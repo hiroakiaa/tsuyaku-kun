@@ -70,6 +70,8 @@ body.phone-home main.phone-home-card>.bottom-nav button[aria-selected=true]{back
 body.phone-home main.phone-home-card>.bottom-nav{grid-template-columns:repeat(5,minmax(0,1fr))}
 .lesson-role-switch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}
 .lesson-role-switch button[aria-pressed=true]{background:linear-gradient(135deg,#dfff9f,#b9ee78);border-color:#70bd50;color:#285f34}
+.shared-language{display:flex;flex-direction:column;gap:6px;max-width:420px;margin-bottom:12px}
+.shared-language select{width:100%;padding:8px 12px}
 .app-shell{padding:12px 16px calc(92px + env(safe-area-inset-bottom));min-height:100dvh}
 header{margin-bottom:12px;min-height:44px}
 body.phone-home main.phone-home-card{min-height:0;padding:16px!important}
