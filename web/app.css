@@ -125,3 +125,19 @@ body.phone-home.mode-active main.phone-home-card{flex:1;display:flex;flex-direct
  .mode-active .call-controls{gap:5px}.mode-active .call-controls button{font-size:12px}
  .mode-active .participants{max-height:28px}.mode-active .face-controls span{font-size:12px}
 }
+/* Keep entry content above the fixed navigation, even on short phones. */
+body.phone-home{padding:0;border:0}
+body.phone-home:not(.mode-active) .app-shell{height:100dvh;min-height:0;display:flex;flex-direction:column}
+body.phone-home:not(.mode-active) .app-shell>header{flex:none;flex-direction:row;flex-wrap:nowrap;gap:8px;min-height:44px}
+body.phone-home:not(.mode-active) main.phone-home-card{flex:1;min-height:0;overflow:auto}
+.header-tools{min-width:0;gap:6px}.header-tools>span{max-width:100px;line-height:1.4}.brand{white-space:nowrap}
+@media(max-height:700px){
+ .app-shell{padding:8px 12px calc(86px + env(safe-area-inset-bottom))}
+ header{margin-bottom:8px}.brand{font-size:20px}
+ body.phone-home:not(.mode-active) main.phone-home-card{padding:10px!important}
+ .phone-home-card .entry-card{padding:12px;gap:10px}
+ .phone-home-card .entry-card label{gap:5px}
+ .phone-home-card .entry-card input,.phone-home-card .entry-card select,.phone-home-card .entry-card button{min-height:44px;padding:8px 12px!important}
+ .lesson-role-switch{gap:8px;margin-bottom:10px}.lesson-role-switch button{min-height:44px;padding:8px!important;font-size:15px}
+}
+@media(max-height:500px){.app-shell{padding-bottom:calc(72px + env(safe-area-inset-bottom))}.mode-active .app-shell{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}}
