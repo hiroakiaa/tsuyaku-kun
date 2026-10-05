@@ -141,3 +141,5 @@ body.phone-home:not(.mode-active) main.phone-home-card{flex:1;min-height:0;overf
  .lesson-role-switch{gap:8px;margin-bottom:10px}.lesson-role-switch button{min-height:44px;padding:8px!important;font-size:15px}
 }
 @media(max-height:500px){.app-shell{padding-bottom:calc(72px + env(safe-area-inset-bottom))}.mode-active .app-shell{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}}
+.brand{flex:0 0 auto}
+.header-tools{flex:1;justify-content:flex-end!important}
