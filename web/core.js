@@ -1,0 +1,28 @@
+export const normalizeLanguage = code => code === 'zh' ? 'zh-CN' : code;
+export const translationField = code => ({ja:'jaText',en:'enText',pt:'ptText',es:'esText',vi:'viText','zh-CN':'zhText',ko:'koText',tl:'tlText',fil:'tlText',id:'idText',ne:'neText'})[code];
+export function translationOf(row, code) {return row[translationField(code)] || (code==='ja' ? row.ja || row.title : code==='en' ? row.en : '') || '';}
+export function glossaryFor(text, glossary) {
+  return glossary.filter(r=>r.ja && text.includes(r.ja)).sort((a,b)=>b.ja.length-a.ja.length).slice(0,16);
+}
+export function protectMath(text) {
+  // Preserve the speaker's numbers/variables; do not invent equations from ambiguous speech.
+  return String(text).normalize('NFC').replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-65248));
+}
+export function parseTranslation(text, targets) {
+  const cleaned = String(text).replace(/<think>[\s\S]*?<\/think>/g,'').replace(/^```(?:json)?\s*|\s*```$/g,'').trim();
+  const start=cleaned.indexOf('{'),end=cleaned.lastIndexOf('}');
+  if(start<0||end<start)throw Error('翻訳の応答を確認できませんでした。');
+  const data=JSON.parse(cleaned.slice(start,end+1));
+  const out={};for(const code of targets){if(typeof data[code]!=='string'||!data[code].trim()||data[code].length>4000)throw Error('翻訳が完了しませんでした。');out[code]=data[code].trim();}
+  return out;
+}
+export function validateCaption(data) {
+  if(typeof data.text!=='string'||!data.text.trim()||data.text.length>1200)throw Error('文章は1200文字以内にしてください。');
+  if(typeof data.id!=='string'||!/^[a-zA-Z0-9_-]{1,80}$/.test(data.id))throw Error('字幕IDを確認してください。');
+  return {id:data.id,text:protectMath(data.text.trim()),final:!!data.final};
+}
+export function csv(rows) {
+  const q=x=>'"'+String(x??'').replace(/"/g,'""')+'"';
+  const safe=x=>/^[=+\-@\t\r]/.test(String(x))?"'"+x:x;
+  return '\uFEFF'+rows.map(r=>r.map(x=>q(safe(x))).join(',')).join('\r\n');
+}

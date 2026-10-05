@@ -1,0 +1,1068 @@
+/* Phone home uses the same cream, green outlines and soft shadows as the call. */
+.header-actions .name-box{display:none;}
+body.phone-home{overflow-y:auto;align-items:start;grid-template-columns:minmax(0,1fr);}
+body.phone-home main{height:auto;max-height:none;min-width:0;overflow:visible;display:flex;flex-direction:column;}
+.phone-home .phone-home-card{flex-shrink:0;}
+#phoneNameDialog:not([open]){display:none;}
+.phone-home-card{position:relative;overflow:visible;min-width:0;box-shadow:0 6px 0 #dfeecc;}
+.phone-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;gap:10px;padding:4px 3px 15px;scrollbar-width:thin;scrollbar-color:#8bc85b #eef7de;}
+.phone-home-card .phone-tabs button{flex:1 0 100px;min-height:54px;padding:12px 18px;border-radius:18px;font-size:17px;font-weight:700;}
+.phone-home-card button{border:2px solid #a0cd79;background:#f4fce9;border-radius:18px;box-shadow:0 3px 0 #e0edcc;transition:background .15s,box-shadow .15s;}
+.phone-home-card button:hover{background:#eaf8d9;}
+.phone-home-card button:active{box-shadow:none;}
+.phone-home-card .phone-tabs [aria-selected="true"]{background:#ddf5bd!important;color:#376b25;border-color:#7ab94e;box-shadow:inset 0 0 0 3px #effbdc,0 3px 0 #d4e9bc;}
+.phone-home-card [role="tabpanel"]{padding:18px 2px 8px;}
+.phone-home-card h2{color:#507f3b;font-size:24px;margin:0 0 18px;}
+.phone-home-card h3{color:#507f3b;margin-top:24px;}
+.phone-home-card p{line-height:1.7;}
+.phone-home-card .phone-form-row{padding:18px;background:#f4fae9;border:1px dashed #b7d794;border-radius:20px;margin-bottom:18px;align-items:end;}
+.phone-home-card input{border:2px solid #c3e39c;border-radius:14px;background:#fffef9;min-height:48px;}
+.phone-home-card input:focus-visible{outline:2px solid #5b993d;outline-offset:2px;}
+.phone-home-card .phone-row{margin:12px 0;padding:16px;background:#f6fbeE;border:1px solid #d7e8c0;border-radius:18px;gap:10px;}
+.phone-row strong{font-size:18px;overflow-wrap:anywhere;}
+.phone-row small{line-height:1.6;}
+.phone-own{justify-content:center;flex-direction:column;margin:0 auto 22px;gap:6px;text-align:center;}
+.phone-own-label{font-size:13px;color:#687d5c;}
+.phone-own strong{font-size:25px;}
+.phone-own-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:6px;}
+.phone-own-actions button{font-size:14px;padding:7px 14px;}
+.phone-dialer{max-width:330px;margin:auto;text-align:center;}
+.phone-home-card .phone-dialer>label{display:block;font-size:14px;color:#607653;margin-bottom:8px;}
+.phone-number-entry{display:flex;align-items:center;margin-bottom:20px;gap:6px;}
+.phone-number-entry #phoneDialNumber{text-align:center;letter-spacing:2px;font-size:28px;width:100%;min-width:0;padding:10px 4px;}
+.phone-home-card #phoneBackspace{flex:0 0 44px;padding:6px;background:transparent;border-color:transparent;box-shadow:none;}
+.phone-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 22px;}
+.phone-home-card .phone-key{border-radius:50%;aspect-ratio:1;min-height:0;min-width:0;width:100%;padding:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#eff9df;border:2px solid #b4d88c;box-shadow:0 4px 0 #dcecc6;gap:0;}
+.phone-key>span{font-size:34px;line-height:1.2;font-weight:500;}
+.phone-key>small{font-size:10px;letter-spacing:2px;line-height:1.5;color:#66804f;}
+.phone-home-card .phone-call{display:flex;align-items:center;justify-content:center;width:78px;height:78px;margin:22px auto 8px;padding:0;border-radius:50%;background:#67b641;border-color:#589f36;color:white;font-size:29px;box-shadow:0 4px 0 #d2e7b7;}
+.phone-home-card .phone-call:hover{background:#559f34;}
+#phoneCancel{display:block;margin:16px auto;}
+#phoneNameDialog::backdrop{background:rgba(40,47,37,.48);}
+#phoneNameDialog label{display:block;margin:20px 0 8px;}
+#phoneNameDialog input{width:100%;box-sizing:border-box;}
+#phoneNameDialog #phoneSaveName{display:block;margin:20px 0 0 auto;}
+@media(max-width:480px){
+ .phone-home-card .phone-tabs button{flex:0 0 96px;font-size:16px;min-height:52px;}
+ .phone-home-card .phone-form-row{padding:13px;}
+ .phone-home-card .phone-form-row>label{flex-basis:100%;}
+ .phone-dialer{max-width:290px;}
+ .phone-keypad{gap:12px 20px;}
+ .phone-key>span{font-size:30px;}
+ .phone-row>button{flex:1 1 auto;}
+ .phone-row>div{flex-basis:100%;}
+ .phone-number-entry #phoneDialNumber{font-size:24px;}
+}
+/* Keep the app shell still; only the selected tab owns overflow. */
+body.phone-home{height:100dvh;min-height:0;overflow:hidden;box-sizing:border-box;}
+body.phone-home main{height:100%;min-height:0;max-height:100%;overflow:hidden;box-sizing:border-box;}
+body.phone-home main>header{flex:0 0 auto;}
+body.phone-home .phone-home-card{display:flex;flex-direction:column;flex:1 1 0;min-height:0;overflow:hidden;}
+.phone-tabs{flex:0 0 auto;}
+.phone-home-card [role="tabpanel"]{flex:1 1 0;min-height:0;overflow-y:auto;overscroll-behavior:contain;}
+#phoneMessage{position:absolute;z-index:8;top:104px;left:50%;width:max-content;max-width:calc(100% - 32px);max-height:3.5em;overflow:hidden;margin:0;font-size:13px;pointer-events:none;opacity:0;transform:translate(-50%,-5px);transition:opacity .22s ease,transform .22s ease;box-shadow:0 5px 18px rgba(50,85,36,.14)}#phoneMessage.is-visible{opacity:1;transform:translate(-50%,0)}
+#phoneDialPanel{display:flex;flex-direction:column;gap:8px;}
+.phone-own{flex:0 0 auto;margin:0;gap:3px;}
+.phone-own-actions{margin:0;}
+.phone-dialer{flex:1 0 290px;min-height:290px;width:100%;max-width:310px;display:grid;grid-template-rows:18px 44px minmax(176px,1fr) 48px;gap:8px;margin:0 auto;}
+.phone-home-card .phone-dialer>label{margin:0;}
+.phone-number-entry{margin:0;}
+.phone-number-entry #phoneDialNumber{min-height:44px;height:44px;padding:4px;}
+.phone-keypad{min-height:0;grid-template-rows:repeat(4,minmax(44px,1fr));gap:6px 18px;}
+.phone-home-card .phone-key{height:100%;max-height:80px;width:auto;max-width:100%;justify-self:center;align-self:center;box-sizing:border-box;padding:0;}
+.phone-home-card .phone-call{width:48px;height:48px;margin:0 auto;font-size:22px;}
+#phoneCancel{flex:0 0 auto;margin:0 auto;}
+@media(max-width:640px), (max-height:740px){
+ body.phone-home{padding:6px max(6px,env(safe-area-inset-right)) max(6px,env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left));}
+ body.phone-home main{padding:8px;gap:8px;border-radius:24px;}
+ body.phone-home main>header{padding:7px 10px;min-height:60px;box-sizing:border-box;gap:8px;}
+ .phone-home header h1{font-size:22px;}
+ .phone-home header .app-icon,.phone-home header .header-icon-btn{width:40px;height:40px;min-height:40px;flex:0 0 40px;}
+ .phone-home .header-actions{gap:8px;}
+ body.phone-home .phone-home-card{padding:8px 10px;border-radius:20px;}
+ .phone-home-card .phone-tabs{gap:8px;padding:2px 2px 8px;}
+ .phone-home-card .phone-tabs button{min-height:44px;flex:0 0 88px;padding:8px 12px;font-size:15px;}
+ .phone-home-card [role="tabpanel"]{padding:8px 0 4px;}
+ .phone-own{flex-direction:row;flex-wrap:wrap;gap:2px 8px;}
+ .phone-own-label{font-size:12px;}
+ .phone-own strong{font-size:18px;letter-spacing:1px;}
+ .phone-own-actions{flex-basis:100%;gap:6px;}
+ .phone-own-actions button{min-height:36px;padding:4px 10px;font-size:12px;}
+ .phone-dialer{max-width:270px;}
+ .phone-key>span{font-size:26px;}
+ .phone-key>small{font-size:8px;line-height:1.1;}
+ #phoneDialPanel{gap:4px;}
+}
+@media(max-height:640px) and (max-width:640px){
+ .phone-home-card .phone-dialer>label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
+ .phone-dialer{min-height:298px;flex-basis:298px;grid-template-rows:44px minmax(194px,1fr) 48px;gap:6px;}
+}
+/* A shared key size keeps the circles and their spacing balanced. */
+#phoneDialForm{container-type:size;flex:1 0 304px;min-height:304px;display:flex;flex-direction:column;justify-content:flex-start;gap:6px;max-width:360px;}
+#phoneDialForm>*{--dial-gap:clamp(4px,1.5cqh,14px);--dial-key:clamp(44px,min(calc((100cqw - 48px) / 3),calc((100cqh - 76px - 3 * var(--dial-gap)) / 5)),80px);flex-shrink:0;}
+.phone-number-entry{position:relative;width:100%;height:52px;}
+.phone-number-entry label{position:absolute;left:12px;top:5px;display:block;min-width:0;font-size:10px;line-height:14px;color:#617650;pointer-events:none;}
+.phone-home-card .phone-number-entry #phoneDialNumber{height:52px;min-height:52px;padding:18px 8px 2px;font-size:25px;line-height:28px;}
+#phoneDialForm .phone-keypad{grid-template-rows:repeat(4,var(--dial-key));grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--dial-gap) 22px;width:calc(3 * var(--dial-key) + 44px);align-self:center;}
+#phoneDialForm .phone-key{width:var(--dial-key);height:var(--dial-key);max-height:none;}
+#phoneDialForm .phone-key>span{font-size:clamp(24px,calc(var(--dial-key) * .45),31px);}
+.phone-dial-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;align-items:center;justify-items:center;width:calc(3 * var(--dial-key) + 44px);align-self:center;height:calc(var(--dial-key) + 8px);}
+#phoneDialForm .phone-call{grid-column:2;width:calc(var(--dial-key) + 8px);height:calc(var(--dial-key) + 8px);min-height:0;font-size:clamp(25px,calc(var(--dial-key) * .45),31px);}
+#phoneDialForm #phoneBackspace{grid-column:3;width:clamp(48px,var(--dial-key),60px);height:clamp(48px,var(--dial-key),60px);padding:0;min-height:48px;border:2px solid #bad895;border-radius:18px;background:#f1f9e5;box-shadow:0 3px 0 #dcecc6;font-size:26px;}
+
+@media(min-height:641px){#phoneDialPanel{gap:16px;padding-top:14px;}.phone-own{margin-bottom:0;}}
+/* Separate the control groups, while keeping the own-number area nearby. */
+#phoneDialPanel{gap:10px;}
+.phone-own{gap:5px 10px;}
+.phone-own-label{font-size:14px;}
+.phone-own strong{font-size:24px;}
+.phone-own-actions button{min-height:44px;font-size:14px;padding:7px 14px;}
+#phoneDialForm{gap:14px;min-height:336px;flex-basis:336px;margin:0 auto;}
+#phoneDialForm>*{--dial-key:clamp(44px,min(calc((100cqw - 48px) / 3),calc((100cqh - 104px - 3 * var(--dial-gap)) / 5)),80px);}
+.phone-number-entry{height:64px;}
+.phone-number-entry label{left:16px;top:7px;font-size:11px;}
+.phone-home-card .phone-number-entry #phoneDialNumber{height:64px;min-height:64px;padding:24px 16px 8px;font-size:25px;line-height:28px;}
+@media(max-height:640px){
+ #phoneDialPanel{gap:4px;padding-top:6px;padding-bottom:2px;}
+ .phone-own{gap:2px 8px;}
+ .phone-own-label{font-size:12px;}
+ .phone-own strong{font-size:18px;}
+ .phone-own-actions button{min-height:36px;padding:4px 10px;font-size:12px;}
+ #phoneDialForm{gap:8px;min-height:312px;flex-basis:312px;}
+ #phoneDialForm>*{--dial-gap:4px;--dial-key:clamp(44px,min(calc((100cqw - 48px) / 3),calc((100cqh - 84px - 3 * var(--dial-gap)) / 5)),80px);}
+ .phone-number-entry{height:56px;}
+ .phone-number-entry label{top:5px;font-size:10px;}
+ .phone-home-card .phone-number-entry #phoneDialNumber{height:56px;min-height:56px;padding:20px 14px 6px;font-size:22px;line-height:26px;}
+ body.phone-home main{gap:6px;padding-top:6px;padding-bottom:6px;}
+}
+#phoneDialPanel{container-type:size;align-items:center;gap:0;padding:8px 0;}
+.phone-dial-content{--phone-key-size:clamp(48px,min(calc((100cqw - 80px) / 3),calc((100cqh - 200px) / 5)),80px);display:flex;flex-direction:column;gap:10px;flex:0 0 auto;width:min(100%,360px);margin:auto;}
+.phone-dial-content .phone-own{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;row-gap:2px;width:100%;text-align:left;}
+.phone-dial-content .phone-own-label{grid-column:1;grid-row:1;}
+.phone-dial-content .phone-own strong{grid-column:1;grid-row:2;white-space:nowrap;letter-spacing:1px;font-size:clamp(18px,6cqw,24px);}
+.phone-dial-content .phone-own-actions{grid-column:2;grid-row:1 / 3;flex-wrap:nowrap;gap:4px;align-items:center;}
+.phone-dial-content .phone-own-icon{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;min-height:44px;padding:0;border:1px solid #d7e5c7;border-radius:13px;background:#f7faef;color:#668254;box-shadow:none;font-size:20px;}
+#phoneDialForm{container-type:normal;flex:none;min-height:0;height:auto;width:100%;margin:0;}
+#phoneDialForm>*{--dial-key:var(--phone-key-size);--dial-gap:clamp(4px,1cqh,12px);}
+@media(max-height:640px){#phoneDialPanel{padding:2px 0;}.phone-dial-content{--phone-key-size:clamp(48px,min(calc((100cqw - 80px) / 3),calc((100cqh - 150px) / 5)),80px);gap:6px;}#phoneDialForm>*{--dial-gap:4px;}.phone-dial-content .phone-own-label{font-size:11px;}}
+.phone-dial-content .phone-own:has(#phoneCreateNumber:not([hidden])) strong{display:none;}
+.phone-dial-content .phone-own:has(#phoneCreateNumber:not([hidden])) .phone-own-label{grid-row:1 / 3;align-self:center;}
+#phoneDialForm #phoneBackspace{border:0;background:transparent;box-shadow:none;}
+#phoneDialForm #phoneBackspace:hover,#phoneDialForm #phoneBackspace:active{background:transparent;box-shadow:none;}
+#phoneDialForm #phoneBackspace{position:relative;overflow:visible;}
+#phoneDialForm #phoneBackspace small{position:absolute;top:calc(50% + 15px);left:50%;display:flex;flex-direction:column;align-items:center;transform:translateX(-50%);font-size:9px;font-weight:700;line-height:1.15;white-space:nowrap;color:#718663;pointer-events:none;}
+#phoneDialForm .phone-dial-actions{height:calc(var(--dial-key) + 34px);align-items:start;}
+#phoneDialPanel{position:relative;padding-top:64px;}
+#phoneOwnToggle{position:absolute;right:4px;top:6px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 8px;background:transparent;border:0;box-shadow:none;min-height:48px;color:#60794d;}
+#phoneOwnToggle i{font-size:22px;}
+#phoneOwnToggle span{font-size:10px;}
+#phoneOwnDetails{position:absolute;right:4px;top:65px;z-index:5;width:min(320px,calc(100% - 8px));box-sizing:border-box;display:flex;flex-direction:row;justify-content:space-between;gap:8px;padding:16px;background:#fffef8;border:1px solid #bad795;border-radius:18px;box-shadow:0 6px 20px #30462d20;opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .18s,transform .18s,visibility .18s;}
+#phoneOwnDetails.is-visible{opacity:1;visibility:visible;transform:translateY(0);}
+#phoneOwnDetails .phone-own-label{flex-basis:100%;text-align:left;font-size:12px;}
+#phoneOwnDetails strong{font-size:22px;}
+#phoneOwnDetails .phone-own-actions{flex-basis:auto;}
+#phoneOwnDetails .phone-own-icon{position:relative;width:44px;height:44px;padding:0;display:grid;place-items:center;border:1px solid #d7e5c7;background:#f7faef;box-shadow:none;font-size:20px;}
+.phone-copy-note{position:absolute;bottom:calc(100% + 8px);right:0;white-space:nowrap;font-size:11px;font-weight:400;line-height:1.5;padding:5px 8px;border-radius:8px;background:#30462d;color:white;pointer-events:none;z-index:6;}
+#phoneDialForm .phone-number-entry,#phoneDialForm .phone-number-entry #phoneDialNumber{background:transparent;border:0;box-shadow:none;}
+#phoneDialForm .phone-number-entry #phoneDialNumber{font-size:clamp(30px,10cqw,40px);padding:8px;text-align:center;line-height:1.2;}
+#phoneNameDialog{position:fixed;inset:0;margin:auto;width:min(36rem,calc(100% - 32px));max-height:88dvh;height:auto;overflow-y:auto;transform:none;transition:none;box-sizing:border-box;}
+#phoneNameDialog[open]{display:grid;grid-template-columns:1fr;grid-template-rows:auto auto;align-content:start;min-height:0;height:fit-content;padding:20px;gap:12px;opacity:1;pointer-events:auto;}
+#phoneNameDialog::backdrop{background:rgba(30,35,38,.58);}
+#phoneNameClose{flex:0 0 44px;width:44px;height:44px;min-height:44px;padding:0;border:1px solid #cad8b9;border-radius:10px;background:#fffef8;color:#30462d;font-size:14px;box-shadow:none!important;}
+#phoneNameClose::before,#phoneNameClose::after{display:none;}
+#phoneNameDialog input{box-sizing:border-box;width:100%;min-height:48px;padding:10px;border:2px solid #c3e39c;border-radius:14px;background:#fffef9;color:#30462d;font-size:18px;}
+@media(prefers-reduced-motion:reduce){#phoneOwnDetails{transition:none;}}
+@media(max-height:640px){#phoneDialPanel{padding-top:52px;padding-bottom:2px;}#phoneOwnToggle{top:2px;}}
+#phoneDialPanel{padding:8px 0;}
+.phone-dial-content{position:relative;}
+#phoneOwnToggle{position:static;align-self:flex-end;flex:0 0 auto;margin:0 6px 0 0;}
+#phoneOwnDetails{right:6px;top:58px;}
+@media(max-height:640px){#phoneDialPanel{padding:0;}.phone-dial-content{gap:0;}#phoneOwnToggle{margin-bottom:2px;}}
+#phoneDialPanel{--own-inset:clamp(12px,4cqw,24px);padding-top:72px;}
+.phone-dial-content{position:static;}
+#phoneOwnToggle{position:absolute;top:var(--own-inset);right:var(--own-inset);margin:0;}
+#phoneOwnDetails{right:var(--own-inset);top:calc(var(--own-inset) + 52px);}
+@media(max-height:640px){#phoneDialPanel{--own-inset:10px;padding-top:56px;}}
+
+/* Phone flows: clear state, comfortable tap targets, and one visual language. */
+.history-row>i{width:28px;text-align:center;color:#5e8d48;font-size:19px}.history-row.is-missed>i,.history-row.is-missed strong{color:#b5414e}.history-count{display:inline-block;padding:2px 7px;border-radius:999px;background:#e4f3d2;color:#507b3d;font-size:11px}.history-row>div,.contact-row>div{flex:1 1 170px}.account-safety{margin:0 0 14px;padding:14px 16px;border:2px solid #d7b950;border-radius:16px;background:#fff8cf;color:#4c4a32;line-height:1.6}.account-safety strong{color:#704f18}
+.history-row>div>strong{display:block;font-size:20px}.history-row>div>small:first-of-type{font-variant-numeric:tabular-nums;letter-spacing:1px;color:#53664b}.history-details{margin-top:7px}.history-details summary{width:max-content;color:#47743b;font-weight:700;cursor:pointer}.history-details>div{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-top:1px solid #dcebcf;font-size:12px}.history-details time{color:#64725e}.call-result-actions{display:grid;gap:9px;margin-top:18px}.call-result-actions button{width:100%}.call-result-dialog #phoneCallResultName{display:block;font-size:24px;margin-top:12px}.call-result-dialog #phoneCallResultNumber{display:block;margin-top:5px;letter-spacing:2px;color:#63725b}
+.group-member-list{display:grid;gap:8px;margin:12px 0}.group-member-list>div{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:14px;background:#f1f8e7}.group-member-list button{min-height:38px;padding:6px 12px}
+.group-detail-dialog{width:min(570px,calc(100% - 28px));max-height:min(88dvh,760px);padding:24px;overflow-y:auto}.group-detail-dialog .number-head{align-items:flex-start}.group-detail-dialog .number-head>div{min-width:0}.group-detail-dialog .number-head h2{overflow-wrap:anywhere}.group-member-count{margin:5px 0 0;color:#66765e;font-size:14px}.group-call-status{display:flex;align-items:center;gap:10px;margin:14px 0;padding:11px 13px;border-radius:14px;background:#f1f8e7;color:#4f6845}.group-call-status i{flex:0 0 28px;text-align:center}.group-call-status p{margin:0;font-size:14px;line-height:1.5}.group-dialog-section{margin-top:16px;padding:16px;border:1px solid #d5e6c5;border-radius:18px;background:#fbfdf7}.group-dialog-section>h3{display:flex;align-items:center;gap:8px;margin:0 0 13px;color:#46663b;font-size:17px}.group-dialog-section>h3 i{width:20px;text-align:center;color:#6ba24e}.group-dialog-section .support-mode-picker{margin:0}.group-primary-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.group-primary-actions button{flex:1 1 130px;min-height:48px}.group-primary-actions #groupJoin{background:#62b43e;color:#fff;border-color:#559f38}.group-detail-dialog .group-member-list{margin:0}.group-invite-area{margin-top:14px;padding-top:14px;border-top:1px solid #dbe9ce}.group-invite-area>label{display:block;margin-bottom:7px;color:#58704c;font-size:13px;font-weight:700}.group-invite-area>div,.group-owner-tools>div{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px}.group-invite-area select,.group-owner-tools input{width:100%;min-width:0;box-sizing:border-box;margin:0!important;min-height:48px;padding:9px 11px;border:1px solid #bcd69f;border-radius:13px;background:#fffef8;color:#30462d;font-size:16px}.group-link-button{width:100%;margin-top:9px;background:#f4fae9!important;box-shadow:none!important}.group-owner-tools>div button{min-height:48px}.group-danger-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:9px;margin-top:18px;padding-top:16px;border-top:1px solid #e7d8d8}.group-danger-actions button{min-height:44px;background:#fffaf7;box-shadow:none}.group-danger-actions #groupDelete{border-color:#d99a9f;color:#a53843}.group-danger-actions #groupQuit{color:#61705a}.group-detail-dialog [hidden]{display:none!important}
+.group-member-list>div{border:1px solid transparent}.group-member-list>div.is-online{border-color:#8fc86a;background:#e8f7d8}.group-member-list>div>span{display:flex;align-items:center;gap:8px}.group-presence-dot{width:9px;height:9px;border-radius:50%;background:#aab4a4}.is-online .group-presence-dot{background:#57ad39;box-shadow:0 0 0 4px #d9efc8}.group-manage-toggle{display:flex;align-items:center;gap:8px;margin:14px 0 0 auto;background:transparent!important;border:0!important;box-shadow:none!important;color:#58704c;text-decoration:underline}.group-owner-tools.is-visible{max-height:400px!important;padding:16px!important;margin-top:10px!important}.group-pending-invites{display:grid!important;grid-template-columns:1fr!important;gap:7px!important;margin-top:10px}.group-pending-invites:empty{display:none!important}.group-pending-invites>div{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:12px;background:#f5faec;font-size:13px}.group-pending-invites button{min-height:36px;padding:5px 9px}.group-member-actions{display:flex;justify-content:flex-end;margin-top:12px}.group-member-actions button{background:transparent;box-shadow:none;color:#61705a}.group-card-status{display:flex!important;align-items:center;gap:6px}.group-card-status.is-live{color:#438331;font-weight:700}.group-card-status i{font-size:9px}.group-row>div:first-child{flex:1 1 auto;min-width:0}.group-row-actions{display:flex;flex:0 0 auto;justify-content:flex-end;gap:8px;margin-left:auto}.group-row-actions button:last-child{min-width:108px;padding-inline:18px;background:#f4fce9;color:#30462d;border-color:#a0cd79;box-shadow:0 3px 0 #e0edcc}.group-row-actions button:last-child:hover{background:#eaf8d9}.group-invite-summary{display:block;margin-top:4px;color:#63725b;font-size:12px}
+@media(max-width:480px){.group-detail-dialog{padding:18px 16px;border-radius:24px}.group-dialog-section{padding:14px 12px}.group-dialog-section .support-mode-picker{grid-template-columns:1fr 1fr}.group-dialog-section .support-mode-picker span{min-height:52px;font-size:14px}.group-invite-area>div,.group-owner-tools>div{grid-template-columns:1fr}.group-invite-area button,.group-owner-tools button{width:100%}.group-danger-actions{display:grid;grid-template-columns:1fr}.group-danger-actions button{width:100%}.group-row-actions{margin-left:auto}}
+.number-modal.incoming-call{width:min(420px,calc(100% - 28px));padding:28px;text-align:center;border:2px solid #78b952;border-radius:28px;background:#fffef8;box-shadow:0 20px 70px #13200f55}.incoming-call::backdrop{background:rgba(25,32,23,.66)}.incoming-pulse{display:grid;place-items:center;width:72px;height:72px;margin:0 auto 10px;border-radius:50%;background:#e1f6c8;color:#4d9634;font-size:30px;animation:incomingPulse 1.5s ease-in-out infinite}.incoming-label{margin:0;color:#668057;font-size:14px}.incoming-call h2{margin:8px 0 4px;font-size:28px;color:#34562d}.incoming-call #numberCallerNumber{display:block;font-size:20px;letter-spacing:2px}.incoming-actions{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin:26px auto 18px}.incoming-actions button{display:flex;flex-direction:column;align-items:center;gap:7px;min-height:76px;border:0;border-radius:22px;color:white;font-weight:700}.incoming-actions button i{font-size:25px}.incoming-actions #numberDecline{background:#d5535e}.incoming-actions #numberAccept{background:#61b43d}.incoming-block{border:0!important;background:transparent!important;box-shadow:none!important;text-decoration:underline;color:#79575a}@keyframes incomingPulse{50%{transform:scale(1.08);box-shadow:0 0 0 12px #e1f6c855}}@media(prefers-reduced-motion:reduce){.incoming-pulse{animation:none}}
+@media(max-width:480px){.contact-row button,.history-row button{min-height:44px}.incoming-call{padding:22px 18px}.incoming-actions{gap:18px}}
+.qr-dialog{text-align:center}.phone-qr-image{width:min(260px,75vw);margin:18px auto;padding:10px;border-radius:16px;background:white}.phone-qr-image svg{display:block;width:100%;height:auto}.qr-dialog>strong{font-size:24px;letter-spacing:2px}
+
+.phone-list-tools{display:flex;gap:10px;align-items:center;margin:0 0 14px}.phone-list-tools input{flex:1 1 220px}.phone-list-tools button{min-height:46px}.phone-setting-check{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:15px;background:#f4fae9}.phone-setting-check input{min-height:22px;width:22px}
+@media(max-width:480px){.phone-list-tools{flex-wrap:wrap}.phone-list-tools button{width:100%}}
+#phoneQrVideo{display:block;width:min(360px,80vw);aspect-ratio:1;object-fit:cover;margin:14px auto;border:2px solid #9acb72;border-radius:18px;background:#172018}#phoneDialConfirmName,#phoneDialConfirmNumber{display:block;margin:8px auto;font-size:22px}#phoneDialConfirmNumber{letter-spacing:3px}.contact-row [data-favorite]{flex:0 0 46px;color:#bb8b18}
+#phoneDialConfirmCancel{background:#d5535e!important}#phoneDialConfirmCall{background:#61b43d!important}
+.phone-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.phone-home-card .phone-panel-head h2{margin:0}.phone-home-card .phone-panel-icon{display:grid;place-items:center;width:48px;height:48px;min-height:48px;padding:0;border-radius:50%;font-size:19px}.phone-collapsible{max-height:0!important;margin-top:0!important;margin-bottom:0!important;padding-top:0!important;padding-bottom:0!important;border-width:0!important;opacity:0;visibility:hidden;overflow:hidden;transform:translateY(-5px);transition:max-height .25s ease,opacity .2s ease,transform .2s ease,margin .25s ease,padding .25s ease,border-width .25s ease,visibility .25s}.phone-collapsible.is-visible{max-height:320px!important;margin-bottom:14px!important;padding-top:14px!important;padding-bottom:14px!important;border-width:1px!important;opacity:1;visibility:visible;transform:translateY(0)}#phoneHistoryTools.is-visible{display:flex;padding-left:14px!important;padding-right:14px!important}.frequent-section{margin-top:12px}.phone-home-card .frequent-section h3,.phone-home-card .history-section h3{margin:12px 0 9px;font-size:17px}.frequent-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.frequent-card{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;align-items:center;justify-items:center;gap:8px 7px;min-width:0;padding:14px 8px;border:1px solid #cfe5b7;border-radius:22px;background:linear-gradient(145deg,#f5fce9,#e9f7d7);box-shadow:0 3px 0 #dfedce}.frequent-card>i{grid-column:1 / 3;font-size:42px;color:#76aa58}.phone-home-card .frequent-card button{display:grid;place-items:center;width:36px;height:36px;min-height:36px;padding:0;border-radius:50%;background:#63b540;color:white;border-color:#57a038;box-shadow:none}.frequent-card strong{min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;justify-self:start}.frequent-empty{grid-column:1 / 4;margin:0;padding:14px;text-align:center;color:#68785f;background:#f5faed;border-radius:16px;font-size:13px}.history-section{margin-top:17px}.history-row>i{flex:0 0 36px;width:36px;height:36px;display:grid;place-items:center;border-radius:50%;background:#e4f3d4}.history-row.is-missed>i{background:#fae5e7}.phone-add-fab{position:sticky;left:calc(100% - 60px);bottom:8px;display:grid!important;place-items:center;width:56px;height:56px;min-height:56px!important;padding:0!important;border-radius:50%!important;background:#62b43e!important;color:white;font-size:22px;z-index:4;box-shadow:0 5px 0 #d8e9c5!important}#phoneContactsPanel{position:relative;padding-bottom:12px}.phone-home-card #phoneContactForm{display:flex;padding-left:14px;padding-right:14px}.phone-home-card #phoneContactForm:not(.is-visible){display:flex}
+@media(max-width:480px){.frequent-list{gap:7px}.frequent-card{padding:12px 5px}.frequent-card>i{font-size:36px}.frequent-card strong{font-size:12px}.history-row>i{align-self:flex-start}.phone-home-card #phoneHistoryTools.is-visible{flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){.phone-collapsible{transition:none}}
+.contact-section{margin-top:8px}.phone-home-card .contact-section>h3{position:sticky;top:-8px;z-index:2;margin:0;padding:7px 10px;border-bottom:2px solid #a9cf83;background:#fffef8eF;color:#4f7a3e;font-size:14px;backdrop-filter:blur(5px)}.contact-section .contact-row{margin:7px 0}.contact-section+.contact-section{margin-top:18px}
+.history-date-section{min-width:0;margin:0 0 18px}.phone-home-card .history-date-section>h3{position:sticky;top:-8px;z-index:2;display:flex;align-items:center;gap:7px;margin:0 0 8px;padding:8px 10px;border-bottom:2px solid #a9cf83;background:#fffef8ef;color:#4f7a3e;font-size:14px;font-weight:800;backdrop-filter:blur(5px)}.history-date-section>h3 i{color:#69a34c}.history-date-list{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}.history-date-list .history-row{margin:0}
+.phone-home-card .phone-add-fab{position:absolute;right:18px;bottom:18px;left:auto;display:grid!important;place-items:center;width:62px;height:62px;min-height:62px!important;padding:0!important;border:3px solid #83bd5c;border-radius:50%!important;background:#effadd!important;color:#4d8735;font-size:24px;box-shadow:0 5px 0 #cfe5b5,0 8px 24px #35552b30!important;z-index:20}.phone-home-card .phone-add-fab:hover,.phone-home-card .phone-add-fab:focus-visible{background:#dff3c5!important;color:#376d25}.contact-form-dialog{width:min(460px,calc(100% - 28px));padding:24px;border:2px solid #78b952;border-radius:28px;background:#fffef8;color:#30462d;box-shadow:0 20px 70px #13200f55}.contact-form-dialog::backdrop{background:rgba(25,32,23,.66)}.contact-form-dialog .phone-form-row{display:grid;grid-template-columns:1fr;gap:12px;margin:16px 0;padding:0;background:transparent;border:0}.contact-form-dialog label{display:grid;gap:5px;text-align:left;font-weight:700;color:#526d46}.contact-form-dialog input{width:100%;box-sizing:border-box;min-height:48px;padding:10px 12px;border:2px solid #c3e39c;border-radius:14px;background:#fffef9;font-size:17px}.contact-form-dialog>#phoneAddContact{display:block;width:100%;min-height:58px;padding:13px 22px;border:2px solid #7fba57;border-radius:18px;background:#dcf4c1;color:#2f5923;font-size:19px;font-weight:800;box-shadow:0 4px 0 #c8e3ad}.frequent-card>i{font-size:52px}
+@media(max-width:540px){.history-row>button span{display:none}.phone-home-card .history-row>button{flex:0 0 46px;width:46px;min-height:46px;padding:0;display:grid;place-items:center}.history-row>button i{font-size:17px}.phone-home-card .phone-add-fab{right:12px;bottom:12px;width:58px;height:58px;min-height:58px!important}.frequent-card>i{font-size:48px}}
+
+.phone-home-card .phone-add-fab[hidden]{display:none!important}
+
+.support-mode-picker{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:18px 0 4px;padding:0;border:0}.support-mode-picker legend{grid-column:1/-1;width:100%;margin-bottom:7px;color:#58704c;font-size:13px;font-weight:700;text-align:left}.support-mode-picker label{position:relative;min-width:0}.support-mode-picker input{position:absolute;opacity:0;pointer-events:none}.support-mode-picker span{display:flex;align-items:center;justify-content:center;gap:7px;min-height:52px;padding:7px 10px;border:2px solid #c9dfa9;border-radius:16px;background:#f6fbe9;color:#405b36;font-weight:700;cursor:pointer;box-sizing:border-box}.support-mode-picker input:checked+span{border-color:#69ad45;background:#ddf4bd;box-shadow:0 3px 0 #c4dfa4}.support-mode-picker input:focus-visible+span{outline:3px solid #345cbe;outline-offset:2px}.support-mode-picker input:disabled+span{cursor:default;opacity:.72}.active-support-mode{flex:0 0 auto;padding:4px 9px;border:1px solid #a9cf83;border-radius:999px;background:#f0f9e3;color:#4c7040;font-size:12px;font-weight:700;white-space:nowrap}@media(max-width:420px){.support-mode-picker{grid-template-columns:1fr}.support-mode-picker span{min-height:48px}.active-support-mode{font-size:10px;padding:3px 6px}}
+
+.audio-health{grid-template-columns:auto minmax(4rem,1fr) auto auto}
+
+.support-proof{margin:8px 0 14px;padding:9px 12px;border-radius:12px;background:#eef8df;color:#44663a;font-weight:700;font-size:13px}.phone-default-mode{max-width:560px;margin-bottom:8px}
+
+.account-help-head{display:flex;align-items:center;gap:8px;margin-top:22px}.phone-home-card .account-help-head h2{margin:0}.phone-home-card .account-help-head .phone-panel-icon{width:40px;height:40px;min-height:40px;padding:0;border-radius:50%;font-size:17px}.account-help-panel{border:1px solid #cfe3b9;border-radius:16px;background:#f8fced}.account-help-panel.is-visible{max-height:520px!important;padding-left:14px!important;padding-right:14px!important}.account-help-panel .account-safety{margin-top:0}.account-help-panel .phone-note{margin:8px 0}#accountActions[hidden]{display:none!important}.account-fields{margin-top:12px}
+#phoneSettingsPanel>h2,#phoneSettingsPanel>h3,.account-help-head{padding-bottom:10px;border-bottom:1px solid #d5e6c5}#phoneSettingsPanel>h2{margin:4px 0 10px}#phoneSettingsPanel>h3{margin:24px 0 12px;font-size:18px}.account-help-head{justify-content:flex-start}.account-fields,#accountActions,#phoneSettingsPanel>.phone-setting-check,#phoneSettingsPanel>#phoneBlocks{padding:12px 14px;border-radius:16px;background:#f7fbef}
+
+/* Quiet by default: headings organize the screen and optional explanations stay behind ?. */
+.phone-section-head,.setting-title-row,.account-help-head{min-height:48px;padding:0 0 10px;border-bottom:1px solid #d8e7cc}.phone-section-head{margin-bottom:14px}.setting-title-row{display:flex;align-items:center;justify-content:flex-start;gap:8px}.setting-title-row h2,.phone-section-head h2{margin:0!important}.phone-help-icon{display:grid;place-items:center;width:40px;height:40px;min-height:40px;padding:0;border:1px solid #b9d79e;border-radius:50%;background:#f5fbe9;color:#47763a;font-size:17px}.phone-help-icon[aria-expanded="true"]{background:#def2c7;border-color:#71ae4e}.setting-help-panel{border:1px solid #d1e3bf;border-radius:14px;background:#f8fbed}.setting-help-panel.is-visible{max-height:140px!important;padding:10px 13px!important;margin:8px 0 12px!important}.setting-help-panel p{margin:0;color:#576a50;font-size:13px;line-height:1.65}.phone-primary-form{padding:12px!important;border-radius:16px;background:#f7fbef}.phone-primary-form input{min-width:0}.setting-status:empty{display:none}.setting-status{margin:8px 2px 0;color:#5e7157}.phone-home-card [role="tabpanel"]>h2,.phone-home-card [role="tabpanel"]>.phone-panel-head:first-child{color:#3d6f32}.number-head{padding-bottom:12px;border-bottom:1px solid #d8e7cc}.number-head h2{margin:0}.number-head button{display:grid;place-items:center;width:44px;height:44px;min-height:44px;padding:0;border-radius:14px}.phone-home-card button,.number-modal button,.call-tips button{-webkit-user-select:none;user-select:none}.visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+@media(max-width:480px){.phone-section-head,.setting-title-row,.account-help-head{min-height:44px;padding-bottom:8px}.phone-primary-form{display:grid!important;grid-template-columns:minmax(0,1fr) auto}.phone-primary-form button{width:auto!important;padding-inline:16px}.setting-title-row h2,.phone-section-head h2{font-size:20px!important}}
+
+/* Shared visual language for lists, settings, and empty screens. */
+:root{--phone-surface:#fffef8;--phone-soft:#f5faec;--phone-line:#d6e6c8;--phone-ink:#30482d;--phone-muted:#64735e;--phone-accent:#63ad43}
+.phone-home-card [role="tabpanel"]{color:var(--phone-ink)}
+.phone-home-card .phone-row{border:1px solid var(--phone-line);border-radius:16px;background:var(--phone-surface);box-shadow:0 2px 0 #e6efdc}
+.phone-empty-state{display:grid;place-items:center;align-content:center;gap:9px;min-height:120px;margin:10px 0;padding:20px;border:1px dashed #cadfba;border-radius:18px;background:var(--phone-soft);color:var(--phone-muted);font-size:13px;text-align:center}
+.phone-empty-state i{font-size:27px;color:#82ae68}
+.setting-subtitle-row{margin-top:24px}.setting-subtitle-row h3{margin:0!important;font-size:18px}.setting-subtitle-row+.setting-help-panel+.phone-form-row{padding:12px 14px;border-radius:16px;background:var(--phone-soft)}
+.caption-heading-actions{display:flex;align-items:center;gap:8px}.panel-icon-button{display:grid;place-items:center;width:42px;height:42px;min-height:42px;padding:0;border:1px solid #b9d79e;border-radius:50%;background:#f5fbe9;color:#47763a}.panel-icon-button[aria-expanded="true"]{background:#def2c7;border-color:#71ae4e}.term-form{margin:8px 0 12px;padding:10px;border:1px solid var(--phone-line);border-radius:16px;background:var(--phone-soft)}.term-empty{display:grid;place-items:center;min-height:84px;margin:0;border:1px dashed #cadfba;border-radius:16px;color:var(--phone-muted);background:#fbfdf7}.caption-dialog-header{padding-bottom:12px;border-bottom:1px solid var(--phone-line)}
+.phone-home-card input,.phone-home-card select,.number-modal input,.number-modal select,.caption-dialog input,.caption-dialog select{border-color:#c7dfa9;background:#fffef9;color:var(--phone-ink)}
+.phone-home-card button,.number-modal button,.caption-dialog button,.call-tips button{font-family:inherit}
+@media(max-width:480px){.phone-empty-state{min-height:96px}.caption-heading-actions{gap:6px}.panel-icon-button{width:40px;height:40px;min-height:40px}}
+
+/* Keep the group call action as bright and inviting as the main join action. */
+.group-primary-actions #groupJoin{
+ position:relative;isolation:isolate;width:100%;min-height:62px;flex-basis:100%;
+ border:2px solid #79b94f;border-radius:18px;
+ background:linear-gradient(135deg,#edffcb 0%,#dff5b5 100%);
+ color:#355c2d;font-size:18px;font-weight:800;
+ box-shadow:0 4px 0 #cee5ae;
+}
+.group-primary-actions #groupJoin::before{
+ content:"";display:block!important;position:absolute;z-index:-1;inset:5px;
+ border:1px dashed rgba(83,143,54,.58);border-radius:12px;pointer-events:none;
+}
+.group-primary-actions #groupJoin:hover{background:linear-gradient(135deg,#e5fac0 0%,#d4efaa 100%);}
+.group-primary-actions #groupJoin:disabled{opacity:.58;box-shadow:none;}
+
+/* Self identity uses the same light surfaces as the rest of the application. */
+body.is-in-call .participants .participant.is-self,
+body.is-one-to-one.is-in-call .participants .participant.is-self{
+ flex-basis:7rem;width:7rem;height:4.35rem;margin-left:auto;
+ border:2px solid #76b955;border-radius:1.35rem;
+ background:linear-gradient(145deg,#efffd0 0%,#d9f3ad 100%);
+ color:#32702d;box-shadow:0 4px 0 #d4e8b8;
+}
+body.is-one-to-one.is-in-call .participants .participant.is-self{margin-left:0;}
+body.is-in-call .participants .participant.is-self::before{border-radius:.95rem;border-color:rgba(91,153,57,.55);}
+body.is-in-call .participants .participant.is-self .avatar-initial{font-size:1.25rem;color:#2f7130;}
+body.is-in-call .participants .participant.is-self .participant-state-badge{
+ left:0;right:0;top:calc(100% + 7px);width:100%;max-width:none;
+ transform:none;box-sizing:border-box;justify-content:center;
+ border:1px solid #9bc879;background:#f4fbe8;color:#41663a;
+ box-shadow:0 2px 0 #dfebcf;font-size:11px;
+}
+body.is-in-call .participants .participant.is-self .participant-state-badge.is-connected,
+body.is-in-call .participants .participant.is-self .participant-state-badge.is-speaking{
+ background:#e5f7cf;color:#31652d;border-color:#82bd5e;
+}
+body.is-in-call .participants .participant.is-self .participant-state-badge.is-muted{
+ background:#f4f5ed;color:#64705d;border-color:#c7d2ba;
+}
+
+/* Below tablet width only the tab strip may scroll sideways. Panel content wraps vertically. */
+@media(max-width:670px){
+ html,body,body.phone-home{max-width:100%;overflow-x:hidden}
+ body.phone-home main,.phone-home .phone-home-card{width:100%;max-width:100%;min-width:0}
+ .phone-home-card [role="tabpanel"]{width:100%;max-width:100%;min-width:0;overflow-x:hidden}
+ .phone-home-card [role="tabpanel"] *{box-sizing:border-box;max-width:100%}
+ .phone-home-card .phone-tabs{max-width:100%;overflow-x:auto}
+ .phone-home-card .phone-row{width:100%;min-width:0;align-items:center}
+ .phone-home-card .phone-row>div,.phone-home-card .phone-row>span{min-width:0;overflow-wrap:anywhere}
+ .phone-home-card .phone-form-row,.phone-home-card .phone-list-tools{width:100%;min-width:0;flex-wrap:wrap}
+ .phone-home-card .phone-form-row>label,.phone-home-card .phone-list-tools>input{min-width:0;flex:1 1 100%}
+ .phone-home-card .account-fields{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+ .phone-home-card #accountActions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+ .phone-home-card #accountActions[hidden]{display:none!important}
+ .history-details summary{width:auto;max-width:100%;overflow-wrap:anywhere}
+ .history-details>div{flex-wrap:wrap}
+ .number-modal,.call-tips,.app-info-tooltip,.metrics-modal-card,.caption-dialog{width:calc(100% - 24px);max-width:calc(100% - 24px);overflow-x:hidden}
+ .number-modal .phone-form-row,.number-modal #groupInviteArea,.caption-dialog .analogy-controls{min-width:0;flex-wrap:wrap}
+ .number-modal input,.number-modal select,.caption-dialog input,.caption-dialog select{width:100%;min-width:0}
+ .metrics-modal-card *{max-width:100%;box-sizing:border-box;overflow-wrap:anywhere}
+ .metrics-modal-card dl>div{grid-template-columns:minmax(0,1fr);gap:4px}
+ .metrics-modal-card dd{text-align:left!important;white-space:normal!important}
+}
+@media(max-width:420px){.phone-home-card #accountActions{grid-template-columns:minmax(0,1fr)}.phone-home-card .phone-row>button{flex:1 1 44px}.phone-home-card .phone-primary-form{grid-template-columns:minmax(0,1fr) auto}}
+
+/* Bottom navigation: the active panel scrolls above a thumb-friendly fixed tab row. */
+.phone-home-card>.phone-tabs{order:4;position:relative;z-index:12;width:100%;margin-top:0;padding:9px 2px 4px;border-top:1px solid #cad8b9;border-bottom:0;background:#fffef8;box-sizing:border-box}
+.phone-home-card>[role="tabpanel"]{order:2}
+.phone-home-card>.phone-add-fab{bottom:86px}
+@media(max-width:540px){.phone-home-card>.phone-tabs{padding:7px 2px 3px}.phone-home-card>.phone-add-fab{bottom:72px}}
+@media(min-width:640px){body.phone-home .phone-home-card{padding-bottom:0}.phone-home-card>.phone-tabs{padding:9px 2px}}
+.admin-login-dialog{width:min(430px,calc(100% - 28px))}
+.admin-login-dialog .modal-head h2{display:flex;align-items:center;gap:10px}
+.admin-login-form{display:grid;gap:10px;padding-top:18px}
+.admin-login-form label{text-align:left;font-size:14px;font-weight:800;color:#4e6942}
+.admin-login-form input{box-sizing:border-box;width:100%;min-height:52px;padding:11px 14px;border:2px solid #bedc9e;border-radius:15px;background:#fffef9;color:#30462d;font:inherit;font-size:18px}
+.admin-login-form button{min-height:56px;margin-top:4px;border:2px solid #7fba57;border-radius:17px;background:#dcf4c1;color:#2f5923;font-size:18px;font-weight:800;box-shadow:0 4px 0 #c8e3ad}
+.admin-login-form p{min-height:20px;margin:2px 0 0;text-align:center;color:#b33f4e;font-size:13px}
+.admin-control-card{display:grid;gap:10px;margin:16px 0;padding:16px;border:1px solid #cfe3bb;border-radius:18px;background:#f8fced}.admin-control-card h3,.admin-control-card p{margin:0}.admin-control-card>label{display:flex;align-items:center;gap:9px;min-height:38px}.admin-control-card input[type="checkbox"]{width:19px;height:19px}.admin-control-card form{display:grid;gap:10px}.admin-control-card form label{display:grid;gap:5px}.admin-control-card input[type="password"]{box-sizing:border-box;width:100%;min-height:48px;padding:10px 12px;border:1px solid #aaca8d;border-radius:12px;background:#fff}.admin-control-card button{min-height:48px;border:2px solid #80ba58;border-radius:14px;background:#dcf4c1;color:#31552b;font:inherit;font-weight:800}.admin-control-card form p{min-height:1.2em;color:#9b4650;font-size:13px}.app-recovery{position:fixed;z-index:2147483647;left:50%;bottom:max(22px,env(safe-area-inset-bottom));display:grid;gap:7px;width:min(430px,calc(100% - 28px));box-sizing:border-box;padding:18px;border:2px solid #78b958;border-radius:20px;background:#fffef8;box-shadow:0 14px 45px rgba(32,48,28,.3);transform:translateX(-50%);text-align:center;color:#30462d}.app-recovery[hidden]{display:none}.app-recovery span{font-size:13px}.app-recovery button{min-height:50px;border:2px solid #79b758;border-radius:15px;background:#dff6c5;color:#31582a;font:inherit;font-weight:800}
+
+/* Keep every settings help control perfectly circular, even in a shrinking flex row. */
+.phone-help-icon,.phone-home-card .account-help-head .phone-panel-icon{display:grid!important;place-items:center;width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;flex:0 0 40px!important;aspect-ratio:1/1;box-sizing:border-box;padding:0!important;border:2px solid #9fc982!important;border-radius:50%!important;line-height:1;box-shadow:0 3px 0 #dceaca!important}
+.phone-help-icon i,.account-help-head .phone-panel-icon i{display:block;width:1em;height:1em;line-height:1;text-align:center}
+.phone-help-icon[aria-expanded="true"],.account-help-head .phone-panel-icon[aria-expanded="true"]{border-color:#71ae4e!important;background:#def2c7}
+
+#phoneSettingsPanel h2,#phoneSettingsPanel h3{margin-top:0;font-size:20px!important;line-height:1.35;font-weight:700;letter-spacing:0}
+#phoneSettingsPanel>h3,.setting-subtitle-row h3{margin-bottom:0}
+
+#phoneSettingsPanel>.account-help-head,#phoneSettingsPanel>.setting-subtitle-row{margin-top:32px}
+#phoneSettingsPanel>h3{margin-top:32px!important;margin-bottom:12px!important}
+#phoneSettingsPanel>.account-fields{margin-top:14px}
+@media(max-width:480px){#phoneSettingsPanel>.account-help-head,#phoneSettingsPanel>.setting-subtitle-row,#phoneSettingsPanel>h3{margin-top:28px!important}}
+
+#phoneContactTools.is-visible{display:flex;padding:14px!important;margin-bottom:14px!important}
+#phoneContactsPanel,#phoneGroupsPanel{position:relative;padding-bottom:90px!important}
+#phoneContactsPanel .phone-add-fab,#phoneGroupsPanel .phone-add-fab{position:absolute;right:14px;bottom:14px}
+.phone-empty-state button{min-height:42px!important;padding:8px 14px!important;border-radius:14px!important}
+.history-details>p{margin:6px 0;color:#64725e;font-size:12px;overflow-wrap:anywhere}
+#phoneSettingsPanel{display:flex;flex-direction:column}
+#phoneSettingsPanel>.support-mode-picker,#phoneSettingsPanel>.account-fields,#phoneSettingsPanel>.phone-form-row,#phoneSettingsPanel>.phone-setting-check,#phoneSettingsPanel>#phoneBlocks{border:1px solid #d6e6c8!important;background:#f7fbef;box-shadow:0 2px 0 #e7efdf}
+#phoneSettingsPanel>.support-mode-picker{padding:12px!important;border-radius:16px}
+#phoneSettingsPanel>.phone-setting-check{flex:0 0 auto;min-height:54px}
+.device-check-card{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px;border:1px solid #d6e6c8;border-radius:16px;background:#f7fbef;box-shadow:0 2px 0 #e7efdf}.device-check-card>div{display:grid;gap:3px}.device-check-card small{color:#66775e}.device-check-dialog,.onboarding-dialog{width:min(560px,calc(100% - 28px));padding:22px;border:2px solid #79bb50;border-radius:28px;background:#fffef8;color:#30462d}.device-check-dialog::backdrop,.onboarding-dialog::backdrop{background:rgba(34,43,32,.58)}.device-check-intro{color:#61705a;line-height:1.65}.device-check-results{display:grid;gap:8px;margin:16px 0}.device-check-result{display:grid;grid-template-columns:30px 1fr;gap:2px 10px;align-items:center;padding:11px 13px;border-radius:14px;background:#f3f9e9}.device-check-result i{grid-row:1/3;font-size:19px}.device-check-result small{color:#66745f}.device-check-result.is-ok i{color:#58a43c}.device-check-result.is-warn i{color:#d28b21}.device-check-result.is-error{background:#fff0ee}.device-check-result.is-error i{color:#c94c58}.device-check-manual{display:grid;gap:8px;margin:18px 0;padding-top:15px;border-top:1px solid #d8e7cc}.device-check-manual label{display:flex;align-items:center;gap:9px}.device-check-id{font-size:12px;color:#6c7a65}.onboarding-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}.onboarding-steps>div{position:relative;display:grid;place-items:center;gap:8px;min-height:130px;padding:14px 8px;border:1px solid #cfe3ba;border-radius:18px;background:#f4faea;text-align:center}.onboarding-steps b{position:absolute;left:9px;top:8px;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#dff3c5;color:#47743a}.onboarding-steps i{font-size:28px;color:#62a844}.onboarding-dialog>p{text-align:center;color:#61705a}.onboarding-dialog>.phone-primary,.device-check-dialog>.phone-primary{width:100%;min-height:54px}
+.device-check-manual>label{display:grid!important;grid-template-columns:20px minmax(0,1fr)!important;align-items:center!important;justify-content:start!important;gap:10px!important;width:100%;min-width:0!important;margin:0!important;padding:4px 0!important}.device-check-manual>label>input[type="checkbox"]{appearance:auto!important;-webkit-appearance:checkbox!important;box-sizing:border-box!important;flex:0 0 18px!important;width:18px!important;height:18px!important;min-width:18px!important;min-height:18px!important;max-width:18px!important;max-height:18px!important;margin:0!important;padding:0!important;transform:none!important;accent-color:#62b83f}
+@media(max-width:540px){.device-check-card{align-items:stretch;flex-direction:column}.device-check-card button{width:100%}.onboarding-steps{grid-template-columns:1fr}.onboarding-steps>div{grid-template-columns:36px 34px 1fr;min-height:62px;text-align:left}.onboarding-steps b{position:static}.onboarding-steps i{font-size:23px}.device-check-dialog,.onboarding-dialog{padding:17px;border-radius:23px}}
+.number-head button i{font-size:18px;line-height:1}
+
+/* Incoming calls use the same quiet visual hierarchy as the dial screen. */
+#numberIncoming{width:min(390px,calc(100% - 28px));padding:30px 28px 24px;border-radius:30px}
+#numberIncoming .incoming-pulse{width:78px;height:78px;margin-bottom:14px;background:#def3c4;color:#4b9634;font-size:31px;box-shadow:0 0 0 8px #f5faed}
+#numberIncoming .incoming-label{margin:0 0 8px;color:#718268;font-size:14px;font-weight:600;letter-spacing:.08em}
+#numberIncoming #numberCaller{margin:0;color:#2f4d2b;font-size:30px;line-height:1.25;font-weight:800;overflow-wrap:anywhere}
+#numberIncoming #numberCallerNumber{margin-top:7px;color:#667361;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:18px;line-height:1.3;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:.08em}
+#numberIncoming #numberIncomingText{display:inline-flex;align-items:center;justify-content:center;margin:18px auto 0;padding:6px 12px;border:1px solid #c9dfb7;border-radius:999px;background:#f4faeb;color:#52674a;font-size:13px;line-height:1.25}
+#numberIncoming .incoming-actions{display:flex;justify-content:center;align-items:flex-start;gap:52px;margin:30px auto 24px}
+#numberIncoming .incoming-actions button{display:flex;flex:0 0 82px;min-width:82px;min-height:0;padding:0;gap:9px;border:0!important;border-radius:0!important;outline:0!important;background:transparent!important;box-shadow:none!important;color:#394b35!important;font-size:14px;font-weight:700;line-height:1.2;transform:none!important;-webkit-tap-highlight-color:transparent}
+#numberIncoming .incoming-actions button i{display:grid;place-items:center;width:70px;height:70px;border-radius:50%;color:#fff;font-size:27px;box-shadow:0 5px 0 rgba(40,66,33,.16),0 8px 20px rgba(40,66,33,.12)}
+#numberIncoming #numberDecline i{background:#d95761}
+#numberIncoming #numberAccept i{background:#60b83d}
+#numberIncoming .incoming-actions button:focus-visible i{outline:3px solid #355f2d;outline-offset:4px}
+#numberIncoming .incoming-actions button:active i{transform:translateY(2px);box-shadow:0 2px 0 rgba(40,66,33,.16)}
+#numberIncoming .incoming-block{margin-top:2px;padding:8px 10px!important;color:#657060!important;font-size:13px;text-decoration:none;border-radius:10px!important}
+#numberIncoming .incoming-block:hover,#numberIncoming .incoming-block:focus-visible{background:#f0f6e8!important;color:#384d33!important;text-decoration:underline}
+@media(max-width:420px){#numberIncoming{padding:26px 20px 22px}#numberIncoming .incoming-actions{gap:38px;margin-top:26px}#numberIncoming #numberCaller{font-size:28px}}
+
+.dial-confirm-dialog{position:relative;width:min(390px,calc(100% - 28px));padding:34px 28px 28px;text-align:center;border:3px solid #78b952;background:linear-gradient(180deg,#fffef9 0%,#fbfdf5 100%);box-shadow:0 20px 70px #13200f55,inset 0 0 0 7px #f1f8e7}
+.dial-confirm-close{position:absolute;top:16px;right:16px;display:grid;place-items:center;width:42px;height:42px;min-height:42px;padding:0;border:1px solid #c5dda9;border-radius:50%;background:#f3fae8;color:#3d5836;box-shadow:none!important}
+.dial-confirm-person{padding:16px 48px 4px}
+#phoneDialConfirmName{display:block;margin:0!important;color:#2f4d2b;font-size:32px!important;line-height:1.25;font-weight:800;overflow-wrap:anywhere}
+#phoneDialConfirmNumber{display:block;margin:8px 0 0!important;color:#71806a;font-size:17px!important;line-height:1.3;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:.08em!important}
+.dial-mode-row{position:relative;width:min(280px,100%);margin:22px auto 24px}
+.dial-mode-toggle{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch;width:100%;min-inline-size:0;gap:3px;margin:0;padding:3px;border:1px solid #cbdcb9;border-radius:999px;background:#edf5e4;box-sizing:border-box}
+.dial-mode-toggle label{display:flex;align-items:stretch;min-width:0;margin:0;padding:0}
+.dial-mode-toggle span{display:flex;width:100%;height:38px;min-height:38px;margin:0;padding:5px 11px;border:0;border-radius:999px;background:transparent;color:#62705c;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:none!important;box-sizing:border-box}
+.dial-mode-toggle input:checked+span{border:0;background:#fffef8;color:#365d2b;box-shadow:0 0 7px rgba(47,77,43,.14)!important}
+.dial-support-help{position:absolute;z-index:2;top:-9px;right:-9px;display:grid!important;place-items:center;width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important;aspect-ratio:1/1;padding:0!important;border:2px solid #8fbe70!important;border-radius:50%!important;background:#f8fdec!important;color:#3f6235!important;font-size:11px;line-height:1;box-shadow:0 2px 0 #d4e6c4!important}
+.dial-support-help i{display:block;width:1em;height:1em;line-height:1;text-align:center}
+.dial-support-help[aria-expanded="true"]{background:#def2c7}
+.dial-support-help-panel{width:min(310px,100%);box-sizing:border-box;text-align:left;color:#4a6042;background:#f3f8eb;border:1px solid #cfdfc0;border-radius:14px}
+.dial-support-help-panel.is-visible{max-height:150px!important;margin:-12px auto 22px!important;padding:12px 14px!important;border-width:1px!important}
+.dial-support-help-panel strong{display:block;margin-bottom:4px;font-size:13px;color:#36552f}
+.dial-support-help-panel p{margin:0;font-size:12px;line-height:1.55}
+.dial-confirm-actions{display:flex;flex-direction:column;align-items:center;gap:12px}
+#phoneDialConfirmCall{position:relative;display:flex;align-items:center;justify-content:center;gap:12px;width:min(280px,100%);min-height:70px;padding:14px 24px;border:2px solid #78b952;border-radius:24px;background:linear-gradient(135deg,#efffd3,#dff8bd)!important;color:#31582a!important;font-size:20px;font-weight:800;text-shadow:none;box-shadow:0 5px 0 #d2e9bd,0 10px 24px rgba(74,126,53,.14)!important;overflow:hidden}
+#phoneDialConfirmCall::after{content:"";display:block!important;position:absolute;inset:5px;border:2px dashed rgba(83,145,56,.58);border-radius:18px;pointer-events:none}
+#phoneDialConfirmCall span,#phoneDialConfirmCall i{position:relative;z-index:1;color:#31582a!important}
+#phoneDialConfirmCall i{font-size:28px}
+@media(max-width:420px){.dial-confirm-dialog{padding:30px 18px 22px}.dial-confirm-person{padding-inline:42px}#phoneDialConfirmName{font-size:29px!important}.dial-mode-toggle span{padding-inline:9px;font-size:11px}#phoneDialConfirmCall{min-height:66px}}
+
+.group-detail-dialog .group-mode-toggle{
+ width:100%;min-inline-size:0;margin:0;
+ grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;padding:3px;
+ border:1px solid #cbdcb9;border-radius:999px;background:#edf5e4;
+}
+.group-mode-row,.settings-mode-row{width:min(340px,100%);margin:10px auto 18px;}
+.group-mode-row+.dial-support-help-panel.is-visible,
+.settings-mode-row+.dial-support-help-panel.is-visible{margin:-7px auto 18px!important;}
+.settings-mode-row{margin-top:16px;}
+.group-detail-dialog .group-mode-toggle label{display:flex;align-items:stretch;margin:0;padding:0;}
+.group-detail-dialog .group-mode-toggle span{
+ width:100%;height:42px;min-height:42px;padding:6px 10px;
+ border:0;border-radius:999px;background:transparent;color:#62705c;
+ font-size:13px;font-weight:700;white-space:nowrap;box-shadow:none!important;
+}
+.group-detail-dialog .group-mode-toggle input:checked+span{
+ border:0;background:#fffef8;color:#365d2b;
+ box-shadow:0 1px 7px rgba(47,77,43,.16)!important;
+}
+.group-detail-dialog .group-mode-toggle input:disabled+span{opacity:.7;cursor:default;}
+.call-add-participant-dialog{display:none;gap:14px;width:min(590px,calc(100% - 24px));max-height:min(86dvh,720px);overflow:auto}.call-add-participant-dialog[open]{display:grid}.call-add-participant-dialog>p{margin:0;line-height:1.65;color:#607057}.call-add-source-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:5px;border:1px solid #c9dfb5;border-radius:16px;background:#f1f8e8}.call-add-source-tabs button{display:flex;align-items:center;justify-content:center;gap:7px;min-width:0;min-height:44px;padding:7px;border:0;box-shadow:none;background:transparent}.call-add-source-tabs button[aria-selected=true]{background:#fffef9;border:1px solid #8fc46b;box-shadow:0 2px 0 #d9eacb}.call-add-choice-list{display:grid;gap:7px;max-height:260px;overflow:auto;overscroll-behavior:contain}.call-add-choice-list>button{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;width:100%;min-height:58px;padding:9px 12px;text-align:left;background:#fbfff5;border-color:#c4dda9;box-shadow:none}.call-add-choice-list>button>span{display:grid;gap:2px;min-width:0}.call-add-choice-list>button strong,.call-add-choice-list>button small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.call-add-choice-list>button small{font-size:.78rem;color:#728069}.call-add-choice-list>button.is-selected{background:#ddf6bd;border-color:#62af3f}.call-add-empty{margin:0;padding:20px;text-align:center;background:#f5faef;border-radius:14px;color:#718069}.call-add-number{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end}.call-add-number label{grid-column:1/-1;font-weight:800}.call-add-number input{min-width:0;min-height:48px;padding:8px 12px;border:1px solid #a4ce83;border-radius:13px;background:#fffef8;font:inherit;font-size:1.05rem;letter-spacing:.08em}.call-add-number button{min-height:48px}.call-add-selected{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:13px;background:#e5f7cb;color:#36542c;font-weight:800}.call-add-participant-actions{display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);gap:10px}.call-add-participant-actions button{width:100%}.call-add-participant-actions #callAddParticipantStart{background:#dff5ba;font-weight:800}
+@media(max-width:520px){.call-add-source-tabs button{flex-direction:column;font-size:.78rem;gap:3px}.call-add-number{grid-template-columns:1fr}.call-add-participant-actions{grid-template-columns:1fr}.call-add-participant-dialog{width:calc(100% - 18px);padding:18px 14px}.call-add-choice-list{max-height:220px}}
+@media(max-width:390px){
+ .group-detail-dialog .group-mode-toggle span{gap:5px;padding-inline:7px;font-size:12px;}
+}
+
+body.is-in-call .participants-card{position:relative;}
+body.is-in-call .participants-card .participants{min-height:6.25rem;padding-right:6.4rem;}
+body.is-in-call .participants .participant.is-self,
+body.is-one-to-one.is-in-call .participants .participant.is-self{
+ position:absolute;left:auto;right:16px;top:auto;bottom:32px;
+ flex-basis:5rem;width:5rem;height:5rem;margin:0;
+ border-radius:1.3rem;
+}
+body.is-in-call .participants .participant.is-self::before{border-radius:.92rem;}
+body.is-in-call .participants .participant.is-self .self-avatar-icon{
+ color:#4f9d3d;font-size:1.7rem;
+}
+body.is-in-call .participants .participant.is-self .participant-state-badge{
+ width:5rem;min-width:5rem;padding-inline:3px;font-size:10px;white-space:nowrap;
+}
+@media(max-width:480px){
+ body.is-in-call .participants-card .participants{min-height:5.9rem;padding-right:5.8rem;}
+ body.is-in-call .participants .participant.is-self,
+ body.is-one-to-one.is-in-call .participants .participant.is-self{right:12px;bottom:30px;width:4.6rem;height:4.6rem;flex-basis:4.6rem;}
+ body.is-in-call .participants .participant.is-self .participant-state-badge{width:4.6rem;min-width:4.6rem;font-size:9px;}
+}
+
+/* Final consistency pass: optional group tools, responsive people layout, and safe mobile dialogs. */
+.group-section-toggle{
+ display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:46px;
+ margin-top:12px;border:1px solid #bcd69f!important;border-radius:15px!important;
+ background:#f4fae9!important;color:#45663a!important;box-shadow:none!important;font-weight:700;
+}
+.group-section-toggle[aria-expanded="true"]{background:#e4f5d0!important;border-color:#80bb5b!important;}
+.group-detail-dialog .group-invite-area{box-sizing:border-box;width:100%;}
+.group-detail-dialog .group-invite-area.is-visible{
+ max-height:430px!important;margin:10px 0 0!important;padding:14px 0 0!important;
+ border-top-width:1px!important;overflow:visible;
+}
+.group-detail-dialog{overflow-x:hidden;scroll-padding-block:88px 28px;}
+.group-detail-dialog>.number-head{
+ position:sticky;top:-24px;z-index:5;margin:-4px -2px 0;padding:4px 2px 12px;
+ background:rgba(255,254,248,.97);backdrop-filter:blur(8px);
+}
+body.is-in-call .participants-card .participants{
+ display:flex;align-items:center;justify-content:flex-start;gap:clamp(10px,3vw,24px);
+ overflow:visible;
+}
+body.is-in-call .participants .participant:not(.is-self){flex:0 0 3.35rem;width:3.35rem;height:3.35rem;}
+body.is-in-call .participants .participant:not(.is-self) .participant-state-badge{font-size:10px;}
+
+/* Participant state is a quiet text label; the avatar already provides the visual container. */
+body.is-in-call .participants .participant-state-badge,
+body.is-in-call .participants .participant.is-self .participant-state-badge,
+body.is-in-call .participants .participant-state-badge.is-waiting,
+body.is-in-call .participants .participant-state-badge.is-connected,
+body.is-in-call .participants .participant-state-badge.is-speaking,
+body.is-in-call .participants .participant-state-badge.is-muted{
+ border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
+}
+/* 通話中の自分アイコンと音量計は、参加者カード内で一つのまとまりにする。 */
+body.is-in-call .participants .participant.is-self,
+body.is-one-to-one.is-in-call .participants .participant.is-self{
+ width:4.15rem;height:4.15rem;flex-basis:4.15rem;bottom:2.4rem;
+}
+body.is-in-call .participants .participant.is-self .participant-state-badge{
+ width:4.15rem;min-width:4.15rem;
+}
+@media(max-width:670px){
+ .group-detail-dialog{width:calc(100% - 18px);max-height:calc(100dvh - 18px);padding:18px 14px;}
+ .group-detail-dialog>.number-head{top:-18px;}
+ .group-dialog-section{min-width:0;}
+ .group-mode-row,.settings-mode-row{max-width:100%;}
+ .group-detail-dialog .group-invite-area>div{grid-template-columns:minmax(0,1fr);}
+ .group-detail-dialog .group-invite-area select,.group-detail-dialog .group-invite-area button{width:100%;max-width:100%;}
+ body.is-in-call .participants-card .participants{flex-wrap:wrap;row-gap:28px;}
+}
+@media(max-width:640px){
+ body.is-in-call .participants .participant.is-self,
+ body.is-one-to-one.is-in-call .participants .participant.is-self{
+  width:3.85rem;height:3.85rem;flex-basis:3.85rem;right:.45rem;bottom:2.35rem;
+ }
+ body.is-in-call .participants .participant.is-self .participant-state-badge{width:3.85rem;min-width:3.85rem;}
+}
+@media(max-width:380px){
+ .group-detail-dialog{width:calc(100% - 10px);padding-inline:10px;border-radius:20px;}
+ .group-dialog-section{padding-inline:10px;}
+ .group-detail-dialog .group-mode-toggle span{font-size:11px;padding-inline:5px;}
+ body.is-in-call .participants .participant:not(.is-self){flex-basis:3rem;width:3rem;height:3rem;}
+}
+
+/* Calm handoff between an ended call and the phone home. */
+.remote-ended-dialog{
+ position:fixed;inset:0;z-index:5000;width:min(360px,calc(100% - 32px));
+ margin:auto;padding:30px 24px;border:3px solid #84bf5c;border-radius:28px;
+ background:linear-gradient(180deg,#fffef9 0%,#f4fbe9 100%);color:#304d2c;
+ text-align:center;box-shadow:0 20px 70px rgba(28,43,23,.34),inset 0 0 0 7px #edf7df;
+ opacity:0;transform:translateY(10px) scale(.97);
+ transition:opacity .24s ease,transform .24s ease;
+}
+.remote-ended-dialog[open]{display:block;}
+.remote-ended-dialog.is-visible{opacity:1;transform:translateY(0) scale(1);}
+.remote-ended-dialog::backdrop{background:rgba(35,43,32,.48);backdrop-filter:blur(2px);}
+.remote-ended-icon{
+ display:grid;place-items:center;width:68px;height:68px;margin:0 auto 15px;
+ border:2px solid #9dcb7c;border-radius:50%;background:#e7f7d2;color:#589b3f;font-size:26px;
+ box-shadow:0 4px 0 #d7e9c3;
+}
+.remote-ended-dialog h2{margin:0;color:#34582e;font-size:22px;line-height:1.45;overflow-wrap:anywhere;}
+.remote-ended-dialog p{margin:10px 0 0;color:#687b61;font-size:14px;line-height:1.6;}
+.group-detail-dialog{z-index:4000;}
+@media(max-width:420px){.remote-ended-dialog{padding:26px 18px;border-radius:24px}.remote-ended-dialog h2{font-size:20px}}
+@media(prefers-reduced-motion:reduce){.remote-ended-dialog{transition:none;}}
+.diagnostic-live-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:12px;padding:10px;border:1px solid #cfe2bd;border-radius:14px;background:#f5faed}
+.diagnostic-live-summary span{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:2px 7px;min-width:0;color:#596d51;font-size:12px}
+.diagnostic-live-summary i{grid-row:1/3;color:#65a647}.diagnostic-live-summary b{color:#385b31;font-size:11px}.diagnostic-live-summary span{overflow-wrap:anywhere}
+
+.ringtone-title-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.ringtone-title-row span{color:#75846d;font-size:12px}
+.notification-setting-card{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;margin:10px 0 20px;padding:14px;border:1px solid #cee4b9;border-radius:18px;background:#f8fcef}.notification-setting-card .notification-enabled{margin:0;min-width:0}.notification-setting-card #phoneNotificationTest{min-height:44px;padding:9px 14px;border:1px solid #a8d182;border-radius:14px;background:#eff9df;color:#355b2d;font-weight:700}.notification-setting-card .setting-status{grid-column:1/-1;margin:0;padding-top:9px;border-top:1px solid #dbe9cd}.notification-enabled input{width:1.25rem;height:1.25rem;accent-color:#65b941}.notification-enabled span{display:grid;gap:3px}.notification-enabled small{color:#74826d;font-size:11px;line-height:1.45}
+@media(max-width:480px){.notification-setting-card{grid-template-columns:1fr}.notification-setting-card #phoneNotificationTest{width:100%}}
+
+/* Keep the dial button perfectly circular even when mobile button defaults impose a minimum size. */
+#phoneDialForm .phone-dial-actions .phone-call{box-sizing:border-box;flex:none;inline-size:calc(var(--dial-key) + 8px)!important;block-size:calc(var(--dial-key) + 8px)!important;min-inline-size:calc(var(--dial-key) + 8px)!important;min-block-size:calc(var(--dial-key) + 8px)!important;max-inline-size:calc(var(--dial-key) + 8px);max-block-size:calc(var(--dial-key) + 8px);aspect-ratio:1/1;border-radius:50%!important;padding:0!important;line-height:1}
+#phoneDialForm .phone-dial-actions .phone-call i{display:block;line-height:1}
+.ringtone-picker{display:grid;gap:12px;padding:14px;border:1px solid #d3e5c4;border-radius:18px;background:#f8fbf2;box-shadow:0 2px 0 #e8f0e0}
+.ringtone-enabled{display:flex!important;align-items:center;gap:11px;min-height:58px!important;margin:0!important;padding:10px 12px!important;border:0!important;background:#eef7e3!important;box-shadow:none!important}.ringtone-enabled>span{display:grid;gap:2px;text-align:left}.ringtone-enabled strong{color:#385a31;font-size:14px}.ringtone-enabled small{color:#718069;font-size:11px;font-weight:400}
+.ringtone-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.ringtone-option{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 40px;align-items:center;min-width:0;min-height:76px;padding:9px 9px 9px 12px;border:2px solid #d5e7c5;border-radius:16px;background:#fffef9;cursor:pointer;box-sizing:border-box;transition:border-color .18s ease,background .18s ease,transform .18s ease}.ringtone-option:has(input:checked){border-color:#73b451;background:#e9f7d7;box-shadow:0 3px 0 #d2e8bf}.ringtone-option>input{position:absolute;opacity:0;pointer-events:none}.ringtone-option>span{display:grid;grid-template-columns:24px minmax(0,1fr);align-items:center;gap:2px 7px;min-width:0;text-align:left}.ringtone-option>span>i{grid-row:1/3;color:#64a844;font-size:18px}.ringtone-option b{overflow:hidden;color:#385a31;font-size:13px;text-overflow:ellipsis;white-space:nowrap}.ringtone-option small{color:#77866f;font-size:10px}.ringtone-option>button{display:grid!important;place-items:center;width:36px!important;height:36px!important;min-width:36px!important;min-height:36px!important;padding:0!important;border:1px solid #9ac779!important;border-radius:50%!important;background:#f5fbe9!important;color:#4d8338!important;box-shadow:0 2px 0 #d6e7c7!important;line-height:1}.ringtone-option>button i{display:block;width:14px;text-align:center;line-height:1;transform:translateX(1px)}.ringtone-option>button .fa-pause{transform:none}.ringtone-option>button.is-playing{background:#73b951!important;color:white!important;transform:scale(.94)}.ringtone-option>input:focus-visible~span{outline:2px solid #477f35;outline-offset:5px;border-radius:8px}.ringtone-preview-status{min-height:1.2em;margin:0;color:#5d7553;font-size:11px;text-align:center}.ringtone-muted .ringtone-options{opacity:.58}.ringtone-muted .ringtone-option{filter:saturate(.7)}
+@media(max-width:430px){.ringtone-options{grid-template-columns:1fr}.ringtone-option{min-height:68px}.ringtone-title-row{align-items:center}.ringtone-title-row span{font-size:10px}}
+
+.outgoing-call-dialog{width:min(390px,calc(100% - 28px));padding:34px 26px 28px;border:3px solid #78b952;border-radius:30px;background:linear-gradient(180deg,#fffef9,#f8fcec);color:#34542f;text-align:center;box-shadow:0 20px 70px #13200f55,inset 0 0 0 7px #f0f8e6}
+.outgoing-call-dialog::backdrop{background:rgba(30,38,28,.58);backdrop-filter:blur(2px)}.outgoing-call-pulse{display:grid;place-items:center;width:78px;height:78px;margin:0 auto 14px;border-radius:50%;background:#def3c4;color:#4b9634;font-size:30px;box-shadow:0 0 0 8px #f3fae9;animation:outgoingPulse 1.5s ease-in-out infinite}.outgoing-call-dialog>p{margin:0;color:#718268;font-size:14px;font-weight:700;letter-spacing:.08em}.outgoing-call-dialog h2{margin:8px 0 4px;color:#2f4d2b;font-size:30px;line-height:1.25;overflow-wrap:anywhere}.outgoing-call-dialog>strong{display:block;color:#687764;font-size:18px;font-variant-numeric:tabular-nums;letter-spacing:.08em}.outgoing-call-wave{display:flex;justify-content:center;align-items:center;gap:6px;height:24px;margin:18px 0}.outgoing-call-wave i{display:block;width:7px;height:7px;border-radius:50%;background:#7dbb59;animation:outgoingDot 1.05s ease-in-out infinite}.outgoing-call-wave i:nth-child(2){animation-delay:.15s}.outgoing-call-wave i:nth-child(3){animation-delay:.3s}.outgoing-call-dialog #phoneCancel{display:flex;align-items:center;justify-content:center;gap:10px;width:min(280px,100%);min-height:58px;margin:6px auto 0;padding:12px 18px;border:2px solid #d86d73;border-radius:20px;background:#fff1ee;color:#a83e49;font-size:16px;font-weight:800;box-shadow:0 4px 0 #efd0cc}.outgoing-call-dialog #phoneCancel i{font-size:20px}@keyframes outgoingPulse{50%{transform:scale(1.07);box-shadow:0 0 0 13px #e5f5d5}}@keyframes outgoingDot{0%,70%,100%{transform:translateY(0);opacity:.45}35%{transform:translateY(-6px);opacity:1}}@media(prefers-reduced-motion:reduce){.outgoing-call-pulse,.outgoing-call-wave i{animation:none}}
+
+#phoneDialNumber{display:flex;align-items:center;justify-content:center;width:100%;box-sizing:border-box;color:#30462d;letter-spacing:clamp(2px,1.2vw,7px);font-variant-numeric:tabular-nums;-webkit-user-select:none;user-select:none;cursor:default}
+#phoneDialNumber:empty::before{content:'番号を入力';color:#9aaa91;font-size:14px;letter-spacing:.08em;font-weight:500}
+
+/* Compact call status and phonebook actions. */
+.audio-health{grid-template-columns:minmax(4rem,1fr) auto!important}
+.participants-card>h2{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
+.frequent-card{appearance:none;width:100%;min-height:118px!important;display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:10px!important;padding:14px 8px!important;color:#30462d!important;font:inherit;text-align:center;cursor:pointer}
+.frequent-card>i{grid-column:auto!important;font-size:52px;color:#76aa58}.frequent-card strong{width:100%;justify-self:auto!important;text-align:center;font-size:14px}
+.frequent-card:hover,.frequent-card:focus-visible{background:linear-gradient(145deg,#effbdc,#dff2c8)!important;border-color:#91bf6c!important}
+.contact-row{position:relative;overflow:visible!important}.contact-row-person{flex:1 1 170px;min-width:0}.contact-row-person strong,.contact-row-person small{display:block}.contact-menu-wrap{position:relative;flex:0 0 auto!important}.phone-home-card .contact-menu-toggle{display:grid;place-items:center;width:46px;min-width:46px;min-height:46px;padding:0;border-radius:50%;font-size:20px}.contact-row-menu{position:absolute;z-index:25;right:0;top:calc(100% + 7px);display:grid;gap:4px;width:max-content;min-width:190px;padding:7px;border:1px solid #bcd69f;border-radius:15px;background:#fffef8;box-shadow:0 10px 28px rgba(45,70,38,.2);opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .18s ease,transform .18s ease,visibility .18s ease}.contact-row-menu.is-visible{opacity:1;visibility:visible;transform:translateY(0)}.phone-home-card .contact-row-menu button{display:flex;align-items:center;justify-content:flex-start;gap:10px;width:100%;min-height:42px;padding:8px 11px;border:0;border-radius:10px;background:transparent;box-shadow:none;text-align:left}.contact-row-menu button:hover,.contact-row-menu button:focus-visible{background:#eef7e2}.contact-row-menu button i{width:20px;text-align:center}.contact-row-menu [data-favorite] i{color:#bb8b18}.contact-row-menu [data-remove-contact] i,.contact-row-menu [data-block-contact] i{color:#a94a53}.phone-home-card .contact-call-button{min-width:92px;background:#f0fae5;border-color:#9bc979;color:#345f2b}.phone-home-card .contact-call-button i{color:#57a43a}
+@media(max-width:540px){.frequent-card{min-height:104px!important;padding:11px 5px!important}.frequent-card>i{font-size:44px}.frequent-card strong{font-size:12px}.phone-home-card .contact-call-button{min-width:48px;width:48px;padding:0}.contact-call-button span{display:none}.contact-row-menu{right:-56px;min-width:184px}}
+@media(prefers-reduced-motion:reduce){.contact-row-menu{transition:none}}
+/* Keep the phonebook action buttons together at the card's right edge. */
+.contact-row-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex:0 0 auto!important;margin-left:auto}.contact-row-actions>.contact-menu-wrap{flex:0 0 auto!important}
+@media(max-width:540px){.contact-row-actions{gap:6px}}
+
+.admin-connection-quality{margin-top:16px;padding:15px;border:1px solid #d2e4c0;border-radius:17px;background:#f8fbf2}.admin-connection-quality h4{display:flex;align-items:center;gap:8px;margin:0 0 12px;color:#3c6233}.admin-connection-timeline{display:grid;gap:6px;margin:12px 0 0;padding:0;list-style:none}.admin-connection-timeline li{display:grid;grid-template-columns:58px minmax(0,1fr) auto;align-items:center;gap:9px;padding:8px 10px;border-radius:11px;background:#fffef9;color:#536b4c}.admin-connection-timeline li.is-slow{background:#fff2cf;color:#765816}.admin-connection-timeline time{font-variant-numeric:tabular-nums;font-weight:800}.admin-connection-timeline small{font-size:11px}
+@media(max-width:670px){.admin-connection-timeline li{grid-template-columns:52px minmax(0,1fr)}.admin-connection-timeline li small{grid-column:2}.contact-row-menu{right:0;max-width:min(220px,calc(100vw - 42px))}}
+
+/* School notices: one task and its responses stay in one compact card. */
+#phoneNoticesPanel{position:relative;padding-bottom:90px!important}.phone-tab-badge{display:inline-grid;place-items:center;min-width:20px;height:20px;margin-left:5px;padding:0 5px;border-radius:999px;background:#d95664;color:#fff;font-size:11px;line-height:1}.school-notice-list{display:grid;gap:12px}.school-notice-card{padding:15px;border:1px solid #cee1bb;border-radius:18px;background:#fbfdf6;box-shadow:0 3px 0 #e6efdd}.school-notice-card.is-urgent{border-color:#e7ad67;background:#fff9eb}.school-notice-card.is-done{opacity:.68}.school-notice-card header{display:flex;align-items:center;justify-content:space-between;gap:10px}.school-notice-card header span{padding:4px 9px;border-radius:999px;background:#e6f4d5;color:#47703a;font-size:12px;font-weight:800}.school-notice-card.is-urgent header span{background:#ffe3b7;color:#895519}.school-notice-card time,.school-notice-card small{color:#75816e;font-size:12px}.school-notice-card h3{margin:10px 0 5px;font-size:18px}.school-notice-card>p{margin:5px 0 8px;line-height:1.6}.school-notice-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:13px}.school-notice-actions button{min-width:104px}.school-notice-card details{margin-top:12px;padding-top:9px;border-top:1px solid #dbe8ce}.school-notice-card details p{margin:7px 0;font-size:13px}.notice-latest{padding:8px 10px;border-radius:10px;background:#eff7e6;font-size:13px}.school-notice-compose,.school-notice-reply{width:min(560px,calc(100% - 24px))}.school-notice-compose form,.school-notice-reply form{display:grid;gap:15px}.school-notice-compose form>label{display:grid;gap:7px;font-weight:800}.school-notice-compose textarea,.school-notice-reply textarea,.school-notice-compose select{width:100%;box-sizing:border-box;padding:12px;border:1px solid #aacb89;border-radius:12px;background:#fff;color:#30462d;font:inherit;resize:vertical}.notice-kind-picker{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:0;padding:0;border:0}.notice-kind-picker legend{grid-column:1/-1;margin-bottom:5px;font-weight:800}.notice-kind-picker label{position:relative}.notice-kind-picker input{position:absolute;opacity:0}.notice-kind-picker span{display:flex;align-items:center;justify-content:center;gap:8px;min-height:50px;border:2px solid #c9ddaF;border-radius:15px;background:#f6fbea;font-weight:800}.notice-kind-picker input:checked+span{border-color:#69ac45;background:#daf2bd}.notice-recipient-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;max-height:180px;overflow-y:auto}.notice-recipient-list label{display:flex!important;align-items:center;gap:8px;min-width:0;padding:9px;border-radius:10px;background:#f2f8e9;font-weight:600!important}.notice-recipient-list input,.notice-urgent-check input{width:18px!important;height:18px;flex:0 0 18px}.notice-urgent-check{display:flex!important;align-items:center;gap:9px}.notice-send-review{min-height:1.3em;color:#b14a54;font-size:13px}.notice-send-button{min-height:56px!important;font-size:17px!important}
+@media(max-width:540px){.notice-recipient-list{grid-template-columns:1fr}.school-notice-actions{display:grid;grid-template-columns:1fr 1fr}.school-notice-actions button{min-width:0}.phone-tabs button{min-width:88px}}
+.phone-dial-scope-note{position:absolute;left:16px;top:14px;z-index:2;display:flex;align-items:center;gap:6px;margin:0;padding:6px 10px;border:1px solid #d7e8c7;border-radius:999px;background:#f7fbed;color:#687d5d;font-size:11px;font-weight:600;line-height:1.2;white-space:nowrap}
+.phone-dial-scope-note i{color:#72ad50}
+@media(max-width:430px){.phone-dial-scope-note{left:8px;top:12px;padding:5px 8px;font-size:10px}}
+/* Notice workflow: one clear inbox with progressive disclosure. */
+.notice-filter-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:0 0 10px;padding:5px;border:1px solid #d6e5c8;border-radius:16px;background:#f1f7e9}
+.notice-filter-tabs button{min-width:0;min-height:42px;padding:7px 8px;border:0;border-radius:12px;background:transparent;box-shadow:none;color:#64745c;font-size:13px;font-weight:800}
+.notice-filter-tabs button[aria-selected="true"]{background:#fff;color:#35612d;box-shadow:0 2px 8px rgba(62,99,46,.12)}
+.notice-search-toggle-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:0 0 auto;margin:0 0 7px}.notice-search-toggle-row .phone-panel-icon{margin:0}.notice-presence-control{display:flex;align-items:center;gap:9px;min-width:0}.notice-presence-label{color:#62745b;font-size:12px;font-weight:700;white-space:nowrap}.phone-presence-toggle{display:flex;align-items:center;gap:7px;min-height:42px;padding:7px 12px!important;border-radius:999px!important;font-size:12px;font-weight:800}.phone-presence-toggle i{font-size:9px;color:#62af42}.phone-presence-toggle[data-status="class"] i{color:#df9c34}.phone-presence-toggle[data-status="away"] i{color:#86927e}.phone-presence-toggle[data-status="urgent"] i{color:#d65260}.notice-search-wrap{margin:0 0 10px}.notice-search-wrap input{width:100%;box-sizing:border-box;padding:11px 14px;border:1px solid #bdd5a7;border-radius:13px;background:#fff;font:inherit;color:#30462d}
+@media(max-width:430px){.notice-presence-control{gap:6px}.notice-presence-label{font-size:11px;white-space:normal;line-height:1.3}}
+.notice-deadline{display:inline-flex;align-items:center;gap:5px;margin:7px 0 1px;padding:4px 8px;border-radius:999px;background:#edf6e4;color:#527046;font-size:12px;font-weight:700}.notice-deadline.is-overdue{background:#ffe0d8;color:#9b3f35}
+.school-notice-compose input[type="datetime-local"]{box-sizing:border-box;width:100%;padding:12px;border:1px solid #aacb89;border-radius:12px;background:#fff;color:#30462d;font:inherit}.school-notice-compose label>small{color:#75816e;font-size:11px;font-weight:500}
+.school-notice-card .notice-cancel-send{color:#8b5842;background:#fff9ee;border-color:#dfbf98}
+.contact-presence{display:flex!important;align-items:center;gap:6px;color:#58804c!important}.contact-presence i{font-size:8px;color:#63ad43}.contact-presence.is-class i{color:#df9c34}.contact-presence.is-away i{color:#86927e}.contact-presence.is-urgent i{color:#d65260}.presence-dialog{width:min(480px,calc(100% - 24px))}.presence-dialog>p{margin:0 0 14px;color:#65745e;line-height:1.6}.presence-options{display:grid;gap:9px}.presence-options button{display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:10px 14px;text-align:left}.presence-options button>i{width:25px;color:#66aa47;font-size:20px;text-align:center}.presence-options button>span{display:grid;gap:2px}.presence-options button small{color:#718069;font-weight:500}.presence-options button[aria-pressed="true"]{border-color:#65a943;background:#dff5c6;box-shadow:inset 0 0 0 2px #f3ffe8,0 3px 0 #d5e9bf}.school-notice-actions [data-notice-call-back]{background:#f7fbe9;color:#31552d}.call-result-actions #phoneCallResultNotify{min-height:54px;background:#ddf5bd;border-color:#79b84f;color:#315d27;font-weight:800}
+.notice-recipient-heading{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.notice-recipient-heading small{color:#74816e;font-size:11px;font-weight:500}
+.notice-recipient-list label>span{display:flex;align-items:center;gap:7px;min-width:0}.notice-recipient-list label>span>small{margin-left:auto;color:#7c8874;font-size:10px;font-weight:500}.notice-recipient-organization,.notice-recipient-department,.notice-recipient-group,.notice-recipient-all{border:1px solid #d3e5c1;background:#f7fbea!important}
+.admin-notice-overview{display:grid;gap:9px;margin:12px 0;padding:14px;border:1px solid #d2e4c1;border-radius:16px;background:#f8fbf3}.admin-notice-overview h3{margin:0;font-size:15px}.admin-notice-overview>small{color:#718069;font-size:11px}.admin-notice-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.admin-notice-stats span{display:grid;place-items:center;padding:9px 5px;border-radius:12px;background:#ebf5df;color:#64745c;font-size:10px}.admin-notice-stats strong{color:#315c2a;font-size:21px;line-height:1.1}
+.notice-operation-recommendation{display:flex;align-items:center;gap:8px;margin:-5px 0 0;padding:10px 12px;border-radius:12px;background:#eef7e4;color:#496443;font-size:12px;line-height:1.5}.notice-operation-recommendation i{color:#63ad43}.recipient-presence{display:flex!important;align-items:center;gap:4px;margin-left:auto!important;padding-left:6px;color:#65745e!important;white-space:nowrap}.recipient-presence i{font-size:7px;color:#63ad43}.recipient-presence.is-class i{color:#df9c34}.recipient-presence.is-away i,.recipient-presence.is-unknown i{color:#8d9887}.recipient-presence.is-urgent i{color:#d65260}.notice-assigned-banner{display:flex;align-items:center;gap:7px;padding:9px 11px!important;border-radius:11px;background:#e8f4dc;color:#42623b;font-size:12px!important;font-weight:800}.notice-reminder-chip{display:inline-flex;align-items:center;gap:5px;margin:3px 7px 7px 0;padding:5px 8px;border-radius:999px;background:#fff3cb;color:#795b20;font-size:11px}.notice-action-dialog{width:min(440px,calc(100% - 24px))}.notice-action-dialog>p{color:#65745e;line-height:1.6}.notice-time-options,.notice-handoff-people{display:grid;gap:9px}.notice-time-options{grid-template-columns:repeat(3,1fr)}.notice-time-options button{min-height:52px}.notice-handoff-people button{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;width:100%;min-height:58px;text-align:left}.notice-handoff-people button small{color:#718069}.admin-two-device-check label{display:flex!important;align-items:center;gap:9px}.admin-two-device-check input{width:18px!important;height:18px!important;flex:0 0 18px}.admin-two-device-check button{justify-self:start}
+.contact-row-person small+small{margin-top:2px}
+@media(max-width:540px){.notice-filter-tabs{gap:3px;padding:4px}.notice-filter-tabs button{min-height:40px;padding:6px 3px;font-size:11px}.notice-recipient-heading{align-items:flex-start;flex-direction:column;gap:2px}.admin-notice-stats{gap:5px}}
+
+/* Match the three global header controls to the 48px phone-panel icon target. */
+.phone-home main>header .app-icon,
+.phone-home main>header .header-icon-btn{
+  width:48px;
+  height:48px;
+  min-width:48px;
+  min-height:48px;
+  flex:0 0 48px;
+  box-sizing:border-box;
+  font-size:19px;
+}
+
+/* Two clear primary destinations with a separate, non-overlapping phone-tool row. */
+.phone-home-card>.phone-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;overflow:visible}
+.phone-home-card>.phone-tabs button{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-width:0;flex:none;font-size:17px}
+.phone-home-card>.phone-tabs button>i{font-size:19px;color:#5d963f}
+.phone-home-card>.phone-tabs button[aria-selected="true"]>i{color:#3e7b2d}
+.phone-home-card>.phone-dial-shortcuts,.phone-home-card>.phone-notice-filters{order:1;position:relative;z-index:11;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));flex:0 0 auto;gap:6px;width:100%;box-sizing:border-box;margin:10px 0;padding:5px;border:1px solid #d6e5c8;border-radius:16px;background:#f1f7e9}
+.phone-home-card .phone-dial-shortcuts button,.phone-home-card .phone-notice-filters button{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-width:0;min-height:42px;padding:7px 8px;border:0;border-radius:12px;background:transparent;color:#64745c;font-size:13px;font-weight:800;text-align:center;box-shadow:none}
+.phone-dial-shortcuts button i{display:grid;place-items:center;width:21px;flex:0 0 21px;color:#65a645;font-size:16px}
+.phone-dial-shortcuts button[aria-selected="true"],.phone-notice-filters button[aria-selected="true"]{background:#fff!important;color:#2f6525;border:1px solid #8abe67;box-shadow:inset 0 0 0 2px #edf8df,0 3px 8px rgba(62,99,46,.16)}
+.phone-dial-shortcuts button[aria-selected="true"] i{color:#4e9835}
+.phone-dial-shortcuts button:focus-visible,.phone-notice-filters button:focus-visible{outline:3px solid #4d8539!important;outline-offset:2px!important}
+@media(max-width:540px){.phone-home-card>.phone-tabs button{min-height:48px;font-size:16px}.phone-home-card>.phone-dial-shortcuts,.phone-home-card>.phone-notice-filters{gap:3px;margin:7px 0;padding:4px}.phone-home-card .phone-dial-shortcuts button,.phone-home-card .phone-notice-filters button{min-height:40px;padding:6px 2px;font-size:10px;gap:4px}.phone-dial-shortcuts button i{width:16px;flex-basis:16px;font-size:14px}}
+@media(max-width:340px){.phone-home-card .phone-dial-shortcuts button{font-size:11px;letter-spacing:-.04em}}
+#phoneHistoryPanel{padding-bottom:8px!important}
+#phoneContactsPanel,#phoneGroupsPanel{padding-bottom:96px!important}
+.phone-home-card>#phoneDialUtility{order:3;position:relative;z-index:13;display:flex;align-items:center;justify-content:space-between;flex:0 0 auto;gap:12px;width:100%;min-height:58px;box-sizing:border-box;padding:7px 12px;border-top:1px solid #cad8b9;background:#fffef8}
+.phone-home-card>#phoneDialUtility[hidden]{display:none!important}
+#phoneDialUtility .phone-dial-scope-note{position:static;min-width:0;white-space:normal}
+#phoneDialUtility #phoneOwnToggle{position:static;right:auto;top:auto;flex:0 0 auto;margin:0}
+@media(max-width:430px){.phone-home-card>#phoneDialUtility{gap:7px;padding:6px 7px}.phone-home-card>#phoneDialUtility .phone-dial-scope-note{left:auto;top:auto;max-width:calc(100% - 68px);padding:5px 7px;font-size:9px}}
+#phoneDialPanel{padding-top:8px}
+
+/* Profile and settings share the header person button without crowding the main navigation. */
+#phoneNameDialog.profile-settings-dialog{width:min(680px,calc(100% - 24px));max-height:min(90dvh,820px);grid-template-rows:auto auto minmax(0,1fr)}
+.profile-settings-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:5px;border:1px solid #d4e5c4;border-radius:17px;background:#f1f7e9}
+.profile-settings-tabs button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border:0;border-radius:13px;background:transparent;color:#607258;font:inherit;font-weight:800}
+.profile-settings-tabs button[aria-selected="true"]{background:#fffef8;color:#35612d;box-shadow:0 2px 8px rgba(62,99,46,.13)}
+#profileNamePanel,#profileSettingsHost{min-height:0;overflow-y:auto;padding:2px 3px 8px}
+#profileNamePanel[hidden],#profileSettingsHost[hidden]{display:none!important}
+#phoneNameDialog [hidden]{display:none!important}
+
+/* Keep the settings tab readable inside the narrow profile dialog. */
+#profileSettingsHost{overflow-x:hidden}
+#profileSettingsHost #phoneSettingsPanel>*{min-width:0;max-width:100%;box-sizing:border-box}
+#profileSettingsHost #phoneSettingsPanel label{min-width:0;margin:0}
+#profileSettingsHost .support-mode-picker label{display:flex;align-items:stretch;padding:0}
+#profileSettingsHost .ringtone-option{display:grid;margin:0}
+#profileSettingsHost .ringtone-option>span{width:auto;grid-template-columns:24px minmax(0,1fr)}
+#profileSettingsHost .notification-enabled,#profileSettingsHost .ringtone-enabled{display:flex!important;margin:0!important}
+
+@media(max-width:480px){
+ #phoneNameDialog.profile-settings-dialog{width:calc(100% - 12px);max-height:calc(100dvh - 12px);padding:14px 12px 12px;border-radius:22px;box-sizing:border-box}
+ #phoneNameDialog .tips-modal-head{min-height:42px;padding-bottom:9px}
+ #phoneNameDialog .tips-modal-head h2{font-size:18px}
+ #phoneNameDialog .profile-settings-tabs{gap:5px;padding:4px}
+ #phoneNameDialog .profile-settings-tabs button{min-height:48px;padding:8px 6px;font-size:14px;line-height:1.3}
+ #profileSettingsHost{padding:0 2px 10px;overscroll-behavior:contain}
+ #profileSettingsHost #phoneSettingsPanel{width:100%;padding:8px 2px 4px;overflow-x:hidden}
+ #profileSettingsHost #phoneSettingsPanel>.setting-title-row,
+ #profileSettingsHost #phoneSettingsPanel>.account-help-head,
+ #profileSettingsHost #phoneSettingsPanel>h3{min-height:40px;margin-top:24px!important;padding:0 2px 8px;border-bottom:1px solid #d5e6c5}
+ #profileSettingsHost #phoneSettingsPanel>.setting-title-row:first-child{margin-top:0!important}
+ #profileSettingsHost #phoneSettingsPanel h2,
+ #profileSettingsHost #phoneSettingsPanel h3{font-size:17px!important;line-height:1.35}
+ #profileSettingsHost .phone-help-icon,
+ #profileSettingsHost .account-help-head .phone-panel-icon{width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;flex-basis:34px!important;font-size:14px!important}
+ #profileSettingsHost .settings-mode-row{width:100%;margin:12px 0 14px;padding:0 4px}
+ #profileSettingsHost .settings-mode-row .support-mode-picker{width:100%;max-width:none;padding:3px!important;grid-template-columns:repeat(2,minmax(0,1fr))}
+ #profileSettingsHost .settings-mode-row .support-mode-picker span{min-height:48px;padding:6px 4px;font-size:12px;white-space:nowrap}
+ #profileSettingsHost .settings-mode-row .dial-support-help{top:-10px;right:0}
+ #profileSettingsHost .account-fields{width:100%;margin-top:10px!important;padding:12px!important;gap:12px!important}
+ #profileSettingsHost .account-fields label{display:grid;gap:6px;font-size:13px}
+ #profileSettingsHost .notification-setting-card,
+ #profileSettingsHost .ringtone-picker,
+ #profileSettingsHost .device-check-card,
+ #profileSettingsHost #phoneBlocks{width:100%;margin-inline:0;padding:12px;border-radius:15px}
+ #profileSettingsHost .notification-setting-card{grid-template-columns:minmax(0,1fr);gap:10px;margin-bottom:4px}
+ #profileSettingsHost .notification-setting-card #phoneNotificationTest{width:100%;min-height:46px}
+ #profileSettingsHost .notification-enabled,
+ #profileSettingsHost .ringtone-enabled{align-items:flex-start;gap:9px;padding:10px!important}
+ #profileSettingsHost .notification-enabled input,
+ #profileSettingsHost .ringtone-enabled input{flex:0 0 18px;width:18px!important;height:18px!important;margin-top:2px}
+ #profileSettingsHost .ringtone-title-row{align-items:center}
+ #profileSettingsHost .ringtone-title-row span{font-size:10px;text-align:right}
+ #profileSettingsHost .ringtone-options{width:100%;grid-template-columns:minmax(0,1fr);gap:8px}
+ #profileSettingsHost .ringtone-option{width:100%;min-height:66px;grid-template-columns:minmax(0,1fr) 40px;padding:8px 8px 8px 10px}
+ #profileSettingsHost .ringtone-option>span{grid-template-columns:22px minmax(0,1fr);gap:2px 6px}
+ #profileSettingsHost .ringtone-option b{font-size:13px}
+ #profileSettingsHost .ringtone-option small{white-space:normal;line-height:1.35}
+ #profileSettingsHost .device-check-card{align-items:stretch;gap:11px}
+ #profileSettingsHost .device-check-card button{width:100%;min-height:46px}
+ #profileSettingsHost #phoneBlocks{min-height:48px;background:#f7fbef}
+}
+#profileNamePanel #phoneNameForm{display:grid;gap:10px;padding:8px 2px}
+#profileNamePanel #phoneNameForm label{margin:8px 0 0;font-weight:700}
+#profileNamePanel #phoneSaveName{min-height:50px;padding:10px 20px;border:2px solid #8bc466;border-radius:15px;background:#dcf4c1;color:#31582a;font:inherit;font-weight:800}
+#profileSettingsHost #phoneSettingsPanel{display:flex;flex-direction:column;padding:10px 2px 2px;color:#30462d}
+#profileSettingsHost #phoneSettingsPanel input[type="email"],#profileSettingsHost #phoneSettingsPanel input[type="password"]{box-sizing:border-box;width:100%;min-height:48px;padding:10px 12px;border:2px solid #c3e39c;border-radius:14px;background:#fffef9;color:#30462d;font:inherit}
+#profileSettingsHost #phoneSettingsPanel button{font-family:inherit}
+
+/* The contact flow exposes only two destinations and one main action per card. */
+.phone-home-card>.phone-notice-filters{grid-template-columns:repeat(2,minmax(0,1fr))}
+.phone-home-card .phone-notice-filters button{font-size:14px}
+.phone-home-card .phone-notice-filters button>i{color:#65a645;font-size:15px}
+.notice-filter-count{display:inline-grid;place-items:center;min-width:21px;height:21px;padding:0 6px;border-radius:999px;background:#d95664;color:#fff;font-size:11px;font-weight:900;box-sizing:border-box}
+.notice-past-toggle{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:46px;margin:14px 0 72px;border:1px solid #ccdfb8;border-radius:14px;background:#f8fbf3;color:#58704f;font:inherit;font-weight:800}
+.notice-past-toggle[hidden]{display:none!important}
+.school-notice-card{display:grid;gap:8px;padding:17px}
+.school-notice-card>h3{margin:3px 0!important;font-size:19px;line-height:1.45}
+.school-notice-card>p{margin:0 0 3px!important;font-size:15px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
+.school-notice-card.is-later{background:#fffdf3}
+.school-notice-actions{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;margin-top:7px}
+.school-notice-actions .notice-main-action{grid-column:1/-1;width:100%;min-height:58px;border-radius:17px;font-size:17px;font-weight:900}
+.notice-more{grid-column:2;justify-self:end;position:relative}
+.notice-more>summary{display:flex;align-items:center;justify-content:center;gap:6px;min-width:96px;min-height:42px;padding:7px 11px;border:1px solid #c9ddaF;border-radius:13px;background:#f8fbea;color:#52694b;font-weight:800;cursor:pointer;list-style:none;box-sizing:border-box}
+.notice-more>summary::-webkit-details-marker{display:none}
+.notice-more>div{display:grid;gap:7px;position:absolute;right:0;bottom:calc(100% + 7px);z-index:6;width:min(240px,72vw);padding:9px;border:1px solid #c7dcae;border-radius:15px;background:#fffef9;box-shadow:0 10px 28px rgba(47,70,40,.18)}
+.notice-more>div button{display:flex;align-items:center;justify-content:flex-start;gap:9px;width:100%;min-height:45px;padding:8px 11px;text-align:left}
+.notice-response-details{margin-top:3px;padding-top:9px;border-top:1px solid #dbe8ce}
+.notice-response-details summary{color:#52704a;font-weight:800;cursor:pointer}
+.notice-response-details p{margin:7px 0;font-size:13px}
+.phone-home-card>#phoneNoticeAddToggle{display:grid;place-items:center;width:60px;height:60px;min-width:60px;min-height:60px;aspect-ratio:1;padding:0;border-radius:50%;font-size:26px;line-height:1}
+.phone-home-card>#phoneNoticeAddToggle i{display:block;line-height:1}
+.phone-home-card>#phoneNoticeAddToggle[hidden]{display:none!important}
+
+/* New contact creation asks only who and what, with advanced timing folded away. */
+.school-notice-compose{width:min(620px,calc(100% - 20px));max-height:min(92dvh,850px)}
+.school-notice-compose form{gap:14px}
+.notice-compose-step{display:grid;gap:9px;padding:13px;border:1px solid #d5e5c6;border-radius:17px;background:#f9fcf4}
+.notice-compose-step h3{display:flex;align-items:center;gap:9px;margin:0;color:#365831;font-size:17px}
+.notice-compose-step h3>span{display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:#74b653;color:#fff;font-size:14px}
+.notice-purpose-picker{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0;padding:0;border:0}
+.notice-purpose-picker label{position:relative;margin:0!important}
+.notice-purpose-picker input{position:absolute;width:1px!important;height:1px!important;opacity:0}
+.notice-purpose-picker span{display:flex;align-items:center;justify-content:flex-start;gap:9px;min-height:50px;padding:9px 12px;border:2px solid #d0e1bd;border-radius:14px;background:#fffef9;color:#496443;font-weight:800;box-sizing:border-box;cursor:pointer}
+.notice-purpose-picker input:checked+span{border-color:#70ad4d;background:#ddf3c5;color:#315e29;box-shadow:inset 0 0 0 2px #f7ffef}
+.notice-purpose-picker input:focus-visible+span{outline:3px solid #345cbe;outline-offset:2px}
+.notice-detail-label{display:grid!important;gap:7px;margin:0!important;padding:0 2px;font-weight:800}
+.notice-compose-options{border:1px solid #d4e4c4;border-radius:15px;background:#fbfdf7}
+.notice-compose-options>summary{display:flex;align-items:center;gap:8px;min-height:48px;padding:8px 13px;color:#566e4f;font-weight:800;cursor:pointer;list-style:none}
+.notice-compose-options>summary::-webkit-details-marker{display:none}
+.notice-compose-options[open]>summary{border-bottom:1px solid #dce8d0}
+.notice-compose-options .notice-deadline-picker{border:0;border-radius:0;background:transparent}
+.notice-send-summary{display:grid;gap:3px;min-height:48px;padding:10px 13px;border-radius:13px;background:#eef7e5;color:#52694b;box-sizing:border-box}
+.notice-send-summary strong{color:#315b2b}
+.notice-send-summary span{font-size:12px}
+.school-notice-compose .notice-send-button{position:sticky;bottom:0;z-index:2;width:100%;box-shadow:0 -8px 18px #fffef9,0 3px 0 #cae2b5}
+@media(max-width:540px){
+ .phone-home-card>.phone-notice-filters{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .phone-home-card .phone-notice-filters button{font-size:12px;gap:5px}
+ .school-notice-card{padding:14px}
+ .school-notice-card header{display:grid;gap:5px}
+ .school-notice-card header time{justify-self:start;padding:0}
+ .notice-purpose-picker{grid-template-columns:1fr}
+ .notice-purpose-picker span{min-height:48px}
+ .notice-recipient-list{max-height:155px}
+ .notice-more>summary{min-width:92px}
+ .phone-home-card>#phoneNoticeAddToggle{width:58px;height:58px;min-width:58px;min-height:58px;padding:0;font-size:25px}
+}
+/* Direct contact actions and an easy deadline picker for staff messages. */
+.phone-home-card .contact-message-button{min-width:92px;background:#f7f5df;border-color:#d6c978;color:#57633f}.phone-home-card .contact-message-button i,.history-row [data-message-number] i,.group-row [data-message-group] i{color:#6d913f}
+.notice-deadline-picker{display:grid;gap:11px;margin:0;padding:14px;border:1px solid #cee1bb;border-radius:16px;background:#f8fbf3}.notice-field-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}.notice-field-heading legend{padding:0;font-weight:800}.notice-field-heading .phone-help-icon{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;min-height:30px;padding:0;border-radius:50%}
+.notice-deadline-options{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.notice-deadline-options label{position:relative;min-width:0}.notice-deadline-options input{position:absolute;opacity:0;pointer-events:none}.notice-deadline-options span{display:flex;align-items:center;justify-content:center;min-height:42px;padding:5px;border:1px solid #c7daaf;border-radius:12px;background:#fffef9;color:#5b6f52;font-size:12px;font-weight:800;cursor:pointer;box-sizing:border-box}.notice-deadline-options input:checked+span{border-color:#6dad49;background:#def3c5;color:#315c2a;box-shadow:inset 0 0 0 1px #f5ffe9}.notice-deadline-options input:focus-visible+span{outline:3px solid #345cbe;outline-offset:2px}
+.notice-deadline-help p{margin:3px 0;font-size:12px;line-height:1.55;color:#5f7057}.notice-deadline-help.is-visible{max-height:220px!important;margin:0!important;padding:11px 12px!important;border:1px solid #d6e5c8!important;border-radius:12px;background:#fffef9}.notice-deadline-range{display:grid;grid-template-columns:1fr 1fr;gap:8px}.notice-deadline-range label,.notice-deadline-text{display:grid!important;gap:5px;font-size:12px;font-weight:700!important;color:#61725a}.school-notice-compose .notice-deadline-text input{width:100%;box-sizing:border-box;min-height:44px;padding:10px 12px;border:1px solid #aacb89;border-radius:12px;background:#fff;color:#30462d;font:inherit}
+.notice-send-button{position:relative;display:flex!important;align-items:center;justify-content:center;gap:9px}.notice-send-spinner{display:none}.notice-send-button.is-loading .fa-paper-plane{display:none}.notice-send-button.is-loading .notice-send-spinner{display:inline-block}.notice-send-button.is-loading span{font-size:0}.notice-send-button.is-loading span::before{content:'送信中';font-size:17px}
+@media(max-width:540px){.phone-home-card .contact-message-button{min-width:48px;width:48px;padding:0}.contact-message-button span{display:none}.notice-deadline-options{grid-template-columns:repeat(3,minmax(0,1fr))}.notice-deadline-range{grid-template-columns:1fr}.history-row [data-message-number] span,.group-row [data-message-group] span{display:none}}
+.notice-deadline-range[hidden]{display:none!important}.notice-deadline-options input{width:1px!important;height:1px!important;min-height:0!important;margin:0!important}.school-notice-compose{box-sizing:border-box;overflow-x:hidden}
+/* Notice cards identify the sender, state and action target at a glance. */
+.notice-card-badges{display:flex;align-items:center;flex-wrap:wrap;gap:6px}.school-notice-card header .notice-status-badge{background:#edf4e6;color:#5b6d54}.school-notice-card header .notice-status-badge.is-waiting{background:#fff1c9;color:#795b20}.school-notice-card header .notice-status-badge.is-progress{background:#dff1ff;color:#37647c}.school-notice-card header .notice-status-badge.is-complete{background:#dff3d0;color:#36702a}.notice-sender-badge{display:inline-flex;align-items:center;gap:6px;margin:11px 0 2px;padding:6px 10px;border:1px solid #c4dda9;border-radius:999px;background:#eff8e5;color:#42663a;font-size:12px;font-weight:800}.notice-sender-badge i{color:#6ba64c}.notice-delivery-summary{display:block;margin-top:7px}.school-notice-card.is-done{opacity:1;background:#f7f9f3}.school-notice-card.is-done>h3,.school-notice-card.is-done>p{color:#667260}
+@media(max-width:540px){.school-notice-card header{align-items:flex-start}.school-notice-card header time{padding-top:5px}.school-notice-actions button{font-size:12px;padding-inline:8px}}
+/* Reply counts update inside the action without changing button size. */
+.notice-reply-count{display:inline-grid;place-items:center;min-width:20px;height:20px;margin-left:3px;padding:0 5px;border-radius:999px;background:#d95664;color:#fff;font-size:11px;font-weight:800;line-height:1;box-sizing:border-box}.school-notice-card details summary{display:flex;align-items:center;gap:6px;width:max-content;padding:7px 10px;border:1px solid #c6dcae;border-radius:999px;background:#f3f9ea;color:#43653a;font-weight:800;cursor:pointer}.school-notice-card details summary small{margin-left:2px;color:#718069;font-size:10px;font-weight:600}
+
+/* State changes keep the two main modes calm and visually continuous. */
+#phoneHome>[role="tabpanel"]:not([hidden]){animation:phone-panel-enter .22s ease-out both}
+.phone-tabs button,.notice-filter-tabs button{transition:background-color .2s ease,color .2s ease,box-shadow .2s ease,transform .16s ease}
+.phone-tabs button:active,.notice-filter-tabs button:active{transform:scale(.985)}
+.school-notice-card{animation:notice-card-enter .2s ease-out both}
+.notice-action-dialog form{display:grid;gap:12px}.notice-action-dialog form label{font-weight:800}.notice-action-dialog form select{width:100%;min-height:50px;padding:10px 12px;border:1px solid #aacb89;border-radius:13px;background:#fffef8;color:#30462d;font:inherit}.notice-action-dialog form .phone-primary{min-height:52px;font-size:16px}
+@keyframes phone-panel-enter{from{opacity:.45;transform:translateY(5px)}to{opacity:1;transform:none}}
+@keyframes notice-card-enter{from{opacity:.55;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){#phoneHome>[role="tabpanel"]:not([hidden]),.school-notice-card{animation:none}.phone-tabs button,.notice-filter-tabs button{transition:none}}
+
+/* Keep creation actions in reach while only the panel content scrolls. */
+.phone-home-card .phone-add-fab,#phoneContactsPanel .phone-add-fab,#phoneGroupsPanel .phone-add-fab{position:fixed;right:max(22px,calc((100vw - 1180px)/2 + 30px));bottom:calc(env(safe-area-inset-bottom,0px) + 84px);left:auto;z-index:24}
+.notice-self-sent-badge{display:inline-flex;align-items:center;gap:6px;margin:11px 0 2px;padding:6px 10px;border:1px solid #bcd8a3;border-radius:999px;background:#e8f5dc;color:#3e6735;font-size:12px;font-weight:800}.notice-self-sent-badge i{color:#65a946}
+@media(max-width:540px){.phone-home-card .phone-add-fab,#phoneContactsPanel .phone-add-fab,#phoneGroupsPanel .phone-add-fab{right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 74px)}}
+/* Add actions belong to phoneHome, so they stay at the visible section corner at every width. */
+.phone-home-card>.phone-add-fab{position:absolute;right:clamp(12px,1.6vw,20px);bottom:86px;left:auto;z-index:24}
+@media(max-width:540px){.phone-home-card>.phone-add-fab{right:12px;bottom:74px}}
+
+.notice-reply-history{display:grid;gap:8px;margin:13px 0;padding:12px;border:1px solid #d4e5c4;border-radius:15px;background:#f4f9ec}.notice-reply-history h4{display:flex;align-items:center;gap:7px;margin:0 0 2px;color:#4b6b40;font-size:13px}.notice-reply-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;padding:11px 12px;border:1px solid #dce9cf;border-radius:13px;background:#fffef9}.notice-reply-author{display:flex;align-items:center;gap:7px;min-width:0;color:#396331}.notice-reply-author i{color:#74ad52;font-size:18px}.notice-reply-author strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}.notice-reply-item p{grid-column:1/-1;margin:0!important;color:#344c30;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}.notice-reply-item time{grid-column:2;justify-self:end;color:#788671;font-size:11px}
+
+.school-notice-actions .notice-reply-action{border-color:#8fc16d;background:#e9f7d8;color:#37632e;font-weight:800}.school-notice-actions .notice-reply-action i{color:#60a541}
+
+/* One clear notice card: sender, type, message, then response. */
+.school-notice-list .school-notice-card{gap:0;padding:0;overflow:visible;border:2px solid #82bb5d;border-radius:20px;background:#fffef9;box-shadow:0 4px 0 #d7e6c9}
+.school-notice-list .school-notice-card.is-urgent{border-color:#dda453;background:#fffdf8}.school-notice-list .school-notice-card.is-later{background:#fffef9}.school-notice-list .school-notice-card.is-done{background:#f9fbf6}
+.school-notice-list .school-notice-card>header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 17px;border:0;border-bottom:1px solid #d5e4c8;border-radius:18px 18px 0 0;background:#e9f6dc}
+.school-notice-list .school-notice-card.is-urgent>header{background:#fff1d2}
+.school-notice-list .notice-sender-badge,.school-notice-list .notice-self-sent-badge{display:flex;align-items:center;gap:10px;width:auto;min-width:0;margin:0;padding:0;border:0;border-radius:0;background:transparent;color:#345b2f}
+.school-notice-list .notice-sender-badge>i,.school-notice-list .notice-self-sent-badge>i{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;border-radius:12px;background:#d5edc2;color:#4d8c39;font-size:17px}
+.school-notice-list .notice-sender-badge>span,.school-notice-list .notice-self-sent-badge>span{display:grid;min-width:0;gap:1px;padding:0;border-radius:0;background:transparent}.school-notice-list .notice-sender-badge small,.school-notice-list .notice-self-sent-badge small{color:#718269;font-size:10px;font-weight:700}.school-notice-list .notice-sender-badge strong,.school-notice-list .notice-self-sent-badge strong{overflow:hidden;text-overflow:ellipsis;color:#31582c;font-size:16px;line-height:1.35;white-space:nowrap}
+.school-notice-list .school-notice-card>header time{flex:0 0 auto;color:#70806a;font-size:12px;font-variant-numeric:tabular-nums}
+.notice-card-status{display:flex;align-items:center;gap:12px;padding:11px 17px;border-bottom:1px solid #e1ead8;background:#fffef9}.notice-field-label{flex:0 0 auto;color:#64775c;font-size:12px;font-weight:800;letter-spacing:.04em}.notice-card-status .notice-card-badges{gap:7px}.notice-card-status .notice-card-badges span{padding:5px 11px;border-radius:999px;font-size:13px;font-weight:800}.notice-card-status .notice-kind-badge{background:#e5f3d5;color:#416d35}.school-notice-card.is-urgent .notice-card-status .notice-kind-badge{background:#ffe3b7;color:#895519}.notice-card-status .notice-status-badge{background:#edf4e6;color:#5b6d54}.notice-card-status .notice-status-badge.is-waiting{background:#fff1c9;color:#795b20}.notice-card-status .notice-status-badge.is-progress{background:#dff1ff;color:#37647c}.notice-card-status .notice-status-badge.is-complete{background:#dff3d0;color:#36702a}
+.notice-message-block{display:grid;gap:8px;padding:17px 17px 20px;border:0;border-radius:0;background:#fffef9}.notice-message-block .notice-field-label{margin-bottom:1px}.notice-message-block h3{margin:0;color:#2f582b;font-size:clamp(20px,2.1vw,23px);line-height:1.4}.notice-message-block p{margin:0;color:#3d5138;font-size:16px;line-height:1.72;white-space:pre-wrap;overflow-wrap:anywhere}
+.school-notice-list .school-notice-actions{display:grid;grid-template-columns:minmax(0,1fr) max-content;align-items:stretch;gap:10px;margin:0;padding:13px 17px 16px;border:0;border-top:1px solid #dce8d1;border-radius:0 0 18px 18px;background:#f1f8e9}.school-notice-list .school-notice-actions>.notice-field-label{grid-column:1/-1}.school-notice-list .school-notice-actions .notice-main-action{grid-column:1;grid-row:2;width:100%;min-height:54px}.school-notice-list .notice-more{grid-column:2;grid-row:2;align-self:stretch;margin:0;padding:0;border:0}.school-notice-list .notice-more>summary{min-width:94px;height:100%;min-height:54px}.school-notice-list .notice-response-details{margin:0;padding:12px 17px;border:0;border-top:1px solid #dce8d1;border-radius:0;background:#f8fbf4}
+.school-notice-list .school-notice-card.is-done .notice-message-block h3,.school-notice-list .school-notice-card.is-done .notice-message-block p{color:#667260}
+@media(max-width:540px){.school-notice-list .school-notice-card>header{padding:12px}.notice-card-status{padding:10px 12px}.notice-message-block{padding:14px 12px 16px}.school-notice-list .school-notice-actions{grid-template-columns:minmax(0,1fr) auto;padding:11px 12px 13px}.notice-message-block h3{font-size:19px}.notice-message-block p{font-size:15px}.school-notice-list .notice-more>summary{min-width:82px;padding-inline:9px}.school-notice-list .notice-sender-badge>i,.school-notice-list .notice-self-sent-badge>i{flex-basis:34px;width:34px;height:34px}}
+
+/* Responsive dial controls: keep every target comfortable while fitting short and narrow screens. */
+#phoneDialPanel{container-name:phone-dial-panel;container-type:size;}
+.phone-dial-content{
+  --phone-key-size:clamp(52px,min(calc((100cqw - 56px)/3),calc((100cqh - 138px)/5)),88px);
+  --phone-key-gap-x:clamp(14px,5cqw,24px);
+  --phone-key-gap-y:clamp(5px,1.25cqh,12px);
+}
+#phoneDialForm>*{--dial-gap:var(--phone-key-gap-y);}
+#phoneDialForm .phone-keypad,
+#phoneDialForm .phone-dial-actions{column-gap:var(--phone-key-gap-x);width:calc(3 * var(--dial-key) + 2 * var(--phone-key-gap-x));}
+#phoneDialForm .phone-key{touch-action:manipulation;}
+#phoneDialForm .phone-key>small{font-size:clamp(8px,calc(var(--dial-key) * .14),11px);}
+#phoneDialForm #phoneBackspace{width:clamp(48px,var(--dial-key),64px);height:clamp(48px,var(--dial-key),64px);}
+@container phone-dial-panel (max-width:360px){
+ .phone-dial-content{--phone-key-size:clamp(48px,min(calc((100cqw - 40px)/3),calc((100cqh - 166px)/5)),66px);--phone-key-gap-x:clamp(10px,4cqw,18px);}
+}
+@container phone-dial-panel (max-height:560px){
+ .phone-dial-content{--phone-key-size:clamp(46px,min(calc((100cqw - 44px)/3),calc((100cqh - 132px)/5)),58px);--phone-key-gap-y:4px;}
+ #phoneDialForm .phone-dial-actions{height:calc(var(--dial-key) + 28px);}
+ #phoneDialForm #phoneBackspace small{top:calc(50% + 13px);font-size:8px;}
+}
+@container phone-dial-panel (min-width:700px) and (min-height:680px){
+ .phone-dial-content{--phone-key-size:clamp(68px,min(calc((100cqw - 72px)/3),calc((100cqh - 190px)/5)),88px);width:min(100%,400px);}
+}
+
+/* Keep number creation feedback beside the own-number control without moving other controls. */
+.phone-own-creating{display:inline-flex;align-items:center;justify-content:center;gap:.35rem;margin-left:auto;padding:.35rem .55rem;border:1px solid #b9d994;border-radius:999px;background:#f1f9e5;color:#527542;font-size:.75rem;font-weight:700;white-space:nowrap;pointer-events:none;}
+.phone-own-creating[hidden]{display:none!important;}
+.phone-own-creating i{animation:phoneOwnCreatingSpin .8s linear infinite;}
+#phoneOwnToggle.is-creating{opacity:.72;}
+@keyframes phoneOwnCreatingSpin{to{transform:rotate(360deg)}}
+@media(max-width:380px){.phone-own-creating{padding:.3rem .42rem;font-size:.6875rem}.phone-own-creating span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}}
+@media(prefers-reduced-motion:reduce){.phone-own-creating i{animation:none}}
+
+/* The dial footer always shows the device number; profile details live in settings. */
+.phone-own-number-display{display:grid!important;grid-template-columns:auto auto;align-items:center;justify-items:end;column-gap:.45rem;min-width:9.4rem;min-height:2.75rem;padding:.3rem .65rem!important;border:1px solid #bddb9e!important;border-radius:.9rem!important;background:#f5fbe9!important;color:#395c31!important;box-shadow:none!important}
+.phone-own-number-display span{grid-column:1;font-size:.6875rem;color:#718568;line-height:1}
+.phone-own-number-display strong{grid-column:1;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:1.05rem;line-height:1.2;letter-spacing:.08em;font-variant-numeric:tabular-nums}
+.phone-own-number-display>i{grid-column:2;grid-row:1/3;font-size:1rem;color:#67a747}
+.phone-own-number-display:disabled{opacity:.72}
+.profile-number-card{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.35rem .75rem;padding:1rem;border:1px solid #c9e1af;border-radius:1rem;background:#f5faed}
+.profile-number-card>span:first-child{font-size:.75rem;color:#718568}
+.profile-number-card>strong{grid-column:1;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:1.45rem;letter-spacing:.1em;font-variant-numeric:tabular-nums}
+.profile-number-card>div{grid-column:2;grid-row:1/3;display:flex;align-items:center;gap:.4rem}
+.profile-number-card button{min-height:2.5rem;padding:.45rem .7rem;border-radius:.75rem}
+.profile-number-loading{grid-column:1/-1;display:inline-flex;align-items:center;gap:.45rem;color:#5d774f;font-size:.75rem;font-weight:700}
+.profile-number-loading[hidden]{display:none}
+.profile-number-loading i{animation:phoneOwnCreatingSpin .8s linear infinite}
+#profileNamePanel #phoneNameForm>input{box-sizing:border-box;width:100%;min-height:3rem;padding:.65rem .8rem;border:2px solid #c3e39c;border-radius:.875rem;background:#fffef9;color:#30462d;font:inherit}
+#profileNamePanel #phoneNameForm label small{color:#718568;font-size:.75rem;font-weight:600}
+.incoming-caller-meta{display:block;margin:.4rem 0 0;color:#63775b;font-size:.9rem}
+.incoming-caller-meta[hidden]{display:none}
+@media(max-width:430px){.phone-own-number-display{min-width:8.3rem;padding-inline:.5rem!important}.phone-own-number-display strong{font-size:.92rem}.profile-number-card{grid-template-columns:1fr}.profile-number-card>div{grid-column:1;grid-row:auto}.profile-number-card>strong{grid-column:1}}
+@media(prefers-reduced-motion:reduce){.profile-number-loading i{animation:none}}
+
+/* Notice archive and clearer create/action layout. */
+#phoneNoticeAddToggle.notice-add-button{display:flex!important;align-items:center;justify-content:center;gap:9px;width:auto;max-width:calc(100vw - 36px);height:56px;min-height:56px!important;padding:0 20px!important;border-radius:18px!important;font-size:16px;font-weight:900;white-space:nowrap}
+#phoneNoticeAddToggle.notice-add-button i{font-size:20px}
+.notice-card-header-meta{display:flex;align-items:center;justify-content:flex-end;gap:10px;min-width:0;margin-left:auto}
+.school-notice-card header .notice-card-status{display:flex;align-items:center;justify-content:flex-end;gap:6px;min-width:0;padding:0;border:0;background:transparent}
+.school-notice-card header .notice-card-status>span{padding:4px 9px;border-radius:999px;font-size:12px;font-weight:800;white-space:nowrap}
+.school-notice-card header .notice-kind-badge{background:#dcefc9;color:#416d35}
+.school-notice-card.is-urgent header .notice-kind-badge{background:#ffe0aa;color:#895519}
+.school-notice-card header .notice-status-badge{background:#edf4e6;color:#5b6d54}
+.school-notice-card header .notice-status-badge.is-waiting{background:#fff1c9;color:#795b20}
+.school-notice-card header .notice-status-badge.is-progress{background:#dff1ff;color:#37647c}
+.school-notice-card header .notice-status-badge.is-complete{background:#dff3d0;color:#36702a}
+.school-notice-list .notice-more>summary span{font-size:13px}
+.notice-day-group{margin:0;border:2px solid #91c56e;border-radius:19px;background:#f3fae9;box-shadow:0 4px 0 #d9e9ca;overflow:hidden}
+.notice-day-group>summary{display:grid!important;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:10px;width:auto!important;min-height:58px;margin:0!important;padding:10px 15px!important;border:0!important;border-radius:17px!important;background:linear-gradient(145deg,#eef9df,#e1f3ce)!important;color:#345c2d!important;cursor:pointer;list-style:none}
+.notice-day-group>summary::-webkit-details-marker{display:none}.notice-day-date{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:900}.notice-day-date i{color:#68a747}.notice-day-count{padding:5px 10px;border-radius:999px;background:#fff0bf;color:#765719;font-size:12px;font-weight:900;white-space:nowrap}.notice-day-chevron{font-size:13px;transition:transform .22s ease}.notice-day-group[open]>summary .notice-day-chevron{transform:rotate(180deg)}
+.notice-day-items{display:grid;gap:12px;padding:12px 10px 14px}.notice-day-group[open]>.notice-day-items{animation:notice-day-open .24s ease-out both}@keyframes notice-day-open{from{opacity:0;transform:translateY(-7px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:620px){.school-notice-list .school-notice-card>header{display:flex;align-items:flex-start}.notice-card-header-meta{display:grid;justify-items:end;gap:5px}.school-notice-card header .notice-card-status{flex-wrap:wrap}.school-notice-card header .notice-card-status>span{font-size:11px;padding:4px 7px}.notice-day-date{font-size:16px}.notice-day-group>summary{padding:9px 11px!important}.notice-day-count{font-size:11px;padding:4px 8px}#phoneNoticeAddToggle.notice-add-button{right:14px;padding-inline:16px!important}}
+@media(prefers-reduced-motion:reduce){.notice-day-chevron{transition:none}.notice-day-group[open]>.notice-day-items{animation:none}}
+.phone-home-card>#phoneNoticeAddToggle.notice-add-button{width:max-content;min-width:0;max-width:calc(100vw - 36px);height:56px;min-height:56px!important;aspect-ratio:auto;padding:0 20px!important;border-radius:18px!important;font-size:16px}
+@media(max-width:620px){.phone-home-card>#phoneNoticeAddToggle.notice-add-button{width:max-content;min-width:0;height:54px;min-height:54px!important;aspect-ratio:auto;padding-inline:16px!important;font-size:15px}}
+
+/* Tablet and staff-room desktop workspace layout. */
+@media(min-width:760px){
+ body.phone-home .phone-home-card{padding-inline:clamp(16px,2.2vw,30px)}
+ .phone-home-card [role="tabpanel"]{padding:18px 4px 10px}
+ .phone-dial-shortcuts.notice-filter-tabs,.phone-notice-filters.notice-filter-tabs{gap:8px;padding:8px}
+ .phone-dial-shortcuts.notice-filter-tabs button,.phone-notice-filters.notice-filter-tabs button{min-height:54px;font-size:16px}
+ .notice-search-toggle-row{min-height:58px}
+ .notice-recipient-list{grid-template-columns:repeat(3,minmax(0,1fr));max-height:240px}
+ .phone-list-tools.is-visible{display:grid!important;grid-template-columns:minmax(0,1fr) max-content;align-items:center;gap:12px}
+ .phone-list-tools.is-visible>input{grid-column:1;min-width:0}
+ .phone-list-tools.is-visible>button{grid-column:2;min-width:170px}
+ .phone-home-card>.phone-tabs{padding-inline:4px}
+ .phone-home-card>.phone-tabs button{min-height:58px;font-size:18px}
+}
+@media(min-width:960px){
+ .school-notice-list{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:18px}
+ .school-notice-list>.phone-empty-state,.school-notice-list>.notice-day-group{grid-column:1/-1}
+ .notice-day-items{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding:16px}
+ .school-notice-list .school-notice-card{height:100%;align-self:stretch}
+ #phoneHistoryPanel:not([hidden]){display:grid;grid-template-columns:minmax(280px,.38fr) minmax(440px,1fr);grid-template-areas:"history-head history-head" "history-tools history-tools" "frequent history";align-content:start;column-gap:22px}
+ #phoneHistoryPanel>.phone-panel-head{grid-area:history-head}
+ #phoneHistoryPanel>#phoneHistoryTools{grid-area:history-tools}
+ #phoneHistoryPanel>.frequent-section{grid-area:frequent;margin-top:17px;padding:14px;border:1px solid #d3e5c0;border-radius:20px;background:#f7fbed}
+ #phoneHistoryPanel>.history-section{grid-area:history;min-width:0;margin-top:0}
+ #phoneHistoryPanel .frequent-section h3,#phoneHistoryPanel .history-section h3{margin-top:0}
+ #phoneHistoryPanel .frequent-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #phoneHistory{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+ #phoneHistory>.phone-row{height:100%;margin:0}
+ #phoneContacts>.contact-section{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:10px 14px;margin-top:12px}
+ #phoneContacts>.contact-section>h3{grid-column:1/-1}
+ #phoneContacts>.contact-section .contact-row{height:100%;margin:0}
+ #phoneGroups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:14px}
+ #phoneGroups>.phone-row,#phoneGroups>.group-row,#phoneGroups>.group-card{height:100%;margin:0}
+ #phoneGroupInvites:not(:empty){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:16px}
+ #phoneDialPanel:not([hidden]){display:grid;place-items:center}
+ #phoneDialPanel .phone-dial-content{width:min(100%,620px)}
+ .phone-home-card>#phoneNoticeAddToggle.notice-add-button{right:max(26px,calc((100vw - 1240px)/2 + 36px));bottom:96px}
+}
+@media(min-width:1280px){
+ .school-notice-list,#phoneHistory{gap:20px}
+ #phoneContacts>.contact-section,#phoneGroups,#phoneGroupInvites:not(:empty){gap:16px 18px}
+ .school-notice-list .school-notice-card>header{padding:17px 19px}
+ .notice-message-block{padding:19px 19px 22px}
+ .school-notice-list .school-notice-actions{padding:15px 19px 18px}
+}
+
+/* Short school tablets and compact Chromebooks: spend height on the task, not on chrome. */
+@media(min-width:641px) and (max-height:700px){
+ body.phone-home{padding:4px max(6px,env(safe-area-inset-right)) max(4px,env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left))}
+ body.phone-home main{gap:5px;padding:6px;border-radius:22px}
+ body.phone-home main>header{min-height:52px;padding:5px 10px}
+ .phone-home header h1{font-size:clamp(22px,2.5vw,28px)}
+ .phone-home header .app-icon,.phone-home header .header-icon-btn{width:42px;height:42px;min-height:42px;flex-basis:42px}
+ body.phone-home .phone-home-card{padding:7px 14px;border-radius:19px}
+ .phone-home-card>.phone-dial-shortcuts,.phone-home-card>.phone-notice-filters{gap:5px;margin:3px 0;padding:4px}
+ .phone-home-card .phone-dial-shortcuts button,.phone-home-card .phone-notice-filters button{min-height:42px;padding:5px 7px;font-size:13px}
+ .phone-home-card [role="tabpanel"]{padding:4px 2px 2px}
+ .phone-home-card>#phoneDialUtility{min-height:48px;padding:3px 9px}
+ #phoneDialUtility .phone-dial-scope-note{padding:4px 8px;font-size:10px}
+ .phone-own-number-display{min-height:40px;padding-block:2px!important}
+ .phone-home-card>.phone-tabs{gap:8px;padding:3px 3px 2px}
+ .phone-home-card>.phone-tabs button{min-height:46px;padding:7px 12px;font-size:16px}
+ #phoneDialPanel{padding:0}
+ .phone-home-card>#phoneNoticeAddToggle.notice-add-button{bottom:64px;height:48px;min-height:48px!important;padding-inline:16px!important}
+}
+
+/* On a wide but short screen, keep all twelve keys and call controls visible together. */
+@media(min-width:700px) and (max-height:820px){
+ #phoneDialPanel .phone-dial-content{--phone-key-size:clamp(44px,min(calc((100cqw - 150px)/3),calc((100cqh - 76px)/4)),56px);width:min(100%,540px);gap:3px}
+ #phoneDialForm{display:grid;grid-template-columns:auto 76px;grid-template-rows:46px auto;align-items:center;justify-content:center;column-gap:18px;row-gap:3px;width:100%}
+ #phoneDialForm .phone-number-entry{grid-column:1/-1;grid-row:1;width:100%;height:46px}
+ #phoneDialForm .phone-number-entry #phoneDialNumber{height:46px;min-height:46px;padding:16px 12px 3px;font-size:21px}
+ #phoneDialForm .phone-number-entry label{top:3px}
+ #phoneDialForm .phone-keypad{grid-column:1;grid-row:2}
+ #phoneDialForm .phone-dial-actions{grid-column:2;grid-row:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;width:76px;height:auto}
+ #phoneDialForm .phone-call{flex:0 0 auto;width:58px;height:58px}
+ #phoneDialForm #phoneBackspace{flex:0 0 auto;width:54px;height:54px;min-height:54px}
+ #phoneDialForm #phoneBackspace small{top:calc(50% + 14px)}
+}
+
+/* Extremely short windows remain operable without stealing space from the content pane. */
+@media(min-width:641px) and (max-height:540px){
+ body.phone-home main>header{min-height:46px;padding-block:3px}
+ .phone-home header .app-icon,.phone-home header .header-icon-btn{width:38px;height:38px;min-height:38px;flex-basis:38px}
+ .phone-home-card .phone-dial-shortcuts button,.phone-home-card .phone-notice-filters button{min-height:38px}
+ .phone-home-card>#phoneDialUtility{min-height:43px}
+ .phone-home-card>.phone-tabs button{min-height:42px}
+ .phone-home-card>#phoneNoticeAddToggle.notice-add-button{bottom:56px}
+}
+
+/* Notice cards keep a predictable scan rhythm; replies open only when requested. */
+.notice-card-header-meta{align-items:stretch}
+.school-notice-card header .notice-card-status{flex-direction:column;align-items:flex-end;justify-content:center;gap:4px}
+.school-notice-list .school-notice-card>header time{display:grid;align-content:center;justify-items:end;gap:1px;min-width:3.4em;line-height:1.15}
+.notice-reply-history{display:block;margin:0!important;padding:0!important;border:0!important;border-top:1px solid #dce8d1!important;background:#f7fbf2}
+.notice-reply-history>summary{display:grid!important;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;width:100%!important;box-sizing:border-box;padding:11px 17px!important;border:0!important;border-radius:0!important;background:#f2f8eb!important;color:#42663a;list-style:none}
+.notice-reply-history>summary::-webkit-details-marker{display:none}
+.notice-reply-history>summary>span{display:flex;align-items:center;gap:7px;font-weight:850}
+.notice-reply-history>summary>small{padding:3px 8px;border-radius:999px;background:#dcefc9;color:#42663a;font-size:11px;font-weight:850}
+.notice-reply-chevron{font-size:11px;transition:transform .22s ease}
+.notice-reply-history[open] .notice-reply-chevron{transform:rotate(180deg)}
+.notice-reply-list{display:grid;grid-template-rows:0fr;padding:0 12px;opacity:0;overflow:hidden;transition:grid-template-rows .24s ease,opacity .2s ease,padding .24s ease}
+.notice-reply-list-inner{display:grid;gap:8px;min-height:0;overflow:hidden}
+.notice-reply-history[open]>.notice-reply-list{grid-template-rows:1fr;max-height:180px;padding:10px 12px 12px;opacity:1;overflow-y:auto}
+
+@media(min-width:960px){
+ .school-notice-list>.school-notice-card,.notice-day-items>.school-notice-card{height:430px;min-height:430px;max-height:430px;display:flex;flex-direction:column;overflow:hidden}
+ .school-notice-list .notice-message-block{flex:1 1 auto;min-height:0;align-content:start}
+ .school-notice-list .notice-message-block h3{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+ .school-notice-list .notice-message-block>p{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:3}
+ .school-notice-list .school-notice-actions{flex:0 0 auto;width:100%;box-sizing:border-box}
+ .school-notice-list .notice-reply-history{flex:0 0 auto;width:100%;box-sizing:border-box}
+}
+
+/* Use wide dialogs as workspaces only where two columns reduce scrolling. */
+@media(min-width:900px) and (min-height:620px){
+ .contact-form-dialog{width:min(760px,calc(100% - 40px))}
+ .contact-form-dialog .phone-form-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+ .presence-dialog{width:min(720px,calc(100% - 40px))}
+ .presence-options{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .school-notice-compose{width:min(920px,calc(100% - 40px))}
+ .school-notice-compose form{grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);align-items:start;gap:14px 18px}
+ .school-notice-compose .notice-compose-step:first-child{grid-column:1;grid-row:1/4}
+ .school-notice-compose .notice-compose-step:nth-child(2),.school-notice-compose .notice-detail-label,.school-notice-compose .notice-compose-options{grid-column:2}
+ .school-notice-compose .notice-recipient-list{grid-template-columns:repeat(2,minmax(0,1fr));max-height:420px}
+ .school-notice-compose .notice-send-summary,.school-notice-compose .notice-send-review,.school-notice-compose .notice-send-button{grid-column:1/-1}
+ .device-check-dialog{width:min(780px,calc(100% - 40px))}
+ .device-check-results{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .device-check-manual{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:18px}
+ .device-check-manual>strong{grid-column:1/-1}
+ .call-result-dialog{width:min(660px,calc(100% - 40px))}
+ .call-result-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .group-detail-dialog{width:min(920px,calc(100% - 40px))}
+ .group-detail-dialog[open]{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:14px 18px}
+ .group-detail-dialog>.number-head,.group-detail-dialog>.group-call-status,.group-detail-dialog>.group-manage-toggle,.group-detail-dialog>.group-owner-tools,.group-detail-dialog>.group-member-actions{grid-column:1/-1;width:100%;box-sizing:border-box}
+ .group-detail-dialog>.group-dialog-section{margin-top:0;height:100%;box-sizing:border-box}
+}
+
+/* Keep the complete dial control group on the visual center line. */
+#phoneDialPanel .phone-dial-content{align-self:center;margin-inline:auto}
+#phoneDialForm{place-self:center;margin-inline:auto}
+@media(min-width:700px) and (max-height:820px){#phoneDialForm{width:max-content;max-width:100%}}
+@media(prefers-reduced-motion:reduce){.notice-reply-list,.notice-reply-chevron{transition:none}}
+
+/* Keep notice metadata and action menus readable from narrow cards to wide desktops. */
+.school-notice-list .school-notice-card{container-type:inline-size}
+.school-notice-list .school-notice-card>header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}
+.notice-card-header-meta{display:flex;flex-flow:row nowrap;align-items:center;justify-content:flex-end;gap:8px;white-space:nowrap}
+.school-notice-card header .notice-card-status{display:flex;flex-direction:row;align-items:center;justify-content:flex-end;gap:5px}
+.school-notice-list .school-notice-card>header time{display:block;min-width:auto;line-height:1.2;white-space:nowrap}
+.school-notice-list .notice-sender-badge strong,.school-notice-list .notice-self-sent-badge strong{max-width:100%;text-overflow:ellipsis;overflow:hidden}
+.notice-more>div{width:clamp(240px,70cqw,330px)}
+.notice-more>div button{min-width:0;white-space:normal;word-break:keep-all;overflow-wrap:normal;writing-mode:horizontal-tb;line-height:1.35}
+.notice-more>div button i{flex:0 0 18px;text-align:center}
+
+@container(max-width:560px){
+ .school-notice-list .school-notice-card>header{gap:8px;padding-inline:12px}
+ .notice-card-header-meta{gap:5px}
+ .school-notice-card header .notice-card-status{gap:4px}
+ .school-notice-card header .notice-card-status>span{padding:4px 7px;font-size:11px}
+ .school-notice-list .school-notice-card>header time{font-size:11px}
+ .school-notice-list .notice-sender-badge,.school-notice-list .notice-self-sent-badge{gap:7px}
+ .school-notice-list .notice-sender-badge>i,.school-notice-list .notice-self-sent-badge>i{flex-basis:34px;width:34px;height:34px}
+ .school-notice-list .notice-sender-badge strong,.school-notice-list .notice-self-sent-badge strong{font-size:14px}
+ .notice-more>div{right:0;width:min(300px,calc(100cqw - 24px));grid-template-columns:1fr}
+}
+
+@container(max-width:390px){
+ .school-notice-list .school-notice-card>header{grid-template-columns:minmax(0,1fr);align-items:start}
+ .notice-card-header-meta{justify-content:space-between;margin:7px 0 0}
+ .school-notice-card header .notice-card-status{justify-content:flex-start}
+ .notice-more>div{position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 76px);left:14px;width:auto;max-height:50dvh;overflow-y:auto;padding:12px;border-radius:18px;z-index:60}
+ .notice-more>div button{min-height:48px;font-size:14px}
+}
+
+/* Keep an opened reply history inside its own scroll area so card actions never overlap it. */
+.notice-reply-history[open]{display:block;height:190px;min-height:190px;max-height:190px;overflow:hidden}
+.notice-reply-history[open]>.notice-reply-list{display:block;height:142px;min-height:142px;max-height:142px;box-sizing:border-box;padding:10px 12px 14px;overflow-x:hidden;overflow-y:scroll!important;overscroll-behavior:contain;scrollbar-gutter:stable;scroll-padding-block:10px 14px;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+.notice-reply-history[open] .notice-reply-list-inner{display:grid;min-height:0;overflow:visible;padding-bottom:1px}
+@media(min-width:960px){.school-notice-list .notice-reply-history[open]{flex:0 0 190px}}
+.school-notice-list .school-notice-card>header+.notice-reply-history{border-top:0!important;border-bottom:1px solid #dce8d1!important;background:#f3f9ec}
+.school-notice-list .school-notice-card>header+.notice-reply-history>summary{background:#edf7e4!important}
+
+/* Expanded replies become the card's main view from its top edge to the action area. */
+.school-notice-list .school-notice-card:has(>.notice-reply-history[open]){display:flex;flex-direction:column;height:clamp(430px,65dvh,560px);min-height:430px;max-height:min(560px,75dvh);overflow:hidden}
+.school-notice-list .school-notice-card:has(>.notice-reply-history[open])>header,
+.school-notice-list .school-notice-card:has(>.notice-reply-history[open])>.notice-message-block,
+.school-notice-list .school-notice-card:has(>.notice-reply-history[open])>.notice-assigned-banner,
+.school-notice-list .school-notice-card:has(>.notice-reply-history[open])>.notice-response-details{display:none!important}
+.school-notice-list .school-notice-card:has(>.notice-reply-history[open])>.notice-reply-history[open]{order:-1;position:relative;display:block;flex:1 1 auto;width:100%;height:auto;min-height:0;max-height:none;border-top:0!important;border-bottom:1px solid #dce8d1!important;background:#f3f9ec}
+.school-notice-list .school-notice-card:has(>.notice-reply-history[open])>.notice-reply-history[open]>summary{position:relative;z-index:2;min-height:54px;padding:13px 17px!important;background:#e9f6dc!important}
+.school-notice-list .school-notice-card:has(>.notice-reply-history[open])>.notice-reply-history[open]>.notice-reply-list{position:absolute;inset:54px 0 0;display:block;width:100%;height:auto;min-height:0;max-height:none;padding:12px 14px 16px;overflow-x:hidden;overflow-y:scroll!important;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+.school-notice-list .school-notice-card:has(>.notice-reply-history[open])>.school-notice-actions{order:2;flex:0 0 auto;margin-top:0}
+@media(max-width:540px){.school-notice-list .school-notice-card:has(>.notice-reply-history[open]){height:clamp(420px,68dvh,540px);min-height:420px;max-height:min(540px,76dvh)}}
+@media(min-width:960px){.school-notice-list .school-notice-card:has(>.notice-reply-history[open]){height:430px;min-height:430px;max-height:430px}}
+
+/* Anchor the create button to the app card, independent of the browser viewport width. */
+.phone-home-card>#phoneNoticeAddToggle.notice-add-button{right:clamp(12px,1.6vw,20px)}
+@media(max-width:540px){.phone-home-card>#phoneNoticeAddToggle.notice-add-button{right:12px}}

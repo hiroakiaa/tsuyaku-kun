@@ -1,0 +1,2 @@
+import qrcode from './qrcode.mjs';
+export function drawQr(canvas,text){const qr=qrcode(0,'M');qr.addData(text);qr.make();const count=qr.getModuleCount(),scale=4,margin=4;canvas.width=canvas.height=(count+margin*2)*scale;const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#223e1c';for(let y=0;y<count;y++)for(let x=0;x<count;x++)if(qr.isDark(y,x))ctx.fillRect((x+margin)*scale,(y+margin)*scale,scale,scale);canvas.setAttribute('aria-label','参加用QRコード');canvas.setAttribute('role','img');}
