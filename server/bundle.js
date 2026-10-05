@@ -97,6 +97,18 @@ function cleanRecognition(result) {
 
 
 
+// server/lesson-codes.js
+const ROOM_TTL=24*60*60*1000;
+function normalizeRoomCode(value){return String(value??'').replace(/[０-９]/g,c=>String(c.charCodeAt(0)-65296)).trim();}
+class LessonCodes{
+ constructor(storage,now=()=>Date.now(),random=()=>crypto.getRandomValues(new Uint32Array(1))[0]%10000){this.storage=storage;this.now=now;this.random=random;}
+ async allocate(data){const now=this.now();const row=await this.storage.transaction(async tx=>{const slots=await tx.list({prefix:'code:',limit:10000});const start=this.random();for(let offset=0;offset<10000;offset++){const code=String((start+offset)%10000).padStart(4,'0'),old=slots.get('code:'+code);if(old&&old.expires>now)continue;const next={id:data.id,key:data.key,code,mode:'lesson',expires:now+ROOM_TTL};await tx.put('code:'+code,next);await tx.put('codesDirectory',true);return next;}throw Error('授業ルームが満員です。期限切れ後にもう一度お試しください。');});const alarm=await this.storage.getAlarm();if(!alarm||alarm>row.expires)await this.storage.setAlarm(row.expires);return row;}
+ async lookup(value){const code=normalizeRoomCode(value);if(!/^\d{4}$/.test(code))throw Error('ルームIDは4桁で入力してください。');const row=await this.storage.get('code:'+code);if(!row||row.expires<=this.now())throw Error('このルームIDは見つからないか、期限が切れています。');return row;}
+ async release(code,id){await this.storage.transaction(async tx=>{const row=await tx.get('code:'+code);if(row?.id===id)await tx.delete('code:'+code);});}
+ async cleanup(){let next=Infinity;const now=this.now();await this.storage.transaction(async tx=>{for(const [key,row]of await tx.list({prefix:'code:',limit:10000})){if(row.expires<=now)await tx.delete(key);else next=Math.min(next,row.expires);}});if(Number.isFinite(next))await this.storage.setAlarm(next);}
+}
+
+
 // server/worker.js
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'}});
 const error=(text,status=400)=>json({error:text},status);
@@ -120,7 +132,7 @@ export default {async fetch(request,env){
   const allowed=origin===env.ALLOWED_ORIGIN||origin==='http://localhost:8787';
   const cors=response=>{const h=new Headers(response.headers);if(allowed){h.set('Access-Control-Allow-Origin',origin);h.set('Access-Control-Allow-Headers','Content-Type, Authorization, X-Term-Hints');h.set('Access-Control-Allow-Methods','GET, POST, OPTIONS');h.set('Vary','Origin');}return new Response(response.body,{status:response.status,headers:h});};
   if(request.method==='OPTIONS')return allowed?cors(new Response(null,{status:204})):error('接続元を確認してください。',403);
-  if(url.pathname==='/health')return cors(json({ok:true,app:'通訳君',version:'0.1.0',sheets:!!env.SHEETS_BRIDGE}));
+  if(url.pathname==='/health')return cors(json({ok:true,app:'通訳君',version:'0.5.0',sheets:!!env.SHEETS_BRIDGE}));
   if(!allowed)return error('接続元を確認してください。',403);
   try{
     if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:request.headers.get('CF-Connecting-IP')||'local'})).success))return cors(error('少し待ってから再試行してください。',429));
@@ -139,19 +151,20 @@ export default {async fetch(request,env){
         const text=cleanRecognition(result);if(text===null)return cors(error('音声を認識できませんでした。',502));return cors(json({text}));
       }finally{bytes.fill(0);}
     }
-    if(url.pathname==='/catalog'&&request.method==='GET')return cors(json(await bridge(env,token,'tsuyakuCatalog')||catalog));
+    if(url.pathname==='/catalog'&&request.method==='GET'){try{return cors(json(await bridge(env,token,'tsuyakuCatalog')||catalog));}catch{return cors(json(catalog));}}
+    if(url.pathname==='/lessons/join'&&request.method==='POST'){const data=await body(request);const directory=env.ROOMS.get(env.ROOMS.idFromName('__lesson_codes_v1__'));const response=await directory.fetch(new Request('https://room/codes/find',{method:'POST',body:JSON.stringify({code:data.code})}));const found=await response.json();if(!response.ok)throw Error(found.error);const live=await env.ROOMS.get(env.ROOMS.idFromName(found.id)).fetch(new Request('https://room/status'));const info=await live.json();if(!live.ok||info.ended)throw Error('この授業は終了しました。');return cors(json({...found,unit:info.unit}));}
     if(url.pathname==='/rooms'&&request.method==='POST'){
       const data=await body(request);if(!['interpreter','lesson','face'].includes(data.mode))return cors(error('モードを選んでください。'));
-      if(data.mode==='lesson'&&auth.provider==='anonymous')return cors(error('授業を作るには先生のログインが必要です。',403));
+      
       const id=crypto.randomUUID().replaceAll('-',''),key=crypto.randomUUID().replaceAll('-','');
-      const result=await env.ROOMS.get(env.ROOMS.idFromName(id)).fetch(new Request('https://room/init',{method:'POST',body:JSON.stringify({id,key,owner:auth.uid,mode:data.mode,unit:String(data.unit||'数学').slice(0,160),expires:Date.now()+6*3600000})}));
-      if(!result.ok)return cors(result);return cors(json({id,key,mode:data.mode}));
+      const directory=env.ROOMS.get(env.ROOMS.idFromName('__lesson_codes_v1__'));let reservation;if(data.mode==='lesson'){const response=await directory.fetch(new Request('https://room/codes/allocate',{method:'POST',body:JSON.stringify({id,key})}));reservation=await response.json();if(!response.ok)throw Error(reservation.error);}const expires=reservation?.expires||Date.now()+ROOM_TTL;const result=await env.ROOMS.get(env.ROOMS.idFromName(id)).fetch(new Request('https://room/init',{method:'POST',body:JSON.stringify({id,key,owner:auth.uid,mode:data.mode,code:reservation?.code,unit:String(data.unit||'数学').slice(0,160),expires})}));
+      if(!result.ok){if(reservation)await directory.fetch(new Request('https://room/codes/release',{method:'POST',body:JSON.stringify({code:reservation.code,id})}));return cors(result);}return cors(json({id,key,mode:data.mode,code:reservation?.code,expires}));
     }
     if(url.pathname==='/dictionary/candidate'&&request.method==='POST'){
-      if(auth.provider==='anonymous')return cors(error('先生のログインが必要です。',403));
+      
       const data=await body(request);const term=String(data.term||'').trim(),translation=String(data.translation||'').trim();
       if(!term||term.length>80||translation.length>500)return cors(error('ことばと訳を確認してください。'));
-      const result=await bridge(env,token,'tsuyakuCandidate',{term,translation,language:String(data.language||'en'),subject:'math'});
+      let result;try{result=await bridge(env,token,'tsuyakuCandidate',{term,translation,language:String(data.language||'en'),subject:'math'});}catch{return cors(error('辞書への追記接続を確認してください。候補はまだ登録されていません。',503));}
       return cors(result?json(result):error('辞書の追記接続がまだ設定されていません。',503));
     }
     return cors(error('ページが見つかりません。',404));
@@ -166,8 +179,10 @@ export class TranslationRoom {
   roster(){this.broadcast({type:'participants',participants:this.participants().map(({a})=>({id:a.id,name:a.name,language:a.language,role:a.role}))});}
   async fetch(request){
     const path=new URL(request.url).pathname;
+    if(path.startsWith('/codes/')){try{const codes=new LessonCodes(this.ctx.storage),data=await body(request);if(path==='/codes/allocate')return json(await codes.allocate(data));if(path==='/codes/find')return json(await codes.lookup(data.code));if(path==='/codes/release'){await codes.release(data.code,data.id);return json({ok:true});}return error('操作を確認してください。');}catch(e){return error(e.message);}}
     if(path==='/init'){if(await this.info())return error('ルームは作成済みです。',409);const data=await body(request);await this.ctx.storage.put('room',data);await this.ctx.storage.setAlarm(data.expires);return json({ok:true});}
     const room=await this.info();if(!room||room.expires<=Date.now())return error('このルームは終了しました。',410);
+    if(path==='/status')return json({unit:room.unit,ended:!!room.ended});
     if(!path.endsWith('/socket')||request.headers.get('Upgrade')?.toLowerCase()!=='websocket')return error('接続方法を確認してください。',426);
     // Unauthenticated sockets occupy a bounded slot and must authenticate within 10 seconds.
     if(this.ctx.getWebSockets().length>=100)return error('ルームが満員です。',429);
@@ -191,7 +206,7 @@ export class TranslationRoom {
         const stableId=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(auth.uid)))].slice(0,16).map(x=>x.toString(16).padStart(2,'0')).join('');
         const viewLanguage=String(data.viewLanguage||lang);if(!catalog.languages.some(l=>l.code===viewLanguage))throw Error('表示言語を確認してください。');
         ws.serializeAttachment({...a,...auth,id:stableId,token:data.token,name:String(data.name||'参加者').slice(0,40),language:role==='teacher'&&room.mode==='lesson'?'ja':lang,viewLanguage,role});
-        this.send(ws,{type:'ready',id:stableId,role,mode:room.mode,unit:room.unit,ended:!!room.ended,history:[...(await this.ctx.storage.list({prefix:'caption:',limit:3000})).values()].sort((x,y)=>x.at-y.at)});this.roster();
+        this.send(ws,{type:'ready',id:stableId,role,mode:room.mode,unit:room.unit,code:room.code,expires:room.expires,ended:!!room.ended,history:[...(await this.ctx.storage.list({prefix:'caption:',limit:3000})).values()].sort((x,y)=>x.at-y.at)});this.roster();
         if(this.env.SHEETS_BRIDGE&&Date.now()>this.catalogUntil){this.catalogUntil=Date.now()+300000;this.ctx.waitUntil(bridge(this.env,data.token,'tsuyakuCatalog').then(r=>{if(r)this.cachedCatalog=r;}).catch(()=>{}));}return;
       }
       if(a.expires<=Date.now())throw Error('ログインし直してください。');
@@ -204,7 +219,7 @@ export class TranslationRoom {
         this.send(other.ws,{type:'signal',from:a.id,signal:data.signal});return;
       }
       if(data.type==='end'){
-        if(a.role!=='teacher')throw Error('先生だけが終了できます。');await this.ctx.storage.put('room',{...room,ended:true,expires:Date.now()+3600000});await this.ctx.storage.setAlarm(Date.now()+3600000);this.broadcast({type:'ended'});return;
+        if(a.role!=='teacher')throw Error('先生だけが終了できます。');await this.ctx.storage.put('room',{...room,ended:true});await this.ctx.storage.setAlarm(room.expires);this.broadcast({type:'ended'});return;
       }
       if(room.ended)throw Error('この授業は終了しました。');
       if(data.type!=='caption')return;
@@ -227,11 +242,11 @@ export class TranslationRoom {
       const all=this.cachedCatalog;
       const past=(await this.ctx.storage.get('recent')||[]).map(r=>r.text);
       const translations=await translateText(this.env,text,a.language,targets,past,room.unit,all,u=>{usage=u;});
-      const done={...record,translations,usage,status:'ready',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,done);const recent=await this.ctx.storage.get('recent')||[];await this.ctx.storage.put('recent',[...recent,{at:start,text}].sort((a,b)=>a.at-b.at).slice(-3));this.broadcast({type:'translation',...done});
-    }catch(e){const failed={...record,usage,status:'failed',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,failed);this.broadcast({type:'translation',...failed,error:'翻訳に失敗しました。字幕の「再試行」を押してください。'});}
+      if(!(await this.info())||room.expires<=Date.now())return;const done={...record,translations,usage,status:'ready',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,done);const recent=await this.ctx.storage.get('recent')||[];await this.ctx.storage.put('recent',[...recent,{at:start,text}].sort((a,b)=>a.at-b.at).slice(-3));this.broadcast({type:'translation',...done});
+    }catch(e){if(!(await this.info())||room.expires<=Date.now())return;const failed={...record,usage,status:'failed',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,failed);this.broadcast({type:'translation',...failed,error:'翻訳に失敗しました。字幕の「再試行」を押してください。'});}
   }
   async webSocketClose(ws){const a=ws.deserializeAttachment();if(a?.uid)this.broadcast({type:'notice',text:a.name+'さんが退室しました。'});try{ws.close();}catch{}this.roster();}
   async webSocketError(ws){await this.webSocketClose(ws);}
-  async alarm(){const room=await this.info();if(!room||room.expires<=Date.now()){for(const ws of this.ctx.getWebSockets()){try{ws.close(1000,'expired');}catch{}}await this.ctx.storage.deleteAll();return;}for(const ws of this.ctx.getWebSockets()){const a=ws.deserializeAttachment();if(!a?.uid&&Date.now()-a.opened>=10000||a?.expires<=Date.now()){try{ws.close(1008,'auth');}catch{}}}await this.ctx.storage.setAlarm(Math.min(room.expires,Date.now()+60000));}
+  async alarm(){if(await this.ctx.storage.get('codesDirectory')){await new LessonCodes(this.ctx.storage).cleanup();return;}const room=await this.info();if(!room||room.expires<=Date.now()){for(const ws of this.ctx.getWebSockets()){try{ws.close(1000,'expired');}catch{}}await this.ctx.storage.deleteAll();return;}for(const ws of this.ctx.getWebSockets()){const a=ws.deserializeAttachment();if(!a?.uid&&Date.now()-a.opened>=10000||a?.expires<=Date.now()){try{ws.close(1008,'auth');}catch{}}}await this.ctx.storage.setAlarm(Math.min(room.expires,Date.now()+60000));}
 }
 
