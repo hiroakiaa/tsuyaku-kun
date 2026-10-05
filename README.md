@@ -61,7 +61,7 @@ APIキーやログイン用トークンをGitHubへ保存しません。Firebase
 
 「分析を作る」→「分析をコピー」でJSONをこのチャットへ貼り付けると、改善候補を分析できます。標準の分析には名前・本文・招待キー・ログインtokenを含めません。翻訳の例も検討する場合は「発言・訳の例も含める」を選択します。「JSONを保存」と「利用履歴CSV」も利用できます。
 
-単価は2026-10-06にCloudflare公式の[AI料金表](https://developers.cloudflare.com/workers-ai/platform/pricing/)と[TURN料金表](https://developers.cloudflare.com/realtime/sfu/pricing/)で確認。自動テスト24件を実行します。
+単価は2026-10-06にCloudflare公式の[AI料金表](https://developers.cloudflare.com/workers-ai/platform/pricing/)と[TURN料金表](https://developers.cloudflare.com/realtime/sfu/pricing/)で確認。自動テスト25件を実行します。
 
 
 ## 0.3.0：接続分析と読み上げ
