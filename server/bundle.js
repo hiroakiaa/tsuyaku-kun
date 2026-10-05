@@ -235,7 +235,7 @@ export class TranslationRoom {
     }catch(e){this.send(ws,{type:'error',error:e.message||'接続を確認してください。'});if(!ws.deserializeAttachment()?.uid)ws.close(1008,'auth');}
   }
   async translate(ws,a,room,id,text){
-    const start=Date.now();let usage;const record={id,speaker:a.name,source:a.language,text,final:true,at:start,status:'translating'};
+    const start=Date.now();if(!(await this.info())||room.expires<=start)return;let usage;const record={id,speaker:a.name,source:a.language,text,final:true,at:start,status:'translating'};
     await this.ctx.storage.put('caption:'+id,record);
     try{
       const targets=[...new Set(['ja','en',...this.participants().flatMap(p=>[p.a.language,p.a.viewLanguage])])];
