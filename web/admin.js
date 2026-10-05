@@ -1,5 +1,5 @@
-import {PRICES,costOf,percentile,analysisReport} from './usage.js?v=20261006-face-1';
-import {listHistory} from './history.js';
+import {PRICES,costOf,percentile,analysisReport} from './usage.js?v=20261006-school-1';
+import {listHistory} from './history.js?v=20261006-school-1';
 import {csv} from './core.js';
 export function installAdmin({button,modal,el,ledger,download,currentRecords,message}){
  if(!button)return;
