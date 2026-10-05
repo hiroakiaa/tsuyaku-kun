@@ -55,3 +55,14 @@ body.phone-home main.phone-home-card>.bottom-nav button[aria-selected=true]{back
 @media(max-height:500px){body.phone-home main.phone-home-card>.bottom-nav button{min-height:46px;gap:3px;padding:5px 1px!important}.nav-icon{font-size:17px!important;line-height:19px!important}.app-shell{padding-bottom:calc(90px + env(safe-area-inset-bottom))}}
 .nav-icon,.speech-symbol{font-family:'Font Awesome 6 Free'!important;font-weight:900!important;font-style:normal}
 .phone-home-card button.primary{color:#294632}.call-controls button[aria-pressed=true]{background:#dcefd7;border-color:#9bc49f;color:#3e6348}
+/* Match 計算定着君's lime palette while keeping the flat stitched buttons. */
+html,body{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body.phone-home input,body.phone-home select,body.phone-home textarea,dialog input,dialog select,dialog textarea{font-size:16px!important}
+#lesson-code-input{font-size:28px!important}
+.phone-home-card button,#modal-body button,.header-tools button{background:#f4ffe4;border-color:#8bce62;color:#39713c}
+.phone-home-card button.primary,.call-controls button[aria-pressed=true]{background:linear-gradient(135deg,#dfff9f,#b9ee78);border-color:#70bd50;color:#285f34}
+.phone-home-card button.danger{background:linear-gradient(135deg,#fffbd7,#e8efa1);border-color:#91bd58;color:#52652d}
+body.phone-home main.phone-home-card>.bottom-nav button{color:#39713c;touch-action:pan-x pan-y}
+body.phone-home main.phone-home-card>.bottom-nav button[aria-selected=true]{background:linear-gradient(135deg,#dfff9f,#b9ee78)!important;color:#285f34}
+.speech-controls button{background:#f4ffe4!important;color:#39713c}
+.reference-card button,.face-controls button,.lesson-code-card button{background:#f4ffe4;border-color:#8bce62;color:#39713c}

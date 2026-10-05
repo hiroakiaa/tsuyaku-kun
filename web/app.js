@@ -1,3 +1,5 @@
+// Keep Safari pinch gestures from changing the app scale; scrolling remains available.
+for (const type of ['gesturestart','gesturechange']) document.addEventListener(type,event=>event.preventDefault(),{passive:false});
 import {UsageLedger} from './usage.js?v=20261006-school-1';
 import {SpeechPlayer} from './speech-player.js?v=20261006-playback-2';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261006-telemetry-1';
