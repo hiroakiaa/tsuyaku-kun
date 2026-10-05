@@ -26,3 +26,5 @@ export function csv(rows) {
   const safe=x=>/^[=+\-@\t\r]/.test(String(x))?"'"+x:x;
   return '\uFEFF'+rows.map(r=>r.map(x=>q(safe(x))).join(',')).join('\r\n');
 }
+
+export function captionParticipant(room,a,data){if(room.mode!=='face')return a;if(!['self','other'].includes(data.speakerSide)||![a.language,a.viewLanguage].includes(data.source))throw Error('対面の話し手と言語を確認してください。');return {...a,language:data.source,name:data.speakerSide==='self'?'自分':'相手'};}
