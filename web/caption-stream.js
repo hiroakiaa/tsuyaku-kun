@@ -1,4 +1,4 @@
-export function createStreamingRecognition({endpoint,getStream,getToken,
+export function createStreamingRecognition({endpoint,getStream,getToken,onUsage=()=>{},
   Context=window.AudioContext||window.webkitAudioContext,Worklet=window.AudioWorkletNode,Socket=window.WebSocket}) {
   return class StreamingRecognition {
     start(){
@@ -33,7 +33,7 @@ export function createStreamingRecognition({endpoint,getStream,getToken,
           this.node.port.onmessage=event=>{
             if(!this.active)return;
             if(this.socket.readyState!==1||this.socket.bufferedAmount>64000){this.fail('overloaded');return}
-            this.socket.send(event.data.buffer);event.data.fill(0);
+            this.socket.send(event.data.buffer);onUsage(event.data.length/16000);event.data.fill(0);
           };
           this.source.connect(this.node);this.node.connect(this.context.destination);
           this.context.onstatechange=()=>{if(this.active&&this.context.state!=='running')this.fail('interrupted')};
