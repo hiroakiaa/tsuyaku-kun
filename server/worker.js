@@ -46,6 +46,11 @@ export default {async fetch(request,env){
       }finally{bytes.fill(0);}
     }
     if(url.pathname==='/catalog'&&request.method==='GET'){try{return cors(json(await bridge(env,token,'tsuyakuCatalog')||catalog));}catch{return cors(json(catalog));}}
+    if(url.pathname==='/dictionary/translate'&&request.method==='POST'){
+      const data=await body(request,4096),text=String(data.text||'').trim(),language=String(data.language||'');
+      if(!text||text.length>1500||!catalog.languages.some(l=>l.code===language))return cors(error('ことばと言語を確認してください。'));
+      let usage;const started=Date.now();try{const translations=await translateText(env,text,'ja',[language],[],String(data.subject||'').slice(0,80),catalog,u=>{usage=u;});return cors(json({translation:translations[language],usage,latencyMs:Date.now()-started}));}catch{return cors(json({error:'翻訳できませんでした。再試行してください。',usage,latencyMs:Date.now()-started},502));}
+    }
     if(url.pathname==='/lessons/join'&&request.method==='POST'){const data=await body(request);const directory=env.ROOMS.get(env.ROOMS.idFromName('__lesson_codes_v1__'));const response=await directory.fetch(new Request('https://room/codes/find',{method:'POST',body:JSON.stringify({code:data.code})}));const found=await response.json();if(!response.ok)throw Error(found.error);const live=await env.ROOMS.get(env.ROOMS.idFromName(found.id)).fetch(new Request('https://room/status'));const info=await live.json();if(!live.ok||info.ended)throw Error('この授業は終了しました。');return cors(json({...found,unit:info.unit}));}
     if(url.pathname==='/rooms'&&request.method==='POST'){
       const data=await body(request);if(!['interpreter','lesson','face'].includes(data.mode))return cors(error('モードを選んでください。'));
