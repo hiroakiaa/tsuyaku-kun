@@ -1,7 +1,7 @@
 import {UsageLedger} from './usage.js?v=20261006-telemetry-1';
 import {SpeechPlayer} from './speech-player.js?v=20261006-telemetry-1';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261006-telemetry-1';
-import {installAdmin} from './admin.js?v=20261006-telemetry-1';
+import {installAdmin} from './admin.js?v=20261006-telemetry-2';
 import {config} from './config.js';
 import {catalog as seed} from '../server/catalog.js';
 import {translationOf,csv} from './core.js';
