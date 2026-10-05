@@ -1,5 +1,5 @@
 import {UsageLedger} from './usage.js?v=20261006-telemetry-1';
-import {SpeechPlayer} from './speech-player.js?v=20261006-telemetry-1';
+import {SpeechPlayer} from './speech-player.js?v=20261006-playback-2';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261006-telemetry-1';
 import {installAdmin} from './admin.js?v=20261006-telemetry-2';
 import {config} from './config.js';
@@ -51,7 +51,7 @@ async function handle(data){
  if(data.type==='participants'){await turnReady;participants=data.participants;$('#participants').replaceChildren(...participants.map(p=>el('span',(p.id===selfId?'あなた':p.name)+(p.role==='teacher'&&room.mode==='lesson'?'・先生':''),'participant')));for(const [id,p] of peers){if(!participants.some(x=>x.id===id)){p.pc.close();p.audio.remove();peers.delete(id);}}for(const p of participants){if(p.id===selfId)continue;if(room.mode==='interpreter'&&selfId<p.id||room.mode==='lesson'&&role==='teacher')await offer(p.id);}return;}
  if(data.type==='signal'){await turnReady;await signal(data.from,data.signal);return;}
  if(data.type==='caption'){renderCaption(data);return;}
- if(data.type==='translation'){const rawId=[...localTimings.keys()].find(id=>data.id===selfId+'_'+id);if(rawId&&data.status==='ready'){const metrics=latencyFromTiming(localTimings.get(rawId),Date.now());ledger.timing(data.id,metrics);localTimings.delete(rawId);}ledger.caption(data);renderCaption(data);records.set(data.id,data);for(const [id,p] of pending){if(data.id.endsWith('_'+id))pending.delete(id);}return;}
+ if(data.type==='translation'){const rawId=[...localTimings.keys()].find(id=>data.id===selfId+'_'+id);if(rawId){if(data.status==='ready'){const metrics=latencyFromTiming(localTimings.get(rawId),Date.now());ledger.timing(data.id,metrics);}localTimings.delete(rawId);}ledger.caption(data);renderCaption(data);records.set(data.id,data);for(const [id,p] of pending){if(data.id.endsWith('_'+id))pending.delete(id);}return;}
  if(data.type==='notice'){message(data.text);return;}
  if(data.type==='ended'){speechPlayer.stop();ledger.event('lesson_ended');ledger.end();clearInterval(metricsTimer);message('授業が終了しました。履歴を保存できます。');stopRecognition();mic=false;for(const p of peers.values()){p.pc.close();p.audio.remove();}peers.clear();localStream?.getTracks().forEach(t=>t.stop());localStream=null;$('#microphone').disabled=true;$('#text-form').hidden=true;return;}
 }
