@@ -1,4 +1,7 @@
 import assert from 'node:assert/strict';
+import {readdir,readFile} from 'node:fs/promises';
+import {SourceTextModule} from 'node:vm';
+import {fileURLToPath} from 'node:url';
 import {protectMath,parseTranslation,glossaryFor,csv,validateCaption} from '../web/core.js';
 import {catalog} from '../server/catalog.js';
 import {TranslationRoom,translateText} from '../server/worker.js';
@@ -35,4 +38,5 @@ await test('発話末尾は無音を除き推定し、文字入力と未計測�
 await test('字幕の再送を総待ち時間に重複計上しない',()=>{const data=new Map(),ledger=new UsageLedger({getItem:k=>data.get(k),setItem:(k,v)=>data.set(k,v)});ledger.begin('interpreter',['ja']);ledger.timing('one',{totalMs:2000,recognitionMs:500,pipelineMs:1500});ledger.timing('one',{totalMs:9000});const r=JSON.parse(analysisReport(ledger.list()));assert.equal(r.summary.p95SpeechToDisplayMs,2000);assert.equal(r.summary.speechTimingSamples,1);assert.equal(r.summary.p95RecognitionMs,500);});
 await test('再接続は間隔を広げ、上限を設ける',()=>{assert.equal(retryDelay(1,()=>0),1000);assert.equal(retryDelay(3,()=>0),4000);assert.equal(retryDelay(30,()=>0),15000);});
 await test('読み上げの一時停止・再開・停止と古い完了イベントを扱う',()=>{const calls=[],spoken=[];const engine={cancel:()=>calls.push('cancel'),pause:()=>calls.push('pause'),resume:()=>calls.push('resume'),speak:u=>spoken.push(u)};class Utterance{constructor(text){this.text=text;}}const player=new SpeechPlayer({engine,Utterance});player.toggle('ja','文','ja-JP');assert.equal(player.key,'ja');player.toggle('ja','文','ja-JP');assert.equal(player.paused,true);player.toggle('ja','文','ja-JP');assert.equal(player.paused,false);assert.ok(calls.includes('pause'));assert.ok(calls.includes('resume'));player.toggle('en','sentence','en-US');spoken[0].onend();assert.equal(player.key,'en');player.stop();assert.equal(player.key,null);assert.equal(player.paused,false);spoken[1].onend();assert.equal(player.key,null);});
+await test('画面用の全JavaScriptが構文検証を通る',async()=>{for(const file of await readdir(new URL('../web/',import.meta.url))){if(!file.endsWith('.js'))continue;const p=fileURLToPath(new URL('../web/'+file,import.meta.url));new SourceTextModule(await readFile(p,'utf8'),{identifier:p});}});
 console.log(count+' tests passed');
