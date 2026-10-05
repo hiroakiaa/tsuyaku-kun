@@ -1,1 +1,1 @@
-{"name":"tsuyaku-kun","version":"0.2.0","private":true,"type":"module","scripts":{"test":"node tests/run.mjs","serve":"node tools/serve.mjs","deploy":"wrangler deploy"},"devDependencies":{"wrangler":"^4.35.0"}}
+{"name":"tsuyaku-kun","version":"0.3.0","private":true,"type":"module","scripts":{"test":"node tests/run.mjs","serve":"node tools/serve.mjs","deploy":"wrangler deploy"},"devDependencies":{"wrangler":"^4.35.0"}}
