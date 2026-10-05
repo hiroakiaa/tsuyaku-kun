@@ -25,3 +25,5 @@ dialog{width:min(880px,calc(100% - 32px));max-width:880px;max-height:calc(100vh 
 @media(max-width:360px){header{align-items:flex-start}.header-tools{width:100%;justify-content:flex-end}.header-tools span{margin-right:auto;max-width:140px}.app-shell{padding:12px 8px}.entry-card{padding:18px}.phone-home-card .phone-tabs button{font-size:14px}.call-controls{grid-template-columns:1fr}}
 @media(max-width:600px){.phone-home-card>.phone-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-height:600px){.captions{height:58dvh;min-height:220px}.app-shell{padding-top:12px}header{margin-bottom:16px}.phone-tabs{margin-bottom:18px}dialog{max-height:calc(100dvh - 16px)}.admin-history{max-height:220px}}
+
+.speech-controls{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:44px}.speech-controls button{min-width:44px;min-height:44px}#modal-body .speech-controls{flex-direction:row;justify-content:flex-start}#modal-body .speech-controls button{margin-top:0}

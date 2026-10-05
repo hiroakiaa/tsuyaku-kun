@@ -1,8 +1,9 @@
+import {lastVoicedAt} from './diagnostics.js?v=20261006-telemetry-1';
 export function createStreamingRecognition({endpoint,getStream,getToken,onUsage=()=>{},
   Context=window.AudioContext||window.webkitAudioContext,Worklet=window.AudioWorkletNode,Socket=window.WebSocket}) {
   return class StreamingRecognition {
     start(){
-      this.active=true;
+      this.active=true;this.lastSpeechAt=null;
       try{
         this.stream=getStream();
         if(!this.stream?.getAudioTracks().some(t=>t.enabled&&t.readyState==='live'))throw Error('microphone');
@@ -33,7 +34,7 @@ export function createStreamingRecognition({endpoint,getStream,getToken,onUsage=
           this.node.port.onmessage=event=>{
             if(!this.active)return;
             if(this.socket.readyState!==1||this.socket.bufferedAmount>64000){this.fail('overloaded');return}
-            this.socket.send(event.data.buffer);onUsage(event.data.length/16000);event.data.fill(0);
+            const voiceAt=lastVoicedAt(event.data,Date.now());if(voiceAt!==null)this.lastSpeechAt=voiceAt;this.socket.send(event.data.buffer);onUsage(event.data.length/16000);event.data.fill(0);
           };
           this.source.connect(this.node);this.node.connect(this.context.destination);
           this.context.onstatechange=()=>{if(this.active&&this.context.state!=='running')this.fail('interrupted')};
@@ -42,7 +43,7 @@ export function createStreamingRecognition({endpoint,getStream,getToken,onUsage=
         }
         if(data.type==='result'&&Number.isSafeInteger(data.id)&&data.id>=0&&typeof data.text==='string'&&typeof data.final==='boolean'){
           const result=[{transcript:data.text.slice(0,600)}];result.isFinal=data.final;
-          this.onresult?.({resultIndex:data.id,results:{length:data.id+1,[data.id]:result}});
+          this.onresult?.({resultIndex:data.id,results:{length:data.id+1,[data.id]:result},speechEndedAt:this.lastSpeechAt,recognitionReadyAt:Date.now()});
         }
       }catch(_){if(this.active)this.fail('network')}
     }

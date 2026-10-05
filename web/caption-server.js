@@ -1,3 +1,4 @@
+import {lastVoicedAt} from './diagnostics.js?v=20261006-telemetry-1';
 // Browser-independent recognition using the call's existing microphone stream.
 export function encodeWav(samples) {
   const bytes = new ArrayBuffer(44 + samples.length * 2), view = new DataView(bytes);
@@ -30,14 +31,14 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
     async prepare(stream, resumed) {
       try {
         await resumed;
-        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=2026-09-03-faster-terms', import.meta.url));
+        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261006-telemetry-1', import.meta.url));
         if (!this.active) return;
         this.source = this.context.createMediaStreamSource(stream);
         this.node = new Worklet(this.context, 'caption-pcm');
         this.node.port.onmessage = event => {
           if (!this.active) return;
           if (this.queue.length >= 2) { event.data.fill(0); this.fail('overloaded'); return; }
-          this.queue.push({ samples: event.data, at: Date.now() });
+          const at=Date.now();this.queue.push({samples:event.data,at,speechEndedAt:lastVoicedAt(event.data,at)});
           void this.drain();
         };
         this.source.connect(this.node); this.node.connect(this.context.destination);
@@ -76,7 +77,7 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
           // No cumulative transcript list is retained by the recognizer.
           const result = [{ transcript: text }]; result.isFinal = true;
           const results = { length: this.index + 1, [this.index]: result };
-          this.onresult?.({ resultIndex: this.index++, results });
+          this.onresult?.({ resultIndex: this.index++, results, speechEndedAt:chunk.speechEndedAt, recognitionReadyAt:Date.now() });
         }
       } catch (_) { if (this.active) this.fail('network'); }
       finally {
