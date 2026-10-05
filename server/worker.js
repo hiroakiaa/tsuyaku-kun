@@ -93,7 +93,7 @@ export class TranslationRoom {
         const stableId=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(auth.uid)))].slice(0,16).map(x=>x.toString(16).padStart(2,'0')).join('');
         const viewLanguage=String(data.viewLanguage||lang);if(!catalog.languages.some(l=>l.code===viewLanguage))throw Error('表示言語を確認してください。');
         ws.serializeAttachment({...a,...auth,id:stableId,token:data.token,name:String(data.name||'参加者').slice(0,40),language:role==='teacher'&&room.mode==='lesson'?'ja':lang,viewLanguage,role});
-        this.send(ws,{type:'ready',id:stableId,role,mode:room.mode,unit:room.unit,history:[...(await this.ctx.storage.list({prefix:'caption:',limit:3000})).values()].sort((x,y)=>x.at-y.at)});this.roster();
+        this.send(ws,{type:'ready',id:stableId,role,mode:room.mode,unit:room.unit,ended:!!room.ended,history:[...(await this.ctx.storage.list({prefix:'caption:',limit:3000})).values()].sort((x,y)=>x.at-y.at)});this.roster();
         if(this.env.SHEETS_BRIDGE&&Date.now()>this.catalogUntil){this.catalogUntil=Date.now()+300000;this.ctx.waitUntil(bridge(this.env,data.token,'tsuyakuCatalog').then(r=>{if(r)this.cachedCatalog=r;}).catch(()=>{}));}return;
       }
       if(a.expires<=Date.now())throw Error('ログインし直してください。');
