@@ -52,3 +52,13 @@ APIキーやログイン用トークンをGitHubへ保存しません。Firebase
 - [Workers AI Gemma](https://developers.cloudflare.com/workers-ai/models/gemma-4-26b-a4b-it/)
 - [Durable Objects WebSocket](https://developers.cloudflare.com/durable-objects/best-practices/websockets/)
 - [QR Code Generator](https://github.com/kazuhikoarase/qrcode-generator)（MIT。ライセンスはweb/QRCODE-LICENSE.txt）
+
+## 管理者画面と改善用の分析
+
+右上の「管理者」ボタンを押し、パスワード `1111` を入力します。このパスワードは端末内の管理画面用です。利用履歴はこの端末に最大200回保存します。音声の録音・本文の自動保存はしません。
+
+1回ごとの利用時間、翻訳の試行・失敗・待ち時間、音声認識の送信秒数、TURNの観測通信量、変動費の目安を表示します。AIが返したtoken数を優先し、返らない場合は文字数から推定します。無料枠・固定費・サーバー/共有保存費・他端末の音声認識費は含まず、実際の請求額ではありません。複数端末の同じルームの費用を合算しないでください。換算レートは管理画面で指定できます。
+
+「分析を作る」→「分析をコピー」でJSONをこのチャットへ貼り付けると、改善候補を分析できます。標準の分析には名前・本文・招待キー・ログインtokenを含めません。翻訳の例も検討する場合は「発言・訳の例も含める」を選択します。「JSONを保存」と「利用履歴CSV」も利用できます。
+
+単価は2026-10-06にCloudflare公式の[AI料金表](https://developers.cloudflare.com/workers-ai/platform/pricing/)と[TURN料金表](https://developers.cloudflare.com/realtime/sfu/pricing/)で確認。自動テスト18件を実行します。
