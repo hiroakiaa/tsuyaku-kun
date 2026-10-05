@@ -1,3 +1,4 @@
+import {captionParticipant} from '../web/core.js';
 import {verifyToken} from './auth.js';
 import {catalog} from './catalog.js';
 import {validWav,hasSpeechEnergy,cleanRecognition} from './audio.js';
@@ -45,7 +46,7 @@ export default {async fetch(request,env){
     }
     if(url.pathname==='/catalog'&&request.method==='GET')return cors(json(await bridge(env,token,'tsuyakuCatalog')||catalog));
     if(url.pathname==='/rooms'&&request.method==='POST'){
-      const data=await body(request);if(!['interpreter','lesson'].includes(data.mode))return cors(error('モードを選んでください。'));
+      const data=await body(request);if(!['interpreter','lesson','face'].includes(data.mode))return cors(error('モードを選んでください。'));
       if(data.mode==='lesson'&&auth.provider==='anonymous')return cors(error('授業を作るには先生のログインが必要です。',403));
       const id=crypto.randomUUID().replaceAll('-',''),key=crypto.randomUUID().replaceAll('-','');
       const result=await env.ROOMS.get(env.ROOMS.idFromName(id)).fetch(new Request('https://room/init',{method:'POST',body:JSON.stringify({id,key,owner:auth.uid,mode:data.mode,unit:String(data.unit||'数学').slice(0,160),expires:Date.now()+6*3600000})}));
@@ -89,7 +90,7 @@ export class TranslationRoom {
         const auth=await verifyToken(data.token,this.env.FIREBASE_PROJECT);
         if(data.key!==room.key&&auth.uid!==room.owner)throw Error('招待リンクを確認してください。');
         const lang=String(data.language||'ja');if(!catalog.languages.some(l=>l.code===lang))throw Error('言語を確認してください。');
-        const role=auth.uid===room.owner?'teacher':'guest';
+        if(room.mode==='face'&&auth.uid!==room.owner)throw Error('対面は作成した端末で使います。');const role=auth.uid===room.owner?'teacher':'guest';
         if(this.participants().some(p=>p.a.uid===auth.uid))throw Error('別のタブで参加中です。');
         if(room.mode==='interpreter'&&this.participants().length>=2)throw Error('通訳は2人まで参加できます。');
         const stableId=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(auth.uid)))].slice(0,16).map(x=>x.toString(16).padStart(2,'0')).join('');
@@ -102,7 +103,7 @@ export class TranslationRoom {
       if(data.type==='reauth'){const auth=await verifyToken(data.token,this.env.FIREBASE_PROJECT);if(auth.uid!==a.uid)throw Error('ログインし直してください。');ws.serializeAttachment({...a,...auth,token:data.token});return;}
       if(Date.now()-a.window>60000){a.window=Date.now();a.count=0;}if(++a.count>400)throw Error('操作が多すぎます。');ws.serializeAttachment(a);
       if(data.type==='ping'){this.send(ws,{type:'pong'});return;}
-      if(data.type==='signal'){
+      if(data.type==='signal'){if(room.mode==='face')return;
         const other=this.participants().find(p=>p.a.id===data.to);if(!other)return;
         if(room.mode==='lesson'&&a.role!=='teacher'&&data.signal?.description?.type==='offer')throw Error('先生から接続します。');
         this.send(other.ws,{type:'signal',from:a.id,signal:data.signal});return;
@@ -114,13 +115,13 @@ export class TranslationRoom {
       if(data.type!=='caption')return;
       if(room.mode==='lesson'&&a.role!=='teacher')throw Error('授業では先生の発言を表示します。');
       const cap=validateCaption(data),id=a.id+'_'+cap.id;
-      this.broadcast({type:'caption',id,speaker:a.name,source:a.language,text:cap.text,final:cap.final,at:Date.now()});
+      this.broadcast({type:'caption',id,speaker:captionParticipant(room,a,data).name,source:captionParticipant(room,a,data).language,text:cap.text,final:cap.final,at:Date.now()});
       if(!cap.final)return;
       const existing=await this.ctx.storage.get('caption:'+id);if(existing?.text===cap.text&&existing.status!=='failed')return;
       if(!existing&&(await this.ctx.storage.get('captionCount')||0)>=3000)throw Error('この授業は3000文に達しました。履歴を保存して新しいルームを作ってください。');
       if(!existing)await this.ctx.storage.put('captionCount',(await this.ctx.storage.get('captionCount')||0)+1);
       if(this.jobs.has(id))return;
-      const task=this.translate(ws,a,room,id,cap.text).finally(()=>this.jobs.delete(id));this.jobs.set(id,task);this.ctx.waitUntil(task);
+      const task=this.translate(ws,captionParticipant(room,a,data),room,id,cap.text).finally(()=>this.jobs.delete(id));this.jobs.set(id,task);this.ctx.waitUntil(task);
     }catch(e){this.send(ws,{type:'error',error:e.message||'接続を確認してください。'});if(!ws.deserializeAttachment()?.uid)ws.close(1008,'auth');}
   }
   async translate(ws,a,room,id,text){
