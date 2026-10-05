@@ -11,6 +11,8 @@ import {encodeWav} from '../web/caption-server.js';
 import {UsageLedger,costOf,analysisReport,percentile} from '../web/usage.js';
 import {SpeechPlayer} from '../web/speech-player.js';
 import {lastVoicedAt,latencyFromTiming,retryDelay} from '../web/diagnostics.js';
+import {speakerInfo,speakerCaption} from '../web/face-mode.js';
+import {captionParticipant} from '../web/core.js';
 let count=0;async function test(name,fn){await fn();count++;console.log('PASS '+name);}
 await test('数式・否定・数字を壊さない',()=>assert.equal(protectMath('x² + ３x − ２ = ０ ではありません。'),'x² + 3x − 2 = 0 ではありません。'));
 await test('全言語の結果がそろわなければ翻訳失敗にする',()=>{assert.deepEqual(parseTranslation('```json\n{"ja":"日本語","en":"English"}\n```',['ja','en']),{ja:'日本語',en:'English'});assert.throws(()=>parseTranslation('{"en":""}',['en']));assert.throws(()=>parseTranslation('{"en":"English"}',['en','pt']));});
@@ -39,4 +41,7 @@ await test('字幕の再送を総待ち時間に重複計上しない',()=>{cons
 await test('再接続は間隔を広げ、上限を設ける',()=>{assert.equal(retryDelay(1,()=>0),1000);assert.equal(retryDelay(3,()=>0),4000);assert.equal(retryDelay(30,()=>0),15000);});
 await test('読み上げの一時停止・再開・停止と古い完了イベントを扱う',()=>{const calls=[],spoken=[];const engine={cancel:()=>calls.push('cancel'),pause:()=>calls.push('pause'),resume:()=>calls.push('resume'),speak:u=>spoken.push(u)};class Utterance{constructor(text){this.text=text;}}const player=new SpeechPlayer({engine,Utterance});player.toggle('ja','文','ja-JP');assert.equal(player.key,'ja');player.toggle('ja','文','ja-JP');assert.equal(player.paused,true);player.toggle('ja','文','ja-JP');assert.equal(player.paused,false);assert.ok(calls.includes('pause'));assert.ok(calls.includes('resume'));player.toggle('en','sentence','en-US');spoken[0].onend();assert.equal(player.key,'en');player.stop();assert.equal(player.key,null);assert.equal(player.paused,false);spoken[1].onend();assert.equal(player.key,null);});
 await test('画面用の全JavaScriptが構文検証を通る',async()=>{for(const file of await readdir(new URL('../web/',import.meta.url))){if(!file.endsWith('.js'))continue;const p=fileURLToPath(new URL('../web/'+file,import.meta.url));new SourceTextModule(await readFile(p,'utf8'),{identifier:p});}});
+await test('対面の話し手切替は自分と相手の言語を保持する',()=>{assert.deepEqual(speakerCaption('self','ja','pt'),{source:'ja',speakerSide:'self'});assert.equal(speakerInfo('other','ja','pt').language,'pt');assert.throws(()=>speakerInfo('unknown','ja','pt'));});
+await test('対面の字幕言語は選んだ2言語だけを受け付ける',()=>{const a={language:'ja',viewLanguage:'pt',name:'user'};assert.equal(captionParticipant({mode:'face'},a,{source:'pt',speakerSide:'other'}).name,'相手');assert.throws(()=>captionParticipant({mode:'face'},a,{source:'en',speakerSide:'other'}));assert.equal(captionParticipant({mode:'interpreter'},a,{source:'pt'}),a);});
+await test('対面の相手の発言は相手言語から翻訳して記録する',async()=>{const f=fixture('face','teacher');f.room.env.AI.run=async()=>({response:'{"ja":"こんにちは。","en":"Hello."}'});await f.room.webSocketMessage(f.ws,JSON.stringify({type:'caption',id:'face_one',text:'Olá.',source:'pt',speakerSide:'other',final:true}));await Promise.all(f.jobs);const r=f.db.get('caption:'+f.ws.deserializeAttachment().id+'_face_one');assert.equal(r.source,'pt');assert.equal(r.speaker,'相手');assert.equal(r.status,'ready');assert.equal(r.translations.pt,'Olá.');assert.equal(r.translations.ja,'こんにちは。');});
 console.log(count+' tests passed');
