@@ -151,3 +151,16 @@ body.phone-home:not(.mode-active) .app-shell{padding-bottom:calc(72px + env(safe
  body.phone-home main.phone-home-card>.bottom-nav button{min-height:44px!important}
  body.phone-home:not(.mode-active) .app-shell{padding-bottom:calc(56px + env(safe-area-inset-bottom,0px))}
 }
+
+/* Explicit placement prevents the mobile language label from squeezing text into the desktop label column. */
+.mode-active .caption-line{min-width:0}
+.mode-active .caption-line>small{grid-column:1;grid-row:1}
+.mode-active .caption-line>p{grid-column:2;grid-row:1;min-width:0}
+.mode-active .caption-line>.speech-controls{grid-column:3;grid-row:1;width:44px;min-width:44px;align-self:start}
+@media(max-width:600px){
+ .mode-active .caption-line{grid-template-columns:minmax(0,1fr) 44px;gap:4px 10px}
+ .mode-active .caption-line>small{grid-column:1;grid-row:1;padding-top:4px}
+ .mode-active .caption-line>p{grid-column:1;grid-row:2;line-height:1.6}
+ .mode-active .caption-line>.speech-controls{grid-column:2;grid-row:2}
+ .mode-active .caption{padding:12px}
+}
