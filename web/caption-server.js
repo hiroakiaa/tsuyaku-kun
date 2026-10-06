@@ -1,4 +1,4 @@
-import {lastVoicedAt} from './diagnostics.js?v=20261006-telemetry-1';
+import {lastVoicedAt} from './diagnostics.js?v=20261007-speech-1';
 // Browser-independent recognition using the call's existing microphone stream.
 export function encodeWav(samples) {
   const bytes = new ArrayBuffer(44 + samples.length * 2), view = new DataView(bytes);
@@ -32,7 +32,7 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
       try {
         await resumed;
         if (!this.active) return;
-        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261006-economy-1', import.meta.url));
+        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261007-speech-1', import.meta.url));
         if (!this.active) return;
         this.source = this.context.createMediaStreamSource(stream);
         this.node = new Worklet(this.context, 'caption-pcm');
@@ -54,6 +54,7 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
       if (this.sending || !this.active || !this.queue.length) return;
       this.sending = true;
       const chunk = this.queue.shift();
+      const requestAt=Date.now(), queueMs=Math.max(0,requestAt-chunk.at);
       const controller = new AbortController(); this.request = controller;
       const timeout = setTimeout(() => controller.abort(), 12000);
       try {
@@ -70,7 +71,7 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
             ...(encodedHints ? { 'X-Term-Hints': encodedHints } : {}) },
           body, signal: controller.signal, cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer'
         });
-        let failure; if(!response.ok){try{failure=(await response.json()).aiFailure;}catch{}} onDiagnostic({code:response.ok?'ok':'http_error',status:response.status,...(failure?{aiReason:failure.reason,aiCode:failure.code,aiEvidence:failure.evidence,aiModel:failure.model}:{})});
+        let failure; if(!response.ok){try{failure=(await response.json()).aiFailure;}catch{}} onDiagnostic({code:response.ok?'ok':'http_error',status:response.status,elapsedMs:Date.now()-requestAt,queueMs,audioSeconds:chunk.samples.length/16000,...(failure?{aiReason:failure.reason,aiCode:failure.code,aiEvidence:failure.evidence,aiModel:failure.model}:{})});
         if (!response.ok) { const error=failure?.reason|| (response.status === 429 ? 'quota' : [401,403].includes(response.status) ? 'auth' : 'network'); if (['network','service','timeout','overloaded'].includes(error) && (response.status>=500||error==='overloaded')) { this.transientFailure(); return; } this.fail(error,failure?.message); return; }
         const data = await response.json(); this.failures=0;
         if (!this.active || controller.signal.aborted || Date.now() - chunk.at > 15000) return;

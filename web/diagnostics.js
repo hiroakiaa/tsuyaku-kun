@@ -1,6 +1,6 @@
 // Estimate the last audible sample in the already captured PCM; retain no audio.
 export function lastVoicedAt(samples,receivedAt,rate=16000){
- let last=-1;for(let start=0;start<samples.length;start+=160){const end=Math.min(start+160,samples.length);let power=0;for(let i=start;i<end;i++)power+=(samples[i]/32768)**2;if(power/(end-start)>.006**2)last=end;}
+ let last=-1;for(let start=0;start<samples.length;start+=160){const end=Math.min(start+160,samples.length);let power=0;for(let i=start;i<end;i++)power+=(samples[i]/32768)**2;if(power/(end-start)>.004**2)last=end;}
  return last<0?null:receivedAt-(samples.length-last)/rate*1000;
 }
 export function latencyFromTiming(timing,displayedAt){
