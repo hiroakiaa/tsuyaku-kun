@@ -14,7 +14,7 @@ export function createStreamingRecognition({endpoint,getStream,getToken,onUsage=
     }
     async connect(resumed){
       try{
-        await resumed;const token=await getToken();if(!this.active)return;
+        await resumed;if(!this.active)return;const token=await getToken();if(!this.active)return;
         this.socket=new Socket(endpoint);
         this.socket.onopen=()=>{if(this.active)this.socket.send(JSON.stringify({token}))};
         this.socket.onmessage=event=>{if(this.active)void this.message(event)};

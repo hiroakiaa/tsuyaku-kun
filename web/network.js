@@ -1,5 +1,5 @@
 const STAGES=new Set(['api','auth','turn','api_simple','api_headers']);
-const OPERATIONS=new Set(['room_create','lesson_join','catalog','dictionary_translate','dictionary_candidate','token','initial_auth','turn_credentials','health','other']);
+const OPERATIONS=new Set(['transcribe','room_create','lesson_join','catalog','dictionary_translate','dictionary_candidate','token','initial_auth','turn_credentials','health','other']);
 const RESULTS=new Set(['ok','network_or_cors','timeout','http_error','invalid_response','auth_unavailable','no_turn_server']);
 export function connectionFailure(error,{stage='api',endpoint='',operation='other',status}={}){
  const code=error?.code&&RESULTS.has(error.code)?error.code:error?.name==='TimeoutError'||error?.name==='AbortError'?'timeout':Number.isInteger(status)?'http_error':'network_or_cors';

@@ -11,10 +11,10 @@ export function encodeWav(samples) {
   return bytes;
 }
 
-export function createServerRecognition({ endpoint, getStream, getToken, fetcher = fetch, onUsage = () => {},
+export function createServerRecognition({ endpoint, getStream, getToken, fetcher = fetch, onUsage = () => {}, onDiagnostic = () => {},
   Context = window.AudioContext || window.webkitAudioContext, Worklet = window.AudioWorkletNode }) {
   return class ServerRecognition {
-    constructor() { this.active = false; this.queue = []; this.sending = false; this.index = 0; this.getHints = () => []; }
+    constructor() { this.active = false; this.queue = []; this.sending = false; this.index = 0; this.failures = 0; this.getHints = () => []; }
     setHints(getHints) { this.getHints = typeof getHints === 'function' ? getHints : () => []; }
     start() {
       this.active = true;
@@ -31,6 +31,7 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
     async prepare(stream, resumed) {
       try {
         await resumed;
+        if (!this.active) return;
         await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261006-telemetry-1', import.meta.url));
         if (!this.active) return;
         this.source = this.context.createMediaStreamSource(stream);
@@ -69,8 +70,9 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
             ...(encodedHints ? { 'X-Term-Hints': encodedHints } : {}) },
           body, signal: controller.signal, cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer'
         });
-        if (!response.ok) { this.fail(response.status === 429 ? 'quota' : response.status === 401 ? 'auth' : 'network'); return; }
-        const data = await response.json();
+        onDiagnostic({code:response.ok?'ok':'http_error',status:response.status});
+        if (!response.ok) { const error=response.status === 429 ? 'quota' : response.status === 401 ? 'auth' : 'network'; if (error==='network' && response.status>=500) { this.transientFailure(); return; } this.fail(error); return; }
+        const data = await response.json(); this.failures=0;
         if (!this.active || controller.signal.aborted || Date.now() - chunk.at > 15000) return;
         const text = typeof data.text === 'string' ? data.text.trim().slice(0, 600) : '';
         if (text) {
@@ -79,11 +81,17 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
           const results = { length: this.index + 1, [this.index]: result };
           this.onresult?.({ resultIndex: this.index++, results, speechEndedAt:chunk.speechEndedAt, recognitionReadyAt:Date.now() });
         }
-      } catch (_) { if (this.active) this.fail('network'); }
+      } catch (_) { if (this.active) { onDiagnostic({code:controller.signal.aborted?'timeout':'network_or_cors'}); this.transientFailure(); } }
       finally {
         chunk.samples.fill(0); clearTimeout(timeout); this.request = null; this.sending = false;
         if (this.active) void this.drain();
       }
+    }
+    transientFailure() {
+      // Keep capturing after a brief service/network failure. A later utterance retries; never replay stale speech.
+      this.failures++;
+      this.onrecovering?.({attempt:this.failures});
+      if(this.failures>=3)this.fail('network');
     }
     fail(error) { const notify = this.onerror; this.abort(); notify?.({ error }); }
     abort() {
