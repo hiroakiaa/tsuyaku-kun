@@ -1,8 +1,8 @@
 // 20 ms RMS frames avoid treating every waveform zero crossing as silence.
 // Audio stays in bounded memory only; natural pauses do not duplicate billing.
 export class PcmSegmenter {
-  constructor(rate, emit) {
-    this.rate=rate;this.emit=emit;this.samples=new Int16Array(64000);
+  constructor(rate, emit, activity=()=>{}) {
+    this.rate=rate;this.emit=emit;this.activity=activity;this.samples=new Int16Array(128000);
     this.preroll=new Int16Array(3200);this.frame=new Int16Array(320);
     this.clear();
   }
@@ -23,13 +23,14 @@ export class PcmSegmenter {
     if(!this.started){
       if(!voiced){this.noise=this.noise*.98+Math.min(rms,.006)*.02;this.preroll.set(this.frame,this.preIndex);this.preIndex=(this.preIndex+320)%this.preroll.length;return;}
       this.samples.set(this.preroll.subarray(this.preIndex));this.samples.set(this.preroll.subarray(0,this.preIndex),this.preroll.length-this.preIndex);
-      this.length=this.preroll.length;this.started=true;this.preroll.fill(0);this.preIndex=0;
+      this.length=this.preroll.length;this.started=true;this.activity('start');this.preroll.fill(0);this.preIndex=0;
     }
     this.samples.set(this.frame,this.length);this.length+=320;
     if(voiced){this.voiced+=320;this.silence=0;}else this.silence+=320;
     const forced=this.length===this.samples.length;
-    if(forced||this.silence>=5120){
-      if(this.voiced>=1920)this.emit(this.samples.slice(0,this.length));
+    if(forced||this.silence>=9600){
+      if(this.voiced>=1920)this.emit(this.samples.slice(0,this.length),{boundary:forced?'limit':'pause'});
+      if(!forced)this.activity('end');
       const overlap=forced?this.samples.slice(this.length-this.preroll.length,this.length):null;
       this.samples.fill(0);this.length=0;this.voiced=0;this.silence=0;this.started=false;
       if(overlap)this.preroll.set(overlap);
@@ -39,7 +40,7 @@ export class PcmSegmenter {
 }
 if(typeof AudioWorkletProcessor!=='undefined'){
   class CaptionPcmProcessor extends AudioWorkletProcessor{
-    constructor(){super();this.active=true;this.segmenter=new PcmSegmenter(sampleRate,samples=>this.port.postMessage(samples,[samples.buffer]));this.port.onmessage=()=>{this.active=false;this.segmenter.clear();};}
+    constructor(){super();this.active=true;this.segmenter=new PcmSegmenter(sampleRate,(samples,detail)=>this.port.postMessage({samples,...detail},[samples.buffer]),activity=>this.port.postMessage({activity}));this.port.onmessage=()=>{this.active=false;this.segmenter.clear();};}
     process(inputs){if(!this.active)return false;if(inputs[0]?.[0])this.segmenter.push(inputs[0][0]);return true;}
   }
   registerProcessor('caption-pcm',CaptionPcmProcessor);

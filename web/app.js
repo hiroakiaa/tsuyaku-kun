@@ -1,19 +1,19 @@
-import {recognitionHints} from './recognition-hints.js?v=20261007-recovery-1';
+import {recognitionHints} from './recognition-hints.js?v=20261007-continuity-1';
 // Keep Safari pinch gestures from changing the app scale; scrolling remains available.
 for (const type of ['gesturestart','gesturechange']) document.addEventListener(type,event=>event.preventDefault(),{passive:false});
 import {acquireMicrophone} from './microphone.js?v=20261006-mic-1';
-import {UsageLedger} from './usage.js?v=20261007-recovery-1';
+import {UsageLedger} from './usage.js?v=20261007-continuity-1';
 import {SpeechPlayer} from './speech-player.js?v=20261006-playback-2';
-import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-recovery-1';
-import {installAdmin} from './admin.js?v=20261007-recovery-1';
+import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-continuity-1';
+import {installAdmin} from './admin.js?v=20261007-continuity-1';
 import {config} from './config.js';
-import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection} from './network.js?v=20261007-recovery-1';
+import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection} from './network.js?v=20261007-continuity-1';
 import {catalog as seed} from '../server/catalog.js?v=20261006-easy-1';
 import {translationOf,spokenLanguage,withEasyJapanese} from './core.js?v=20261006-easy-1';
 import {speakerCaption,speakerInfo} from './face-mode.js?v=20261006-school-1';
 import {callCaptionLanguages,isDisplayableCaption} from './call-mode.js?v=20261006-easy-1';
 import {listHistory} from './history.js?v=20261006-school-1';
-import {createServerRecognition} from './caption-server.js?v=20261007-recovery-1';
+import {createServerRecognition} from './caption-server.js?v=20261007-continuity-1';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 function readCatalogCache(){try{const saved=JSON.parse(localStorage.getItem('tsuyaku-catalog-v1'));if(saved&&Array.isArray(saved.languages)&&Array.isArray(saved.phrases)&&Array.isArray(saved.terms)&&Array.isArray(saved.glossary))return saved;}catch{}return seed;}
 let catalog=withEasyJapanese(readCatalogCache()),authApi,user,socket,room,selfId,role,localStream,recognition,restarting=false,recognitionRetries=0,recognitionRetryTimer,sessionEpoch=0,mic=false,participants=[],tab='interpreter',intentionalClose=false,refreshTimer,reconnectTimer,heartbeat;

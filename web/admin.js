@@ -1,4 +1,4 @@
-import {PRICES,costOf,percentile,analysisReport} from './usage.js?v=20261007-recovery-1';
+import {PRICES,costOf,percentile,analysisReport} from './usage.js?v=20261007-continuity-1';
 import {listHistory} from './history.js?v=20261006-school-1';
 import {csv} from './core.js';
 export function installAdmin({button,modal,el,ledger,download,currentRecords,connectionHistory=()=>[],connectionAnalysis=()=>null,checkConnection,message}){

@@ -1,4 +1,4 @@
-import {lastVoicedAt} from './diagnostics.js?v=20261007-recovery-1';
+import {lastVoicedAt} from './diagnostics.js?v=20261007-continuity-1';
 // Browser-independent recognition using the call's existing microphone stream.
 export function encodeWav(samples) {
   const bytes = new ArrayBuffer(44 + samples.length * 2), view = new DataView(bytes);
@@ -32,14 +32,16 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
       try {
         await resumed;
         if (!this.active) return;
-        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261007-recovery-1', import.meta.url));
+        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261007-continuity-1', import.meta.url));
         if (!this.active) return;
         this.source = this.context.createMediaStreamSource(stream);
         this.node = new Worklet(this.context, 'caption-pcm');
         this.node.port.onmessage = event => {
           if (!this.active) return;
-          if (this.queue.length >= 2) { this.queue.shift().samples.fill(0); onDiagnostic({stage:'asr',operation:'capture',code:'queue_overflow'}); this.onrecovering?.({reason:'queue_overflow',attempt:1}); }
-          const at=Date.now();this.queue.push({samples:event.data,at,speechEndedAt:lastVoicedAt(event.data,at)});
+          if(event.data?.activity){this.capturing=event.data.activity==='start';return;}
+          const samples=event.data?.samples||event.data,boundary=event.data?.boundary==='limit'?'limit':'pause';
+          if (this.queue.length >= 2) { this.queue.shift().samples.fill(0);this.breakContinuity=true; onDiagnostic({stage:'asr',operation:'capture',code:'queue_overflow'}); this.onrecovering?.({reason:'queue_overflow',attempt:1}); }
+          const at=Date.now();this.queue.push({samples,boundary,at,speechEndedAt:lastVoicedAt(samples,at)});
           void this.drain();
         };
         this.source.connect(this.node); this.node.connect(this.context.destination);
@@ -71,14 +73,14 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
             ...(encodedHints ? { 'X-Term-Hints': encodedHints } : {}) },
           body, signal: controller.signal, cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer'
         });
-        let failure; if(!response.ok){try{failure=(await response.json()).aiFailure;}catch{}} onDiagnostic({code:response.ok?'ok':'http_error',status:response.status,elapsedMs:Date.now()-requestAt,queueMs,audioSeconds:chunk.samples.length/16000,...(failure?{aiReason:failure.reason,aiCode:failure.code,aiEvidence:failure.evidence,aiModel:failure.model}:{})});
+        let failure; if(!response.ok){try{failure=(await response.json()).aiFailure;}catch{}} onDiagnostic({code:response.ok?'ok':'http_error',status:response.status,elapsedMs:Date.now()-requestAt,queueMs,audioSeconds:chunk.samples.length/16000,segmentBoundary:chunk.boundary,...(failure?{aiReason:failure.reason,aiCode:failure.code,aiEvidence:failure.evidence,aiModel:failure.model}:{})});
         if (!response.ok) { const error=failure?.reason|| (response.status === 429 ? 'quota' : [401,403].includes(response.status) ? 'auth' : 'network'); if (['network','service','timeout','overloaded'].includes(error) && (response.status>=500||error==='overloaded')) { this.transientFailure(); return; } this.fail(error,failure?.message); return; }
         const data = await response.json(); this.failures=0;
         if (!this.active || controller.signal.aborted || Date.now() - chunk.at > 15000) return;
         const text = typeof data.text === 'string' ? data.text.trim().slice(0, 600) : '';
         if (text) {
           // No cumulative transcript list is retained by the recognizer.
-          this.acceptText(text,{speechEndedAt:chunk.speechEndedAt,recognitionReadyAt:Date.now()});
+          this.acceptText(text,{speechEndedAt:chunk.speechEndedAt,recognitionReadyAt:Date.now(),boundary:chunk.boundary});
         }
       } catch (_) { if (this.active) { onDiagnostic({code:controller.signal.aborted?'timeout':'network_or_cors'}); this.transientFailure(); } }
       finally {
@@ -91,24 +93,25 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
       this.onresult?.({resultIndex:this.index,results:{length:this.index+1,[this.index++]:result},...timing});
     }
     acceptText(text,timing) {
-      const now=Date.now();
-      if(this.fragment){const previous=this.fragment;this.fragment=null;clearTimeout(this.fragmentTimer);if(now-previous.at<=5000)text=previous.text+' '+text;else this.emitText(previous.text,previous.timing);}
-      if(isIncompleteJapanese(text)){
-        this.fragment={text,timing,at:now};
-        const flush=()=>{if(!this.active||!this.fragment)return;if((this.sending||this.queue.length)&&Date.now()-this.fragment.at<5000){this.fragmentTimer=setTimeout(flush,250);return;}const pending=this.fragment;this.fragment=null;this.emitText(pending.text,pending.timing);};
-        this.fragmentTimer=setTimeout(flush,2500);
+      const now=Date.now();let joined=false;
+      if(this.fragment){const previous=this.fragment;this.fragment=null;clearTimeout(this.fragmentTimer);if(!this.breakContinuity&&now-previous.at<=previous.waitMs){text=previous.text.replace(/[。．.]$/u,'')+' '+text;joined=true;}else this.emitText(previous.text,previous.timing);}
+      this.breakContinuity=false;
+      if(((timing.boundary==='limit'&&!joined)||isIncompleteJapanese(text))&&text.length<1000){
+        this.fragment={text,timing,at:now,waitMs:timing.boundary==='limit'?12000:10000};
+        const flush=()=>{if(!this.active||!this.fragment)return;if((this.capturing||this.sending||this.queue.length)&&Date.now()-this.fragment.at<this.fragment.waitMs){this.fragmentTimer=setTimeout(flush,250);return;}const pending=this.fragment;this.fragment=null;this.emitText(pending.text,pending.timing);};
+        this.fragmentTimer=setTimeout(flush,timing.boundary==='limit'?12000:2500);
       }else this.emitText(text,timing);
     }
     transientFailure() {
       // Keep capturing after a brief service/network failure. A later utterance retries; never replay stale speech.
-      this.failures++;
+      this.failures++;this.breakContinuity=true;
       this.onrecovering?.({attempt:this.failures});
       if(this.failures>=3)this.fail('network');
     }
     fail(error,message) { const notify = this.onerror; this.abort(); notify?.({ error, message }); }
     abort() {
       clearTimeout(this.startTimer);clearTimeout(this.fragmentTimer);this.fragment=null;
-      this.active = false; this.request?.abort();
+      this.active = false;this.capturing=false; this.request?.abort();
       for (const chunk of this.queue) chunk.samples.fill(0); this.queue=[];
       if (this.node) { this.node.port.onmessage = null; this.node.port.postMessage('stop'); this.node.disconnect(); }
       this.source?.disconnect();
@@ -118,4 +121,4 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
   };
 }
 
-export function isIncompleteJapanese(text){return typeof text==='string'&&text.length<=12&&/^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}0-9０-９\s]+(?:は|が|を|に|から|まで)$/u.test(text);}
+export function isIncompleteJapanese(text){return typeof text==='string'&&text.length<=20&&(/^(?:[0-9０-９]{1,2}月[0-9０-９]{1,2}日|[月火水木金土日]曜日)[、。．.!！?？]?$/u.test(text)||/^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}0-9０-９\s]+(?:は|が|を|に|から|まで)$/u.test(text));}
