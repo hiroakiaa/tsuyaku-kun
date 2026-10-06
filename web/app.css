@@ -243,3 +243,16 @@ body.phone-home:not(.mode-active) main.phone-home-card{background:transparent;bo
 @media(max-width:600px){.phone-home-card .entry-card{padding:20px}.reference-title{font-size:17px}.reference-list button.reference-card{min-height:76px;padding:14px 16px!important}}
 
 .reference-list{max-height:none!important;overflow:visible!important;padding-right:0!important}.search-field input{appearance:none;-webkit-appearance:none}.search-field input::-webkit-search-cancel-button{display:none}
+
+/* Keep each translation and its playback controls together. */
+.reference-detail{display:grid;gap:16px;padding-top:18px}
+.reference-language{min-width:0;padding:18px 20px;border:1px solid #cbdcc1;border-radius:18px;background:#f8fbf2}
+.reference-language:nth-child(2){background:#f1f8e8}.reference-language:nth-child(3){background:#fffaf0}
+.reference-language-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.reference-language-heading h3{margin:0;font-size:17px;color:#304d3a;line-height:1.5}
+.reference-language-text{margin:14px 0 0;font-size:18px;line-height:1.85;overflow-wrap:anywhere}
+.reference-missing{margin:12px 0 0;font-size:14px;color:#65755c}
+#modal-body .speech-controls-labeled{flex-direction:row;align-items:center;gap:8px;flex-wrap:wrap;max-width:100%}
+#modal-body .speech-controls-labeled button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:9px 13px!important;font-size:13px;line-height:1.4;border:1px solid #93ba78;border-radius:13px;white-space:normal}
+#modal-body .speech-controls-labeled button[hidden]{display:none}
+@media(max-width:480px){.reference-detail{gap:12px;padding-top:14px}.reference-language{padding:16px}.reference-language-heading{align-items:flex-start;gap:10px}.reference-language-heading h3{flex-basis:100%}.reference-language-text{font-size:17px;margin-top:12px}.reference-language-heading .speech-controls-labeled{width:100%}}
