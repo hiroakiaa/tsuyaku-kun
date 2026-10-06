@@ -5,7 +5,7 @@ import {SourceTextModule} from 'node:vm';
 import {fileURLToPath} from 'node:url';
 import {protectMath,parseTranslation,glossaryFor,csv,validateCaption} from '../web/core.js';
 import {catalog} from '../server/catalog.js';
-import workerApi,{TranslationRoom,translateText,recognizeAudio} from '../server/worker.js';
+import workerApi,{TranslationRoom,translateText,recognizeAudio,aiFailure} from '../server/worker.js';
 import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection,summarizeSessions} from '../web/network.js';
 import {verifyToken} from '../server/auth.js';
 import {validWav,hasSpeechEnergy} from '../server/audio.js';
@@ -85,4 +85,8 @@ await test('高速音声モデルが失敗したら独立した予備モデル�
 await test('低費用認識は無音10秒を送信しない',()=>{const out=[],s=new PcmSegmenter(16000,x=>out.push(x));s.push(new Float32Array(160000));assert.equal(out.length,0);});
 await test('短い発話は400msの無音で送信し先頭を保持する',()=>{const out=[],s=new PcmSegmenter(16000,x=>out.push(x));s.push(Float32Array.from({length:6400},(_,i)=>Math.sin(i*.15)*.08));s.push(new Float32Array(6401));assert.equal(out.length,1);assert.ok(out[0].length<=20000);assert.ok(validWav(new Uint8Array(encodeWav(out[0]))));});
 await test('連続発話は6秒に制限し停止時に音声を消去する',()=>{const out=[],s=new PcmSegmenter(16000,x=>out.push(x));s.push(Float32Array.from({length:112000},(_,i)=>Math.sin(i*.15)*.08));assert.equal(out.length,1);assert.equal(out[0].length,96000);s.clear();assert.equal(s.length,0);assert.ok(s.samples.every(x=>x===0));assert.ok(s.preroll.every(x=>x===0));});
+
+await test('AIの無料枠・混雑・有料要件を区別しneurons単語だけで上限扱いしない',()=>{assert.equal(aiFailure(Error('3036: daily free allocation')).reason,'quota');assert.equal(aiFailure(Error('3040: capacity exceeded')).reason,'overloaded');assert.equal(aiFailure(Error('5035: model requires paid')).reason,'billing');assert.equal(aiFailure(Error('Invalid neurons input')).reason,'input');assert.ok(!JSON.stringify(aiFailure(Error('private speech token secret'))).includes('secret'));});
+await test('失敗字幕は翻訳成功に数えない',()=>{const s=summarizeSessions([{startedAt:1,captionCount:1,failedCaptions:1}]);assert.equal(s[0].translatedCaptions,0);});
+await test('音声認識と翻訳のAI失敗が原因候補へ含まれる',()=>{const r=explainConnection([{stage:'api',operation:'transcribe',code:'http_error',status:502,aiReason:'overloaded',aiCode:3040},{stage:'api',operation:'translation',code:'http_error',status:502,aiReason:'quota',aiCode:3036}]);assert.ok(r.candidates.some(x=>x.cause==='AIサービスの混雑'));assert.ok(r.candidates.some(x=>x.cause==='AIの無料枠上限'));});
 console.log(count+' tests passed');
