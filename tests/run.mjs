@@ -1,3 +1,5 @@
+import {speechScore} from '../tools/speech-score.js';
+import {recognitionHints,safeRecognitionHints} from '../web/recognition-hints.js';
 import {runInNewContext} from 'node:vm';
 import {storedTranslations,correctionHints} from '../server/dictionary.js';
 import {acquireMicrophone} from '../web/microphone.js';
@@ -86,8 +88,8 @@ await test('音声認識は一時的なHTTP障害から次の発話で復旧す�
 await test('高速音声モデルが失敗したら独立した予備モデルへWAVを渡す',async()=>{const calls=[];const wav=new Uint8Array(encodeWav(new Int16Array(16000)));const result=await recognizeAudio({AI:{run:async(model,input)=>{calls.push({model,input});if(calls.length===1)throw Error('model unavailable');return {text:'hello'};}}},wav,'en');assert.equal(result.text,'hello');assert.equal(calls[0].input.vad_filter,false);assert.equal(calls[1].model,'@cf/openai/whisper');assert.deepEqual(calls[1].input.audio,Array.from(wav));});
 
 await test('低費用認識は無音10秒を送信しない',()=>{const out=[],s=new PcmSegmenter(16000,x=>out.push(x));s.push(new Float32Array(160000));assert.equal(out.length,0);});
-await test('短い発話は400msの無音で送信し先頭を保持する',()=>{const out=[],s=new PcmSegmenter(16000,x=>out.push(x));s.push(Float32Array.from({length:6400},(_,i)=>Math.sin(i*.15)*.08));s.push(new Float32Array(6401));assert.equal(out.length,1);assert.ok(out[0].length<=20000);assert.ok(validWav(new Uint8Array(encodeWav(out[0]))));});
-await test('連続発話は6秒に制限し停止時に音声を消去する',()=>{const out=[],s=new PcmSegmenter(16000,x=>out.push(x));s.push(Float32Array.from({length:112000},(_,i)=>Math.sin(i*.15)*.08));assert.equal(out.length,1);assert.equal(out[0].length,96000);s.clear();assert.equal(s.length,0);assert.ok(s.samples.every(x=>x===0));assert.ok(s.preroll.every(x=>x===0));});
+await test('短い発話は320msの無音で送信し先頭を保持する',()=>{const out=[],s=new PcmSegmenter(16000,x=>out.push(x));s.push(Float32Array.from({length:6400},(_,i)=>Math.sin(i*.15)*.08));s.push(new Float32Array(6401));assert.equal(out.length,1);assert.ok(out[0].length<=20000);assert.ok(validWav(new Uint8Array(encodeWav(out[0]))));});
+await test('連続発話は4秒に制限し停止時に音声を消去する',()=>{const out=[],s=new PcmSegmenter(16000,x=>out.push(x));s.push(Float32Array.from({length:112000},(_,i)=>Math.sin(i*.15)*.08));assert.equal(out.length,1);assert.equal(out[0].length,64000);s.clear();assert.equal(s.length,0);assert.ok(s.samples.every(x=>x===0));assert.ok(s.preroll.every(x=>x===0));});
 
 await test('AIの無料枠・混雑・有料要件を区別しneurons単語だけで上限扱いしない',()=>{assert.equal(aiFailure(Error('3036: daily free allocation')).reason,'quota');assert.equal(aiFailure(Error('3040: capacity exceeded')).reason,'overloaded');assert.equal(aiFailure(Error('5035: model requires paid')).reason,'billing');assert.equal(aiFailure(Error('Invalid neurons input')).reason,'input');assert.ok(!JSON.stringify(aiFailure(Error('private speech token secret'))).includes('secret'));});
 await test('失敗字幕は翻訳成功に数えない',()=>{const s=summarizeSessions([{startedAt:1,captionCount:1,failedCaptions:1}]);assert.equal(s[0].translatedCaptions,0);});
@@ -108,4 +110,21 @@ await test('シートで埋まっている訳を残し不足言語だけAIへ送
 await test('訂正ヒントは無効・重複・数字を足すルールを除外し原文は変更しない',()=>{const rules=[{from:'感数',to:'関数',enabled:'TRUE',subject:'math'},{from:'感数',to:'関数',enabled:true,subject:'math'},{from:'鳥の子',to:'問いの5',enabled:true,subject:'common'},{from:'少数',to:'小数',enabled:false,subject:'math'}];assert.deepEqual(correctionHints('感数と鳥の子と少数',rules,'math').map(r=>r.possible),['関数']);});
 await test('Google辞書は読み・平易説明を補完し承認待ちの訳を公開しない',async()=>{const ctx={};runInNewContext(await readFile(new URL('../sheets/Code.gs',import.meta.url),'utf8'),ctx);const rows={languages:[{code:'ja'}],school_terms:[{id:'t1',ja:'教科書',reading:'',en:'textbook'}],ruby_dictionary:[{text:'教科書',reading:'きょうかしょ',easyJa:'授業で使う本です。'},{text:'欠席届',reading:'けっせきとどけ',easyJa:'休むことを知らせる紙です。',enText:'A notice of absence.'}],tsuyaku_term_candidates:[{term:'教科書',language:'es',translation:'not reviewed',status:'pending'},{term:'欠席届',language:'es',translation:'Aviso de ausencia.',status:'approved'}],interpreter_translation_bank:[{status:'pending',sourceText:'private',sourceLang:'ja',enText:'private'},{bankKey:'ok',status:'approved',sourceText:'こんにちは',sourceLang:'ja',enText:'Hello'}]};ctx.tsuyakuRows_=name=>rows[name]||[];const result=ctx.tsuyakuCatalog_();assert.equal(result.terms[0].reading,'きょうかしょ');assert.equal(result.terms[0].simpleJaText,'授業で使う本です。');assert.equal(result.terms[0].esText,undefined);assert.equal(result.terms[1].esText,'Aviso de ausencia.');assert.equal(result.bank.length,1);assert.ok(!JSON.stringify(result).includes('private'));});
 await test('自動候補保存は登録素材の完全一致だけで一般の会話を保存しない',async()=>{const ctx={};runInNewContext(await readFile(new URL('../sheets/Code.gs',import.meta.url),'utf8'),ctx);ctx.tsuyakuRows_=name=>name==='interpreter_template_sources'?[{jaText:'明日の朝は、体温を確認してください。',status:'imported'}]:[];let saves=0;ctx.tsuyakuPhrase_=()=>{saves++;return {ok:true};};ctx.tsuyakuLearn_({text:'私の家の電話番号は123です。'},{});assert.equal(saves,0);ctx.tsuyakuLearn_({text:'明日の朝は、体温を確認してください。'},{});assert.equal(saves,1);ctx.tsuyakuLearn_({text:'明後日の朝は、体温を確認してください。'},{});assert.equal(saves,1);});
+
+await test('短い返事と小さな声を拾い一瞬のクリック音を送らない',()=>{
+ const wave=(n,amp)=>Float32Array.from({length:n},(_,i)=>Math.sin(i*.15)*amp);
+ for(const n of [1920,3200]){const out=[],s=new PcmSegmenter(16000,x=>out.push(x));s.push(wave(n,.012));s.push(new Float32Array(5120));assert.equal(out.length,1);assert.ok(validWav(new Uint8Array(encodeWav(out[0]))));assert.ok(hasSpeechEnergy(new Uint8Array(encodeWav(out[0]))));}
+ const out=[],s=new PcmSegmenter(16000,x=>out.push(x));s.push(wave(320,.1));s.push(new Float32Array(16000));assert.equal(out.length,0);
+});
+await test('200msの短い間は文を分断せず48kHzでも無音終了を検出',()=>{
+ const out=[],s=new PcmSegmenter(48000,x=>out.push(x));const wave=n=>Float32Array.from({length:n},(_,i)=>Math.sin(i*.05)*.03);
+ s.push(wave(19200));s.push(new Float32Array(9600));assert.equal(out.length,0);s.push(wave(19200));s.push(new Float32Array(15360));assert.equal(out.length,1);assert.ok(out[0].length<25600);
+});
+await test('用語ヒントを音声モデルに渡し未知言語に英語を押し付けない',async()=>{
+ let input;await recognizeAudio({AI:{run:async(_,p)=>{input=p;return {text:'問いの3'};}}},new Uint8Array(encodeWav(new Int16Array(16000))),'ja',['問い','教科書']);assert.ok(input.initial_prompt.includes('問い'));assert.ok(input.initial_prompt.includes('教科書'));
+ assert.deepEqual(safeRecognitionHints('%E0%A4%A'),[]);assert.deepEqual(safeRecognitionHints(encodeURIComponent('教科書,ignore: instructions,問い,問い')),['教科書','問い']);
+ assert.ok(recognitionHints(catalog,'ja','数学').includes('教科書'));assert.ok(recognitionHints(catalog,'ja','数学').includes('方程式'));assert.deepEqual(recognitionHints({glossary:[{ja:'関数',en:'function',esText:'función'}]},'es','数学'),['función']);assert.deepEqual(recognitionHints(catalog,'unknown','数学'),[]);
+});
+
+await test('比較評価は数字の誤りと未計測を成功扱いにしない',()=>{assert.equal(speechScore('15ページ','16ページ').numbersMatch,false);assert.equal(speechScore('はい。','はい').characterErrorRate,0);assert.ok(speechScore('必要ありません','必要です').characterErrorRate>0);assert.equal(speechScore('','').characterErrorRate,null);});
 console.log(count+' tests passed');

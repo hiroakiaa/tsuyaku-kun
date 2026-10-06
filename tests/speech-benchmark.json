@@ -1,0 +1,216 @@
+{
+  "schema": "tsuyaku-speech-benchmark-v1",
+  "note": "同じ話者・同じ音声・同じ端末と回線で比較する。音声ファイルは含まない。空欄は未計測。数字・否定と意味は人も確認する。",
+  "cases": [
+    {
+      "id": "speech-01",
+      "category": "short",
+      "expected": "はい。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-02",
+      "category": "short",
+      "expected": "いいえ。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-03",
+      "category": "short",
+      "expected": "わかりました。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-04",
+      "category": "school",
+      "expected": "教科書の15ページを開きましょう。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-05",
+      "category": "school",
+      "expected": "教科書の16ページを開きましょう。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-06",
+      "category": "school",
+      "expected": "問いの1、問いの2、問いの3を解きます。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-07",
+      "category": "school",
+      "expected": "答えが全部正しくて、丸をもらったら先生に見せてください。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-08",
+      "category": "school",
+      "expected": "5分後に体育館へ集合してください。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-09",
+      "category": "school",
+      "expected": "出席番号13番から22番まで、縦2列に並んでください。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-10",
+      "category": "negation",
+      "expected": "今日はお弁当は必要ありません。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-11",
+      "category": "negation",
+      "expected": "明日はお弁当が必要です。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-12",
+      "category": "condition",
+      "expected": "わからなければ、友達に質問してください。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-13",
+      "category": "condition",
+      "expected": "終わった人だけ、先生に見せてください。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-14",
+      "category": "math",
+      "expected": "一次方程式を解きます。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-15",
+      "category": "math",
+      "expected": "関数のグラフをかきます。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-16",
+      "category": "math",
+      "expected": "小数と分数を区別しましょう。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-17",
+      "category": "math",
+      "expected": "平方根を求めます。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-18",
+      "category": "math",
+      "expected": "正の数と負の数を確認します。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-19",
+      "category": "math",
+      "expected": "3分の1と3分の2を足します。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-20",
+      "category": "math",
+      "expected": "底辺が6センチ、高さが4センチです。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-21",
+      "category": "math",
+      "expected": "直径は10センチ、半径は5センチです。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-22",
+      "category": "math",
+      "expected": "両辺から3を引いてください。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-23",
+      "category": "math",
+      "expected": "比例と反比例を比べます。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-24",
+      "category": "math",
+      "expected": "角度は90度です。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-25",
+      "category": "math",
+      "expected": "2乗と2倍は違います。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-26",
+      "category": "school",
+      "expected": "プリントを1人に2枚ずつ配ってください。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-27",
+      "category": "school",
+      "expected": "遅刻します。到着する時間はあとで連絡します。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-28",
+      "category": "easy",
+      "expected": "提出期限は明日の午前9時です。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-29",
+      "category": "easy",
+      "expected": "必ず保護者に確認してください。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    },
+    {
+      "id": "speech-30",
+      "category": "uncertain",
+      "expected": "その並び方の名前は、よく聞こえませんでした。",
+      "recognized": null,
+      "speechToDisplayMs": null
+    }
+  ]
+}

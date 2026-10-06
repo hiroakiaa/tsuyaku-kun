@@ -1,0 +1,10 @@
+# 音声認識の比較手順
+
+1. speech-benchmark.json の30例を、同じ話者・同じ端末と回線で読む。可能なら同じ音声を繰り返して使う。共有先へ録音をアップロードする必要はない。
+2. 出力された日本語を recognized に、話し終わりから表示までの時間を speechToDisplayMs に記入する。空欄は未計測のままにする。
+3. node tools/evaluate-speech.mjs tests/speech-benchmark.json を実行する。数字の誤り、文字誤り率、未計測数を確認する。意味、否定、専門用語、訳の自然さは人が確認する。
+4. 声の大きさ・周囲の音・言語・端末・回線を記録し、変更前後で条件をそろえる。
+
+今回の変更：20msの平均音量で区切りを判定し、短い返事は120ms以上、無音は320ms、連続発話は最大4秒。前の200msを保持する。実端末での精度・速さの改善率は未計測。
+
+Cloudflare公式モデル仕様: https://developers.cloudflare.com/ai/models/%40cf/openai/whisper-large-v3-turbo/
