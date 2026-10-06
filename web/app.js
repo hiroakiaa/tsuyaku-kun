@@ -5,7 +5,7 @@ import {SpeechPlayer} from './speech-player.js?v=20261006-playback-2';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261006-telemetry-1';
 import {installAdmin} from './admin.js?v=20261006-network-3';
 import {config} from './config.js';
-import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection} from './network.js?v=20261006-audio-1';
+import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection} from './network.js?v=20261006-audio-2';
 import {catalog as seed} from '../server/catalog.js';
 import {translationOf} from './core.js?v=20261006-school-1';
 import {speakerCaption,speakerInfo} from './face-mode.js?v=20261006-school-1';

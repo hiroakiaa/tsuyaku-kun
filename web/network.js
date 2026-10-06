@@ -34,11 +34,11 @@ export async function probeNetwork(api,{fetcher=fetch,now=()=>Date.now()}={}){
 }
 
 export function explainConnection(checks,{authentication='unavailable',online=true,now=Date.now(),sessions=[]}={}){
- const history=checks.map(safeConnectionRecord),records=history.filter(r=>r.at<=now&&now-r.at<=300000),latest=stage=>records.filter(r=>r.stage===stage).sort((a,b)=>a.at-b.at).at(-1),simple=latest('api_simple'),headers=latest('api_headers'),turn=latest('turn');
+ const history=checks.map(r=>safeConnectionRecord({...r,at:Number.isFinite(r.at)?r.at:now})),records=history.filter(r=>r.at<=now&&now-r.at<=300000),latest=stage=>records.filter(r=>r.stage===stage).sort((a,b)=>a.at-b.at).at(-1),simple=latest('api_simple'),headers=latest('api_headers'),turn=latest('turn'),transcribe=records.filter(r=>r.operation==='transcribe').sort((a,b)=>a.at-b.at).at(-1);
  const facts=[],candidates=[],nextSteps=[];const recentSessions=summarizeSessions(sessions);facts.push('接続診断の判定対象は過去5分の記録です。利用結果とは別の検査です。');if(history.length>records.length)facts.push('5分より古い通信記録 '+(history.length-records.length)+'件は現在の原因判定から除外しています。');if(recentSessions.length){const s=recentSessions[0];facts.push('最新の利用：翻訳成功 '+s.translatedCaptions+'文、翻訳失敗 '+s.failedCaptions+'文、再接続 '+s.reconnectCount+'回。');if(s.slowTranslationCount>0)facts.push('最新の利用で5秒以上の翻訳 '+s.slowTranslationCount+'文、最初の翻訳 '+s.firstTranslationMs+'ms。処理内訳は未計測で、原因は断定できません。');if(s.relayBytes>0)facts.push('最新の利用でTURN中継通信 '+s.relayBytes+' bytesを観測しました。相手の音声再生成功までは判定しません。');}
  facts.push(authentication==='ready'?'匿名認証の準備は完了しています。':'匿名認証の準備完了を確認できていません。');
  if(!online)facts.push('端末がオフラインと報告しています。');
- for(const r of [simple,headers,turn].filter(Boolean))facts.push(({api_simple:'APIの通常通信',api_headers:'APIの認証ヘッダー付き通信',turn:'TURN接続情報の取得'})[r.stage]+'：'+r.code+(r.status?'（HTTP '+r.status+'）':'')+'。');
+ for(const r of [simple,headers,turn,transcribe].filter(Boolean))facts.push((r.operation==='transcribe'?'音声認識API':({api_simple:'APIの通常通信',api_headers:'APIの認証ヘッダー付き通信',turn:'TURN接続情報の取得'})[r.stage])+'：'+r.code+(r.status?'（HTTP '+r.status+'）':'')+'。');
  const failed=records.filter(r=>r.code!=='ok');
  if(failed.some(r=>r.operation==='room_create'))facts.push('ルーム作成の失敗記録があります。QR表示前の段階です。');
  if(simple?.code==='network_or_cors'&&headers?.code==='network_or_cors')candidates.push({cause:'接続先への通信制限・DNS・TLS・CORS',confidence:'未確定',evidence:'通常通信とヘッダー付き通信の両方が失敗しています。認証ヘッダーだけの問題とは絞れません。'});
