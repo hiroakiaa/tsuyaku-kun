@@ -5,13 +5,13 @@ import {SpeechPlayer} from './speech-player.js?v=20261006-playback-2';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261006-telemetry-1';
 import {installAdmin} from './admin.js?v=20261006-network-3';
 import {config} from './config.js';
-import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection} from './network.js?v=20261006-audio-2';
+import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection} from './network.js?v=20261006-failure-1';
 import {catalog as seed} from '../server/catalog.js';
 import {translationOf} from './core.js?v=20261006-school-1';
 import {speakerCaption,speakerInfo} from './face-mode.js?v=20261006-school-1';
 import {callCaptionLanguages,isDisplayableCaption} from './call-mode.js?v=20261006-call-1';
 import {listHistory} from './history.js?v=20261006-school-1';
-import {createServerRecognition} from './caption-server.js?v=20261006-economy-1';
+import {createServerRecognition} from './caption-server.js?v=20261006-failure-1';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 let catalog=seed,authApi,user,socket,room,selfId,role,localStream,recognition,restarting=false,sessionEpoch=0,mic=false,participants=[],tab='interpreter',intentionalClose=false,refreshTimer,reconnectTimer,heartbeat;
 let roomExpiryTimer;let faceSide='self';let reconnectAttempts=0,recoveryStartedAt=null,connectedAt=null,authTimer;const localTimings=new Map();
@@ -85,7 +85,7 @@ function inviteLink(){const url=new URL(location.href);url.hash=new URLSearchPar
 function showInvite(){if(!room||room.mode!=='interpreter'||participants.some(p=>p.id!==selfId))return;const n=el('div'),input=el('input');input.readOnly=true;input.value=inviteLink();n.append(label('招待リンク',input));const copy=el('button','リンクをコピー');copy.onclick=async()=>{try{await navigator.clipboard.writeText(input.value);copy.textContent='コピーしました';}catch{input.select();message('招待リンクをコピーしてください。');}};n.append(copy);const canvas=el('canvas');canvas.className='qr';n.append(canvas);void import('./qr.js').then(m=>m.drawQr(canvas,input.value)).catch(()=>{});n.append(el('p','このリンクを受け取った人が参加できます。'));modal('相手を招待',n);$('#modal').dataset.kind='invite';}
 $('#invite').onclick=showInvite;
 function download(name,text,type='text/csv;charset=utf-8'){const a=el('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
-function showTranslationFailure(data){message(data.error||'翻訳できませんでした。');if(!data.id.startsWith(selfId+'_'))return;const retry=el('button','再試行');retry.onclick=()=>{send({type:'caption',id:data.id.slice(selfId.length+1),text:data.text,final:true,...(room?.mode==='face'?{source:data.source,speakerSide:data.speaker==='相手'?'other':'self'}:{})});message('翻訳を再試行しています。');};$('#message').append(retry);}
+function showTranslationFailure(data){connections.add({stage:'api',operation:'translation',code:'http_error',endpoint:config.api,aiReason:data.aiFailure?.reason,aiCode:data.aiFailure?.code,online:navigator.onLine});message(data.error||'翻訳できませんでした。');if(!data.id.startsWith(selfId+'_'))return;const retry=el('button','再試行');retry.onclick=()=>{send({type:'caption',id:data.id.slice(selfId.length+1),text:data.text,final:true,...(room?.mode==='face'?{source:data.source,speakerSide:data.speaker==='相手'?'other':'self'}:{})});message('翻訳を再試行しています。');};$('#message').append(retry);}
 
 
 async function leave(show=true){intentionalClose=true;if(socket?.readyState===1)send({type:'leave'});stopRecognition();localStream?.getAudioTracks().forEach(t=>t.enabled=false);speechPlayer.stop();await sampleRtc();ledger.end();clearInterval(metricsTimer);clearTimeout(roomExpiryTimer);sessionEpoch++;intentionalClose=true;clearTimeout(reconnectTimer);clearTimeout(authTimer);reconnectAttempts=0;recoveryStartedAt=null;connectedAt=null;localTimings.clear();clearInterval(refreshTimer);clearInterval(heartbeat);stopRecognition();mic=false;socket?.close();socket=null;for(const p of peers.values()){p.pc.close();p.audio.remove();}peers.clear();localStream?.getTracks().forEach(t=>t.stop());localStream=null;pending.clear();participants=[];$('#participants').replaceChildren();if($('#modal').dataset.kind==='invite')$('#modal').close();room=null;updateFace();updateLessonCode();paintButton($('#microphone'),'マイクを開始','microphone');$('#microphone').setAttribute('aria-pressed','false');$('#microphone').disabled=false;if(show){await exitModeFullscreen();lastJoinCode='';$('#live').hidden=true;$$('[data-tab]').forEach(b=>b.disabled=false);setTab(tab);history.replaceState(null,'',location.pathname);status('退室しました');}}
