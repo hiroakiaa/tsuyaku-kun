@@ -2,7 +2,7 @@
 export class PcmSegmenter {
   constructor(rate, emit) {
     this.rate = rate; this.emit = emit;
-    this.samples = new Int16Array(128000); this.length = 0;
+    this.samples = new Int16Array(96000); this.length = 0;
     this.preroll = new Int16Array(6400); this.preIndex = 0; this.started = false;
     this.phase = 0; this.sum = 0; this.count = 0;
     this.voiced = 0; this.silence = 0;
@@ -23,7 +23,7 @@ export class PcmSegmenter {
       this.samples[this.length++] = pcm;
       if (Math.abs(sample) > 0.006) { this.voiced++; this.silence = 0; } else this.silence++;
       const forced = this.length === this.samples.length;
-      if (forced || (this.length >= 40000 && this.silence >= 10400)) {
+      if (forced || (this.length >= 12800 && this.silence >= 6400)) {
         if (this.voiced >= 2400) this.emit(this.samples.slice(0, this.length));
         // Preserve overlap only across a forced split. Natural pauses already
         // include a post-roll and do not need to be billed twice.
