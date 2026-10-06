@@ -72,7 +72,7 @@ export default {async fetch(request,env){
 export class TranslationRoom {
   constructor(ctx,env){this.ctx=ctx;this.env=env;this.jobs=new Map();this.cachedCatalog=catalog;this.catalogUntil=0;}
   async info(){return this.ctx.storage.get('room');}
-  participants(){return this.ctx.getWebSockets().map(ws=>({ws,a:ws.deserializeAttachment()})).filter(x=>x.a?.uid);}
+  participants(){return this.ctx.getWebSockets().map(ws=>({ws,a:ws.deserializeAttachment()})).filter(x=>x.a?.uid&&!x.a.left&&(x.ws.readyState===undefined||x.ws.readyState===1));}
   send(ws,data){try{ws.send(JSON.stringify(data));}catch{}}
   broadcast(data){for(const {ws} of this.participants())this.send(ws,data);}
   roster(){this.broadcast({type:'participants',participants:this.participants().map(({a})=>({id:a.id,name:a.name,language:a.language,role:a.role}))});}
@@ -103,15 +103,18 @@ export class TranslationRoom {
         if(this.participants().some(p=>p.a.uid===auth.uid))throw Error('別のタブで参加中です。');
         if(room.mode==='interpreter'&&this.participants().length>=2)throw Error('通訳は2人まで参加できます。');
         const stableId=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(auth.uid)))].slice(0,16).map(x=>x.toString(16).padStart(2,'0')).join('');
-        const viewLanguage=String(data.viewLanguage||lang);if(!catalog.languages.some(l=>l.code===viewLanguage))throw Error('表示言語を確認してください。');
+        const viewLanguage=room.mode==='interpreter'?lang:String(data.viewLanguage||lang);if(!catalog.languages.some(l=>l.code===viewLanguage))throw Error('表示言語を確認してください。');
         ws.serializeAttachment({...a,...auth,id:stableId,token:data.token,name:String(data.name||'参加者').slice(0,40),language:role==='teacher'&&room.mode==='lesson'?'ja':lang,viewLanguage,role});
         this.send(ws,{type:'ready',id:stableId,role,mode:room.mode,unit:room.unit,code:room.code,expires:room.expires,ended:!!room.ended,history:[...(await this.ctx.storage.list({prefix:'caption:',limit:3000})).values()].sort((x,y)=>x.at-y.at)});this.roster();
         if(this.env.SHEETS_BRIDGE&&Date.now()>this.catalogUntil){this.catalogUntil=Date.now()+300000;this.ctx.waitUntil(bridge(this.env,data.token,'tsuyakuCatalog').then(r=>{if(r)this.cachedCatalog=r;}).catch(()=>{}));}return;
       }
+      if(a.left)return;
+      if(data.type==='leave'){await this.webSocketClose(ws);return;}
       if(a.expires<=Date.now())throw Error('ログインし直してください。');
       if(data.type==='reauth'){const auth=await verifyToken(data.token,this.env.FIREBASE_PROJECT);if(auth.uid!==a.uid)throw Error('ログインし直してください。');ws.serializeAttachment({...a,...auth,token:data.token});return;}
       if(Date.now()-a.window>60000){a.window=Date.now();a.count=0;}if(++a.count>400)throw Error('操作が多すぎます。');ws.serializeAttachment(a);
       if(data.type==='ping'){this.send(ws,{type:'pong'});return;}
+      if(data.type==='language'&&room.mode==='interpreter'){const language=String(data.language||'');if(!catalog.languages.some(l=>l.code===language))throw Error('言語を確認してください。');ws.serializeAttachment({...a,language,viewLanguage:language,name:(catalog.languages.find(l=>l.code===language)?.labelJa||'ことば')+'の参加者'});this.roster();return;}
       if(data.type==='signal'){if(room.mode==='face')return;
         const other=this.participants().find(p=>p.a.id===data.to);if(!other)return;
         if(room.mode==='lesson'&&a.role!=='teacher'&&data.signal?.description?.type==='offer')throw Error('先生から接続します。');
@@ -127,7 +130,7 @@ export class TranslationRoom {
       this.broadcast({type:'caption',id,speaker:captionParticipant(room,a,data).name,source:captionParticipant(room,a,data).language,text:cap.text,final:cap.final,at:Date.now()});
       if(!cap.final)return;
       const existing=await this.ctx.storage.get('caption:'+id);if(existing?.text===cap.text&&existing.status!=='failed')return;
-      if(!existing&&(await this.ctx.storage.get('captionCount')||0)>=3000)throw Error('この授業は3000文に達しました。履歴を保存して新しいルームを作ってください。');
+      if(!existing&&(await this.ctx.storage.get('captionCount')||0)>=3000)throw Error('この授業は3000文に達しました。新しいルームを作ってください。');
       if(!existing)await this.ctx.storage.put('captionCount',(await this.ctx.storage.get('captionCount')||0)+1);
       if(this.jobs.has(id))return;
       const task=this.translate(ws,captionParticipant(room,a,data),room,id,cap.text).finally(()=>this.jobs.delete(id));this.jobs.set(id,task);this.ctx.waitUntil(task);
@@ -137,14 +140,14 @@ export class TranslationRoom {
     const start=Date.now();if(!(await this.info())||room.expires<=start)return;let usage;const record={id,speaker:a.name,source:a.language,text,final:true,at:start,status:'translating'};
     await this.ctx.storage.put('caption:'+id,record);
     try{
-      const targets=[...new Set(['ja','en',...this.participants().flatMap(p=>[p.a.language,p.a.viewLanguage])])];
+      const languages=this.participants().map(p=>p.a.language);const targets=room.mode==='interpreter'?[...new Set([...languages,...(languages.some(code=>code!=='en')?['en']:[])])]:[...new Set(['ja','en',...this.participants().flatMap(p=>[p.a.language,p.a.viewLanguage])])];
       const all=this.cachedCatalog;
       const past=(await this.ctx.storage.get('recent')||[]).map(r=>r.text);
       const translations=await translateText(this.env,text,a.language,targets,past,room.unit,all,u=>{usage=u;});
       if(!(await this.info())||room.expires<=Date.now())return;const done={...record,translations,usage,status:'ready',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,done);const recent=await this.ctx.storage.get('recent')||[];await this.ctx.storage.put('recent',[...recent,{at:start,text}].sort((a,b)=>a.at-b.at).slice(-3));this.broadcast({type:'translation',...done});
-    }catch(e){if(!(await this.info())||room.expires<=Date.now())return;const failed={...record,usage,status:'failed',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,failed);this.broadcast({type:'translation',...failed,error:'翻訳に失敗しました。字幕の「再試行」を押してください。'});}
+    }catch(e){if(!(await this.info())||room.expires<=Date.now())return;const failed={...record,usage,status:'failed',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,failed);this.broadcast({type:'translation',...failed,error:'翻訳に失敗しました。画面の「再試行」を押してください。'});}
   }
-  async webSocketClose(ws){const a=ws.deserializeAttachment();if(a?.uid)this.broadcast({type:'notice',text:a.name+'さんが退室しました。'});try{ws.close();}catch{}this.roster();}
+  async webSocketClose(ws){const a=ws.deserializeAttachment();if(a?.left)return;ws.serializeAttachment({...a,left:true});try{ws.close(1000,'left');}catch{}if(a?.uid)this.broadcast({type:'notice',text:a.name+'さんが退室しました。'});this.roster();}
   async webSocketError(ws){await this.webSocketClose(ws);}
   async alarm(){if(await this.ctx.storage.get('codesDirectory')){await new LessonCodes(this.ctx.storage).cleanup();return;}const room=await this.info();if(!room||room.expires<=Date.now()){for(const ws of this.ctx.getWebSockets()){try{ws.close(1000,'expired');}catch{}}await this.ctx.storage.deleteAll();return;}for(const ws of this.ctx.getWebSockets()){const a=ws.deserializeAttachment();if(!a?.uid&&Date.now()-a.opened>=10000||a?.expires<=Date.now()){try{ws.close(1008,'auth');}catch{}}}await this.ctx.storage.setAlarm(Math.min(room.expires,Date.now()+60000));}
 }
