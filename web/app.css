@@ -164,3 +164,62 @@ body.phone-home:not(.mode-active) .app-shell{padding-bottom:calc(72px + env(safe
  .mode-active .caption-line>.speech-controls{grid-column:2;grid-row:2}
  .mode-active .caption{padding:12px}
 }
+
+/* Clear, friendly controls across phone, tablet and desktop. */
+:root{--ink:#304d3a;--muted:#5d7263;--line:#d7e4d0;--paper:#fffef9;--green:#337342}
+body.phone-home{background:#f7f9ee;color:var(--ink);font-size:17px;line-height:1.6}
+body.phone-home:not(.mode-active) .app-shell{max-width:1200px;padding:16px 20px calc(78px + env(safe-area-inset-bottom))}
+header{gap:12px;margin-bottom:12px}.brand{font-size:23px;letter-spacing:.04em}.header-tools #connection{color:#506953;font-size:12px}.header-tools button{width:44px;height:44px;border-radius:16px}
+body.phone-home main.phone-home-card{border:1px solid #d4e3cb;border-radius:24px!important;background:#fffef9;padding:20px!important}
+.phone-home-card .entry-card{border:0;background:#f3f8eb;border-radius:20px;padding:24px;gap:22px;max-width:980px;margin-inline:auto}
+.phone-home-card label{color:#3f5c46;font-size:15px;font-weight:700;gap:8px}
+.phone-home-card input,.phone-home-card select{min-height:54px;border:2px solid #b9cfb0;border-radius:14px;padding:12px 14px;color:#304d3a;background:#fffefb;line-height:1.4}
+.phone-home-card input::placeholder{color:#68776b;opacity:1}
+.phone-home-card button,#modal-body button{border-radius:16px;min-height:48px;line-height:1.4}
+.phone-home-card button.primary{min-height:58px;padding:14px 20px!important;font-size:17px;justify-content:center;gap:14px}
+button::after{inset:5px;border-width:1px;opacity:.4}
+button:active:not(:disabled){transform:translateY(1px)}button:disabled{opacity:.65;transform:none}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #28703d;outline-offset:3px}
+.phone-home-card button.danger{background:#fff7d8;border-color:#b7c571;color:#546226}
+.lesson-role-switch{max-width:980px;margin:0 auto 14px;gap:10px}.lesson-role-switch button{background:#fffef9;color:#46624a;border-color:#bbd2ad;font-size:16px;gap:10px}
+.lesson-role-switch button[aria-pressed=true]{border-color:#5e9d46;background:#dff2bc}
+#lesson-code-input{letter-spacing:.28em;font-weight:700;background:#fffbed;border-color:#c6c68e}
+#join-status{color:#536a55;font-size:13px;line-height:1.5}
+body.phone-home main.phone-home-card>.bottom-nav{background:#fffef9;border-top:1px solid #cbdac1;padding-top:6px!important;gap:4px!important}
+body.phone-home main.phone-home-card>.bottom-nav button{min-height:62px!important;color:#4d6851;border-radius:14px;font-weight:700;gap:5px}
+body.phone-home main.phone-home-card>.bottom-nav button[aria-selected=true]{background:#e1f4bc!important;color:#275d34;border:1px solid #abd18b}
+.nav-icon{font-size:22px!important;line-height:24px!important}.nav-label{font-size:12px!important;line-height:1.3}
+.shared-language{max-width:100%;margin:0 0 14px}.search{max-width:none;margin:0 0 16px}.reference-list{gap:12px}.reference-card{border:1px solid #d5e3cc;border-radius:18px;padding:18px;align-items:center;background:#fffef9}.reference-card h3{color:#304d3a;font-size:18px;line-height:1.5}.reference-card p{color:#52685a;font-size:15px;line-height:1.6}.reference-card button{font-size:14px;padding:10px 16px!important;min-width:72px}
+#add-term{margin-bottom:14px}
+body.phone-home.mode-active main.phone-home-card{padding:12px!important}
+.mode-active #live:not([hidden]){gap:10px}
+.mode-active .captions{background:#f2f6eb;border:1px solid #d5e2cb;border-radius:20px;padding:10px;scrollbar-gutter:auto}
+.mode-active .caption{padding:14px 16px;margin-bottom:10px;border:1px solid #d5e2cb;border-radius:18px;background:#fffefb}
+.caption-meta{color:#566b5c;font-size:12px;line-height:1.4}
+.mode-active .caption-line{margin-top:12px;grid-template-columns:70px minmax(0,1fr) 48px;gap:8px 12px}
+.mode-active .caption-line>small{color:#526c57;font-size:12px;line-height:1.4;padding-top:5px}
+.mode-active .caption-line>p{font-size:19px;line-height:1.65;overflow-wrap:anywhere;word-break:normal}
+.mode-active .caption-line>.speech-controls{width:48px;min-width:48px;gap:6px}
+.caption-line .speech-controls button{min-width:48px;min-height:48px;font-size:18px;padding:10px!important;border:1px solid #c9dfb6!important;background:#eff9df!important;border-radius:14px}
+.mode-active .face-controls{padding:12px 14px;border:1px solid #ccdfbc;border-radius:18px;background:#eaf4df;gap:12px}
+.mode-active .face-controls strong{font-size:18px;color:#304d3a}.mode-active .face-controls span{font-size:14px;color:#536a55}.mode-active .face-controls button{font-size:15px;min-height:48px;padding:10px 14px!important}
+.mode-active .text-form{gap:8px}.mode-active .text-form input{min-height:50px;border-radius:14px}.mode-active .text-form button{min-width:50px;border-radius:14px;padding:10px!important}
+.mode-active .call-controls{gap:8px}.mode-active .call-controls button{min-height:50px;font-size:15px;padding:10px 12px!important;gap:8px}
+.mode-active .participants{max-height:56px;font-size:12px;gap:6px;padding:0}.participant{padding:5px 10px;background:#eef6e4;color:#3c5d42}
+.empty{color:#526d59;display:grid;place-content:center;min-height:100%;padding:24px 12px}.empty h2{font-size:19px;color:#446a4c;line-height:1.5}.empty p{font-size:14px;color:#536c59;margin:4px 0}.speech-symbol{font-size:40px;color:#7fa865}
+.message:empty{display:none}.message:not(:empty){background:#fff5dc;border:1px solid #e5d4a6;border-radius:12px;color:#67542e;padding:10px 12px;font-size:14px;line-height:1.5;margin:12px 0 0}
+.mode-active .message:not(:empty){max-height:84px;padding:8px 10px;font-size:13px;margin-top:8px}
+dialog{border-radius:22px;border:1px solid #becfac}#modal-body{color:#304d3a;line-height:1.7}.modal-heading{border-bottom:1px solid #dce6d4;padding-bottom:14px}.modal-heading h2{font-size:20px}.modal-heading button{border:1px solid #c8d7bd;border-radius:14px;background:#f4f8eb;color:#3e6046;font-size:20px}
+@media(max-width:600px){
+ body.phone-home:not(.mode-active) .app-shell{padding:12px 12px calc(76px + env(safe-area-inset-bottom))}
+ body.phone-home main.phone-home-card{padding:14px!important;border-radius:20px!important}.brand{font-size:21px}
+ .phone-home-card .entry-card{padding:18px;gap:18px}.phone-home-card #panel-face .entry-card{grid-template-columns:minmax(0,1fr)}
+ .nav-label{font-size:11px!important}.nav-icon{font-size:21px!important}
+ body.phone-home.mode-active main.phone-home-card{padding:8px!important}.mode-active .face-controls{flex-direction:row;align-items:center;gap:8px;padding:10px 12px}.mode-active .face-controls>div{min-width:0;flex:1}.mode-active .face-controls button{width:auto;max-width:58%;font-size:13px;padding:10px!important;min-height:48px}
+ .mode-active .face-controls strong{font-size:16px}.mode-active .face-controls span{font-size:13px}
+ .mode-active .caption{padding:12px}.mode-active .caption-line{grid-template-columns:minmax(0,1fr) 48px;gap:4px 10px}.mode-active .caption-line>small{grid-column:1;grid-row:1}.mode-active .caption-line>p{grid-column:1;grid-row:2;font-size:18px;line-height:1.65}.mode-active .caption-line>.speech-controls{grid-column:2;grid-row:2}
+ .mode-active .call-controls button{font-size:14px}.reference-card{padding:16px}.reference-card h3{font-size:17px}
+}
+@media(min-width:760px),(min-width:600px) and (max-height:500px){.mode-active #live:not([hidden]){grid-template-columns:minmax(220px,28%) minmax(0,1fr)}.mode-active .face-controls{flex-direction:column;align-items:stretch}.mode-active .face-controls button{max-width:none;width:100%}}
+@media(max-height:500px){body.phone-home:not(.mode-active) .app-shell{padding:6px 10px calc(56px + env(safe-area-inset-bottom))}body.phone-home main.phone-home-card>.bottom-nav button{min-height:44px!important;gap:2px}.nav-icon{font-size:18px!important;line-height:20px!important}.nav-label{font-size:10px!important}.phone-home-card .entry-card{padding:12px;gap:10px}.phone-home-card input,.phone-home-card select,.phone-home-card button.primary{min-height:44px}.mode-active .message:not(:empty){max-height:48px}}
+@media(prefers-reduced-motion:reduce){button:active:not(:disabled){transform:none}}
