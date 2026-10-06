@@ -1,3 +1,4 @@
+export function aiFailure(error){const text=String(error?.message||'');const code=/(?:code|error)[^0-9]{0,12}(\d{3,6})/i.exec(text)?.[1];const reason=/quota|neurons|daily|free.*limit|usage.*limit/i.test(text)?'quota':/billing|paid|payment/i.test(text)?'billing':/model.*not|unsupported|not.*available/i.test(text)?'model':/schema|invalid|parameter/i.test(text)?'input':'service';return {reason,code:code||null,message:reason==='quota'?'Cloudflare AIの利用上限に達しています。':reason==='billing'?'Cloudflare AIの料金プランの確認が必要です。':'AIサービスが処理できませんでした。'};}
 export async function recognizeAudio(env,bytes,language){
         let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
         const hints=catalog.glossary.map(r=>language==='ja'?r.ja:r.en).join('、').slice(0,400);
@@ -150,7 +151,7 @@ export class TranslationRoom {
       const past=(await this.ctx.storage.get('recent')||[]).map(r=>r.text);
       const translations=await translateText(this.env,text,a.language,targets,past,room.unit,all,u=>{usage=u;});
       if(!(await this.info())||room.expires<=Date.now())return;const done={...record,translations,usage,status:'ready',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,done);const recent=await this.ctx.storage.get('recent')||[];await this.ctx.storage.put('recent',[...recent,{at:start,text}].sort((a,b)=>a.at-b.at).slice(-3));this.broadcast({type:'translation',...done});
-    }catch(e){if(!(await this.info())||room.expires<=Date.now())return;const failed={...record,usage,status:'failed',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,failed);this.broadcast({type:'translation',...failed,error:'翻訳に失敗しました。画面の「再試行」を押してください。'});}
+    }catch(e){if(!(await this.info())||room.expires<=Date.now())return;const failed={...record,usage,status:'failed',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,failed);this.broadcast({type:'translation',...failed,error:aiFailure(e).message,aiFailure:aiFailure(e)});}
   }
   async webSocketClose(ws){const a=ws.deserializeAttachment();if(a?.left)return;ws.serializeAttachment({...a,left:true});try{ws.close(1000,'left');}catch{}if(a?.uid)this.broadcast({type:'notice',text:a.name+'さんが退室しました。'});this.roster();}
   async webSocketError(ws){await this.webSocketClose(ws);}
