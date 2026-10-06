@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {PcmSegmenter} from '../web/caption-pcm.js';
 import {readdir,readFile} from 'node:fs/promises';
 import {SourceTextModule} from 'node:vm';
 import {fileURLToPath} from 'node:url';
@@ -80,4 +81,8 @@ await test('音声認識は一時的なHTTP障害から次の発話で復旧す�
 
 
 await test('高速音声モデルが失敗したら独立した予備モデルへWAVを渡す',async()=>{const calls=[];const wav=new Uint8Array(encodeWav(new Int16Array(16000)));const result=await recognizeAudio({AI:{run:async(model,input)=>{calls.push({model,input});if(calls.length===1)throw Error('model unavailable');return {text:'hello'};}}},wav,'en');assert.equal(result.text,'hello');assert.equal(calls[0].input.vad_filter,false);assert.equal(calls[1].model,'@cf/openai/whisper');assert.deepEqual(calls[1].input.audio,Array.from(wav));});
+
+await test('低費用認識は無音10秒を送信しない',()=>{const out=[],s=new PcmSegmenter(16000,x=>out.push(x));s.push(new Float32Array(160000));assert.equal(out.length,0);});
+await test('短い発話は400msの無音で送信し先頭を保持する',()=>{const out=[],s=new PcmSegmenter(16000,x=>out.push(x));s.push(Float32Array.from({length:6400},(_,i)=>Math.sin(i*.15)*.08));s.push(new Float32Array(6401));assert.equal(out.length,1);assert.ok(out[0].length<=20000);assert.ok(validWav(new Uint8Array(encodeWav(out[0]))));});
+await test('連続発話は6秒に制限し停止時に音声を消去する',()=>{const out=[],s=new PcmSegmenter(16000,x=>out.push(x));s.push(Float32Array.from({length:112000},(_,i)=>Math.sin(i*.15)*.08));assert.equal(out.length,1);assert.equal(out[0].length,96000);s.clear();assert.equal(s.length,0);assert.ok(s.samples.every(x=>x===0));assert.ok(s.preroll.every(x=>x===0));});
 console.log(count+' tests passed');
