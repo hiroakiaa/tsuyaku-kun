@@ -1,6 +1,8 @@
+export const spokenLanguage=code=>code==='ja-easy'?'ja':code;
+export function withEasyJapanese(data){return {...data,languages:[...data.languages.filter(l=>l.code!=='ja-easy'),{code:'ja-easy',speechCode:'ja-JP',labelJa:'やさしい日本語',labelNative:'やさしい日本語',icon:'comment'}]};}
 export const normalizeLanguage = code => code === 'zh' ? 'zh-CN' : code;
-export const translationField = code => ({ja:'jaText',en:'enText',pt:'ptText',es:'esText',vi:'viText','zh-CN':'zhText',ko:'koText',tl:'tlText',fil:'tlText',id:'idText',ne:'neText'})[code];
-export function translationOf(row, code) {return row[translationField(code)] || (code==='ja' ? row.ja || row.title : code==='en' ? row.en : '') || '';}
+export const translationField = code => ({'ja-easy':'simpleJaText',ja:'jaText',en:'enText',pt:'ptText',es:'esText',vi:'viText','zh-CN':'zhText',ko:'koText',tl:'tlText',fil:'tlText',id:'idText',ne:'neText'})[code];
+export function translationOf(row, code) {return row[translationField(code)] || (code==='ja-easy' ? row.descriptionJa : '') || (code==='ja' ? row.ja || row.title : code==='en' ? row.en : '') || '';}
 export function glossaryFor(text, glossary) {
   return glossary.filter(r=>r.ja && text.includes(r.ja)).sort((a,b)=>b.ja.length-a.ja.length).slice(0,16);
 }
