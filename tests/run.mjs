@@ -15,7 +15,7 @@ import {UsageLedger,costOf,analysisReport,percentile} from '../web/usage.js';
 import {SpeechPlayer} from '../web/speech-player.js';
 import {lastVoicedAt,latencyFromTiming,retryDelay} from '../web/diagnostics.js';
 import {speakerInfo,speakerCaption} from '../web/face-mode.js';
-import {captionParticipant} from '../web/core.js';
+import {captionParticipant,spokenLanguage,translationOf,withEasyJapanese} from '../web/core.js';
 import {LessonCodes,ROOM_TTL,normalizeRoomCode} from '../server/lesson-codes.js';
 import {historyExpired} from '../web/history.js';
 import {callCaptionLanguages,isDisplayableCaption} from '../web/call-mode.js';
@@ -98,4 +98,7 @@ await test('混雑の429はマイクを維持し上限の429は明確な理由�
 await test('マイク許可待ちの時間切れ後は遅れて得た音声を停止する',async()=>{let release,stopped=0;const stream={getTracks:()=>[{stop:()=>stopped++}]};const pending=new Promise(r=>release=r);await assert.rejects(()=>acquireMicrophone(()=>pending,()=>true,{timeoutMs:5}),e=>e.name==='TimeoutError');release(stream);await new Promise(r=>setTimeout(r,0));assert.equal(stopped,1);});
 await test('退室後に届いたマイクは保持せず即停止する',async()=>{let stopped=0;await assert.rejects(()=>acquireMicrophone(async()=>({getTracks:()=>[{stop:()=>stopped++}]}),()=>false),e=>e.name==='AbortError');assert.equal(stopped,1);});
 await test('HTTP状態がないWebSocket翻訳失敗でundefinedを表示しない',()=>{const r=explainConnection([{stage:'api',operation:'translation',code:'http_error',aiReason:'quota'}]);assert.ok(!JSON.stringify(r).includes('undefined'));assert.equal(r.candidates.length,1);});
+await test('やさしい日本語は日本語音声として認識し古い辞書でも選択できる',()=>{assert.equal(spokenLanguage('ja-easy'),'ja');assert.equal(withEasyJapanese({languages:[{code:'ja'}]}).languages.filter(l=>l.code==='ja-easy').length,1);assert.equal(translationOf({simpleJaText:'あした、もってきてください。'},'ja-easy'),'あした、もってきてください。');assert.equal(translationOf({descriptionJa:'文字にかける数です。'},'ja-easy'),'文字にかける数です。');});
+await test('やさしい日本語の文例はAIなしでシートの言い換えを利用',async()=>{const out=await translateText({AI:{run:()=>{throw Error('AI must not run');}}},'ご持参ください','ja-easy',['ja-easy'],[],'',{phrases:[{jaText:'ご持参ください',simpleJaText:'もってきてください。'}]});assert.equal(out.ja,'ご持参ください');assert.equal(out['ja-easy'],'もってきてください。');});
+await test('日本語からやさしい日本語へも省略せずAIで言い換える',async()=>{let prompt;const out=await translateText({AI:{run:async(model,input)=>{prompt=input.messages;return {response:'{"ja-easy":"あしたは、お休みではありません。"}'};}}},'明日は休業日ではありません','ja',['ja-easy'],[],'',{phrases:[],glossary:[]});assert.equal(out['ja-easy'],'あしたは、お休みではありません。');assert.ok(prompt[0].content.includes('Preserve all facts'));assert.deepEqual(JSON.parse(prompt[1].content).targets,['ja-easy']);assert.deepEqual(callCaptionLanguages('ja-easy'),['ja','ja-easy','en']);});
 console.log(count+' tests passed');
