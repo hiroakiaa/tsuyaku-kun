@@ -1,3 +1,4 @@
+import {protectUncertainSpeech,restoreUncertainSpeech} from '../server/quality.js';
 import {speechScore} from '../tools/speech-score.js';
 import {recognitionHints,safeRecognitionHints} from '../web/recognition-hints.js';
 import {runInNewContext} from 'node:vm';
@@ -127,4 +128,5 @@ await test('用語ヒントを音声モデルに渡し未知言語に英語を�
 });
 
 await test('比較評価は数字の誤りと未計測を成功扱いにしない',()=>{assert.equal(speechScore('15ページ','16ページ').numbersMatch,false);assert.equal(speechScore('はい。','はい').characterErrorRate,0);assert.ok(speechScore('必要ありません','必要です').characterErrorRate>0);assert.equal(speechScore('','').characterErrorRate,null);});
+await test('不自然な序数は数学の概念や数字を推測せず原文確認として残す',()=>{const p=protectUncertainSpeech('13番から二次つ目になります');assert.equal(p.speech,'13番から__UNCLEAR_1__になります');assert.deepEqual(p.spans,['二次つ目']);const restored=restoreUncertainSpeech({en:'From 13 to __UNCLEAR_1__'},'13番から二次つ目になります',p.spans);assert.ok(restored.en.includes('二次つ目'));assert.ok(restored.en.includes('unclear wording'));assert.ok(!restored.en.includes('quadratic'));assert.ok(restoreUncertainSpeech({en:'second quadratic'},'13番から二次つ目になります',p.spans).en.includes('unclear wording'));assert.deepEqual(protectUncertainSpeech('二次方程式と13番').spans,[]);});
 console.log(count+' tests passed');
