@@ -1,3 +1,10 @@
+export async function recognizeAudio(env,bytes,language){
+        let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
+        const hints=catalog.glossary.map(r=>language==='ja'?r.ja:r.en).join('、').slice(0,400);
+        let result;try{result=await env.AI.run('@cf/openai/whisper-large-v3-turbo',{audio:btoa(binary),language:language==='zh-CN'?'zh':language==='fil'?'tl':language,task:'transcribe',initial_prompt:hints,vad_filter:false,beam_size:5,condition_on_previous_text:false,no_speech_threshold:.35});}catch{try{result=await env.AI.run('@cf/openai/whisper',{audio:Array.from(bytes)});}catch{throw Object.assign(Error('音声認識サービスが応答できませんでした。'),{recognitionCode:'upstream_unavailable'});}}
+
+ return result;
+}
 import {LessonCodes,ROOM_TTL} from './lesson-codes.js';
 import {captionParticipant} from '../web/core.js';
 import {verifyToken} from './auth.js';
@@ -39,11 +46,9 @@ export default {async fetch(request,env){
       const reader=request.body.getReader(),chunks=[];let size=0;try{for(;;){const r=await reader.read();if(r.done)break;size+=r.value.length;if(size>512044){await reader.cancel();return cors(error('音声が長すぎます。',413));}chunks.push(r.value);}}finally{reader.releaseLock();}
       const bytes=new Uint8Array(size);let offset=0;for(const c of chunks){bytes.set(c,offset);offset+=c.length;c.fill(0);}
       try{if(!validWav(bytes))return cors(error('音声形式を確認してください。',415));if(!hasSpeechEnergy(bytes))return cors(json({text:''}));
-        let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
-        const hints=catalog.glossary.map(r=>language==='ja'?r.ja:r.en).join('、').slice(0,400);
-        const result=await env.AI.run('@cf/openai/whisper-large-v3-turbo',{audio:btoa(binary),language:language==='zh-CN'?'zh':language==='fil'?'tl':language,task:'transcribe',initial_prompt:hints,vad_filter:true,beam_size:5,condition_on_previous_text:false,no_speech_threshold:.35});
+        const result=await recognizeAudio(env,bytes,language);
         const text=cleanRecognition(result);if(text===null)return cors(error('音声を認識できませんでした。',502));return cors(json({text}));
-      }finally{bytes.fill(0);}
+      }catch{return cors(json({error:'音声認識サービスが応答できませんでした。再試行してください。',recognitionCode:'upstream_unavailable'},502));}finally{bytes.fill(0);}
     }
     if(url.pathname==='/catalog'&&request.method==='GET'){try{return cors(json(await bridge(env,token,'tsuyakuCatalog')||catalog));}catch{return cors(json(catalog));}}
     if(url.pathname==='/dictionary/translate'&&request.method==='POST'){
