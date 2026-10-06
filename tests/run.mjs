@@ -8,7 +8,7 @@ import workerApi,{TranslationRoom,translateText} from '../server/worker.js';
 import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection,summarizeSessions} from '../web/network.js';
 import {verifyToken} from '../server/auth.js';
 import {validWav,hasSpeechEnergy} from '../server/audio.js';
-import {encodeWav} from '../web/caption-server.js';
+import {createServerRecognition,encodeWav} from '../web/caption-server.js';
 import {UsageLedger,costOf,analysisReport,percentile} from '../web/usage.js';
 import {SpeechPlayer} from '../web/speech-player.js';
 import {lastVoicedAt,latencyFromTiming,retryDelay} from '../web/diagnostics.js';
@@ -73,4 +73,8 @@ await test('HTTP状態と想定外応答の診断にも秘密を含めない',()
 await test('古い失敗を現在の障害判定から除外し時刻を保持する',()=>{const now=600000,r=explainConnection([{at:1,stage:'api_simple',code:'timeout'},{at:2,stage:'api_headers',code:'timeout'},{at:now,stage:'api_simple',code:'ok'},{at:now,stage:'api_headers',code:'ok'}],{now});assert.equal(r.pastRecordCount,2);assert.equal(r.candidates.length,0);assert.ok(!r.nextSteps.some(s=>s.includes('Wi-Fi')));});
 await test('今回の翻訳と中継成功を診断の時間切れとは別に出力する',()=>{const now=600000,sessions=[{startedAt:500000,updatedAt:590000,ended:true,captionCount:8,failedCaptions:0,relayBytes:428459,latencies:[17104,334],events:[]}];const r=explainConnection([{at:now,stage:'api_simple',code:'timeout'}],{now,sessions});assert.equal(r.candidates.length,1);assert.equal(r.sessionResults[0].translatedCaptions,8);assert.equal(r.sessionResults[0].firstTranslationMs,17104);assert.equal(r.sessionResults[0].slowTranslationCount,1);assert.ok(r.facts.some(f=>f.includes('TURN中継通信')));});
 await test('利用結果の要約に本文・秘密をコピーしない',()=>{const r=summarizeSessions([{startedAt:1,captionCount:2,text:'private speech',token:'secret',events:[{type:'reconnect',reason:'private'}]}]);assert.equal(r[0].reconnectCount,1);assert.equal(r[0].firstTranslationMs,null);assert.ok(!JSON.stringify(r).includes('private'));assert.ok(!JSON.stringify(r).includes('secret'));});
+
+
+await test('音声認識は一時的なHTTP障害から次の発話で復旧する',async()=>{let calls=0,results=0,errors=0,diagnostics=[];const Recognition=createServerRecognition({endpoint:'https://example.test/transcribe',getStream:()=>null,getToken:async()=> 'test',Context:class{},Worklet:class{},fetcher:async()=>++calls===1?{ok:false,status:503}:{ok:true,status:200,json:async()=>({text:'hello'})},onDiagnostic:d=>diagnostics.push(d)});const r=new Recognition();r.active=true;r.onresult=()=>results++;r.onerror=()=>errors++;r.queue.push({samples:new Int16Array(16000),at:Date.now()});await r.drain();assert.equal(r.active,true);assert.equal(errors,0);r.queue.push({samples:new Int16Array(16000),at:Date.now()});await r.drain();assert.equal(results,1);assert.equal(r.failures,0);assert.deepEqual(diagnostics.map(d=>d.status),[503,200]);r.abort();});
+
 console.log(count+' tests passed');
