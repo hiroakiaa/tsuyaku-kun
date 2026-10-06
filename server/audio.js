@@ -17,12 +17,12 @@ export function hasSpeechEnergy(wav) {
     let sum = 0, squares = 0;
     for (let i = 0; i < 320; i++) { const x = view.getInt16(at + i * 2, true) / 32768; sum += x; squares += x * x; }
     const rms = Math.sqrt(Math.max(0, squares / 320 - (sum / 320) ** 2));
-    levels.push(rms); if (rms >= 0.006) active++;
+    levels.push(rms); if (rms >= 0.004) active++;
   }
   if (active < 6) return false;
   levels.sort((a,b) => a-b);
   const low = levels[Math.floor(levels.length * .2)], high = levels[Math.floor(levels.length * .9)];
-  return high >= 0.006 && high > low * 1.5;
+  return high >= 0.004 && high > low * 1.5;
 }
 
 export function cleanRecognition(result) {
