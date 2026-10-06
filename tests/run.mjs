@@ -4,7 +4,7 @@ import {SourceTextModule} from 'node:vm';
 import {fileURLToPath} from 'node:url';
 import {protectMath,parseTranslation,glossaryFor,csv,validateCaption} from '../web/core.js';
 import {catalog} from '../server/catalog.js';
-import workerApi,{TranslationRoom,translateText} from '../server/worker.js';
+import workerApi,{TranslationRoom,translateText,recognizeAudio} from '../server/worker.js';
 import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection,summarizeSessions} from '../web/network.js';
 import {verifyToken} from '../server/auth.js';
 import {validWav,hasSpeechEnergy} from '../server/audio.js';
@@ -77,4 +77,7 @@ await test('利用結果の要約に本文・秘密をコピーしない',()=>{c
 
 await test('音声認識は一時的なHTTP障害から次の発話で復旧する',async()=>{let calls=0,results=0,errors=0,diagnostics=[];const Recognition=createServerRecognition({endpoint:'https://example.test/transcribe',getStream:()=>null,getToken:async()=> 'test',Context:class{},Worklet:class{},fetcher:async()=>++calls===1?{ok:false,status:503}:{ok:true,status:200,json:async()=>({text:'hello'})},onDiagnostic:d=>diagnostics.push(d)});const r=new Recognition();r.active=true;r.onresult=()=>results++;r.onerror=()=>errors++;r.queue.push({samples:new Int16Array(16000),at:Date.now()});await r.drain();assert.equal(r.active,true);assert.equal(errors,0);r.queue.push({samples:new Int16Array(16000),at:Date.now()});await r.drain();assert.equal(results,1);assert.equal(r.failures,0);assert.deepEqual(diagnostics.map(d=>d.status),[503,200]);r.abort();});
 
+
+
+await test('高速音声モデルが失敗したら独立した予備モデルへWAVを渡す',async()=>{const calls=[];const wav=new Uint8Array(encodeWav(new Int16Array(16000)));const result=await recognizeAudio({AI:{run:async(model,input)=>{calls.push({model,input});if(calls.length===1)throw Error('model unavailable');return {text:'hello'};}}},wav,'en');assert.equal(result.text,'hello');assert.equal(calls[0].input.vad_filter,false);assert.equal(calls[1].model,'@cf/openai/whisper');assert.deepEqual(calls[1].input.audio,Array.from(wav));});
 console.log(count+' tests passed');
