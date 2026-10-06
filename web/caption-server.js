@@ -1,4 +1,4 @@
-import {lastVoicedAt} from './diagnostics.js?v=20261007-speech-1';
+import {lastVoicedAt} from './diagnostics.js?v=20261007-recovery-1';
 // Browser-independent recognition using the call's existing microphone stream.
 export function encodeWav(samples) {
   const bytes = new ArrayBuffer(44 + samples.length * 2), view = new DataView(bytes);
@@ -32,13 +32,13 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
       try {
         await resumed;
         if (!this.active) return;
-        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261007-speech-1', import.meta.url));
+        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261007-recovery-1', import.meta.url));
         if (!this.active) return;
         this.source = this.context.createMediaStreamSource(stream);
         this.node = new Worklet(this.context, 'caption-pcm');
         this.node.port.onmessage = event => {
           if (!this.active) return;
-          if (this.queue.length >= 2) { event.data.fill(0); this.fail('overloaded'); return; }
+          if (this.queue.length >= 2) { this.queue.shift().samples.fill(0); onDiagnostic({stage:'asr',operation:'capture',code:'queue_overflow'}); this.onrecovering?.({reason:'queue_overflow',attempt:1}); }
           const at=Date.now();this.queue.push({samples:event.data,at,speechEndedAt:lastVoicedAt(event.data,at)});
           void this.drain();
         };
@@ -78,15 +78,26 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
         const text = typeof data.text === 'string' ? data.text.trim().slice(0, 600) : '';
         if (text) {
           // No cumulative transcript list is retained by the recognizer.
-          const result = [{ transcript: text }]; result.isFinal = true;
-          const results = { length: this.index + 1, [this.index]: result };
-          this.onresult?.({ resultIndex: this.index++, results, speechEndedAt:chunk.speechEndedAt, recognitionReadyAt:Date.now() });
+          this.acceptText(text,{speechEndedAt:chunk.speechEndedAt,recognitionReadyAt:Date.now()});
         }
       } catch (_) { if (this.active) { onDiagnostic({code:controller.signal.aborted?'timeout':'network_or_cors'}); this.transientFailure(); } }
       finally {
         chunk.samples.fill(0); clearTimeout(timeout); this.request = null; this.sending = false;
         if (this.active) void this.drain();
       }
+    }
+    emitText(text,timing) {
+      const result=[{transcript:text}];result.isFinal=true;
+      this.onresult?.({resultIndex:this.index,results:{length:this.index+1,[this.index++]:result},...timing});
+    }
+    acceptText(text,timing) {
+      const now=Date.now();
+      if(this.fragment){const previous=this.fragment;this.fragment=null;clearTimeout(this.fragmentTimer);if(now-previous.at<=5000)text=previous.text+' '+text;else this.emitText(previous.text,previous.timing);}
+      if(isIncompleteJapanese(text)){
+        this.fragment={text,timing,at:now};
+        const flush=()=>{if(!this.active||!this.fragment)return;if((this.sending||this.queue.length)&&Date.now()-this.fragment.at<5000){this.fragmentTimer=setTimeout(flush,250);return;}const pending=this.fragment;this.fragment=null;this.emitText(pending.text,pending.timing);};
+        this.fragmentTimer=setTimeout(flush,2500);
+      }else this.emitText(text,timing);
     }
     transientFailure() {
       // Keep capturing after a brief service/network failure. A later utterance retries; never replay stale speech.
@@ -96,7 +107,7 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
     }
     fail(error,message) { const notify = this.onerror; this.abort(); notify?.({ error, message }); }
     abort() {
-      clearTimeout(this.startTimer);
+      clearTimeout(this.startTimer);clearTimeout(this.fragmentTimer);this.fragment=null;
       this.active = false; this.request?.abort();
       for (const chunk of this.queue) chunk.samples.fill(0); this.queue=[];
       if (this.node) { this.node.port.onmessage = null; this.node.port.postMessage('stop'); this.node.disconnect(); }
@@ -106,3 +117,5 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
     }
   };
 }
+
+export function isIncompleteJapanese(text){return typeof text==='string'&&text.length<=12&&/^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}0-9０-９\s]+(?:は|が|を|に|から|まで)$/u.test(text);}

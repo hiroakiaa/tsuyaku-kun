@@ -1,6 +1,6 @@
-const STAGES=new Set(['api','auth','turn','api_simple','api_headers']);
-const OPERATIONS=new Set(['translation','transcribe','room_create','lesson_join','catalog','dictionary_translate','dictionary_candidate','token','initial_auth','turn_credentials','health','other']);
-const RESULTS=new Set(['ok','network_or_cors','timeout','http_error','invalid_response','auth_unavailable','no_turn_server']);
+const STAGES=new Set(['api','auth','turn','api_simple','api_headers','asr']);
+const OPERATIONS=new Set(['capture','translation','transcribe','room_create','lesson_join','catalog','dictionary_translate','dictionary_candidate','token','initial_auth','turn_credentials','health','other']);
+const RESULTS=new Set(['queue_overflow','ok','network_or_cors','timeout','http_error','invalid_response','auth_unavailable','no_turn_server']);
 export function connectionFailure(error,{stage='api',endpoint='',operation='other',status}={}){
  const code=error?.code&&RESULTS.has(error.code)?error.code:error?.name==='TimeoutError'||error?.name==='AbortError'?'timeout':Number.isInteger(status)?'http_error':'network_or_cors';
  const subject=stage==='auth'?'参加の認証':stage==='turn'?'音声中継サーバー':'字幕・翻訳サーバー';
@@ -41,12 +41,16 @@ export function explainConnection(checks,{authentication='unavailable',online=tr
  if(!online)facts.push('端末がオフラインと報告しています。');
  for(const r of [simple,headers,turn,transcribe,translation].filter(Boolean))facts.push((r.operation==='translation'?'翻訳AI':r.operation==='transcribe'?'音声認識API':({api_simple:'APIの通常通信',api_headers:'APIの認証ヘッダー付き通信',turn:'TURN接続情報の取得'})[r.stage])+'：'+r.code+(r.status?'（HTTP '+r.status+'）':'')+'。');
  const failed=records.filter(r=>r.code!=='ok');
+ const recent=sessions.filter(s=>Number.isFinite(s.updatedAt)&&s.updatedAt<=now&&now-s.updatedAt<=300000),errors=recent.flatMap(s=>s.events||[]).filter(e=>e.type==='recognition_error'),drops=recent.flatMap(s=>s.events||[]).filter(e=>e.type==='asr_queue_drop');
+ if(errors.length){facts.push('直近の利用中に音声認識エラー '+errors.length+'回を観測しました。最後のAPI成功とは別に扱います。');candidates.push({cause:'利用中の音声認識の中断',confidence:'イベントを観測・原因は未確定',evidence:[...new Set(errors.map(e=>e.recognitionCode||'unknown'))].join(', ')});nextSteps.push('音声認識の自動復旧回数と復旧後の字幕を確認してください。');}
+ if(drops.length)facts.push('直近の利用で待機音声の破棄 '+drops.length+'回。該当部分はもう一度話す必要があります。');
  if(failed.some(r=>r.operation==='room_create'))facts.push('ルーム作成の失敗記録があります。QR表示前の段階です。');
  if(simple?.code==='network_or_cors'&&headers?.code==='network_or_cors')candidates.push({cause:'接続先への通信制限・DNS・TLS・CORS',confidence:'未確定',evidence:'通常通信とヘッダー付き通信の両方が失敗しています。認証ヘッダーだけの問題とは絞れません。'});
  else if(simple?.code==='ok'&&headers&&headers.code!=='ok')candidates.push({cause:'認証ヘッダーを含む通信・CORSプリフライトの制限',confidence:'候補',evidence:'通常通信は成功し、ヘッダー付き通信は失敗しています。'});
  if(simple?.code==='ok'&&headers?.code==='ok')facts.push('直近の健康確認は成功しています。認証更新・ルーム作成・WebSocket・音声通信の成功は別途確認が必要です。');
  if(turn&&turn.code!=='ok')facts.push('TURN情報を取得できないため、音声中継の利用を確認できません。');
- for(const r of [simple,headers,turn,transcribe,translation].filter(Boolean)){
+ for(const r of failed){
+ if(r.code==='queue_overflow')candidates.push({cause:'端末内の音声認識待ち行列の増加',confidence:'アプリ内で観測',evidence:'古い待機音声を破棄しました。AIサービスの混雑とは区別しています。'});
  if(r.code==='timeout')candidates.push({cause:'応答の遅延・無応答',confidence:'候補',evidence:r.stage+' が制限時間内に完了していません。'});
  if(r.aiReason)candidates.push({cause:({quota:'AIの無料枠上限',billing:'AIモデルの有料プラン要件',overloaded:'AIサービスの混雑',input:'AIへの入力形式',model:'AIモデルの利用不可',auth:'AIサービスのアクセス拒否',timeout:'AI処理の時間切れ',service:'AI内部エラー'})[r.aiReason],confidence:r.aiCode?'AIエラーコードを観測':r.aiEvidence==='provider_message'?'AI側の報告・残量は未確認':'分類のみ・未確定',evidence:r.operation+' AI code '+(r.aiCode??'未取得')+(r.aiModel?' model '+r.aiModel:'')+'。'});
  if(r.code==='http_error'&&Number.isInteger(r.status))candidates.push({cause:r.status===401?'認証の拒否':r.status===403?'アクセスの拒否':r.status===429?'呼び出し制限':r.status>=500?'サーバー側のエラー':'HTTPエラー',confidence:'HTTP状態のみ確定',evidence:r.stage+' HTTP '+r.status+'。拒否した機器・理由はこの状態だけでは分かりません。'});
@@ -61,5 +65,5 @@ export function explainConnection(checks,{authentication='unavailable',online=tr
 
 export function summarizeSessions(sessions=[]){
  const number=v=>Number.isFinite(v)&&v>=0?v:0;
- return sessions.filter(s=>Number.isFinite(s.startedAt)).sort((a,b)=>b.startedAt-a.startedAt).slice(0,10).map(s=>{const times=(s.latencies||[]).filter(v=>Number.isFinite(v)&&v>=0),events=s.events||[];return {startedAt:new Date(s.startedAt).toISOString(),updatedAt:Number.isFinite(s.updatedAt)?new Date(s.updatedAt).toISOString():null,ended:s.ended===true,translatedCaptions:Math.max(0,number(s.captionCount)-number(s.failedCaptions)),failedCaptions:number(s.failedCaptions),reconnectCount:events.filter(e=>e.type==='reconnect').length,relayBytes:number(s.relayBytes),firstTranslationMs:times[0]??null,maxTranslationMs:times.length?Math.max(...times):null,slowTranslationCount:times.filter(v=>v>=5000).length,speechTimingSamples:(s.speechLatencies||[]).length,interpretation:'翻訳・中継の観測値です。通話全体が成功したか、相手に聞こえたか、翻訳品質は自動判定しません。'};});
+ return sessions.filter(s=>Number.isFinite(s.startedAt)).sort((a,b)=>b.startedAt-a.startedAt).slice(0,10).map(s=>{const times=(s.latencies||[]).filter(v=>Number.isFinite(v)&&v>=0),events=s.events||[];return {startedAt:new Date(s.startedAt).toISOString(),updatedAt:Number.isFinite(s.updatedAt)?new Date(s.updatedAt).toISOString():null,ended:s.ended===true,translatedCaptions:Math.max(0,number(s.captionCount)-number(s.failedCaptions)),failedCaptions:number(s.failedCaptions),reconnectCount:events.filter(e=>e.type==='reconnect').length,relayBytes:number(s.relayBytes),firstTranslationMs:times[0]??null,maxTranslationMs:times.length?Math.max(...times):null,slowTranslationCount:times.filter(v=>v>=5000).length,speechTimingSamples:(s.speechLatencies||[]).length,recognitionErrorCount:events.filter(e=>e.type==='recognition_error').length,recognitionRestartCount:events.filter(e=>e.type==='asr_restart').length,queueDropCount:events.filter(e=>e.type==='asr_queue_drop').length,interpretation:'翻訳・中継の観測値です。通話全体が成功したか、相手に聞こえたか、翻訳品質は自動判定しません。'};});
 }
