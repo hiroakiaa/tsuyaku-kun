@@ -70,8 +70,8 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
             ...(encodedHints ? { 'X-Term-Hints': encodedHints } : {}) },
           body, signal: controller.signal, cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer'
         });
-        let failure; if(!response.ok){try{failure=(await response.json()).aiFailure;}catch{}} onDiagnostic({code:response.ok?'ok':'http_error',status:response.status,...(failure?{aiReason:failure.reason,aiCode:failure.code}:{})});
-        if (!response.ok) { const error=response.status === 429 ? 'quota' : [401,403].includes(response.status) ? 'auth' : 'network'; if (error==='network' && response.status>=500) { this.transientFailure(); return; } this.fail(error); return; }
+        let failure; if(!response.ok){try{failure=(await response.json()).aiFailure;}catch{}} onDiagnostic({code:response.ok?'ok':'http_error',status:response.status,...(failure?{aiReason:failure.reason,aiCode:failure.code,aiEvidence:failure.evidence,aiModel:failure.model}:{})});
+        if (!response.ok) { const error=failure?.reason|| (response.status === 429 ? 'quota' : [401,403].includes(response.status) ? 'auth' : 'network'); if (['network','service','timeout','overloaded'].includes(error) && (response.status>=500||error==='overloaded')) { this.transientFailure(); return; } this.fail(error,failure?.message); return; }
         const data = await response.json(); this.failures=0;
         if (!this.active || controller.signal.aborted || Date.now() - chunk.at > 15000) return;
         const text = typeof data.text === 'string' ? data.text.trim().slice(0, 600) : '';
@@ -93,7 +93,7 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
       this.onrecovering?.({attempt:this.failures});
       if(this.failures>=3)this.fail('network');
     }
-    fail(error) { const notify = this.onerror; this.abort(); notify?.({ error }); }
+    fail(error,message) { const notify = this.onerror; this.abort(); notify?.({ error, message }); }
     abort() {
       clearTimeout(this.startTimer);
       this.active = false; this.request?.abort();
