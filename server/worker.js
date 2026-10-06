@@ -1,8 +1,13 @@
-export function aiFailure(error){const text=String(error?.message||'');const code=/(?:code|error)[^0-9]{0,12}(\d{3,6})/i.exec(text)?.[1];const reason=/quota|neurons|daily|free.*limit|usage.*limit/i.test(text)?'quota':/billing|paid|payment/i.test(text)?'billing':/model.*not|unsupported|not.*available/i.test(text)?'model':/schema|invalid|parameter/i.test(text)?'input':'service';return {reason,code:code||null,message:reason==='quota'?'Cloudflare AIの利用上限に達しています。':reason==='billing'?'Cloudflare AIの料金プランの確認が必要です。':'AIサービスが処理できませんでした。'};}
+export function aiFailure(error){
+ const text=String(error?.message||'');const numeric=Number(error?.code);const match=/\b(3036|3040|5035|5004|5007|3003|3006|3007|3008|3023|3041|3042|5016|5018)\b/.exec(text);const code=Number.isInteger(numeric)&&numeric>=1000&&numeric<=9999?numeric:match?Number(match[1]):null;
+ const reason=code===3036?'quota':code===3040?'overloaded':code===5035?'billing':[5004,3003,3006].includes(code)?'input':[5007,3042].includes(code)?'model':[3023,3041,5016,5018].includes(code)?'auth':[3007,3008].includes(code)?'timeout':/daily.*(?:allocation|limit)|quota.*(?:exceed|exhaust)|used up.*neurons/i.test(text)?'quota':/requires.*paid|billing|payment/i.test(text)?'billing':/capacity.*exceed|out of capacity/i.test(text)?'overloaded':/schema|invalid|parameter/i.test(text)?'input':'service';
+ const messages={quota:'Cloudflare AIの1日の無料枠を超えています。',billing:'このAIモデルは有料プランが必要です。',overloaded:'AIサービスが混雑しています。',input:'AIへの音声・文章の形式を確認する必要があります。',model:'AIモデルを利用できません。',auth:'AIサービスがこのアカウントの利用を拒否しています。',timeout:'AIサービスの処理が時間切れになりました。',service:'AIサービスが処理できませんでした。'};
+ return {reason,code,message:messages[reason]};
+}
 export async function recognizeAudio(env,bytes,language){
         let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
         const hints=catalog.glossary.map(r=>language==='ja'?r.ja:r.en).join('、').slice(0,400);
-        let result;try{result=await env.AI.run('@cf/openai/whisper-large-v3-turbo',{audio:btoa(binary),language:language==='zh-CN'?'zh':language==='fil'?'tl':language,task:'transcribe',initial_prompt:hints,vad_filter:false,beam_size:5,condition_on_previous_text:false,no_speech_threshold:.35});}catch{try{result=await env.AI.run('@cf/openai/whisper',{audio:Array.from(bytes)});}catch{throw Object.assign(Error('音声認識サービスが応答できませんでした。'),{recognitionCode:'upstream_unavailable'});}}
+        let result;try{result=await env.AI.run('@cf/openai/whisper-large-v3-turbo',{audio:btoa(binary),language:language==='zh-CN'?'zh':language==='fil'?'tl':language,task:'transcribe',initial_prompt:hints,vad_filter:false,beam_size:5,condition_on_previous_text:false,no_speech_threshold:.35});}catch(firstError){if(['quota','billing','auth'].includes(aiFailure(firstError).reason))throw firstError;try{result=await env.AI.run('@cf/openai/whisper',{audio:Array.from(bytes)});}catch(secondError){throw secondError;}}
 
  return result;
 }
@@ -49,7 +54,7 @@ export default {async fetch(request,env){
       try{if(!validWav(bytes))return cors(error('音声形式を確認してください。',415));if(!hasSpeechEnergy(bytes))return cors(json({text:''}));
         const result=await recognizeAudio(env,bytes,language);
         const text=cleanRecognition(result);if(text===null)return cors(error('音声を認識できませんでした。',502));return cors(json({text}));
-      }catch{return cors(json({error:'音声認識サービスが応答できませんでした。再試行してください。',recognitionCode:'upstream_unavailable'},502));}finally{bytes.fill(0);}
+      }catch(e){const failure=aiFailure(e);return cors(json({error:failure.message,aiFailure:failure,recognitionCode:failure.reason},failure.reason==='quota'?429:['billing','auth'].includes(failure.reason)?403:502));}finally{bytes.fill(0);}
     }
     if(url.pathname==='/catalog'&&request.method==='GET'){try{return cors(json(await bridge(env,token,'tsuyakuCatalog')||catalog));}catch{return cors(json(catalog));}}
     if(url.pathname==='/dictionary/translate'&&request.method==='POST'){
