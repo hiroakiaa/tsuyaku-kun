@@ -70,8 +70,8 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
             ...(encodedHints ? { 'X-Term-Hints': encodedHints } : {}) },
           body, signal: controller.signal, cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer'
         });
-        onDiagnostic({code:response.ok?'ok':'http_error',status:response.status});
-        if (!response.ok) { const error=response.status === 429 ? 'quota' : response.status === 401 ? 'auth' : 'network'; if (error==='network' && response.status>=500) { this.transientFailure(); return; } this.fail(error); return; }
+        let failure; if(!response.ok){try{failure=(await response.json()).aiFailure;}catch{}} onDiagnostic({code:response.ok?'ok':'http_error',status:response.status,...(failure?{aiReason:failure.reason,aiCode:failure.code}:{})});
+        if (!response.ok) { const error=response.status === 429 ? 'quota' : [401,403].includes(response.status) ? 'auth' : 'network'; if (error==='network' && response.status>=500) { this.transientFailure(); return; } this.fail(error); return; }
         const data = await response.json(); this.failures=0;
         if (!this.active || controller.signal.aborted || Date.now() - chunk.at > 15000) return;
         const text = typeof data.text === 'string' ? data.text.trim().slice(0, 600) : '';
