@@ -49,7 +49,7 @@ export function explainConnection(checks,{authentication='unavailable',online=tr
  for(const r of [simple,headers,turn,transcribe,translation].filter(Boolean)){
  if(r.code==='timeout')candidates.push({cause:'応答の遅延・無応答',confidence:'候補',evidence:r.stage+' が制限時間内に完了していません。'});
  if(r.aiReason)candidates.push({cause:({quota:'AIの無料枠上限',billing:'AIモデルの有料プラン要件',overloaded:'AIサービスの混雑',input:'AIへの入力形式',model:'AIモデルの利用不可',auth:'AIサービスのアクセス拒否',timeout:'AI処理の時間切れ',service:'AI内部エラー'})[r.aiReason],confidence:r.aiCode?'AIエラーコードを観測':r.aiEvidence==='provider_message'?'AI側の報告・残量は未確認':'分類のみ・未確定',evidence:r.operation+' AI code '+(r.aiCode??'未取得')+(r.aiModel?' model '+r.aiModel:'')+'。'});
- if(r.code==='http_error')candidates.push({cause:r.status===401?'認証の拒否':r.status===403?'アクセスの拒否':r.status===429?'呼び出し制限':r.status>=500?'サーバー側のエラー':'HTTPエラー',confidence:'HTTP状態のみ確定',evidence:r.stage+' HTTP '+r.status+'。拒否した機器・理由はこの状態だけでは分かりません。'});
+ if(r.code==='http_error'&&Number.isInteger(r.status))candidates.push({cause:r.status===401?'認証の拒否':r.status===403?'アクセスの拒否':r.status===429?'呼び出し制限':r.status>=500?'サーバー側のエラー':'HTTPエラー',confidence:'HTTP状態のみ確定',evidence:r.stage+' HTTP '+r.status+'。拒否した機器・理由はこの状態だけでは分かりません。'});
  if(r.code==='invalid_response')candidates.push({cause:'フィルター画面・プロキシ・想定外の応答',confidence:'候補',evidence:r.stage+' は期待するアプリ用JSONではありません。'});
  }
  if(records.some(r=>r.aiReason==='quota'))nextSteps.push('AI側は上限を報告しています。管理画面の当日残量・アカウント・時刻と照合してください。この診断だけで実際の残量は断定しません。');
