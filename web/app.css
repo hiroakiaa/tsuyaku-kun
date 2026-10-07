@@ -427,3 +427,6 @@ body.phone-home.mode-active[data-active-mode="interpreter"] main.phone-home-card
 .call-invite input{font-size:13px;min-height:44px;}
 .call-invite button{min-height:48px;}
 @media(max-width:759px){.mode-active[data-active-mode="interpreter"] #live:not([hidden]){overflow:auto;display:flex;flex-direction:column;}.mode-active[data-active-mode="interpreter"] .captions{flex:1;min-height:260px;}.mode-active[data-active-mode="interpreter"] .live-tools{flex:none;overflow:visible;}.mode-active[data-active-mode="interpreter"] .live-actions{flex:none;}.call-invite .qr{width:140px;}}
+
+.mode-active[data-active-mode="interpreter"] #panel-interpreter:not([hidden]){width:100%;max-width:none;margin:0;align-self:stretch;}
+@media(min-width:760px){.mode-active[data-active-mode="interpreter"] #live:not([hidden]){grid-template-columns:minmax(300px,28%) minmax(0,1fr);}}
