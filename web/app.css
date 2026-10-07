@@ -310,8 +310,8 @@ body.phone-home input,body.phone-home select,body.phone-home textarea,dialog inp
 .header-tools .reading-options{width:auto;min-width:48px;padding:8px 12px;font-size:14px;gap:7px;border:1px solid #c4d8b6;}
 .reading-options::after{display:none;}
 .reading-options i{font-size:17px;}
-.live-reading-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;}
-#live-mode-label{font-size:16px;font-weight:700;color:#46654a;}
+.live-reading-bar{display:flex;align-items:center;justify-content:flex-end;gap:12px;min-height:48px;}
+
 .phone-home-card .live-reading-bar .reading-options{min-height:48px;font-size:14px;padding:9px 12px!important;border:1px solid #c9d9bc;background:#fffef9;border-radius:14px;}
 .live-guide{margin:0;font-size:var(--read-label);line-height:1.6;color:#4a6352;padding:10px 12px;border-radius:14px;background:#f0f5e9;}
 .live-guide[data-listening=true]{background:#e1f2ce;color:#2d5b34;border:1px solid #9fc788;}

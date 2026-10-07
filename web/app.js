@@ -47,7 +47,7 @@ function showReadingOptions(){
 for(const id of ['reading-options','live-reading-options'])if($('#'+id))$('#'+id).onclick=showReadingOptions;
 function updateLiveGuide(){
  if(!room)return;
- $('#live-mode-label').textContent=({face:'たいめん',interpreter:'つうわ',lesson:'じゅぎょう'})[room.mode];
+
  const student=room.mode==='lesson'&&role!=='teacher';
  $('#live-guide').textContent=student?'先生のことばが、ここに出ます。':mic?'マイクがついています。いつもどおり話してください。':'「マイクをONにする」を押すと、話せます。';
  $('#live-guide').dataset.listening=String(mic);
