@@ -126,7 +126,9 @@ const invite=new URLSearchParams(location.hash.slice(1));if(/^[a-f0-9]{32}$/.tes
 
 
 function currentSource(){return room?.mode==='lesson'?'ja':room?.mode==='face'?speakerInfo(faceSide,$('#face-self-language').value,$('#face-other-language').value).language:$('#source-language').value;}
-function updateFace(){const face=room?.mode==='face';$('#face-controls').hidden=!face;$('#participants').hidden=face;if(!face){$('#text-input').placeholder='ことばを入力して送る';return;}const info=speakerInfo(faceSide,$('#face-self-language').value,$('#face-other-language').value);$('#face-speaker').textContent=info.speaker+'が話す';$('#face-language').textContent=catalog.languages.find(l=>l.code===info.language)?.labelJa||info.language;paintButton($('#switch-speaker'),(faceSide==='self'?'相手の番にする':'じぶんの番にする'),'arrow-right-arrow-left');$('#text-input').placeholder=info.speaker+'のことばを入力';}
+function updateFace(){const face=room?.mode==='face';$('#face-controls').hidden=!face;$('#participants').hidden=face;if(!face){$('#text-input').placeholder='ことばを入力して送る';return;}const info=speakerInfo(faceSide,$('#face-self-language').value,$('#face-other-language').value);$('#face-speaker').textContent=info.speaker+'が話す';options($('#face-language'),info.language);paintButton($('#switch-speaker'),(faceSide==='self'?'相手の番にする':'じぶんの番にする'),'arrow-right-arrow-left');$('#text-input').placeholder=info.speaker+'のことばを入力';}
+
+$('#face-language').onchange=()=>{if(room?.mode!=='face')return;const value=$('#face-language').value;speechPlayer.stop();stopRecognition(true);if(faceSide==='self')setSpeakingLanguage(value);else setSharedLanguage(value);updateFace();for(const record of [...records.values()])renderCaption(record);if(mic)startRecognition();};
 $('#switch-speaker').onclick=()=>{if(room?.mode!=='face')return;speechPlayer.stop();stopRecognition(true);faceSide=faceSide==='self'?'other':'self';$('#text-input').value='';updateFace();if(mic)startRecognition();ledger.event('speaker_switch');};
 
 function icon(name){const i=el('i',undefined,'fa-solid fa-'+name);i.setAttribute('aria-hidden','true');return i;}
