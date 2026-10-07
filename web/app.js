@@ -197,6 +197,14 @@ function scheduleRoomExpiry(){clearTimeout(roomExpiryTimer);if(!room?.expires)re
 
 // Open the default conversation once; invitation links keep their join dialog.
 if(!(/^[a-f0-9]{32}$/.test(invite.get('room')||'')&&/^[a-f0-9]{32}$/.test(invite.get('key')||''))){
- void activateTab('face');
+ const requestedStart=new URLSearchParams(location.search).get('mode')||sessionStorage.getItem('tsuyaku-update-tab');sessionStorage.removeItem('tsuyaku-update-tab');void activateTab(['face','interpreter','lesson','words'].includes(requestedStart)?requestedStart:'face');
 } resetConversationContents();
 
+
+
+// Refresh only an idle screen; never interrupt speech, peers, drafts or captions.
+let checkingRelease=false;
+async function checkForAppUpdate(){if(checkingRelease||document.visibilityState!=='visible'||mic||$('#text-input').value.trim()||records.size||participants.some(p=>p.id!==selfId)||(room&&!room.creator))return;checkingRelease=true;try{const url=new URL('index.html',location.href);url.searchParams.set('release-check',String(Date.now()));url.hash='';const response=await fetch(url,{cache:'no-store',signal:AbortSignal.timeout(8000)});if(!response.ok)return;const doc=new DOMParser().parseFromString(await response.text(),'text/html'),incoming=doc.querySelector('script[type="module"][src*="app.js"]')?.getAttribute('src'),current=document.querySelector('script[type="module"][src*="app.js"]')?.getAttribute('src');if(!incoming||incoming===current||mic||$('#text-input').value.trim()||records.size||participants.some(p=>p.id!==selfId))return;sessionStorage.setItem('tsuyaku-update-tab',tab);const fresh=new URL('index.html',location.href);fresh.searchParams.set('update',new URL(incoming,location.href).searchParams.get('v')||String(Date.now()));fresh.hash='';location.replace(fresh);}catch{}finally{checkingRelease=false;}}
+setInterval(()=>void checkForAppUpdate(),60000);
+window.addEventListener('pageshow',()=>void checkForAppUpdate());
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')void checkForAppUpdate();});
