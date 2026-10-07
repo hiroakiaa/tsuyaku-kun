@@ -413,3 +413,17 @@ header button.brand::after{display:none;}
 body.phone-home{font-family:"Zen Maru Gothic",-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;}
 body.phone-home .brand{font-family:inherit;font-weight:700;letter-spacing:.02em;}
 textarea{font:inherit;}
+
+/* Keep the call workspace within its selected mode tab. */
+body.phone-home.mode-active[data-active-mode="interpreter"] .app-shell{max-width:1440px;padding:12px 16px calc(82px + env(safe-area-inset-bottom));}
+.mode-active[data-active-mode="interpreter"] header{display:flex!important;flex:none;margin-bottom:10px;}
+.mode-active[data-active-mode="interpreter"] main.phone-home-card>.bottom-nav{display:grid!important;}
+body.phone-home.mode-active[data-active-mode="interpreter"] main.phone-home-card{padding:0!important;height:auto;background:transparent;}
+.mode-active[data-active-mode="interpreter"] #panel-interpreter:not([hidden]){display:flex;flex:1;min-height:0;padding:0!important;}
+.mode-active[data-active-mode="interpreter"] #panel-words:not([hidden]){min-height:0;overflow:auto;}
+.call-invite{border:1px solid #ccdfbc;border-radius:18px;background:#eaf4df;padding:14px;display:grid;gap:12px;}
+.call-invite label{font-size:14px;gap:6px;}
+.call-invite .qr{width:180px;max-width:100%;height:auto;margin:0 auto;border-radius:12px;background:white;padding:8px;}
+.call-invite input{font-size:13px;min-height:44px;}
+.call-invite button{min-height:48px;}
+@media(max-width:759px){.mode-active[data-active-mode="interpreter"] #live:not([hidden]){overflow:auto;display:flex;flex-direction:column;}.mode-active[data-active-mode="interpreter"] .captions{flex:1;min-height:260px;}.mode-active[data-active-mode="interpreter"] .live-tools{flex:none;overflow:visible;}.mode-active[data-active-mode="interpreter"] .live-actions{flex:none;}.call-invite .qr{width:140px;}}
