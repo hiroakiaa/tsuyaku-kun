@@ -500,3 +500,45 @@ body.phone-home #panel-words>#panel-phrases:not([hidden]),body.phone-home #panel
 .reference-categories{overscroll-behavior-x:contain;position:relative;}
 
 body.phone-home #panel-words:not([hidden]){height:calc(100dvh - 160px - env(safe-area-inset-bottom));max-height:calc(100dvh - 160px - env(safe-area-inset-bottom));flex:none!important;}
+
+/* Unified responsive shell: keep controls reachable and content independently scrollable. */
+body.phone-home{--nav-space:82px;--shell-gap:12px;height:100dvh;min-height:0;overflow:hidden;}
+body.phone-home .app-shell,body.phone-home.mode-active .app-shell,body.phone-home.mode-active[data-active-mode="interpreter"] .app-shell,body.phone-home:not(.mode-active) .app-shell{display:flex;flex-direction:column;width:100%;height:100dvh;min-height:0;max-width:1680px;margin:auto;padding:calc(var(--shell-gap) + env(safe-area-inset-top)) max(var(--shell-gap),env(safe-area-inset-right)) calc(var(--nav-space) + env(safe-area-inset-bottom)) max(var(--shell-gap),env(safe-area-inset-left));}
+body.phone-home .app-shell>header{flex:none;min-height:44px;margin-bottom:10px;align-items:center;flex-wrap:nowrap;}
+body.phone-home header .header-tools{width:auto;flex:none;}
+body.phone-home main.phone-home-card{display:flex!important;flex-direction:column;flex:1;min-width:0;min-height:0;height:auto;max-height:none;padding:0!important;overflow:hidden;background:transparent;border:0;box-shadow:none;}
+body.phone-home main.phone-home-card>[role=tabpanel]:not([hidden]){flex:1;min-height:0;min-width:0;width:100%;max-width:none;margin:0;overflow:auto;padding:0!important;}
+body.phone-home #panel-words:not([hidden]){display:flex!important;flex:1!important;height:auto;max-height:none;overflow:hidden!important;}
+body.phone-home .mode-panel:has(#live:not([hidden])){overflow:hidden;}
+body.phone-home #panel-face:not([hidden]),body.phone-home #panel-interpreter:not([hidden]){display:flex;flex-direction:column;overflow:hidden;}
+body.phone-home #live:not([hidden]),body.phone-home.mode-active #live:not([hidden]),body.phone-home.mode-active[data-active-mode="interpreter"] #live:not([hidden]){display:grid;flex:1;min-height:0;width:100%;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(80px,1fr) auto;gap:10px;overflow:hidden;}
+body.phone-home #live>.live-tools{grid-column:1;grid-row:1;max-height:38dvh;overflow:auto;min-width:0;min-height:0;}
+body.phone-home #live>.captions{grid-column:1;grid-row:2;flex:none;height:100%;min-height:0;max-height:none;overflow:auto;padding:10px;}
+body.phone-home #live>.live-actions{grid-column:1;grid-row:3;flex:none;min-height:0;}
+body.phone-home .face-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:12px;margin:0;align-items:center;}
+body.phone-home .face-controls strong{font-size:18px;}
+body.phone-home .face-controls button{width:auto;min-height:44px;font-size:14px;}
+body.phone-home .text-form{gap:8px;}
+body.phone-home .text-form input{min-width:0;min-height:44px;font-size:16px;}
+body.phone-home .text-form button{flex:none;min-width:44px;min-height:44px;padding:8px!important;}
+body.phone-home .call-controls{display:flex;flex-wrap:wrap;gap:8px;padding:0;}
+body.phone-home .call-controls button{flex:1;min-width:0;min-height:44px;font-size:14px;padding:8px!important;}
+body.phone-home .call-controls button.danger{margin:0;}
+body.phone-home main.phone-home-card>.bottom-nav{padding:4px max(6px,calc((100vw - 1100px)/2)) calc(6px + env(safe-area-inset-bottom))!important;}
+body.phone-home main.phone-home-card>.bottom-nav button{min-height:60px!important;}
+body.phone-home #lesson-role-picker{width:100%;max-width:680px;gap:16px;margin:clamp(12px,8dvh,64px) auto;}
+body.phone-home #lesson-role-picker button{min-width:0;min-height:160px;}
+body.phone-home #panel-lesson:not([hidden]){display:flex;flex-direction:column;}
+body.phone-home #panel-lesson>#live{flex:1 1 auto;}
+body.phone-home #lesson-role-back{flex:none;margin-bottom:10px;}
+body.phone-home dialog{width:min(880px,calc(100vw - 24px));max-height:calc(100dvh - 24px);padding:20px;}
+.reference-detail,.reference-copy,.caption p{overflow-wrap:anywhere;}
+@media(max-width:359px){body.phone-home{--shell-gap:8px;}body.phone-home .brand{font-size:20px;}body.phone-home .face-controls{grid-template-columns:1fr;}body.phone-home .face-controls button{width:100%;}body.phone-home .nav-label{font-size:10px!important;}body.phone-home .reference-group-cards .reference-card{padding:10px!important;}body.phone-home .reference-title{font-size:16px;}body.phone-home #lesson-role-picker{gap:10px;}body.phone-home #lesson-role-picker button{font-size:24px;min-height:130px;}}
+@media(min-width:360px) and (max-width:479px){body.phone-home{--shell-gap:10px;}body.phone-home .face-controls button{max-width:150px;font-size:13px;}body.phone-home .caption-primary p{font-size:20px;}}
+@media(min-width:480px) and (max-width:599px){body.phone-home{--shell-gap:12px;}body.phone-home .caption-primary p{font-size:22px;}}
+@media(min-width:600px) and (max-width:899px){body.phone-home{--shell-gap:16px;}body.phone-home .reference-group-cards{grid-template-columns:repeat(2,minmax(0,1fr));}body.phone-home .captions{padding:14px;}body.phone-home .call-invite:not([hidden]){grid-template-columns:minmax(0,1fr) 116px;grid-template-rows:auto auto;}body.phone-home .call-invite>label{grid-column:1;grid-row:1;}body.phone-home .call-invite>.invite-link-area{grid-column:1;grid-row:2;}body.phone-home .call-invite>.qr{grid-column:2;grid-row:1 / span 2;width:116px;height:116px;}}
+@media(min-width:900px){body.phone-home{--shell-gap:18px;}body.phone-home #live:not([hidden]),body.phone-home.mode-active #live:not([hidden]),body.phone-home.mode-active[data-active-mode="interpreter"] #live:not([hidden]){grid-template-columns:minmax(260px,30%) minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;gap:16px;}body.phone-home #live>.live-tools{grid-column:1;grid-row:1;max-height:none;}body.phone-home #live>.live-actions{grid-column:1;grid-row:2;}body.phone-home #live>.captions{grid-column:2;grid-row:1 / span 2;padding:16px;}body.phone-home .face-controls{grid-template-columns:1fr;}body.phone-home .face-controls button{width:100%;max-width:none;}body.phone-home .reference-group-cards{grid-template-columns:repeat(3,minmax(0,1fr));}}
+@media(min-width:1200px){body.phone-home{--shell-gap:24px;}body.phone-home .reference-group-cards{grid-template-columns:repeat(4,minmax(0,1fr));}body.phone-home #live:not([hidden]),body.phone-home.mode-active #live:not([hidden]){grid-template-columns:minmax(300px,26%) minmax(0,1fr);}body.phone-home .caption-primary p{font-size:26px;}}
+@media(min-width:1600px){body.phone-home .reference-group-cards{grid-template-columns:repeat(5,minmax(0,1fr));}body.phone-home .caption-primary p{font-size:28px;}}
+@media(max-height:500px){body.phone-home{--nav-space:62px;--shell-gap:6px;}body.phone-home .app-shell>header{min-height:40px;margin-bottom:4px;}body.phone-home .header-tools #language-options{width:40px;height:40px;}body.phone-home main.phone-home-card>.bottom-nav button{min-height:44px!important;gap:2px;}body.phone-home #lesson-role-picker{margin:8px auto;}body.phone-home #lesson-role-picker button{min-height:100px;font-size:22px;gap:8px;}body.phone-home #lesson-role-picker button>i{font-size:32px;}body.phone-home dialog{padding:12px;max-height:calc(100dvh - 12px);}body.phone-home .empty{padding:8px 0;}body.phone-home .empty h2{font-size:17px;}body.phone-home .speech-symbol{font-size:40px;}}
+@media(min-width:600px) and (max-height:500px){body.phone-home #live:not([hidden]),body.phone-home.mode-active #live:not([hidden]),body.phone-home.mode-active[data-active-mode="interpreter"] #live:not([hidden]){grid-template-columns:minmax(220px,35%) minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;}body.phone-home #live>.live-tools{grid-column:1;grid-row:1;max-height:none;}body.phone-home #live>.live-actions{grid-column:1;grid-row:2;}body.phone-home #live>.captions{grid-column:2;grid-row:1 / span 2;}body.phone-home .face-controls{grid-template-columns:1fr;padding:8px;}body.phone-home .call-invite>.qr{width:90px;height:90px;}body.phone-home .call-invite:not([hidden]){grid-template-columns:minmax(0,1fr) 90px;padding:8px;gap:6px;}}
