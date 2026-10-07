@@ -1,4 +1,4 @@
-import {lastVoicedAt} from './diagnostics.js?v=20261007-continuity-1';
+import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261007-progressive-1';
 // Browser-independent recognition using the call's existing microphone stream.
 export function encodeWav(samples) {
   const bytes = new ArrayBuffer(44 + samples.length * 2), view = new DataView(bytes);
@@ -32,7 +32,7 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
       try {
         await resumed;
         if (!this.active) return;
-        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261007-continuity-1', import.meta.url));
+        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261007-progressive-1', import.meta.url));
         if (!this.active) return;
         this.source = this.context.createMediaStreamSource(stream);
         this.node = new Worklet(this.context, 'caption-pcm');
@@ -41,7 +41,7 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
           if(event.data?.activity){this.capturing=event.data.activity==='start';return;}
           const samples=event.data?.samples||event.data,boundary=event.data?.boundary==='limit'?'limit':'pause';
           if (this.queue.length >= 2) { this.queue.shift().samples.fill(0);this.breakContinuity=true; onDiagnostic({stage:'asr',operation:'capture',code:'queue_overflow'}); this.onrecovering?.({reason:'queue_overflow',attempt:1}); }
-          const at=Date.now();this.queue.push({samples,boundary,at,speechEndedAt:lastVoicedAt(samples,at)});
+          const at=Date.now();this.queue.push({samples,boundary,at,speechStartedAt:firstVoicedAt(samples,at),speechEndedAt:lastVoicedAt(samples,at)});
           void this.drain();
         };
         this.source.connect(this.node); this.node.connect(this.context.destination);
@@ -80,7 +80,7 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
         const text = typeof data.text === 'string' ? data.text.trim().slice(0, 600) : '';
         if (text) {
           // No cumulative transcript list is retained by the recognizer.
-          this.acceptText(text,{speechEndedAt:chunk.speechEndedAt,recognitionReadyAt:Date.now(),boundary:chunk.boundary});
+          this.acceptText(text,{speechStartedAt:chunk.speechStartedAt,speechEndedAt:chunk.speechEndedAt,recognitionReadyAt:Date.now(),boundary:chunk.boundary});
         }
       } catch (_) { if (this.active) { onDiagnostic({code:controller.signal.aborted?'timeout':'network_or_cors'}); this.transientFailure(); } }
       finally {
@@ -88,19 +88,41 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
         if (this.active) void this.drain();
       }
     }
-    emitText(text,timing) {
+    emitText(text,timing,index=this.index++,revision=0,continuing=false) {
       const result=[{transcript:text}];result.isFinal=true;
-      this.onresult?.({resultIndex:this.index,results:{length:this.index+1,[this.index++]:result},...timing});
+      this.onresult?.({resultIndex:index,results:{length:index+1,[index]:result},...timing,revision,continuing});
+    }
+    finishFragment() {
+      if(!this.fragment)return;
+      const pending=this.fragment;this.fragment=null;clearTimeout(this.fragmentTimer);
+      // Metadata-only completion reuses the translation; do not charge for the same text again.
+      this.emitText(pending.text,{...pending.timing,metadataOnly:true},pending.index,pending.revision+1,false);
     }
     acceptText(text,timing) {
-      const now=Date.now();let joined=false;
-      if(this.fragment){const previous=this.fragment;this.fragment=null;clearTimeout(this.fragmentTimer);if(!this.breakContinuity&&now-previous.at<=previous.waitMs){text=previous.text.replace(/[。．.]$/u,'')+' '+text;joined=true;}else this.emitText(previous.text,previous.timing);}
+      const now=Date.now();let joined=false,index,revision=0;
+      if(this.fragment){
+        const previous=this.fragment;
+        if(!this.breakContinuity&&now-previous.at<=previous.waitMs){
+          this.fragment=null;clearTimeout(this.fragmentTimer);
+          text=previous.text.replace(/[。．.]$/u,'')+' '+text;joined=true;
+          index=previous.index;revision=previous.revision+1;
+          timing={...timing,speechStartedAt:previous.timing.speechStartedAt};
+        }else this.finishFragment();
+      }
       this.breakContinuity=false;
-      if(((timing.boundary==='limit'&&!joined)||isIncompleteJapanese(text))&&text.length<1000){
-        this.fragment={text,timing,at:now,waitMs:timing.boundary==='limit'?12000:10000};
-        const flush=()=>{if(!this.active||!this.fragment)return;if((this.capturing||this.sending||this.queue.length)&&Date.now()-this.fragment.at<this.fragment.waitMs){this.fragmentTimer=setTimeout(flush,250);return;}const pending=this.fragment;this.fragment=null;this.emitText(pending.text,pending.timing);};
-        this.fragmentTimer=setTimeout(flush,timing.boundary==='limit'?12000:2500);
-      }else this.emitText(text,timing);
+      index??=this.index++;
+      // At most two chunks per translated card bound the repeated-prefix cost.
+      const continuing=!joined&&(timing.boundary==='limit'||isIncompleteJapanese(text))&&text.length<600;
+      this.emitText(text,timing,index,revision,continuing);
+      if(continuing){
+        this.fragment={text,timing,index,revision,at:now,waitMs:8000};
+        const flush=()=>{
+          if(!this.active||!this.fragment)return;
+          if((this.capturing||this.sending||this.queue.length)&&Date.now()-this.fragment.at<this.fragment.waitMs){this.fragmentTimer=setTimeout(flush,250);return;}
+          this.finishFragment();
+        };
+        this.fragmentTimer=setTimeout(flush,timing.boundary==='limit'?8000:2500);
+      }
     }
     transientFailure() {
       // Keep capturing after a brief service/network failure. A later utterance retries; never replay stale speech.

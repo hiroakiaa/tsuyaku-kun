@@ -21,7 +21,8 @@ export function parseTranslation(text, targets) {
 export function validateCaption(data) {
   if(typeof data.text!=='string'||!data.text.trim()||data.text.length>1200)throw Error('文章は1200文字以内にしてください。');
   if(typeof data.id!=='string'||!/^[a-zA-Z0-9_-]{1,80}$/.test(data.id))throw Error('字幕IDを確認してください。');
-  return {id:data.id,text:protectMath(data.text.trim()),final:!!data.final};
+  if(data.revision!==undefined&&(!Number.isInteger(data.revision)||data.revision<0||data.revision>100))throw Error('字幕の更新番号を確認してください。');
+  return {id:data.id,text:protectMath(data.text.trim()),final:!!data.final,revision:data.revision??0,continuing:data.continuing===true,metadataOnly:data.metadataOnly===true};
 }
 export function csv(rows) {
   const q=x=>'"'+String(x??'').replace(/"/g,'""')+'"';
