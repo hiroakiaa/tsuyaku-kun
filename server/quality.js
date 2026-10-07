@@ -1,7 +1,7 @@
 // Conservative checks for malformed ordinal phrases. Never repair numbers by guessing.
 export function schoolContextHints(text,source='ja') {
  if(source!=='ja')return [];
- const rules=[['丸をもら','In schoolwork: getting an answer marked correct by the teacher.'],['終業式','End-of-term ceremony; different from graduation.'],['下校','Leaving school for home.'],['問','When followed by a number: an exercise/question.']];
+ const rules=[['丸をもら','In schoolwork: the teacher confirmed the answer is correct. Translate the meaning, never the shape circle: English marked correct, Spanish respuesta correcta, Portuguese resposta correta. Do not claim who marked it unless specified.'],['終業式','End-of-term ceremony; different from graduation.'],['下校','Leaving school for home.'],['問','When followed by a number: an exercise/question.']];
  return rules.filter(([term])=>text.includes(term)).map(([term,meaning])=>({term,meaning,scope:'Use only in clear school context; preserve the recognized source text.'}));
 }
 export function uncertainSpeech(text){return [...new Set(String(text).match(/[一二三四五六七八九十0-9０-９]+次つ目/g)||[])].slice(0,4);}
