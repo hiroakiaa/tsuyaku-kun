@@ -1,3 +1,4 @@
+import {nonSpeechReason} from './speech-filter.js?v=20261007-learning-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261007-progressive-1';
 // Browser-independent recognition using the call's existing microphone stream.
 export function encodeWav(samples) {
@@ -32,7 +33,7 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
       try {
         await resumed;
         if (!this.active) return;
-        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261007-progressive-1', import.meta.url));
+        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261007-learning-1', import.meta.url));
         if (!this.active) return;
         this.source = this.context.createMediaStreamSource(stream);
         this.node = new Worklet(this.context, 'caption-pcm');
@@ -77,6 +78,8 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
         if (!response.ok) { const error=failure?.reason|| (response.status === 429 ? 'quota' : [401,403].includes(response.status) ? 'auth' : 'network'); if (['network','service','timeout','overloaded'].includes(error) && (response.status>=500||error==='overloaded')) { this.transientFailure(); return; } this.fail(error,failure?.message); return; }
         const data = await response.json(); this.failures=0;
         if (!this.active || controller.signal.aborted || Date.now() - chunk.at > 15000) return;
+        const rejected=nonSpeechReason(data,new URL(endpoint).searchParams.get('language'));
+        if(rejected){this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:rejected});return;}
         const text = typeof data.text === 'string' ? data.text.trim().slice(0, 600) : '';
         if (text) {
           // No cumulative transcript list is retained by the recognizer.
@@ -99,23 +102,23 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
       this.emitText(pending.text,{...pending.timing,metadataOnly:true},pending.index,pending.revision+1,false);
     }
     acceptText(text,timing) {
-      const now=Date.now();let joined=false,index,revision=0;
+      const now=Date.now();let joined=false,index,revision=0,chunks=1;
       if(this.fragment){
         const previous=this.fragment;
         if(!this.breakContinuity&&now-previous.at<=previous.waitMs){
           this.fragment=null;clearTimeout(this.fragmentTimer);
           text=previous.text.replace(/[。．.]$/u,'')+' '+text;joined=true;
-          index=previous.index;revision=previous.revision+1;
+          index=previous.index;revision=previous.revision+1;chunks=(previous.chunks||1)+1;
           timing={...timing,speechStartedAt:previous.timing.speechStartedAt};
         }else this.finishFragment();
       }
       this.breakContinuity=false;
       index??=this.index++;
-      // At most two chunks per translated card bound the repeated-prefix cost.
-      const continuing=!joined&&(timing.boundary==='limit'||isIncompleteJapanese(text))&&text.length<600;
+      // Bound cumulative updates to four chunks and 480 characters.
+      const continuing=chunks<4&&(timing.boundary==='limit'||isIncompleteJapanese(text))&&text.length<480;
       this.emitText(text,timing,index,revision,continuing);
       if(continuing){
-        this.fragment={text,timing,index,revision,at:now,waitMs:8000};
+        this.fragment={text,timing,chunks,index,revision,at:now,waitMs:8000};
         const flush=()=>{
           if(!this.active||!this.fragment)return;
           if((this.capturing||this.sending||this.queue.length)&&Date.now()-this.fragment.at<this.fragment.waitMs){this.fragmentTimer=setTimeout(flush,250);return;}
@@ -143,4 +146,4 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
   };
 }
 
-export function isIncompleteJapanese(text){return typeof text==='string'&&text.length<=20&&(/^(?:[0-9０-９]{1,2}月[0-9０-９]{1,2}日|[月火水木金土日]曜日)[、。．.!！?？]?$/u.test(text)||/^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}0-9０-９\s]+(?:は|が|を|に|から|まで)$/u.test(text));}
+export function isIncompleteJapanese(text){return typeof text==='string'&&text.length<=40&&(/^(?:(?:来週|今週|再来週)の)?(?:[0-9０-９]{1,2}月[0-9０-９]{1,2}日(?:[月火水木金土日]曜日)?|[月火水木金土日]曜日|(?:午前|午後)?[0-9０-９]{1,2}時(?:[0-9０-９]{1,2}分)?)[、。．.!！?？]?$/u.test(text)||/^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}0-9０-９\s]+(?:は|が|を|に|から|まで)$/u.test(text));}

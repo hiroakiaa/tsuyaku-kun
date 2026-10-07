@@ -550,3 +550,5 @@ body.phone-home #panel-words>#panel-phrases,body.phone-home #panel-words>#panel-
 /* Center only the initial lesson role choice within the available workspace. */
 body.phone-home #panel-lesson:not([hidden]):has(>#lesson-role-picker:not([hidden])){justify-content:center;align-items:center;}
 body.phone-home #panel-lesson>#lesson-role-picker:not([hidden]){flex:none;margin:0 auto!important;width:100%;}
+
+.caption-meta .secondary{width:40px;min-width:40px;height:40px;min-height:40px;padding:8px;border:0;background:transparent}.caption-memory{font-size:11px;color:var(--muted);margin-left:auto}
