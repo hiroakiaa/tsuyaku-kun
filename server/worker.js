@@ -20,7 +20,7 @@ export async function recognizeAudio(env,bytes,language,termHints=[]){
  language=spokenLanguage(language);
         let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
         const hints=[...new Set([...termHints,...recognitionHints(catalog,language)])].slice(0,30).join('、').slice(0,400);
-        let result;try{result=await runAi(env,'@cf/openai/whisper-large-v3-turbo',{audio:btoa(binary),language:language==='zh-CN'?'zh':language==='fil'?'tl':language,task:'transcribe',initial_prompt:hints,vad_filter:false,beam_size:5,condition_on_previous_text:false,no_speech_threshold:.35});}catch(firstError){if(['quota','billing','auth'].includes(aiFailure(firstError).reason))throw firstError;try{result=await runAi(env,'@cf/openai/whisper',{audio:Array.from(bytes)});}catch(secondError){throw secondError;}}
+        let result;try{result=await runAi(env,'@cf/openai/whisper-large-v3-turbo',{audio:btoa(binary),language:language==='zh-CN'?'zh':language==='fil'?'tl':language,task:'transcribe',initial_prompt:hints,vad_filter:true,beam_size:5,condition_on_previous_text:false,no_speech_threshold:.35,compression_ratio_threshold:2.4,log_prob_threshold:-1,hallucination_silence_threshold:.6});}catch(firstError){if(['quota','billing','auth'].includes(aiFailure(firstError).reason))throw firstError;try{result=await runAi(env,'@cf/openai/whisper',{audio:Array.from(bytes)});}catch(secondError){throw secondError;}}
 
  return result;
 }

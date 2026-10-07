@@ -32,8 +32,19 @@ export function cleanRecognition(result) {
   // A standalone stock outro is a known silence hallucination. Preserve quotes
   // and ordinary sentences containing these words rather than rewriting speech.
   if (/^(?:ご視聴(?:どうも)?ありがとうございました|ご視聴ありがとうございます)+$/.test(normalized)) return '';
-  if (result.segments?.length && result.segments.every(segment =>
-    typeof segment.no_speech_prob === 'number' && segment.no_speech_prob >= .35)) return '';
+  const segments = result.segments || result.transcription_info?.segments;
+  if (Array.isArray(segments) && segments.length) {
+    // Never remove words solely because they repeat: confidence evidence is required.
+    const unreliable = segment =>
+      (Number.isFinite(segment.no_speech_prob) && segment.no_speech_prob >= .35) ||
+      (Number.isFinite(segment.avg_logprob) && segment.avg_logprob < -1 &&
+        Number.isFinite(segment.compression_ratio) && segment.compression_ratio > 2.4);
+    const kept = segments.filter(segment => !unreliable(segment));
+    if (!kept.length) return '';
+    // Preserve reliable speech around rejected noise, only when complete segment text is available.
+    if (kept.length !== segments.length && segments.every(segment => typeof segment.text === 'string'))
+      return kept.map(segment => segment.text.trim()).filter(Boolean).join(' ').slice(0, 600);
+  }
   return text.trim().slice(0, 600);
 }
 
