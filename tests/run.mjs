@@ -222,4 +222,11 @@ await test('ブラウザー認識の失敗・停止後は古い結果を届け�
 await test('登録済みの逆方向訳と不足言語を区別し曖昧な辞書一致は使わない',async()=>{
  const {TranslationMemory}=await import('../web/translation-memory.js');const m=new TranslationMemory({getItem:()=>null,setItem(){}}),catalog={phrases:[{id:'a',jaText:'こんにちは',esText:'Hola',enText:'Hello'}]};assert.equal(m.lookup('es','Hola',['ja','en'],'',catalog).translations.ja,'こんにちは');const partial=m.lookup('es','Hola',['ja','pt'],'',catalog,true);assert.deepEqual(partial.missing,['pt']);catalog.phrases.push({id:'b',jaText:'やあ',esText:'Hola'});assert.equal(m.lookup('es','Hola',['ja'],'',catalog),null);
 });
+await test('対面の完了通知は処理中の訳を再課金せず同じ字幕へ反映する',async()=>{
+ const app=await readFile(new URL('../web/app.js',import.meta.url),'utf8'),code=app.slice(app.indexOf('const localJobs='),app.indexOf('const invite=new URLSearchParams'));
+ let resolve,calls=0;const replies=[],records=new Map(),activeRoom={local:true,unit:''};const scope={Map,Set,Date,JSON,Error,AbortController,room:activeRoom,selfId:'local',sessionEpoch:1,records,catalog:{},pending:new Map(),$:selector=>({value:selector==='#face-other-language'?'es':'ja'}),translationMemory:{lookup:(source,text,targets)=>({translations:{[source]:text},missing:targets,source:'spreadsheet'})},api:()=>{calls++;return new Promise(r=>resolve=r);},message(){},ledger:{event(){}},handle:async r=>{records.set(r.id,r);replies.push(r);}};
+ runInNewContext(code+';this.translateLocally=translateLocally;this.cancelLocalTranslations=cancelLocalTranslations;',scope);
+ const work=scope.translateLocally({id:'one',text:'10月9日',revision:0,continuing:true},'ja');await scope.translateLocally({id:'one',text:'10月9日',revision:1,metadataOnly:true},'ja');assert.equal(typeof resolve,'function',JSON.stringify(replies));resolve({translations:{ja:'10月9日',es:'9 de octubre'},usage:{inputTokens:10,outputTokens:3},latencyMs:100});await work;assert.equal(calls,1);assert.equal(replies.length,1);assert.equal(replies[0].continuing,false);assert.equal(replies[0].revision,1);
+ const late=scope.translateLocally({id:'two',text:'火曜日',revision:0},'ja');scope.cancelLocalTranslations();scope.room=null;scope.sessionEpoch++;resolve({translations:{es:'martes'}});await late;assert.equal(replies.length,1);
+});
 console.log(count+' tests passed');
