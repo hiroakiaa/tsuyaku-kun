@@ -286,3 +286,95 @@ body.phone-home:not(.mode-active) main.phone-home-card{background:transparent;bo
 @media(max-height:500px){.mode-active .caption-line>p{font-size:17px;}.mode-active .caption-line-primary>p{font-size:21px;}.mode-active .caption-line+.caption-line{margin-top:8px;padding-top:8px;}}
 
 .caption-progress{font-size:11px;font-weight:400;color:#60755b;margin-left:auto;}
+
+/* Shared child-friendly reading and touch controls, across all five modes. */
+body.phone-home{--read-body:18px;--read-text:20px;--read-main:25px;--read-title:21px;--read-label:16px;--read-control:17px;}
+body[data-reading-size=large]{--read-body:20px;--read-text:23px;--read-main:29px;--read-title:24px;--read-label:18px;--read-control:19px;}
+body[data-reading-size=extra]{--read-body:22px;--read-text:26px;--read-main:33px;--read-title:27px;--read-label:20px;--read-control:21px;}
+body.phone-home{font-size:var(--read-body);touch-action:pan-x pan-y pinch-zoom;}
+html{touch-action:pan-x pan-y pinch-zoom;}
+.mode-intro{margin:4px 0 22px;padding:0 4px;}
+.mode-intro h1{margin:0 0 8px;font-size:var(--read-title);line-height:1.5;color:#294d36;}
+.mode-intro p{margin:0;font-size:var(--read-label);line-height:1.7;color:#526858;}
+.phone-home-card .entry-card{gap:22px;padding:24px;background:#fffef9;}
+.phone-home-card label{font-size:var(--read-label);line-height:1.6;gap:9px;}
+body.phone-home input,body.phone-home select,body.phone-home textarea,dialog input,dialog select,dialog textarea{font-size:var(--read-control)!important;}
+.phone-home-card input,.phone-home-card select{min-height:56px;}
+.phone-home-card button.primary{min-height:60px;font-size:var(--read-control);border:2px solid #75ac58;background:#dff2c1;color:#264f31;}
+.phone-home-card button::after,#modal-body button::after{display:none;}
+.lesson-role-switch{gap:12px;margin-bottom:18px;}
+.lesson-role-switch button{min-height:60px;flex-wrap:wrap;gap:5px 9px;font-size:var(--read-control);background:#fffef9;}
+.role-note{font-size:14px;font-weight:500;color:#526b58;}
+.lesson-role-switch [aria-pressed=true]{border-width:2px;border-color:#4f8b3a;}
+#lesson-code-input{font-size:30px!important;min-height:64px;letter-spacing:.2em;}
+.header-tools .reading-options{width:auto;min-width:48px;padding:8px 12px;font-size:14px;gap:7px;border:1px solid #c4d8b6;}
+.reading-options::after{display:none;}
+.reading-options i{font-size:17px;}
+.live-reading-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;}
+#live-mode-label{font-size:16px;font-weight:700;color:#46654a;}
+.phone-home-card .live-reading-bar .reading-options{min-height:48px;font-size:14px;padding:9px 12px!important;border:1px solid #c9d9bc;background:#fffef9;border-radius:14px;}
+.live-guide{margin:0;font-size:var(--read-label);line-height:1.6;color:#4a6352;padding:10px 12px;border-radius:14px;background:#f0f5e9;}
+.live-guide[data-listening=true]{background:#e1f2ce;color:#2d5b34;border:1px solid #9fc788;}
+.live-guide[data-listening=true]::before{content:'';display:inline-block;width:9px;height:9px;margin-right:8px;border-radius:50%;background:#388844;}
+.mode-active .call-controls button{font-size:var(--read-control);min-height:56px;padding:12px 10px!important;}
+.mode-active .call-controls #microphone{background:#e0f2c8;border-color:#75ab59;color:#294f31;font-weight:700;}
+.mode-active .call-controls #microphone[aria-pressed=true]{background:#d7eec7;border-color:#488837;}
+.mode-active .call-controls #leave{background:#fffef9;border-color:#c7d4bc;color:#48604f;}
+.mode-active .text-form input{min-height:54px;}
+.mode-active .text-form button{min-width:54px;min-height:54px;}
+.mode-active .captions{scroll-padding:18px;}
+.mode-active .caption{padding:18px 20px;margin-bottom:14px;border-radius:18px;}
+.mode-active .caption-line>p{font-size:var(--read-text);line-height:1.75;letter-spacing:.015em;}
+.mode-active .caption-line-primary>p{font-size:var(--read-main);line-height:1.7;}
+.mode-active .caption-line>small{font-size:14px;color:#4c6452;}
+.mode-active .caption-line+.caption-line{padding-top:16px;margin-top:16px;border-color:#d3decd;}
+.mode-active .caption-meta button{min-width:44px;min-height:44px;}
+.reference-title{font-size:var(--read-text);line-height:1.6;}
+.reference-reading{font-size:var(--read-label);color:#4f6958;line-height:1.5;font-weight:500;}
+.reference-category{font-size:14px;}
+.reference-list button.reference-card{min-height:88px;padding:18px 20px!important;}
+.reference-language-text{font-size:var(--read-text);line-height:1.85;}
+.reference-language-heading h3{font-size:var(--read-label);}
+#modal-body{font-size:var(--read-body);}
+#modal-body label{font-size:var(--read-label);}
+.modal-heading h2{font-size:var(--read-title);}
+.reading-panel{display:grid;gap:18px;}
+.reading-panel p{margin:0;}
+.reading-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+#modal-body .reading-choices button{margin:0;min-height:62px;padding:12px 10px!important;font-size:16px;background:#fffef9;border:2px solid #cfddc4;}
+#modal-body .reading-choices button[aria-pressed=true]{background:#e0f2c4;border-color:#5c943e;color:#294f31;}
+.reading-preview{font-size:var(--read-main);line-height:1.75;padding:20px;border:1px solid #cddcc4;border-radius:16px;background:#f5f9ef;}
+.reading-note{font-size:14px;color:#516658;}
+#modal-body .reading-panel>.primary{margin:0;width:100%;font-size:17px;background:#dff2c1;border-color:#75ac58;color:#294f31;min-height:56px;}
+body.phone-home main.phone-home-card>.bottom-nav button{min-height:66px!important;}
+.nav-label{font-size:12px!important;color:inherit;}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #23623a;outline-offset:3px;}
+@media(max-width:600px){
+ .mode-intro{margin:4px 0 18px;padding:0 2px;}
+ .phone-home-card .entry-card{padding:20px;gap:20px;}
+ .header-tools .reading-options{padding:8px 10px;font-size:12px;min-height:44px;}
+ .header-tools #admin{width:44px;}
+ .brand{font-size:20px;}
+ .mode-active .caption{padding:14px 16px;}
+ .mode-active .face-controls button{font-size:14px;min-height:52px;}
+ .mode-active .live-tools{gap:8px;}
+ .mode-active .call-controls{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:10px;}
+ .mode-active .call-controls button{font-size:var(--read-label);}
+ .mode-active .live-actions{padding-top:2px;}
+ .reference-list button.reference-card{padding:16px 18px!important;}
+ .reading-choices{grid-template-columns:1fr;}
+ #modal-body .reading-choices button{min-height:52px;}
+ .reading-preview{padding:16px;}
+}
+@media(max-width:360px){.header-tools .reading-options span{display:none;}body.phone-home:not(.mode-active) .app-shell>header{gap:6px;}.header-tools{gap:4px;}.nav-label{font-size:11px!important;}}
+@media(max-height:500px){
+ .mode-intro{margin-bottom:14px;}
+ .mode-active .live-guide{font-size:14px;padding:8px 10px;}
+ .mode-active .call-controls button{min-height:48px;}
+ .mode-active .live-reading-bar{min-height:44px;}
+ body.phone-home main.phone-home-card>.bottom-nav button{min-height:52px!important;}
+ body.phone-home:not(.mode-active) .app-shell{padding-bottom:calc(64px + env(safe-area-inset-bottom));}
+}
+
+.mode-active .call-controls:has(#microphone[hidden]){grid-template-columns:1fr;}
+.mode-active .caption-line .speech-controls button{min-width:48px;min-height:48px;width:48px;height:48px;}
