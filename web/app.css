@@ -430,3 +430,13 @@ body.phone-home.mode-active[data-active-mode="interpreter"] main.phone-home-card
 
 .mode-active[data-active-mode="interpreter"] #panel-interpreter:not([hidden]){width:100%;max-width:none;margin:0;align-self:stretch;}
 @media(min-width:760px){.mode-active[data-active-mode="interpreter"] #live:not([hidden]){grid-template-columns:minmax(300px,28%) minmax(0,1fr);}}
+
+/* Every mode stays inside the shared application shell and its own tab. */
+body.phone-home.mode-active .app-shell{max-width:1440px;padding:12px 16px calc(82px + env(safe-area-inset-bottom));}
+.mode-active header{display:flex!important;flex:none;margin-bottom:10px;}
+.mode-active main.phone-home-card>.bottom-nav{display:grid!important;}
+body.phone-home.mode-active main.phone-home-card{padding:0!important;height:auto;background:transparent;}
+.mode-active [role="tabpanel"]:not([hidden]){display:flex;flex-direction:column;flex:1;min-height:0;width:100%;max-width:none;margin:0;align-self:stretch;padding:0!important;}
+.mode-active #panel-words:not([hidden]){display:block;overflow:auto;}
+@media(min-width:760px){.mode-active #live:not([hidden]){grid-template-columns:minmax(300px,28%) minmax(0,1fr);}}
+@media(max-width:759px){.mode-active #live:not([hidden]){overflow:auto;display:flex;flex-direction:column;}.mode-active .captions{flex:1;min-height:240px;}.mode-active .live-tools{flex:none;overflow:visible;}.mode-active .live-actions{flex:none;}}
