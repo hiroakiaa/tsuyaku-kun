@@ -23,7 +23,6 @@ installAdmin({button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[..
 const status=text=>{$('#connection').textContent=text;};
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;if(tag==='button'&&text){const icons={'接続を確認':'network-wired','再試行':'rotate-right','リンクをコピー':'copy','ひらく':'book-open','候補として送る':'plus','授業をおわる':'stop','じぶんだけホームにもどる':'door-open'};if(icons[text])n.prepend(icon(icons[text]));}return n;}
 function modal(title,content){delete $('#modal').dataset.kind;$('#modal-title').textContent=title;$('#modal-reading')?.remove();$('#modal-body').replaceChildren(content);$('#modal').showModal();}
-if($('#connection-details'))$('#connection-details').onclick=()=>{const n=el('div');n.append(el('p',$('#connection').textContent));const check=el('button','接続を確認');check.onclick=showNetworkDiagnostics;n.append(check);modal('接続状況',n);};
 
 // One reading preference applies to every mode and survives reloads on this device.
 function applyReadingSize(size){
@@ -65,6 +64,8 @@ function setSpeakingLanguage(value){if(!catalog.languages.some(l=>l.code===value
 function setSharedLanguage(value){if(!catalog.languages.some(l=>l.code===value))return;localStorage.setItem('tsuyaku-display-language',value);for(const id of sharedLanguageIds){$('#'+id).value=value;localStorage.setItem(id,value);}renderReferences();}
 function fillLanguages(){for(const id of ['face-self-language','source-language'])options($('#'+id),speakingLanguage());const value=sharedLanguage();for(const id of sharedLanguageIds)options($('#'+id),value);}
 fillLanguages();for(const id of sharedLanguageIds)$('#'+id).onchange=()=>setSharedLanguage($('#'+id).value);for(const id of ['face-self-language','source-language'])$('#'+id).onchange=()=>setSpeakingLanguage($('#'+id).value);
+function showLanguageOptions(){const content=el('div',undefined,'language-panel'),spoken=el('select'),display=el('select');options(spoken,speakingLanguage());options(display,sharedLanguage());spoken.onchange=()=>{setSpeakingLanguage(spoken.value);if(room?.mode==='face'){updateFace();if(mic)startRecognition();}};display.onchange=()=>{setSharedLanguage(display.value);if(room?.mode==='face')updateFace();for(const record of [...records.values()])renderCaption(record);};content.append(label('じぶんが話すことば',spoken),label('訳を読むことば',display));const done=el('button','閉じる','primary');done.onclick=()=>$('#modal').close();content.append(done);modal('言語を選ぶ',content);}
+$('#language-options').onclick=showLanguageOptions;
 let lessonRole=null;
 function chooseLessonRole(next){lessonRole=next;$("#lesson-role-picker").hidden=!!next;$("#lesson-role-back").hidden=!next;$("#teacher-entry").hidden=next!=="teacher";$("#student-entry").hidden=next!=="student";$("#lesson-role-teacher").setAttribute("aria-pressed",String(next==="teacher"));$("#lesson-role-student").setAttribute("aria-pressed",String(next==="student"));}
 $("#lesson-role-teacher").onclick=()=>chooseLessonRole("teacher");$("#lesson-role-student").onclick=()=>chooseLessonRole("student");

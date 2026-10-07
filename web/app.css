@@ -413,3 +413,15 @@ body.phone-home main.phone-home-card>.bottom-nav{grid-template-columns:repeat(4,
 .reference-tabs button{min-height:52px;background:#fffef9;font-size:var(--read-control);}
 .reference-tabs [aria-selected=true]{background:#dff2c1;border:2px solid #75ac58;color:#264f31;font-weight:700;}
 @media(max-height:500px){#lesson-role-picker{margin:16px auto;}#lesson-role-picker button{min-height:124px;gap:12px;}}
+
+/* Header tools and tabs that clearly belong to the content beneath them. */
+header button.brand{width:auto;min-height:44px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--ink);cursor:pointer;}
+header button.brand::after{display:none;}
+.header-tools #language-options{width:48px;height:48px;font-size:23px;background:#fffef9;border:1px solid #c4d8b6;border-radius:14px;}
+.reference-tabs{display:flex;gap:0;margin:0 0 18px;border-bottom:2px solid #adc899;border-radius:0;background:transparent;padding:0;}
+.phone-home-card .reference-tabs button{flex:1;min-height:56px;margin:0 0 -2px;padding:12px 8px;border:0;border-bottom:4px solid transparent;border-radius:0;background:transparent;box-shadow:none;color:#62765f;font-weight:500;}
+.phone-home-card .reference-tabs button[aria-selected=true]{border:0;border-bottom:4px solid #39723e;background:#edf5e4;color:#294f31;font-weight:700;border-radius:12px 12px 0 0;}
+.language-panel{display:grid;gap:16px;}
+#modal-body .language-panel label{margin:0;}
+#modal-body .language-panel select{min-height:54px;}
+#modal-body .language-panel button{min-height:48px;}
