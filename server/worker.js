@@ -1,3 +1,4 @@
+import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
@@ -56,7 +57,7 @@ export default {async fetch(request,env){
   const allowed=origin===env.ALLOWED_ORIGIN||origin==='http://localhost:8787';
   const cors=response=>{const h=new Headers(response.headers);if(allowed){h.set('Access-Control-Allow-Origin',origin);h.set('Access-Control-Allow-Headers','Content-Type, Authorization, X-Term-Hints');h.set('Access-Control-Allow-Methods','GET, POST, OPTIONS');h.set('Vary','Origin');}return new Response(response.body,{status:response.status,headers:h});};
   if(request.method==='OPTIONS')return allowed?cors(new Response(null,{status:204})):error('接続元を確認してください。',403);
-  if(url.pathname==='/health')return cors(json({ok:true,app:'通訳君',version:'0.6.3',sheets:!!env.SHEETS_BRIDGE}));
+  if(url.pathname==='/health')return cors(json({ok:true,app:'通訳君',version:'0.6.5',sheets:!!env.SHEETS_BRIDGE}));
   if(!allowed)return error('接続元を確認してください。',403);
   try{
     if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:request.headers.get('CF-Connecting-IP')||'local'})).success))return cors(error('少し待ってから再試行してください。',429));
@@ -97,10 +98,21 @@ export default {async fetch(request,env){
       return cors(result?json(result):error('辞書の追記接続がまだ設定されていません。',503));
     }
     return cors(error('ページが見つかりません。',404));
-  }catch(e){return cors(error(e.message||'接続を確認してください。',400));}
+  }catch(e){const failure=resourceFailure(e);if(failure)return cors(json({error:failure.message,resourceFailure:{reason:failure.reason,retryable:false}},failure.status));return cors(error(e.message||'接続を確認してください。',400));}
 }};
 export class TranslationRoom {
-  constructor(ctx,env){this.ctx=ctx;this.env=env;this.jobs=new Map();this.queuedCaptions=new Map();this.cachedCatalog=catalog;this.catalogUntil=0;}
+  constructor(ctx,env){this.ctx=ctx;this.env=env;this.jobs=new Map();this.queuedCaptions=new Map();this.cachedCatalog=catalog;this.catalogUntil=0;if(ctx.setWebSocketAutoResponse&&typeof WebSocketRequestResponsePair!=='undefined')ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair('{"type":"ping"}','{"type":"pong"}'));}
+  async scheduleAlarm(room){
+    room??=await this.info();if(!room)return;
+    let next=room.expires;
+    for(const ws of this.ctx.getWebSockets()){
+      const a=ws.deserializeAttachment();if(a?.left||ws.readyState!==undefined&&ws.readyState!==1)continue;
+      const deadline=a?.uid?a.expires:(a?.opened||Date.now())+10000;
+      if(Number.isFinite(deadline))next=Math.min(next,deadline);
+    }
+    next=Math.max(Date.now()+1,next);
+    if(await this.ctx.storage.getAlarm()!==next)await this.ctx.storage.setAlarm(next);
+  }
   async info(){return this.ctx.storage.get('room');}
   participants(){return this.ctx.getWebSockets().map(ws=>({ws,a:ws.deserializeAttachment()})).filter(x=>x.a?.uid&&!x.a.left&&(x.ws.readyState===undefined||x.ws.readyState===1));}
   send(ws,data){try{ws.send(JSON.stringify(data));}catch{}}
@@ -135,13 +147,13 @@ export class TranslationRoom {
         const stableId=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(auth.uid)))].slice(0,16).map(x=>x.toString(16).padStart(2,'0')).join('');
         const viewLanguage=room.mode==='interpreter'?lang:String(data.viewLanguage||lang);if(!catalog.languages.some(l=>l.code===viewLanguage))throw Error('表示言語を確認してください。');
         ws.serializeAttachment({...a,...auth,id:stableId,token:data.token,name:String(data.name||'参加者').slice(0,40),language:role==='teacher'&&room.mode==='lesson'?'ja':lang,viewLanguage,role});
-        this.send(ws,{type:'ready',id:stableId,role,mode:room.mode,unit:room.unit,code:room.code,expires:room.expires,ended:!!room.ended,history:[...(await this.ctx.storage.list({prefix:'caption:',limit:3000})).values()].sort((x,y)=>x.at-y.at)});this.roster();
+        await this.scheduleAlarm(room);this.send(ws,{type:'ready',id:stableId,role,mode:room.mode,unit:room.unit,code:room.code,expires:room.expires,ended:!!room.ended,history:[...(await this.ctx.storage.list({prefix:'caption:',limit:3000})).values()].sort((x,y)=>x.at-y.at)});this.roster();
         if(this.env.SHEETS_BRIDGE&&Date.now()>this.catalogUntil){this.catalogUntil=Date.now()+300000;this.ctx.waitUntil(bridge(this.env,data.token,'tsuyakuCatalog').then(r=>{if(r)this.cachedCatalog=r;}).catch(()=>{}));}return;
       }
       if(a.left)return;
       if(data.type==='leave'){await this.webSocketClose(ws);return;}
       if(a.expires<=Date.now())throw Error('ログインし直してください。');
-      if(data.type==='reauth'){const auth=await verifyToken(data.token,this.env.FIREBASE_PROJECT);if(auth.uid!==a.uid)throw Error('ログインし直してください。');ws.serializeAttachment({...a,...auth,token:data.token});return;}
+      if(data.type==='reauth'){const auth=await verifyToken(data.token,this.env.FIREBASE_PROJECT);if(auth.uid!==a.uid)throw Error('ログインし直してください。');ws.serializeAttachment({...a,...auth,token:data.token});await this.scheduleAlarm(room);return;}
       if(Date.now()-a.window>60000){a.window=Date.now();a.count=0;}if(++a.count>400)throw Error('操作が多すぎます。');ws.serializeAttachment(a);
       if(data.type==='ping'){this.send(ws,{type:'pong'});return;}
       if(data.type==='language'&&room.mode==='interpreter'){const language=String(data.language||'');if(!catalog.languages.some(l=>l.code===language))throw Error('言語を確認してください。');ws.serializeAttachment({...a,language,viewLanguage:language,name:(catalog.languages.find(l=>l.code===language)?.labelJa||'ことば')+'の参加者'});this.roster();return;}
@@ -151,7 +163,7 @@ export class TranslationRoom {
         this.send(other.ws,{type:'signal',from:a.id,signal:data.signal});return;
       }
       if(data.type==='end'){
-        if(a.role!=='teacher')throw Error('先生だけが終了できます。');await this.ctx.storage.put('room',{...room,ended:true});await this.ctx.storage.setAlarm(room.expires);this.broadcast({type:'ended'});return;
+        if(a.role!=='teacher')throw Error('先生だけが終了できます。');await this.ctx.storage.put('room',{...room,ended:true});await this.scheduleAlarm(room);this.broadcast({type:'ended'});return;
       }
       if(room.ended)throw Error('この授業は終了しました。');
       if(data.type!=='caption')return;
@@ -197,7 +209,18 @@ export class TranslationRoom {
       if(!(await this.info())||room.expires<=Date.now())return;const done={...record,translations,usage,status:'ready',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,done);const recent=await this.ctx.storage.get('recent')||[];await this.ctx.storage.put('recent',[...recent.filter(r=>r.id!==id),{id,at:start,text}].sort((a,b)=>a.at-b.at).slice(-3));this.broadcast({type:'translation',...done});if(a.language==='ja'&&!usage?.cacheHit&&((all.learnableTexts||[]).includes(text)||(all.phrases||[]).some(p=>p.jaText===text)))this.ctx.waitUntil(bridge(this.env,a.token,'tsuyakuLearn',{text,translations}).catch(()=>{}));
     }catch(e){if(!(await this.info())||room.expires<=Date.now())return;const failed={...record,usage,status:'failed',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,failed);this.broadcast({type:'translation',...failed,error:aiFailure(e).message,aiFailure:aiFailure(e)});}
   }
-  async webSocketClose(ws){const a=ws.deserializeAttachment();if(a?.left)return;ws.serializeAttachment({...a,left:true});try{ws.close(1000,'left');}catch{}if(a?.uid)this.broadcast({type:'notice',text:a.name+'さんが退室しました。'});this.roster();}
+  async webSocketClose(ws){const a=ws.deserializeAttachment();if(a?.left)return;ws.serializeAttachment({...a,left:true});try{ws.close(1000,'left');}catch{}if(a?.uid)this.broadcast({type:'notice',text:a.name+'さんが退室しました。'});this.roster();await this.scheduleAlarm();}
   async webSocketError(ws){await this.webSocketClose(ws);}
-  async alarm(){if(await this.ctx.storage.get('codesDirectory')){await new LessonCodes(this.ctx.storage).cleanup();return;}const room=await this.info();if(!room||room.expires<=Date.now()){for(const ws of this.ctx.getWebSockets()){try{ws.close(1000,'expired');}catch{}}await this.ctx.storage.deleteAll();return;}for(const ws of this.ctx.getWebSockets()){const a=ws.deserializeAttachment();if(!a?.uid&&Date.now()-a.opened>=10000||a?.expires<=Date.now()){try{ws.close(1008,'auth');}catch{}}}await this.ctx.storage.setAlarm(Math.min(room.expires,Date.now()+60000));}
+  async alarm(){
+    if(await this.ctx.storage.get('codesDirectory')){await new LessonCodes(this.ctx.storage).cleanup();return;}
+    const room=await this.info();
+    if(!room||room.expires<=Date.now()){for(const ws of this.ctx.getWebSockets()){try{ws.close(1000,'expired');}catch{}}await this.ctx.storage.deleteAll();return;}
+    for(const ws of this.ctx.getWebSockets()){
+      const a=ws.deserializeAttachment();if(a?.left)continue;
+      if(!a?.uid&&Date.now()-(a?.opened||0)>=10000||a?.uid&&a.expires<=Date.now()){
+        ws.serializeAttachment({...a,left:true});try{ws.close(1008,'auth');}catch{}
+      }
+    }
+    console.log(JSON.stringify({event:'room_alarm',activeSockets:this.participants().length}));await this.scheduleAlarm(room);
+  }
 }
