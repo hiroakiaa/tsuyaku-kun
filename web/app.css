@@ -457,3 +457,6 @@ body.phone-home.mode-active main.phone-home-card{padding:0!important;height:auto
 #call-invite .invite-copy::before,#call-invite .invite-copy::after{display:none;}
 #call-invite .invite-copy:hover{background:#edf5e3;}
 #call-invite .invite-copy:focus-visible{outline:2px solid #609345;outline-offset:-2px;}
+
+.call-controls:has(#leave[hidden]){grid-template-columns:1fr;}
+.call-controls:has(#leave[hidden]) #microphone{width:100%;}
