@@ -31,7 +31,7 @@ export class TranslationMemory {
  async lookupAsync(source,text,targets,unit='',catalog={},partial=false){
  text=exact(text);const hotResult=this.lookup(source,text,targets,unit,catalog,partial);if(hotResult&&(!partial||!hotResult.missing.length))return hotResult;
  let timer;const row=await Promise.race([this.store.get(memoryKey(source,text,unit)),new Promise(resolve=>timer=setTimeout(()=>resolve(null),750))]);clearTimeout(timer);
- if(row&&row.source===source&&row.text===text&&row.unit===unit&&row.translations){row.lastUsed=Date.now();this.hot.set(memoryKey(source,text,unit),row);this.persist();return this.lookup(source,text,targets,unit,catalog,partial);}return hotResult;
+ if(row&&row.source===source&&row.text===text&&row.unit===unit&&row.translations){row.lastUsed=Date.now();row.hits=(row.hits||0)+1;this.hot.set(memoryKey(source,text,unit),row);this.persist();return this.lookup(source,text,targets,unit,catalog,partial);}return hotResult;
  }
  correct(heard,corrected,unit=''){heard=exact(heard);corrected=exact(corrected);if(!heard||!corrected||heard===corrected||heard.length>600||corrected.length>600)return;const existing=this.corrections.find(r=>r.heard===heard&&r.unit===unit);if(existing)existing.corrected=corrected;else this.corrections.push({heard,corrected,unit});this.persist();}
  corrected(heard,unit=''){const text=exact(heard);return this.corrections.find(r=>r.heard===text&&r.unit===unit)?.corrected||text;}
