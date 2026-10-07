@@ -199,7 +199,7 @@ function scheduleRoomExpiry(){clearTimeout(roomExpiryTimer);if(!room?.expires)re
 
 // Open the default conversation once; invitation links keep their join dialog.
 if(!(/^[a-f0-9]{32}$/.test(invite.get('room')||'')&&/^[a-f0-9]{32}$/.test(invite.get('key')||''))){
- const requestedStart=new URLSearchParams(location.search).get('mode')||sessionStorage.getItem('tsuyaku-update-tab');sessionStorage.removeItem('tsuyaku-update-tab');void activateTab(['face','interpreter','lesson','words'].includes(requestedStart)?requestedStart:'face');
+ sessionStorage.removeItem('tsuyaku-update-tab');void activateTab('face');
 } resetConversationContents();
 
 
