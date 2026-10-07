@@ -498,3 +498,5 @@ body.phone-home #panel-words:not([hidden]){display:flex!important;flex-direction
 #panel-words>.reference-tabs{flex:none;position:relative;margin-bottom:12px;}
 body.phone-home #panel-words>#panel-phrases:not([hidden]),body.phone-home #panel-words>#panel-terms:not([hidden]){display:block!important;flex:1 1 0;min-height:0;height:0;max-height:none;overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain;padding-right:4px!important;}
 .reference-categories{overscroll-behavior-x:contain;position:relative;}
+
+body.phone-home #panel-words:not([hidden]){height:calc(100dvh - 160px - env(safe-area-inset-bottom));max-height:calc(100dvh - 160px - env(safe-area-inset-bottom));flex:none!important;}
