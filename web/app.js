@@ -1,6 +1,6 @@
 import {recordResource} from './resource-usage.js?v=20261007-free-2';
 import {mayReconnect} from './resource-policy.js';
-import {TranslationMemory} from './translation-memory.js?v=20261007-free-1';
+import {TranslationMemory} from './translation-memory.js?v=20261007-memory-index-1';
 import {PersonalPhrases} from './personal-phrases.js?v=20261007-learning-1';
 import {recognitionHints} from './recognition-hints.js?v=20261007-progressive-1';
 import {acquireMicrophone} from './microphone.js?v=20261006-mic-1';
