@@ -596,3 +596,12 @@ body.phone-home #lesson-toolbar .lesson-code-card{margin:0;padding:8px 14px;min-
 body.phone-home .admin-tabs button{border:0!important;border-radius:10px 10px 0 0!important;background:transparent!important;box-shadow:none!important;color:#5b6b54!important}body.phone-home .admin-tabs button[aria-selected="true"]{background:#e5f1d7!important;border-bottom:3px solid #527d3b!important;color:#284822!important;font-weight:700!important}
 
 body.phone-home .admin-tabs button{flex:1 0 auto!important;width:auto!important;min-width:0!important;white-space:nowrap!important;padding:8px!important;font-size:14px!important}
+/* Keep the admin shell stable while only the selected tab content scrolls. */
+body.phone-home dialog[open]:has(.admin-panel){height:min(720px,calc(100dvh - 24px));box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;}
+body.phone-home dialog:has(.admin-panel)>.modal-heading{flex:none;}
+body.phone-home dialog:has(.admin-panel)>#modal-body{flex:1;min-height:0;overflow:hidden;}
+body.phone-home .admin-panel{height:100%;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden;}
+body.phone-home .admin-panel>.admin-tabs{position:static;min-width:0;}
+body.phone-home .admin-panel>.admin-tab-panel:not([hidden]){min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;}
+body.phone-home .admin-panel>button:last-child{margin-bottom:0;}
+@media(max-height:500px){body.phone-home dialog[open]:has(.admin-panel){height:calc(100dvh - 12px);}}
