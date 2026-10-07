@@ -2731,7 +2731,7 @@ export default {async fetch(request,env){
   const allowed=origin===env.ALLOWED_ORIGIN||origin==='http://localhost:8787';
   const cors=response=>{const h=new Headers(response.headers);if(allowed){h.set('Access-Control-Allow-Origin',origin);h.set('Access-Control-Allow-Headers','Content-Type, Authorization, X-Term-Hints');h.set('Access-Control-Allow-Methods','GET, POST, OPTIONS');h.set('Vary','Origin');}return new Response(response.body,{status:response.status,headers:h});};
   if(request.method==='OPTIONS')return allowed?cors(new Response(null,{status:204})):error('接続元を確認してください。',403);
-  if(url.pathname==='/health')return cors(json({ok:true,app:'通訳君',version:'0.6.5',sheets:!!env.SHEETS_BRIDGE}));
+  if(url.pathname==='/health')return cors(json({ok:true,app:'通訳君',version:'0.6.6',sheets:!!env.SHEETS_BRIDGE}));
   if(!allowed)return error('接続元を確認してください。',403);
   try{
     if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:request.headers.get('CF-Connecting-IP')||'local'})).success))return cors(error('少し待ってから再試行してください。',429));
@@ -2747,6 +2747,15 @@ export default {async fetch(request,env){
         const result=await recognizeAudio(env,bytes,language,safeRecognitionHints(request.headers.get('X-Term-Hints')));
         const text=cleanRecognition(result,language);if(text===null)return cors(error('音声を認識できませんでした。',502));return cors(json({text}));
       }catch(e){const failure=aiFailure(e);return cors(json({error:failure.message,aiFailure:failure,recognitionCode:failure.reason},failure.reason==='quota'?429:['billing','auth'].includes(failure.reason)?403:502));}finally{bytes.fill(0);}
+    }
+    if(url.pathname==='/translate'&&request.method==='POST'){
+      const data=await body(request,16000),text=String(data.text||'').trim(),source=String(data.source||'');
+      const targets=[...new Set(Array.isArray(data.targets)?data.targets:[])];
+      if(!text||text.length>1200||!catalog.languages.some(l=>l.code===source)||!targets.length||targets.length>4||targets.some(c=>!catalog.languages.some(l=>l.code===c)))return cors(error('ことばと言語を確認してください。'));
+      const context=(Array.isArray(data.context)?data.context:[]).slice(-3).filter(x=>typeof x==='string').map(x=>x.slice(0,480));
+      let usage={},started=Date.now();
+      try{const translations=await translateText(env,text,source,targets,context,String(data.unit||'').slice(0,160),catalog,u=>{usage=u;});return cors(json({translations,usage,latencyMs:Date.now()-started}));}
+      catch(e){const failure=aiFailure(e);return cors(json({error:failure.message,aiFailure:failure,usage},failure.reason==='quota'?429:['billing','auth'].includes(failure.reason)?403:502));}
     }
     if(url.pathname==='/catalog'&&request.method==='GET'){try{return cors(json(await bridge(env,token,'tsuyakuCatalog')||catalog));}catch{return cors(json(catalog));}}
     if(url.pathname==='/dictionary/translate'&&request.method==='POST'){
