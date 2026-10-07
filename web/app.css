@@ -378,3 +378,9 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 
 .mode-active .call-controls:has(#microphone[hidden]){grid-template-columns:1fr;}
 .mode-active .caption-line .speech-controls button{min-width:48px;min-height:48px;width:48px;height:48px;}
+
+.lesson-role-switch button{display:flex;flex-direction:column;flex-wrap:nowrap;justify-content:center;gap:5px;padding:16px 12px!important;}
+.lesson-role-switch button>i{font-size:22px;}
+.lesson-role-switch ruby{ruby-position:over;}
+.lesson-role-switch rt{font-size:11px;font-weight:500;line-height:1;}
+@media(max-height:500px){.lesson-role-switch button{padding:10px 12px!important;min-height:88px;}}
