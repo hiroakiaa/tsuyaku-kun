@@ -188,11 +188,24 @@ await test('背景の会話準備は一つを再利用しマイクを起動せ�
  const pool=source.slice(source.indexOf('// Each inactive conversation'),source.indexOf('const roomPreparations='));
  let calls=0;const sockets=[],timers=new Map();let timer=0;
  class Socket{constructor(){this.readyState=0;this.sent=[];sockets.push(this);Promise.resolve().then(()=>{this.readyState=1;this.onopen();this.onmessage({data:JSON.stringify({type:'ready',id:'self',mode:'face'})});});}send(data){this.sent.push(JSON.parse(data));}close(){this.readyState=3;this.onclose?.();}}
- const scope={Map,Promise,Date,Error,JSON,WebSocket:Socket,api:async()=>{calls++;return {id:'room'+calls,key:'key'};},token:async()=> 'token',config:{api:'https://example.test'},catalog:{languages:[{code:'ja',labelJa:'日本語'}]},speakingLanguage:()=> 'ja',sharedLanguage:()=> 'es',$:()=>({value:'数学'}),setTimeout:fn=>{timers.set(++timer,fn);return timer;},setInterval:fn=>{timers.set(++timer,fn);return timer;},clearTimeout:id=>timers.delete(id),clearInterval:id=>timers.delete(id)};
+ const scope={Map,Promise,Date,Error,JSON,recordResource:()=>{},WebSocket:Socket,api:async()=>{calls++;return {id:'room'+calls,key:'key'};},token:async()=> 'token',config:{api:'https://example.test'},catalog:{languages:[{code:'ja',labelJa:'日本語'}]},speakingLanguage:()=> 'ja',sharedLanguage:()=> 'es',$:()=>({value:'数学'}),setTimeout:fn=>{timers.set(++timer,fn);return timer;},setInterval:fn=>{timers.set(++timer,fn);return timer;},clearTimeout:id=>timers.delete(id),clearInterval:id=>timers.delete(id)};
  const state=runInNewContext(pool+';({prepareConversation,takeConversation,warmConversation,preparedConversations,disposePreparation})',scope);
  const first=state.prepareConversation('face'),second=state.prepareConversation('face');assert.equal(first,second);const prepared=await first;assert.equal(calls,1);assert.equal(prepared.ws.readyState,1);assert.equal(prepared.messages[0].type,'ready');assert.equal(prepared.ws.sent[0].type,'auth');
  assert.equal(await state.takeConversation('face'),prepared);assert.equal(state.preparedConversations.size,0);assert.equal(timers.size,0);
  const replacement=await state.prepareConversation('face');assert.notEqual(replacement.room.id,prepared.room.id);assert.equal(calls,2);replacement.ws.close();assert.equal(state.preparedConversations.size,0);assert.equal(timers.size,0);
  prepared.ws.close();
+});
+await test('無人ルームは保存期限まで監視を休止する',async()=>{
+ let scheduled;const expiry=Date.now()+86400000;const storage={get:async key=>key==='room'?{expires:expiry}:null,getAlarm:async()=>0,setAlarm:async value=>scheduled=value};
+ await new TranslationRoom({storage,getWebSockets:()=>[]},{}).alarm();assert.equal(scheduled,expiry);
+});
+await test('期限切れ認証を閉じ次の有効期限だけを予約する',async()=>{
+ let scheduled,closed=false;const now=Date.now(),expiry=now+86400000;let attachment={uid:'test',expires:now-10};const ws={deserializeAttachment:()=>attachment,serializeAttachment:a=>attachment=a,close:()=>closed=true};
+ const storage={get:async key=>key==='room'?{expires:expiry}:null,getAlarm:async()=>0,setAlarm:async value=>scheduled=value};const r=new TranslationRoom({storage,getWebSockets:()=>[ws]},{});
+ await r.alarm();assert.equal(closed,true);assert.equal(scheduled,expiry);attachment={uid:'test',expires:now+3600000};await r.scheduleAlarm();assert.equal(scheduled,attachment.expires);
+});
+await test('再接続は認証拒否と連続失敗とオフラインで停止する',async()=>{
+ const {resourceFailure,mayReconnect}=await import('../web/resource-policy.js');assert.equal(resourceFailure(Error('Daily request limit exceeded')).reason,'quota');assert.equal(resourceFailure(Error('upstream timeout')),null);
+ assert.equal(mayReconnect(1008,1),false);assert.equal(mayReconnect(1006,6),false);assert.equal(mayReconnect(1006,1,false),false);assert.equal(mayReconnect(1006,1),true);
 });
 console.log(count+' tests passed');
