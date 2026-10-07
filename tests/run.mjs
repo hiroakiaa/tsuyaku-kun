@@ -1,4 +1,5 @@
 import './reviewed-memory.mjs';
+import './reuse-quality.mjs';
 import {protectUncertainSpeech,restoreUncertainSpeech} from '../server/quality.js';
 import {speechScore} from '../tools/speech-score.js';
 import {recognitionHints,safeRecognitionHints} from '../web/recognition-hints.js';
