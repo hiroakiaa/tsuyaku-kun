@@ -581,3 +581,6 @@ body.phone-home #lesson-toolbar .lesson-code-card{margin:0;padding:8px 14px;min-
  body.phone-home #lesson-toolbar #lesson-code-entry>span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
  body.phone-home #lesson-toolbar #lesson-code-input{height:48px;min-height:48px;width:100%;font-size:17px!important;border-radius:16px;letter-spacing:.12em;margin:0;padding:8px;}
 }
+
+/* Match the interpreter sidebar in the face mode on wide screens. */
+@media(min-width:1200px) and (min-height:501px){body.phone-home.mode-active[data-active-mode=face] #live:not([hidden]){grid-template-columns:minmax(260px,30%) minmax(0,1fr);}}
