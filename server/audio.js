@@ -25,9 +25,15 @@ export function hasSpeechEnergy(wav) {
   return high >= 0.004 && high > low * 1.5;
 }
 
-export function cleanRecognition(result) {
+export function cleanRecognition(result, language) {
   const text = result?.text ?? result?.transcription_info?.text;
   if (typeof text !== 'string') return null;
+  // Ignore the confirmed sneeze-like standalone Japanese ASR result only.
+  // Keep questions, meaningful short replies, and text in every other language.
+  const finish = value => {
+    const trimmed = value.trim().slice(0, 600);
+    return (language === 'ja' || language === 'ja-easy') && /^[\sんン、。,.!！…]+$/.test(trimmed) ? '' : trimmed;
+  };
   const normalized = text.normalize('NFKC').replace(/[\s、。,.!！?？…]/g, '');
   // A standalone stock outro is a known silence hallucination. Preserve quotes
   // and ordinary sentences containing these words rather than rewriting speech.
@@ -43,9 +49,9 @@ export function cleanRecognition(result) {
     if (!kept.length) return '';
     // Preserve reliable speech around rejected noise, only when complete segment text is available.
     if (kept.length !== segments.length && segments.every(segment => typeof segment.text === 'string'))
-      return kept.map(segment => segment.text.trim()).filter(Boolean).join(' ').slice(0, 600);
+      return finish(kept.map(segment => segment.text.trim()).filter(Boolean).join(' '));
   }
-  return text.trim().slice(0, 600);
+  return finish(text);
 }
 
 

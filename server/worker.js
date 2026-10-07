@@ -70,7 +70,7 @@ export default {async fetch(request,env){
       const bytes=new Uint8Array(size);let offset=0;for(const c of chunks){bytes.set(c,offset);offset+=c.length;c.fill(0);}
       try{if(!validWav(bytes))return cors(error('音声形式を確認してください。',415));if(!hasSpeechEnergy(bytes))return cors(json({text:''}));
         const result=await recognizeAudio(env,bytes,language,safeRecognitionHints(request.headers.get('X-Term-Hints')));
-        const text=cleanRecognition(result);if(text===null)return cors(error('音声を認識できませんでした。',502));return cors(json({text}));
+        const text=cleanRecognition(result,language);if(text===null)return cors(error('音声を認識できませんでした。',502));return cors(json({text}));
       }catch(e){const failure=aiFailure(e);return cors(json({error:failure.message,aiFailure:failure,recognitionCode:failure.reason},failure.reason==='quota'?429:['billing','auth'].includes(failure.reason)?403:502));}finally{bytes.fill(0);}
     }
     if(url.pathname==='/catalog'&&request.method==='GET'){try{return cors(json(await bridge(env,token,'tsuyakuCatalog')||catalog));}catch{return cors(json(catalog));}}
