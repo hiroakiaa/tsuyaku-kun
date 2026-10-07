@@ -14,7 +14,7 @@ import {catalog} from '../server/catalog.js';
 import workerApi,{TranslationRoom,translateText,recognizeAudio,aiFailure,runAi,translationBudget} from '../server/worker.js';
 import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection,summarizeSessions} from '../web/network.js';
 import {verifyToken} from '../server/auth.js';
-import {validWav,hasSpeechEnergy} from '../server/audio.js';
+import {validWav,hasSpeechEnergy,cleanRecognition} from '../server/audio.js';
 import {createServerRecognition,encodeWav,isIncompleteJapanese} from '../web/caption-server.js';
 import {UsageLedger,costOf,analysisReport,percentile} from '../web/usage.js';
 import {SpeechPlayer} from '../web/speech-player.js';
@@ -86,7 +86,7 @@ await test('音声認識は一時的なHTTP障害から次の発話で復旧す�
 
 
 
-await test('高速音声モデルが失敗したら独立した予備モデルへWAVを渡す',async()=>{const calls=[];const wav=new Uint8Array(encodeWav(new Int16Array(16000)));const result=await recognizeAudio({AI:{run:async(model,input)=>{calls.push({model,input});if(calls.length===1)throw Error('model unavailable');return {text:'hello'};}}},wav,'en');assert.equal(result.text,'hello');assert.equal(calls[0].input.vad_filter,false);assert.equal(calls[1].model,'@cf/openai/whisper');assert.deepEqual(calls[1].input.audio,Array.from(wav));});
+await test('高速音声モデルが失敗したら独立した予備モデルへWAVを渡す',async()=>{const calls=[];const wav=new Uint8Array(encodeWav(new Int16Array(16000)));const result=await recognizeAudio({AI:{run:async(model,input)=>{calls.push({model,input});if(calls.length===1)throw Error('model unavailable');return {text:'hello'};}}},wav,'en');assert.equal(result.text,'hello');assert.equal(calls[0].input.vad_filter,true);assert.equal(calls[1].model,'@cf/openai/whisper');assert.deepEqual(calls[1].input.audio,Array.from(wav));});
 
 await test('低費用認識は無音10秒を送信しない',()=>{const out=[],s=new PcmSegmenter(16000,x=>out.push(x));s.push(new Float32Array(160000));assert.equal(out.length,0);});
 await test('短い発話は600msの無音で送信し先頭を保持する',()=>{const out=[],s=new PcmSegmenter(16000,x=>out.push(x));s.push(Float32Array.from({length:6400},(_,i)=>Math.sin(i*.15)*.08));s.push(new Float32Array(9601));assert.equal(out.length,1);assert.ok(out[0].length<=20000);assert.ok(validWav(new Uint8Array(encodeWav(out[0]))));});
@@ -135,4 +135,17 @@ await test('最後のAPI成功で途中の認識エラーやHTTP失敗を隠さ�
 await test('日付・曜日を内容と結合し処理上の分割だけで文章を確定しない',()=>{const R=createServerRecognition({endpoint:'https://example.test',getStream:()=>null,getToken:async()=>'',Context:class{},Worklet:class{}});for(const prefix of ['10月9日','１０月９日。','金曜日']){const r=new R(),out=[];r.active=true;r.onresult=e=>out.push(e.results[e.resultIndex][0].transcript);r.acceptText(prefix,{boundary:'pause'});assert.equal(out.length,0);r.acceptText('終業式があります',{boundary:'pause'});assert.equal(out.length,1);assert.ok(out[0].includes('終業式があります'));r.abort();}const r=new R(),out=[];r.active=true;r.onresult=e=>out.push(e.results[e.resultIndex][0].transcript);r.acceptText('これから教科書を開いて問題を確認してください',{boundary:'limit'});assert.equal(out.length,0);r.acceptText('15ページの問1を解きます',{boundary:'pause'});assert.equal(out.length,1);assert.ok(out[0].includes('15ページ'));r.acceptText('別の長い発話の処理用の区切りです',{boundary:'limit'});r.acceptText('さらに続く発話の処理用の区切りです',{boundary:'limit'});assert.equal(out.length,2);assert.equal(r.fragment,null);r.abort();});
 await test('400msの間や5秒の連続発話で日付と内容を分割しない',()=>{const out=[],boundaries=[],s=new PcmSegmenter(16000,(x,d)=>{out.push(x);boundaries.push(d.boundary);}),wave=n=>Float32Array.from({length:n},(_,i)=>Math.sin(i*.1)*.03);s.push(wave(16000));s.push(new Float32Array(6400));assert.equal(out.length,0);s.push(wave(64000));assert.equal(out.length,0);s.push(new Float32Array(9600));assert.equal(out.length,1);assert.equal(boundaries[0],'pause');const q=new PcmSegmenter(16000,(x,d)=>boundaries.push(d.boundary));q.push(wave(128000));assert.equal(boundaries.at(-1),'limit');});
 await test('音声が欠けた前後の日付と内容を勝手に結合しない',()=>{const R=createServerRecognition({endpoint:'https://example.test',getStream:()=>null,getToken:async()=>'',Context:class{},Worklet:class{}}),r=new R(),out=[];r.active=true;r.onresult=e=>out.push(e.results[e.resultIndex][0].transcript);r.acceptText('10月9日',{boundary:'pause'});r.transientFailure();r.acceptText('弁当が必要です',{boundary:'pause'});assert.deepEqual(out,['10月9日','弁当が必要です']);r.abort();});
+await test('環境音の誤認識を確信度で除外し正常な前後の声を残す',()=>{
+ const result={text:'授業を始めます エアガーフ エアガーフ お願いします',transcription_info:{segments:[{text:'授業を始めます',no_speech_prob:.01,avg_logprob:-.2,compression_ratio:1},{text:'エアガーフ エアガーフ',no_speech_prob:.8},{text:'お願いします',no_speech_prob:.02}]}};
+ assert.equal(cleanRecognition(result),'授業を始めます お願いします');
+ assert.equal(cleanRecognition({text:'エアガーフ',segments:[{text:'エアガーフ',avg_logprob:-1.5,compression_ratio:3}]}),'');
+ assert.equal(cleanRecognition({text:'はい はい はい',segments:[{text:'はい はい はい',no_speech_prob:.01,avg_logprob:-.2,compression_ratio:3}]}),'はい はい はい');
+ assert.equal(cleanRecognition({text:'はい',segments:[{avg_logprob:-1.5,compression_ratio:1}]}),'はい');
+ assert.equal(cleanRecognition({text:'こんにちは エアガーフ',segments:[{no_speech_prob:.01},{no_speech_prob:.8}]}),'こんにちは エアガーフ');
+ assert.equal(cleanRecognition({text:'エアガーフ',transcription_info:{segments:[{no_speech_prob:.9}]}}),'');
+});
+await test('無言区間の幻覚対策と音声検出を認識モデルに明示する',async()=>{
+ let params;await recognizeAudio({AI:{run:async(_,input)=>{params=input;return {text:''};}}},new Uint8Array(encodeWav(new Int16Array(16000))),'ja');
+ assert.equal(params.vad_filter,true);assert.equal(params.condition_on_previous_text,false);assert.equal(params.hallucination_silence_threshold,.6);assert.equal(params.compression_ratio_threshold,2.4);assert.equal(params.log_prob_threshold,-1);
+});
 console.log(count+' tests passed');
