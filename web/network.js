@@ -1,6 +1,6 @@
-const STAGES=new Set(['api','auth','turn','api_simple','api_headers','asr']);
+const STAGES=new Set(['api','auth','turn','api_simple','api_headers','asr','browser_speech']);
 const OPERATIONS=new Set(['capture','translation','transcribe','room_create','lesson_join','catalog','dictionary_translate','dictionary_candidate','token','initial_auth','turn_credentials','health','other']);
-const RESULTS=new Set(['queue_overflow','ok','network_or_cors','timeout','http_error','invalid_response','auth_unavailable','no_turn_server']);
+const RESULTS=new Set(['queue_overflow','ok','network_or_cors','timeout','http_error','invalid_response','auth_unavailable','no_turn_server','browser_speech_started','browser_speech_error']);
 export function connectionFailure(error,{stage='api',endpoint='',operation='other',status}={}){
  const code=error?.code&&RESULTS.has(error.code)?error.code:error?.name==='TimeoutError'||error?.name==='AbortError'?'timeout':Number.isInteger(status)?'http_error':'network_or_cors';
  const subject=stage==='auth'?'参加の認証':stage==='turn'?'音声中継サーバー':'字幕・翻訳サーバー';
@@ -21,7 +21,7 @@ export async function requestJson(url,options={}, {fetcher=fetch,stage='api',ope
  try{response=await fetcher(url,options);}catch(error){const failure=connectionFailure(error,{stage,endpoint:url,operation});onFailure(failure.connection);throw failure;}
  let result;
  try{result=await response.json();}catch{const failure=connectionFailure({code:'invalid_response'},{stage,endpoint:url,operation,status:response.status});onFailure(failure.connection);throw failure;}
- if(!response.ok||result.error){onFailure(safeConnectionRecord({stage,operation,endpoint:url,code:'http_error',status:response.status,aiReason:result.aiFailure?.reason,aiCode:result.aiFailure?.code,aiEvidence:result.aiFailure?.evidence,aiModel:result.aiFailure?.model}));throw Object.assign(Error(result.error||'接続先が応答しました（HTTP '+response.status+'）。'),{usage:result.usage,latencyMs:result.latencyMs,httpStatus:response.status,resourceFailure:result.resourceFailure});}
+ if(!response.ok||result.error){onFailure(safeConnectionRecord({stage,operation,endpoint:url,code:'http_error',status:response.status,aiReason:result.aiFailure?.reason,aiCode:result.aiFailure?.code,aiEvidence:result.aiFailure?.evidence,aiModel:result.aiFailure?.model}));throw Object.assign(Error(result.error||'接続先が応答しました（HTTP '+response.status+'）。'),{usage:result.usage,latencyMs:result.latencyMs,httpStatus:response.status,resourceFailure:result.resourceFailure,aiFailure:result.aiFailure});}
  return result;
 }
 export async function probeNetwork(api,{fetcher=fetch,now=()=>Date.now()}={}){
