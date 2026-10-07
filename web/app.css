@@ -449,3 +449,11 @@ body.phone-home.mode-active main.phone-home-card{padding:0!important;height:auto
 .invite-link-row{display:flex;align-items:center;gap:6px;min-width:0;}
 .invite-link-row input{flex:1;width:0;min-width:0;margin:0;}
 #call-invite .invite-copy{flex:0 0 44px;width:44px;height:44px;min-height:44px;padding:0;display:grid;place-items:center;margin:0;}
+
+/* Copy action belongs inside the invitation input, without a separate button frame. */
+.invite-link-row{position:relative;display:block;}
+.invite-link-row input{box-sizing:border-box;width:100%;padding-right:54px;}
+#call-invite .invite-copy{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:44px;height:44px;min-height:44px;padding:0;border:0;background:transparent;box-shadow:none;border-radius:10px;}
+#call-invite .invite-copy::before,#call-invite .invite-copy::after{display:none;}
+#call-invite .invite-copy:hover{background:#edf5e3;}
+#call-invite .invite-copy:focus-visible{outline:2px solid #609345;outline-offset:-2px;}
