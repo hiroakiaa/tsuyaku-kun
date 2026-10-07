@@ -229,4 +229,14 @@ await test('対面の完了通知は処理中の訳を再課金せず同じ字�
  const work=scope.translateLocally({id:'one',text:'10月9日',revision:0,continuing:true},'ja');await scope.translateLocally({id:'one',text:'10月9日',revision:1,metadataOnly:true},'ja');assert.equal(typeof resolve,'function',JSON.stringify(replies));resolve({translations:{ja:'10月9日',es:'9 de octubre'},usage:{inputTokens:10,outputTokens:3},latencyMs:100});await work;assert.equal(calls,1);assert.equal(replies.length,1);assert.equal(replies[0].continuing,false);assert.equal(replies[0].revision,1);
  const late=scope.translateLocally({id:'two',text:'火曜日',revision:0},'ja');scope.cancelLocalTranslations();scope.room=null;scope.sessionEpoch++;resolve({translations:{es:'martes'}});await late;assert.equal(replies.length,1);
 });
+await test('確認済み訳はホット150件から外れても端末DBの完全一致で取り出す',async()=>{
+ const {TranslationMemory}=await import('../web/translation-memory.js');const {memoryKey}=await import('../web/reviewed-store.js');const db=new Map(),store={get:async k=>db.get(k)||null,put:async r=>{db.set(memoryKey(r.source,r.text,r.unit),structuredClone(r));return true;}};
+ const m=new TranslationMemory({getItem:()=>null,setItem(){}},store);for(let i=0;i<180;i++)assert.equal(m.remember('ja','文'+i,{en:'Sentence '+i},'math'),true);await new Promise(r=>setTimeout(r,0));assert.equal(m.rows.length,150);assert.equal(db.size,180);assert.equal(m.lookup('ja','文0',['en'],'math'),null);const found=await m.lookupAsync('ja','文0',['en'],'math');assert.equal(found.translations.en,'Sentence 0');assert.equal(m.lookup('ja','文0',['en'],'other'),null);assert.equal(m.lookup('ja','文1',['en'],'math'),null);assert.equal(m.rows.length,150);
+});
+await test('確認済み訳の保存は頻度と新しさを優先し件数とバイト数を制限する',async()=>{
+ const {retainedRows}=await import('../web/reviewed-store.js'),now=Date.now();const rows=Array.from({length:5100},(_,i)=>({key:String(i),hits:0,lastUsed:now-i*86400000,text:'文'}));rows.push({key:'frequent',hits:1000,lastUsed:now-20*86400000});const kept=retainedRows(rows,now);assert.equal(kept.length,5000);assert(kept.some(r=>r.key==='frequent'));assert(!kept.some(r=>r.key==='5099'));const huge=retainedRows(Array.from({length:20},(_,i)=>({key:String(i),text:'a'.repeat(1000000),lastUsed:now})),now);assert(JSON.stringify(huge).length*2<16*1024*1024);
+});
+await test('端末DBが使えなくても確認済み訳と共有辞書は利用できる',async()=>{
+ const {TranslationMemory}=await import('../web/translation-memory.js');const m=new TranslationMemory({getItem:()=>null,setItem(){throw Error('full');}},{get:async()=>null,put:async()=>false});assert.equal(m.remember('ja','保存した文',{en:'Reviewed'}),true);assert.equal((await m.lookupAsync('ja','保存した文',['en'])).translations.en,'Reviewed');assert.equal(await m.lookupAsync('ja','未登録',['en']),null);
+});
 console.log(count+' tests passed');
