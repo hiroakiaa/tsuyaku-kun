@@ -552,3 +552,23 @@ body.phone-home #panel-lesson:not([hidden]):has(>#lesson-role-picker:not([hidden
 body.phone-home #panel-lesson>#lesson-role-picker:not([hidden]){flex:none;margin:0 auto!important;width:100%;}
 
 .caption-meta .secondary{width:40px;min-width:40px;height:40px;min-height:40px;padding:8px;border:0;background:transparent}.caption-memory{font-size:11px;color:var(--muted);margin-left:auto}
+
+/* Shared lesson navigation and room number, for teachers and students. */
+body.phone-home #lesson-toolbar:not([hidden]){display:flex;align-items:stretch;gap:10px;margin-bottom:10px;flex:none;}
+body.phone-home #lesson-toolbar #lesson-role-back{margin:0;min-height:48px;}
+body.phone-home #lesson-toolbar .lesson-code-card{margin:0;padding:8px 14px;min-width:0;}
+@media(max-width:599px){
+ body.phone-home #lesson-toolbar:not([hidden]){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+ body.phone-home #lesson-toolbar #lesson-role-back,body.phone-home #lesson-toolbar .lesson-code-card{width:100%;height:48px;min-height:48px;max-height:48px;border-radius:16px;font-size:17px;box-sizing:border-box;}
+ body.phone-home #lesson-toolbar .lesson-code-card{padding:0 6px 0 12px;gap:4px;justify-content:space-between;}
+ body.phone-home #lesson-toolbar .lesson-code-card span{display:none;}
+ body.phone-home #lesson-toolbar .lesson-code-card strong{font-size:17px;line-height:1;letter-spacing:.16em;}
+ body.phone-home #lesson-toolbar .lesson-code-card button{width:36px;min-width:36px;height:40px;min-height:40px;padding:8px!important;border:0;background:transparent;}
+}
+
+#lesson-code-entry{margin:0;min-width:0;flex:1;}
+#student-entry #join-lesson-form{grid-template-columns:1fr;margin-top:12px;}
+@media(max-width:599px){
+ body.phone-home #lesson-toolbar #lesson-code-entry>span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
+ body.phone-home #lesson-toolbar #lesson-code-input{height:48px;min-height:48px;width:100%;font-size:17px!important;border-radius:16px;letter-spacing:.12em;margin:0;padding:8px;}
+}
