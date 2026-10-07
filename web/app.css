@@ -492,3 +492,9 @@ body.phone-home.mode-active main.phone-home-card{padding:0!important;height:auto
 .reference-group .reference-more,.reference-group .reference-less{min-height:44px;margin-top:10px;padding:8px 14px;font-size:14px;box-shadow:none;background:#eef5e7;border:1px solid #cadcbc;border-radius:12px;}
 .reference-group .reference-less{margin-left:8px;background:transparent;}
 .reference-group .reference-more::after,.reference-group .reference-less::after{display:none;}
+
+/* The reference tabs stay fixed; only the active reference panel scrolls vertically. */
+body.phone-home #panel-words:not([hidden]){display:flex!important;flex-direction:column;min-height:0;overflow:hidden!important;}
+#panel-words>.reference-tabs{flex:none;position:relative;margin-bottom:12px;}
+body.phone-home #panel-words>#panel-phrases:not([hidden]),body.phone-home #panel-words>#panel-terms:not([hidden]){display:block!important;flex:1 1 0;min-height:0;height:0;max-height:none;overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain;padding-right:4px!important;}
+.reference-categories{overscroll-behavior-x:contain;position:relative;}
