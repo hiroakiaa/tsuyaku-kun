@@ -56,7 +56,7 @@ export default {async fetch(request,env){
   const allowed=origin===env.ALLOWED_ORIGIN||origin==='http://localhost:8787';
   const cors=response=>{const h=new Headers(response.headers);if(allowed){h.set('Access-Control-Allow-Origin',origin);h.set('Access-Control-Allow-Headers','Content-Type, Authorization, X-Term-Hints');h.set('Access-Control-Allow-Methods','GET, POST, OPTIONS');h.set('Vary','Origin');}return new Response(response.body,{status:response.status,headers:h});};
   if(request.method==='OPTIONS')return allowed?cors(new Response(null,{status:204})):error('接続元を確認してください。',403);
-  if(url.pathname==='/health')return cors(json({ok:true,app:'通訳君',version:'0.6.2',sheets:!!env.SHEETS_BRIDGE}));
+  if(url.pathname==='/health')return cors(json({ok:true,app:'通訳君',version:'0.6.3',sheets:!!env.SHEETS_BRIDGE}));
   if(!allowed)return error('接続元を確認してください。',403);
   try{
     if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:request.headers.get('CF-Connecting-IP')||'local'})).success))return cors(error('少し待ってから再試行してください。',429));
@@ -100,7 +100,7 @@ export default {async fetch(request,env){
   }catch(e){return cors(error(e.message||'接続を確認してください。',400));}
 }};
 export class TranslationRoom {
-  constructor(ctx,env){this.ctx=ctx;this.env=env;this.jobs=new Map();this.cachedCatalog=catalog;this.catalogUntil=0;}
+  constructor(ctx,env){this.ctx=ctx;this.env=env;this.jobs=new Map();this.queuedCaptions=new Map();this.cachedCatalog=catalog;this.catalogUntil=0;}
   async info(){return this.ctx.storage.get('room');}
   participants(){return this.ctx.getWebSockets().map(ws=>({ws,a:ws.deserializeAttachment()})).filter(x=>x.a?.uid&&!x.a.left&&(x.ws.readyState===undefined||x.ws.readyState===1));}
   send(ws,data){try{ws.send(JSON.stringify(data));}catch{}}
@@ -157,17 +157,36 @@ export class TranslationRoom {
       if(data.type!=='caption')return;
       if(room.mode==='lesson'&&a.role!=='teacher')throw Error('授業では先生の発言を表示します。');
       const cap=validateCaption(data),id=a.id+'_'+cap.id;
-      this.broadcast({type:'caption',id,speaker:captionParticipant(room,a,data).name,source:captionParticipant(room,a,data).language,text:cap.text,final:cap.final,at:Date.now()});
+      this.broadcast({type:'caption',id,speaker:captionParticipant(room,a,data).name,source:captionParticipant(room,a,data).language,text:cap.text,final:cap.final,revision:cap.revision,continuing:cap.continuing,at:Date.now()});
       if(!cap.final)return;
-      const existing=await this.ctx.storage.get('caption:'+id);if(existing?.text===cap.text&&existing.status!=='failed')return;
+      const existing=await this.ctx.storage.get('caption:'+id);if(existing?.text===cap.text&&existing.status!=='failed'&&cap.revision<=(existing.revision||0)&&cap.continuing===!!existing.continuing)return;
       if(!existing&&(await this.ctx.storage.get('captionCount')||0)>=3000)throw Error('この授業は3000文に達しました。新しいルームを作ってください。');
       if(!existing)await this.ctx.storage.put('captionCount',(await this.ctx.storage.get('captionCount')||0)+1);
+      if(existing&&cap.revision<(existing.revision||0))return;
+      const queued=this.queuedCaptions.get(id);
+      if(queued&&cap.revision<queued.cap.revision)return;
+      if(data.revision!==undefined&&existing&&cap.revision===(existing.revision||0)&&existing.text!==cap.text)return;
+      this.queuedCaptions.set(id,{ws,a:captionParticipant(room,a,data),room,cap});
       if(this.jobs.has(id))return;
-      const task=this.translate(ws,captionParticipant(room,a,data),room,id,cap.text).finally(()=>this.jobs.delete(id));this.jobs.set(id,task);this.ctx.waitUntil(task);
+      this.startCaptionJob(id);
     }catch(e){this.send(ws,{type:'error',error:e.message||'接続を確認してください。'});if(!ws.deserializeAttachment()?.uid)ws.close(1008,'auth');}
   }
-  async translate(ws,a,room,id,text){
-    const start=Date.now();if(!(await this.info())||room.expires<=start)return;let usage;const record={id,speaker:a.name,source:spokenLanguage(a.language),text,final:true,at:start,status:'translating'};
+  startCaptionJob(id){
+    if(this.jobs.has(id))return;
+    const task=(async()=>{
+        while(this.queuedCaptions.has(id)){
+          const next=this.queuedCaptions.get(id);this.queuedCaptions.delete(id);
+          if(!(await this.info())||next.room.expires<=Date.now())continue;
+          const saved=await this.ctx.storage.get('caption:'+id);
+          if(saved?.text===next.cap.text&&(saved.status==='ready'||next.cap.metadataOnly&&saved.status==='failed')){
+            const updated={...saved,revision:next.cap.revision,continuing:next.cap.continuing};
+            await this.ctx.storage.put('caption:'+id,updated);this.broadcast({type:'translation',...updated});
+          }else await this.translate(next.ws,next.a,next.room,id,next.cap.text,next.cap);
+        }
+      })().finally(()=>{this.jobs.delete(id);if(this.queuedCaptions.has(id))this.startCaptionJob(id);});this.jobs.set(id,task);this.ctx.waitUntil(task);
+  }
+  async translate(ws,a,room,id,text,update={}){
+    const start=Date.now();if(!(await this.info())||room.expires<=start)return;let usage;const record={id,speaker:a.name,source:spokenLanguage(a.language),text,final:true,revision:update.revision??0,continuing:update.continuing===true,usageId:crypto.randomUUID(),at:start,status:'translating'};
     await this.ctx.storage.put('caption:'+id,record);
     try{
       const languages=this.participants().map(p=>p.a.language);const targets=room.mode==='interpreter'?[...new Set([...languages,...(languages.some(code=>code!=='en')?['en']:[])])]:[...new Set(['ja','en',...this.participants().flatMap(p=>[p.a.language,p.a.viewLanguage])])];
@@ -175,7 +194,7 @@ export class TranslationRoom {
     const all=this.cachedCatalog;
       const past=(await this.ctx.storage.get('recent')||[]).map(r=>r.text);
       const translations=await translateText(this.env,text,a.language,targets,past,room.unit,all,u=>{usage=u;});
-      if(!(await this.info())||room.expires<=Date.now())return;const done={...record,translations,usage,status:'ready',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,done);const recent=await this.ctx.storage.get('recent')||[];await this.ctx.storage.put('recent',[...recent,{at:start,text}].sort((a,b)=>a.at-b.at).slice(-3));this.broadcast({type:'translation',...done});if(a.language==='ja'&&!usage?.cacheHit&&((all.learnableTexts||[]).includes(text)||(all.phrases||[]).some(p=>p.jaText===text)))this.ctx.waitUntil(bridge(this.env,a.token,'tsuyakuLearn',{text,translations}).catch(()=>{}));
+      if(!(await this.info())||room.expires<=Date.now())return;const done={...record,translations,usage,status:'ready',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,done);const recent=await this.ctx.storage.get('recent')||[];await this.ctx.storage.put('recent',[...recent.filter(r=>r.id!==id),{id,at:start,text}].sort((a,b)=>a.at-b.at).slice(-3));this.broadcast({type:'translation',...done});if(a.language==='ja'&&!usage?.cacheHit&&((all.learnableTexts||[]).includes(text)||(all.phrases||[]).some(p=>p.jaText===text)))this.ctx.waitUntil(bridge(this.env,a.token,'tsuyakuLearn',{text,translations}).catch(()=>{}));
     }catch(e){if(!(await this.info())||room.expires<=Date.now())return;const failed={...record,usage,status:'failed',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,failed);this.broadcast({type:'translation',...failed,error:aiFailure(e).message,aiFailure:aiFailure(e)});}
   }
   async webSocketClose(ws){const a=ws.deserializeAttachment();if(a?.left)return;ws.serializeAttachment({...a,left:true});try{ws.close(1000,'left');}catch{}if(a?.uid)this.broadcast({type:'notice',text:a.name+'さんが退室しました。'});this.roster();}
