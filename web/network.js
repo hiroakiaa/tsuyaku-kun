@@ -21,7 +21,7 @@ export async function requestJson(url,options={}, {fetcher=fetch,stage='api',ope
  try{response=await fetcher(url,options);}catch(error){const failure=connectionFailure(error,{stage,endpoint:url,operation});onFailure(failure.connection);throw failure;}
  let result;
  try{result=await response.json();}catch{const failure=connectionFailure({code:'invalid_response'},{stage,endpoint:url,operation,status:response.status});onFailure(failure.connection);throw failure;}
- if(!response.ok||result.error){onFailure(safeConnectionRecord({stage,operation,endpoint:url,code:'http_error',status:response.status,aiReason:result.aiFailure?.reason,aiCode:result.aiFailure?.code,aiEvidence:result.aiFailure?.evidence,aiModel:result.aiFailure?.model}));throw Object.assign(Error(result.error||'接続先が応答しました（HTTP '+response.status+'）。'),{usage:result.usage,latencyMs:result.latencyMs,httpStatus:response.status});}
+ if(!response.ok||result.error){onFailure(safeConnectionRecord({stage,operation,endpoint:url,code:'http_error',status:response.status,aiReason:result.aiFailure?.reason,aiCode:result.aiFailure?.code,aiEvidence:result.aiFailure?.evidence,aiModel:result.aiFailure?.model}));throw Object.assign(Error(result.error||'接続先が応答しました（HTTP '+response.status+'）。'),{usage:result.usage,latencyMs:result.latencyMs,httpStatus:response.status,resourceFailure:result.resourceFailure});}
  return result;
 }
 export async function probeNetwork(api,{fetcher=fetch,now=()=>Date.now()}={}){

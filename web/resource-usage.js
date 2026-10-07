@@ -1,0 +1,3 @@
+const key='tsuyaku-resource-v1';const allowed=new Set(['roomCreate','lessonJoin','socketOpen','socketSend','heartbeat','turnCredentials']);
+export function recordResource(kind,storage=globalThis.localStorage){if(!allowed.has(kind))return;try{const data=resourceSnapshot(storage);data.counts[kind]=(data.counts[kind]||0)+1;storage.setItem(key,JSON.stringify(data));}catch{}}
+export function resourceSnapshot(storage=globalThis.localStorage){let data;try{data=JSON.parse(storage.getItem(key)||'null');}catch{}const day=new Date().toISOString().slice(0,10);const counts={};if(data?.utcDay===day)for(const kind of allowed){const n=data.counts?.[kind];if(Number.isSafeInteger(n)&&n>=0)counts[kind]=n;}return {utcDay:day,counts};}
