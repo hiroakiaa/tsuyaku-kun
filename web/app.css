@@ -399,3 +399,6 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 #modal-body .reference-language-heading .speech-controls button:hover{background:#eef5e7!important;}
 #modal-body .reference-language-heading .speech-controls button[hidden]{display:none;}
 .mode-intro h1{margin-bottom:0;}
+
+.modal-heading{justify-content:flex-start;}
+#modal-body .reference-language-heading .speech-controls button{margin-top:0;}
