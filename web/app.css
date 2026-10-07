@@ -384,3 +384,18 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .lesson-role-switch ruby{ruby-position:over;}
 .lesson-role-switch rt{font-size:11px;font-weight:500;line-height:1;}
 @media(max-height:500px){.lesson-role-switch button{padding:10px 12px!important;min-height:88px;}}
+
+/* Compact dictionary metadata and icon-only language playback. */
+.reference-list button.reference-card{display:grid;grid-template-columns:minmax(0,1fr) auto 14px;gap:8px 12px;align-items:center;}
+.reference-card>.reference-category{align-self:start;margin-top:3px;padding:3px 9px;border-radius:9px;background:#eef4e7;font-size:13px;line-height:1.5;font-weight:500;max-width:10em;overflow-wrap:anywhere;}
+.modal-heading{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;}
+.modal-heading h2{min-width:0;overflow-wrap:anywhere;}
+.modal-reading{font-size:var(--read-label);font-weight:500;color:#526858;line-height:1.5;}
+.modal-heading #modal-close{margin-left:auto;flex:none;}
+.reference-language-heading{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:10px;}
+.reference-language-heading h3{flex-basis:auto;padding-top:10px;}
+.reference-language-heading .speech-controls{display:flex;flex-direction:row;justify-content:flex-end;gap:2px;width:auto;min-width:44px;}
+#modal-body .reference-language-heading .speech-controls button{width:44px;min-width:44px;height:44px;min-height:44px;padding:8px!important;border:0;background:transparent!important;box-shadow:none;color:#526953;font-size:15px;}
+#modal-body .reference-language-heading .speech-controls button:hover{background:#eef5e7!important;}
+#modal-body .reference-language-heading .speech-controls button[hidden]{display:none;}
+.mode-intro h1{margin-bottom:0;}
