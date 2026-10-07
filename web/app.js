@@ -1,10 +1,10 @@
-import {recordResource} from './resource-usage.js';
+import {recordResource} from './resource-usage.js?v=20261007-free-2';
 import {mayReconnect} from './resource-policy.js';
 import {TranslationMemory} from './translation-memory.js?v=20261007-free-1';
 import {PersonalPhrases} from './personal-phrases.js?v=20261007-learning-1';
 import {recognitionHints} from './recognition-hints.js?v=20261007-progressive-1';
 import {acquireMicrophone} from './microphone.js?v=20261006-mic-1';
-import {UsageLedger} from './usage.js?v=20261007-free-1';
+import {UsageLedger} from './usage.js?v=20261007-free-2';
 import {SpeechPlayer} from './speech-player.js?v=20261006-playback-2';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-progressive-1';
 import {installAdmin} from './admin.js?v=20261007-resource-1';
@@ -215,7 +215,7 @@ async function translateLocally(cap,source){
     localRequest=new AbortController();result=await api('/translate',{text:cap.text,source,targets:missing,unit:room.unit,context},{signal:localRequest.signal});
     sessionTranslations.set(cacheKey,result);if(sessionTranslations.size>100)sessionTranslations.delete(sessionTranslations.keys().next().value);
    }
-   if(valid()){const completion=localCompletions.get(cap.id);await handle({...base,...result,translations:{...result.translations,...known.translations},status:'ready',...(completion?.text===cap.text?{revision:completion.revision,continuing:false}:{})});}
+   if(room===job.activeRoom&&sessionEpoch===job.epoch&&!valid())ledger.caption({...base,...result,status:'ready'});if(valid()){const completion=localCompletions.get(cap.id);await handle({...base,...result,translations:{...result.translations,...known.translations},status:'ready',...(completion?.text===cap.text?{revision:completion.revision,continuing:false}:{})});}
   }catch(error){if(error.aiFailure?.reason==='quota')aiBlockedUntil=Math.floor(Date.now()/86400000)*86400000+86400000;
    if(valid())await handle({...base,translations:known.translations,status:'failed',error:error.message,aiFailure:error.aiFailure,usage:error.usage});
   }finally{localRequest=null;}
