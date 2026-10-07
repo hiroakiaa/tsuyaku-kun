@@ -584,3 +584,9 @@ body.phone-home #lesson-toolbar .lesson-code-card{margin:0;padding:8px 14px;min-
 
 /* Match the interpreter sidebar in the face mode on wide screens. */
 @media(min-width:1200px) and (min-height:501px){body.phone-home.mode-active[data-active-mode=face] #live:not([hidden]){grid-template-columns:minmax(260px,30%) minmax(0,1fr);}}
+
+/* Keep the category and arrow in a consistent right-hand column. */
+.reference-list button.reference-card{grid-template-columns:minmax(0,1fr) 7em;grid-template-rows:auto minmax(18px,1fr);column-gap:12px;row-gap:8px;align-items:start;}
+.reference-card>.reference-copy{grid-column:1;grid-row:1 / span 2;align-self:center;}
+.reference-card>.reference-category{grid-column:2;grid-row:1;justify-self:center;align-self:start;margin-top:0;max-width:100%;text-align:center;}
+.reference-card>i{grid-column:2;grid-row:2;justify-self:center;align-self:end;line-height:18px;}
