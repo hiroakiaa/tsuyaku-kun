@@ -460,3 +460,18 @@ body.phone-home.mode-active main.phone-home-card{padding:0!important;height:auto
 
 .call-controls:has(#leave[hidden]){grid-template-columns:1fr;}
 .call-controls:has(#leave[hidden]) #microphone{width:100%;}
+
+/* On phones, language and link share the left column beside the QR code. */
+@media(max-width:759px){
+ #call-invite:not([hidden]){display:grid;grid-template-columns:minmax(0,1fr) 116px;grid-template-rows:auto auto;gap:10px 12px;align-items:center;}
+ #call-invite>label{grid-column:1;grid-row:1;min-width:0;margin:0;}
+ #call-invite>.invite-link-area{grid-column:1;grid-row:2;min-width:0;}
+ #call-invite>.qr{grid-column:2;grid-row:1 / span 2;width:116px;height:116px;margin:0;justify-self:end;}
+ #call-invite select,#call-invite .invite-link-row input{min-height:44px;font-size:14px;padding-top:8px;padding-bottom:8px;}
+ #call-invite select{padding-left:10px;padding-right:22px;}
+ #call-invite label{font-size:12px;}
+ #call-invite .invite-copy{width:40px;height:40px;min-height:40px;right:3px;}
+ #call-invite .invite-link-row input{padding-left:10px;padding-right:44px;}
+ #call-invite>.invite-preparing{grid-column:2;grid-row:1 / span 2;min-height:116px;font-size:12px;}
+}
+@media(max-width:359px){#call-invite:not([hidden]){grid-template-columns:minmax(0,1fr) 100px;gap:8px;}#call-invite>.qr{width:100px;height:100px;}}
