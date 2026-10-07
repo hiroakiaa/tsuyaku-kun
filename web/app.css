@@ -406,4 +406,4 @@ header button.brand::after{display:none;}
 #panel-words>.reference-tabs{position:sticky;top:0;z-index:5;background:#f7f9ee;}
 
 /* Change the current speaker language directly from the face controls. */
-.phone-home-card #face-language{width:auto;max-width:100%;min-height:44px;padding:6px 28px 6px 10px;margin:0;font-size:15px!important;border:1px solid #b8d2a6;border-radius:10px;background-color:#fffef9;color:#35573e;}
+.phone-home-card #face-language{width:100%;min-width:0;max-width:100%;min-height:44px;padding:6px 28px 6px 10px;margin:0;font-size:15px!important;border:1px solid #b8d2a6;border-radius:10px;background-color:#fffef9;color:#35573e;}
