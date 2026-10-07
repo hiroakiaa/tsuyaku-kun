@@ -205,7 +205,7 @@ await test('期限切れ認証を閉じ次の有効期限だけを予約する',
  await r.alarm();assert.equal(closed,true);assert.equal(scheduled,expiry);attachment={uid:'test',expires:now+3600000};await r.scheduleAlarm();assert.equal(scheduled,attachment.expires);
 });
 await test('再接続は認証拒否と連続失敗とオフラインで停止する',async()=>{
- const {resourceFailure,mayReconnect}=await import('../web/resource-policy.js');assert.equal(resourceFailure(Error('Daily request limit exceeded')).reason,'quota');assert.equal(resourceFailure(Error('upstream timeout')),null);
+ const {resourceFailure,mayReconnect}=await import('../web/resource-policy.js');assert.equal(resourceFailure(Error('Daily request limit exceeded')).reason,'quota');assert.equal(resourceFailure(Error('upstream timeout')),null);assert.equal(resourceFailure(Error('Exceeded allowed volume of requests in Durable Objects free tier.')).reason,'quota');
  assert.equal(mayReconnect(1008,1),false);assert.equal(mayReconnect(1006,6),false);assert.equal(mayReconnect(1006,1,false),false);assert.equal(mayReconnect(1006,1),true);
 });
 console.log(count+' tests passed');
