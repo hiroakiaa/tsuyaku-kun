@@ -440,3 +440,6 @@ body.phone-home.mode-active main.phone-home-card{padding:0!important;height:auto
 .mode-active #panel-words:not([hidden]){display:block;overflow:auto;}
 @media(min-width:760px){.mode-active #live:not([hidden]){grid-template-columns:minmax(300px,28%) minmax(0,1fr);}}
 @media(max-width:759px){.mode-active #live:not([hidden]){overflow:auto;display:flex;flex-direction:column;}.mode-active .captions{flex:1;min-height:240px;}.mode-active .live-tools{flex:none;overflow:visible;}.mode-active .live-actions{flex:none;}}
+
+.invite-preparing{min-height:180px;display:grid;place-items:center;text-align:center;background:#fffef9;border-radius:12px;color:#62765b;font-size:14px;}
+@media(max-width:759px){.invite-preparing{min-height:140px;}}
