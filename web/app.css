@@ -475,3 +475,15 @@ body.phone-home.mode-active main.phone-home-card{padding:0!important;height:auto
  #call-invite>.invite-preparing{grid-column:2;grid-row:1 / span 2;min-height:116px;font-size:12px;}
 }
 @media(max-width:359px){#call-invite:not([hidden]){grid-template-columns:minmax(0,1fr) 100px;gap:8px;}#call-invite>.qr{width:100px;height:100px;}}
+
+/* Browse references by category rather than mixing every entry. */
+#panel-words .reference-list{display:flex;flex-direction:column;gap:22px;}
+.reference-categories{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px;margin:0 0 8px;}
+.reference-categories .category-filter{flex:none;min-height:40px;padding:8px 14px!important;font-size:14px;white-space:nowrap;border-radius:20px;background:#fffef9;}
+.reference-categories .category-filter[aria-pressed=true]{background:#dcefc6;border-color:#73a64f;color:#284c2d;font-weight:700;}
+.reference-group{min-width:0;}
+.reference-group-title{display:flex;align-items:center;gap:10px;margin:0 0 10px;font-size:17px;color:#355339;}
+.reference-group-count{font-size:12px;background:#e9f1e0;border-radius:12px;padding:2px 8px;color:#647a58;}
+.reference-group-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.reference-group-cards .reference-title{overflow-wrap:anywhere;}
+@media(max-width:759px){.reference-group-cards{grid-template-columns:1fr;}.reference-group-cards .reference-card{min-height:72px!important;padding:14px 16px!important;}.reference-group-title{font-size:16px;}}
