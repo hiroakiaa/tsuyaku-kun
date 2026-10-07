@@ -24,27 +24,6 @@ const status=text=>{$('#connection').textContent=text;};
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;if(tag==='button'&&text){const icons={'接続を確認':'network-wired','再試行':'rotate-right','リンクをコピー':'copy','ひらく':'book-open','候補として送る':'plus','授業をおわる':'stop','じぶんだけホームにもどる':'door-open'};if(icons[text])n.prepend(icon(icons[text]));}return n;}
 function modal(title,content){delete $('#modal').dataset.kind;$('#modal-title').textContent=title;$('#modal-reading')?.remove();$('#modal-body').replaceChildren(content);$('#modal').showModal();}
 
-// One reading preference applies to every mode and survives reloads on this device.
-function applyReadingSize(size){
- const value=['normal','large','extra'].includes(size)?size:'normal';
- document.body.dataset.readingSize=value;
- try{localStorage.setItem('tsuyaku-reading-size',value);}catch{}
- return value;
-}
-try{applyReadingSize(localStorage.getItem('tsuyaku-reading-size'));}catch{applyReadingSize('normal');}
-function showReadingOptions(){
- const content=el('div',undefined,'reading-panel'),group=el('div',undefined,'reading-choices');
- group.setAttribute('role','group');group.setAttribute('aria-label','文字の大きさ');
- const preview=el('p','あしたは、おべんとうを持ってきてください。','reading-preview');
- for(const [value,text] of [['normal','ふつう'],['large','大きめ'],['extra','もっと大きく']]){
-  const button=el('button',text);button.type='button';button.dataset.size=value;
-  button.setAttribute('aria-pressed',String(document.body.dataset.readingSize===value));
-  button.onclick=()=>{applyReadingSize(value);for(const b of group.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.size===value));};group.append(button);
- }
- content.append(el('p','読みやすい大きさをえらんでください。'),group,preview,el('p','どのモードでも、この大きさで読めます。','reading-note'));
- const done=el('button','この大きさにする','primary');done.type='button';done.onclick=()=>$('#modal').close();content.append(done);modal('文字の大きさ',content);
-}
-for(const id of ['reading-options','live-reading-options'])if($('#'+id))$('#'+id).onclick=showReadingOptions;
 function updateLiveGuide(){
  if(!room)return;
 
