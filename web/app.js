@@ -24,12 +24,9 @@ const status=text=>{$('#connection').textContent=text;};
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;if(tag==='button'&&text){const icons={'接続を確認':'network-wired','再試行':'rotate-right','リンクをコピー':'copy','ひらく':'book-open','候補として送る':'plus','授業をおわる':'stop','じぶんだけホームにもどる':'door-open'};if(icons[text])n.prepend(icon(icons[text]));}return n;}
 function modal(title,content){delete $('#modal').dataset.kind;$('#modal-title').textContent=title;$('#modal-reading')?.remove();$('#modal-body').replaceChildren(content);$('#modal').showModal();}
 
-function updateLiveGuide(){
+function updateLiveActions(){
  if(!room)return;
 
- const student=room.mode==='lesson'&&role!=='teacher';
- $('#live-guide').textContent=student?'先生のことばが、ここに出ます。':mic?'マイクがついています。いつもどおり話してください。':'「マイクをONにする」を押すと、話せます。';
- $('#live-guide').dataset.listening=String(mic);
  const endingLesson=room.mode==='lesson'&&role==='teacher';paintButton($('#leave'),endingLesson?'授業をおわる':'もどる','door-open');$('#leave').setAttribute('aria-label',endingLesson?'授業をおわる':'ホームにもどる');
 }
 
@@ -76,7 +73,7 @@ window.addEventListener('online',()=>{if(room&&socket?.readyState===3){clearTime
 function send(data){if(socket?.readyState!==1)return false;socket.send(JSON.stringify(data));return true;}
 async function handle(data){
  if(data.type==='error'){ledger.event('server_error');message(data.error);return;}
- if(data.type==='ready'){clearTimeout(authTimer);connectedAt=Date.now();if(recoveryStartedAt!==null)ledger.event('connection_restored',{recoverySeconds:(connectedAt-recoveryStartedAt)/1000,attempt:reconnectAttempts});recoveryStartedAt=null;reconnectAttempts=0;selfId=data.id;role=data.role;room.mode=data.mode;room.code=data.code||room.code;room.expires=data.expires||room.expires;scheduleRoomExpiry();updateLessonCode();room.unit=data.unit;updateFace();updateLiveGuide();status('接続中');$('#microphone').hidden=room.mode==='lesson'&&role!=='teacher';$('#text-form').hidden=room.mode==='lesson'&&role!=='teacher';$('#invite').hidden=room.mode!=='interpreter'||role!=='teacher';for(const r of data.history||[])renderCaption(r);for(const p of pending.values())send(p);await turnReady;if(data.ended){await handle({type:'ended'});return;}if(mic)startRecognition();return;}
+ if(data.type==='ready'){clearTimeout(authTimer);connectedAt=Date.now();if(recoveryStartedAt!==null)ledger.event('connection_restored',{recoverySeconds:(connectedAt-recoveryStartedAt)/1000,attempt:reconnectAttempts});recoveryStartedAt=null;reconnectAttempts=0;selfId=data.id;role=data.role;room.mode=data.mode;room.code=data.code||room.code;room.expires=data.expires||room.expires;scheduleRoomExpiry();updateLessonCode();room.unit=data.unit;updateFace();updateLiveActions();status('接続中');$('#microphone').hidden=room.mode==='lesson'&&role!=='teacher';$('#text-form').hidden=room.mode==='lesson'&&role!=='teacher';$('#invite').hidden=room.mode!=='interpreter'||role!=='teacher';for(const r of data.history||[])renderCaption(r);for(const p of pending.values())send(p);await turnReady;if(data.ended){await handle({type:'ended'});return;}if(mic)startRecognition();return;}
  if(data.type==='participants'){if(room.mode==='face')return;participants=data.participants||[];$('#participants').replaceChildren(...participants.map(p=>el('span',(p.id===selfId?'あなた':p.name)+(p.role==='teacher'&&room.mode==='lesson'?'・先生':''),'participant')));if(room.mode==='interpreter'&&participants.some(p=>p.id!==selfId)&&$('#modal').open&&$('#modal').dataset.kind==='invite')$('#modal').close();for(const [id,p] of peers){if(!participants.some(x=>x.id===id)){p.pc.close();p.audio.remove();peers.delete(id);}}const epoch=sessionEpoch;await turnReady;if(epoch!==sessionEpoch||!room)return;for(const p of participants){if(p.id===selfId)continue;if(room.mode==='interpreter'&&selfId<p.id||room.mode==='lesson'&&role==='teacher')await offer(p.id);}return;}
  if(data.type==='signal'){await turnReady;await signal(data.from,data.signal);return;}
  if(data.type==='caption')return;
@@ -133,7 +130,7 @@ function updateFace(){const face=room?.mode==='face';$('#face-controls').hidden=
 $('#switch-speaker').onclick=()=>{if(room?.mode!=='face')return;speechPlayer.stop();stopRecognition(true);faceSide=faceSide==='self'?'other':'self';$('#text-input').value='';updateFace();if(mic)startRecognition();ledger.event('speaker_switch');};
 
 function icon(name){const i=el('i',undefined,'fa-solid fa-'+name);i.setAttribute('aria-hidden','true');return i;}
-function paintButton(button,text,name){button.replaceChildren(icon(name),el('span',text));if(button.id==='microphone')queueMicrotask(updateLiveGuide);}
+function paintButton(button,text,name){button.replaceChildren(icon(name),el('span',text));if(button.id==='microphone')queueMicrotask(updateLiveActions);}
 function updateLessonCode(){const visible=room?.mode==='lesson'&&role==='teacher'&&!!room.code;$('#lesson-code-card').hidden=!visible;$('#lesson-room-code').textContent=visible?room.code:'';}
 $('#copy-lesson-code').onclick=async()=>{try{await navigator.clipboard.writeText(room.code);message('4けた番号をコピーしました。');}catch{message('4けた番号：'+room.code);}};
 let joiningLesson=false,lastJoinCode='';async function joinLesson(){const input=$('#lesson-code-input'),code=input.value.replace(/[０-９]/g,c=>String(c.charCodeAt(0)-65296)).trim();input.value=code;if(joiningLesson||!/^\d{4}$/.test(code))return;joiningLesson=true;lastJoinCode=code;$('#join-lesson').disabled=true;input.disabled=true;$('#join-status').textContent='授業に入っています…';try{const r=await api('/lessons/join',{code});await enter(r);$('#join-status').textContent='';}catch(e){await exitModeFullscreen();lastJoinCode='';$('#join-status').textContent=e.message;if(e.connectionIssue)showConnectionError(e);}finally{joiningLesson=false;input.disabled=false;$('#join-lesson').disabled=false;}}
