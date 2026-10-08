@@ -737,3 +737,8 @@ body.phone-home .caption-composer .text-form button{border:0!important;backgroun
 body.phone-home .caption-composer:has(.text-form[hidden]){display:none;}
 @media(max-width:359px){body.phone-home .caption-composer{right:10px;bottom:10px;max-width:calc(100% - 20px);}}
 @media(prefers-reduced-motion:reduce){body.phone-home .caption-composer .text-form{transition:none;}}
+
+/* Conversation panels share the app surface and use only structural dividers. */
+body.phone-home .caption-stage>.captions{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;}
+body.phone-home .face-controls{background:transparent!important;border:0!important;border-bottom:1px solid #343438!important;border-bottom-left-radius:0!important;border-bottom-right-radius:0!important;box-shadow:none!important;}
+@media(min-width:900px){body.phone-home .caption-stage>.captions{border-left:1px solid #343438!important;border-radius:0 26px 26px 0!important;}}
