@@ -1,5 +1,5 @@
 // Private to this browser profile. Only explicitly reviewed translations are stored.
-import {phraseIdentity} from './phrase-equivalence.js?v=20261007-reuse-1';
+import {phraseIdentity} from './phrase-equivalence.js?v=20261008-report-2';
 export const memoryKey=(source,text,unit='')=>JSON.stringify([source,phraseIdentity(text,source),unit]);
 const MAX_ROWS=5000,MAX_BYTES=16*1024*1024;
 export function retentionScore(row,now=Date.now()){return Math.log2(1+Math.min(row.hits||0,1024))*7-Math.max(0,now-(row.lastUsed||row.at||now))/86400000;}
