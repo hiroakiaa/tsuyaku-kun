@@ -15,7 +15,7 @@ export function aiFailure(error){
  return {reason,code,message:messages[reason],evidence:code?'provider_code':reason!=='service'?'provider_message':'unclassified',...(AI_MODELS.has(error?.model)?{model:error.model}:{})};
 }
 export async function runAi(env,model,input){
- try{return await guardedAi(env,model,input,async()=>{const result=await env.AI.run(model,input);if(result?.success===false||result?.errors?.length){const error=Error('AI response error');error.errors=result.errors;throw error;}return result;});}catch(error){const wrapped=Error(error?.message||'AI request failed',{cause:error});wrapped.model=model;throw wrapped;}
+ try{if(env.executionValid&&!await env.executionValid())throw Error('処理の有効期限が切れました。');return await guardedAi(env,model,input,async()=>{if(env.executionValid&&!await env.executionValid())throw Error('処理の有効期限が切れました。');const result=await env.AI.run(model,input);if(result?.success===false||result?.errors?.length){const error=Error('AI response error');error.errors=result.errors;throw error;}return result;});}catch(error){const wrapped=Error(error?.message||'AI request failed',{cause:error});wrapped.model=model;throw wrapped;}
 }
 export function translationBudget(text,targetCount){return Math.min(4096,Math.max(128,Math.ceil(text.length*2.5+40)*targetCount));}
 const phraseKey=text=>String(text||'').normalize('NFC').trim().replace(/。$/,'');
@@ -55,17 +55,17 @@ export async function translateText(env,text,source,targets,context=[],unit='',d
   return {...out,...restoreUncertainSpeech(parseTranslation(result.response||result.choices?.[0]?.message?.content||'',missing),text,protectedSpeech.spans)};
 }
 export default {async fetch(request,env){
-  const origin=request.headers.get('Origin'),url=new URL(request.url);
+  const requestStarted=Date.now(),origin=request.headers.get('Origin'),url=new URL(request.url);
   const allowed=origin===env.ALLOWED_ORIGIN||origin==='http://localhost:8787';
   const cors=response=>{const h=new Headers(response.headers);if(allowed){h.set('Access-Control-Allow-Origin',origin);h.set('Access-Control-Allow-Headers','Content-Type, Authorization, X-Term-Hints');h.set('Access-Control-Allow-Methods','GET, POST, OPTIONS');h.set('Vary','Origin');}return new Response(response.body,{status:response.status,headers:h});};
   if(request.method==='OPTIONS')return allowed?cors(new Response(null,{status:204})):error('接続元を確認してください。',403);
-  if(url.pathname==='/health')return cors(json({ok:true,app:'通訳君',version:'0.6.8',safety:'20261008-budget-1',sheets:!!env.SHEETS_BRIDGE}));
+  if(url.pathname==='/health')return cors(json({ok:true,app:'通訳君',version:'0.6.9',safety:'20261008-lifecycle-1',sheets:!!env.SHEETS_BRIDGE}));
   if(!allowed)return error('接続元を確認してください。',403);
   try{
     
     const match=url.pathname.match(/^\/rooms\/([a-f0-9]{32})(\/socket)?$/);
     if(match){if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'socket:'+(request.headers.get('CF-Connecting-IP')||'local')})).success))return cors(error('少し待ってから再試行してください。',429));const room=env.ROOMS.get(env.ROOMS.idFromName(match[1]));const r=await room.fetch(request);return r.status===101?r:cors(r);}
-    const token=(request.headers.get('Authorization')||'').replace(/^Bearer /,'');const auth=await verifyToken(token,env.FIREBASE_PROJECT);env={...env,budgetUid:auth.uid};if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'user:'+auth.uid})).success))return cors(error('少し待ってから再試行してください。',429));
+    const token=(request.headers.get('Authorization')||'').replace(/^Bearer /,'');const auth=await verifyToken(token,env.FIREBASE_PROJECT);env={...env,budgetUid:auth.uid,executionValid:()=>!request.signal.aborted&&Date.now()<requestStarted+25000};if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'user:'+auth.uid})).success))return cors(error('少し待ってから再試行してください。',429));
     if(url.pathname==='/transcribe'&&request.method==='POST'){
       const language=url.searchParams.get('language')||'ja';if(!catalog.languages.some(l=>l.code===language))return cors(error('言語を確認してください。'));
       if(request.headers.get('Content-Type')!=='audio/wav')return cors(error('音声形式を確認してください。',415));
@@ -183,46 +183,64 @@ export class TranslationRoom {
       if(room.ended)throw Error('この授業は終了しました。');
       if(data.type!=='caption')return;
       if(room.mode==='lesson'&&a.role!=='teacher')throw Error('授業では先生の発言を表示します。');
+      const admission=(this.admissionTail||Promise.resolve()).then(()=>this.acceptCaption(ws,a,room,data));
+      this.admissionTail=admission.catch(()=>{});await admission;
+    }catch(e){this.send(ws,{type:'error',error:e.message||'接続を確認してください。'});if(!ws.deserializeAttachment()?.uid)ws.close(1008,'auth');}
+  }
+  async acceptCaption(ws,a,room,data){
       const cap=validateCaption(data),id=a.id+'_'+cap.id;
-      this.broadcast({type:'caption',id,speaker:captionParticipant(room,a,data).name,source:captionParticipant(room,a,data).language,text:cap.text,final:cap.final,revision:cap.revision,continuing:cap.continuing,at:Date.now()});
-      if(!cap.final)return;
-      const existing=await this.ctx.storage.get('caption:'+id);if(existing?.text===cap.text&&existing.status!=='failed'&&cap.revision<=(existing.revision||0)&&cap.continuing===!!existing.continuing)return;
-      if(!existing&&(await this.ctx.storage.get('captionCount')||0)>=3000)throw Error('この授業は3000文に達しました。新しいルームを作ってください。');
-      if(!existing)await this.ctx.storage.put('captionCount',(await this.ctx.storage.get('captionCount')||0)+1);
+      if(!await this.captionIsLive(ws,room))return;
+      if(!cap.final){this.broadcast({type:'caption',id,speaker:captionParticipant(room,a,data).name,source:captionParticipant(room,a,data).language,text:cap.text,final:false,revision:cap.revision,continuing:cap.continuing,at:Date.now()});return;}
+      const existing=await this.ctx.storage.get('caption:'+id);if(existing?.text===cap.text&&cap.revision<=(existing.revision||0)&&cap.continuing===!!existing.continuing){
+        if(['ready','failed'].includes(existing.status))this.send(ws,{type:'translation',...existing});
+        else if(this.jobs.has(id))this.ctx.waitUntil(this.jobs.get(id).then(async()=>{const saved=await this.ctx.storage.get('caption:'+id);if(['ready','failed'].includes(saved?.status)&&await this.captionIsLive(ws,room))this.send(ws,{type:'translation',...saved});}));
+        else if(!this.queuedCaptions.has(id)){const interrupted={...existing,status:'failed',error:'前の翻訳処理の完了を確認できません。必要なら再試行してください。',aiFailure:{reason:'service',evidence:'unclassified'}};await this.ctx.storage.put('caption:'+id,interrupted);this.send(ws,{type:'translation',...interrupted});}
+        return;
+      }
       if(existing&&cap.revision<(existing.revision||0))return;
       const queued=this.queuedCaptions.get(id);
       if(queued&&cap.revision<queued.cap.revision)return;
       if(data.revision!==undefined&&existing&&cap.revision===(existing.revision||0)&&existing.text!==cap.text)return;
-      if(this.queuedCaptions.size>=24&&!this.queuedCaptions.has(id))throw Error('翻訳待ちが増えています。短く区切ってください。');this.queuedCaptions.set(id,{ws,a:captionParticipant(room,a,data),room,cap,queuedAt:Date.now()});
+      if(this.queuedCaptions.size>=24&&!this.queuedCaptions.has(id)){await this.rejectCaption(ws,id,cap,'翻訳待ちが増えています。短く区切ってください。');return;}
+      if(!existing&&(await this.ctx.storage.get('captionCount')||0)>=3000)throw Error('この授業は3000文に達しました。新しいルームを作ってください。');
+      if(!existing){await this.ctx.storage.put('captionCount',(await this.ctx.storage.get('captionCount')||0)+1);await this.ctx.storage.put('caption:'+id,{id,source:captionParticipant(room,a,data).language,speaker:captionParticipant(room,a,data).name,text:cap.text,revision:cap.revision,continuing:cap.continuing,final:true,at:Date.now(),status:'queued'});}
+      this.queuedCaptions.set(id,{ws,a:captionParticipant(room,a,data),room,cap,queuedAt:Date.now()});
       if(this.jobs.has(id))return;
       this.startCaptionJob(id);
-    }catch(e){this.send(ws,{type:'error',error:e.message||'接続を確認してください。'});if(!ws.deserializeAttachment()?.uid)ws.close(1008,'auth');}
   }
+  async rejectCaption(ws,id,cap,error){const saved=await this.ctx.storage.get('caption:'+id);if(saved?.status==='queued'&&(saved.revision||0)<=(cap.revision||0))await this.ctx.storage.put('caption:'+id,{...saved,status:'failed',error,usage:{inputTokens:0,outputTokens:0,cacheHit:true},usageId:'rejected-'+id});if(!ws.deserializeAttachment()?.left)this.send(ws,{type:'caption_rejected',id,revision:cap.revision||0,error});}
   startCaptionJob(id){
-    if(this.jobs.has(id))return;
-    const task=(async()=>{
-        while(this.queuedCaptions.has(id)){
-          const next=this.queuedCaptions.get(id);this.queuedCaptions.delete(id);
-          if((await this.info())?.ended||!(await this.info())||next.room.expires<=Date.now()||Date.now()-(next.queuedAt||Date.now())>15000||next.ws.deserializeAttachment()?.left||!this.participants().some(p=>p.ws===next.ws))continue;while(this.activeTranslations>=2){await new Promise(resolve=>setTimeout(resolve,50));if(next.ws.deserializeAttachment()?.left||Date.now()-(next.queuedAt||Date.now())>15000)break;}if(next.ws.deserializeAttachment()?.left||Date.now()-(next.queuedAt||Date.now())>15000)continue;
-          const saved=await this.ctx.storage.get('caption:'+id);
-          if(saved?.text===next.cap.text&&(saved.status==='ready'||next.cap.metadataOnly&&saved.status==='failed')){
-            const updated={...saved,revision:next.cap.revision,continuing:next.cap.continuing};
-            await this.ctx.storage.put('caption:'+id,updated);this.broadcast({type:'translation',...updated});
-          }else{this.activeTranslations++;try{await this.translate(next.ws,next.a,next.room,id,next.cap.text,next.cap);}finally{this.activeTranslations--;}}
-        }
-      })().finally(()=>{this.jobs.delete(id);if(this.queuedCaptions.has(id))this.startCaptionJob(id);});this.jobs.set(id,task);this.ctx.waitUntil(task);
+    // Keep waiting work in the bounded queue; never create a timer per waiting caption.
+    if(this.jobs.has(id)||this.jobs.size>=2||!this.queuedCaptions.has(id))return;
+    const task=Promise.resolve().then(async()=>{
+      while(this.queuedCaptions.has(id)){
+        const next=this.queuedCaptions.get(id);this.queuedCaptions.delete(id);
+        if(!await this.captionIsLive(next.ws,next.room,next.queuedAt)){await this.rejectCaption(next.ws,id,next.cap,'翻訳待ちの期限が切れました。もう一度伝えてください。');continue;}
+        const saved=await this.ctx.storage.get('caption:'+id);
+        if(saved?.text===next.cap.text&&(saved.status==='ready'||next.cap.metadataOnly&&saved.status==='failed')){
+          const updated={...saved,revision:next.cap.revision,continuing:next.cap.continuing};
+          if(!await this.captionIsLive(next.ws,next.room,next.queuedAt))continue;
+          await this.ctx.storage.put('caption:'+id,updated);this.broadcast({type:'translation',...updated});
+        }else{this.activeTranslations++;try{await this.translate(next.ws,next.a,next.room,id,next.cap.text,next.cap,next.queuedAt);}finally{this.activeTranslations--;}}
+      }
+    }).finally(()=>{this.jobs.delete(id);for(const key of this.queuedCaptions.keys()){if(this.jobs.size>=2)break;this.startCaptionJob(key);}});
+    this.jobs.set(id,task);this.ctx.waitUntil(task);
   }
-  async translate(ws,a,room,id,text,update={}){
-    const start=Date.now();if((await this.info())?.ended||!(await this.info())||room.expires<=start||ws.deserializeAttachment()?.left||!this.participants().some(p=>p.ws===ws))return;let usage;const record={id,speaker:a.name,source:spokenLanguage(a.language),text,final:true,revision:update.revision??0,continuing:update.continuing===true,usageId:crypto.randomUUID(),at:start,status:'translating'};
+  async captionIsLive(ws,room,queuedAt=Date.now()){
+    const current=await this.info(),participant=ws.deserializeAttachment();
+    return !!current&&!current.ended&&current.expires>Date.now()&&room.expires>Date.now()&&Date.now()-queuedAt<15000&&!participant?.left&&participant?.expires>Date.now()&&this.participants().some(p=>p.ws===ws);
+  }
+  async translate(ws,a,room,id,text,update={},queuedAt=Date.now()){
+    const start=Date.now();if(!await this.captionIsLive(ws,room,queuedAt))return;let usage;const record={id,speaker:a.name,source:spokenLanguage(a.language),text,final:true,revision:update.revision??0,continuing:update.continuing===true,usageId:crypto.randomUUID(),at:start,status:'translating'};
     await this.ctx.storage.put('caption:'+id,record);
     try{
       const languages=this.participants().map(p=>p.a.language);const targets=room.mode==='interpreter'?[...new Set([...languages,...(languages.some(code=>code!=='en')?['en']:[])])]:[...new Set(['ja','en',...this.participants().flatMap(p=>[p.a.language,p.a.viewLanguage])])];
       if(this.env.SHEETS_BRIDGE&&Date.now()>this.catalogUntil){this.catalogUntil=Date.now()+300000;this.ctx.waitUntil(bridge(this.env,a.token,'tsuyakuCatalog').then(r=>{if(r)this.cachedCatalog=r;}).catch(()=>{}));}
     const all=this.cachedCatalog;
       const past=(await this.ctx.storage.get('recent')||[]).map(r=>r.text);
-      if((await this.info())?.ended||room.expires<=Date.now()||ws.deserializeAttachment()?.left||!this.participants().some(p=>p.ws===ws))return;if(Date.now()<this.aiBlockedUntil)throw Object.assign(Error('quota'),{code:3036});const translations=await translateText({...this.env,budgetUid:a.uid},text,a.language,targets,past,room.unit,all,u=>{usage=u;});
-      if(!(await this.info())||room.expires<=Date.now())return;const done={...record,translations,usage,status:'ready',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,done);const recent=await this.ctx.storage.get('recent')||[];await this.ctx.storage.put('recent',[...recent.filter(r=>r.id!==id),{id,at:start,text}].sort((a,b)=>a.at-b.at).slice(-3));this.broadcast({type:'translation',...done});if(a.language==='ja'&&!usage?.cacheHit&&((all.learnableTexts||[]).includes(text)||(all.phrases||[]).some(p=>p.jaText===text)))this.ctx.waitUntil(bridge(this.env,a.token,'tsuyakuLearn',{text,translations}).catch(()=>{}));
-    }catch(e){if(['quota','billing','auth'].includes(aiFailure(e).reason))this.aiBlockedUntil=Math.floor(Date.now()/86400000)*86400000+86400000;if(!(await this.info())||room.expires<=Date.now())return;const failed={...record,usage,status:'failed',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,failed);this.broadcast({type:'translation',...failed,error:aiFailure(e).message,aiFailure:aiFailure(e)});}
+      if(!await this.captionIsLive(ws,room,queuedAt))return;if(Date.now()<this.aiBlockedUntil)throw Object.assign(Error('quota'),{code:3036});const translations=await translateText({...this.env,budgetUid:a.uid,executionValid:()=>this.captionIsLive(ws,room,queuedAt)},text,a.language,targets,past,room.unit,all,u=>{usage=u;});
+      if(!(await this.info())||room.expires<=Date.now())return;const publish=await this.captionIsLive(ws,room);const done={...record,translations,usage,status:'ready',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,done);const recent=await this.ctx.storage.get('recent')||[];await this.ctx.storage.put('recent',[...recent.filter(r=>r.id!==id),{id,at:start,text}].sort((a,b)=>a.at-b.at).slice(-3));if(publish)this.broadcast({type:'translation',...done});if(publish&&a.language==='ja'&&!usage?.cacheHit&&((all.learnableTexts||[]).includes(text)||(all.phrases||[]).some(p=>p.jaText===text)))this.ctx.waitUntil(bridge(this.env,a.token,'tsuyakuLearn',{text,translations}).catch(()=>{}));
+    }catch(e){if(['quota','billing','auth'].includes(aiFailure(e).reason))this.aiBlockedUntil=Math.floor(Date.now()/86400000)*86400000+86400000;if(!(await this.info())||room.expires<=Date.now())return;const publish=await this.captionIsLive(ws,room),failure=aiFailure(e),failed={...record,usage,status:'failed',latencyMs:Date.now()-start,error:failure.message,aiFailure:failure};await this.ctx.storage.put('caption:'+id,failed);if(publish)this.broadcast({type:'translation',...failed});}
   }
   async webSocketClose(ws){for(const [id,job]of this.queuedCaptions)if(job.ws===ws)this.queuedCaptions.delete(id);const a=ws.deserializeAttachment();if(a?.left)return;ws.serializeAttachment({...a,left:true});try{ws.close(1000,'left');}catch{}if(a?.uid)this.broadcast({type:'notice',text:a.name+'さんが退室しました。'});this.roster();await this.scheduleAlarm();}
   async webSocketError(ws){await this.webSocketClose(ws);}
