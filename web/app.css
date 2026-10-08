@@ -675,7 +675,7 @@ body.phone-home .reference-title{font-size:17px;font-weight:600;letter-spacing:-
 body.phone-home .reference-category{color:#909096;font-size:11px}
 body.phone-home .category-filter{border-radius:999px!important;font-size:12px;min-height:40px!important;padding:8px 15px!important}
 body.phone-home #lesson-role-picker{gap:20px;max-width:640px}
-body.phone-home #lesson-role-picker button{min-height:170px;border-radius:24px!important;font-size:25px;font-weight:600;gap:20px;background:#1c1c1f!important;border-color:#343438!important}
+body.phone-home #lesson-role-picker button{min-height:170px;border-radius:0 0 0 24px!important;font-size:25px;font-weight:600;gap:20px;background:#1c1c1f!important;border-color:#343438!important}
 body.phone-home #lesson-role-picker button i{font-size:38px;color:#dddde1}
 body.phone-home dialog{background:#1c1c1f!important;border:1px solid #3a3a3e!important;border-radius:26px!important;padding:24px;box-shadow:0 32px 96px rgba(0,0,0,.55)}
 body.phone-home .modal-heading{background:transparent!important;margin-bottom:24px;gap:20px}
@@ -713,7 +713,7 @@ body.phone-home #panel-words .search-field input{border:0!important;box-shadow:n
 body.phone-home #panel-words .search-field:focus-within{outline:2px solid #a1a1a6;outline-offset:2px}
 body.phone-home #panel-words .category-filter{border:0!important;box-shadow:none!important}
 body.phone-home #panel-words button.reference-card,body.phone-home #panel-words button.reference-card:hover,body.phone-home #panel-words button.reference-card:active{border:0!important;box-shadow:none!important;transform:none!important;background:#1c1c1f}
-body.phone-home #lesson-role-picker button{border:0;border-left:1px solid #3a3a3e;border-bottom:1px solid #3a3a3e;border-radius:0 0 0 24px;background:#101011!important;box-shadow:none!important}
+body.phone-home #lesson-role-picker button{border:0;border-left:1px solid #3a3a3e;border-bottom:1px solid #3a3a3e;border-radius:0 0 0 24px!important;background:#101011!important;box-shadow:none!important}
 body.phone-home #lesson-role-picker button:hover{border-left-color:#77777d;border-bottom-color:#77777d}
 
 /* Reference playback keeps the active text bright while paused. */
