@@ -240,4 +240,13 @@ await test('確認済み訳の保存は頻度と新しさを優先し件数と�
 await test('端末DBが使えなくても確認済み訳と共有辞書は利用できる',async()=>{
  const {TranslationMemory}=await import('../web/translation-memory.js');const m=new TranslationMemory({getItem:()=>null,setItem(){throw Error('full');}},{get:async()=>null,put:async()=>false});assert.equal(m.remember('ja','保存した文',{en:'Reviewed'}),true);assert.equal((await m.lookupAsync('ja','保存した文',['en'])).translations.en,'Reviewed');assert.equal(await m.lookupAsync('ja','未登録',['en']),null);
 });
+
+await test('非発話の除外をネットワーク障害と誤診断しない',async()=>{
+ const {safeConnectionRecord,explainConnection}=await import('../web/network.js');
+ const r=safeConnectionRecord({stage:'browser_speech',operation:'transcribe',code:'filtered',filterReason:'nonverbal',endpoint:'',at:Date.now()});assert.equal(r.code,'filtered');assert.equal(r.filterReason,'nonverbal');const report=explainConnection([r],[],Date.now());assert(!JSON.stringify(report).includes('DNS解決・HTTPS'));
+});
+await test('ブラウザー認識のくしゃみは前後の字幕を結合しない',async()=>{
+ const {createBrowserRecognition}=await import('../web/caption-browser.js');let native;class Native{constructor(){native=this;}start(){}abort(){}}
+ const diagnostics=[],events=[];const R=createBrowserRecognition({language:'ja',Native,onDiagnostic:r=>diagnostics.push(r)}),r=new R();r.onresult=e=>events.push(e);r.start();const send=text=>{const row=[{transcript:text}];row.isFinal=true;native.onresult({resultIndex:0,results:[row]});};send('10月9日');send('ハックション！');send('はい');assert(diagnostics.some(d=>d.code==='filtered'&&d.filterReason==='nonverbal'));assert(!events.some(e=>e.results[e.resultIndex][0].transcript.includes('ハックション')));assert(!events.some(e=>e.results[e.resultIndex][0].transcript.includes('10月9日 はい')));assert(events.some(e=>e.results[e.resultIndex][0].transcript==='はい'));r.abort();
+});
 console.log(count+' tests passed');
