@@ -713,5 +713,5 @@ body.phone-home #panel-words .search-field input{border:0!important;box-shadow:n
 body.phone-home #panel-words .search-field:focus-within{outline:2px solid #a1a1a6;outline-offset:2px}
 body.phone-home #panel-words .category-filter{border:0!important;box-shadow:none!important}
 body.phone-home #panel-words button.reference-card,body.phone-home #panel-words button.reference-card:hover,body.phone-home #panel-words button.reference-card:active{border:0!important;box-shadow:none!important;transform:none!important;background:#1c1c1f}
-body.phone-home #lesson-role-picker button{border:0;border-left:1px solid #3a3a3e;border-bottom:1px solid #3a3a3e;border-radius:0 0 0 24px;background:#1c1c1f!important;box-shadow:none!important}
+body.phone-home #lesson-role-picker button{border:0;border-left:1px solid #3a3a3e;border-bottom:1px solid #3a3a3e;border-radius:0 0 0 24px;background:#101011!important;box-shadow:none!important}
 body.phone-home #lesson-role-picker button:hover{border-left-color:#77777d;border-bottom-color:#77777d}
