@@ -722,3 +722,5 @@ body.phone-home #modal-body .reference-language-text{color:#a1a1a6;transition:co
 body.phone-home #modal-body .reference-language-text .speech-word-active{color:#fff;animation:speech-word-in .16s ease}
 @keyframes speech-word-in{from{color:#a1a1a6}to{color:#fff}}
 @media(prefers-reduced-motion:reduce){body.phone-home #modal-body .reference-language-text{transition:none}}
+
+body.phone-home #modal-body .reference-language-text .speech-words-spoken{color:#fff}
