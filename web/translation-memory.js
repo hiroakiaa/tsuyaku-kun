@@ -27,11 +27,11 @@ export class TranslationMemory {
  for(const code of targets)if(!out[code]){const candidates=[...bank,...phraseRows,...(glossary?[glossary]:[])];const values=[...new Set(candidates.map(r=>r[translationField(code)]||(r===glossary&&code==='en'?r.en:'')).filter(v=>typeof v==='string'&&v.trim()&&!/^[#=]/.test(v)))];if(values.length===1)out[code]=values[0];}
  const matches=bucket?.materials||[];
  for(const code of targets)if(!out[code]){const values=[...new Set(matches.map(r=>translationOf(r,code)).filter(v=>typeof v==='string'&&v.trim()&&!/^[#=]/.test(v)))];if(values.length===1)out[code]=values[0];}
- if(partial)return {translations:out,missing:targets.filter(c=>!out[c]),source:row?'reviewed':'spreadsheet'};
+ if(partial)return {translations:out,missing:targets.filter(c=>!out[c]),source:row?'reviewed':'spreadsheet',diagnostic:{reason:targets.every(c=>out[c])?'complete':row||bucket?'missing_languages':'no_match',missing:targets.filter(c=>!out[c])}};
  return targets.every(c=>typeof out[c]==='string'&&out[c].trim())?{translations:out,source:row?'reviewed':'spreadsheet'}:null;}
  async lookupAsync(source,text,targets,unit='',catalog={},partial=false){
  text=exact(text);const hotResult=this.lookup(source,text,targets,unit,catalog,partial);if(hotResult&&(!partial||!hotResult.missing.length))return hotResult;
- let timer;const id=memoryKey(source,text,unit),legacy=JSON.stringify([source,text,unit]);const read=async()=>await this.store.get(id)||(id!==legacy?await this.store.get(legacy):null);const row=await Promise.race([read(),new Promise(resolve=>timer=setTimeout(()=>resolve(null),750))]);clearTimeout(timer);
+ let timer;const id=memoryKey(source,text,unit),legacy=JSON.stringify([source,text,unit]);const read=async()=>await this.store.get(id)||(id!==legacy?await this.store.get(legacy):null);const row=await Promise.race([read(),new Promise(resolve=>timer=setTimeout(()=>resolve(null),120))]);clearTimeout(timer);
  if(row&&row.source===source&&phraseIdentity(row.text,source)===phraseIdentity(text,source)&&row.unit===unit&&row.translations){row.lastUsed=Date.now();row.hits=(row.hits||0)+1;this.hot.set(id,row);this.persist();void this.store.put(row);return this.lookup(source,text,targets,unit,catalog,partial);}return hotResult;
  }
  correct(heard,corrected,unit=''){heard=exact(heard);corrected=exact(corrected);if(!heard||!corrected||heard===corrected||heard.length>600||corrected.length>600)return;const existing=this.corrections.find(r=>r.heard===heard&&r.unit===unit);if(existing)existing.corrected=corrected;else this.corrections.push({heard,corrected,unit});this.persist();}
