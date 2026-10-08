@@ -715,3 +715,9 @@ body.phone-home #panel-words .category-filter{border:0!important;box-shadow:none
 body.phone-home #panel-words button.reference-card,body.phone-home #panel-words button.reference-card:hover,body.phone-home #panel-words button.reference-card:active{border:0!important;box-shadow:none!important;transform:none!important;background:#1c1c1f}
 body.phone-home #lesson-role-picker button{border:0;border-left:1px solid #3a3a3e;border-bottom:1px solid #3a3a3e;border-radius:0 0 0 24px;background:#101011!important;box-shadow:none!important}
 body.phone-home #lesson-role-picker button:hover{border-left-color:#77777d;border-bottom-color:#77777d}
+
+/* Reference playback keeps the active text bright while paused. */
+body.phone-home #modal-body .reference-language{border:0!important;box-shadow:none!important}
+body.phone-home #modal-body .reference-language-text{color:#a1a1a6;transition:color .28s ease}
+body.phone-home #modal-body .reference-language[data-speech-state="playing"] .reference-language-text,body.phone-home #modal-body .reference-language[data-speech-state="paused"] .reference-language-text{color:#fff!important}
+@media(prefers-reduced-motion:reduce){body.phone-home #modal-body .reference-language-text{transition:none}}
