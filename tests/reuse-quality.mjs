@@ -27,3 +27,8 @@ assert.equal(summary.withoutAIRate,.5);assert.equal(summary.withoutAI,1);assert.
 const large={phrases:Array.from({length:10000},(_,i)=>({jaText:'登録文'+i,enText:'Entry '+i})).concat(phrase)};
 assert.equal(m.lookup('ja','必要な書類を教えてください',['en'],'',large).translations.en,phrase.enText);
 console.log('Reuse quality: variants, protected facts, conflicts, reviewed corrections, counters and 10,000-row index passed');
+
+const partial=m.lookup('ja',phrase.jaText,['en','es'],'',data,true);
+assert.equal(partial.diagnostic.reason,'missing_languages');assert.deepEqual(partial.diagnostic.missing,['es']);
+assert.equal(m.lookup('ja','未登録の文章',['en'],'',data,true).diagnostic.reason,'no_match');
+ledger.reuseLookup(partial.diagnostic);assert.equal(ledger.current.reuseLookupCounts.missing_languages,1);assert.equal(ledger.current.missingTranslationLanguages.es,1);
