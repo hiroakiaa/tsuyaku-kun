@@ -174,7 +174,18 @@ function showReference(row,type){
 const sharedTerminal=localStorage.getItem('tsuyaku-device-mode')!=='personal',privateRows=new Map(),privateStorage={getItem:key=>privateRows.get(key)||null,setItem:(key,value)=>privateRows.set(key,value)};const translationMemory=new TranslationMemory(sharedTerminal?privateStorage:localStorage,sharedTerminal?new ReviewedStore(null):undefined);
 const personalPhrases=new PersonalPhrases(sharedTerminal?privateStorage:localStorage);
 const referenceCategory={phrase:'すべて',term:'すべて'};
-function referenceCategoryName(row){return String(row.category||row.subject||'その他').trim()||'その他';}
+function referenceCategoryName(row){
+ const c=String(row.category||row.subject||'その他').trim();
+ if(c==='あなたのよく使う文')return c;
+ const groups={
+ '授業・勉強':['授業・勉強','授業一般','数学','学習','成績','進路','体育','図工','水泳','句読点'],
+ '持ち物・提出':['持ち物・提出','持ち物','提出物','服装'],
+ '学校生活・行事':['学校生活・行事','学校生活','行事・部活動','行事','部活動','給食','生活','校内','学校','登下校','交通','友達'],
+ '健康・安全':['健康・安全','休み・健康・安全','欠席・遅刻','安全','体調','健康'],
+ '連絡・相談':['連絡・相談','会話・連絡','家族・相談','基本','面談','家庭','連絡','相談','その他','カテゴリー','追加されたことば'],
+ 'お金・手続き':['お金・手続き','手続き','お金','支払い','集金']};
+ return Object.keys(groups).find(k=>groups[k].includes(c))||'連絡・相談';
+}
 const referenceVisibleLimits=new Map();
 function renderReferences(){for(const [type,list,q,rawRows]of[['phrase',$('#phrase-list'),$('#phrase-search').value,[...personalPhrases.list(),...catalog.phrases]],['term',$('#term-list'),$('#term-search').value,[...personalPhrases.list('term'),...catalog.glossary,...catalog.terms]]]){
  const rows=[...new Map(rawRows.map(r=>[r.jaText||r.ja||r.title,r])).values()];const categories=[...new Set(rows.map(referenceCategoryName))].sort((a,b)=>a==='あなたのよく使う文'?-1:b==='あなたのよく使う文'?1:a.localeCompare(b,'ja'));
