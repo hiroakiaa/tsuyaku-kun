@@ -9,14 +9,14 @@ import {SpeechPlayer} from './speech-player.js?v=20261006-playback-2';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-progressive-1';
 import {installAdmin} from './admin.js?v=20261008-greeting-reuse-1';
 import {config} from './config.js';
-import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection} from './network.js?v=20261007-free-1';
+import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection} from './network.js?v=20261008-speech-filter-1';
 import {catalog as seed} from '../server/catalog.js?v=20261006-easy-1';
 import {translationOf,spokenLanguage,withEasyJapanese} from './core.js?v=20261007-progressive-1';
 import {speakerCaption,speakerInfo} from './face-mode.js?v=20261006-school-1';
 import {callCaptionLanguages,isDisplayableCaption} from './call-mode.js?v=20261006-easy-1';
 import {listHistory} from './history.js?v=20261006-school-1';
 import {createServerRecognition} from './caption-server.js?v=20261007-free-1';
-import {createBrowserRecognition} from './caption-browser.js?v=20261007-free-1';
+import {createBrowserRecognition} from './caption-browser.js?v=20261008-speech-filter-1';
 const browserSpeechUnavailable=new Set();
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 function readCatalogCache(){try{const saved=JSON.parse(localStorage.getItem('tsuyaku-catalog-v1'));if(saved&&Array.isArray(saved.languages)&&Array.isArray(saved.phrases)&&Array.isArray(saved.terms)&&Array.isArray(saved.glossary))return saved;}catch{}return seed;}
