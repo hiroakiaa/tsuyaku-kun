@@ -16,14 +16,16 @@ export function createBrowserRecognition({language, Native, onDiagnostic = () =>
         if(!this.active)return;
         for(let i=event.resultIndex;i<event.results.length;i++){
           const result=event.results[i],text=result?.[0]?.transcript?.trim();
-          if(!result?.isFinal||!text||nonSpeechReason({text},language))continue;
+          if(!result?.isFinal||!text)continue;
+          const rejected=nonSpeechReason({text},language);
+          if(rejected){this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:rejected});continue;}
           // Native speech events do not expose PCM timings: leave these unmeasured.
           this.acceptText(text,{recognitionReadyAt:Date.now(),boundary:'pause'});
         }
       };
       native.onerror=event=>{
         if(!this.active)return;
-        if(event.error==='no-speech')return;
+        if(event.error==='no-speech'){this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:'empty'});return;}
         const error=['not-allowed','service-not-allowed'].includes(event.error)?'auth':event.error==='audio-capture'?'audio-capture':'service';
         onDiagnostic({code:'browser_speech_error',recognitionCode:event.error});
         this.fail(error);
