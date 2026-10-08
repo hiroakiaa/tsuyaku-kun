@@ -1,13 +1,13 @@
 import {recordResource} from './resource-usage.js?v=20261007-free-2';
 import {mayReconnect} from './resource-policy.js';
-import {TranslationMemory} from './translation-memory.js?v=20261008-analysis-1';
+import {TranslationMemory} from './translation-memory.js?v=20261008-greeting-reuse-1';
 import {PersonalPhrases} from './personal-phrases.js?v=20261007-learning-1';
 import {recognitionHints} from './recognition-hints.js?v=20261007-progressive-1';
 import {acquireMicrophone} from './microphone.js?v=20261006-mic-1';
 import {UsageLedger} from './usage.js?v=20261007-reuse-1';
 import {SpeechPlayer} from './speech-player.js?v=20261006-playback-2';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-progressive-1';
-import {installAdmin} from './admin.js?v=20261008-analysis-1';
+import {installAdmin} from './admin.js?v=20261008-greeting-reuse-1';
 import {config} from './config.js';
 import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection} from './network.js?v=20261007-free-1';
 import {catalog as seed} from '../server/catalog.js?v=20261006-easy-1';
@@ -204,7 +204,8 @@ async function translateLocally(cap,source){
   if(room!==job.activeRoom||sessionEpoch!==job.epoch)continue;
   const {cap,source}=job,revision=cap.revision??0,id=selfId+'_'+cap.id;
   const targets=[...new Set(['ja',$('#face-self-language').value,$('#face-other-language').value,'en'])].filter(c=>c!==source);
-  const context=[...records.values()].filter(r=>r.status==='ready'&&r.id!==id).slice(-3).map(r=>r.text);
+  const contextIndependent=source==='ja'&&/^(こんにちは|おはようございます|こんばんは)[。？?！!]?$/u.test(cap.text.trim());
+  const context=contextIndependent?[]:[...records.values()].filter(r=>r.status==='ready'&&r.id!==id).slice(-3).map(r=>r.text);
   const known=translationMemory.lookupAsync?await translationMemory.lookupAsync(source,cap.text,targets,job.activeRoom.unit,catalog,true):translationMemory.lookup(source,cap.text,targets,job.activeRoom.unit,catalog,true);if(room!==job.activeRoom||sessionEpoch!==job.epoch||localRevisions.get(cap.id)!==revision)continue;ledger.reuseLookup(known.diagnostic);const missing=known.missing;const cacheKey=JSON.stringify([source,cap.text,missing,room.unit,context]);
   const base={type:'translation',id,source,text:cap.text,speaker:cap.speaker||'自分',final:true,revision,continuing:!!cap.continuing,at:Date.now(),usageId:'local-'+cap.id+'-'+revision};
   const valid=()=>room===job.activeRoom&&sessionEpoch===job.epoch&&localRevisions.get(cap.id)===revision;
