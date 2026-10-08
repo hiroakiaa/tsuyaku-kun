@@ -742,3 +742,9 @@ body.phone-home .caption-composer:has(.text-form[hidden]){display:none;}
 body.phone-home .caption-stage>.captions{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;}
 body.phone-home .face-controls{background:transparent!important;border:0!important;border-bottom:1px solid #343438!important;border-bottom-left-radius:0!important;border-bottom-right-radius:0!important;box-shadow:none!important;}
 @media(min-width:900px){body.phone-home .caption-stage>.captions{border-left:1px solid #343438!important;border-radius:0 26px 26px 0!important;}}
+
+/* Borderless entry controls and explicit microphone preparation feedback. */
+body.phone-home .caption-composer,body.phone-home #text-toggle,body.phone-home #switch-speaker,body.phone-home #panel-words .search-field,body.phone-home #panel-words .search-field input{border:0!important;box-shadow:none!important;}
+body.phone-home #microphone[aria-busy=true] i{animation:mic-preparing 1s linear infinite;}
+@keyframes mic-preparing{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){body.phone-home #microphone[aria-busy=true] i{animation:none;}}
