@@ -28,7 +28,7 @@ let messageTimer;const message=text=>{clearTimeout(messageTimer);const n=$('#mes
 installAdmin({button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});
 const status=text=>{$('#connection').textContent=text;};
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;if(tag==='button'&&text){const icons={'接続を確認':'network-wired','再試行':'rotate-right','リンクをコピー':'copy','ひらく':'book-open','候補として送る':'plus','授業をおわる':'stop','じぶんだけホームにもどる':'door-open'};if(icons[text])n.prepend(icon(icons[text]));}return n;}
-function modal(title,content){delete $('#modal').dataset.kind;$('#modal-title').textContent=title;$('#modal-reading')?.remove();$('#modal-body').replaceChildren(content);$('#modal').showModal();}
+function modal(title,content){delete $('#modal').dataset.kind;$('#modal-title').textContent=title;$('#modal-reading')?.remove();$('#modal-body').replaceChildren(content);$('#modal-title').tabIndex=-1;$('#modal').showModal();$('#modal-title').focus({preventScroll:true});}
 
 let callStarted=false;
 function updateLiveActions(){
