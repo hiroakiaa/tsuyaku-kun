@@ -1,6 +1,6 @@
 import {recordResource} from './resource-usage.js?v=20261007-free-2';
 import {mayReconnect} from './resource-policy.js';
-import {TranslationMemory} from './translation-memory.js?v=20261008-greeting-reuse-1';
+import {TranslationMemory} from './translation-memory.js?v=20261008-report-2';
 import {PersonalPhrases} from './personal-phrases.js?v=20261007-learning-1';
 import {recognitionHints} from './recognition-hints.js?v=20261007-progressive-1';
 import {acquireMicrophone} from './microphone.js?v=20261006-mic-1';
@@ -9,7 +9,7 @@ import {SpeechPlayer} from './speech-player.js?v=20261006-playback-2';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-progressive-1';
 import {installAdmin} from './admin.js?v=20261008-greeting-reuse-1';
 import {config} from './config.js';
-import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection} from './network.js?v=20261008-speech-filter-1';
+import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection} from './network.js?v=20261008-report-2';
 import {catalog as seed} from '../server/catalog.js?v=20261006-easy-1';
 import {translationOf,spokenLanguage,withEasyJapanese} from './core.js?v=20261007-progressive-1';
 import {speakerCaption,speakerInfo} from './face-mode.js?v=20261006-school-1';
