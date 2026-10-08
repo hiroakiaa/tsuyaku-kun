@@ -9,7 +9,7 @@ const groups = [
  ['やさしい日本語で説明してください。','簡単な日本語で説明してください。'],
  ['書類をもう一度もらえますか。','書類をもう一度ください。']
 ];
-const normalize = text => String(text||'').normalize('NFC').trim().replace(/[。？?]$/,'');
+const normalize = text => String(text||'').normalize('NFC').trim().replace(/(?<=[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}])\s+(?=[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}])/gu,'').replace(/[。？?]$/,'');
 const aliases = new Map();
 for (const group of groups) for (const text of group) aliases.set(normalize(text),normalize(group[0]));
 export function phraseIdentity(text,source='ja') {
