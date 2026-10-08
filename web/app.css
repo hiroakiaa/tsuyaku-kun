@@ -719,5 +719,6 @@ body.phone-home #lesson-role-picker button:hover{border-left-color:#77777d;borde
 /* Reference playback keeps the active text bright while paused. */
 body.phone-home #modal-body .reference-language{border:0!important;box-shadow:none!important}
 body.phone-home #modal-body .reference-language-text{color:#a1a1a6;transition:color .28s ease}
-body.phone-home #modal-body .reference-language[data-speech-state="playing"] .reference-language-text,body.phone-home #modal-body .reference-language[data-speech-state="paused"] .reference-language-text{color:#fff!important}
+body.phone-home #modal-body .reference-language-text .speech-word-active{color:#fff;animation:speech-word-in .16s ease}
+@keyframes speech-word-in{from{color:#a1a1a6}to{color:#fff}}
 @media(prefers-reduced-motion:reduce){body.phone-home #modal-body .reference-language-text{transition:none}}
