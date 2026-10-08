@@ -634,3 +634,55 @@ body.phone-home dialog::backdrop{background:rgba(0,0,0,.75)}
 body.phone-home :focus-visible{outline:2px solid #fff;outline-offset:3px}
 body.phone-home a{color:#eee}
 body.phone-home main.phone-home-card>.bottom-nav button[aria-selected=true] .nav-icon,body.phone-home button.primary i,body.phone-home #microphone[aria-pressed=true] i{color:#111!important}
+
+/* Refined monochrome: typography, spacing, materials and interaction hierarchy. */
+body.phone-home{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans JP','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif;line-height:1.5;--ink:#f5f5f7;--muted:#a1a1a6;--line:#343438;background:#101011!important;-webkit-font-smoothing:antialiased}
+body.phone-home .app-shell{max-width:1440px;margin-inline:auto}
+body.phone-home .app-shell>header{padding-block:8px;margin-bottom:14px;min-height:58px}
+body.phone-home header .brand{font-family:inherit;font-size:23px;letter-spacing:-.04em;font-weight:650}
+body.phone-home .header-tools #language-options{width:44px;height:44px;border-radius:14px;background:#222225!important;border:1px solid #37373b!important}
+body.phone-home button,body.phone-home input,body.phone-home select,body.phone-home textarea{font-family:inherit;font-weight:500;letter-spacing:0;transition:background-color .18s ease,border-color .18s ease,transform .18s ease}
+body.phone-home button{border-width:1px!important;border-radius:14px!important;background:#28282b!important;border-color:#414145!important}
+body.phone-home button:active:not(:disabled){transform:scale(.985)}
+body.phone-home button::after{display:none!important}
+body.phone-home input,body.phone-home select,body.phone-home textarea{background:#19191c!important;border:1px solid #3c3c40!important;border-radius:12px!important;font-size:16px}
+body.phone-home input:focus,body.phone-home select:focus,body.phone-home textarea:focus{border-color:#99999f!important}
+body.phone-home .face-controls,body.phone-home .call-invite,body.phone-home .entry-card,body.phone-home .lesson-code-card{background:#1c1c1f!important;border:1px solid #303034!important;border-radius:20px!important;padding:18px;box-shadow:none!important}
+body.phone-home .face-controls strong,body.phone-home .call-invite label,body.phone-home label{font-size:13px;font-weight:600;color:#b9b9bf;letter-spacing:.01em}
+body.phone-home .face-controls strong{display:block;margin-bottom:8px}
+body.phone-home .face-controls #switch-speaker{margin-top:8px;min-height:44px;font-size:14px}
+body.phone-home .captions{background:#161618!important;border:1px solid #2b2b2e!important;border-radius:24px!important;padding:24px;box-shadow:0 12px 40px rgba(0,0,0,.12)}
+body.phone-home .empty h2{font-family:inherit;font-size:18px;font-weight:500;letter-spacing:-.02em;color:#99999f;margin-top:16px}
+body.phone-home .speech-symbol{font-size:38px;color:#737379!important}
+body.phone-home .live-actions{gap:12px}
+body.phone-home .text-form input{min-height:52px;padding-inline:16px}
+body.phone-home .text-form button{width:52px;min-width:52px;height:52px;border-radius:14px!important}
+body.phone-home #microphone{min-height:52px;background:#f5f5f7!important;border-color:#f5f5f7!important;color:#151517!important;font-size:15px;font-weight:600}
+body.phone-home #microphone i{color:inherit!important}
+body.phone-home #microphone[aria-pressed=true]{background:#343438!important;border-color:#8b8b91!important;color:#f5f5f7!important}
+body.phone-home #microphone[aria-pressed=true] i{color:inherit!important}
+body.phone-home main.phone-home-card>.bottom-nav{background:rgba(20,20,22,.94)!important;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid #303034!important;gap:6px!important;padding-inline:max(16px,calc((100vw - 680px)/2))!important}
+body.phone-home main.phone-home-card>.bottom-nav button{border:0!important;border-radius:16px!important;min-height:56px!important;gap:5px;flex:1 1 0!important;color:#8e8e93!important;transition:background-color .18s ease,color .18s ease}
+body.phone-home main.phone-home-card>.bottom-nav button[aria-selected=true]{background:#303034!important;color:#fff!important}
+body.phone-home main.phone-home-card>.bottom-nav button .nav-icon{font-size:22px!important;color:inherit!important}
+body.phone-home main.phone-home-card>.bottom-nav button[aria-selected=true] .nav-icon{color:#fff!important}
+body.phone-home .nav-label{font-size:11px!important;font-weight:600;letter-spacing:.01em}
+body.phone-home .reference-tabs,body.phone-home .admin-tabs{background:#1e1e21!important;padding:4px!important;border:1px solid #303034!important;border-radius:14px;gap:4px!important}
+body.phone-home .reference-tabs button,body.phone-home .admin-tabs button{border:0!important;border-radius:10px!important;font-size:14px;min-height:40px!important}
+body.phone-home .reference-tabs button[aria-selected=true],body.phone-home .admin-tabs button[aria-selected=true]{background:#414145!important;color:#fff!important;box-shadow:0 2px 8px rgba(0,0,0,.18)!important}
+body.phone-home .reference-card{border:1px solid #303034!important;background:#1c1c1f!important;border-radius:18px!important;padding:18px!important}
+body.phone-home .reference-title{font-size:17px;font-weight:600;letter-spacing:-.02em;line-height:1.5}
+body.phone-home .reference-category{color:#909096;font-size:11px}
+body.phone-home .category-filter{border-radius:999px!important;font-size:12px;min-height:40px!important;padding:8px 15px!important}
+body.phone-home #lesson-role-picker{gap:20px;max-width:640px}
+body.phone-home #lesson-role-picker button{min-height:170px;border-radius:24px!important;font-size:25px;font-weight:600;gap:20px;background:#1c1c1f!important;border-color:#343438!important}
+body.phone-home #lesson-role-picker button i{font-size:38px;color:#dddde1}
+body.phone-home dialog{background:#1c1c1f!important;border:1px solid #3a3a3e!important;border-radius:26px!important;padding:24px;box-shadow:0 32px 96px rgba(0,0,0,.55)}
+body.phone-home .modal-heading{background:transparent!important;margin-bottom:24px;gap:20px}
+body.phone-home .modal-heading h2{font-family:inherit;font-size:21px;font-weight:650;letter-spacing:-.025em}
+body.phone-home #modal-close{width:36px;height:36px;min-height:36px;padding:0!important;border:0!important;border-radius:50%!important;background:#343438!important;color:#c5c5cb!important}
+body.phone-home .caption{background:#1c1c1f;border-color:#303034;border-radius:18px;padding:18px;box-shadow:none}
+@media(min-width:900px){body.phone-home #live:not([hidden]),body.phone-home.mode-active #live:not([hidden]){gap:24px;grid-template-columns:minmax(280px,29%) minmax(0,1fr)}body.phone-home .captions{padding:28px}}
+@media(max-width:599px){body.phone-home{--shell-gap:16px}body.phone-home .app-shell>header{margin-bottom:10px;min-height:52px;padding-block:4px}body.phone-home .face-controls,body.phone-home .call-invite{padding:14px;border-radius:18px!important}body.phone-home .captions{padding:18px;border-radius:20px!important}body.phone-home .empty h2{font-size:16px}body.phone-home dialog{padding:20px;border-radius:24px!important}body.phone-home #lesson-role-picker{gap:12px}body.phone-home #lesson-role-picker button{min-height:145px;font-size:22px}body.phone-home main.phone-home-card>.bottom-nav{padding-inline:12px!important}}
+@media(max-height:500px){body.phone-home .app-shell>header{min-height:38px;margin-bottom:6px}body.phone-home .face-controls{padding:10px}body.phone-home #lesson-role-picker button{min-height:100px}body.phone-home .captions{padding:12px}}
+@media(prefers-reduced-motion:reduce){body.phone-home button,body.phone-home input,body.phone-home select{transition:none!important}body.phone-home button:active{transform:none!important}}
