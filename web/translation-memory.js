@@ -1,6 +1,6 @@
-import {ReviewedStore,memoryKey,retentionScore} from './reviewed-store.js?v=20261007-reuse-1';
+import {ReviewedStore,memoryKey,retentionScore} from './reviewed-store.js?v=20261008-report-2';
 import {translationField,translationOf} from './core.js?v=20261007-progressive-1';
-import {phraseIdentity} from './phrase-equivalence.js?v=20261007-reuse-1';
+import {phraseIdentity} from './phrase-equivalence.js?v=20261008-report-2';
 const key='tsuyaku-reviewed-memory-v1';
 const exact=text=>String(text||'').normalize('NFC').trim();
 // Catalog objects are replaced when refreshed; weak keys release old indexes.
