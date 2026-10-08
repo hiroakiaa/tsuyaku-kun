@@ -613,3 +613,18 @@ body.phone-home #call-invite[hidden],body.phone-home:not([data-active-mode="inte
 :root{--ink:#244b3d;--muted:#526f62;--green:#237451;--line:#c6e4d6;--paper:#fbfefc;--mint:#eaf7f0;--accent:#d2efdf}
 body.phone-home{background:#f1faf5;color:var(--ink)}
 body.phone-home .admin-tabs button{color:var(--muted)!important}body.phone-home .admin-tabs button[aria-selected=true]{background:#d8f1e3!important;border-bottom-color:#31835b!important;color:#20553e!important}
+
+/* Quiet botanical backdrop: original vector leaves, with clear reading surfaces. */
+:root{--ink:#304d43;--muted:#586f62;--green:#456f59;--line:#ceded2;--paper:#fffefa;--mint:#eaf2e9;--accent:#dcebdd}
+body.phone-home{background-color:#f3f0e7;background-image:url('natural-leaves.svg');background-position:center;background-size:cover;background-repeat:no-repeat;color:var(--ink)}
+body.phone-home .face-controls,body.phone-home .call-invite{background:#e8f0e6;border-color:#cfddcf}
+body.phone-home .captions{background:rgba(251,253,246,.94);border-color:#d6e0d2}
+body.phone-home input,body.phone-home select,body.phone-home .reference-card,body.phone-home dialog{background-color:#fffefa!important;border-color:#c8d8cb!important;color:var(--ink)}
+body.phone-home button,body.phone-home button.primary{background-color:#e4efdf!important;border-color:#9ebda6!important;color:#345940!important}
+body.phone-home button:hover{background-color:#d9e8d4!important}
+body.phone-home .bottom-nav{background-color:rgba(255,254,249,.96)!important;border-top-color:#d5dfd1!important}
+body.phone-home .bottom-nav button{background-color:transparent!important;color:#587551!important}
+body.phone-home .bottom-nav button[aria-selected=true]{background-color:#dbeacb!important;color:#365d3e!important}
+body.phone-home .admin-tabs,body.phone-home .modal-heading{background:#fffefa}
+body.phone-home .admin-tabs button[aria-selected=true]{background:#e4eedc!important;border-bottom-color:#628265!important;color:#36543d!important}
+body.phone-home button.danger{background-color:#fff3ed!important;border-color:#d2a898!important;color:#8b493a!important}
