@@ -1,4 +1,4 @@
-import {resourceSnapshot} from './resource-usage.js?v=20261007-free-2';
+import {resourceSnapshot} from './resource-usage.js?v=20261008-safety-1';
 // Device-local operational history. No names, room keys, tokens or speech are stored here.
 export const PRICES={checkedAt:'2026-10-06',inputPerMillion:.10,outputPerMillion:.30,streamPerMinute:.0092,whisperPerMinute:.000513,turnPerGB:.05};
 export function percentile(values,p){const a=values.filter(Number.isFinite).sort((a,b)=>a-b);return a.length?a[Math.max(0,Math.ceil(a.length*p)-1)]:null;}
