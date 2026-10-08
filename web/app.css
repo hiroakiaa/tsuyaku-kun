@@ -605,3 +605,6 @@ body.phone-home .admin-panel>.admin-tabs{position:static;min-width:0;}
 body.phone-home .admin-panel>.admin-tab-panel:not([hidden]){min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;}
 body.phone-home .admin-panel>button:last-child{margin-bottom:0;}
 @media(max-height:500px){body.phone-home dialog[open]:has(.admin-panel){height:calc(100dvh - 12px);}}
+
+/* Invite controls belong exclusively to the call tab. */
+body.phone-home #call-invite[hidden],body.phone-home:not([data-active-mode="interpreter"]) #call-invite{display:none!important;}
