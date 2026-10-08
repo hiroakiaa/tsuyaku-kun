@@ -633,3 +633,4 @@ body.phone-home .empty,body.phone-home .speech-symbol{color:#bcbcbc!important}
 body.phone-home dialog::backdrop{background:rgba(0,0,0,.75)}
 body.phone-home :focus-visible{outline:2px solid #fff;outline-offset:3px}
 body.phone-home a{color:#eee}
+body.phone-home main.phone-home-card>.bottom-nav button[aria-selected=true] .nav-icon,body.phone-home button.primary i,body.phone-home #microphone[aria-pressed=true] i{color:#111!important}
