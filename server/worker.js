@@ -192,7 +192,7 @@ export class TranslationRoom {
       }
       if(room.ended)throw Error('この授業は終了しました。');
       if(data.type!=='caption')return;
-      if(room.mode==='lesson'&&a.role!=='teacher')throw Error('授業では先生の発言を表示します。');
+      if(room.mode==='lesson'&&a.role!=='teacher'&&(data.kind!=='text'||data.final!==true||data.continuing||data.metadataOnly))throw Error('生徒は文字入力で伝えてください。');
       const admission=(this.admissionTail||Promise.resolve()).then(()=>this.acceptCaption(ws,a,room,data));
       this.admissionTail=admission.catch(()=>{});await admission;
     }catch(e){this.send(ws,{type:'error',error:e.message||'接続を確認してください。'});if(!ws.deserializeAttachment()?.uid)ws.close(1008,'auth');}
