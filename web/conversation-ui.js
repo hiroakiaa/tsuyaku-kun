@@ -13,7 +13,7 @@ export function installConversationUI({getState,stop}){
  const $=s=>document.querySelector(s),live=$('#live'),captions=$('#captions');
  const make=(tag,text,cls)=>{const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n;};
  const bar=make('div',null,'conversation-status'),mic=make('span'),connection=make('span'),cost=make('span'),stopButton=make('button','一時停止');
- bar.setAttribute('aria-label','会話の状態');mic.setAttribute('role','status');connection.setAttribute('role','status');cost.className='processing-state';cost.title='変動費の対象となる処理の目印です。固定費・サーバー維持費は含まず、請求額や無料枠の残量を示しません。';stopButton.type='button';stopButton.onclick=stop;bar.append(mic,connection,cost,stopButton);live.prepend(bar);
+ bar.setAttribute('aria-label','会話の状態');mic.setAttribute('role','status');connection.setAttribute('role','status');cost.className='processing-state';cost.title='変動費の対象となる処理の目印です。固定費・サーバー維持費は含まず、請求額や無料枠の残量を示しません。';stopButton.type='button';stopButton.onclick=stop;bar.append(mic,connection,cost,stopButton);live.querySelector('.live-tools').prepend(bar);
  const badge=make('span',null,'header-role');badge.hidden=true;$('.app-shell>header').insertBefore(badge,$('.header-tools'));
  const latest=make('button','最新へ ↓','captions-latest');latest.type='button';latest.hidden=true;captions.parentElement.append(latest);
  let unread=false,scheduled=false;
