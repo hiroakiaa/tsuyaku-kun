@@ -833,3 +833,8 @@ body.phone-home #panel-words .dictionary-search .search-field{min-width:0;gap:4p
 body.phone-home #panel-words .dictionary-search .search-field input{box-sizing:border-box;min-width:0;padding:12px 10px!important;}
 body.phone-home #panel-words .dictionary-search .search-field button{flex:0 0 44px;width:44px;margin:0;padding:8px!important;color:#ddd;}
 body.phone-home #panel-words .dictionary-search .search-field button:disabled{opacity:.45;}
+
+/* Search focus is expressed only by a brighter bottom rule. */
+body.phone-home #panel-words .dictionary-search .search-field{border:0!important;border-bottom:1px solid #55555b!important;border-radius:0!important;outline:none!important;box-shadow:none!important;transition:border-color .2s ease;}
+body.phone-home #panel-words .dictionary-search .search-field:focus-within{border-bottom-color:#fff!important;outline:none!important;}
+body.phone-home #panel-words .dictionary-search input:focus-visible{outline:none!important;}
