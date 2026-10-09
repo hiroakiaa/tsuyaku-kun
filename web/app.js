@@ -1,18 +1,18 @@
-import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261009-rtc-answer-1';
+import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261009-mobile-speaker-1';
 import {IdleWatch} from './idle-watch.js?v=20261008-safety-1';
-import {recordResource,recordPause,recordResume} from './resource-usage.js?v=20261009-rtc-answer-1';
+import {recordResource,recordPause,recordResume} from './resource-usage.js?v=20261009-mobile-speaker-1';
 import {mayReconnect} from './resource-policy.js';
 import {TranslationMemory} from './translation-memory.js?v=20261008-safety-1';
 import {ReviewedStore} from './reviewed-store.js';
 import {PersonalPhrases} from './personal-phrases.js?v=20261007-learning-1';
 import {recognitionHints} from './recognition-hints.js?v=20261007-progressive-1';
 import {acquireMicrophone} from './microphone.js?v=20261006-mic-1';
-import {UsageLedger} from './usage.js?v=20261009-rtc-answer-1';
+import {UsageLedger} from './usage.js?v=20261009-mobile-speaker-1';
 import {SpeechPlayer} from './speech-player.js?v=20261008-word-highlight-1';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-progressive-1';
-import {installAdmin} from './admin.js?v=20261009-rtc-answer-1';
+import {installAdmin} from './admin.js?v=20261009-mobile-speaker-1';
 import {config} from './config.js';
-import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection} from './network.js?v=20261009-rtc-answer-1';
+import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection} from './network.js?v=20261009-mobile-speaker-1';
 import {catalog as seed} from '../server/catalog.js?v=20261006-easy-1';
 import {translationOf,spokenLanguage,withEasyJapanese} from './core.js?v=20261007-progressive-1';
 import {speakerCaption,speakerInfo} from './face-mode.js?v=20261006-school-1';
@@ -20,7 +20,7 @@ import {callCaptionLanguages,isDisplayableCaption} from './call-mode.js?v=202610
 import {listHistory as storedHistory} from './history.js?v=20261006-school-1';
 const listHistory=()=>localStorage.getItem('tsuyaku-device-mode')==='personal'?storedHistory():Promise.resolve([]);
 import {createServerRecognition} from './caption-server.js?v=20261007-free-1';
-import {createBrowserRecognition} from './caption-browser.js?v=20261009-rtc-answer-1';
+import {createBrowserRecognition} from './caption-browser.js?v=20261009-mobile-speaker-1';
 const browserSpeechUnavailable=new Set();
 const idleWatch=new IdleWatch({onWarn:()=>{ledger.event('idle_warning');message('発話がないため、15秒後にマイクを停止します。');const keep=el('button','続ける');keep.onclick=()=>{idleWatch.continue();message('');ledger.event('idle_continue');};$('#message').append(keep);clearTimeout(messageTimer);},onStop:()=>pauseConversation('idle'),onDiagnostic:code=>ledger.event(code)});
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -70,7 +70,7 @@ const qrModule=import('./qr.js').catch(()=>null);
 function resetConversationContents(){setTextComposer(false);const empty=el('div',undefined,'empty');empty.id='empty-caption';empty.append(icon('comments'),el('h2','話したことばが、ここに。'));$('#captions').replaceChildren(empty);$('#text-input').value='';}
 function showConversationPreparation(mode){paintButton($('#microphone'),'準備中','spinner');
  $('#leave').hidden=true;const endLabel=mode==='interpreter'?'通話をおわる':'会話をおわる';paintButton($('#leave'),endLabel,'door-open');$('#leave').setAttribute('aria-label',endLabel);$('#text-input').value='';const empty=el('div',undefined,'empty'),symbol=icon('comments');empty.id='empty-caption';symbol.classList.add('speech-symbol');empty.append(symbol,el('h2','話したことばが、ここに。'));$('#captions').replaceChildren(empty);if(mode==='face'){showFacePreparation();return;}mountConversation('interpreter');$('#panel-interpreter').hidden=false;$('#live').hidden=false;$('#face-controls').hidden=true;$('#participants').hidden=true;$('#invite').hidden=true;document.body.classList.add('mode-active');document.body.dataset.activeMode='interpreter';const n=$('#call-invite');n.hidden=false;n.replaceChildren();delete n.dataset.room;const language=el('select');options(language,speakingLanguage());language.onchange=()=>setSpeakingLanguage(language.value);const preparing=el('div','接続を準備しています','invite-preparing');preparing.setAttribute('role','status');n.append(label('じぶんが話すことば',language),preparing);$('#text-input').placeholder='ことばを入力して送る';for(const selector of ['#text-input','#text-form button','#microphone'])$(selector).disabled=true;}
-function showFacePreparation(){paintButton($('#microphone'),'準備中','spinner');mountConversation('face');$('#panel-face').hidden=false;$('#live').hidden=false;$('#face-controls').hidden=false;$('#participants').hidden=true;$('#invite').hidden=true;document.body.classList.add('mode-active');document.body.dataset.activeMode='face';$('#face-speaker').textContent='自分が話す';options($('#face-language'),$('#face-self-language').value);paintButton($('#switch-speaker'),'相手の番にする','arrow-right-arrow-left');for(const selector of ['#face-language','#switch-speaker','#text-input','#text-form button','#microphone'])$(selector).disabled=true;}
+function showFacePreparation(){paintButton($('#microphone'),'準備中','spinner');mountConversation('face');$('#panel-face').hidden=false;$('#live').hidden=false;$('#face-controls').hidden=false;$('#participants').hidden=true;$('#invite').hidden=true;document.body.classList.add('mode-active');document.body.dataset.activeMode='face';setFaceSpeaker('自分が話す');options($('#face-language'),$('#face-self-language').value);paintButton($('#switch-speaker'),'相手の番にする','arrow-right-arrow-left');for(const selector of ['#face-language','#switch-speaker','#text-input','#text-form button','#microphone'])$(selector).disabled=true;}
 function enableConversationControls(){if($('#microphone').getAttribute('aria-busy')==='true')paintButton($('#microphone'),'マイクをONにする','microphone');for(const selector of ['#face-language','#switch-speaker','#text-input','#text-form button','#microphone'])$(selector).disabled=false;}
 // Each inactive conversation owns at most one fresh, microphone-free connection.
 const preparedConversations=new Map();let pageClosing=false;
@@ -266,7 +266,8 @@ const invite=new URLSearchParams(location.hash.slice(1));if(/^[a-f0-9]{32}$/.tes
 
 
 function currentSource(){return room?.mode==='lesson'?(role==='teacher'?'ja':sharedLanguage()):room?.mode==='face'?speakerInfo(faceSide,$('#face-self-language').value,$('#face-other-language').value).language:$('#source-language').value;}
-function updateFace(){const face=room?.mode==='face';$('#face-controls').hidden=!face;$('#participants').hidden=face;if(!face){$('#text-input').placeholder='ことばを入力して送る';return;}const info=speakerInfo(faceSide,$('#face-self-language').value,$('#face-other-language').value);$('#face-speaker').textContent=info.speaker+'が話す';options($('#face-language'),info.language);paintButton($('#switch-speaker'),(faceSide==='self'?'相手の番にする':'じぶんの番にする'),'arrow-right-arrow-left');$('#text-input').placeholder=info.speaker+'のことばを入力';}
+function setFaceSpeaker(text){$('#face-speaker').textContent=text;$('#header-face-speaker').textContent=text;}
+function updateFace(){const face=room?.mode==='face';$('#face-controls').hidden=!face;$('#participants').hidden=face;if(!face){$('#text-input').placeholder='ことばを入力して送る';return;}const info=speakerInfo(faceSide,$('#face-self-language').value,$('#face-other-language').value);setFaceSpeaker(info.speaker+'が話す');options($('#face-language'),info.language);paintButton($('#switch-speaker'),(faceSide==='self'?'相手の番にする':'じぶんの番にする'),'arrow-right-arrow-left');$('#text-input').placeholder=info.speaker+'のことばを入力';}
 
 $('#face-language').onchange=()=>{if(room?.mode!=='face')return;const value=$('#face-language').value;speechPlayer.stop();stopRecognition(true);if(faceSide==='self')setSpeakingLanguage(value);else setSharedLanguage(value);updateFace();for(const record of [...records.values()])renderCaption(record);if(mic)startRecognition();};
 $('#switch-speaker').onclick=()=>{if(room?.mode!=='face')return;speechPlayer.stop();stopRecognition(true);faceSide=faceSide==='self'?'other':'self';$('#text-input').value='';updateFace();if(mic)startRecognition();ledger.event('speaker_switch');};
