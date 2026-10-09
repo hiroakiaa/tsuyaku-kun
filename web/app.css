@@ -773,3 +773,10 @@ body.phone-home .header-face-speaker{display:none;}
 body.phone-home #lesson-role-picker button{width:100%;aspect-ratio:1;min-height:0;height:auto;box-sizing:border-box;}
 @media(orientation:portrait){body.phone-home #lesson-role-picker{width:min(100%,260px,calc((100dvh - 190px)/2))!important;}}
 @media(orientation:landscape){body.phone-home #lesson-role-picker{width:min(100%,540px,calc(2 * (100dvh - 170px) + 20px))!important;}}
+
+/* Compact square choices with quiet typography and generous surrounding space. */
+body.phone-home #lesson-role-picker{gap:24px;}
+body.phone-home #lesson-role-picker button{font-size:20px;gap:14px;padding:16px;}
+body.phone-home #lesson-role-picker button i{font-size:32px;}
+@media(orientation:portrait){body.phone-home #lesson-role-picker{width:min(100%,164px,calc((100dvh - 190px)/2))!important;}}
+@media(orientation:landscape){body.phone-home #lesson-role-picker{width:min(100%,352px,calc(2 * (100dvh - 170px) + 24px))!important;}}
