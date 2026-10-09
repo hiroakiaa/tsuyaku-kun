@@ -748,3 +748,6 @@ body.phone-home .caption-composer,body.phone-home #text-toggle,body.phone-home #
 body.phone-home #microphone[aria-busy=true] i{animation:mic-preparing 1s linear infinite;}
 @keyframes mic-preparing{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){body.phone-home #microphone[aria-busy=true] i{animation:none;}}
+
+/* Lesson roster: one participant per row, language aligned right. */
+body.phone-home #participants.lesson-participants{display:flex;flex-direction:column;gap:8px;max-height:40vh;overflow:auto;width:100%}body.phone-home #participants.lesson-participants .participant{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,55%);align-items:center;gap:12px;width:100%;padding:6px 0;background:transparent;border:0;box-shadow:none;border-radius:0}body.phone-home .lesson-participants .participant-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}body.phone-home .lesson-participants select{min-width:0;width:100%;font-size:13px;padding:9px 10px;border:0;box-shadow:none}body.phone-home .lesson-participants select:disabled{opacity:.7}
