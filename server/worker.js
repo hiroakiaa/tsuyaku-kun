@@ -1,9 +1,10 @@
+import {inspectTranslations} from '../web/translation-quality.js';
 import {guardedAi,budgetOperation} from './ai-budget.js';
 import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261009-diagnostics-1';
+const BUILD_ID='20261009-quality-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -85,7 +86,7 @@ export default {async fetch(request,env){
       if(!text||text.length>1200||!catalog.languages.some(l=>l.code===source)||!targets.length||targets.length>4||targets.some(c=>!catalog.languages.some(l=>l.code===c)))return cors(error('ことばと言語を確認してください。'));
       const context=(Array.isArray(data.context)?data.context:[]).slice(-3).filter(x=>typeof x==='string').map(x=>x.slice(0,480));
       let usage={},started=Date.now();
-      try{const translations=await translateText(env,text,source,targets,context,String(data.unit||'').slice(0,160),catalog,u=>{usage=u;});return cors(json({translations,usage,latencyMs:Date.now()-started}));}
+      try{const translations=await translateText(env,text,source,targets,context,String(data.unit||'').slice(0,160),catalog,u=>{usage=u;});return cors(json({translations,quality:inspectTranslations(text,source,targets,translations),usage,latencyMs:Date.now()-started}));}
       catch(e){const failure=aiFailure(e);return cors(json({error:failure.message,aiFailure:failure,usage},failure.reason==='quota'?429:['billing','auth'].includes(failure.reason)?403:502));}
     }
     if(url.pathname==='/catalog'&&request.method==='GET'){try{return cors(json(await bridge(env,token,'tsuyakuCatalog')||catalog));}catch{return cors(json(catalog));}}
@@ -251,7 +252,7 @@ export class TranslationRoom {
     const all=this.cachedCatalog;
       const past=(await this.ctx.storage.get('recent')||[]).map(r=>r.text);
       if(!await this.captionIsLive(ws,room,queuedAt))return;if(Date.now()<this.aiBlockedUntil)throw Object.assign(Error('quota'),{code:3036});const translations=await translateText({...this.env,budgetUid:a.uid,executionValid:()=>this.captionIsLive(ws,room,queuedAt)},text,a.language,targets,past,room.unit,all,u=>{usage=u;if(u.translationTiming)u.translationTiming.queueMs=Math.max(0,start-queuedAt);});
-      if(!(await this.info())||room.expires<=Date.now())return;const publish=await this.captionIsLive(ws,room);const done={...record,translations,usage,status:'ready',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,done);const recent=await this.ctx.storage.get('recent')||[];await this.ctx.storage.put('recent',[...recent.filter(r=>r.id!==id),{id,at:start,text}].sort((a,b)=>a.at-b.at).slice(-3));if(publish)this.broadcast({type:'translation',...done});if(publish&&a.language==='ja'&&!usage?.cacheHit&&((all.learnableTexts||[]).includes(text)||(all.phrases||[]).some(p=>p.jaText===text)))this.ctx.waitUntil(bridge(this.env,a.token,'tsuyakuLearn',{text,translations}).catch(()=>{}));
+      if(!(await this.info())||room.expires<=Date.now())return;const publish=await this.captionIsLive(ws,room);const quality=inspectTranslations(text,record.source,targets,translations);const done={...record,translations,quality,usage,status:'ready',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,done);const recent=await this.ctx.storage.get('recent')||[];await this.ctx.storage.put('recent',[...recent.filter(r=>r.id!==id),{id,at:start,text}].sort((a,b)=>a.at-b.at).slice(-3));if(publish)this.broadcast({type:'translation',...done});if(publish&&!quality.warnings.length&&!quality.unmeasuredLanguages.length&&a.language==='ja'&&!usage?.cacheHit&&((all.learnableTexts||[]).includes(text)||(all.phrases||[]).some(p=>p.jaText===text)))this.ctx.waitUntil(bridge(this.env,a.token,'tsuyakuLearn',{text,translations}).catch(()=>{}));
     }catch(e){if(['quota','billing','auth'].includes(aiFailure(e).reason))this.aiBlockedUntil=Math.floor(Date.now()/86400000)*86400000+86400000;if(!(await this.info())||room.expires<=Date.now())return;const publish=await this.captionIsLive(ws,room),failure=aiFailure(e),failed={...record,usage,status:'failed',latencyMs:Date.now()-start,error:failure.message,aiFailure:failure};await this.ctx.storage.put('caption:'+id,failed);if(publish)this.broadcast({type:'translation',...failed});}
   }
   async webSocketClose(ws){for(const [id,job]of this.queuedCaptions)if(job.ws===ws)this.queuedCaptions.delete(id);const a=ws.deserializeAttachment();if(a?.left)return;ws.serializeAttachment({...a,left:true});try{ws.close(1000,'left');}catch{}if(a?.uid)this.broadcast({type:'notice',text:a.name+'さんが退室しました。'});this.roster();await this.scheduleAlarm();}
