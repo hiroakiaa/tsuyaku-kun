@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {conversationPresentation as present} from '../web/conversation-ui.js';
+assert.equal(present({preparing:true}).microphone,'準備中');
+assert.equal(present({mic:false,translating:true}).microphone,'マイクOFF');
+assert.match(present({mic:false,translating:true}).cost,/翻訳処理中/);
+assert.equal(present({mic:true,paused:true}).microphone,'再接続待ち');
+assert.match(present({mic:true,recognitionKind:'server'}).cost,/従量課金対象/);
+assert.match(present({mic:true,recognitionKind:'browser'}).cost,/認識API費用なし/);
+assert.match(present({mic:false,relay:true}).cost,/TURN/);
+assert.equal(present({mode:'lesson',role:'student'}).role,'生徒');
+assert.equal(present({mode:'lesson',mic:false}).canStop,false);
+assert.equal(present({mode:'interpreter',relay:true}).canStop,true);
+console.log('Conversation UI: microphone, ongoing processing, role and pause states passed');
