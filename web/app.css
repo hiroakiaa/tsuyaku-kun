@@ -751,3 +751,16 @@ body.phone-home #microphone[aria-busy=true] i{animation:mic-preparing 1s linear 
 
 /* Lesson roster: one participant per row, language aligned right. */
 body.phone-home #participants.lesson-participants{display:flex;flex-direction:column;gap:8px;max-height:40vh;overflow:auto;width:100%}body.phone-home #participants.lesson-participants .participant{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,55%);align-items:center;gap:12px;width:100%;padding:6px 0;background:transparent;border:0;box-shadow:none;border-radius:0}body.phone-home .lesson-participants .participant-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}body.phone-home .lesson-participants select{min-width:0;width:100%;font-size:13px;padding:9px 10px;border:0;box-shadow:none}body.phone-home .lesson-participants select:disabled{opacity:.7}
+
+/* Mobile interpreter: current speaker belongs to the header; controls share one row. */
+body.phone-home .header-face-speaker{display:none;}
+@media(max-width:899px){
+ body.phone-home.mode-active[data-active-mode="face"] .header-face-speaker{display:block;flex:1;min-width:0;margin-left:10px;margin-right:auto;font-size:13px;font-weight:600;line-height:1.4;color:#b9b9bf;white-space:nowrap;}
+ body.phone-home.mode-active[data-active-mode="face"] .app-shell>header{gap:0;}
+ body.phone-home .face-controls{grid-template-columns:minmax(0,1fr) auto!important;gap:10px;align-items:center;}
+ body.phone-home .face-controls>div{min-width:0;}
+ body.phone-home .face-controls #face-speaker{display:none;}
+ body.phone-home .face-controls #face-language,body.phone-home .face-controls #switch-speaker{box-sizing:border-box;height:44px;min-height:44px;max-height:44px;margin:0!important;}
+ body.phone-home .face-controls #face-language{width:100%;font-size:16px!important;padding:0 28px 0 10px;}
+ body.phone-home .face-controls #switch-speaker{width:auto;max-width:none;padding:0 10px;font-size:13px;white-space:nowrap;}
+}
