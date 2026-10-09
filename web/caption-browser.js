@@ -25,12 +25,13 @@ export function createBrowserRecognition({language, Native, onDiagnostic = () =>
       };
       native.onerror=event=>{
         if(!this.active)return;
+        if(event.error==='aborted'){this.finishFragment();this.active=false;onDiagnostic({code:'browser_speech_ended'});this.onend?.();return;}
         if(event.error==='no-speech'){this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:'empty'});return;}
         const error=['not-allowed','service-not-allowed'].includes(event.error)?'auth':event.error==='audio-capture'?'audio-capture':'service';
         onDiagnostic({code:'browser_speech_error',recognitionCode:event.error});
         this.fail(error);
       };
-      native.onend=()=>{if(!this.active)return;this.finishFragment();this.active=false;this.onend?.();};
+      native.onend=()=>{if(!this.active)return;this.finishFragment();this.active=false;onDiagnostic({code:'browser_speech_ended'});this.onend?.();};
       try{native.start();onDiagnostic({code:'browser_speech_started'});}catch{this.fail('service');}
     }
     abort(){super.abort();if(this.native){this.native.onresult=this.native.onerror=this.native.onend=null;try{this.native.abort();}catch{}this.native=null;}}
