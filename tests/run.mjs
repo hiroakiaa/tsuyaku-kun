@@ -13,7 +13,7 @@ import {SourceTextModule} from 'node:vm';
 import {fileURLToPath} from 'node:url';
 import {protectMath,parseTranslation,glossaryFor,csv,validateCaption} from '../web/core.js';
 import {catalog} from '../server/catalog.js';
-import workerApi,{TranslationRoom,translateText,recognizeAudio,aiFailure,runAi,translationBudget} from '../server/worker.js';
+import workerApi,{TranslationRoom,translateText,recognizeAudio,aiFailure,runAi,translationBudget,requestExecutionValid} from '../server/worker.js';
 import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection,summarizeSessions} from '../web/network.js';
 import {verifyToken} from '../server/auth.js';
 import {validWav,hasSpeechEnergy,cleanRecognition} from '../server/audio.js';
@@ -94,6 +94,7 @@ await test('低費用認識は無音10秒を送信しない',()=>{const out=[],s
 await test('短い発話は600msの無音で送信し先頭を保持する',()=>{const out=[],s=new PcmSegmenter(16000,x=>out.push(x));s.push(Float32Array.from({length:6400},(_,i)=>Math.sin(i*.15)*.08));s.push(new Float32Array(9601));assert.equal(out.length,1);assert.ok(out[0].length<=20000);assert.ok(validWav(new Uint8Array(encodeWav(out[0]))));});
 await test('連続発話は3秒に制限し停止時に音声を消去する',()=>{const out=[],s=new PcmSegmenter(16000,x=>out.push(x));s.push(Float32Array.from({length:160000},(_,i)=>Math.sin(i*.15)*.08));assert.equal(out.length,3);assert.equal(out[0].length,48000);s.clear();assert.equal(s.length,0);assert.ok(s.samples.every(x=>x===0));assert.ok(s.preroll.every(x=>x===0));});
 
+await test('CloudflareでRequest.signalが未提供でも有効な翻訳を拒否せず、中断と期限切れを止める',async()=>{const started=100000;for(const signal of [undefined,null,{aborted:false}])assert.equal(requestExecutionValid({signal},started,started+1),true);assert.equal(requestExecutionValid({signal:{aborted:true}},started,started+1),false);assert.equal(requestExecutionValid({},started,started+25000),false);const config=JSON.parse(await readFile(new URL('../wrangler.jsonc',import.meta.url),'utf8'));assert.ok(config.compatibility_flags.includes('enable_request_signal'));});
 await test('AIの無料枠・混雑・有料要件を区別しneurons単語だけで上限扱いしない',()=>{assert.equal(aiFailure(Error('3036: daily free allocation')).reason,'quota');assert.equal(aiFailure(Error('3040: capacity exceeded')).reason,'overloaded');assert.equal(aiFailure(Error('5035: model requires paid')).reason,'billing');assert.equal(aiFailure(Error('Invalid neurons input')).reason,'input');assert.ok(!JSON.stringify(aiFailure(Error('private speech token secret'))).includes('secret'));});
 await test('失敗字幕は翻訳成功に数えない',()=>{const s=summarizeSessions([{startedAt:1,captionCount:1,failedCaptions:1}]);assert.equal(s[0].translatedCaptions,0);});
 await test('音声認識と翻訳のAI失敗が原因候補へ含まれる',()=>{const r=explainConnection([{stage:'api',operation:'transcribe',code:'http_error',status:502,aiReason:'overloaded',aiCode:3040},{stage:'api',operation:'translation',code:'http_error',status:502,aiReason:'quota',aiCode:3036}]);assert.ok(r.candidates.some(x=>x.cause==='AIサービスの混雑'));assert.ok(r.candidates.some(x=>x.cause==='AIの無料枠上限'));});
