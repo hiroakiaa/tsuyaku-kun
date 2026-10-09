@@ -33,9 +33,9 @@ export async function guardedAi(env,model,input,run){
  if(!env.ROOMS)return run(); // Unit fixtures do not provide Cloudflare bindings.
  const budget=env.ROOMS.get(env.ROOMS.idFromName('__ai_budget_v1__'));
  const call=async data=>{const r=await budget.fetch(new Request('https://budget/budget',{method:'POST',body:JSON.stringify(data)}));const result=await r.json();if(!r.ok)throw budgetError(result.reason);return result;};
- const reservation=await call({action:'reserve',uid:env.budgetUid||'unknown',cost:reserveCost(model,input)});
+ const reserveStarted=Date.now();let reservation;try{reservation=await call({action:'reserve',uid:env.budgetUid||'unknown',cost:reserveCost(model,input)});}finally{if(env.translationTiming)env.translationTiming.budgetWaitMs=Date.now()-reserveStarted;}
  let actual;
  try{const result=await run();const u=result?.usage;if(model.includes('gemma')&&Number.isFinite(u?.prompt_tokens)&&Number.isFinite(u?.completion_tokens))actual=Math.ceil(u.prompt_tokens*.1+u.completion_tokens*.3);return result;}
  catch(e){if([e,...(e?.errors||[]),e?.cause].some(v=>[3036,5035,3023,3041,5016,5018].includes(Number(v?.code))))await call({action:'block'}).catch(()=>{});throw e;}
- finally{await call({action:'settle',...reservation,...(actual!==undefined?{actual}:{})}).catch(()=>{});}
+ finally{const settleStarted=Date.now();try{await call({action:'settle',...reservation,...(actual!==undefined?{actual}:{})}).catch(()=>{});}finally{if(env.translationTiming)env.translationTiming.budgetSettleMs=Date.now()-settleStarted;}}
 }
