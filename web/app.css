@@ -780,3 +780,6 @@ body.phone-home #lesson-role-picker button{font-size:20px;gap:14px;padding:16px;
 body.phone-home #lesson-role-picker button i{font-size:32px;}
 @media(orientation:portrait){body.phone-home #lesson-role-picker{width:min(100%,164px,calc((100dvh - 190px)/2))!important;}}
 @media(orientation:landscape){body.phone-home #lesson-role-picker{width:min(100%,352px,calc(2 * (100dvh - 170px) + 24px))!important;}}
+
+/* Role choices share the standard control surface without decorative borders. */
+body.phone-home #lesson-role-picker button{border:0!important;border-radius:14px!important;background:#28282b!important;box-shadow:none!important;}
