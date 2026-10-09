@@ -762,7 +762,7 @@ body.phone-home .header-face-speaker{display:none;}
  body.phone-home .face-controls #face-speaker{display:none;}
  body.phone-home .face-controls #face-language,body.phone-home .face-controls #switch-speaker{box-sizing:border-box;height:44px;min-height:44px;max-height:44px;margin:0!important;}
  body.phone-home .face-controls #face-language{width:100%;font-size:16px!important;padding:0 28px 0 10px;}
- body.phone-home .face-controls #switch-speaker{width:auto;max-width:none;padding:0 10px;font-size:13px;white-space:nowrap;}
+ body.phone-home .face-controls #switch-speaker{width:164px;min-width:164px;max-width:164px;padding:0 10px;font-size:13px;white-space:nowrap;}
 }
 
 /* Role selection follows the screen aspect ratio, independent of device width. */
