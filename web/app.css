@@ -810,3 +810,6 @@ body.phone-home .captions-latest{position:absolute;bottom:20px;left:50%;transfor
 body.phone-home .captions-latest:active{transform:translateX(-50%)!important;}
 body.phone-home .caption-stage:has(.caption-composer.is-open) .captions-latest{bottom:78px;}
 @media(prefers-reduced-motion:reduce){body.phone-home .caption{transition:none;}}
+
+/* Reference pagination blends into the dictionary background. */
+body.phone-home #panel-words .reference-group button.reference-more,body.phone-home #panel-words .reference-group button.reference-more:hover{background:transparent!important;}
