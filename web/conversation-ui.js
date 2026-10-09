@@ -12,14 +12,14 @@ export function conversationPresentation(s){
 export function installConversationUI({getState,stop}){
  const $=s=>document.querySelector(s),live=$('#live'),captions=$('#captions');
  const make=(tag,text,cls)=>{const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n;};
- const bar=make('div',null,'conversation-status'),mic=make('span'),connection=make('span'),cost=make('span'),stopButton=make('button','一時停止');
- bar.setAttribute('aria-label','会話の状態');mic.setAttribute('role','status');connection.setAttribute('role','status');cost.className='processing-state';cost.title='変動費の対象となる処理の目印です。固定費・サーバー維持費は含まず、請求額や無料枠の残量を示しません。';stopButton.type='button';stopButton.onclick=stop;bar.append(mic,connection,cost,stopButton);live.querySelector('.live-tools').prepend(bar);
+ const bar=make('div',null,'conversation-status'),mic=make('span'),connection=make('span'),stopButton=make('button','一時停止');
+ bar.setAttribute('aria-label','会話の状態');mic.setAttribute('role','status');connection.setAttribute('role','status');stopButton.type='button';stopButton.onclick=stop;bar.append(mic,connection,stopButton);live.querySelector('.live-tools').prepend(bar);
  const badge=make('span',null,'header-role');badge.hidden=true;$('.app-shell>header').insertBefore(badge,$('.header-tools'));
  const latest=make('button','最新へ ↓','captions-latest');latest.type='button';latest.hidden=true;captions.parentElement.append(latest);
  let unread=false,scheduled=false;
  const nearBottom=()=>captions.scrollHeight-captions.scrollTop-captions.clientHeight<100;
  const text=(n,v)=>{if(n.textContent!==v)n.textContent=v;};
- const refresh=()=>{scheduled=false;const p=conversationPresentation(getState());text(mic,p.microphone);text(connection,p.connection);text(cost,p.cost);badge.hidden=!p.role;text(badge,p.role);stopButton.hidden=!p.canStop;mic.dataset.active=String(p.microphone==='音声認識中');const cards=[...captions.querySelectorAll('.caption')];cards.forEach((n,i)=>n.classList.toggle('caption-latest',i===cards.length-1));if(nearBottom())unread=false;latest.hidden=!cards.length||nearBottom();text(latest,unread?'新しい字幕 · 最新へ ↓':'最新へ ↓');};
+ const refresh=()=>{scheduled=false;const p=conversationPresentation(getState());text(mic,p.microphone);text(connection,p.connection);badge.hidden=!p.role;text(badge,p.role);stopButton.hidden=!p.canStop;mic.dataset.active=String(p.microphone==='音声認識中');const cards=[...captions.querySelectorAll('.caption')];cards.forEach((n,i)=>n.classList.toggle('caption-latest',i===cards.length-1));if(nearBottom())unread=false;latest.hidden=!cards.length||nearBottom();text(latest,unread?'新しい字幕 · 最新へ ↓':'最新へ ↓');};
  const schedule=()=>{if(!scheduled){scheduled=true;queueMicrotask(refresh);}};
  latest.onclick=()=>{unread=false;captions.scrollTo({top:captions.scrollHeight,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});schedule();};
  captions.addEventListener('scroll',schedule,{passive:true});
