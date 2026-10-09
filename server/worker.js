@@ -18,6 +18,7 @@ export async function runAi(env,model,input){
  try{if(env.executionValid&&!await env.executionValid())throw Error('処理の有効期限が切れました。');return await guardedAi(env,model,input,async()=>{if(env.executionValid&&!await env.executionValid())throw Error('処理の有効期限が切れました。');const result=await env.AI.run(model,input);if(result?.success===false||result?.errors?.length){const error=Error('AI response error');error.errors=result.errors;throw error;}return result;});}catch(error){const wrapped=Error(error?.message||'AI request failed',{cause:error});wrapped.model=model;throw wrapped;}
 }
 export function translationBudget(text,targetCount){return Math.min(4096,Math.max(128,Math.ceil(text.length*2.5+40)*targetCount));}
+export function requestExecutionValid(request,started,now=Date.now()){return !request.signal?.aborted&&now<started+25000;}
 const phraseKey=text=>String(text||'').normalize('NFC').trim().replace(/。$/,'');
 export async function recognizeAudio(env,bytes,language,termHints=[]){
  language=spokenLanguage(language);
@@ -65,7 +66,7 @@ export default {async fetch(request,env){
     
     const match=url.pathname.match(/^\/rooms\/([a-f0-9]{32})(\/socket)?$/);
     if(match){if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'socket:'+(request.headers.get('CF-Connecting-IP')||'local')})).success))return cors(error('少し待ってから再試行してください。',429));const room=env.ROOMS.get(env.ROOMS.idFromName(match[1]));const r=await room.fetch(request);return r.status===101?r:cors(r);}
-    const token=(request.headers.get('Authorization')||'').replace(/^Bearer /,'');const auth=await verifyToken(token,env.FIREBASE_PROJECT);env={...env,budgetUid:auth.uid,executionValid:()=>!request.signal.aborted&&Date.now()<requestStarted+25000};if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'user:'+auth.uid})).success))return cors(error('少し待ってから再試行してください。',429));
+    const token=(request.headers.get('Authorization')||'').replace(/^Bearer /,'');const auth=await verifyToken(token,env.FIREBASE_PROJECT);env={...env,budgetUid:auth.uid,executionValid:()=>requestExecutionValid(request,requestStarted)};if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'user:'+auth.uid})).success))return cors(error('少し待ってから再試行してください。',429));
     if(url.pathname==='/transcribe'&&request.method==='POST'){
       const language=url.searchParams.get('language')||'ja';if(!catalog.languages.some(l=>l.code===language))return cors(error('言語を確認してください。'));
       if(request.headers.get('Content-Type')!=='audio/wav')return cors(error('音声形式を確認してください。',415));
