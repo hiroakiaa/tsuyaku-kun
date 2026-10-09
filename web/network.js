@@ -1,6 +1,6 @@
 const STAGES=new Set(['api','auth','turn','api_simple','api_headers','asr','browser_speech']);
 const OPERATIONS=new Set(['capture','translation','transcribe','room_create','lesson_join','catalog','dictionary_translate','dictionary_candidate','token','initial_auth','turn_credentials','health','other']);
-const RESULTS=new Set(['filtered','queue_overflow','ok','network_or_cors','timeout','http_error','invalid_response','auth_unavailable','no_turn_server','browser_speech_started','browser_speech_error']);
+const RESULTS=new Set(['filtered','queue_overflow','ok','network_or_cors','timeout','http_error','invalid_response','auth_unavailable','no_turn_server','browser_speech_started','browser_speech_ended','browser_speech_error']);
 export function connectionFailure(error,{stage='api',endpoint='',operation='other',status}={}){
  const code=error?.code&&RESULTS.has(error.code)?error.code:error?.name==='TimeoutError'||error?.name==='AbortError'?'timeout':Number.isInteger(status)?'http_error':'network_or_cors';
  const subject=stage==='auth'?'参加の認証':stage==='turn'?'音声中継サーバー':'字幕・翻訳サーバー';
@@ -40,7 +40,7 @@ export function explainConnection(checks,{authentication='unavailable',online=tr
  facts.push(authentication==='ready'?'匿名認証の準備は完了しています。':'匿名認証の準備完了を確認できていません。');
  if(!online)facts.push('端末がオフラインと報告しています。');
  for(const r of [simple,headers,turn,transcribe,translation].filter(Boolean))facts.push((r.stage==='browser_speech'?'ブラウザー音声認識':r.operation==='translation'?'翻訳AI':r.operation==='transcribe'?'音声認識API':({api_simple:'APIの通常通信',api_headers:'APIの認証ヘッダー付き通信',turn:'TURN接続情報の取得'})[r.stage])+'：'+r.code+(r.status?'（HTTP '+r.status+'）':'')+'。');
- const failed=records.filter(r=>!['ok','filtered','browser_speech_started'].includes(r.code));
+ const failed=records.filter(r=>!['ok','filtered','browser_speech_started','browser_speech_ended'].includes(r.code));
  const recent=sessions.filter(s=>Number.isFinite(s.updatedAt)&&s.updatedAt<=now&&now-s.updatedAt<=300000),errors=recent.flatMap(s=>s.events||[]).filter(e=>e.type==='recognition_error'),drops=recent.flatMap(s=>s.events||[]).filter(e=>e.type==='asr_queue_drop');
  if(errors.length){facts.push('直近の利用中に音声認識エラー '+errors.length+'回を観測しました。最後のAPI成功とは別に扱います。');candidates.push({cause:'利用中の音声認識の中断',confidence:'イベントを観測・原因は未確定',evidence:[...new Set(errors.map(e=>e.recognitionCode||'unknown'))].join(', ')});nextSteps.push('音声認識の自動復旧回数と復旧後の字幕を確認してください。');}
  if(drops.length)facts.push('直近の利用で待機音声の破棄 '+drops.length+'回。該当部分はもう一度話す必要があります。');
