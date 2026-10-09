@@ -133,7 +133,7 @@ export class TranslationRoom {
   participants(){return this.ctx.getWebSockets().map(ws=>({ws,a:ws.deserializeAttachment()})).filter(x=>x.a?.uid&&!x.a.left&&(x.ws.readyState===undefined||x.ws.readyState===1));}
   send(ws,data){try{ws.send(JSON.stringify(data));}catch{}}
   broadcast(data){for(const {ws} of this.participants())this.send(ws,data);}
-  roster(){this.broadcast({type:'participants',participants:this.participants().map(({a})=>({id:a.id,name:a.name,language:a.language,role:a.role}))});}
+  roster(){this.broadcast({type:'participants',participants:this.participants().map(({a})=>({id:a.id,name:a.name,language:a.language,viewLanguage:a.viewLanguage,role:a.role}))});}
   async fetch(request){
     const path=new URL(request.url).pathname;if(path==='/budget'){try{return json(await budgetOperation(this.ctx.storage,await body(request,2048)));}catch(e){return json({reason:e.aiReason||'budget'},429);}}
     if(path.startsWith('/codes/')){try{const codes=new LessonCodes(this.ctx.storage),data=await body(request);if(path==='/codes/allocate')return json(await codes.allocate(data));if(path==='/codes/find')return json(await codes.lookup(data.code));if(path==='/codes/release'){await codes.release(data.code,data.id);return json({ok:true});}return error('操作を確認してください。');}catch(e){return error(e.message);}}
@@ -172,6 +172,15 @@ export class TranslationRoom {
       if(data.type==='reauth'){const auth=await verifyToken(data.token,this.env.FIREBASE_PROJECT);if(auth.uid!==a.uid)throw Error('ログインし直してください。');ws.serializeAttachment({...a,...auth,token:data.token});await this.scheduleAlarm(room);return;}
       if(Date.now()-a.window>60000){a.window=Date.now();a.count=0;}if(++a.count>400)throw Error('操作が多すぎます。');ws.serializeAttachment(a);
       if(data.type==='ping'){this.send(ws,{type:'pong'});return;}
+      if(data.type==='participant_language'&&room.mode==='lesson'){
+        if(room.ended)throw Error('この授業は終了しました。');
+        const language=String(data.language||''),target=this.participants().find(p=>p.a.id===data.to);
+        if(!catalog.languages.some(l=>l.code===language))throw Error('言語を確認してください。');
+        if(!target)throw Error('参加者が退室しました。');
+        if(target.a.role==='teacher'||a.role!=='teacher'&&target.a.id!==a.id)throw Error('他の生徒の言語は先生だけが変更できます。');
+        target.ws.serializeAttachment({...target.a,language,viewLanguage:language});
+        this.send(target.ws,{type:'language_changed',language});this.roster();return;
+      }
       if(data.type==='language'&&room.mode==='interpreter'){const language=String(data.language||'');if(!catalog.languages.some(l=>l.code===language))throw Error('言語を確認してください。');ws.serializeAttachment({...a,language,viewLanguage:language,name:(catalog.languages.find(l=>l.code===language)?.labelJa||'ことば')+'の参加者'});this.roster();return;}
       if(data.type==='signal'){if(room.mode==='face')return;
         const other=this.participants().find(p=>p.a.id===data.to);if(!other)return;
