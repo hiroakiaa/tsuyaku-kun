@@ -813,3 +813,7 @@ body.phone-home .caption-stage:has(.caption-composer.is-open) .captions-latest{b
 
 /* Reference pagination blends into the dictionary background. */
 body.phone-home #panel-words .reference-group button.reference-more,body.phone-home #panel-words .reference-group button.reference-more:hover{background:transparent!important;}
+
+/* Dictionary search and selected category contrast. */
+body.phone-home #panel-words .search-field,body.phone-home #panel-words .search-field input,body.phone-home #panel-words .search-field button{background:transparent!important;}
+body.phone-home #panel-words .reference-categories .category-filter[aria-pressed=true]{background:#343438!important;color:#fff!important;font-weight:700;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px;}
