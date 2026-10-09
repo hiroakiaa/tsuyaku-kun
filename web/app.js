@@ -306,7 +306,7 @@ function pauseConversation(reason='background'){
   clearTimeout(reconnectTimer);clearTimeout(authTimer);clearInterval(heartbeat);clearInterval(refreshTimer);clearInterval(metricsTimer);
   socket?.close();socket=null;connectedAt=null;recoveryStartedAt=null;reconnectAttempts=0;
   for(const peer of peers.values()){peer.pc.close();peer.audio.pause();peer.audio.srcObject=null;peer.audio.remove();}peers.clear();
-  participants=[];$('#participants').replaceChildren();turnRoomId=null;updateLiveActions();status('通話を一時停止しました');
+  participants=[];$('#participants').replaceChildren();turnRoomId=null;updateLiveActions();renderCallInvite();status('通話を一時停止しました');
  }
  const button=$('#microphone');paintButton(button,'マイクをONにする','microphone');button.setAttribute('aria-pressed','false');
  if(wasActive){ledger.event(reason==='idle'?'idle_pause':'background_pause');recordPause(reason,undefined,{mode:room.mode,scope:room.mode==='interpreter'?'conversation':'microphone'});message(reason==='idle'?'発話がないためマイクを停止しました。再開するときはマイクをONにしてください。':room.mode==='interpreter'?'画面を離れたため通話を一時停止しました。マイクをONにすると同じルームへ再接続します。':'画面を離れたためマイクを停止しました。再開するときはマイクをONにしてください。');}
