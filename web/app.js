@@ -1,4 +1,4 @@
-import {installConversationUI} from './conversation-ui.js?v=20261009-admin-only-1';
+import {installConversationUI} from './conversation-ui.js?v=20261009-status-clean-1';
 import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261009-mobile-speaker-1';
 import {IdleWatch} from './idle-watch.js?v=20261008-safety-1';
 import {recordResource,recordPause,recordResume} from './resource-usage.js?v=20261009-mobile-speaker-1';
@@ -11,7 +11,7 @@ import {acquireMicrophone} from './microphone.js?v=20261006-mic-1';
 import {UsageLedger} from './usage.js?v=20261009-mobile-speaker-1';
 import {SpeechPlayer} from './speech-player.js?v=20261008-word-highlight-1';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-progressive-1';
-import {installAdmin} from './admin.js?v=20261009-admin-only-1';
+import {installAdmin} from './admin.js?v=20261009-status-clean-1';
 import {config} from './config.js';
 import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection} from './network.js?v=20261009-mobile-speaker-1';
 import {catalog as seed} from '../server/catalog.js?v=20261006-easy-1';
