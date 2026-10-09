@@ -825,3 +825,11 @@ body.phone-home #panel-words .dictionary-search{display:block;width:0;max-height
 body.phone-home #panel-words .dictionary-search.is-open{width:100%;max-height:80px;margin:12px 0;opacity:1;visibility:visible;}
 body.phone-home #panel-words .dictionary-search .search-field{width:100%;box-sizing:border-box;padding-left:0;}
 @media(prefers-reduced-motion:reduce){body.phone-home #panel-words .dictionary-search{transition:none;}}
+
+/* Keep the search focus outline inside the expanding wrapper. */
+body.phone-home #panel-words .dictionary-search{box-sizing:border-box;}
+body.phone-home #panel-words .dictionary-search.is-open{padding:4px;max-height:96px;}
+body.phone-home #panel-words .dictionary-search .search-field{min-width:0;gap:4px;}
+body.phone-home #panel-words .dictionary-search .search-field input{box-sizing:border-box;min-width:0;padding:12px 10px!important;}
+body.phone-home #panel-words .dictionary-search .search-field button{flex:0 0 44px;width:44px;margin:0;padding:8px!important;color:#ddd;}
+body.phone-home #panel-words .dictionary-search .search-field button:disabled{opacity:.45;}
