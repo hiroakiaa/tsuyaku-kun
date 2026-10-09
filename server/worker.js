@@ -4,7 +4,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261009-quality-2';
+const BUILD_ID='20261009-latency-retry-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -42,7 +42,7 @@ const rid=/^[a-f0-9]{32}$/;
 async function body(request,max=32768){const reader=request.body?.getReader();if(!reader)throw Error('データがありません。');let s='',size=0;const decoder=new TextDecoder();try{for(;;){const r=await reader.read();if(r.done)break;size+=r.value.length;if(size>max){await reader.cancel();throw Error('データが大きすぎます。');}s+=decoder.decode(r.value,{stream:true});}s+=decoder.decode();return JSON.parse(s);}finally{reader.releaseLock();}}
 async function bridge(env,token,action,extra={}){if(!env.SHEETS_BRIDGE)return null;const r=await fetch(env.SHEETS_BRIDGE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,idToken:token,...extra}),signal:AbortSignal.timeout(20000)});if(!r.ok)throw Error('辞書との接続を確認してください。');const result=await r.json();if(result.error)throw Error(result.error);return result;}
 export async function translateText(env,text,source,targets,context=[],unit='',data=catalog,onUsage=()=>{}){
-  const timing={serverBuild:BUILD_ID,dictionaryMs:null,aiTotalMs:null,providerMs:null};const reportUsage=onUsage;onUsage=u=>reportUsage({...u,translationTiming:timing});env={...env,translationTiming:timing};
+  const timing={serverBuild:BUILD_ID,dictionaryMs:null,aiTotalMs:null,providerMs:null,budgetWaitMs:null,budgetSettleMs:null,parseMs:null,authMs:env.authMs??null};const reportUsage=onUsage;onUsage=u=>reportUsage({...u,translationTiming:timing});env={...env,translationTiming:timing};
   source=spokenLanguage(source);
   const unique=[...new Set(targets)].filter(c=>c!==source);
   const out={[source]:text};if(!unique.length){onUsage({inputTokens:0,outputTokens:0,cacheHit:true});return out;}
@@ -56,7 +56,7 @@ export async function translateText(env,text,source,targets,context=[],unit='',d
   onUsage({inputTokens:Math.ceil(messages.map(m=>m.content).join('').length/2),outputTokens:0,estimated:true,unknown:true});
   const aiStarted=Date.now();let result;try{result=await runAi(env,'@cf/google/gemma-4-26b-a4b-it',{messages,temperature:0,max_completion_tokens:translationBudget(text,missing.length),store:false,chat_template_kwargs:{enable_thinking:false}});}finally{timing.aiTotalMs=Date.now()-aiStarted;}
   const raw=result.response||result.choices?.[0]?.message?.content||'';const u=result.usage;const measured=Number.isFinite(u?.prompt_tokens)&&Number.isFinite(u?.completion_tokens);onUsage({inputTokens:measured?u.prompt_tokens:Math.ceil(messages.map(m=>m.content).join('').length/2),outputTokens:measured?u.completion_tokens:Math.ceil(raw.length/2),estimated:!measured,unknown:false});
-  return {...out,...restoreUncertainSpeech(parseTranslation(result.response||result.choices?.[0]?.message?.content||'',missing),text,protectedSpeech.spans)};
+  const parseStarted=Date.now();try{return {...out,...restoreUncertainSpeech(parseTranslation(result.response||result.choices?.[0]?.message?.content||'',missing),text,protectedSpeech.spans)};}finally{timing.parseMs=Date.now()-parseStarted;}
 }
 export default {async fetch(request,env){
   const requestStarted=Date.now(),origin=request.headers.get('Origin'),url=new URL(request.url);
@@ -69,7 +69,7 @@ export default {async fetch(request,env){
     
     const match=url.pathname.match(/^\/rooms\/([a-f0-9]{32})(\/socket)?$/);
     if(match){if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'socket:'+(request.headers.get('CF-Connecting-IP')||'local')})).success))return cors(error('少し待ってから再試行してください。',429));const room=env.ROOMS.get(env.ROOMS.idFromName(match[1]));const r=await room.fetch(request);return r.status===101?r:cors(r);}
-    const token=(request.headers.get('Authorization')||'').replace(/^Bearer /,'');const auth=await verifyToken(token,env.FIREBASE_PROJECT);env={...env,budgetUid:auth.uid,executionValid:()=>requestExecutionValid(request,requestStarted)};if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'user:'+auth.uid})).success))return cors(error('少し待ってから再試行してください。',429));
+    const token=(request.headers.get('Authorization')||'').replace(/^Bearer /,'');const authStarted=Date.now(),auth=await verifyToken(token,env.FIREBASE_PROJECT);env={...env,authMs:Date.now()-authStarted,budgetUid:auth.uid,executionValid:()=>requestExecutionValid(request,requestStarted)};if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'user:'+auth.uid})).success))return cors(error('少し待ってから再試行してください。',429));
     if(url.pathname==='/transcribe'&&request.method==='POST'){
       const language=url.searchParams.get('language')||'ja';if(!catalog.languages.some(l=>l.code===language))return cors(error('言語を確認してください。'));
       if(request.headers.get('Content-Type')!=='audio/wav')return cors(error('音声形式を確認してください。',415));
