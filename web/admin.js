@@ -1,4 +1,4 @@
-import {PRICES,costOf,percentile,analysisReport,translationTimingSummary} from './usage.js?v=20261009-recognition-resume-1';
+import {PRICES,costOf,percentile,analysisReport,translationTimingSummary} from './usage.js?v=20261009-rtc-answer-1';
 import {listHistory as storedHistory} from './history.js?v=20261006-school-1';
 import {resourceSnapshot} from './resource-usage.js?v=20261008-safety-2';
 const listHistory=()=>localStorage.getItem('tsuyaku-device-mode')==='personal'?storedHistory():Promise.resolve([]);
