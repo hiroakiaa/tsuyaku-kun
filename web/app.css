@@ -841,7 +841,7 @@ body.phone-home #panel-words .dictionary-search input:focus-visible{outline:none
 
 /* Keep usage moderation readable without horizontal scrolling. */
 body.phone-home .admin-panel>.admin-tab-panel{min-width:0;overflow-x:hidden!important;overflow-wrap:anywhere}
-body.phone-home .admin-word-usage>label{display:flex;flex-direction:row;align-items:center;gap:8px}
-body.phone-home .admin-word-usage>label>input[type=checkbox]{width:18px;min-width:18px;max-width:18px;min-height:18px;height:18px;padding:0;margin:0;flex:none}
-body.phone-home .admin-word-usage li{margin:8px 0}
-body.phone-home .admin-word-usage li select{display:inline-block;width:140px;max-width:100%;min-height:40px;margin:4px 0;font-size:14px}
+body.phone-home #modal-body .admin-word-usage>label{display:flex;flex-direction:row;align-items:center;gap:8px}
+body.phone-home #modal-body .admin-word-usage>label>input[type=checkbox]{width:18px;min-width:18px;max-width:18px;min-height:18px;height:18px;padding:0;margin:0;flex:none}
+body.phone-home #modal-body .admin-word-usage li{margin:8px 0}
+body.phone-home #modal-body .admin-word-usage li select{display:inline-block;width:140px;max-width:100%;min-height:40px;margin:4px 0;font-size:14px}
