@@ -1,10 +1,11 @@
+import {wordStats,validateWordEvents} from './word-stats.js';
 import {inspectTranslations} from '../web/translation-quality.js';
 import {guardedAi,budgetOperation} from './ai-budget.js';
 import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261009-latency-retry-1';
+const BUILD_ID='20261011-continuity-words-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -107,6 +108,7 @@ export default {async fetch(request,env){
       const directory=env.ROOMS.get(env.ROOMS.idFromName('__lesson_codes_v1__'));let reservation;if(data.mode==='lesson'){const response=await directory.fetch(new Request('https://room/codes/allocate',{method:'POST',body:JSON.stringify({id,key})}));reservation=await response.json();if(!response.ok)throw Error(reservation.error);}const expires=reservation?.expires||Date.now()+ROOM_TTL;const result=await env.ROOMS.get(env.ROOMS.idFromName(id)).fetch(new Request('https://room/init',{method:'POST',body:JSON.stringify({id,key,owner:auth.uid,mode:data.mode,code:reservation?.code,unit:String(data.unit||'数学').slice(0,160),expires})}));
       if(!result.ok){if(reservation)await directory.fetch(new Request('https://room/codes/release',{method:'POST',body:JSON.stringify({code:reservation.code,id})}));return cors(result);}return cors(json({id,key,mode:data.mode,code:reservation?.code,expires}));
     }
+    if(url.pathname==='/dictionary/stats'&&['GET','POST'].includes(request.method)){const data=request.method==='POST'?{events:validateWordEvents((await body(request,12000)).events)}:null;const stats=env.ROOMS.get(env.ROOMS.idFromName('__dictionary_stats_v1__'));return cors(await stats.fetch(new Request('https://room/word-stats',{method:data?'POST':'GET',...(data?{body:JSON.stringify(data)}:{})})));}
     if(url.pathname==='/dictionary/usage'&&request.method==='POST'){const data=await body(request,4096);return cors(json(await bridge(env,token,'tsuyakuUsage',{kind:data.kind,id:data.id})||{ok:false}));}
     if(url.pathname==='/dictionary/phrase'&&request.method==='POST'){const data=await body(request,16000);return cors(json(await bridge(env,token,'tsuyakuPhrase',{text:data.text,translations:data.translations})||{ok:false}));}
     if(url.pathname==='/dictionary/candidate'&&request.method==='POST'){
@@ -138,7 +140,7 @@ export class TranslationRoom {
   broadcast(data){for(const {ws} of this.participants())this.send(ws,data);}
   roster(){this.broadcast({type:'participants',participants:this.participants().map(({a})=>({id:a.id,name:a.name,language:a.language,viewLanguage:a.viewLanguage,role:a.role}))});}
   async fetch(request){
-    const path=new URL(request.url).pathname;if(path==='/budget'){try{return json(await budgetOperation(this.ctx.storage,await body(request,2048)));}catch(e){return json({reason:e.aiReason||'budget'},429);}}
+    const path=new URL(request.url).pathname;if(path==='/word-stats'){try{return json(await wordStats(this.ctx.storage,request.method==='POST'?(await body(request,12000)).events:null));}catch(e){return error(e.message,400);}}if(path==='/budget'){try{return json(await budgetOperation(this.ctx.storage,await body(request,2048)));}catch(e){return json({reason:e.aiReason||'budget'},429);}}
     if(path.startsWith('/codes/')){try{const codes=new LessonCodes(this.ctx.storage),data=await body(request);if(path==='/codes/allocate')return json(await codes.allocate(data));if(path==='/codes/find')return json(await codes.lookup(data.code));if(path==='/codes/release'){await codes.release(data.code,data.id);return json({ok:true});}return error('操作を確認してください。');}catch(e){return json({error:e.message,...(e.errorCode?{errorCode:e.errorCode}:{})},400);}}
     if(path==='/init'){if(await this.info())return error('ルームは作成済みです。',409);const data=await body(request);await this.ctx.storage.put('room',data);await this.ctx.storage.setAlarm(data.expires);return json({ok:true});}
     const room=await this.info();if(!room||room.expires<=Date.now())return error('このルームは終了しました。',410);
