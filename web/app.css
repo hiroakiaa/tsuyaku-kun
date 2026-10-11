@@ -838,3 +838,10 @@ body.phone-home #panel-words .dictionary-search .search-field button:disabled{op
 body.phone-home #panel-words .dictionary-search .search-field{border:0!important;border-bottom:1px solid #55555b!important;border-radius:0!important;outline:none!important;box-shadow:none!important;transition:border-color .2s ease;}
 body.phone-home #panel-words .dictionary-search .search-field:focus-within{border-bottom-color:#fff!important;outline:none!important;}
 body.phone-home #panel-words .dictionary-search input:focus-visible{outline:none!important;}
+
+/* Keep usage moderation readable without horizontal scrolling. */
+body.phone-home .admin-panel>.admin-tab-panel{min-width:0;overflow-x:hidden!important;overflow-wrap:anywhere}
+body.phone-home .admin-word-usage>label{display:flex;flex-direction:row;align-items:center;gap:8px}
+body.phone-home .admin-word-usage>label>input[type=checkbox]{width:18px;min-width:18px;max-width:18px;min-height:18px;height:18px;padding:0;margin:0;flex:none}
+body.phone-home .admin-word-usage li{margin:8px 0}
+body.phone-home .admin-word-usage li select{display:inline-block;width:140px;max-width:100%;min-height:40px;margin:4px 0;font-size:14px}
