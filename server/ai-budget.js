@@ -15,6 +15,11 @@ export async function budgetOperation(storage,data,now=Date.now()){
   const day=Math.floor(now/DAY);let state=await tx.get('budget');
   if(!state||state.day!==day)state={day,total:0,users:{},leases:{},blockedUntil:0};
   for(const [id,l]of Object.entries(state.leases))if(l.expires<=now)delete state.leases[id];
+  if(data.action==='status'){
+   const user=state.users[String(data.uid||'unknown').slice(0,128)]||{cost:0,calls:0};
+   const globalRemaining=Math.max(0,80000-state.total),userRemaining=Math.max(0,20000-user.cost);
+   return {day:new Date(day*DAY).toISOString().slice(0,10),asOf:now,resetsAt:(day+1)*DAY,currency:'USD',global:{limitUSD:.08,usedUSD:state.total/1e6,remainingUSD:globalRemaining/1e6},user:{limitUSD:.02,usedUSD:user.cost/1e6,remainingUSD:userRemaining/1e6,calls:user.calls,callLimit:1000,callsRemaining:Math.max(0,1000-user.calls)},availableUSD:state.blockedUntil>now?0:Math.min(globalRemaining,userRemaining)/1e6,blocked:state.blockedUntil>now,inFlight:Object.values(state.leases).length};
+  }
   if(data.action==='reserve'){
    const uid=String(data.uid||'unknown').slice(0,128),cost=data.cost;
    if(!Number.isSafeInteger(cost)||cost<1||cost>10000)throw budgetError();

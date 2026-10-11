@@ -5,7 +5,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261011-continuity-words-1';
+const BUILD_ID='20261012-budget-dashboard-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -71,6 +71,11 @@ export default {async fetch(request,env){
     const match=url.pathname.match(/^\/rooms\/([a-f0-9]{32})(\/socket)?$/);
     if(match){if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'socket:'+(request.headers.get('CF-Connecting-IP')||'local')})).success))return cors(error('少し待ってから再試行してください。',429));const room=env.ROOMS.get(env.ROOMS.idFromName(match[1]));const r=await room.fetch(request);return r.status===101?r:cors(r);}
     const token=(request.headers.get('Authorization')||'').replace(/^Bearer /,'');const authStarted=Date.now(),auth=await verifyToken(token,env.FIREBASE_PROJECT);env={...env,authMs:Date.now()-authStarted,budgetUid:auth.uid,executionValid:()=>requestExecutionValid(request,requestStarted)};if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'user:'+auth.uid})).success))return cors(error('少し待ってから再試行してください。',429));
+    if(url.pathname==='/usage/budget'&&request.method==='GET'){
+      const budget=env.ROOMS.get(env.ROOMS.idFromName('__ai_budget_v1__'));
+      const response=await budget.fetch(new Request('https://budget/budget',{method:'POST',body:JSON.stringify({action:'status',uid:auth.uid})}));
+      const result=cors(json(await response.json(),response.status));result.headers.set('Cache-Control','no-store');return result;
+    }
     if(url.pathname==='/transcribe'&&request.method==='POST'){
       const language=url.searchParams.get('language')||'ja';if(!catalog.languages.some(l=>l.code===language))return cors(error('言語を確認してください。'));
       if(request.headers.get('Content-Type')!=='audio/wav')return cors(error('音声形式を確認してください。',415));
