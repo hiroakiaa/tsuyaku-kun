@@ -1,6 +1,7 @@
 // Curated generic reference data. Student/teacher information and conversation history are excluded.
 export const catalog = {
   "languages": [
+    {"code":"de","speechCode":"de-DE","labelJa":"ドイツ語","labelNative":"Deutsch"},
     {
       "code": "ja",
       "speechCode": "ja-JP",
