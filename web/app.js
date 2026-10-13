@@ -16,7 +16,7 @@ import {installAdmin} from './admin.js?v=20261012-budget-labels-2';
 import {config} from './config.js';
 import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection} from './network.js?v=20261009-mobile-speaker-1';
 import {catalog as seed} from '../server/catalog.js?v=20261006-easy-1';
-import {translationOf,spokenLanguage,withEasyJapanese} from './core.js?v=20261007-progressive-1';
+import {translationOf,spokenLanguage,withEasyJapanese} from './core.js?v=20261013-german-1';
 import {speakerCaption,speakerInfo} from './face-mode.js?v=20261006-school-1';
 import {callCaptionLanguages,isDisplayableCaption} from './call-mode.js?v=20261006-easy-1';
 import {listHistory as storedHistory} from './history.js?v=20261006-school-1';
