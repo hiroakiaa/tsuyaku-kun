@@ -1,5 +1,11 @@
 export const spokenLanguage=code=>code==='ja-easy'?'ja':code;
-export function withEasyJapanese(data){return {...data,languages:[...(!data.languages.some(l=>l.code==='de')?[{code:'de',speechCode:'de-DE',labelJa:'ドイツ語',labelNative:'Deutsch'}]:[]),...data.languages.filter(l=>l.code!=='ja-easy'),{code:'ja-easy',speechCode:'ja-JP',labelJa:'やさしい日本語',labelNative:'やさしい日本語',icon:'comment'}]};}
+export const LANGUAGE_ORDER=['ja','en','pt','es','tl','vi','zh-CN','ko','id','ne','de','fil','ja-easy'];
+export function withEasyJapanese(data){
+ const languages=[...data.languages.filter(l=>l.code!=='ja-easy'),...(!data.languages.some(l=>l.code==='de')?[{code:'de',speechCode:'de-DE',labelJa:'ドイツ語',labelNative:'Deutsch'}]:[]),{code:'ja-easy',speechCode:'ja-JP',labelJa:'やさしい日本語',labelNative:'やさしい日本語',icon:'comment'}];
+ const rank=code=>{const index=LANGUAGE_ORDER.indexOf(code);return index<0?LANGUAGE_ORDER.length:index;};
+ languages.sort((a,b)=>rank(a.code)-rank(b.code)||a.code.localeCompare(b.code));
+ return {...data,languages};
+}
 export const normalizeLanguage = code => code === 'zh' ? 'zh-CN' : code;
 export const translationField = code => ({'ja-easy':'simpleJaText',ja:'jaText',en:'enText',pt:'ptText',es:'esText',vi:'viText','zh-CN':'zhText',ko:'koText',tl:'tlText',fil:'tlText',id:'idText',ne:'neText',de:'deText'})[code];
 export function translationOf(row, code) {return row[translationField(code)] || (code==='ja-easy' ? row.descriptionJa : '') || (code==='ja' ? row.ja || row.title : code==='en' ? row.en : '') || '';}
