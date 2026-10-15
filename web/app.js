@@ -14,7 +14,7 @@ import {SpeechPlayer} from './speech-player.js?v=20261010-speech-progress-1';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-progressive-1';
 import {installAdmin} from './admin.js?v=20261012-budget-labels-2';
 import {config} from './config.js';
-import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection} from './network.js?v=20261009-mobile-speaker-1';
+import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection as explainRecentConnection} from './network.js?v=20261009-mobile-speaker-1';
 import {catalog as seed} from '../server/catalog.js?v=20261006-easy-1';
 import {translationOf,spokenLanguage,withEasyJapanese} from './core.js?v=20261013-german-1';
 import {speakerCaption,speakerInfo} from './face-mode.js?v=20261006-school-1';
@@ -329,3 +329,6 @@ conversationUI=installConversationUI({getState:conversationState,stop:()=>{if(ro
 
 // Flush bounded batches only while visible. Failures stay queued for a later foreground run.
 setInterval(()=>{if(document.visibilityState==='visible'&&user)void sharedWords.flush().catch(()=>{});},60000);
+
+// Daily observations are separate from the five-minute current connection diagnosis.
+function explainConnection(checks,options={}){const result=explainRecentConnection(checks,options),now=options.now??Date.now(),day=new Date(now).toISOString().slice(0,10),today=(options.sessions||[]).filter(s=>new Date(s.startedAt).toISOString().slice(0,10)===day),errors=today.flatMap(s=>(s.events||[]).filter(e=>e.type==='recognition_error'));result.dailyObservations={utcDay:day,recognitionErrors:errors.length,recognitionCodes:[...new Set(errors.map(e=>e.recognitionCode||'unknown'))],speechTimingSamples:today.reduce((n,s)=>n+(s.speechLatencies||[]).length,0)};if(errors.length)result.facts.push('当日UTCの利用履歴：音声認識エラー '+errors.length+'回（'+result.dailyObservations.recognitionCodes.join(', ')+'）。現在の障害とは別の記録です。');if(today.length&&!result.dailyObservations.speechTimingSamples)result.facts.push('当日の発話から表示までの時間は未計測です。ブラウザー認識には発話時刻がないため、翻訳時間を体感待ち時間として扱いません。');return result;}
