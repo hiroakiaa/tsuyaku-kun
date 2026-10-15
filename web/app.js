@@ -9,7 +9,7 @@ import {ReviewedStore} from './reviewed-store.js';
 import {PersonalPhrases} from './personal-phrases.js?v=20261007-learning-1';
 import {recognitionHints} from './recognition-hints.js?v=20261007-progressive-1';
 import {acquireMicrophone} from './microphone.js?v=20261006-mic-1';
-import {UsageLedger,WordUsage} from './usage.js?v=20261011-continuity-words-1';
+import {UsageLedger,WordUsage} from './usage.js?v=20261015-microphone-lesson-1';
 import {SpeechPlayer} from './speech-player.js?v=20261010-speech-progress-1';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-progressive-1';
 import {installAdmin} from './admin.js?v=20261012-budget-labels-2';
