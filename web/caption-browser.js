@@ -15,7 +15,7 @@ export function createBrowserRecognition({language, Native, onDiagnostic = () =>
       const started=()=>{if(!this.active||this.native!==native)return;cancel(this.startWatch);this.startWatch=null;};
       native.onstart=()=>{started();if(this.active&&this.native===native)onDiagnostic({code:'browser_speech_started'});};
       native.onresult=event=>{started();
-        if(!this.active)return;
+        if(!this.active||this.native!==native)return;
         for(let i=event.resultIndex;i<event.results.length;i++){
           const result=event.results[i],text=result?.[0]?.transcript?.trim();
           if(!result?.isFinal||!text)continue;
@@ -26,14 +26,14 @@ export function createBrowserRecognition({language, Native, onDiagnostic = () =>
         }
       };
       native.onerror=event=>{started();
-        if(!this.active)return;
+        if(!this.active||this.native!==native)return;
         if(event.error==='aborted'){this.finishFragment();this.active=false;onDiagnostic({code:'browser_speech_ended'});this.onend?.();return;}
         if(event.error==='no-speech'){this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:'empty'});return;}
         const error=['not-allowed','service-not-allowed'].includes(event.error)?'auth':event.error==='audio-capture'?'audio-capture':'service';
         onDiagnostic({code:'browser_speech_error',recognitionCode:event.error});
         this.fail(error);
       };
-      native.onend=()=>{started();if(!this.active)return;this.finishFragment();this.active=false;onDiagnostic({code:'browser_speech_ended'});this.onend?.();};
+      native.onend=()=>{started();if(!this.active||this.native!==native)return;this.finishFragment();this.active=false;onDiagnostic({code:'browser_speech_ended'});this.onend?.();};
       this.startWatch=schedule(()=>{if(this.active&&this.native===native){onDiagnostic({code:'browser_speech_error',recognitionCode:'start_timeout'});this.fail('audio-capture');}},8000);
       try{native.start();}catch{this.fail('service');}
     }
