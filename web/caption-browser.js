@@ -3,16 +3,18 @@ import {nonSpeechReason} from './speech-filter.js?v=20261007-learning-1';
 
 // The browser may use its vendor's speech service. This is not an offline guarantee.
 // Reuse the bounded fragment assembler so dates and their following sentence stay together.
-export function createBrowserRecognition({language, Native, onDiagnostic = () => {}}) {
+export function createBrowserRecognition({language, Native, onDiagnostic = () => {}, schedule = setTimeout, cancel = clearTimeout}) {
   if (!Native) return null;
   const Base = createServerRecognition({Context:null,Worklet:null});
   return class BrowserRecognition extends Base {
     start() {
-      this.active=true;
+      this.abort();this.active=true;
       let native;
       try{native=this.native=new Native();}catch{this.fail('service');return;}
       native.lang=language; native.continuous=true; native.interimResults=false; native.maxAlternatives=1;
-      native.onresult=event=>{
+      const started=()=>{if(!this.active||this.native!==native)return;cancel(this.startWatch);this.startWatch=null;};
+      native.onstart=()=>{started();if(this.active&&this.native===native)onDiagnostic({code:'browser_speech_started'});};
+      native.onresult=event=>{started();
         if(!this.active)return;
         for(let i=event.resultIndex;i<event.results.length;i++){
           const result=event.results[i],text=result?.[0]?.transcript?.trim();
@@ -23,7 +25,7 @@ export function createBrowserRecognition({language, Native, onDiagnostic = () =>
           this.acceptText(text,{recognitionReadyAt:Date.now(),boundary:'pause'});
         }
       };
-      native.onerror=event=>{
+      native.onerror=event=>{started();
         if(!this.active)return;
         if(event.error==='aborted'){this.finishFragment();this.active=false;onDiagnostic({code:'browser_speech_ended'});this.onend?.();return;}
         if(event.error==='no-speech'){this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:'empty'});return;}
@@ -31,9 +33,10 @@ export function createBrowserRecognition({language, Native, onDiagnostic = () =>
         onDiagnostic({code:'browser_speech_error',recognitionCode:event.error});
         this.fail(error);
       };
-      native.onend=()=>{if(!this.active)return;this.finishFragment();this.active=false;onDiagnostic({code:'browser_speech_ended'});this.onend?.();};
-      try{native.start();onDiagnostic({code:'browser_speech_started'});}catch{this.fail('service');}
+      native.onend=()=>{started();if(!this.active)return;this.finishFragment();this.active=false;onDiagnostic({code:'browser_speech_ended'});this.onend?.();};
+      this.startWatch=schedule(()=>{if(this.active&&this.native===native){onDiagnostic({code:'browser_speech_error',recognitionCode:'start_timeout'});this.fail('audio-capture');}},8000);
+      try{native.start();}catch{this.fail('service');}
     }
-    abort(){super.abort();if(this.native){this.native.onresult=this.native.onerror=this.native.onend=null;try{this.native.abort();}catch{}this.native=null;}}
+    abort(){cancel(this.startWatch);this.startWatch=null;super.abort();if(this.native){this.native.onstart=this.native.onresult=this.native.onerror=this.native.onend=null;try{this.native.abort();}catch{}this.native=null;}}
   };
 }
