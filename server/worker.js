@@ -1,3 +1,4 @@
+import {translatePhotoBlocks} from './photo-translation.js';
 import {photoBudget,photoOperation,photoUid,recognizePhoto} from './photo-ocr.js';
 import {speechBudget,speechOperation,synthesizeFilipino} from './cloud-speech.js';
 import {wordStats,validateWordEvents} from './word-stats.js';
@@ -7,7 +8,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261020-photo-1';
+const BUILD_ID='20261020-photo-overlay-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -76,6 +77,10 @@ export default {async fetch(request,env){
     if(url.pathname.startsWith('/photo/')){try{
       if(url.pathname==='/photo/status'&&request.method==='GET')return cors(json({enabled:!!env.GOOGLE_VISION_API_KEY,...await photoOperation(env,{action:'status',uid:await photoUid(auth.uid)})}));
       if(url.pathname==='/photo/recognize'&&request.method==='POST')return cors(json(await recognizePhoto(env,await body(request,2810000))));
+      if(url.pathname==='/photo/translate'&&request.method==='POST'){
+       try{return cors(json(await translatePhotoBlocks(await body(request,24000),catalog,input=>runAi(env,'@cf/google/gemma-4-26b-a4b-it',input))));}
+       catch(e){if(e.status)throw e;const failure=aiFailure(e);return cors(json({error:failure.message,aiFailure:failure},failure.reason==='quota'?429:502));}
+      }
       return cors(error('写真の操作を確認してください。',404));
     }catch(e){return cors(error(e.message||'写真を読み取れませんでした。',e.status||502));}}
     if(url.pathname==='/speech/status'&&request.method==='GET')return cors(json({enabled:!!env.GOOGLE_TTS_API_KEY,voice:'fil-PH-Wavenet-A',...await speechOperation(env,{action:'status'})}));

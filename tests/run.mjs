@@ -1,3 +1,4 @@
+import './photo-overlay.mjs';
 import './photo-ocr.mjs';
 import './cloud-speech.mjs';
 import './ui-english.mjs';

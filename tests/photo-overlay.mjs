@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {photoLayout} from '../server/photo-ocr.js';
+import {photoTranslationInput,translatePhotoBlocks} from '../server/photo-translation.js';
+import {matchingPhotoBlocks,wrapPhotoText,drawPhotoOverlay} from '../web/photo-overlay.js';
+const paragraph=(text,y)=>({boundingBox:{vertices:[{y},{x:800,y},{x:800,y:y+100},{y:y+100}]},words:[{symbols:[...text].map(text=>({text}))}]});
+const layout=photoLayout({fullTextAnnotation:{pages:[{width:1000,height:1000,blocks:[{paragraphs:[paragraph('提出日は10月20日です。',100),paragraph('教科書を持ってきてください。',400)]}]}]}});
+assert.equal(layout.length,2);assert.equal(layout[0].id,'b0');assert.equal(layout[0].box.x,0);assert.equal(layout[0].box.y,.1);assert.equal(layout[0].box.width,.8);
+const text=layout.map(b=>b.text).join('\n');assert.equal(matchingPhotoBlocks(text,text,layout),layout);assert.equal(matchingPhotoBlocks(text.replace('20','21'),text,layout),null);assert.equal(matchingPhotoBlocks(text.slice(0,5),text,layout),null);assert.equal(matchingPhotoBlocks(text,text,[...layout].reverse()),null);assert.equal(matchingPhotoBlocks(text,text,[{...layout[0],box:{x:NaN,y:0,width:1,height:1}}]),null);
+const catalog={languages:[{code:'ja'},{code:'en'},{code:'pt'}],glossary:[],bank:[],phrases:[]};let calls=0;
+const input={source:'ja',targets:['ja','en','pt'],blocks:layout};
+const translated=await translatePhotoBlocks(input,catalog,async request=>{calls++;const sent=JSON.parse(request.messages[1].content);assert.equal(sent.blocks.length,2);return {response:JSON.stringify({blocks:[{id:'b1',translations:{en:'Bring your textbook.',pt:'Traga seu livro.'}},{id:'b0',translations:{en:'Due October 20.',pt:'Entrega em 20 de outubro.'}}]}),usage:{prompt_tokens:100,completion_tokens:40}};});
+assert.equal(calls,1,'all blocks and languages must use one budgeted AI request');assert.equal(translated.blocks[0].id,'b0');assert.equal(translated.blocks[0].translations.en,'Due October 20.');assert.equal(translated.blocks[1].translations.ja,layout[1].text);
+await assert.rejects(()=>translatePhotoBlocks(input,catalog,async()=>({response:'{"blocks":[{"id":"wrong","translations":{"en":"x"}}]}'})));
+assert.throws(()=>photoTranslationInput({...input,blocks:[layout[0],layout[0]]},['ja','en','pt']));assert.throws(()=>photoTranslationInput({...input,blocks:[{id:'b0',text:'a'.repeat(1201)}]},['ja','en','pt']));
+assert.deepEqual(wrapPhotoText(t=>t.length,'abc\ndef',2),['ab','c','de','f']);
+const draws=[],ctx={drawImage(){},fillRect(x,y,w,h){assert.ok(x>=0&&y>=0&&w>0&&h>0);},save(){},beginPath(){},rect(){},clip(){},restore(){},measureText(text){return {width:text.length*Number(this.font.split(' ')[1].replace('px',''))/2};},fillText(text,x,y){draws.push({text,x,y});}};
+const canvas={getContext:()=>ctx};drawPhotoOverlay(canvas,{width:1000,height:1000},layout,translated.blocks,'en');assert.equal(canvas.width,1000);assert.ok(draws.some(d=>d.text.includes('Due')));assert.ok(draws.every(d=>d.x>=0&&d.y>=0));
+console.log('Photo overlay: OCR paragraph geometry, edited-text protection, one AI call, strict ID mapping and bounded drawing passed');

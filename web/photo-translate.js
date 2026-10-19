@@ -1,3 +1,4 @@
+import {matchingPhotoBlocks,drawPhotoOverlay} from './photo-overlay.js?v=20261020-photo-overlay-1';
 export function photoTranslationText(text,start=0,end=0){const selected=end>start?text.slice(start,end):text;const value=selected.trim();if(!value||value.length>1200)throw Error('訳す部分を選択するか、原文を1200文字以内に直してください。');return value;}
 export function cropRect(width,height,crop){
  const [left,top,right,bottom]=crop.map(Number);if(![width,height,...crop].every(n=>Number.isFinite(Number(n)))||width<1||height<1||left<0||top<0||right>100||bottom>100||right-left<5||bottom-top<5)throw Error('読取範囲を広げてください。');
@@ -20,40 +21,46 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
   const sourceLabel=el('label','原文の言語'),targetLabel=el('label','訳す言語');sourceLabel.append(source);targetLabel.append(target);const languageRow=el('div',undefined,'photo-languages');languageRow.append(sourceLabel,targetLabel);
   const translate=el('button','確認した原文を翻訳する');translate.type='button';translate.disabled=true;
   const count=el('p','1200文字まで。長い場合は、原文の訳したい部分を選択してから翻訳できます。','photo-help'),result=el('div',undefined,'photo-results');
-  root.append(help,file,preview,crop,consentLabel,recognize,notice,textLabel,count,languageRow,translate,result,el('p','写真はサーバーに保存しません。読取結果・訳はこのページを開いている間だけ再利用します。ページを閉じる・再読み込みすると消えます。','photo-help'));
+  const overlay=el('section',undefined,'photo-overlay');overlay.hidden=true;const overlayMode=el('input');overlayMode.type='checkbox';overlayMode.checked=true;const overlayLabel=el('label','画像に訳を重ねる');overlayLabel.prepend(overlayMode);const zoom=el('input');zoom.type='range';zoom.min='1';zoom.max='4';zoom.step='.5';zoom.value='1';zoom.setAttribute('aria-label','翻訳画像の拡大');const zoomLabel=el('label','拡大');zoomLabel.append(zoom);const viewport=el('div',undefined,'photo-overlay-viewport'),overlayCanvas=el('canvas'),overlayNote=el('p','画像上の訳は必要に応じて拡大できます。全文は下の訳文で確認してください。','photo-help');overlayCanvas.setAttribute('aria-label','写真に重ねた翻訳。全文は下に表示します。');viewport.append(overlayCanvas);overlay.append(el('h3','画像上の翻訳'),overlayLabel,zoomLabel,viewport,overlayNote);overlayMode.onchange=()=>{viewport.hidden=!overlayMode.checked;};zoom.oninput=()=>{overlayCanvas.style.width=Number(zoom.value)*100+'%';};
+  root.append(help,file,preview,crop,consentLabel,recognize,notice,textLabel,count,languageRow,translate,overlay,result,el('p','写真はサーバーに保存しません。読取結果・訳はこのページを開いている間だけ再利用します。ページを閉じる・再読み込みすると消えます。','photo-help'));
   modal('写真を翻訳',root);
-  let image=null,objectURL=null,busy=false,closed=false,epoch=0,controller=null,requestId=null,currentHash=null;
+  let image=null,objectURL=null,busy=false,closed=false,epoch=0,controller=null,requestId=null,currentHash=null,ocrText='',ocrBlocks=[];
   const dialog=root.closest('dialog');
-  const close=()=>{closed=true;epoch++;controller?.abort();if(objectURL)URL.revokeObjectURL(objectURL);image=null;preview.width=preview.height=1;};dialog.addEventListener('close',close,{once:true});
+  const close=()=>{closed=true;epoch++;controller?.abort();if(objectURL)URL.revokeObjectURL(objectURL);image=null;preview.width=preview.height=overlayCanvas.width=overlayCanvas.height=1;};dialog.addEventListener('close',close,{once:true});
   function buttons(){file.disabled=busy;consent.disabled=busy;ranges.forEach(r=>r.disabled=busy);recognize.disabled=busy||!image||!consent.checked;translate.disabled=busy||!text.value.trim();source.disabled=target.disabled=text.disabled=busy;root.setAttribute('aria-busy',String(busy));}
-  function draw(){if(!image)return;const area=cropRect(image.naturalWidth,image.naturalHeight,cropValues),scale=Math.min(1,1800/Math.max(area.width,area.height));preview.width=Math.round(area.width*scale);preview.height=Math.round(area.height*scale);const ctx=preview.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,preview.width,preview.height);ctx.drawImage(image,area.x,area.y,area.width,area.height,0,0,preview.width,preview.height);currentHash=null;requestId=null;text.value='';textLabel.hidden=true;result.replaceChildren();buttons();}
-  consent.onchange=buttons;text.oninput=()=>{result.replaceChildren();buttons();};
+  function draw(){if(!image)return;const area=cropRect(image.naturalWidth,image.naturalHeight,cropValues),scale=Math.min(1,1800/Math.max(area.width,area.height));preview.width=Math.round(area.width*scale);preview.height=Math.round(area.height*scale);const ctx=preview.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,preview.width,preview.height);ctx.drawImage(image,area.x,area.y,area.width,area.height,0,0,preview.width,preview.height);currentHash=null;requestId=null;text.value='';textLabel.hidden=true;ocrText='';ocrBlocks=[];clearTranslation();buttons();}
+  function clearTranslation(){result.replaceChildren();overlay.hidden=true;}
+  consent.onchange=buttons;text.oninput=()=>{clearTranslation();buttons();};source.onchange=target.onchange=clearTranslation;
   file.onchange=async()=>{
-   const selected=file.files?.[0];if(!selected)return;const version=++epoch;busy=true;buttons();text.value='';textLabel.hidden=true;result.replaceChildren();preview.hidden=true;crop.hidden=true;image=null;requestId=currentHash=null;notice.textContent='写真を準備しています…';
+   const selected=file.files?.[0];if(!selected)return;const version=++epoch;busy=true;buttons();text.value='';textLabel.hidden=true;ocrText='';ocrBlocks=[];clearTranslation();preview.hidden=true;crop.hidden=true;image=null;requestId=currentHash=null;notice.textContent='写真を準備しています…';
    try{if(selected.size>15000000)throw Error('15MB以内の写真を選んでください。');if(objectURL)URL.revokeObjectURL(objectURL);objectURL=URL.createObjectURL(selected);const next=new Image();next.src=objectURL;await next.decode();if(closed||version!==epoch)return;if(next.naturalWidth*next.naturalHeight>50000000)throw Error('画像が大きすぎます。小さくして選び直してください。');image=next;cropValues.splice(0,4,0,0,100,100);ranges.forEach((r,i)=>{r.value=cropValues[i];r.nextElementSibling.value=r.value+'%';});draw();preview.hidden=crop.hidden=false;notice.textContent='範囲と写りを確認し、写真の送信にチェックを入れてください。';}
    catch(e){if(!closed&&version===epoch)notice.textContent='写真を開けませんでした。'+(e.message||'JPEG・PNGの写真をお試しください。');}
    finally{if(!closed&&version===epoch){busy=false;buttons();}}
   };
   async function bounded(operation){controller=new AbortController();let timer;try{return await Promise.race([operation(controller.signal),new Promise((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(Error('時間内に完了しませんでした。通信を確認してください。'));},22000);})]);}finally{clearTimeout(timer);}}
   recognize.onclick=async()=>{
-   if(busy||!image||!consent.checked)return;busy=true;buttons();const version=epoch;notice.textContent='文字を読み取っています…';result.replaceChildren();
+   if(busy||!image||!consent.checked)return;busy=true;buttons();const version=epoch;notice.textContent='文字を読み取っています…';clearTranslation();
    try{
     const dataURL=preview.toDataURL('image/jpeg',.9),base64=dataURL.split(',')[1];if(base64.length>2800000)throw Error('画像が大きすぎます。読取範囲を絞ってください。');
     const bytes=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(base64)));currentHash=[...bytes].map(b=>b.toString(16).padStart(2,'0')).join('');
     let data=images.get(currentHash),cached=!!data;
     if(!data){requestId||=crypto.randomUUID();data=await bounded(signal=>api('/photo/recognize',{image:base64,id:requestId},{signal}));remember(images,currentHash,data);}
-    if(closed||version!==epoch)return;text.value=data.text;textLabel.hidden=false;notice.textContent=!data.text?'文字が見つかりませんでした。写真を選び直してください。':(cached?'保存中の読取結果を使いました。':'読み取れました。')+(data.truncated?'長い原文のため、一部だけ表示しています。範囲を絞ってください。':'原文の数字・日付・名前を確認してから翻訳してください。');
+    if(closed||version!==epoch)return;text.value=data.text;ocrText=data.text;ocrBlocks=data.blocks||[];textLabel.hidden=false;notice.textContent=!data.text?'文字が見つかりませんでした。写真を選び直してください。':(cached?'保存中の読取結果を使いました。':'読み取れました。')+(data.truncated?'長い原文のため、一部だけ表示しています。範囲を絞ってください。':'原文の数字・日付・名前を確認してから翻訳してください。');
    }catch(e){if(!closed&&version===epoch)notice.textContent=e.message||'文字を読み取れませんでした。';}
    finally{if(!closed&&version===epoch){busy=false;buttons();}}
   };
   translate.onclick=async()=>{
    if(busy)return;let original;try{original=photoTranslationText(text.value,text.selectionStart,text.selectionEnd);}catch(e){notice.textContent=e.message;return;}
-   busy=true;buttons();result.replaceChildren();notice.textContent='翻訳しています…';const version=epoch,from=source.value,to=target.value,targets=[...new Set(['ja',to,'en'])],key=JSON.stringify([original,from,targets]);
+   busy=true;buttons();clearTranslation();notice.textContent='翻訳しています…';const version=epoch,from=source.value,to=target.value,targets=[...new Set(['ja',to,'en'])],blocks=matchingPhotoBlocks(original,ocrText,ocrBlocks),key=JSON.stringify([original,from,targets,blocks?blocks.map(b=>[b.id,b.text]):null]);
    try{
-    let data=translations.get(key),cached=!!data;if(!data){data=await bounded(signal=>api('/translate',{text:original,source:from,targets,unit:'学校の配布物。原文の段落・箇条書き・数字・日付・否定を保ち、読めない箇所を推測で補わない。'},{signal}));remember(translations,key,data);}
+    let data=translations.get(key),cached=!!data;if(!data){
+     data=blocks?await bounded(signal=>api('/photo/translate',{blocks:blocks.map(b=>({id:b.id,text:b.text})),source:from,targets},{signal})):await bounded(signal=>api('/translate',{text:original,source:from,targets,unit:'学校の配布物。原文の段落・箇条書き・数字・日付・否定を保ち、読めない箇所を推測で補わない。'},{signal}));
+     if(blocks)data={...data,translations:Object.fromEntries([...new Set([from,...targets])].map(code=>[code,data.blocks.map(b=>b.translations[code]).join('\n\n')])),quality:{warnings:data.blocks.flatMap(b=>b.quality?.warnings||[])}};remember(translations,key,data);
+    }
     if(closed||version!==epoch)return;
+    if(blocks&&data.blocks){const painted=drawPhotoOverlay(overlayCanvas,preview,blocks,data.blocks,to);overlay.hidden=false;viewport.hidden=!overlayMode.checked;overlayNote.textContent=painted.clipped?'画像内に収まらない訳は「…」で示しています。全文は下の訳文で確認してください。':'読める大きさに拡大できます。全文は下の訳文でも確認できます。';}
     for(const code of [...new Set([from,...targets])]){const translated=code===from?original:data.translations?.[code];if(!translated)continue;const section=el('section',undefined,'reference-language'),name=languages().find(l=>l.code===code)?.labelJa||code;section.setAttribute('aria-label',name);section.append(el('h3',name),el('p',translated,'reference-language-text'),speechControls(translated,code,'photo:'+crypto.randomUUID()+':'+code));result.append(section);}
-    notice.textContent=(cached?'保存中の訳を使いました。':'翻訳しました。')+(data.quality?.warnings?.length?'数字・日付など、訳の確認が必要な箇所があります。':'原文と訳を見比べて確認してください。');updateSpeechControls();
+    notice.textContent=(cached?'保存中の訳を使いました。':'翻訳しました。')+(!blocks?'位置情報と原文が一致しないため通常表示にしています。':'')+(data.quality?.warnings?.length?'数字・日付など、訳の確認が必要な箇所があります。':'原文と訳を見比べて確認してください。');updateSpeechControls();
    }catch(e){if(!closed&&version===epoch)notice.textContent=e.message||'翻訳できませんでした。原文は残しています。';}
    finally{if(!closed&&version===epoch){busy=false;buttons();}}
   };
