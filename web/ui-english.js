@@ -1,4 +1,4 @@
-import {uiLabels} from './ui-labels.js?v=20261019-english-guides-1';
+import {uiLabels} from './ui-labels.js?v=20261020-english-guides-2';
 
 export const ENGLISH_GUIDES_KEY='tsuyaku-english-guides-v1';
 export function guidesEnabled(storage){try{return storage.getItem(ENGLISH_GUIDES_KEY)!=='off';}catch{return true;}}
@@ -79,8 +79,8 @@ export function installEnglishGuides({doc=document,storage=localStorage,Observer
   annotateControls(scope);
   const walker=doc.createTreeWalker(scope,4),nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);for(const node of nodes)annotateText(node);
  }
- const observer=new Observer(records=>{for(const record of records){if(record.type==='attributes')pending.add(record.target);else if(record.type==='characterData')pending.add(record.target.parentElement);else for(const node of record.addedNodes)pending.add(node);}schedule();});
- const observe=()=>observer.observe(doc.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['aria-label','title']});
+ const observer=new Observer(records=>{for(const record of records){if(record.type==='attributes')pending.add(record.target);else if(record.type==='characterData')pending.add(record.target.parentElement);else{pending.add(record.target);for(const node of record.addedNodes)pending.add(node);}}schedule();});
+ const observe=()=>observer.observe(doc.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['aria-label','title','data-active-mode']});
  function flush(){scheduled=false;observer.disconnect();try{for(const node of pending)if(node)visit(node);pending.clear();}finally{observe();}}
  function schedule(){if(!scheduled){scheduled=true;queueMicrotask(flush);}}
  const oldSet=setEnabled;
