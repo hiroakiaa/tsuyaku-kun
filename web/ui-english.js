@@ -1,4 +1,4 @@
-import {uiLabels} from './ui-labels.js?v=20261020-live-guides-1';
+import {uiLabels} from './ui-labels.js?v=20261020-live-guides-2';
 
 export const ENGLISH_GUIDES_KEY='tsuyaku-english-guides-v1';
 export function guidesEnabled(storage){try{return storage.getItem(ENGLISH_GUIDES_KEY)!=='off';}catch{return true;}}

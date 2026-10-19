@@ -902,3 +902,5 @@ body.phone-home .call-controls button{container-type:inline-size;}
 @container(min-width:250px){body.phone-home .call-controls button .ui-copy{grid-template-columns:auto auto;align-items:baseline;gap:8px;}}
 @media(min-width:600px){body.phone-home[data-active-mode="face"] .face-language-field .ui-copy,body.phone-home[data-active-mode="interpreter"] .call-invite label>.ui-copy{grid-template-columns:auto auto;align-items:baseline;gap:8px;}}
 @media(min-width:600px) and (max-width:900px){body.phone-home .face-controls{grid-template-columns:minmax(0,1.08fr) 64px minmax(0,1fr)!important;}body.phone-home .face-controls #switch-speaker{width:64px!important;max-width:64px!important;min-width:64px!important;}}
+
+body.phone-home .ui-copy>.ui-en[data-ui-english=""]{display:none!important;}
