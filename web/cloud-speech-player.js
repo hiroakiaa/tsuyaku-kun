@@ -27,7 +27,7 @@ export class CloudSpeechPlayer extends SpeechPlayer{
    try{
     const result=await this.cloud.load(text,lang,{signal:this.cloudAbort.signal});
     if(generation!==this.generation)return;
-    audio.pause();audio.onplaying=()=>{if(generation!==this.generation)return;this.loading=false;this.started=true;this.paused=false;this.clearPending();this.onChange();};
+    audio.pause();audio.onplaying=()=>{if(generation!==this.generation)return;this.loading=false;this.started=true;this.paused=false;this.clearPending();this.watchStart=watch;this.onChange();};
     audio.ontimeupdate=()=>{if(generation!==this.generation||this.paused||!Number.isFinite(audio.duration)||audio.duration<=0)return;const at=audio.currentTime/audio.duration*total,word=words.filter(w=>w.at<=at).at(-1);if(word&&word.start!==this.range?.start){this.range={start:word.start,end:word.end};this.onChange();}};
     audio.onended=()=>this.started?finish():fail('cloud-speech');audio.onerror=()=>fail('cloud-speech');
     audio.src='data:audio/mpeg;base64,'+result.audioContent;
