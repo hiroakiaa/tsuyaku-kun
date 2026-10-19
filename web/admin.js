@@ -1,4 +1,4 @@
-import {englishPrompt} from './ui-english.js?v=20261020-english-guides-4';
+import {englishPrompt} from './ui-english.js?v=20261020-live-guides-1';
 import {createBudgetView} from './budget-view.js?v=20261012-budget-labels-2';
 import {conversationPresentation} from './conversation-ui.js?v=20261009-status-clean-1';
 import {PRICES,costOf,percentile,analysisReport,translationTimingSummary} from './usage.js?v=20261011-continuity-words-1';

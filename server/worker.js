@@ -95,6 +95,7 @@ export default {async fetch(request,env){
       try{const translations=await translateText(env,text,source,targets,context,String(data.unit||'').slice(0,160),catalog,u=>{usage=u;});return cors(json({translations,quality:inspectTranslations(text,source,targets,translations),usage,latencyMs:Date.now()-started}));}
       catch(e){const failure=aiFailure(e);return cors(json({error:failure.message,aiFailure:failure,usage},failure.reason==='quota'?429:['billing','auth'].includes(failure.reason)?403:502));}
     }
+    if(url.pathname==='/ui-labels'&&request.method==='GET'){const result=await bridge(env,token,'tsuyakuUiLabels');if(!result?.labels)return cors(error('画面表記を取得できませんでした。',503));return cors(json({labels:result.labels,updatedAt:result.updatedAt}));}
     if(url.pathname==='/catalog'&&request.method==='GET'){try{return cors(json(await bridge(env,token,'tsuyakuCatalog')||catalog));}catch{return cors(json(catalog));}}
     if(url.pathname==='/dictionary/translate'&&request.method==='POST'){
       const data=await body(request,4096),text=String(data.text||'').trim(),language=String(data.language||'');

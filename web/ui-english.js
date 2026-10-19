@@ -1,7 +1,9 @@
-import {uiLabels} from './ui-labels.js?v=20261020-english-guides-4';
+import {uiLabels} from './ui-labels.js?v=20261020-live-guides-1';
 
 export const ENGLISH_GUIDES_KEY='tsuyaku-english-guides-v1';
 export function guidesEnabled(storage){try{return storage.getItem(ENGLISH_GUIDES_KEY)!=='off';}catch{return true;}}
+let sheetLabels=Object.create(null);
+export function applyEnglishLabels(labels){if(!labels||Array.isArray(labels)||typeof labels!=='object')return false;const next=Object.create(null);for(const [ja,en] of Object.entries(labels)){if(ja.length<=3000&&typeof en==='string'&&en.length<=300&&!/[<>\x00-\x08]/.test(en))next[ja]=en.trim();}if(!Object.keys(next).length)return false;sheetLabels=next;activeGuides?.refresh();return true;}
 const trim=value=>String(value??'').replace(/\s+/g,' ').trim();
 const dynamicLabels=[
  ['この認証IDの本日の利用：',"This user's use today"],['この認証IDの1日の設定上限：',"This user's daily limit"],['この認証IDの残り：',"This user's remaining budget"],
@@ -13,6 +15,7 @@ const dynamicLabels=[
 ];
 export function englishFor(value){
  const text=trim(value);if(!text||text.length>3000)return '';
+ if(Object.hasOwn(sheetLabels,text))return sheetLabels[text];
  if(Object.hasOwn(uiLabels,text))return uiLabels[text];
  let match=text.match(/^あと(\d+)件\s*[·・]\s*続きを見る$/);if(match)return match[1]+' more';
  if(/^.+を少なく表示$/.test(text))return 'Show less';
@@ -70,7 +73,7 @@ export function installEnglishGuides({doc=document,storage=localStorage,Observer
     if(!value)continue;
     const previous=control.dataset[attribute==='title'?'uiTitle':'uiAria'];
     const ja=previous&&value===previous.split('\u001f')[1]?previous.split('\u001f')[0]:value;
-    const en=englishFor(ja);if(!en)continue;
+    const en=englishFor(ja);if(!en){if(previous)control.setAttribute(attribute,ja);continue;}
     const bilingual=en+' / '+ja;control.dataset[attribute==='title'?'uiTitle':'uiAria']=ja+'\u001f'+bilingual;
     control.setAttribute(attribute,enabled?bilingual:ja);
    }
@@ -85,7 +88,7 @@ export function installEnglishGuides({doc=document,storage=localStorage,Observer
  }
  const observer=new Observer(records=>{for(const record of records){if(record.type==='attributes')pending.add(record.target);else if(record.type==='characterData')pending.add(record.target.parentElement);else{pending.add(record.target);for(const node of record.addedNodes)pending.add(node);}}schedule();});
  const observe=()=>observer.observe(doc.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['aria-label','title','data-active-mode']});
- function flush(){scheduled=false;observer.disconnect();try{for(const node of pending)if(node)visit(node);pending.clear();}finally{observe();}}
+ function flush(){scheduled=false;observer.disconnect();try{for(const wrapper of doc.querySelectorAll('.ui-copy')){const en=englishFor(wrapper.querySelector('.ui-ja')?.textContent);wrapper.querySelector('.ui-en').dataset.uiEnglish=en;}for(const node of pending)if(node)visit(node);pending.clear();}finally{observe();}}
  function schedule(){if(!scheduled){scheduled=true;queueMicrotask(flush);}}
  const oldSet=setEnabled;
  button.onclick=()=>{oldSet(!enabled);try{storage.setItem(ENGLISH_GUIDES_KEY,enabled?'on':'off');}catch{}pending.add(doc.body);schedule();};

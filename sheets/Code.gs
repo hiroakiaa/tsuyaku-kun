@@ -7,7 +7,8 @@ function doPost(e){
     var raw=String(e&&e.postData&&e.postData.contents||'');if(raw.length>16000)throw Error('データが大きすぎます。');
     var p=JSON.parse(raw);var user=tsuyakuVerify_(p.idToken);
     var result;
-    if(p.action==='tsuyakuCatalog')result=tsuyakuCatalog_();
+    if(p.action==='tsuyakuUiLabels')result=tsuyakuUiLabels_();
+    else if(p.action==='tsuyakuCatalog')result=tsuyakuCatalog_();
     else if(p.action==='tsuyakuCandidate')result=tsuyakuCandidate_(p,user);
     else if(p.action==='tsuyakuLearn')result=tsuyakuLearn_(p,user);
     else if(p.action==='tsuyakuPhrase')result=tsuyakuPhrase_(p,user);
@@ -96,4 +97,9 @@ function tsuyakuBank_(p){
 function tsuyakuLearn_(p,user){
  var text=String(p.text||'').trim();var known=tsuyakuRows_('interpreter_template_sources',8).some(function(r){return r.status!=='rejected'&&r.jaText===text;})||tsuyakuRows_('phrase_cards',22).some(function(r){return r.jaText===text;});
  if(!known)return {ok:true,recorded:false};return tsuyakuPhrase_(p,user);
+}
+
+function tsuyakuUiLabels_(){
+ var labels=Object.create(null);tsuyakuRows_('ui_translations',14).forEach(function(row){var ja=String(row.ja||'').trim(),en=String(row.enShort||'').trim();if(ja&&ja.length<=3000&&en.length<=300&&row.uiKey&&!Object.prototype.hasOwnProperty.call(labels,ja))labels[ja]=en;});
+ return {labels:labels,updatedAt:new Date().toISOString()};
 }

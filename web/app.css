@@ -866,7 +866,7 @@ body.phone-home .face-controls #face-language{height:48px!important;min-height:4
 body.phone-home .face-controls #switch-speaker{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;width:48px!important;min-width:48px!important;max-width:48px!important;height:48px!important;min-height:48px!important;padding:4px!important;margin:0!important;background:transparent!important;color:#eee;font-size:18px;transform:none;}
 body.phone-home .face-controls #switch-speaker span{font-size:12px!important;line-height:1.2;color:inherit;white-space:nowrap;}
 body.phone-home .face-controls #switch-speaker:focus-visible{outline:2px solid white;outline-offset:2px;}
-@media(min-width:600px){body.phone-home .face-controls{grid-template-columns:minmax(0,1fr)!important;gap:8px!important;}body.phone-home .face-controls #switch-speaker{flex-direction:row;justify-self:center;gap:7px;width:80px!important;min-width:80px!important;max-width:80px!important;height:44px!important;min-height:44px!important;}body.phone-home .face-controls #switch-speaker>i{transform:rotate(90deg);}body.phone-home .face-controls #switch-speaker span{font-size:14px!important;}body.phone-home .face-controls select{height:46px;min-height:46px;font-size:16px!important;}body.phone-home .face-controls #face-language{height:50px!important;min-height:50px!important;font-size:17px!important;}}
+@media(min-width:901px){body.phone-home .face-controls{grid-template-columns:minmax(0,1fr)!important;gap:8px!important;}body.phone-home .face-controls #switch-speaker{flex-direction:row;justify-self:center;gap:7px;width:80px!important;min-width:80px!important;max-width:80px!important;height:44px!important;min-height:44px!important;}body.phone-home .face-controls #switch-speaker>i{transform:rotate(90deg);}body.phone-home .face-controls #switch-speaker span{font-size:14px!important;}body.phone-home .face-controls select{height:46px;min-height:46px;font-size:16px!important;}body.phone-home .face-controls #face-language{height:50px!important;min-height:50px!important;font-size:17px!important;}}
 
 body.phone-home .face-controls[hidden]{display:none!important;}
 /* English is a visual guide above the unchanged Japanese text. */
@@ -894,3 +894,11 @@ body.phone-home #empty-caption .ui-copy{gap:7px;}
 body.phone-home #empty-caption .ui-copy>.ui-en{font-size:13px!important;}
 body.phone-home .admin-tabs .ui-copy,body.phone-home .reference-tabs .ui-copy{justify-items:center;}
 @media(max-width:359px){body.phone-home .header-tools{gap:3px;}body.phone-home .header-tools #language-options{width:46px;padding:10px!important;}body.phone-home .brand{font-size:20px;}}
+
+/* Reserve the navigation's full bilingual height, including safe-area space. */
+html[data-english-guides="on"] body.phone-home{--nav-space:100px;}
+body.phone-home .live-actions{padding-bottom:8px;}
+body.phone-home .call-controls button{container-type:inline-size;}
+@container(min-width:250px){body.phone-home .call-controls button .ui-copy{grid-template-columns:auto auto;align-items:baseline;gap:8px;}}
+@media(min-width:600px){body.phone-home[data-active-mode="face"] .face-language-field .ui-copy,body.phone-home[data-active-mode="interpreter"] .call-invite label>.ui-copy{grid-template-columns:auto auto;align-items:baseline;gap:8px;}}
+@media(min-width:600px) and (max-width:900px){body.phone-home .face-controls{grid-template-columns:minmax(0,1.08fr) 64px minmax(0,1fr)!important;}body.phone-home .face-controls #switch-speaker{width:64px!important;max-width:64px!important;min-width:64px!important;}}

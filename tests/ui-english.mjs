@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {englishFor,englishPrompt,guidesEnabled} from '../web/ui-english.js';
+import {applyEnglishLabels,englishFor,englishPrompt,guidesEnabled} from '../web/ui-english.js';
 for(const [ja,en] of [['話す','Speak'],['聞く','Listen'],['交代','Switch'],['マイクをとめる','Stop mic'],['つうわ','Call'],['じしょ','Dictionary']])assert.equal(englishFor(ja),en);
 assert.equal(englishFor('あと5件 · 続きを見る'),'5 more');
 assert.equal(englishFor('あと12件・続きを見る'),'12 more');
@@ -16,3 +16,11 @@ assert.equal(guidesEnabled({getItem:()=> 'off'}),false);
 assert.equal(guidesEnabled({getItem:()=> 'on'}),true);
 assert.equal(guidesEnabled({getItem(){throw Error('Storage denied');}}),true);
 console.log('English guides: core actions, changing counts, unknown text, prompts and saved preference passed');
+
+assert.equal(applyEnglishLabels({話す:'Speak now',聞く:''}),true);
+assert.equal(englishFor('話す'),'Speak now');
+assert.equal(englishFor('聞く'),'');
+assert.equal(applyEnglishLabels({話す:'<script>'}),false);
+assert.equal(englishFor('話す'),'Speak now');
+assert.equal(applyEnglishLabels(null),false);
+assert.equal(applyEnglishLabels({話す:'Speak'}),true);
