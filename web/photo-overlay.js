@@ -14,7 +14,7 @@ export function drawPhotoOverlay(canvas,source,blocks,translated,language){
   let font=Math.min(48,Math.max(12,h*.65)),lines;
   do{ctx.font=`600 ${font}px system-ui, sans-serif`;lines=wrapPhotoText(t=>ctx.measureText(t).width,text,available);if(lines.length*font*1.25<=h-padding*2||font<=10)break;font--;}while(font>=10);
   const maxLines=Math.max(1,Math.floor((h-padding*2)/(font*1.25))),shown=lines.slice(0,maxLines);if(lines.length>maxLines){clipped=true;let last=shown.at(-1);while(last&&ctx.measureText(last+'…').width>available)last=last.slice(0,-1);shown[shown.length-1]=last+'…';}
-  ctx.fillStyle='rgba(255,255,255,0.96)';ctx.fillRect(x,y,w,h);ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();ctx.fillStyle='#111';shown.forEach((line,i)=>ctx.fillText(line,x+padding,y+padding+i*font*1.25));ctx.restore();
+  ctx.fillStyle='#fff';ctx.fillRect(x,y,w,h);ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();ctx.fillStyle='#111';shown.forEach((line,i)=>ctx.fillText(line,x+padding,y+padding+i*font*1.25));ctx.restore();
  }
  return {clipped};
 }

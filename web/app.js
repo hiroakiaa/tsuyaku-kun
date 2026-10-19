@@ -1,4 +1,4 @@
-import {installPhotoTranslate} from './photo-translate.js?v=20261020-photo-overlay-1';
+import {installPhotoTranslate} from './photo-translate.js?v=20261020-photo-overlay-2';
 import {refreshEnglishGuides,applyEnglishLabels} from './ui-english.js?v=20261020-live-guides-2';
 import {SharedWordUsage} from './shared-word-usage.js?v=20261011-continuity-words-1';
 import {installConversationUI} from './conversation-ui.js?v=20261019-mic-empty-1';
@@ -14,7 +14,7 @@ import {acquireMicrophone} from './microphone.js?v=20261006-mic-1';
 import {UsageLedger,WordUsage} from './usage.js?v=20261015-microphone-lesson-1';
 import {CloudSpeechPlayer,createSpeechCache} from './cloud-speech-player.js?v=20261020-safari-speech-2';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-progressive-1';
-import {installAdmin} from './admin.js?v=20261020-photo-overlay-1';
+import {installAdmin} from './admin.js?v=20261020-photo-overlay-2';
 import {config} from './config.js';
 import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection as explainRecentConnection} from './network.js?v=20261009-mobile-speaker-1';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
