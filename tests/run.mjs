@@ -1,3 +1,4 @@
+import './photo-ocr.mjs';
 import './cloud-speech.mjs';
 import './ui-english.mjs';
 import {wordStats,validateWordEvents} from '../server/word-stats.js';

@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import {photoBudget,photoInput,photoUid,recognizePhoto} from '../server/photo-ocr.js';
+import {cropRect,photoTranslationText} from '../web/photo-translate.js';
+function storage(){const rows=new Map();let chain=Promise.resolve();return {rows,transaction(fn){const run=chain.then(()=>fn({get:async key=>structuredClone(rows.get(key)),put:async(key,value)=>rows.set(key,structuredClone(value))}));chain=run.catch(()=>{});return run;}};}
+const uid=await photoUid('test'),other=await photoUid('other'),now=Date.UTC(2026,9,20),db=storage(),reserve=(id,user=uid)=>photoBudget(db,{action:'reserve',uid:user,id},now);
+const first=await reserve('first-request-1234');await photoBudget(db,{action:'release',id:first.id},now);assert.equal((await photoBudget(db,{action:'status',uid},now)).used,1);
+await assert.rejects(()=>reserve('first-request-1234'),e=>e.status===409);
+const state=db.rows.get('photo-budget');state.used=899;state.recent=Array(899).fill(now);
+const race=await Promise.allSettled([reserve('request-aaaaaaaaaa'),reserve('request-bbbbbbbbbb',other)]);assert.equal(race.filter(r=>r.status==='fulfilled').length,1);assert.equal((await photoBudget(db,{action:'status'},now)).remaining,0);
+const nextMonth=Date.UTC(2026,10,1);assert.equal((await photoBudget(db,{action:'status'},nextMonth)).remaining,0,'UTC month boundary must not bypass rolling guard');
+await assert.rejects(()=>photoBudget(db,{action:'reserve',uid,id:'next-month-123456'},nextMonth),e=>e.status===429);
+assert.equal((await photoBudget(db,{action:'status'},now+33*86400000)).remaining,900);
+const userDb=storage();await photoBudget(userDb,{action:'reserve',uid,id:'user-limit-123456'},now);userDb.rows.get('photo-budget').users[uid]=100;await assert.rejects(()=>photoBudget(userDb,{action:'reserve',uid,id:'user-limit-654321'},now),e=>e.status===429);
+assert.throws(()=>photoInput({image:'https://example.com/private',id:'request-123456789'}));assert.throws(()=>photoInput({image:'A'.repeat(2800004),id:'request-123456789'}));
+const data={image:'/9j/'+'A'.repeat(100),id:'synthetic-1234567'},synthesisDb=storage(),env={GOOGLE_VISION_API_KEY:'test-only',budgetUid:'test',ROOMS:{idFromName:n=>n,get:()=>({fetch:async r=>{try{return Response.json(await photoBudget(synthesisDb,await r.json(),now));}catch(e){return Response.json({error:e.message},{status:e.status});}}})}};
+let calls=0;const result=await recognizePhoto(env,data,async(url,options)=>{calls++;assert.equal(url,'https://vision.googleapis.com/v1/images:annotate');assert.equal(options.headers['X-Goog-Api-Key'],'test-only');const request=JSON.parse(options.body);assert.equal(request.requests.length,1);assert.deepEqual(request.requests[0].features,[{type:'DOCUMENT_TEXT_DETECTION'}]);assert.equal(request.requests[0].image.source,undefined);return Response.json({responses:[{fullTextAnnotation:{text:'提出日は10月20日です。'}}]});});assert.equal(result.text,'提出日は10月20日です。');
+await assert.rejects(()=>recognizePhoto(env,data,async()=>{calls++;}));assert.equal(calls,1,'duplicate ID must never resend image');
+await assert.rejects(()=>recognizePhoto(env,{...data,id:'failure-123456789'},async()=>new Response('',{status:503})));assert.equal((await photoBudget(synthesisDb,{action:'status'},now)).used,2,'provider failure is conservatively retained');
+assert.equal(JSON.stringify(synthesisDb.rows.get('photo-budget')).includes('提出'),false);assert.equal(JSON.stringify(synthesisDb.rows.get('photo-budget')).includes('/9j/'),false);
+assert.deepEqual(cropRect(1000,2000,[10,20,90,80]),{x:100,y:400,width:800,height:1200});assert.throws(()=>cropRect(100,100,[95,0,50,100]));
+assert.equal(photoTranslationText('12345',1,4),'234');assert.throws(()=>photoTranslationText('a'.repeat(1201)));assert.equal(photoTranslationText('a'.repeat(1201),0,100).length,100);
+console.log('Photo OCR: atomic 900/100 caps, 32-day boundary guard, no duplicate provider calls, conservative failures, privacy and selection passed');

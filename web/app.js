@@ -1,3 +1,4 @@
+import {installPhotoTranslate} from './photo-translate.js?v=20261020-photo-1';
 import {refreshEnglishGuides,applyEnglishLabels} from './ui-english.js?v=20261020-live-guides-2';
 import {SharedWordUsage} from './shared-word-usage.js?v=20261011-continuity-words-1';
 import {installConversationUI} from './conversation-ui.js?v=20261019-mic-empty-1';
@@ -13,7 +14,7 @@ import {acquireMicrophone} from './microphone.js?v=20261006-mic-1';
 import {UsageLedger,WordUsage} from './usage.js?v=20261015-microphone-lesson-1';
 import {CloudSpeechPlayer,createSpeechCache} from './cloud-speech-player.js?v=20261020-safari-speech-2';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-progressive-1';
-import {installAdmin} from './admin.js?v=20261020-wavenet-1';
+import {installAdmin} from './admin.js?v=20261020-photo-1';
 import {config} from './config.js';
 import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection as explainRecentConnection} from './network.js?v=20261009-mobile-speaker-1';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
@@ -62,6 +63,8 @@ function fillLanguages(){for(const id of ['face-self-language','source-language'
 fillLanguages();options($('#face-language'),speakingLanguage());for(const id of sharedLanguageIds)$('#'+id).onchange=()=>setSharedLanguage($('#'+id).value);for(const id of ['face-self-language','source-language'])$('#'+id).onchange=()=>setSpeakingLanguage($('#'+id).value);
 function showLanguageOptions(){const content=el('div',undefined,'language-panel'),spoken=el('select'),display=el('select');options(spoken,speakingLanguage());options(display,sharedLanguage());spoken.onchange=()=>{setSpeakingLanguage(spoken.value);if(room?.mode==='face'){updateFace();if(mic)startRecognition();}};display.onchange=()=>{setSharedLanguage(display.value);if(room?.mode==='face')updateFace();for(const record of [...records.values()])renderCaption(record);};if(room?.mode==='interpreter'){nativeLanguageOptions(spoken,speakingLanguage());content.append(label('じぶんが話すことば / Your language',spoken),el('p','相手の言語ではなく、あなたが話す言語を選んでください。','small'));}else if(room?.mode==='lesson'&&role!=='teacher'){nativeLanguageOptions(display,sharedLanguage());content.append(label('じぶんのことば / Your language',display),el('p','先生のことばをこの言語で読み、文字入力もこの言語で送ります。','small'));}else content.append(label('じぶんが話すことば',spoken),label('訳を読むことば',display));modal('言語を選ぶ',content);}
 $('#language-options').onclick=showLanguageOptions;
+const photoButton=el('button');photoButton.id='photo-translate-open';photoButton.type='button';photoButton.setAttribute('aria-label','写真を翻訳');photoButton.title='写真を翻訳';photoButton.append(icon('camera'));$('#language-options').before(photoButton);
+installPhotoTranslate({button:photoButton,api,modal,el,languages:()=>catalog.languages,viewLanguage:sharedLanguage,speechControls,updateSpeechControls});
 $('#lesson-language').onchange=e=>setSharedLanguage(e.target.value);
 let lessonRole=null,lessonSelectionEpoch=0;
 function chooseLessonRole(next){lessonSelectionEpoch++;lessonRole=next;$("#lesson-toolbar").hidden=!next;const codeEntry=$("#lesson-code-entry");if(codeEntry)codeEntry.hidden=next!=="student"||room?.mode==="lesson";$("#lesson-language-entry").hidden=next!=="student";$("#lesson-role-picker").hidden=!!next;$("#lesson-role-back").hidden=!next;$("#teacher-entry").hidden=next!=="teacher";$("#student-entry").hidden=next!=="student";$("#join-lesson-form").hidden=next!=="student";$("#lesson-role-teacher").setAttribute("aria-pressed",String(next==="teacher"));$("#lesson-role-student").setAttribute("aria-pressed",String(next==="student"));}
