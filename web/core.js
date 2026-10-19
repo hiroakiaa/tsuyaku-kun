@@ -39,3 +39,6 @@ export function csv(rows) {
 
 export function captionParticipant(room,a,data){if(room.mode!=='face')return a;if(!['self','other'].includes(data.speakerSide)||![a.language,a.viewLanguage].includes(data.source))throw Error('対面の話し手と言語を確認してください。');return {...a,language:data.source,name:data.speakerSide==='self'?'自分':'相手'};}
 
+
+// Repair old offline caches only when the Japanese meaning still matches.
+export function supplementCatalog(saved,bundled){const out={...saved};for(const key of ['terms','phrases','glossary']){const index=new Map((bundled[key]||[]).map(row=>[row.id,row]));out[key]=(saved[key]||[]).map(row=>{const fallback=index.get(row.id),source=r=>r.jaText||r.descriptionJa||r.ja||r.title;if(row.deText||!fallback?.deText||source(row)!==source(fallback))return row;return {...row,deText:fallback.deText};});}return out;}

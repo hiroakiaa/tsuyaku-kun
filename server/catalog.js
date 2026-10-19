@@ -1,7 +1,12 @@
-// Curated generic reference data. Student/teacher information and conversation history are excluded.
+// Generic reference data from the shared dictionary; no participants or conversation logs.
 export const catalog = {
   "languages": [
-    {"code":"de","speechCode":"de-DE","labelJa":"ドイツ語","labelNative":"Deutsch"},
+    {
+      "code": "de",
+      "speechCode": "de-DE",
+      "labelJa": "ドイツ語",
+      "labelNative": "Deutsch"
+    },
     {
       "code": "ja",
       "speechCode": "ja-JP",
@@ -81,7 +86,7 @@ export const catalog = {
       "id": "p1",
       "title": "欠席の確認",
       "icon": "☎️",
-      "category": "欠席・遅刻",
+      "category": "休み・健康・安全",
       "subCategories": "朝の連絡,確認",
       "targetUser": "保護者",
       "jaText": "本日、お子さんがまだ登校していません。欠席や遅刻の場合は学校へ連絡してください。",
@@ -90,7 +95,7 @@ export const catalog = {
       "keywords": "欠席,遅刻,登校,連絡",
       "warningLevel": "medium",
       "oneComment": "朝の出欠確認で使う連絡です。",
-      "viewCount": "5",
+      "viewCount": "6",
       "ptText": "Seu filho ainda não chegou à escola hoje. Por favor, entre em contato com a escola caso seu filho esteja ausente ou atrasado.",
       "esText": "Su hijo/a aún no ha llegado hoy al colegio. Si su hijo/a falta o llega tarde, póngase en contacto con el colegio.",
       "viText": "Hôm nay con của quý vị chưa đến trường. Vui lòng liên hệ với nhà trường nếu con quý vị vắng mặt hoặc đi học muộn.",
@@ -98,13 +103,14 @@ export const catalog = {
       "koText": "오늘 아이는 아직 학교에 오지 않았습니다. 쉬거나 늦을 때는 학교에 연락하십시오.",
       "tlText": "Hindi pa nakakarating ang inyong anak sa paaralan ngayon. Mangyaring makipag-ugnayan sa paaralan kung lumiban o nahuli ang inyong anak.",
       "idText": "Anak Anda belum tiba di sekolah hari ini. Mohon hubungi sekolah jika anak Anda absen atau terlambat.",
-      "neText": "तपाईंको बच्चा आज अझै स्कूल आइपुगेको छैन। यदि तपाईंको बच्चा अनुपस्थित छ वा ढिलो आएको छ भने कृपया स्कूलमा सम्पर्क गर्नुहोस्।"
+      "neText": "तपाईंको बच्चा आज अझै स्कूल आइपुगेको छैन। यदि तपाईंको बच्चा अनुपस्थित छ वा ढिलो आएको छ भने कृपया स्कूलमा सम्पर्क गर्नुहोस्।",
+      "deText": "Ihr Kind ist heute noch nicht in der Schule angekommen. Bitte informieren Sie die Schule, falls Ihr Kind fehlt oder zu spät kommt."
     },
     {
       "id": "p2",
       "title": "遅刻して登校します",
       "icon": "⏰",
-      "category": "欠席・遅刻",
+      "category": "休み・健康・安全",
       "subCategories": "保護者から,朝の連絡",
       "targetUser": "先生",
       "jaText": "今日は遅れて登校します。学校に着く予定の時間は、あとで連絡します。",
@@ -113,7 +119,7 @@ export const catalog = {
       "keywords": "遅刻,登校,保護者",
       "warningLevel": "low",
       "oneComment": "保護者から学校へ伝える遅刻連絡です。",
-      "viewCount": "17",
+      "viewCount": "19",
       "ptText": "Vou me atrasar para a escola hoje. Avisarei mais tarde quando chegar.",
       "esText": "Hoy llegaré tarde a la escuela. Te avisaré cuando llegue.",
       "viText": "Hôm nay mình sẽ đến trường muộn. Mình sẽ báo cho bạn biết khi nào mình đến sau.",
@@ -121,13 +127,14 @@ export const catalog = {
       "koText": "오늘은 학교에 가는 것이 느려집니다. 도착하는 시간은 나중에 연락합니다.",
       "tlText": "Mahuhuli ako sa pagpasok sa paaralan ngayon. Sasabihin ko sa iyo kung kailan ako darating mamaya.",
       "idText": "Aku akan terlambat ke sekolah hari ini. Nanti aku beritahu saat aku tiba.",
-      "neText": "आज म स्कूल ढिलो पुग्नेछु। म पछि कहिले आइपुग्छु भनेर तपाईंलाई खबर गर्नेछु।"
+      "neText": "आज म स्कूल ढिलो पुग्नेछु। म पछि कहिले आइपुग्छु भनेर तपाईंलाई खबर गर्नेछु।",
+      "deText": "Ich werde heute verspätet zur Schule kommen. Meine voraussichtliche Ankunftszeit teile ich Ihnen später mit."
     },
     {
       "id": "p3",
       "title": "お弁当が必要です",
       "icon": "🍱",
-      "category": "給食",
+      "category": "学校生活",
       "subCategories": "持ち物,明日の連絡",
       "targetUser": "保護者",
       "jaText": "明日は給食がありません。お弁当を持たせてください。",
@@ -136,7 +143,7 @@ export const catalog = {
       "keywords": "弁当,給食,持ち物,明日",
       "warningLevel": "low",
       "oneComment": "給食がない日によく使う連絡です。",
-      "viewCount": "",
+      "viewCount": "5",
       "ptText": "Amanhã não haverá almoço na escola. Por favor, prepare o almoço do seu filho(a).",
       "esText": "Mañana no habrá almuerzo escolar. Por favor, preparen el almuerzo para sus hijos.",
       "viText": "Ngày mai trường sẽ không có bữa trưa. Vui lòng chuẩn bị bữa trưa cho con em mình.",
@@ -144,13 +151,14 @@ export const catalog = {
       "koText": "내일에는 학교 급식이 없습니다. 어린이에게 도시락을 갖게하십시오.",
       "tlText": "Walang pananghalian bukas. Pakihanda po ang inyong anak.",
       "idText": "Besok tidak ada makan siang sekolah. Mohon bawakan bekal makan siang untuk anak Anda.",
-      "neText": "भोलि स्कूलमा खाजा हुनेछैन। कृपया आफ्नो बच्चाको लागि खाजा प्याक गर्नुहोस्।"
+      "neText": "भोलि स्कूलमा खाजा हुनेछैन। कृपया आफ्नो बच्चाको लागि खाजा प्याक गर्नुहोस्।",
+      "deText": "Morgen gibt es kein Schulmittagessen. Bitte geben Sie Ihrem Kind ein Mittagessen mit."
     },
     {
       "id": "p4",
       "title": "持ち物のお知らせ",
       "icon": "🎒",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "subCategories": "明日の連絡",
       "targetUser": "保護者",
       "jaText": "明日は水筒、タオル、筆記用具を持たせてください。",
@@ -159,7 +167,7 @@ export const catalog = {
       "keywords": "水筒,タオル,筆記用具,明日",
       "warningLevel": "low",
       "oneComment": "日常の持ち物連絡に使えます。",
-      "viewCount": "9",
+      "viewCount": "10",
       "ptText": "Por favor, traga uma garrafa de água, toalha, lápis, etc. amanhã.",
       "esText": "Por favor, trae mañana una botella de agua, una toalla, un lápiz, etc.",
       "viText": "Vui lòng mang theo chai nước, khăn, bút chì, v.v. vào ngày mai.",
@@ -167,13 +175,14 @@ export const catalog = {
       "koText": "내일은 물통, 수건, 엔피츠 등을 가져와주세요.",
       "tlText": "Magdala po kayo ng bote ng tubig, tuwalya, lapis, atbp. bukas.",
       "idText": "Mohon bawa botol air minum, handuk, pensil, dll. besok.",
-      "neText": "भोलि पानीको बोतल, तौलिया, पेन्सिल आदि लिएर आउनुहोस्।"
+      "neText": "भोलि पानीको बोतल, तौलिया, पेन्सिल आदि लिएर आउनुहोस्।",
+      "deText": "Bitte geben Sie Ihrem Kind morgen eine Trinkflasche, ein Handtuch und Schreibmaterial mit."
     },
     {
       "id": "p5",
       "title": "体操服が必要です",
       "icon": "👕",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "subCategories": "体育,服",
       "targetUser": "保護者",
       "jaText": "明日は体育があります。体操服を持たせてください。",
@@ -182,7 +191,7 @@ export const catalog = {
       "keywords": "体育,体操服,持ち物",
       "warningLevel": "low",
       "oneComment": "体育の前日に便利です。",
-      "viewCount": "4",
+      "viewCount": "6",
       "ptText": "Amanhã temos aula de educação física. Por favor, tragam suas roupas de ginástica.",
       "esText": "Mañana tenemos clase de educación física. Por favor, traigan su ropa de deporte.",
       "viText": "Ngày mai chúng ta có tiết thể dục. Vui lòng mang theo quần áo thể dục.",
@@ -190,13 +199,14 @@ export const catalog = {
       "koText": "내일에는 체육 수업이 있습니다. 체조복을 가져오세요.",
       "tlText": "May klase tayo sa physical education bukas. Pakidala po ang inyong mga damit pang-gym.",
       "idText": "Besok kita ada pelajaran pendidikan jasmani. Mohon bawa pakaian olahraga kalian.",
-      "neText": "भोलि हाम्रो शारीरिक शिक्षा कक्षा छ। कृपया आफ्नो जिम लुगा ल्याउनुहोस्।"
+      "neText": "भोलि हाम्रो शारीरिक शिक्षा कक्षा छ। कृपया आफ्नो जिम लुगा ल्याउनुहोस्।",
+      "deText": "Morgen findet Sportunterricht statt. Bitte geben Sie Ihrem Kind Sportkleidung mit."
     },
     {
       "id": "p6",
       "title": "提出物のお願い",
       "icon": "📄",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "subCategories": "締切,確認",
       "targetUser": "保護者",
       "jaText": "提出物がまだ出ていません。明日までに学校へ持たせてください。",
@@ -205,7 +215,7 @@ export const catalog = {
       "keywords": "提出物,締切,明日",
       "warningLevel": "medium",
       "oneComment": "書類の提出確認に使います。",
-      "viewCount": "5",
+      "viewCount": "9",
       "ptText": "A documentação necessária ainda não foi enviada para a escola. Por favor, traga-a até amanhã.",
       "esText": "La documentación requerida aún no se ha enviado a la escuela. Por favor, tráigala mañana.",
       "viText": "Giấy tờ cần thiết vẫn chưa được gửi đến trường. Vui lòng mang đến vào ngày mai.",
@@ -213,13 +223,14 @@ export const catalog = {
       "koText": "내보내는 종이가 아직 학교에 나오지 않았습니다. 내일까지 가져와주세요.",
       "tlText": "Hindi pa naipapadala sa paaralan ang mga kinakailangang papeles. Pakidala na lang ito bukas.",
       "idText": "Dokumen yang dibutuhkan belum dikirim ke sekolah. Mohon dibawa paling lambat besok.",
-      "neText": "आवश्यक कागजातहरू अझै स्कूलमा पठाइएको छैन। कृपया भोलिसम्ममा ल्याउनुहोस्।"
+      "neText": "आवश्यक कागजातहरू अझै स्कूलमा पठाइएको छैन। कृपया भोलिसम्ममा ल्याउनुहोस्।",
+      "deText": "Die abzugebenden Unterlagen fehlen noch. Bitte geben Sie sie Ihrem Kind bis morgen für die Schule mit."
     },
     {
       "id": "p7",
       "title": "行事のお知らせ",
       "icon": "📅",
-      "category": "行事",
+      "category": "行事・部活動",
       "subCategories": "予定,連絡",
       "targetUser": "保護者",
       "jaText": "来週、学校行事があります。くわしい内容は配付したお知らせを確認してください。",
@@ -228,7 +239,7 @@ export const catalog = {
       "keywords": "行事,来週,お知らせ",
       "warningLevel": "low",
       "oneComment": "行事前の基本連絡です。",
-      "viewCount": "1",
+      "viewCount": "2",
       "ptText": "Haverá um evento escolar na próxima semana. Por favor, verifique o aviso da escola para obter mais detalhes.",
       "esText": "La semana que viene hay un evento escolar. Consulta el aviso del colegio para más detalles.",
       "viText": "Tuần tới trường có tổ chức sự kiện. Vui lòng xem thông báo từ trường để biết thêm chi tiết.",
@@ -236,13 +247,14 @@ export const catalog = {
       "koText": "다음 주에 학교 행사가 있습니다. 자세한 내용은 학교에서 종이를 참조하십시오.",
       "tlText": "May kaganapan sa paaralan sa susunod na linggo. Pakitingnan ang abiso mula sa paaralan para sa mga detalye.",
       "idText": "Ada acara sekolah minggu depan. Silakan periksa pengumuman dari sekolah untuk detailnya.",
-      "neText": "अर्को हप्ता स्कूलको कार्यक्रम छ। विवरणहरूको लागि कृपया स्कूलको सूचना हेर्नुहोस्।"
+      "neText": "अर्को हप्ता स्कूलको कार्यक्रम छ। विवरणहरूको लागि कृपया स्कूलको सूचना हेर्नुहोस्।",
+      "deText": "Nächste Woche findet eine Schulveranstaltung statt. Einzelheiten entnehmen Sie bitte der ausgeteilten Mitteilung."
     },
     {
       "id": "p8",
       "title": "面談の日程確認",
       "icon": "🗓️",
-      "category": "面談",
+      "category": "家族・相談",
       "subCategories": "日程,保護者",
       "targetUser": "保護者",
       "jaText": "個人面談の日程を確認してください。都合が悪い場合は学校へ連絡してください。",
@@ -251,7 +263,7 @@ export const catalog = {
       "keywords": "面談,日程,個人懇談",
       "warningLevel": "low",
       "oneComment": "面談調整に使える文章です。",
-      "viewCount": "3",
+      "viewCount": "5",
       "ptText": "Por favor, verifique o horário do dia em que você conversará com seu professor. Caso não possa comparecer, entre em contato com a escola.",
       "esText": "Por favor, consulta el horario para el día en que hablarás con tu profesor/a. Si no puedes asistir, ponte en contacto con la escuela.",
       "viText": "Vui lòng kiểm tra lịch trình ngày bạn sẽ nói chuyện với giáo viên. Nếu bạn không thể đến, vui lòng liên hệ với nhà trường.",
@@ -259,13 +271,14 @@ export const catalog = {
       "koText": "선생님과 이야기하는 날의 일정을 확인하십시오. 오지 않을 때는 학교에 연락하십시오.",
       "tlText": "Pakitingnan ang iskedyul para sa araw na makakausap mo ang iyong guro. Kung hindi ka makakapunta, mangyaring makipag-ugnayan sa paaralan.",
       "idText": "Silakan periksa jadwal untuk hari di mana Anda akan berbicara dengan guru Anda. Jika Anda tidak dapat hadir, silakan hubungi sekolah.",
-      "neText": "कृपया तपाईंले आफ्नो शिक्षकसँग कुरा गर्ने दिनको तालिका हेर्नुहोस्। यदि तपाईं आउन असमर्थ हुनुहुन्छ भने, कृपया विद्यालयमा सम्पर्क गर्नुहोस्।"
+      "neText": "कृपया तपाईंले आफ्नो शिक्षकसँग कुरा गर्ने दिनको तालिका हेर्नुहोस्। यदि तपाईं आउन असमर्थ हुनुहुन्छ भने, कृपया विद्यालयमा सम्पर्क गर्नुहोस्।",
+      "deText": "Bitte prüfen Sie den Termin für das Elterngespräch. Falls Sie verhindert sind, informieren Sie bitte die Schule."
     },
     {
       "id": "p9",
       "title": "体調不良の連絡",
       "icon": "🤒",
-      "category": "体調",
+      "category": "休み・健康・安全",
       "subCategories": "保健室,迎え",
       "targetUser": "保護者",
       "jaText": "お子さんの体調がよくありません。できるだけ早く学校へ連絡してください。",
@@ -274,7 +287,7 @@ export const catalog = {
       "keywords": "体調,保健室,病気",
       "warningLevel": "high",
       "oneComment": "体調に関する内容は必ず確認が必要です。",
-      "viewCount": "1",
+      "viewCount": "2",
       "ptText": "Seu filho não está se sentindo bem. Por favor, entre em contato com a escola o mais breve possível.",
       "esText": "Su hijo/a no se encuentra bien. Por favor, póngase en contacto con el colegio lo antes posible.",
       "viText": "Con bạn đang không khỏe. Vui lòng liên hệ với nhà trường càng sớm càng tốt.",
@@ -282,13 +295,14 @@ export const catalog = {
       "koText": "아이의 몸의 상태가 좋지 않습니다. 일찍 학교에 연락하십시오.",
       "tlText": "Hindi maganda ang pakiramdam ng inyong anak. Mangyaring makipag-ugnayan sa paaralan sa lalong madaling panahon.",
       "idText": "Anak Anda sedang kurang sehat. Mohon hubungi sekolah sesegera mungkin.",
-      "neText": "तपाईंको बच्चालाई सन्चो छैन। कृपया सकेसम्म चाँडो स्कूलमा सम्पर्क गर्नुहोस्।"
+      "neText": "तपाईंको बच्चालाई सन्चो छैन। कृपया सकेसम्म चाँडो स्कूलमा सम्पर्क गर्नुहोस्।",
+      "deText": "Ihrem Kind geht es nicht gut. Bitte setzen Sie sich möglichst bald mit der Schule in Verbindung."
     },
     {
       "id": "p10",
       "title": "けがの連絡",
       "icon": "🩹",
-      "category": "体調",
+      "category": "休み・健康・安全",
       "subCategories": "けが,確認",
       "targetUser": "保護者",
       "jaText": "学校でけがをしました。くわしい状況を電話でお伝えします。",
@@ -297,7 +311,7 @@ export const catalog = {
       "keywords": "けが,電話,体調",
       "warningLevel": "high",
       "oneComment": "けがの連絡は翻訳だけで終わらせず確認してください。",
-      "viewCount": "4",
+      "viewCount": "5",
       "ptText": "Me machuquei na escola. Te conto mais detalhes por telefone.",
       "esText": "Me lesioné en la escuela. Te daré más detalles por teléfono.",
       "viText": "Tôi bị thương ở trường. Tôi sẽ kể chi tiết hơn qua điện thoại.",
@@ -305,13 +319,14 @@ export const catalog = {
       "koText": "학교에서 부상당했습니다. 자세한 내용은 전화로 말합니다.",
       "tlText": "Nasaktan ako sa paaralan. Sasabihin ko sa iyo ang higit pang mga detalye sa telepono.",
       "idText": "Aku mengalami cedera di sekolah. Aku akan menceritakan detail lebih lanjut melalui telepon.",
-      "neText": "म स्कूलमा घाइते भएँ। म तपाईंलाई फोनमा थप विवरणहरू बताउनेछु।"
+      "neText": "म स्कूलमा घाइते भएँ। म तपाईंलाई फोनमा थप विवरणहरू बताउनेछु।",
+      "deText": "Ihr Kind hat sich in der Schule verletzt. Die Einzelheiten teilen wir Ihnen telefonisch mit."
     },
     {
       "id": "p11",
       "title": "部活動の予定",
       "icon": "🏃",
-      "category": "部活動",
+      "category": "行事・部活動",
       "subCategories": "予定,放課後",
       "targetUser": "保護者",
       "jaText": "今日は部活動があります。下校時刻がいつもより遅くなります。",
@@ -320,7 +335,7 @@ export const catalog = {
       "keywords": "部活動,下校,遅い",
       "warningLevel": "low",
       "oneComment": "放課後予定の連絡です。",
-      "viewCount": "2",
+      "viewCount": "7",
       "ptText": "Hoje tenho atividades extracurriculares, então chegarei em casa mais tarde do que o normal.",
       "esText": "Hoy tengo actividades con el club, así que llegaré a casa más tarde de lo habitual.",
       "viText": "Hôm nay tôi có hoạt động câu lạc bộ nên sẽ về nhà muộn hơn thường lệ.",
@@ -328,13 +343,14 @@ export const catalog = {
       "koText": "오늘은 부활동이 있습니다. 집으로 돌아가는 시간이 평소보다 느려집니다.",
       "tlText": "May mga aktibidad ako sa club ngayon, kaya mas huli akong makakauwi kaysa dati.",
       "idText": "Saya ada kegiatan klub hari ini, jadi saya akan pulang lebih larut dari biasanya.",
-      "neText": "आज मेरो क्लब गतिविधिहरू छन्, त्यसैले म सधैं भन्दा ढिलो घर फर्कनेछु।"
+      "neText": "आज मेरो क्लब गतिविधिहरू छन्, त्यसैले म सधैं भन्दा ढिलो घर फर्कनेछु।",
+      "deText": "Heute findet die Arbeitsgemeinschaft statt. Ihr Kind wird später als gewöhnlich nach Hause gehen."
     },
     {
       "id": "p12",
       "title": "集金のお願い",
       "icon": "💴",
-      "category": "集金",
+      "category": "お金・手続き",
       "subCategories": "お金,締切",
       "targetUser": "保護者",
       "jaText": "教材費の集金があります。封筒に入れて、明日持たせてください。",
@@ -343,7 +359,7 @@ export const catalog = {
       "keywords": "集金,教材費,お金,封筒",
       "warningLevel": "high",
       "oneComment": "お金の内容は金額や期限を必ず確認してください。",
-      "viewCount": "1",
+      "viewCount": "22",
       "ptText": "Estamos arrecadando dinheiro para as despesas escolares. Por favor, coloque o dinheiro em um envelope e traga amanhã.",
       "esText": "Estamos recolectando dinero para los gastos escolares. Por favor, pónganlo en un sobre y tráiganlo mañana.",
       "viText": "Chúng tôi đang quyên góp tiền cho các khoản chi phí của trường. Vui lòng bỏ tiền vào phong bì và mang đến vào ngày mai.",
@@ -351,13 +367,14 @@ export const catalog = {
       "koText": "학교에서 사용하는 돈을 모으십시오. 봉투에 넣고 내일 가져와주세요.",
       "tlText": "Nangongolekta kami ng pera para sa mga gastusin sa paaralan. Pakilagay lang sa sobre at dalhin bukas.",
       "idText": "Kami sedang mengumpulkan uang untuk biaya sekolah. Mohon masukkan uangnya ke dalam amplop dan bawa besok.",
-      "neText": "हामी स्कूल खर्चको लागि पैसा उठाउँदैछौं। कृपया यसलाई खाममा हालेर भोलि ल्याउनुहोस्।"
+      "neText": "हामी स्कूल खर्चको लागि पैसा उठाउँदैछौं। कृपया यसलाई खाममा हालेर भोलि ल्याउनुहोस्।",
+      "deText": "Für Unterrichtsmaterialien wird Geld eingesammelt. Bitte geben Sie es Ihrem Kind morgen in einem Umschlag mit."
     },
     {
       "id": "p13",
       "title": "アレルギー確認",
       "icon": "⚠️",
-      "category": "給食",
+      "category": "休み・健康・安全",
       "subCategories": "アレルギー,確認",
       "targetUser": "保護者",
       "jaText": "給食のアレルギーについて確認したいことがあります。学校へ連絡してください。",
@@ -366,7 +383,7 @@ export const catalog = {
       "keywords": "アレルギー,給食,確認",
       "warningLevel": "high",
       "oneComment": "アレルギーは必ず人が確認してください。",
-      "viewCount": "",
+      "viewCount": "1",
       "ptText": "Temos algumas dúvidas sobre alergias relacionadas à merenda escolar. Por favor, entre em contato com a escola.",
       "esText": "Tenemos algunas preguntas sobre alergias relacionadas con el almuerzo escolar. Por favor, póngase en contacto con la escuela.",
       "viText": "Chúng tôi có một số thắc mắc liên quan đến dị ứng thực phẩm trong bữa ăn trưa ở trường. Vui lòng liên hệ với nhà trường.",
@@ -374,13 +391,14 @@ export const catalog = {
       "koText": "급식 알레르기에 대해 확인하고 싶을 수 있습니다. 학교에 연락하십시오.",
       "tlText": "Mayroon kaming ilang mga katanungan tungkol sa mga allergy sa tanghalian sa paaralan. Mangyaring makipag-ugnayan sa paaralan.",
       "idText": "Kami memiliki beberapa pertanyaan mengenai alergi makanan saat makan siang di sekolah. Silakan hubungi pihak sekolah.",
-      "neText": "स्कूलको खाजाको एलर्जीको बारेमा हामीसँग केही प्रश्नहरू छन्। कृपया स्कूलमा सम्पर्क गर्नुहोस्।"
+      "neText": "स्कूलको खाजाको एलर्जीको बारेमा हामीसँग केही प्रश्नहरू छन्। कृपया स्कूलमा सम्पर्क गर्नुहोस्।",
+      "deText": "Wir möchten etwas zu den Allergien Ihres Kindes im Zusammenhang mit dem Schulmittagessen klären. Bitte melden Sie sich bei der Schule."
     },
     {
       "id": "p14",
       "title": "授業参観のお知らせ",
       "icon": "👀",
-      "category": "行事",
+      "category": "行事・部活動",
       "subCategories": "保護者会,参観",
       "targetUser": "保護者",
       "jaText": "今週、授業参観があります。参加できる場合は、学校へお知らせください。",
@@ -389,7 +407,7 @@ export const catalog = {
       "keywords": "授業参観,保護者,参加",
       "warningLevel": "low",
       "oneComment": "参観の出欠確認に使えます。",
-      "viewCount": "2",
+      "viewCount": "5",
       "ptText": "Haverá um dia esta semana para observar as aulas. Por favor, avise a escola se você poderá comparecer.",
       "esText": "Esta semana habrá un día para observar las clases. Por favor, avise al colegio si puede asistir.",
       "viText": "Tuần này sẽ có một ngày để quan sát các lớp học. Vui lòng thông báo cho nhà trường nếu bạn có thể đến.",
@@ -397,13 +415,14 @@ export const catalog = {
       "koText": "이번 주, 수업을 보는 날이 있습니다. 올 때는 학교에 알려주세요.",
       "tlText": "Magkakaroon ng isang araw ngayong linggo para obserbahan ang mga klase. Mangyaring ipaalam sa paaralan kung maaari kayong pumunta.",
       "idText": "Akan ada satu hari minggu ini untuk mengamati kegiatan belajar mengajar. Mohon beritahu pihak sekolah jika Anda bisa datang.",
-      "neText": "यस हप्ता कक्षाहरू अवलोकन गर्न एक दिन हुनेछ। यदि तपाईं आउन सक्नुहुन्छ भने कृपया स्कूललाई ​​खबर गर्नुहोस्।"
+      "neText": "यस हप्ता कक्षाहरू अवलोकन गर्न एक दिन हुनेछ। यदि तपाईं आउन सक्नुहुन्छ भने कृपया स्कूललाई ​​खबर गर्नुहोस्।",
+      "deText": "Diese Woche können Eltern den Unterricht besuchen. Bitte teilen Sie der Schule mit, ob Sie teilnehmen können."
     },
     {
       "id": "p15",
       "title": "宿題の確認",
       "icon": "📘",
-      "category": "その他",
+      "category": "授業・勉強",
       "subCategories": "学習,家庭",
       "targetUser": "保護者",
       "jaText": "宿題が終わっているか、家庭で確認してください。",
@@ -412,7 +431,7 @@ export const catalog = {
       "keywords": "宿題,家庭,確認",
       "warningLevel": "low",
       "oneComment": "家庭学習の声かけです。",
-      "viewCount": "2",
+      "viewCount": "3",
       "ptText": "Por favor, verifique em casa se eles terminaram a lição de casa.",
       "esText": "Por favor, compruebe en casa si han terminado sus deberes.",
       "viText": "Hãy về nhà kiểm tra xem các em đã làm xong bài tập về nhà chưa nhé.",
@@ -420,13 +439,14 @@ export const catalog = {
       "koText": "숙제가 끝나거나 집에서 봐.",
       "tlText": "Pakitingnan sa bahay kung natapos na nila ang kanilang takdang-aralin.",
       "idText": "Tolong periksa di rumah untuk melihat apakah mereka sudah menyelesaikan pekerjaan rumah mereka.",
-      "neText": "कृपया घरमै जाँच गर्नुहोस् कि उनीहरूले आफ्नो गृहकार्य पूरा गरेका छन् कि छैनन्।"
+      "neText": "कृपया घरमै जाँच गर्नुहोस् कि उनीहरूले आफ्नो गृहकार्य पूरा गरेका छन् कि छैनन्।",
+      "deText": "Bitte prüfen Sie zu Hause, ob die Hausaufgaben erledigt sind."
     },
     {
       "id": "p16",
       "title": "連絡帳を見てください",
       "icon": "📒",
-      "category": "提出物",
+      "category": "会話・連絡",
       "subCategories": "連絡帳,確認",
       "targetUser": "保護者",
       "jaText": "連絡帳に大切なお知らせを書きました。確認してください。",
@@ -435,7 +455,7 @@ export const catalog = {
       "keywords": "連絡帳,お知らせ,確認",
       "warningLevel": "low",
       "oneComment": "連絡帳確認を促す文です。",
-      "viewCount": "1",
+      "viewCount": "2",
       "ptText": "Escrevi algo importante no seu caderno de comunicação. Por favor, dê uma olhada.",
       "esText": "He escrito algo importante en tu cuaderno de comunicaciones. Por favor, échale un vistazo.",
       "viText": "Tôi đã viết một điều quan trọng vào sổ tay liên lạc của bạn. Vui lòng xem qua.",
@@ -443,13 +463,14 @@ export const catalog = {
       "koText": "연락장에 중요한 것을 썼습니다. 봐.",
       "tlText": "May isinulat akong mahalaga sa iyong kuwaderno sa komunikasyon. Pakitingnan mo.",
       "idText": "Saya menulis sesuatu yang penting di buku catatan komunikasi Anda. Silakan lihat.",
-      "neText": "मैले तपाईंको सञ्चार नोटबुकमा केही महत्त्वपूर्ण कुरा लेखेको छु। कृपया हेर्नुहोस्।"
+      "neText": "मैले तपाईंको सञ्चार नोटबुकमा केही महत्त्वपूर्ण कुरा लेखेको छु। कृपया हेर्नुहोस्।",
+      "deText": "Wir haben eine wichtige Mitteilung in das Mitteilungsheft geschrieben. Bitte lesen Sie sie."
     },
     {
       "id": "p17",
       "title": "早退します",
       "icon": "🏠",
-      "category": "欠席・遅刻",
+      "category": "休み・健康・安全",
       "subCategories": "保護者から,体調",
       "targetUser": "先生",
       "jaText": "今日は家庭の都合で早退します。迎えに行く時間をあとで連絡します。",
@@ -458,7 +479,7 @@ export const catalog = {
       "keywords": "早退,迎え,家庭",
       "warningLevel": "medium",
       "oneComment": "保護者から早退を伝える文です。",
-      "viewCount": "13",
+      "viewCount": "18",
       "ptText": "Vou sair mais cedo hoje para resolver algumas coisas com a família. Te aviso depois quando vou te buscar.",
       "esText": "Hoy salgo temprano para hacer unos recados familiares. Te avisaré más tarde cuando pase a recogerte.",
       "viText": "Hôm nay tôi sẽ đi sớm để giải quyết một số việc gia đình. Tôi sẽ báo cho bạn sau khi nào tôi đến đón.",
@@ -466,13 +487,14 @@ export const catalog = {
       "koText": "오늘은 집의 일로 빨리 돌아갑니다. 마중에 갈 시간은 나중에 연락합니다.",
       "tlText": "Maaga akong aalis ngayon para sa ilang mga gawain sa pamilya. Sasabihin ko sa iyo mamaya kapag sinundo na kita.",
       "idText": "Aku berangkat lebih awal hari ini untuk urusan keluarga. Nanti aku beritahu kapan aku akan menjemputmu.",
-      "neText": "म आज पारिवारिक कामको लागि चाँडै जाँदैछु। म तपाईंलाई लिन आउँदा पछि जानकारी गराउनेछु।"
+      "neText": "म आज पारिवारिक कामको लागि चाँडै जाँदैछु। म तपाईंलाई लिन आउँदा पछि जानकारी गराउनेछु।",
+      "deText": "Mein Kind wird heute aus familiären Gründen früher nach Hause gehen. Die Abholzeit teile ich Ihnen später mit."
     },
     {
       "id": "p18",
       "title": "校外学習の持ち物",
       "icon": "🚌",
-      "category": "行事",
+      "category": "行事・部活動",
       "subCategories": "校外学習,持ち物",
       "targetUser": "保護者",
       "jaText": "校外学習があります。お弁当、水筒、雨具を持たせてください。",
@@ -489,13 +511,14 @@ export const catalog = {
       "koText": "학교 밖으로 학습하러갑니다. 도시락, 물통, 비의 도구를 가져와주세요.",
       "tlText": "Magkakaroon kami ng field trip sa labas ng paaralan. Pakidala po ang inyong baon, bote ng tubig, at gamit pang-ulan.",
       "idText": "Kita akan melakukan kunjungan lapangan di luar sekolah. Mohon bawa bekal makan siang, botol air minum, dan perlengkapan hujan.",
-      "neText": "हामी स्कूल बाहिर फिल्ड ट्रिपमा जाँदैछौं। कृपया आफ्नो खाजा, पानीको बोतल र वर्षाको सामान ल्याउनुहोस्।"
+      "neText": "हामी स्कूल बाहिर फिल्ड ट्रिपमा जाँदैछौं। कृपया आफ्नो खाजा, पानीको बोतल र वर्षाको सामान ल्याउनुहोस्।",
+      "deText": "Es findet ein Schulausflug statt. Bitte geben Sie Ihrem Kind ein Mittagessen, eine Trinkflasche und Regenschutz mit."
     },
     {
       "id": "p19",
       "title": "保護者会のお知らせ",
       "icon": "👪",
-      "category": "面談",
+      "category": "家族・相談",
       "subCategories": "保護者会,行事",
       "targetUser": "保護者",
       "jaText": "来月、保護者会があります。参加できるか学校へ知らせてください。",
@@ -504,7 +527,7 @@ export const catalog = {
       "keywords": "保護者会,参加,来月",
       "warningLevel": "low",
       "oneComment": "保護者会の出欠確認です。",
-      "viewCount": "8",
+      "viewCount": "9",
       "ptText": "Haverá uma reunião na escola no próximo mês, onde os pais poderão ouvir os representantes da escola. Por favor, me avise se você poderá comparecer.",
       "esText": "El próximo mes habrá una reunión en la escuela donde los padres podrán hablar con el personal docente. Por favor, avísenme si pueden asistir.",
       "viText": "Tháng tới sẽ có một cuộc họp tại trường để phụ huynh có thể nghe thông tin từ đội ngũ giáo viên nhà trường. Vui lòng cho tôi biết nếu quý vị có thể tham dự.",
@@ -512,13 +535,14 @@ export const catalog = {
       "koText": "다음 달, 보호자가 학교에서 이야기를 듣는 모임이 있습니다. 올 수 있는지 알려주세요.",
       "tlText": "Magkakaroon ng pagpupulong sa paaralan sa susunod na buwan kung saan maaaring makinig ang mga magulang sa mga kawani ng paaralan. Pakisabi po sa akin kung maaari kayong dumalo.",
       "idText": "Akan ada pertemuan di sekolah bulan depan di mana orang tua dapat mendengarkan penjelasan dari staf sekolah. Mohon beri tahu saya jika Anda dapat hadir.",
-      "neText": "अर्को महिना स्कूलमा एउटा बैठक हुनेछ जहाँ अभिभावकहरूले स्कूलका कर्मचारीहरूबाट सुन्न सक्छन्। यदि तपाईं उपस्थित हुन सक्नुहुन्छ भने कृपया मलाई थाहा दिनुहोस्।"
+      "neText": "अर्को महिना स्कूलमा एउटा बैठक हुनेछ जहाँ अभिभावकहरूले स्कूलका कर्मचारीहरूबाट सुन्न सक्छन्। यदि तपाईं उपस्थित हुन सक्नुहुन्छ भने कृपया मलाई थाहा दिनुहोस्।",
+      "deText": "Nächsten Monat findet ein Elternabend statt. Bitte teilen Sie der Schule mit, ob Sie teilnehmen können."
     },
     {
       "id": "p20",
       "title": "校則の確認",
       "icon": "📌",
-      "category": "その他",
+      "category": "学校生活",
       "subCategories": "生活,確認",
       "targetUser": "保護者",
       "jaText": "学校のルールについて確認したいことがあります。お子さんと一緒に確認してください。",
@@ -535,7 +559,593 @@ export const catalog = {
       "koText": "학교 정리에 대해 확인하고 싶은 경우가 있습니다. 아이와 함께 봐.",
       "tlText": "Mayroon akong gustong kumpirmahin tungkol sa mga patakaran ng paaralan. Pakirepaso ito kasama ang inyong anak.",
       "idText": "Ada sesuatu yang ingin saya konfirmasikan mengenai peraturan sekolah. Mohon tinjau bersama anak Anda.",
-      "neText": "स्कूलका नियमहरूको बारेमा म केही कुरा पुष्टि गर्न चाहन्छु। कृपया आफ्नो बच्चासँग यो कुरा समीक्षा गर्नुहोस्।"
+      "neText": "स्कूलका नियमहरूको बारेमा म केही कुरा पुष्टि गर्न चाहन्छु। कृपया आफ्नो बच्चासँग यो कुरा समीक्षा गर्नुहोस्।",
+      "deText": "Wir möchten etwas zu den Schulregeln klären. Bitte gehen Sie diese gemeinsam mit Ihrem Kind durch."
+    },
+    {
+      "id": "web_school_20261007_p01",
+      "title": "入学の相談",
+      "icon": "📄",
+      "category": "お金・手続き",
+      "subCategories": "enroll",
+      "targetUser": "先生",
+      "jaText": "子どもをこの学校に入学させたいです。",
+      "simpleJaText": "子どもをこの学校に入れたいです。",
+      "enText": "I would like my child to enroll at this school.",
+      "keywords": "入学の相談,保護者,お金・手続き",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "1",
+      "ptText": "Gostaria de matricular meu filho nesta escola.",
+      "esText": "Quisiera matricular a mi hijo o hija en esta escuela.",
+      "viText": "Tôi muốn cho con nhập học tại trường này.",
+      "zhText": "我想让孩子进入这所学校学习。",
+      "koText": "아이를 이 학교에 입학시키고 싶습니다.",
+      "tlText": "Gusto kong ipasok ang aking anak sa paaralang ito.",
+      "idText": "Saya ingin mendaftarkan anak saya di sekolah ini.",
+      "neText": "म मेरो बच्चालाई यस विद्यालयमा भर्ना गराउन चाहन्छु।",
+      "deText": "Ich möchte mein Kind an dieser Schule anmelden."
+    },
+    {
+      "id": "web_school_20261007_p02",
+      "title": "手続きの窓口",
+      "icon": "📄",
+      "category": "お金・手続き",
+      "subCategories": "enroll",
+      "targetUser": "先生",
+      "jaText": "入学の手続きは、どこでできますか。",
+      "simpleJaText": "学校に入る手続きは、どこですればよいですか。",
+      "enText": "Where can I complete the school enrollment procedures?",
+      "keywords": "手続きの窓口,保護者,お金・手続き",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "4",
+      "ptText": "Onde posso fazer os procedimentos de matrícula?",
+      "esText": "¿Dónde puedo realizar los trámites de matrícula?",
+      "viText": "Tôi có thể làm thủ tục nhập học ở đâu?",
+      "zhText": "在哪里可以办理入学手续？",
+      "koText": "입학 절차는 어디에서 할 수 있나요?",
+      "tlText": "Saan ko maaaring asikasuhin ang pagpapatala sa paaralan?",
+      "idText": "Di mana saya bisa mengurus pendaftaran sekolah?",
+      "neText": "विद्यालय भर्नाको प्रक्रिया कहाँ गर्न सक्छु?",
+      "deText": "Wo kann ich mein Kind für die Schule anmelden?"
+    },
+    {
+      "id": "web_school_20261007_p03",
+      "title": "必要な書類の確認",
+      "icon": "📄",
+      "category": "お金・手続き",
+      "subCategories": "enroll",
+      "targetUser": "先生",
+      "jaText": "手続きに必要な書類を教えてください。",
+      "simpleJaText": "手続きで出す書類を教えてください。",
+      "enText": "Please tell me which documents are needed for the procedure.",
+      "keywords": "必要な書類の確認,保護者,お金・手続き",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Por favor, diga quais documentos são necessários para o procedimento.",
+      "esText": "Por favor, dígame qué documentos necesito para el trámite.",
+      "viText": "Xin cho tôi biết cần những giấy tờ nào để làm thủ tục.",
+      "zhText": "请告诉我办理手续需要哪些文件。",
+      "koText": "절차에 필요한 서류를 알려 주세요.",
+      "tlText": "Pakisabi kung anong mga dokumento ang kailangan para sa proseso.",
+      "idText": "Tolong beri tahu dokumen apa yang diperlukan untuk prosedur ini.",
+      "neText": "प्रक्रियाका लागि कुन कागजात चाहिन्छ, बताइदिनुहोस्।",
+      "deText": "Welche Unterlagen werden für die Anmeldung benötigt?"
+    },
+    {
+      "id": "web_school_20261007_p04",
+      "title": "書類の書き方",
+      "icon": "📄",
+      "category": "持ち物・提出",
+      "subCategories": "support",
+      "targetUser": "先生",
+      "jaText": "書類の書き方がわかりません。一緒に確認していただけますか。",
+      "simpleJaText": "書類の書き方がわかりません。一緒に見てもらえますか。",
+      "enText": "I do not know how to fill out the form. Could you go through it with me?",
+      "keywords": "書類の書き方,保護者,持ち物・提出",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Não sei como preencher o formulário. Você poderia conferir comigo?",
+      "esText": "No sé cómo rellenar el formulario. ¿Podría revisarlo conmigo?",
+      "viText": "Tôi không biết cách điền giấy tờ. Bạn có thể xem cùng tôi không?",
+      "zhText": "我不知道怎么填写表格。可以和我一起看一下吗？",
+      "koText": "서류 작성 방법을 모르겠습니다. 함께 확인해 주실 수 있나요?",
+      "tlText": "Hindi ko alam kung paano sagutan ang form. Maaari po ba ninyo akong tulungan?",
+      "idText": "Saya tidak tahu cara mengisi formulir. Bisakah Anda memeriksanya bersama saya?",
+      "neText": "मलाई फाराम भर्ने तरिका थाहा छैन। मसँगै हेरेर सहयोग गरिदिनुहुन्छ?",
+      "deText": "Ich weiß nicht, wie ich dieses Formular ausfüllen soll. Könnten Sie es mit mir gemeinsam durchgehen?"
+    },
+    {
+      "id": "web_school_20261007_p05",
+      "title": "提出先の確認",
+      "icon": "📄",
+      "category": "持ち物・提出",
+      "subCategories": "aid",
+      "targetUser": "先生",
+      "jaText": "この書類は、どこに提出すればよいですか。",
+      "simpleJaText": "この書類は、どこに出せばよいですか。",
+      "enText": "Where should I submit this document?",
+      "keywords": "提出先の確認,保護者,持ち物・提出",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Onde devo entregar este documento?",
+      "esText": "¿Dónde debo entregar este documento?",
+      "viText": "Tôi phải nộp giấy tờ này ở đâu?",
+      "zhText": "这份文件应该交到哪里？",
+      "koText": "이 서류는 어디에 제출하면 되나요?",
+      "tlText": "Saan ko po dapat isumite ang dokumentong ito?",
+      "idText": "Di mana saya harus menyerahkan dokumen ini?",
+      "neText": "यो कागजात कहाँ बुझाउनुपर्छ?",
+      "deText": "Wo soll ich diese Unterlagen abgeben?"
+    },
+    {
+      "id": "web_school_20261007_p06",
+      "title": "提出期限の確認",
+      "icon": "📄",
+      "category": "持ち物・提出",
+      "subCategories": "aid",
+      "targetUser": "先生",
+      "jaText": "この書類は、いつまでに提出すればよいですか。",
+      "simpleJaText": "この書類は、いつまでに出せばよいですか。",
+      "enText": "What is the deadline for submitting this document?",
+      "keywords": "提出期限の確認,保護者,持ち物・提出",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Qual é o prazo para entregar este documento?",
+      "esText": "¿Cuál es el plazo para entregar este documento?",
+      "viText": "Hạn nộp giấy tờ này là khi nào?",
+      "zhText": "这份文件最晚什么时候提交？",
+      "koText": "이 서류는 언제까지 제출해야 하나요?",
+      "tlText": "Kailan ang huling araw para isumite ang dokumentong ito?",
+      "idText": "Kapan batas waktu penyerahan dokumen ini?",
+      "neText": "यो कागजात बुझाउने अन्तिम मिति कहिले हो?",
+      "deText": "Bis wann muss ich diese Unterlagen abgeben?"
+    },
+    {
+      "id": "web_school_20261007_p07",
+      "title": "転校の予定",
+      "icon": "📄",
+      "category": "お金・手続き",
+      "subCategories": "transfer",
+      "targetUser": "先生",
+      "jaText": "引っ越しのため、子どもが転校する予定です。必要な手続きを教えてください。",
+      "simpleJaText": "引っ越すので、子どもは別の学校に移る予定です。手続きを教えてください。",
+      "enText": "My child will change schools because we are moving. Please tell me what procedures are needed.",
+      "keywords": "転校の予定,保護者,お金・手続き",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Meu filho vai mudar de escola porque vamos nos mudar. Por favor, explique os procedimentos necessários.",
+      "esText": "Mi hijo o hija cambiará de escuela porque nos mudamos. Indíqueme los trámites necesarios.",
+      "viText": "Con tôi dự định chuyển trường vì gia đình chuyển nhà. Xin cho biết cần làm thủ tục gì.",
+      "zhText": "由于搬家，孩子准备转学。请告诉我需要办理什么手续。",
+      "koText": "이사 때문에 아이가 전학할 예정입니다. 필요한 절차를 알려 주세요.",
+      "tlText": "Lilipat ng paaralan ang anak ko dahil lilipat kami ng tirahan. Pakisabi ang mga kailangang asikasuhin.",
+      "idText": "Anak saya akan pindah sekolah karena kami akan pindah rumah. Tolong beri tahu prosedur yang diperlukan.",
+      "neText": "हामी घर सर्ने भएकाले बच्चाले विद्यालय बदल्नेछ। आवश्यक प्रक्रिया बताइदिनुहोस्।",
+      "deText": "Wegen eines Umzugs wird mein Kind die Schule wechseln. Welche Schritte sind dafür erforderlich?"
+    },
+    {
+      "id": "web_school_20261007_p08",
+      "title": "転校の書類",
+      "icon": "📄",
+      "category": "お金・手続き",
+      "subCategories": "transfer",
+      "targetUser": "先生",
+      "jaText": "転校先の学校に渡す書類を用意していただけますか。",
+      "simpleJaText": "次の学校に渡す書類を用意してもらえますか。",
+      "enText": "Could you prepare the documents to give to my child's new school?",
+      "keywords": "転校の書類,保護者,お金・手続き",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Você poderia preparar os documentos para entregar à nova escola?",
+      "esText": "¿Podría preparar los documentos que debo entregar a la nueva escuela?",
+      "viText": "Bạn có thể chuẩn bị giấy tờ để nộp cho trường mới không?",
+      "zhText": "可以准备交给新学校的文件吗？",
+      "koText": "전학할 학교에 전달할 서류를 준비해 주실 수 있나요?",
+      "tlText": "Maaari po bang ihanda ang mga dokumentong ibibigay sa bagong paaralan?",
+      "idText": "Bisakah Anda menyiapkan dokumen untuk diserahkan ke sekolah baru?",
+      "neText": "नयाँ विद्यालयलाई दिने कागजात तयार गरिदिनुहुन्छ?",
+      "deText": "Könnten Sie die Unterlagen für die neue Schule vorbereiten?"
+    },
+    {
+      "id": "web_school_20261007_p09",
+      "title": "住所の変更",
+      "icon": "📄",
+      "category": "会話・連絡",
+      "subCategories": "transfer",
+      "targetUser": "先生",
+      "jaText": "住所が変わりました。学校への届け出の方法を教えてください。",
+      "simpleJaText": "住む場所が変わりました。学校に知らせる方法を教えてください。",
+      "enText": "Our address has changed. Please tell me how to notify the school.",
+      "keywords": "住所の変更,保護者,会話・連絡",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Nosso endereço mudou. Por favor, explique como informar a escola.",
+      "esText": "Nuestra dirección ha cambiado. Dígame cómo comunicarlo a la escuela.",
+      "viText": "Địa chỉ của chúng tôi đã thay đổi. Xin cho biết cách thông báo cho trường.",
+      "zhText": "我们的地址变了。请告诉我如何向学校申报。",
+      "koText": "주소가 바뀌었습니다. 학교에 신고하는 방법을 알려 주세요.",
+      "tlText": "Nagbago ang aming address. Pakisabi kung paano ipapaalam ito sa paaralan.",
+      "idText": "Alamat kami berubah. Tolong beri tahu cara melaporkannya ke sekolah.",
+      "neText": "हाम्रो ठेगाना बदलिएको छ। विद्यालयलाई जानकारी दिने तरिका बताइदिनुहोस्।",
+      "deText": "Unsere Adresse hat sich geändert. Wie teile ich dies der Schule mit?"
+    },
+    {
+      "id": "web_school_20261007_p10",
+      "title": "就学援助の相談",
+      "icon": "📄",
+      "category": "お金・手続き",
+      "subCategories": "aid",
+      "targetUser": "先生",
+      "jaText": "学校の費用について相談したいです。就学援助を申請できますか。",
+      "simpleJaText": "学校のお金について相談したいです。お金の援助を申し込めますか。",
+      "enText": "I would like to discuss school expenses. Can I apply for financial assistance?",
+      "keywords": "就学援助の相談,保護者,お金・手続き",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Gostaria de conversar sobre as despesas escolares. Posso solicitar auxílio financeiro?",
+      "esText": "Quisiera consultar sobre los gastos escolares. ¿Puedo solicitar ayuda económica?",
+      "viText": "Tôi muốn trao đổi về chi phí học tập. Tôi có thể xin hỗ trợ tài chính không?",
+      "zhText": "我想咨询学校费用。可以申请就学补助吗？",
+      "koText": "학교 비용에 대해 상담하고 싶습니다. 취학 지원을 신청할 수 있나요?",
+      "tlText": "Gusto kong kumonsulta tungkol sa gastos sa paaralan. Maaari ba akong humiling ng tulong pinansyal?",
+      "idText": "Saya ingin berkonsultasi tentang biaya sekolah. Bisakah saya mengajukan bantuan keuangan?",
+      "neText": "विद्यालय खर्चबारे परामर्श गर्न चाहन्छु। आर्थिक सहायता माग्न सक्छु?",
+      "deText": "Ich möchte mich zu den Schulkosten beraten lassen. Kann ich finanzielle Unterstützung für den Schulbesuch beantragen?"
+    },
+    {
+      "id": "web_school_20261007_p11",
+      "title": "援助の申請方法",
+      "icon": "📄",
+      "category": "お金・手続き",
+      "subCategories": "aid",
+      "targetUser": "先生",
+      "jaText": "就学援助の申請方法と、必要な書類を教えてください。",
+      "simpleJaText": "学校のお金の援助を申し込む方法と、必要な書類を教えてください。",
+      "enText": "Please explain how to apply for school financial assistance and which documents are needed.",
+      "keywords": "援助の申請方法,保護者,お金・手続き",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Explique como solicitar auxílio financeiro escolar e quais documentos são necessários.",
+      "esText": "Explíqueme cómo solicitar la ayuda para gastos escolares y qué documentos necesito.",
+      "viText": "Xin hướng dẫn cách xin hỗ trợ chi phí học tập và các giấy tờ cần thiết.",
+      "zhText": "请说明就学补助的申请方法和所需文件。",
+      "koText": "취학 지원 신청 방법과 필요한 서류를 알려 주세요.",
+      "tlText": "Pakipaliwanag kung paano humiling ng tulong pinansyal sa paaralan at kung anong mga dokumento ang kailangan.",
+      "idText": "Tolong jelaskan cara mengajukan bantuan biaya sekolah dan dokumen yang diperlukan.",
+      "neText": "विद्यालय खर्चको सहायता माग्ने तरिका र आवश्यक कागजात बताइदिनुहोस्।",
+      "deText": "Wie beantrage ich finanzielle Unterstützung für den Schulbesuch, und welche Unterlagen brauche ich?"
+    },
+    {
+      "id": "web_school_20261007_p12",
+      "title": "費用の支払い相談",
+      "icon": "📄",
+      "category": "お金・手続き",
+      "subCategories": "payment",
+      "targetUser": "先生",
+      "jaText": "学校の費用を期限までに払うことが難しいので、相談したいです。",
+      "simpleJaText": "学校のお金を決められた日までに払うのが難しいです。相談したいです。",
+      "enText": "I am having difficulty paying the school expenses by the deadline and would like to discuss this.",
+      "keywords": "費用の支払い相談,保護者,お金・手続き",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Tenho dificuldade para pagar as despesas escolares no prazo e gostaria de conversar sobre isso.",
+      "esText": "Me resulta difícil pagar los gastos escolares dentro del plazo y quisiera hablar sobre ello.",
+      "viText": "Tôi gặp khó khăn khi thanh toán chi phí học tập đúng hạn và muốn trao đổi về việc này.",
+      "zhText": "我很难在期限内支付学校费用，想就此咨询。",
+      "koText": "학교 비용을 기한까지 내기 어려워 상담하고 싶습니다.",
+      "tlText": "Nahihirapan akong bayaran ang gastos sa paaralan sa takdang araw at gusto kong kumonsulta.",
+      "idText": "Saya kesulitan membayar biaya sekolah sebelum batas waktu dan ingin berkonsultasi.",
+      "neText": "विद्यालय खर्च समयमै तिर्न कठिन छ, यसबारे परामर्श गर्न चाहन्छु।",
+      "deText": "Ich kann die Schulkosten voraussichtlich nicht fristgerecht bezahlen und möchte darüber sprechen."
+    },
+    {
+      "id": "web_school_20261007_p13",
+      "title": "口座振替の確認",
+      "icon": "📄",
+      "category": "お金・手続き",
+      "subCategories": "payment",
+      "targetUser": "先生",
+      "jaText": "口座振替の手続きと、引き落とし日を教えてください。",
+      "simpleJaText": "銀行から自動で払う手続きと、お金が引かれる日を教えてください。",
+      "enText": "Please explain how to set up automatic bank payments and when the money will be withdrawn.",
+      "keywords": "口座振替の確認,保護者,お金・手続き",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Explique como cadastrar o débito automático e em que dia o dinheiro será retirado.",
+      "esText": "Explíqueme cómo tramitar la domiciliación bancaria y en qué fecha se cargará el importe.",
+      "viText": "Xin hướng dẫn cách đăng ký trích tiền tự động và ngày tiền được trừ.",
+      "zhText": "请说明办理银行自动扣款的手续和扣款日期。",
+      "koText": "자동이체 신청 방법과 출금일을 알려 주세요.",
+      "tlText": "Pakipaliwanag ang proseso para sa awtomatikong pagbabayad sa bangko at ang petsa ng pagkuha ng pera.",
+      "idText": "Tolong jelaskan cara mengatur pembayaran otomatis dari rekening dan tanggal penarikannya.",
+      "neText": "बैंकबाट स्वचालित भुक्तानी गर्ने प्रक्रिया र पैसा काटिने मिति बताइदिनुहोस्।",
+      "deText": "Wie richte ich das Lastschriftverfahren ein, und wann wird das Geld abgebucht?"
+    },
+    {
+      "id": "web_school_20261007_p14",
+      "title": "通訳をお願いしたい",
+      "icon": "📄",
+      "category": "会話・連絡",
+      "subCategories": "support",
+      "targetUser": "先生",
+      "jaText": "日本語での説明が難しいので、通訳をお願いできますか。",
+      "simpleJaText": "日本語の説明を理解するのが難しいです。通訳をお願いできますか。",
+      "enText": "I find it difficult to understand explanations in Japanese. Could you arrange an interpreter?",
+      "keywords": "通訳をお願いしたい,保護者,会話・連絡",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Tenho dificuldade para entender explicações em japonês. Seria possível solicitar um intérprete?",
+      "esText": "Me cuesta entender las explicaciones en japonés. ¿Podrían facilitarme un intérprete?",
+      "viText": "Tôi khó hiểu lời giải thích bằng tiếng Nhật. Có thể nhờ người phiên dịch không?",
+      "zhText": "我很难理解日语说明。可以安排口译吗？",
+      "koText": "일본어 설명을 이해하기 어렵습니다. 통역을 부탁할 수 있나요?",
+      "tlText": "Nahihirapan akong unawain ang paliwanag sa Japanese. Maaari po bang humingi ng interpreter?",
+      "idText": "Saya kesulitan memahami penjelasan dalam bahasa Jepang. Bisakah meminta penerjemah lisan?",
+      "neText": "जापानी भाषाको व्याख्या बुझ्न कठिन हुन्छ। दोभाषेको व्यवस्था गर्न सक्नुहुन्छ?",
+      "deText": "Es fällt mir schwer, mich auf Japanisch zu verständigen. Könnten Sie eine Dolmetscherin oder einen Dolmetscher hinzuziehen?"
+    },
+    {
+      "id": "web_school_20261007_p15",
+      "title": "やさしい説明のお願い",
+      "icon": "📄",
+      "category": "会話・連絡",
+      "subCategories": "support",
+      "targetUser": "先生",
+      "jaText": "もう少しゆっくり、やさしいことばで説明してください。",
+      "simpleJaText": "ゆっくり、わかりやすいことばで説明してください。",
+      "enText": "Please explain a little more slowly, using simple words.",
+      "keywords": "やさしい説明のお願い,保護者,会話・連絡",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Explique um pouco mais devagar, usando palavras simples.",
+      "esText": "Explíquelo un poco más despacio y con palabras sencillas.",
+      "viText": "Xin giải thích chậm hơn một chút bằng từ ngữ dễ hiểu.",
+      "zhText": "请说慢一点，用简单的词语说明。",
+      "koText": "조금 더 천천히 쉬운 말로 설명해 주세요.",
+      "tlText": "Pakipaliwanag nang mas mabagal, gamit ang madaling salita.",
+      "idText": "Tolong jelaskan sedikit lebih pelan dengan kata-kata sederhana.",
+      "neText": "अलि बिस्तारै, सजिलो शब्दमा बताइदिनुहोस्।",
+      "deText": "Bitte erklären Sie es etwas langsamer und mit einfachen Worten."
+    },
+    {
+      "id": "web_school_20261007_p16",
+      "title": "面談の相談",
+      "icon": "💬",
+      "category": "家族・相談",
+      "subCategories": "support",
+      "targetUser": "先生",
+      "jaText": "子どもの学校での様子について、先生と面談したいです。",
+      "simpleJaText": "学校での子どもの様子を、先生と話したいです。",
+      "enText": "I would like to meet with the teacher to discuss how my child is doing at school.",
+      "keywords": "面談の相談,保護者,家族・相談",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Gostaria de conversar com o professor sobre como meu filho está na escola.",
+      "esText": "Quisiera reunirme con el docente para hablar de cómo está mi hijo o hija en la escuela.",
+      "viText": "Tôi muốn gặp giáo viên để trao đổi về tình hình của con ở trường.",
+      "zhText": "我想与老师面谈，了解孩子在学校的情况。",
+      "koText": "아이의 학교생활에 대해 선생님과 면담하고 싶습니다.",
+      "tlText": "Gusto kong makipagkita sa guro upang pag-usapan ang kalagayan ng anak ko sa paaralan.",
+      "idText": "Saya ingin bertemu guru untuk membicarakan keadaan anak saya di sekolah.",
+      "neText": "विद्यालयमा बच्चाको अवस्थाबारे शिक्षकसँग भेटेर कुरा गर्न चाहन्छु।",
+      "deText": "Ich möchte mit der Lehrkraft darüber sprechen, wie es meinem Kind in der Schule geht."
+    },
+    {
+      "id": "web_school_20261007_p17",
+      "title": "相談の予約",
+      "icon": "💬",
+      "category": "家族・相談",
+      "subCategories": "support",
+      "targetUser": "先生",
+      "jaText": "相談の予約をしたいです。都合のよい日時を教えてください。",
+      "simpleJaText": "相談する時間を決めたいです。話せる日と時間を教えてください。",
+      "enText": "I would like to make an appointment for a consultation. Please tell me a convenient date and time.",
+      "keywords": "相談の予約,保護者,家族・相談",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Gostaria de marcar uma conversa. Informe um dia e horário conveniente.",
+      "esText": "Quisiera pedir una cita para consultar. Dígame qué día y hora le viene bien.",
+      "viText": "Tôi muốn đặt lịch tư vấn. Xin cho biết ngày giờ thuận tiện.",
+      "zhText": "我想预约咨询。请告诉我方便的日期和时间。",
+      "koText": "상담 예약을 하고 싶습니다. 가능한 날짜와 시간을 알려 주세요.",
+      "tlText": "Gusto kong magpa-iskedyul ng konsultasyon. Pakisabi ang maginhawang araw at oras.",
+      "idText": "Saya ingin membuat janji konsultasi. Tolong beri tahu tanggal dan waktu yang sesuai.",
+      "neText": "परामर्शका लागि समय लिन चाहन्छु। उपयुक्त मिति र समय बताइदिनुहोस्।",
+      "deText": "Ich möchte einen Beratungstermin vereinbaren. Wann hätten Sie Zeit?"
+    },
+    {
+      "id": "web_school_20261007_p18",
+      "title": "食物アレルギーを伝える",
+      "icon": "🩺",
+      "category": "休み・健康・安全",
+      "subCategories": "health",
+      "targetUser": "先生",
+      "jaText": "子どもに食物アレルギーがあります。給食について相談したいです。",
+      "simpleJaText": "子どもは食べられない物があります。食物アレルギーです。給食について相談したいです。",
+      "enText": "My child has a food allergy. I would like to discuss school meals.",
+      "keywords": "食物アレルギーを伝える,保護者,休み・健康・安全",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Meu filho tem alergia alimentar. Gostaria de conversar sobre a merenda escolar.",
+      "esText": "Mi hijo o hija tiene una alergia alimentaria. Quisiera consultar sobre las comidas escolares.",
+      "viText": "Con tôi bị dị ứng thực phẩm. Tôi muốn trao đổi về bữa ăn ở trường.",
+      "zhText": "孩子有食物过敏。我想咨询学校供餐的安排。",
+      "koText": "아이가 식품 알레르기가 있습니다. 학교 급식에 대해 상담하고 싶습니다.",
+      "tlText": "May allergy sa pagkain ang anak ko. Gusto kong kumonsulta tungkol sa pagkain sa paaralan.",
+      "idText": "Anak saya memiliki alergi makanan. Saya ingin berkonsultasi tentang makanan di sekolah.",
+      "neText": "मेरो बच्चालाई खानेकुराको एलर्जी छ। विद्यालयको खानाबारे परामर्श गर्न चाहन्छु।",
+      "deText": "Mein Kind hat eine Lebensmittelallergie. Ich möchte mich zum Schulmittagessen beraten lassen."
+    },
+    {
+      "id": "web_school_20261007_p19",
+      "title": "健康情報の確認",
+      "icon": "🩺",
+      "category": "休み・健康・安全",
+      "subCategories": "health",
+      "targetUser": "保護者",
+      "jaText": "持病やアレルギーなど、学校で気をつけることを教えてください。",
+      "simpleJaText": "病気やアレルギーなど、学校で気をつけることを教えてください。",
+      "enText": "Please tell us about any ongoing illnesses, allergies, or other matters the school should be aware of.",
+      "keywords": "健康情報の確認,保護者,休み・健康・安全",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Informe doenças crônicas, alergias ou outros cuidados que a escola deve ter.",
+      "esText": "Infórmenos de enfermedades crónicas, alergias u otros aspectos que la escuela deba tener en cuenta.",
+      "viText": "Xin cho biết bệnh mãn tính, dị ứng hoặc những điều nhà trường cần lưu ý.",
+      "zhText": "请告知慢性病、过敏等学校需要注意的事项。",
+      "koText": "지병이나 알레르기 등 학교에서 주의해야 할 사항을 알려 주세요.",
+      "tlText": "Pakisabi ang anumang pangmatagalang sakit, allergy, o iba pang dapat ingatan sa paaralan.",
+      "idText": "Tolong beri tahu penyakit kronis, alergi, atau hal lain yang perlu diperhatikan sekolah.",
+      "neText": "दीर्घ रोग, एलर्जी वा विद्यालयले ध्यान दिनुपर्ने अन्य कुरा बताइदिनुहोस्।",
+      "deText": "Bitte teilen Sie uns mit, worauf wir in der Schule achten müssen, etwa bei chronischen Erkrankungen oder Allergien."
+    },
+    {
+      "id": "web_school_20261007_p20",
+      "title": "登校再開の確認",
+      "icon": "🩺",
+      "category": "休み・健康・安全",
+      "subCategories": "health",
+      "targetUser": "先生",
+      "jaText": "子どもは、いつから登校できますか。必要な書類はありますか。",
+      "simpleJaText": "子どもは、いつから学校に行けますか。出す書類はありますか。",
+      "enText": "When can my child return to school? Are any documents required?",
+      "keywords": "登校再開の確認,保護者,休み・健康・安全",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Quando meu filho poderá voltar à escola? É necessário algum documento?",
+      "esText": "¿Cuándo puede volver mi hijo o hija a la escuela? ¿Hace falta algún documento?",
+      "viText": "Khi nào con tôi có thể đi học lại? Có cần giấy tờ nào không?",
+      "zhText": "孩子什么时候可以返校？需要提交什么文件吗？",
+      "koText": "아이는 언제부터 다시 등교할 수 있나요? 필요한 서류가 있나요?",
+      "tlText": "Kailan maaaring bumalik sa paaralan ang anak ko? May kailangan bang dokumento?",
+      "idText": "Kapan anak saya boleh kembali ke sekolah? Apakah ada dokumen yang diperlukan?",
+      "neText": "मेरो बच्चा कहिलेदेखि फेरि विद्यालय जान सक्छ? कुनै कागजात चाहिन्छ?",
+      "deText": "Ab wann kann mein Kind die Schule besuchen? Werden dafür Unterlagen benötigt?"
+    },
+    {
+      "id": "web_school_20261007_p21",
+      "title": "学童保育の相談",
+      "icon": "📄",
+      "category": "学校生活",
+      "subCategories": "after",
+      "targetUser": "先生",
+      "jaText": "放課後に子どもを預けたいです。学童保育の申し込み方法を教えてください。",
+      "simpleJaText": "学校が終わったあと、子どもを預けたいです。申し込む方法を教えてください。",
+      "enText": "I would like after-school care for my child. Please tell me how to apply.",
+      "keywords": "学童保育の相談,保護者,学校生活",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Gostaria de atendimento para meu filho após as aulas. Explique como fazer a inscrição.",
+      "esText": "Quisiera un servicio de cuidado para mi hijo o hija después de clase. Dígame cómo solicitarlo.",
+      "viText": "Tôi muốn gửi con sau giờ học. Xin hướng dẫn cách đăng ký dịch vụ trông trẻ.",
+      "zhText": "我想让孩子参加课后托管。请说明申请方法。",
+      "koText": "방과 후에 아이를 맡기고 싶습니다. 돌봄 서비스 신청 방법을 알려 주세요.",
+      "tlText": "Gusto kong may mag-alaga sa anak ko pagkatapos ng klase. Pakisabi kung paano mag-aplay.",
+      "idText": "Saya ingin menitipkan anak setelah sekolah. Tolong beri tahu cara mendaftar layanan pengasuhan.",
+      "neText": "विद्यालयपछि बच्चाको हेरचाह गर्ने सेवा चाहिन्छ। आवेदन दिने तरिका बताइदिनुहोस्।",
+      "deText": "Ich möchte mein Kind nach dem Unterricht betreuen lassen. Wie melde ich es für die Nachmittagsbetreuung an?"
+    },
+    {
+      "id": "web_school_20261007_p22",
+      "title": "買う物の確認",
+      "icon": "📄",
+      "category": "持ち物・提出",
+      "subCategories": "school",
+      "targetUser": "先生",
+      "jaText": "学校で使う物は、何を買えばよいですか。",
+      "simpleJaText": "学校で使う物は、何を買えばよいですか。",
+      "enText": "What should I buy for my child to use at school?",
+      "keywords": "買う物の確認,保護者,持ち物・提出",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "O que devo comprar para meu filho usar na escola?",
+      "esText": "¿Qué debo comprar para que mi hijo o hija use en la escuela?",
+      "viText": "Tôi cần mua những đồ gì để con dùng ở trường?",
+      "zhText": "孩子在学校要用的东西，应该买哪些？",
+      "koText": "아이가 학교에서 쓸 물건은 무엇을 사야 하나요?",
+      "tlText": "Ano ang dapat kong bilhin para gamitin ng anak ko sa paaralan?",
+      "idText": "Apa yang harus saya beli untuk digunakan anak saya di sekolah?",
+      "neText": "बच्चाले विद्यालयमा प्रयोग गर्न के किन्नुपर्छ?",
+      "deText": "Welche Dinge muss ich für die Schule kaufen?"
+    },
+    {
+      "id": "web_school_20261007_p23",
+      "title": "書類をもう一度ください",
+      "icon": "📄",
+      "category": "持ち物・提出",
+      "subCategories": "school",
+      "targetUser": "先生",
+      "jaText": "学校からの書類をなくしました。もう一度いただけますか。",
+      "simpleJaText": "学校からもらった書類をなくしました。もう一度もらえますか。",
+      "enText": "I lost the document from school. Could I have another copy?",
+      "keywords": "書類をもう一度ください,保護者,持ち物・提出",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Perdi o documento enviado pela escola. Posso receber outra cópia?",
+      "esText": "He perdido el documento de la escuela. ¿Podrían darme otra copia?",
+      "viText": "Tôi đã làm mất giấy tờ của trường. Có thể cho tôi một bản nữa không?",
+      "zhText": "我把学校发的文件弄丢了。可以再给我一份吗？",
+      "koText": "학교에서 받은 서류를 잃어버렸습니다. 다시 받을 수 있나요?",
+      "tlText": "Nawala ko ang dokumento mula sa paaralan. Maaari po bang makahingi ulit?",
+      "idText": "Saya kehilangan dokumen dari sekolah. Bisakah saya mendapat salinan lagi?",
+      "neText": "विद्यालयबाट पाएको कागजात हरायो। फेरि एक प्रति पाउन सक्छु?",
+      "deText": "Ich habe die Unterlagen der Schule verloren. Könnte ich sie noch einmal bekommen?"
+    },
+    {
+      "id": "web_school_20261007_p24",
+      "title": "連絡方法の確認",
+      "icon": "📄",
+      "category": "会話・連絡",
+      "subCategories": "school",
+      "targetUser": "先生",
+      "jaText": "学校への連絡は、電話とアプリのどちらを使えばよいですか。",
+      "simpleJaText": "学校に知らせるときは、電話とアプリのどちらを使いますか。",
+      "enText": "Should I contact the school by phone or through the app?",
+      "keywords": "連絡方法の確認,保護者,会話・連絡",
+      "warningLevel": "low",
+      "oneComment": "保護者と学校の会話で使う文例です。",
+      "viewCount": "0",
+      "ptText": "Devo entrar em contato com a escola por telefone ou pelo aplicativo?",
+      "esText": "¿Debo contactar con la escuela por teléfono o mediante la aplicación?",
+      "viText": "Tôi nên liên hệ với trường bằng điện thoại hay ứng dụng?",
+      "zhText": "联系学校应该打电话还是使用应用程序？",
+      "koText": "학교에 연락할 때 전화와 앱 중 어느 것을 사용하면 되나요?",
+      "tlText": "Dapat ba akong tumawag sa paaralan o gumamit ng app?",
+      "idText": "Apakah saya harus menghubungi sekolah lewat telepon atau aplikasi?",
+      "neText": "विद्यालयसँग फोनबाट सम्पर्क गर्ने कि एपबाट?",
+      "deText": "Soll ich die Schule telefonisch oder über die App kontaktieren?"
+    },
+    {
+      "id": "kCP2mZaoeAxfxVLW3DBXaA0Tl2Ynv1rEozLwrl0t",
+      "title": "教科書の16ページを開きましょう",
+      "category": "授業・勉強",
+      "jaText": "教科書の16ページを開きましょう",
+      "enText": "Let's open the textbook to page 16.",
+      "esText": "Abramos el libro de texto en la página 16.",
+      "deText": "Bitte schlagt Seite 16 im Lehrbuch auf."
     }
   ],
   "terms": [
@@ -545,7 +1155,7 @@ export const catalog = {
       "reading": "けっせきとどけ",
       "en": "This is a paper or notice informing students that they will be absent from school.",
       "descriptionJa": "学校を休むことを知らせる紙や連絡です。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "2",
       "ptText": "Este é um documento ou aviso informando os alunos de que eles estarão ausentes da escola.",
@@ -555,7 +1165,9 @@ export const catalog = {
       "koText": "학교를 쉬는 것을 알리는 종이와 연락입니다.",
       "tlText": "Ito ay isang papel o abiso na nagpapaalam sa mga mag-aaral na sila ay liliban sa paaralan.",
       "idText": "Ini adalah selembar kertas atau pemberitahuan yang memberitahukan kepada siswa bahwa mereka akan absen dari sekolah.",
-      "neText": "यो विद्यार्थीहरूलाई विद्यालयमा अनुपस्थित हुने जानकारी दिने पत्र वा सूचना हो।"
+      "neText": "यो विद्यार्थीहरूलाई विद्यालयमा अनुपस्थित हुने जानकारी दिने पत्र वा सूचना हो।",
+      "deText": "Dies ist ein Schreiben oder eine Mitteilung, die die Schüler darüber informiert, dass sie der Schule fernbleiben werden.",
+      "simpleJaText": "学校を休むことを知らせる紙や連絡です。"
     },
     {
       "id": "t2",
@@ -563,7 +1175,7 @@ export const catalog = {
       "reading": "しゅっけつ",
       "en": "It's about whether they're attending school or absent.",
       "descriptionJa": "学校に来ているか、休んでいるかのことです。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "A questão é se eles estão frequentando a escola ou se estão faltando.",
@@ -573,7 +1185,9 @@ export const catalog = {
       "koText": "학교에 왔는지, 쉬고 있는지.",
       "tlText": "Tungkol ito sa kung papasok ba sila sa paaralan o lumiban.",
       "idText": "Ini tentang apakah mereka bersekolah atau tidak.",
-      "neText": "यो उनीहरू स्कूल जान्छन् वा अनुपस्थित छन् भन्ने बारेमा हो।"
+      "neText": "यो उनीहरू स्कूल जान्छन् वा अनुपस्थित छन् भन्ने बारेमा हो।",
+      "deText": "Es geht darum, ob sie zur Schule gehen oder fehlen.",
+      "simpleJaText": "学校に来ているか、休んでいるかのことです。"
     },
     {
       "id": "t3",
@@ -581,7 +1195,7 @@ export const catalog = {
       "reading": "しゅっけつかくにん",
       "en": "The goal is to confirm whether the student is attending school or absent.",
       "descriptionJa": "学校に来ているか、休んでいるかを確認することです。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "1",
       "ptText": "O objetivo é confirmar se o aluno está frequentando a escola ou se está ausente.",
@@ -591,7 +1205,9 @@ export const catalog = {
       "koText": "학교에 오고 있는지, 쉬고 있는지 확인하는 것입니다.",
       "tlText": "Ang layunin ay upang kumpirmahin kung ang estudyante ay pumapasok sa paaralan o lumiban.",
       "idText": "Tujuannya adalah untuk memastikan apakah siswa tersebut bersekolah atau tidak.",
-      "neText": "लक्ष्य भनेको विद्यार्थी स्कूलमा उपस्थित छ वा अनुपस्थित छ भनेर पुष्टि गर्नु हो।"
+      "neText": "लक्ष्य भनेको विद्यार्थी स्कूलमा उपस्थित छ वा अनुपस्थित छ भनेर पुष्टि गर्नु हो।",
+      "deText": "Ziel ist es, festzustellen, ob der Schüler die Schule besucht oder abwesend ist.",
+      "simpleJaText": "学校に来ているか、休んでいるかを確認することです。"
     },
     {
       "id": "t4",
@@ -599,7 +1215,7 @@ export const catalog = {
       "reading": "けっせきりゆう",
       "en": "This is about the reason for being absent from school.",
       "descriptionJa": "学校を休む理由のことです。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este texto trata do motivo da ausência escolar.",
@@ -609,7 +1225,9 @@ export const catalog = {
       "koText": "학교를 쉬는 이유입니다.",
       "tlText": "Ito ay tungkol sa dahilan ng pagliban sa paaralan.",
       "idText": "Ini tentang alasan ketidakhadiran di sekolah.",
-      "neText": "यो स्कूलबाट अनुपस्थित हुनुको कारण हो।"
+      "neText": "यो स्कूलबाट अनुपस्थित हुनुको कारण हो।",
+      "deText": "Hier geht es um den Grund für die Schulabwesenheit.",
+      "simpleJaText": "学校を休む理由のことです。"
     },
     {
       "id": "t5",
@@ -617,7 +1235,7 @@ export const catalog = {
       "reading": "かていのつごう",
       "en": "It means that it's due to family circumstances.",
       "descriptionJa": "家の事情が理由という意味です。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "1",
       "ptText": "Significa que se deve a circunstâncias familiares.",
@@ -627,7 +1245,8 @@ export const catalog = {
       "koText": "집의 사정이 이유라는 뜻입니다.",
       "tlText": "Ibig sabihin, ito ay dahil sa mga pangyayari sa pamilya.",
       "idText": "Artinya hal itu disebabkan oleh keadaan keluarga.",
-      "neText": "यसको अर्थ पारिवारिक परिस्थितिको कारणले हो।"
+      "neText": "यसको अर्थ पारिवारिक परिस्थितिको कारणले हो।",
+      "deText": "Es bedeutet, dass es an familiären Umständen liegt."
     },
     {
       "id": "t6",
@@ -635,7 +1254,7 @@ export const catalog = {
       "reading": "たいちょうふりょうのため",
       "en": "It means I'm not feeling well.",
       "descriptionJa": "体の調子が悪いので、という意味です。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que não estou me sentindo bem.",
@@ -645,7 +1264,9 @@ export const catalog = {
       "koText": "몸의 상태가 나쁘기 때문에, 라는 의미입니다.",
       "tlText": "Ibig sabihin hindi maganda ang pakiramdam ko.",
       "idText": "Artinya aku sedang tidak enak badan.",
-      "neText": "यसको अर्थ मलाई ठीक छैन।"
+      "neText": "यसको अर्थ मलाई ठीक छैन।",
+      "deText": "Es bedeutet, dass es mir nicht gut geht.",
+      "simpleJaText": "体の調子が悪いので、という意味です。"
     },
     {
       "id": "t7",
@@ -653,7 +1274,7 @@ export const catalog = {
       "reading": "むかえ",
       "en": "It means that a parent comes to the school and takes the child home.",
       "descriptionJa": "家の人が学校へ来て、子どもを連れて帰ることです。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que um dos pais vem à escola e leva a criança para casa.",
@@ -663,7 +1284,9 @@ export const catalog = {
       "koText": "집 사람이 학교에 와서 아이를 데리고 돌아가는 것입니다.",
       "tlText": "Nangangahulugan ito na ang magulang ay pumupunta sa paaralan at iniuuwi ang bata.",
       "idText": "Artinya, orang tua datang ke sekolah dan menjemput anak mereka pulang.",
-      "neText": "यसको अर्थ अभिभावक स्कूलमा आउँछन् र बच्चालाई घर लैजान्छन्।"
+      "neText": "यसको अर्थ अभिभावक स्कूलमा आउँछन् र बच्चालाई घर लैजान्छन्।",
+      "deText": "Das bedeutet, dass ein Elternteil zur Schule kommt und das Kind wieder mit nach Hause nimmt.",
+      "simpleJaText": "家の人が学校へ来て、子どもを連れて帰ることです。"
     },
     {
       "id": "t8",
@@ -671,7 +1294,7 @@ export const catalog = {
       "reading": "おむかえ",
       "en": "It means that a parent comes to the school and takes the child home.",
       "descriptionJa": "家の人が学校へ来て、子どもを連れて帰ることです。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que um dos pais vem à escola e leva a criança para casa.",
@@ -681,7 +1304,9 @@ export const catalog = {
       "koText": "집 사람이 학교에 와서 아이를 데리고 돌아가는 것입니다.",
       "tlText": "Nangangahulugan ito na ang magulang ay pumupunta sa paaralan at iniuuwi ang bata.",
       "idText": "Artinya, orang tua datang ke sekolah dan menjemput anak mereka pulang.",
-      "neText": "यसको अर्थ अभिभावक स्कूलमा आउँछन् र बच्चालाई घर लैजान्छन्।"
+      "neText": "यसको अर्थ अभिभावक स्कूलमा आउँछन् र बच्चालाई घर लैजान्छन्।",
+      "deText": "Das bedeutet, dass ein Elternteil zur Schule kommt und das Kind wieder mit nach Hause nimmt.",
+      "simpleJaText": "家の人が学校へ来て、子どもを連れて帰ることです。"
     },
     {
       "id": "t9",
@@ -689,9 +1314,9 @@ export const catalog = {
       "reading": "はやめ",
       "en": "It means a little earlier than usual.",
       "descriptionJa": "いつもより少し早いという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
-      "viewCount": "1",
+      "viewCount": "3",
       "ptText": "Significa um pouco mais cedo do que o habitual.",
       "esText": "Significa un poco antes de lo habitual.",
       "viText": "Điều đó có nghĩa là sớm hơn một chút so với thường lệ.",
@@ -699,7 +1324,9 @@ export const catalog = {
       "koText": "평소보다 조금 빠르다는 의미입니다.",
       "tlText": "Ibig sabihin, medyo mas maaga kaysa sa dati.",
       "idText": "Artinya sedikit lebih awal dari biasanya.",
-      "neText": "यसको अर्थ सामान्य भन्दा अलि अगाडि हो।"
+      "neText": "यसको अर्थ सामान्य भन्दा अलि अगाडि हो।",
+      "deText": "Es bedeutet etwas früher als üblich.",
+      "simpleJaText": "いつもより少し早いという意味です。"
     },
     {
       "id": "t10",
@@ -707,7 +1334,7 @@ export const catalog = {
       "reading": "おくれる",
       "en": "It means being later than the scheduled time.",
       "descriptionJa": "決められた時間より後になることです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa chegar atrasado em relação ao horário previsto.",
@@ -717,7 +1344,9 @@ export const catalog = {
       "koText": "정해진 시간보다 늦게 되는 것입니다.",
       "tlText": "Nangangahulugan ito na mas huli kaysa sa itinakdang oras.",
       "idText": "Artinya datang terlambat dari waktu yang dijadwalkan.",
-      "neText": "यसको अर्थ निर्धारित समयभन्दा ढिलो हुनु हो।"
+      "neText": "यसको अर्थ निर्धारित समयभन्दा ढिलो हुनु हो।",
+      "deText": "Es bedeutet, später als geplant zu sein.",
+      "simpleJaText": "決められた時間より後になることです。"
     },
     {
       "id": "t11",
@@ -725,9 +1354,9 @@ export const catalog = {
       "reading": "まにあう",
       "en": "It's something that can be done by the designated time.",
       "descriptionJa": "決められた時間までにできることです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
-      "viewCount": "",
+      "viewCount": "1",
       "ptText": "É algo que pode ser feito dentro do prazo estipulado.",
       "esText": "Es algo que se puede hacer en el plazo previsto.",
       "viText": "Đó là việc có thể hoàn thành trong thời gian quy định.",
@@ -735,7 +1364,9 @@ export const catalog = {
       "koText": "정해진 시간까지 할 수 있는 일입니다.",
       "tlText": "Ito ay isang bagay na maaaring gawin sa itinakdang oras.",
       "idText": "Ini adalah sesuatu yang dapat dilakukan pada waktu yang ditentukan.",
-      "neText": "यो तोकिएको समय भित्र गर्न सकिने कुरा हो।"
+      "neText": "यो तोकिएको समय भित्र गर्न सकिने कुरा हो।",
+      "deText": "Das kann bis zum festgelegten Zeitpunkt erledigt werden.",
+      "simpleJaText": "決められた時間までにできることです。"
     },
     {
       "id": "t12",
@@ -743,7 +1374,7 @@ export const catalog = {
       "reading": "つごうがわるい",
       "en": "It means that it will be difficult for me to come on that day or at that time.",
       "descriptionJa": "その日や時間に来ることが難しいという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "4",
       "ptText": "Significa que será difícil para mim comparecer nesse dia ou nesse horário.",
@@ -753,7 +1384,8 @@ export const catalog = {
       "koText": "그날이나 시간에 오기가 어렵다는 의미입니다.",
       "tlText": "Ibig sabihin, mahihirapan akong pumunta sa araw na iyon o sa oras na iyon.",
       "idText": "Artinya, akan sulit bagi saya untuk datang pada hari atau waktu itu.",
-      "neText": "यसको अर्थ त्यो दिन वा त्यो समयमा आउन मलाई गाह्रो हुनेछ।"
+      "neText": "यसको अर्थ त्यो दिन वा त्यो समयमा आउन मलाई गाह्रो हुनेछ।",
+      "deText": "Das bedeutet, dass es mir an diesem Tag oder zu dieser Uhrzeit schwerfallen wird zu kommen."
     },
     {
       "id": "t13",
@@ -761,7 +1393,7 @@ export const catalog = {
       "reading": "つごうがよい",
       "en": "It means you can come on that day or at that time.",
       "descriptionJa": "その日や時間に来ることができるという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "2",
       "ptText": "Significa que você pode vir nesse dia ou nesse horário.",
@@ -771,7 +1403,8 @@ export const catalog = {
       "koText": "그날이나 시간에 올 수 있다는 의미입니다.",
       "tlText": "Ibig sabihin, puwede kang pumunta sa araw na iyon o sa oras na iyon.",
       "idText": "Artinya, Anda bisa datang pada hari atau waktu tersebut.",
-      "neText": "यसको अर्थ तपाईं त्यो दिन वा त्यो समयमा आउन सक्नुहुन्छ।"
+      "neText": "यसको अर्थ तपाईं त्यो दिन वा त्यो समयमा आउन सक्नुहुन्छ।",
+      "deText": "Das bedeutet, dass Sie an diesem Tag oder zu dieser Uhrzeit kommen können."
     },
     {
       "id": "t14",
@@ -779,7 +1412,7 @@ export const catalog = {
       "reading": "かのう",
       "en": "It means \"to be able to do.\"",
       "descriptionJa": "できるという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa \"ser capaz de fazer\".",
@@ -789,7 +1422,9 @@ export const catalog = {
       "koText": "할 수 있다는 의미입니다.",
       "tlText": "Ang ibig sabihin nito ay \"magagawa.\"",
       "idText": "Artinya \"mampu melakukan.\"",
-      "neText": "यसको अर्थ \"गर्न सक्षम हुनु\" हो।"
+      "neText": "यसको अर्थ \"गर्न सक्षम हुनु\" हो।",
+      "deText": "Es bedeutet „in der Lage sein, etwas zu tun“.",
+      "simpleJaText": "できるという意味です。"
     },
     {
       "id": "t15",
@@ -797,9 +1432,9 @@ export const catalog = {
       "reading": "ふかのう",
       "en": "It means it's not possible.",
       "descriptionJa": "できないという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
-      "viewCount": "1",
+      "viewCount": "3",
       "ptText": "Significa que não é possível.",
       "esText": "Significa que no es posible.",
       "viText": "Điều đó có nghĩa là điều đó không thể xảy ra.",
@@ -807,7 +1442,9 @@ export const catalog = {
       "koText": "할 수 없다는 뜻입니다.",
       "tlText": "Ibig sabihin hindi ito posible.",
       "idText": "Artinya, hal itu tidak mungkin.",
-      "neText": "यसको अर्थ यो सम्भव छैन।"
+      "neText": "यसको अर्थ यो सम्भव छैन।",
+      "deText": "Es bedeutet, dass es nicht möglich ist.",
+      "simpleJaText": "できないという意味です。"
     },
     {
       "id": "t16",
@@ -815,7 +1452,7 @@ export const catalog = {
       "reading": "ひつようありません",
       "en": "It means you don't have to do it, or you don't have to bring it.",
       "descriptionJa": "しなくてもよい、持ってこなくてもよいという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que você não precisa fazer isso, ou não precisa trazer isso.",
@@ -825,7 +1462,9 @@ export const catalog = {
       "koText": "하지 않아도 되고, 가져오지 않아도 된다는 의미입니다.",
       "tlText": "Ibig sabihin, hindi mo kailangang gawin ito, o hindi mo kailangang dalhin ito.",
       "idText": "Artinya kamu tidak harus melakukannya, atau kamu tidak harus membawanya.",
-      "neText": "यसको अर्थ तपाईंले यो गर्नु पर्दैन, वा तपाईंले यो ल्याउनु पर्दैन।"
+      "neText": "यसको अर्थ तपाईंले यो गर्नु पर्दैन, वा तपाईंले यो ल्याउनु पर्दैन।",
+      "deText": "Das bedeutet, dass du es nicht tun musst oder es nicht mitbringen musst.",
+      "simpleJaText": "しなくてもよい、持ってこなくてもよいという意味です。"
     },
     {
       "id": "t17",
@@ -833,7 +1472,7 @@ export const catalog = {
       "reading": "ひつようです",
       "en": "It means you have to do it, or you have to bring it.",
       "descriptionJa": "しなければならない、持ってこなければならないという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que você tem que fazer isso, ou tem que trazer isso.",
@@ -843,7 +1482,9 @@ export const catalog = {
       "koText": "해야 한다, 가져와야 한다는 뜻입니다.",
       "tlText": "Ibig sabihin kailangan mo itong gawin, o kailangan mo itong dalhin.",
       "idText": "Artinya kamu harus melakukannya, atau kamu harus membawanya.",
-      "neText": "यसको अर्थ तपाईंले यो गर्नुपर्छ, वा तपाईंले ल्याउनुपर्छ।"
+      "neText": "यसको अर्थ तपाईंले यो गर्नुपर्छ, वा तपाईंले ल्याउनुपर्छ।",
+      "deText": "Das bedeutet, du musst es tun oder du musst es mitbringen.",
+      "simpleJaText": "しなければならない、持ってこなければならないという意味です。"
     },
     {
       "id": "t18",
@@ -851,7 +1492,7 @@ export const catalog = {
       "reading": "おねがいします",
       "en": "These are polite ways to convey what you want the other person to do.",
       "descriptionJa": "相手にしてほしいことを丁寧に伝える言葉です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Essas são maneiras educadas de transmitir o que você deseja que a outra pessoa faça.",
@@ -861,7 +1502,9 @@ export const catalog = {
       "koText": "상대로 해 주었으면 하는 것을 정중하게 전하는 말입니다.",
       "tlText": "Ito ay mga magagalang na paraan upang maiparating ang gusto mong gawin ng ibang tao.",
       "idText": "Ini adalah cara-cara sopan untuk menyampaikan apa yang Anda inginkan agar orang lain lakukan.",
-      "neText": "यी तपाईं अर्को व्यक्तिबाट के चाहन्छन् भन्ने कुरा व्यक्त गर्ने विनम्र तरिकाहरू हुन्।"
+      "neText": "यी तपाईं अर्को व्यक्तिबाट के चाहन्छन् भन्ने कुरा व्यक्त गर्ने विनम्र तरिकाहरू हुन्।",
+      "deText": "Dies sind höfliche Wege, um auszudrücken, was Sie von der anderen Person erwarten.",
+      "simpleJaText": "相手にしてほしいことを丁寧に伝える言葉です。"
     },
     {
       "id": "t19",
@@ -869,9 +1512,9 @@ export const catalog = {
       "reading": "かくにんください",
       "en": "This means, \"Please review the content and make sure there are no mistakes.\"",
       "descriptionJa": "内容を見て、間違いがないか確かめてくださいという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
-      "viewCount": "1",
+      "viewCount": "3",
       "ptText": "Isso significa: \"Por favor, revise o conteúdo e certifique-se de que não há erros.\"",
       "esText": "Esto significa: \"Por favor, revise el contenido y asegúrese de que no haya errores\".",
       "viText": "Điều này có nghĩa là, \"Vui lòng xem lại nội dung và đảm bảo không có lỗi.\"",
@@ -879,7 +1522,9 @@ export const catalog = {
       "koText": "내용을 보고, 실수가 없는지 확인해 주세요라는 의미입니다.",
       "tlText": "Ang ibig sabihin nito ay, \"Pakisuri ang nilalaman at siguraduhing walang mga pagkakamali.\"",
       "idText": "Artinya, \"Mohon periksa kembali kontennya dan pastikan tidak ada kesalahan.\"",
-      "neText": "यसको अर्थ हो, \"कृपया सामग्री समीक्षा गर्नुहोस् र कुनै गल्ती नभएको सुनिश्चित गर्नुहोस्।\""
+      "neText": "यसको अर्थ हो, \"कृपया सामग्री समीक्षा गर्नुहोस् र कुनै गल्ती नभएको सुनिश्चित गर्नुहोस्।\"",
+      "deText": "Das bedeutet: „Bitte überprüfen Sie den Inhalt und stellen Sie sicher, dass er keine Fehler enthält.“",
+      "simpleJaText": "内容を見て、間違いがないか確かめてくださいという意味です。"
     },
     {
       "id": "t20",
@@ -887,7 +1532,7 @@ export const catalog = {
       "reading": "りょうしょうください",
       "en": "It means, \"Please understand the circumstances.\"",
       "descriptionJa": "事情を理解してくださいという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa: \"Por favor, compreenda as circunstâncias.\"",
@@ -897,7 +1542,9 @@ export const catalog = {
       "koText": "사정을 이해하시기 바랍니다.",
       "tlText": "Ang ibig sabihin nito ay, \"Unawain mo sana ang mga pangyayari.\"",
       "idText": "Artinya, \"Mohon pahami situasinya.\"",
-      "neText": "यसको अर्थ हो, \"कृपया परिस्थिति बुझ्नुहोस्।\""
+      "neText": "यसको अर्थ हो, \"कृपया परिस्थिति बुझ्नुहोस्।\"",
+      "deText": "Es bedeutet: „Bitte haben Sie Verständnis für die Umstände.“",
+      "simpleJaText": "事情を理解してくださいという意味です。"
     },
     {
       "id": "t21",
@@ -905,7 +1552,7 @@ export const catalog = {
       "reading": "しきゅう",
       "en": "It means as soon as possible.",
       "descriptionJa": "できるだけ早く、という意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa o mais breve possível.",
@@ -915,7 +1562,9 @@ export const catalog = {
       "koText": "가능한 한 빨리, 라는 의미입니다.",
       "tlText": "Ibig sabihin, sa lalong madaling panahon.",
       "idText": "Artinya sesegera mungkin.",
-      "neText": "यसको अर्थ सकेसम्म चाँडो।"
+      "neText": "यसको अर्थ सकेसम्म चाँडो।",
+      "deText": "Es bedeutet so schnell wie möglich.",
+      "simpleJaText": "できるだけ早く、という意味です。"
     },
     {
       "id": "t22",
@@ -923,7 +1572,7 @@ export const catalog = {
       "reading": "そうきゅう",
       "en": "It means to respond quickly.",
       "descriptionJa": "早く対応するという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa responder rapidamente.",
@@ -933,7 +1582,9 @@ export const catalog = {
       "koText": "빨리 대응한다는 의미입니다.",
       "tlText": "Ibig sabihin, mabilis na tumugon.",
       "idText": "Artinya, merespons dengan cepat.",
-      "neText": "यसको अर्थ छिटो प्रतिक्रिया दिनु हो।"
+      "neText": "यसको अर्थ छिटो प्रतिक्रिया दिनु हो।",
+      "deText": "Es bedeutet, schnell zu reagieren.",
+      "simpleJaText": "早く対応するという意味です。"
     },
     {
       "id": "t23",
@@ -941,7 +1592,7 @@ export const catalog = {
       "reading": "ほんじつ",
       "en": "It means today.",
       "descriptionJa": "今日という意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa hoje.",
@@ -951,7 +1602,8 @@ export const catalog = {
       "koText": "오늘이라는 뜻입니다.",
       "tlText": "Ibig sabihin ngayon.",
       "idText": "Artinya hari ini.",
-      "neText": "यसको अर्थ आज हो।"
+      "neText": "यसको अर्थ आज हो।",
+      "deText": "Es bedeutet heute."
     },
     {
       "id": "t24",
@@ -959,7 +1611,7 @@ export const catalog = {
       "reading": "きのう",
       "en": "This is one day before today.",
       "descriptionJa": "今日の一日前です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso foi um dia antes de hoje.",
@@ -969,7 +1621,9 @@ export const catalog = {
       "koText": "오늘 하루 전입니다.",
       "tlText": "Isang araw bago ang araw na ito.",
       "idText": "Ini adalah satu hari sebelum hari ini.",
-      "neText": "यो आजभन्दा एक दिन अगाडिको कुरा हो।"
+      "neText": "यो आजभन्दा एक दिन अगाडिको कुरा हो।",
+      "deText": "Das ist einen Tag vor heute.",
+      "simpleJaText": "今日の一日前です。"
     },
     {
       "id": "t25",
@@ -977,7 +1631,7 @@ export const catalog = {
       "reading": "あさって",
       "en": "It's the day after tomorrow.",
       "descriptionJa": "明日の次の日です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "É depois de amanhã.",
@@ -987,7 +1641,9 @@ export const catalog = {
       "koText": "내일 다음날입니다.",
       "tlText": "Bukas na pala.",
       "idText": "Ini lusa.",
-      "neText": "आज पर्सि हो।"
+      "neText": "आज पर्सि हो।",
+      "deText": "Es ist übermorgen.",
+      "simpleJaText": "明日の次の日です。"
     },
     {
       "id": "t26",
@@ -995,7 +1651,7 @@ export const catalog = {
       "reading": "こんしゅう",
       "en": "This happened this week.",
       "descriptionJa": "この週のことです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso aconteceu esta semana.",
@@ -1005,7 +1661,8 @@ export const catalog = {
       "koText": "이번 주입니다.",
       "tlText": "Nangyari ito ngayong linggo.",
       "idText": "Ini terjadi minggu ini.",
-      "neText": "यो हप्ता भयो।"
+      "neText": "यो हप्ता भयो।",
+      "deText": "Das ist diese Woche passiert."
     },
     {
       "id": "t27",
@@ -1013,7 +1670,7 @@ export const catalog = {
       "reading": "らいしゅう",
       "en": "It was the following week.",
       "descriptionJa": "次の週のことです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Foi na semana seguinte.",
@@ -1023,7 +1680,9 @@ export const catalog = {
       "koText": "다음 주입니다.",
       "tlText": "Nang sumunod na linggo iyon.",
       "idText": "Itu terjadi minggu berikutnya.",
-      "neText": "यो अर्को हप्ता थियो।"
+      "neText": "यो अर्को हप्ता थियो।",
+      "deText": "Es war in der darauffolgenden Woche.",
+      "simpleJaText": "次の週のことです。"
     },
     {
       "id": "t28",
@@ -1031,7 +1690,7 @@ export const catalog = {
       "reading": "こんげつ",
       "en": "This was during that month.",
       "descriptionJa": "この月のことです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso aconteceu durante aquele mês.",
@@ -1041,7 +1700,9 @@ export const catalog = {
       "koText": "이 달입니다.",
       "tlText": "Nangyari ito noong buwang iyon.",
       "idText": "Ini terjadi pada bulan itu.",
-      "neText": "यो त्यही महिनाको कुरा हो।"
+      "neText": "यो त्यही महिनाको कुरा हो।",
+      "deText": "Das war in diesem Monat.",
+      "simpleJaText": "この月のことです。"
     },
     {
       "id": "t29",
@@ -1049,7 +1710,7 @@ export const catalog = {
       "reading": "らいげつ",
       "en": "It was the following month.",
       "descriptionJa": "次の月のことです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Foi no mês seguinte.",
@@ -1059,7 +1720,8 @@ export const catalog = {
       "koText": "다음 달입니다.",
       "tlText": "Nang sumunod na buwan iyon.",
       "idText": "Itu terjadi bulan berikutnya.",
-      "neText": "यो अर्को महिना थियो।"
+      "neText": "यो अर्को महिना थियो।",
+      "deText": "Es war im darauffolgenden Monat."
     },
     {
       "id": "t30",
@@ -1067,7 +1729,7 @@ export const catalog = {
       "reading": "ごぜん",
       "en": "It's from morning until 12 noon.",
       "descriptionJa": "朝から昼の12時までの時間です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "É da manhã até o meio-dia.",
@@ -1077,7 +1739,9 @@ export const catalog = {
       "koText": "아침부터 낮 12시까지의 시간입니다.",
       "tlText": "Mula umaga hanggang alas-12 ng tanghali.",
       "idText": "Itu dari pagi sampai jam 12 siang.",
-      "neText": "यो बिहानदेखि दिउँसो १२ बजेसम्म हो।"
+      "neText": "यो बिहानदेखि दिउँसो १२ बजेसम्म हो।",
+      "deText": "Es dauert von morgens bis 12 Uhr mittags.",
+      "simpleJaText": "朝から昼の12時までの時間です。"
     },
     {
       "id": "t31",
@@ -1085,7 +1749,7 @@ export const catalog = {
       "reading": "ごご",
       "en": "It's from noon until evening.",
       "descriptionJa": "昼の12時から夜までの時間です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "É das 12h até o início da noite.",
@@ -1095,7 +1759,9 @@ export const catalog = {
       "koText": "낮 12시부터 밤까지의 시간입니다.",
       "tlText": "Mula alas-12 ng tanghali hanggang gabi.",
       "idText": "Mulai pukul 12 siang hingga malam hari.",
-      "neText": "यो दिउँसो १२ बजेदेखि साँझसम्म हो।"
+      "neText": "यो दिउँसो १२ बजेदेखि साँझसम्म हो।",
+      "deText": "Es dauert von Mittag bis zum Abend.",
+      "simpleJaText": "昼の12時から夜までの時間です。"
     },
     {
       "id": "t32",
@@ -1103,7 +1769,7 @@ export const catalog = {
       "reading": "よていへんこうがあります",
       "en": "These are things that will be done in the future and things that have already been decided.",
       "descriptionJa": "これから行うことや決まっていることです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Essas são coisas que serão feitas no futuro e coisas que já foram decididas.",
@@ -1113,7 +1779,9 @@ export const catalog = {
       "koText": "앞으로 할 일이나 정해진 것입니다.",
       "tlText": "Ito ay mga bagay na gagawin pa sa hinaharap at mga bagay na napagpasyahan na.",
       "idText": "Ini adalah hal-hal yang akan dilakukan di masa depan dan hal-hal yang telah diputuskan.",
-      "neText": "यी भविष्यमा गरिने कुराहरू हुन् र पहिले नै निर्णय भइसकेका कुराहरू हुन्।"
+      "neText": "यी भविष्यमा गरिने कुराहरू हुन् र पहिले नै निर्णय भइसकेका कुराहरू हुन्।",
+      "deText": "Dies sind Dinge, die in der Zukunft getan werden, und Dinge, die bereits beschlossen wurden.",
+      "simpleJaText": "これから行うことや決まっていることです。"
     },
     {
       "id": "t33",
@@ -1121,9 +1789,9 @@ export const catalog = {
       "reading": "よていへんこうがあります",
       "en": "It means that something that was previously decided has changed.",
       "descriptionJa": "前に決まっていたことが変わるという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
-      "viewCount": "1",
+      "viewCount": "2",
       "ptText": "Significa que algo que havia sido decidido anteriormente mudou.",
       "esText": "Significa que algo que se había decidido previamente ha cambiado.",
       "viText": "Điều đó có nghĩa là một điều gì đó đã được quyết định trước đó đã thay đổi.",
@@ -1131,7 +1799,9 @@ export const catalog = {
       "koText": "전에 정해진 것이 바뀐다는 의미입니다.",
       "tlText": "Nangangahulugan ito na ang isang bagay na napagpasyahan na noon ay nagbago na.",
       "idText": "Artinya, sesuatu yang telah diputuskan sebelumnya telah berubah.",
-      "neText": "यसको अर्थ पहिले नै तय गरिएको कुरा परिवर्तन भएको छ।"
+      "neText": "यसको अर्थ पहिले नै तय गरिएको कुरा परिवर्तन भएको छ।",
+      "deText": "Es bedeutet, dass sich eine zuvor getroffene Entscheidung geändert hat.",
+      "simpleJaText": "前に決まっていたことが変わるという意味です。"
     },
     {
       "id": "t34",
@@ -1139,7 +1809,7 @@ export const catalog = {
       "reading": "ちゅうし",
       "en": "It means not doing what was planned.",
       "descriptionJa": "予定していたことを行わないことです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa não fazer o que você havia planejado.",
@@ -1149,7 +1819,9 @@ export const catalog = {
       "koText": "예정했던 일을 하지 않는 것입니다.",
       "tlText": "Ibig sabihin, hindi mo gagawin ang plano mo.",
       "idText": "Artinya, Anda tidak melakukan apa yang telah direncanakan.",
-      "neText": "यसको अर्थ तपाईंले योजना बनाएको काम नगर्नु हो।"
+      "neText": "यसको अर्थ तपाईंले योजना बनाएको काम नगर्नु हो।",
+      "deText": "Es bedeutet, das Geplante nicht umzusetzen.",
+      "simpleJaText": "予定していたことを行わないことです。"
     },
     {
       "id": "t35",
@@ -1157,7 +1829,7 @@ export const catalog = {
       "reading": "えんき",
       "en": "It means changing the scheduled date to a later date.",
       "descriptionJa": "予定していた日を後の日に変えることです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa alterar a data agendada para uma data posterior.",
@@ -1167,7 +1839,9 @@ export const catalog = {
       "koText": "예정했던 날을 나중의 날로 바꾸는 것입니다.",
       "tlText": "Nangangahulugan ito ng pagpapalit ng nakatakdang petsa sa ibang petsa.",
       "idText": "Artinya mengubah tanggal yang dijadwalkan ke tanggal yang lebih lambat.",
-      "neText": "यसको अर्थ निर्धारित मितिलाई पछिको मितिमा परिवर्तन गर्नु हो।"
+      "neText": "यसको अर्थ निर्धारित मितिलाई पछिको मितिमा परिवर्तन गर्नु हो।",
+      "deText": "Das bedeutet, den geplanten Termin auf einen späteren Zeitpunkt zu verschieben.",
+      "simpleJaText": "予定していた日を後の日に変えることです。"
     },
     {
       "id": "t36",
@@ -1175,7 +1849,7 @@ export const catalog = {
       "reading": "じっし",
       "en": "It's about doing what was planned.",
       "descriptionJa": "予定していたことを行うことです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de fazer o que foi planejado.",
@@ -1185,7 +1859,9 @@ export const catalog = {
       "koText": "예정된 일을하는 것입니다.",
       "tlText": "Tungkol ito sa paggawa ng kung ano ang pinlano.",
       "idText": "Ini tentang melakukan apa yang telah direncanakan.",
-      "neText": "यो योजना बनाएको कुरा गर्ने बारे हो।"
+      "neText": "यो योजना बनाएको कुरा गर्ने बारे हो।",
+      "deText": "Es geht darum, das zu tun, was geplant war.",
+      "simpleJaText": "予定していたことを行うことです。"
     },
     {
       "id": "t37",
@@ -1193,7 +1869,7 @@ export const catalog = {
       "reading": "あんない",
       "en": "These are important documents or communications.",
       "descriptionJa": "大切なことを知らせる文書や連絡です。",
-      "category": "手続き",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estes são documentos ou comunicações importantes.",
@@ -1203,7 +1879,9 @@ export const catalog = {
       "koText": "중요한 것을 알리는 문서나 연락입니다.",
       "tlText": "Ito ay mga mahahalagang dokumento o komunikasyon.",
       "idText": "Ini adalah dokumen atau komunikasi penting.",
-      "neText": "यी महत्त्वपूर्ण कागजात वा सञ्चार हुन्।"
+      "neText": "यी महत्त्वपूर्ण कागजात वा सञ्चार हुन्।",
+      "deText": "Hierbei handelt es sich um wichtige Dokumente oder Mitteilungen.",
+      "simpleJaText": "大切なことを知らせる文書や連絡です。"
     },
     {
       "id": "t38",
@@ -1211,7 +1889,7 @@ export const catalog = {
       "reading": "おしらせ",
       "en": "This is an important message from the school.",
       "descriptionJa": "学校から伝える大切な連絡です。",
-      "category": "手続き",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma mensagem importante da escola.",
@@ -1221,7 +1899,9 @@ export const catalog = {
       "koText": "학교에서 전하는 소중한 연락입니다.",
       "tlText": "Ito ay isang mahalagang mensahe mula sa paaralan.",
       "idText": "Ini adalah pesan penting dari sekolah.",
-      "neText": "यो विद्यालयको तर्फबाट एउटा महत्त्वपूर्ण सन्देश हो।"
+      "neText": "यो विद्यालयको तर्फबाट एउटा महत्त्वपूर्ण सन्देश हो।",
+      "deText": "Dies ist eine wichtige Mitteilung der Schule.",
+      "simpleJaText": "学校から伝える大切な連絡です。"
     },
     {
       "id": "t39",
@@ -1229,7 +1909,7 @@ export const catalog = {
       "reading": "つうち",
       "en": "It's about formally announcing something important.",
       "descriptionJa": "大切なことを正式に知らせることです。",
-      "category": "手続き",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de anunciar formalmente algo importante.",
@@ -1239,7 +1919,9 @@ export const catalog = {
       "koText": "중요한 것을 공식적으로 알리는 것입니다.",
       "tlText": "Tungkol ito sa pormal na pag-aanunsyo ng isang mahalagang bagay.",
       "idText": "Ini tentang mengumumkan sesuatu yang penting secara resmi.",
-      "neText": "यो औपचारिक रूपमा केही महत्त्वपूर्ण कुरा घोषणा गर्ने बारे हो।"
+      "neText": "यो औपचारिक रूपमा केही महत्त्वपूर्ण कुरा घोषणा गर्ने बारे हो।",
+      "deText": "Es geht darum, etwas Wichtiges offiziell bekannt zu geben.",
+      "simpleJaText": "大切なことを正式に知らせることです。"
     },
     {
       "id": "t40",
@@ -1247,7 +1929,7 @@ export const catalog = {
       "reading": "れんらくさき",
       "en": "This is contact information such as a phone number or email address.",
       "descriptionJa": "電話番号やメールアドレスなど、連絡するための情報です。",
-      "category": "手続き",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "São informações de contato, como um número de telefone ou endereço de e-mail.",
@@ -1257,7 +1939,9 @@ export const catalog = {
       "koText": "전화번호나 이메일 주소 등 연락하기 위한 정보입니다.",
       "tlText": "Ito ay impormasyon sa pakikipag-ugnayan tulad ng numero ng telepono o email address.",
       "idText": "Ini adalah informasi kontak seperti nomor telepon atau alamat email.",
-      "neText": "यो फोन नम्बर वा इमेल ठेगाना जस्ता सम्पर्क जानकारी हो।"
+      "neText": "यो फोन नम्बर वा इमेल ठेगाना जस्ता सम्पर्क जानकारी हो।",
+      "deText": "Hierbei handelt es sich um Kontaktinformationen wie Telefonnummer oder E-Mail-Adresse.",
+      "simpleJaText": "電話番号やメールアドレスなど、連絡するための情報です。"
     },
     {
       "id": "t41",
@@ -1265,7 +1949,7 @@ export const catalog = {
       "reading": "きんむさき",
       "en": "This is where the parents work.",
       "descriptionJa": "保護者が働いている場所です。",
-      "category": "手続き",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "1",
       "ptText": "É aqui que os pais trabalham.",
@@ -1275,7 +1959,9 @@ export const catalog = {
       "koText": "학부모가 일하는 곳입니다.",
       "tlText": "Dito nagtatrabaho ang mga magulang.",
       "idText": "Di sinilah orang tua mereka bekerja.",
-      "neText": "आमाबाबुले काम गर्ने ठाउँ यही हो।"
+      "neText": "आमाबाबुले काम गर्ने ठाउँ यही हो।",
+      "deText": "Hier arbeiten die Eltern.",
+      "simpleJaText": "保護者が働いている場所です。"
     },
     {
       "id": "t42",
@@ -1283,9 +1969,9 @@ export const catalog = {
       "reading": "きんむさきでんわばんごう",
       "en": "This is the phone number of the place where the parent/guardian works.",
       "descriptionJa": "保護者が働いている場所の電話番号です。",
-      "category": "手続き",
+      "category": "連絡・相談",
       "keywords": "",
-      "viewCount": "",
+      "viewCount": "1",
       "ptText": "Este é o número de telefone do local onde o pai/mãe/responsável trabalha.",
       "esText": "Este es el número de teléfono del lugar donde trabaja el padre/madre o tutor legal.",
       "viText": "Đây là số điện thoại nơi cha mẹ/người giám hộ làm việc.",
@@ -1293,7 +1979,9 @@ export const catalog = {
       "koText": "학부모가 일하는 곳의 전화 번호입니다.",
       "tlText": "Ito ang numero ng telepono ng lugar kung saan nagtatrabaho ang magulang/tagapag-alaga.",
       "idText": "Ini adalah nomor telepon tempat orang tua/wali bekerja.",
-      "neText": "यो आमाबाबु/अभिभावकले काम गर्ने ठाउँको फोन नम्बर हो।"
+      "neText": "यो आमाबाबु/अभिभावकले काम गर्ने ठाउँको फोन नम्बर हो।",
+      "deText": "Dies ist die Telefonnummer des Arbeitsplatzes des Elternteils/Erziehungsberechtigten.",
+      "simpleJaText": "保護者が働いている場所の電話番号です。"
     },
     {
       "id": "t43",
@@ -1301,7 +1989,7 @@ export const catalog = {
       "reading": "せたい",
       "en": "It's a group of people who live together in the same house.",
       "descriptionJa": "同じ家で一緒に生活している人たちのまとまりです。",
-      "category": "手続き",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "1",
       "ptText": "É um grupo de pessoas que vivem juntas na mesma casa.",
@@ -1311,7 +1999,9 @@ export const catalog = {
       "koText": "같은 집에서 함께 생활하는 사람들의 정리입니다.",
       "tlText": "Ito ay isang grupo ng mga taong magkakasamang nakatira sa iisang bahay.",
       "idText": "Ini adalah sekelompok orang yang tinggal bersama di rumah yang sama.",
-      "neText": "यो एउटै घरमा सँगै बस्ने मानिसहरूको समूह हो।"
+      "neText": "यो एउटै घरमा सँगै बस्ने मानिसहरूको समूह हो।",
+      "deText": "Es handelt sich um eine Gruppe von Menschen, die zusammen in demselben Haus leben.",
+      "simpleJaText": "同じ家で一緒に生活している人たちのまとまりです。"
     },
     {
       "id": "t44",
@@ -1319,7 +2009,7 @@ export const catalog = {
       "reading": "せたいぬし",
       "en": "This person will be the representative of that household.",
       "descriptionJa": "その家の代表になる人です。",
-      "category": "手続き",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Essa pessoa será o representante daquela família.",
@@ -1329,7 +2019,9 @@ export const catalog = {
       "koText": "그 집의 대표가 되는 사람입니다.",
       "tlText": "Ang taong ito ang magiging kinatawan ng sambahayang iyon.",
       "idText": "Orang ini akan menjadi perwakilan dari rumah tangga tersebut.",
-      "neText": "यो व्यक्ति त्यो घरपरिवारको प्रतिनिधि हुनेछ।"
+      "neText": "यो व्यक्ति त्यो घरपरिवारको प्रतिनिधि हुनेछ।",
+      "deText": "Diese Person wird der Vertreter dieses Haushalts sein.",
+      "simpleJaText": "その家の代表になる人です。"
     },
     {
       "id": "t45",
@@ -1337,7 +2029,7 @@ export const catalog = {
       "reading": "ほんにん",
       "en": "It's about that person themselves.",
       "descriptionJa": "その人自身のことです。",
-      "category": "手続き",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se da própria pessoa.",
@@ -1347,7 +2039,9 @@ export const catalog = {
       "koText": "그 사람 자신입니다.",
       "tlText": "Tungkol ito sa taong iyon mismo.",
       "idText": "Ini tentang orang itu sendiri.",
-      "neText": "यो त्यो व्यक्तिको बारेमा हो।"
+      "neText": "यो त्यो व्यक्तिको बारेमा हो।",
+      "deText": "Es geht um die Person selbst.",
+      "simpleJaText": "その人自身のことです。"
     },
     {
       "id": "t46",
@@ -1355,7 +2049,7 @@ export const catalog = {
       "reading": "だいりにん",
       "en": "This is someone who handles the procedures on behalf of the person concerned.",
       "descriptionJa": "本人の代わりに手続きをする人です。",
-      "category": "手続き",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Essa pessoa é responsável por lidar com os procedimentos em nome da pessoa em questão.",
@@ -1365,7 +2059,9 @@ export const catalog = {
       "koText": "본인 대신에 수속을 하는 사람입니다.",
       "tlText": "Ito ay isang taong humahawak ng mga pamamaraan sa ngalan ng taong kinauukulan.",
       "idText": "Ini adalah seseorang yang menangani prosedur atas nama orang yang bersangkutan.",
-      "neText": "यो त्यस्तो व्यक्ति हो जसले सम्बन्धित व्यक्तिको तर्फबाट प्रक्रियाहरू ह्यान्डल गर्छ।"
+      "neText": "यो त्यस्तो व्यक्ति हो जसले सम्बन्धित व्यक्तिको तर्फबाट प्रक्रियाहरू ह्यान्डल गर्छ।",
+      "deText": "Dies ist jemand, der die Abläufe im Namen der betroffenen Person übernimmt.",
+      "simpleJaText": "本人の代わりに手続きをする人です。"
     },
     {
       "id": "t47",
@@ -1373,7 +2069,7 @@ export const catalog = {
       "reading": "ほんにんかくにん",
       "en": "The goal is to verify whether that person is truly who they claim to be.",
       "descriptionJa": "その人が本当に本人かを確かめることです。",
-      "category": "手続き",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "O objetivo é verificar se essa pessoa é realmente quem afirma ser.",
@@ -1383,7 +2079,9 @@ export const catalog = {
       "koText": "그 사람이 정말로 본인인지 확인하는 것입니다.",
       "tlText": "Ang layunin ay upang mapatunayan kung ang taong iyon ay tunay ngang siyang sinasabi nila.",
       "idText": "Tujuannya adalah untuk memverifikasi apakah orang tersebut benar-benar seperti yang mereka klaim.",
-      "neText": "लक्ष्य भनेको त्यो व्यक्ति वास्तवमा उनीहरूले दाबी गरेको व्यक्ति हो कि होइन भनेर प्रमाणित गर्नु हो।"
+      "neText": "लक्ष्य भनेको त्यो व्यक्ति वास्तवमा उनीहरूले दाबी गरेको व्यक्ति हो कि होइन भनेर प्रमाणित गर्नु हो।",
+      "deText": "Ziel ist es, zu überprüfen, ob die Person tatsächlich diejenige ist, für die sie sich ausgibt.",
+      "simpleJaText": "その人が本当に本人かを確かめることです。"
     },
     {
       "id": "t48",
@@ -1391,9 +2089,9 @@ export const catalog = {
       "reading": "みぶんしょうめいしょ",
       "en": "This document is used to verify your identity.",
       "descriptionJa": "本人であることを確認するための書類です。",
-      "category": "手続き",
+      "category": "お金・手続き",
       "keywords": "",
-      "viewCount": "1",
+      "viewCount": "5",
       "ptText": "Este documento é utilizado para verificar sua identidade.",
       "esText": "Este documento se utiliza para verificar su identidad.",
       "viText": "Tài liệu này được sử dụng để xác minh danh tính của bạn.",
@@ -1401,7 +2099,9 @@ export const catalog = {
       "koText": "본인임을 확인하기 위한 서류입니다.",
       "tlText": "Ang dokumentong ito ay ginagamit upang beripikahin ang iyong pagkakakilanlan.",
       "idText": "Dokumen ini digunakan untuk memverifikasi identitas Anda.",
-      "neText": "यो कागजात तपाईंको पहिचान प्रमाणित गर्न प्रयोग गरिन्छ।"
+      "neText": "यो कागजात तपाईंको पहिचान प्रमाणित गर्न प्रयोग गरिन्छ।",
+      "deText": "Dieses Dokument dient der Überprüfung Ihrer Identität.",
+      "simpleJaText": "本人であることを確認するための書類です。"
     },
     {
       "id": "t49",
@@ -1409,7 +2109,7 @@ export const catalog = {
       "reading": "けんこうほけんしょう",
       "en": "This is an insurance card used at hospitals and other medical facilities.",
       "descriptionJa": "病院などで使う保険のカードです。",
-      "category": "手続き",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um cartão de seguro utilizado em hospitais e outras instalações médicas.",
@@ -1419,7 +2119,9 @@ export const catalog = {
       "koText": "병원 등에서 사용하는 보험 카드입니다.",
       "tlText": "Ito ay isang insurance card na ginagamit sa mga ospital at iba pang pasilidad medikal.",
       "idText": "Ini adalah kartu asuransi yang digunakan di rumah sakit dan fasilitas medis lainnya.",
-      "neText": "यो अस्पताल र अन्य चिकित्सा सुविधाहरूमा प्रयोग गरिने बीमा कार्ड हो।"
+      "neText": "यो अस्पताल र अन्य चिकित्सा सुविधाहरूमा प्रयोग गरिने बीमा कार्ड हो।",
+      "deText": "Dies ist eine Versicherungskarte, die in Krankenhäusern und anderen medizinischen Einrichtungen verwendet wird.",
+      "simpleJaText": "病院などで使う保険のカードです。"
     },
     {
       "id": "t50",
@@ -1427,7 +2129,7 @@ export const catalog = {
       "reading": "ぼしけんこうてちょう",
       "en": "This is a notebook for recording your child's health and growth.",
       "descriptionJa": "子どもの健康や成長を記録する手帳です。",
-      "category": "手続き",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um caderno para registrar a saúde e o crescimento do seu filho.",
@@ -1437,7 +2139,9 @@ export const catalog = {
       "koText": "어린이의 건강과 성장을 기록하는 수첩입니다.",
       "tlText": "Ito ay isang kuwaderno para sa pagtatala ng kalusugan at paglaki ng iyong anak.",
       "idText": "Ini adalah buku catatan untuk mencatat kesehatan dan pertumbuhan anak Anda.",
-      "neText": "यो तपाईंको बच्चाको स्वास्थ्य र विकास रेकर्ड गर्ने नोटबुक हो।"
+      "neText": "यो तपाईंको बच्चाको स्वास्थ्य र विकास रेकर्ड गर्ने नोटबुक हो।",
+      "deText": "Dies ist ein Notizbuch zur Dokumentation der Gesundheit und des Wachstums Ihres Kindes.",
+      "simpleJaText": "子どもの健康や成長を記録する手帳です。"
     },
     {
       "id": "t51",
@@ -1445,7 +2149,7 @@ export const catalog = {
       "reading": "つうやく",
       "en": "It's about communicating between people who speak different languages.",
       "descriptionJa": "違う言語を話す人の間で、言葉を伝えることです。",
-      "category": "手続き",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se da comunicação entre pessoas que falam línguas diferentes.",
@@ -1455,7 +2159,9 @@ export const catalog = {
       "koText": "다른 언어를 말하는 사람들 사이에서 말을 전하는 것입니다.",
       "tlText": "Ito ay tungkol sa komunikasyon sa pagitan ng mga taong nagsasalita ng iba't ibang wika.",
       "idText": "Ini tentang berkomunikasi antara orang-orang yang berbicara bahasa berbeda.",
-      "neText": "यो फरक भाषा बोल्ने मानिसहरू बीच सञ्चार गर्ने बारेमा हो।"
+      "neText": "यो फरक भाषा बोल्ने मानिसहरू बीच सञ्चार गर्ने बारेमा हो।",
+      "deText": "Es geht um die Kommunikation zwischen Menschen, die unterschiedliche Sprachen sprechen.",
+      "simpleJaText": "違う言語を話す人の間で、言葉を伝えることです。"
     },
     {
       "id": "t52",
@@ -1463,7 +2169,7 @@ export const catalog = {
       "reading": "ほんやく",
       "en": "It means changing a text into another language.",
       "descriptionJa": "文章を別の言語に変えることです。",
-      "category": "手続き",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa traduzir um texto para outro idioma.",
@@ -1473,7 +2179,9 @@ export const catalog = {
       "koText": "문장을 다른 언어로 바꾸는 것입니다.",
       "tlText": "Nangangahulugan ito ng pagpapalit ng isang teksto sa ibang wika.",
       "idText": "Artinya mengubah teks ke dalam bahasa lain.",
-      "neText": "यसको अर्थ एउटा पाठलाई अर्को भाषामा परिवर्तन गर्नु हो।"
+      "neText": "यसको अर्थ एउटा पाठलाई अर्को भाषामा परिवर्तन गर्नु हो।",
+      "deText": "Es bedeutet, einen Text in eine andere Sprache zu übersetzen.",
+      "simpleJaText": "文章を別の言語に変えることです。"
     },
     {
       "id": "t53",
@@ -1481,7 +2189,7 @@ export const catalog = {
       "reading": "にほんごしえん",
       "en": "This is to help you learn Japanese.",
       "descriptionJa": "日本語を学ぶための助けです。",
-      "category": "手続き",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso é para te ajudar a aprender japonês.",
@@ -1491,7 +2199,9 @@ export const catalog = {
       "koText": "일본어를 배우는 데 도움이됩니다.",
       "tlText": "Ito ay para matulungan kang matuto ng wikang Hapon.",
       "idText": "Ini bertujuan untuk membantu Anda belajar bahasa Jepang.",
-      "neText": "यो तपाईंलाई जापानी भाषा सिक्न मद्दत गर्नको लागि हो।"
+      "neText": "यो तपाईंलाई जापानी भाषा सिक्न मद्दत गर्नको लागि हो।",
+      "deText": "Dies soll Ihnen beim Japanischlernen helfen.",
+      "simpleJaText": "日本語を学ぶための助けです。"
     },
     {
       "id": "t54",
@@ -1499,7 +2209,7 @@ export const catalog = {
       "reading": "きょういくいいんかい",
       "en": "These are municipal and other organizations that handle matters related to schools.",
       "descriptionJa": "学校に関する仕事をする市町村などの機関です。",
-      "category": "手続き",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Essas são agências municipais e outras agências governamentais que lidam com assuntos relacionados às escolas.",
@@ -1509,7 +2219,9 @@ export const catalog = {
       "koText": "학교에 관한 일을 하는 시정촌 등의 기관입니다.",
       "tlText": "Ito ay mga ahensya ng munisipalidad at iba pang ahensya ng gobyerno na humahawak sa mga bagay na may kaugnayan sa mga paaralan.",
       "idText": "Ini adalah instansi pemerintah kota dan instansi pemerintah lainnya yang menangani hal-hal yang berkaitan dengan sekolah.",
-      "neText": "यी नगरपालिका र अन्य सरकारी निकायहरू हुन् जसले विद्यालयहरूसँग सम्बन्धित मामिलाहरू सम्हाल्छन्।"
+      "neText": "यी नगरपालिका र अन्य सरकारी निकायहरू हुन् जसले विद्यालयहरूसँग सम्बन्धित मामिलाहरू सम्हाल्छन्।",
+      "deText": "Hierbei handelt es sich um kommunale und andere Regierungsbehörden, die sich mit Angelegenheiten im Zusammenhang mit Schulen befassen.",
+      "simpleJaText": "学校に関する仕事をする市町村などの機関です。"
     },
     {
       "id": "t55",
@@ -1517,7 +2229,7 @@ export const catalog = {
       "reading": "しやくしょ",
       "en": "This is a place where you can handle city procedures and seek advice.",
       "descriptionJa": "市の手続きや相談をする場所です。",
-      "category": "手続き",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um local onde você pode lidar com procedimentos da prefeitura e buscar aconselhamento.",
@@ -1527,7 +2239,9 @@ export const catalog = {
       "koText": "시의 수속이나 상담을 하는 장소입니다.",
       "tlText": "Ito ay isang lugar kung saan maaari mong pangasiwaan ang mga proseso ng lungsod at humingi ng payo.",
       "idText": "Ini adalah tempat di mana Anda dapat mengurus prosedur kota dan mencari nasihat.",
-      "neText": "यो त्यस्तो ठाउँ हो जहाँ तपाईं शहरका प्रक्रियाहरू ह्यान्डल गर्न र सल्लाह लिन सक्नुहुन्छ।"
+      "neText": "यो त्यस्तो ठाउँ हो जहाँ तपाईं शहरका प्रक्रियाहरू ह्यान्डल गर्न र सल्लाह लिन सक्नुहुन्छ।",
+      "deText": "Hier können Sie städtische Angelegenheiten regeln und sich beraten lassen.",
+      "simpleJaText": "市の手続きや相談をする場所です。"
     },
     {
       "id": "t56",
@@ -1535,7 +2249,7 @@ export const catalog = {
       "reading": "やくば",
       "en": "This is a place where you can handle town and village procedures and seek advice.",
       "descriptionJa": "町や村の手続きや相談をする場所です。",
-      "category": "手続き",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um local onde você pode lidar com procedimentos municipais e locais e buscar aconselhamento.",
@@ -1545,7 +2259,9 @@ export const catalog = {
       "koText": "마을이나 마을의 수속이나 상담을 하는 장소입니다.",
       "tlText": "Ito ay isang lugar kung saan maaari mong pangasiwaan ang mga proseso sa bayan at nayon at humingi ng payo.",
       "idText": "Ini adalah tempat di mana Anda dapat menangani prosedur kota dan desa serta mencari nasihat.",
-      "neText": "यो त्यस्तो ठाउँ हो जहाँ तपाईं शहर र गाउँका प्रक्रियाहरू ह्यान्डल गर्न सक्नुहुन्छ र सल्लाह लिन सक्नुहुन्छ।"
+      "neText": "यो त्यस्तो ठाउँ हो जहाँ तपाईं शहर र गाउँका प्रक्रियाहरू ह्यान्डल गर्न सक्नुहुन्छ र सल्लाह लिन सक्नुहुन्छ।",
+      "deText": "Hier können Sie Angelegenheiten der Stadt und des Dorfes regeln und sich Rat holen.",
+      "simpleJaText": "町や村の手続きや相談をする場所です。"
     },
     {
       "id": "t57",
@@ -1553,7 +2269,7 @@ export const catalog = {
       "reading": "じゅうみんひょう",
       "en": "This is an official document containing your address and family information.",
       "descriptionJa": "住所や家族の情報が書かれた公的な書類です。",
-      "category": "手続き",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um documento oficial contendo seu endereço e informações familiares.",
@@ -1563,7 +2279,9 @@ export const catalog = {
       "koText": "주소나 가족의 정보가 쓰여진 공적인 서류입니다.",
       "tlText": "Ito ay isang opisyal na dokumento na naglalaman ng iyong tirahan at impormasyon ng pamilya.",
       "idText": "Ini adalah dokumen resmi yang berisi alamat dan informasi keluarga Anda.",
-      "neText": "यो तपाईंको ठेगाना र पारिवारिक जानकारी भएको आधिकारिक कागजात हो।"
+      "neText": "यो तपाईंको ठेगाना र पारिवारिक जानकारी भएको आधिकारिक कागजात हो।",
+      "deText": "Dies ist ein offizielles Dokument, das Ihre Adresse und Familieninformationen enthält.",
+      "simpleJaText": "住所や家族の情報が書かれた公的な書類です。"
     },
     {
       "id": "t58",
@@ -1571,7 +2289,7 @@ export const catalog = {
       "reading": "こせき",
       "en": "This is a public system in Japan for recording family relationships and other personal information.",
       "descriptionJa": "家族関係などを記録する日本の公的な制度です。",
-      "category": "手続き",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um sistema público no Japão para registro de relações familiares e outras informações pessoais.",
@@ -1581,7 +2299,9 @@ export const catalog = {
       "koText": "가족관계 등을 기록하는 일본의 공적인 제도입니다.",
       "tlText": "Ito ay isang pampublikong sistema sa Japan para sa pagtatala ng mga ugnayan ng pamilya at iba pang personal na impormasyon.",
       "idText": "Ini adalah sistem publik di Jepang untuk mencatat hubungan keluarga dan informasi pribadi lainnya.",
-      "neText": "यो जापानमा पारिवारिक सम्बन्ध र अन्य व्यक्तिगत जानकारी रेकर्ड गर्ने सार्वजनिक प्रणाली हो।"
+      "neText": "यो जापानमा पारिवारिक सम्बन्ध र अन्य व्यक्तिगत जानकारी रेकर्ड गर्ने सार्वजनिक प्रणाली हो।",
+      "deText": "Dies ist ein öffentliches System in Japan zur Erfassung von Familienverhältnissen und anderen persönlichen Informationen.",
+      "simpleJaText": "家族関係などを記録する日本の公的な制度です。"
     },
     {
       "id": "t59",
@@ -1589,7 +2309,7 @@ export const catalog = {
       "reading": "にゅうがくせつめいかい",
       "en": "This is a meeting to explain school life and preparations before enrollment.",
       "descriptionJa": "入学前に学校生活や準備について説明する会です。",
-      "category": "手続き",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta reunião tem como objetivo explicar a vida escolar e os preparativos antes da matrícula.",
@@ -1599,7 +2319,9 @@ export const catalog = {
       "koText": "입학 전에 학교 생활이나 준비에 대해 설명하는 모임입니다.",
       "tlText": "Ito ay isang pagpupulong upang ipaliwanag ang buhay-paaralan at mga paghahanda bago ang pagpapatala.",
       "idText": "Pertemuan ini bertujuan untuk menjelaskan kehidupan sekolah dan persiapan sebelum pendaftaran.",
-      "neText": "यो बैठक विद्यालय जीवन र भर्ना हुनुभन्दा अघिको तयारीको बारेमा व्याख्या गर्न हो।"
+      "neText": "यो बैठक विद्यालय जीवन र भर्ना हुनुभन्दा अघिको तयारीको बारेमा व्याख्या गर्न हो।",
+      "deText": "Dies ist ein Treffen, um das Schulleben und die Vorbereitungen vor der Einschulung zu erläutern.",
+      "simpleJaText": "入学前に学校生活や準備について説明する会です。"
     },
     {
       "id": "t60",
@@ -1607,7 +2329,7 @@ export const catalog = {
       "reading": "にゅうがくつうちしょ",
       "en": "This is a document informing you of the school you will be attending.",
       "descriptionJa": "入学する学校を知らせる書類です。",
-      "category": "手続き",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este documento tem como objetivo informar sobre a escola que você frequentará.",
@@ -1617,7 +2339,9 @@ export const catalog = {
       "koText": "입학하는 학교를 알리는 서류입니다.",
       "tlText": "Ito ay isang dokumentong nagpapaalam sa iyo tungkol sa paaralang iyong papasukan.",
       "idText": "Ini adalah dokumen yang memberitahukan Anda tentang sekolah yang akan Anda hadiri.",
-      "neText": "यो तपाईंले पढ्न लाग्नुभएको स्कूलको बारेमा जानकारी दिने कागजात हो।"
+      "neText": "यो तपाईंले पढ्न लाग्नुभएको स्कूलको बारेमा जानकारी दिने कागजात हो।",
+      "deText": "Dies ist ein Dokument, das Sie über die Schule informiert, die Sie besuchen werden.",
+      "simpleJaText": "入学する学校を知らせる書類です。"
     },
     {
       "id": "t61",
@@ -1625,7 +2349,7 @@ export const catalog = {
       "reading": "しゅうがくつうちしょ",
       "en": "This is a document that informs you of the school your child will attend.",
       "descriptionJa": "子どもが通う学校を知らせる書類です。",
-      "category": "手続き",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este documento informa sobre a escola que seu filho frequentará.",
@@ -1635,7 +2359,9 @@ export const catalog = {
       "koText": "아이가 다니는 학교를 알리는 서류입니다.",
       "tlText": "Ito ay isang dokumentong nagpapaalam sa iyo tungkol sa paaralang papasukan ng iyong anak.",
       "idText": "Ini adalah dokumen yang memberitahukan Anda tentang sekolah yang akan dihadiri anak Anda.",
-      "neText": "यो एउटा कागजात हो जसले तपाईंको बच्चा कुन स्कूलमा जानेछ भन्ने कुराको जानकारी दिन्छ।"
+      "neText": "यो एउटा कागजात हो जसले तपाईंको बच्चा कुन स्कूलमा जानेछ भन्ने कुराको जानकारी दिन्छ।",
+      "deText": "Dies ist ein Dokument, das Sie über die Schule informiert, die Ihr Kind besuchen wird.",
+      "simpleJaText": "子どもが通う学校を知らせる書類です。"
     },
     {
       "id": "t62",
@@ -1643,9 +2369,9 @@ export const catalog = {
       "reading": "がくようひん",
       "en": "These are tools and items used at school.",
       "descriptionJa": "学校で使う道具や物です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
-      "viewCount": "8",
+      "viewCount": "9",
       "ptText": "Esses são materiais e itens usados ​​na escola.",
       "esText": "Estas son herramientas y objetos que se utilizan en la escuela.",
       "viText": "Đây là những dụng cụ và vật dụng được sử dụng ở trường.",
@@ -1653,7 +2379,9 @@ export const catalog = {
       "koText": "학교에서 사용하는 도구나 물건입니다.",
       "tlText": "Ito ay mga kagamitan at bagay na ginagamit sa paaralan.",
       "idText": "Ini adalah alat dan barang-barang yang digunakan di sekolah.",
-      "neText": "यी विद्यालयमा प्रयोग हुने औजार र वस्तुहरू हुन्।"
+      "neText": "यी विद्यालयमा प्रयोग हुने औजार र वस्तुहरू हुन्।",
+      "deText": "Dies sind Werkzeuge und Gegenstände, die in der Schule verwendet werden.",
+      "simpleJaText": "学校で使う道具や物です。"
     },
     {
       "id": "t63",
@@ -1661,9 +2389,9 @@ export const catalog = {
       "reading": "きょうざい",
       "en": "These are used in classes and for learning.",
       "descriptionJa": "授業や学習で使うものです。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
-      "viewCount": "",
+      "viewCount": "1",
       "ptText": "Esses materiais são utilizados em sala de aula e para fins de aprendizagem.",
       "esText": "Se utilizan en clase y para el aprendizaje.",
       "viText": "Chúng được sử dụng trong các lớp học và để phục vụ việc học tập.",
@@ -1671,7 +2399,9 @@ export const catalog = {
       "koText": "수업이나 학습에 사용하는 것입니다.",
       "tlText": "Ang mga ito ay ginagamit sa mga klase at para sa pag-aaral.",
       "idText": "Ini digunakan di kelas dan untuk pembelajaran.",
-      "neText": "यी कक्षाहरूमा र सिकाइको लागि प्रयोग गरिन्छ।"
+      "neText": "यी कक्षाहरूमा र सिकाइको लागि प्रयोग गरिन्छ।",
+      "deText": "Diese werden im Unterricht und zum Lernen verwendet.",
+      "simpleJaText": "授業や学習で使うものです。"
     },
     {
       "id": "t64",
@@ -1679,7 +2409,7 @@ export const catalog = {
       "reading": "ふくきょうざい",
       "en": "These are learning books and materials used in addition to textbooks.",
       "descriptionJa": "教科書以外に使う学習用の本や資料です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "São livros e materiais de aprendizagem usados ​​em conjunto com os livros didáticos.",
@@ -1689,7 +2419,9 @@ export const catalog = {
       "koText": "교과서 이외에 사용하는 학습용 책이나 자료입니다.",
       "tlText": "Ito ay mga aklat-aralin at mga kagamitang ginagamit bilang karagdagan sa mga aklat-aralin.",
       "idText": "Ini adalah buku dan materi pembelajaran yang digunakan sebagai tambahan selain buku teks.",
-      "neText": "यी पाठ्यपुस्तकहरूका अतिरिक्त प्रयोग हुने सिकाइ पुस्तकहरू र सामग्रीहरू हुन्।"
+      "neText": "यी पाठ्यपुस्तकहरूका अतिरिक्त प्रयोग हुने सिकाइ पुस्तकहरू र सामग्रीहरू हुन्।",
+      "deText": "Hierbei handelt es sich um Lernbücher und -materialien, die zusätzlich zu Lehrbüchern verwendet werden.",
+      "simpleJaText": "教科書以外に使う学習用の本や資料です。"
     },
     {
       "id": "t65",
@@ -1697,7 +2429,7 @@ export const catalog = {
       "reading": "しりょうしゅう",
       "en": "This book is a compilation of materials used for learning.",
       "descriptionJa": "学習に使う資料をまとめた本です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este livro é uma compilação de materiais utilizados para aprendizagem.",
@@ -1707,7 +2439,9 @@ export const catalog = {
       "koText": "학습에 사용하는 자료를 정리한 책입니다.",
       "tlText": "Ang aklat na ito ay isang kalipunan ng mga materyales na ginagamit sa pag-aaral.",
       "idText": "Buku ini merupakan kompilasi materi yang digunakan untuk pembelajaran.",
-      "neText": "यो पुस्तक सिकाइको लागि प्रयोग गरिने सामग्रीहरूको संकलन हो।"
+      "neText": "यो पुस्तक सिकाइको लागि प्रयोग गरिने सामग्रीहरूको संकलन हो।",
+      "deText": "Dieses Buch ist eine Zusammenstellung von Lernmaterialien.",
+      "simpleJaText": "学習に使う資料をまとめた本です。"
     },
     {
       "id": "t66",
@@ -1715,7 +2449,7 @@ export const catalog = {
       "reading": "もんだいしゅう",
       "en": "This book contains many practice problems.",
       "descriptionJa": "練習問題がたくさん入っている本です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este livro contém muitos exercícios práticos.",
@@ -1725,7 +2459,9 @@ export const catalog = {
       "koText": "연습 문제가 많이 들어있는 책입니다.",
       "tlText": "Ang aklat na ito ay naglalaman ng maraming praktikal na problema.",
       "idText": "Buku ini berisi banyak soal latihan.",
-      "neText": "यस पुस्तकमा धेरै अभ्यास समस्याहरू छन्।"
+      "neText": "यस पुस्तकमा धेरै अभ्यास समस्याहरू छन्।",
+      "deText": "Dieses Buch enthält viele Übungsaufgaben.",
+      "simpleJaText": "練習問題がたくさん入っている本です。"
     },
     {
       "id": "t67",
@@ -1733,7 +2469,7 @@ export const catalog = {
       "reading": "わーく",
       "en": "This is a practice book for use in class and for homework.",
       "descriptionJa": "授業や宿題で使う練習用の本です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um livro de exercícios para uso em sala de aula e para tarefas de casa.",
@@ -1743,7 +2479,9 @@ export const catalog = {
       "koText": "수업이나 숙제에서 사용하는 연습용 책입니다.",
       "tlText": "Ito ay isang aklat na pang-praktis para gamitin sa klase at para sa takdang-aralin.",
       "idText": "Ini adalah buku latihan untuk digunakan di kelas dan sebagai pekerjaan rumah.",
-      "neText": "यो कक्षाकोठा र गृहकार्यको लागि प्रयोग गरिने अभ्यास पुस्तक हो।"
+      "neText": "यो कक्षाकोठा र गृहकार्यको लागि प्रयोग गरिने अभ्यास पुस्तक हो।",
+      "deText": "Dies ist ein Übungsbuch für den Unterricht und für Hausaufgaben.",
+      "simpleJaText": "授業や宿題で使う練習用の本です。"
     },
     {
       "id": "t68",
@@ -1751,9 +2489,9 @@ export const catalog = {
       "reading": "ぷりんと",
       "en": "This is a paper distributed by the school.",
       "descriptionJa": "学校から配られる紙です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
-      "viewCount": "",
+      "viewCount": "1",
       "ptText": "Este é um documento distribuído pela escola.",
       "esText": "Este es un documento distribuido por la escuela.",
       "viText": "Đây là một tờ báo do nhà trường phát hành.",
@@ -1761,7 +2499,9 @@ export const catalog = {
       "koText": "학교에서 나온 종이입니다.",
       "tlText": "Ito ay isang papel na ipinamamahagi ng paaralan.",
       "idText": "Ini adalah selebaran yang diedarkan oleh sekolah.",
-      "neText": "यो स्कूलद्वारा वितरण गरिएको पेपर हो।"
+      "neText": "यो स्कूलद्वारा वितरण गरिएको पेपर हो।",
+      "deText": "Dies ist ein von der Schule verteiltes Dokument.",
+      "simpleJaText": "学校から配られる紙です。"
     },
     {
       "id": "t69",
@@ -1769,7 +2509,7 @@ export const catalog = {
       "reading": "はいふぶつ",
       "en": "These are papers and materials distributed by the school.",
       "descriptionJa": "学校から配られる紙や物です。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estes são documentos e materiais distribuídos pela escola.",
@@ -1779,7 +2519,9 @@ export const catalog = {
       "koText": "학교에서 나온 종이와 물건입니다.",
       "tlText": "Ito ay mga papel at kagamitang ipinamamahagi ng paaralan.",
       "idText": "Ini adalah kertas dan materi yang dibagikan oleh sekolah.",
-      "neText": "यी विद्यालयद्वारा वितरण गरिएका कागजात र सामग्रीहरू हुन्।"
+      "neText": "यी विद्यालयद्वारा वितरण गरिएका कागजात र सामग्रीहरू हुन्।",
+      "deText": "Hierbei handelt es sich um von der Schule verteilte Unterlagen und Materialien.",
+      "simpleJaText": "学校から配られる紙や物です。"
     },
     {
       "id": "t70",
@@ -1787,7 +2529,7 @@ export const catalog = {
       "reading": "もちかえり",
       "en": "It means bringing it home from school.",
       "descriptionJa": "学校から家に持って帰ることです。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa trazer da escola para casa.",
@@ -1797,7 +2539,9 @@ export const catalog = {
       "koText": "학교에서 집으로 가져가는 것입니다.",
       "tlText": "Ibig sabihin, iuuwi mo ito galing paaralan.",
       "idText": "Artinya membawanya pulang dari sekolah.",
-      "neText": "यसको अर्थ स्कूलबाट घर ल्याउनु हो।"
+      "neText": "यसको अर्थ स्कूलबाट घर ल्याउनु हो।",
+      "deText": "Das bedeutet, es von der Schule mit nach Hause zu bringen.",
+      "simpleJaText": "学校から家に持って帰ることです。"
     },
     {
       "id": "t71",
@@ -1805,9 +2549,9 @@ export const catalog = {
       "reading": "じさん",
       "en": "This means bringing it to school or somewhere similar.",
       "descriptionJa": "学校などに持ってくることです。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
-      "viewCount": "13",
+      "viewCount": "14",
       "ptText": "Isso significa levá-lo para a escola ou algum lugar semelhante.",
       "esText": "Esto significa llevarlo a la escuela o a algún lugar similar.",
       "viText": "Điều này có nghĩa là mang nó đến trường hoặc những nơi tương tự.",
@@ -1815,7 +2559,8 @@ export const catalog = {
       "koText": "학교 등에 가져오는 것입니다.",
       "tlText": "Ibig sabihin nito ay dalhin ito sa paaralan o sa ibang lugar na katulad nito.",
       "idText": "Artinya, Anda harus membawanya ke sekolah atau tempat serupa.",
-      "neText": "यसको अर्थ यसलाई स्कूल वा यस्तै अन्य ठाउँमा ल्याउनु हो।"
+      "neText": "यसको अर्थ यसलाई स्कूल वा यस्तै अन्य ठाउँमा ल्याउनु हो।",
+      "deText": "Das bedeutet, es mit in die Schule oder an einen ähnlichen Ort zu bringen."
     },
     {
       "id": "t72",
@@ -1823,7 +2568,7 @@ export const catalog = {
       "reading": "もたせてください",
       "en": "It means, \"Please have a child bring it.\"",
       "descriptionJa": "子どもに持ってこさせてくださいという意味です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "3",
       "ptText": "Significa: \"Por favor, peça a uma criança que traga.\"",
@@ -1833,7 +2578,8 @@ export const catalog = {
       "koText": "아이에게 가져오게 한다는 의미입니다.",
       "tlText": "Ang ibig sabihin nito ay, \"Pakidala po ito sa isang bata.\"",
       "idText": "Artinya, \"Silakan minta anak untuk membawanya.\"",
-      "neText": "यसको अर्थ हो, \"कृपया बच्चालाई ल्याउन लगाउनुहोस्।\""
+      "neText": "यसको अर्थ हो, \"कृपया बच्चालाई ल्याउन लगाउनुहोस्।\"",
+      "deText": "Es bedeutet: „Bitte lassen Sie es von einem Kind bringen.“"
     },
     {
       "id": "t73",
@@ -1841,9 +2587,9 @@ export const catalog = {
       "reading": "じゅんび",
       "en": "It's about gathering the necessary items.",
       "descriptionJa": "必要なものをそろえることです。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
-      "viewCount": "4",
+      "viewCount": "5",
       "ptText": "Trata-se de reunir os itens necessários.",
       "esText": "Se trata de reunir los elementos necesarios.",
       "viText": "Đó là việc thu thập những vật dụng cần thiết.",
@@ -1851,7 +2597,9 @@ export const catalog = {
       "koText": "필요한 것을 모으는 것입니다.",
       "tlText": "Tungkol ito sa pagkolekta ng mga kinakailangang bagay.",
       "idText": "Ini tentang mengumpulkan barang-barang yang dibutuhkan.",
-      "neText": "यो आवश्यक सामानहरू जम्मा गर्ने बारे हो।"
+      "neText": "यो आवश्यक सामानहरू जम्मा गर्ने बारे हो।",
+      "deText": "Es geht darum, die notwendigen Dinge zusammenzutragen.",
+      "simpleJaText": "必要なものをそろえることです。"
     },
     {
       "id": "t74",
@@ -1859,7 +2607,7 @@ export const catalog = {
       "reading": "じゅんびぶつ",
       "en": "These are items that need to be prepared in advance.",
       "descriptionJa": "前もって用意する必要がある物です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "4",
       "ptText": "Esses são itens que precisam ser preparados com antecedência.",
@@ -1869,7 +2617,9 @@ export const catalog = {
       "koText": "미리 준비해야 할 것입니다.",
       "tlText": "Ito ang mga bagay na kailangang ihanda nang maaga.",
       "idText": "Ini adalah barang-barang yang perlu dipersiapkan sebelumnya.",
-      "neText": "यी ती वस्तुहरू हुन् जुन पहिले नै तयार पार्नु पर्छ।"
+      "neText": "यी ती वस्तुहरू हुन् जुन पहिले नै तयार पार्नु पर्छ।",
+      "deText": "Dies sind Dinge, die im Voraus vorbereitet werden müssen.",
+      "simpleJaText": "前もって用意する必要がある物です。"
     },
     {
       "id": "t75",
@@ -1877,9 +2627,9 @@ export const catalog = {
       "reading": "ふよう",
       "en": "It means \"I don't need it\" or \"It's not necessary.\"",
       "descriptionJa": "いらない、必要ないという意味です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
-      "viewCount": "5",
+      "viewCount": "6",
       "ptText": "Significa \"Eu não preciso disso\" ou \"Não é necessário\".",
       "esText": "Significa \"No lo necesito\" o \"No es necesario\".",
       "viText": "Nó có nghĩa là \"Tôi không cần nó\" hoặc \"Nó không cần thiết.\"",
@@ -1887,7 +2637,9 @@ export const catalog = {
       "koText": "필요 없다, 필요 없다는 의미입니다.",
       "tlText": "Ang ibig sabihin nito ay \"Hindi ko ito kailangan\" o \"Hindi ito kailangan.\"",
       "idText": "Artinya \"Saya tidak membutuhkannya\" atau \"Itu tidak perlu.\"",
-      "neText": "यसको अर्थ \"मलाई यो चाहिँदैन\" वा \"यो आवश्यक छैन।\""
+      "neText": "यसको अर्थ \"मलाई यो चाहिँदैन\" वा \"यो आवश्यक छैन।\"",
+      "deText": "Es bedeutet „Ich brauche es nicht“ oder „Es ist nicht notwendig“.",
+      "simpleJaText": "いらない、必要ないという意味です。"
     },
     {
       "id": "t76",
@@ -1895,7 +2647,7 @@ export const catalog = {
       "reading": "もちかえる",
       "en": "It means bringing it home from school.",
       "descriptionJa": "学校から家に持って帰ることです。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "2",
       "ptText": "Significa trazer da escola para casa.",
@@ -1905,7 +2657,9 @@ export const catalog = {
       "koText": "학교에서 집으로 가져가는 것입니다.",
       "tlText": "Ibig sabihin, iuuwi mo ito galing paaralan.",
       "idText": "Artinya membawanya pulang dari sekolah.",
-      "neText": "यसको अर्थ स्कूलबाट घर ल्याउनु हो।"
+      "neText": "यसको अर्थ स्कूलबाट घर ल्याउनु हो।",
+      "deText": "Das bedeutet, es von der Schule mit nach Hause zu bringen.",
+      "simpleJaText": "学校から家に持って帰ることです。"
     },
     {
       "id": "t77",
@@ -1913,7 +2667,7 @@ export const catalog = {
       "reading": "うわぐつ",
       "en": "These are shoes to wear inside school buildings.",
       "descriptionJa": "学校の建物の中ではく靴です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "7",
       "ptText": "Estes são sapatos para usar dentro dos edifícios escolares.",
@@ -1923,7 +2677,9 @@ export const catalog = {
       "koText": "학교 건물 안에서 구두 신발입니다.",
       "tlText": "Ito ang mga sapatos na isuot sa loob ng mga gusali ng paaralan.",
       "idText": "Ini adalah sepatu yang dikenakan di dalam gedung sekolah.",
-      "neText": "यी स्कूल भवन भित्र लगाउनका लागि जुत्ता हुन्।"
+      "neText": "यी स्कूल भवन भित्र लगाउनका लागि जुत्ता हुन्।",
+      "deText": "Dies sind Schuhe, die in Schulgebäuden getragen werden.",
+      "simpleJaText": "学校の建物の中ではく靴です。"
     },
     {
       "id": "t78",
@@ -1931,7 +2687,7 @@ export const catalog = {
       "reading": "たいそうふく",
       "en": "These are the clothes you wear for physical education class.",
       "descriptionJa": "体育の授業で着る服です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Essas são as roupas que você usa para a aula de educação física.",
@@ -1941,7 +2697,8 @@ export const catalog = {
       "koText": "체육 수업으로 입는 옷입니다.",
       "tlText": "Ito ang mga damit na isusuot mo para sa klase ng edukasyong pisikal.",
       "idText": "Ini adalah pakaian yang kamu kenakan untuk kelas pendidikan jasmani.",
-      "neText": "यी तपाईंले शारीरिक शिक्षा कक्षाको लागि लगाउने लुगाहरू हुन्।"
+      "neText": "यी तपाईंले शारीरिक शिक्षा कक्षाको लागि लगाउने लुगाहरू हुन्।",
+      "deText": "Das ist die Kleidung, die wir im Sportunterricht tragen."
     },
     {
       "id": "t79",
@@ -1949,7 +2706,7 @@ export const catalog = {
       "reading": "じゃーじ",
       "en": "These are clothes worn during physical education or sports activities.",
       "descriptionJa": "体育や運動のときに着る服です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "3",
       "ptText": "São roupas usadas durante as aulas de educação física ou atividades esportivas.",
@@ -1959,7 +2716,9 @@ export const catalog = {
       "koText": "체육이나 운동 때 입는 옷입니다.",
       "tlText": "Ito ay mga damit na isinusuot sa panahon ng pisikal na edukasyon o mga aktibidad sa palakasan.",
       "idText": "Ini adalah pakaian yang dikenakan selama pelajaran pendidikan jasmani atau kegiatan olahraga.",
-      "neText": "यी शारीरिक शिक्षा वा खेलकुद गतिविधिहरूमा लगाइने लुगाहरू हुन्।"
+      "neText": "यी शारीरिक शिक्षा वा खेलकुद गतिविधिहरूमा लगाइने लुगाहरू हुन्।",
+      "deText": "Dies ist Kleidung, die beim Sportunterricht oder bei sportlichen Aktivitäten getragen wird.",
+      "simpleJaText": "体育や運動のときに着る服です。"
     },
     {
       "id": "t80",
@@ -1967,7 +2726,7 @@ export const catalog = {
       "reading": "あかしろぼう",
       "en": "These are red and white hats used for physical education classes and sports days.",
       "descriptionJa": "体育や運動会で使う赤白の帽子です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "1",
       "ptText": "Estes são chapéus vermelhos e brancos usados ​​nas aulas de educação física e nos dias de esportes.",
@@ -1977,7 +2736,9 @@ export const catalog = {
       "koText": "체육이나 운동회에서 사용하는 적백의 모자입니다.",
       "tlText": "Ito ay mga pula at puting sombrero na ginagamit para sa mga klase sa edukasyong pisikal at mga araw ng palakasan.",
       "idText": "Ini adalah topi merah dan putih yang digunakan untuk kelas pendidikan jasmani dan hari olahraga.",
-      "neText": "यी रातो र सेतो टोपीहरू हुन् जुन शारीरिक शिक्षा कक्षा र खेलकुद दिनहरूमा प्रयोग गरिन्छ।"
+      "neText": "यी रातो र सेतो टोपीहरू हुन् जुन शारीरिक शिक्षा कक्षा र खेलकुद दिनहरूमा प्रयोग गरिन्छ।",
+      "deText": "Dies sind rot-weiße Hüte, die im Sportunterricht und bei Sportfesten getragen werden.",
+      "simpleJaText": "体育や運動会で使う赤白の帽子です。"
     },
     {
       "id": "t81",
@@ -1985,7 +2746,7 @@ export const catalog = {
       "reading": "みずぎ",
       "en": "These are the clothes you wear for swimming lessons.",
       "descriptionJa": "水泳の授業で着る服です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "1",
       "ptText": "Essas são as roupas que você usa para as aulas de natação.",
@@ -1995,7 +2756,9 @@ export const catalog = {
       "koText": "수영 수업으로 입는 옷입니다.",
       "tlText": "Ito ang mga damit na isusuot mo para sa mga leksyon sa paglangoy.",
       "idText": "Ini adalah pakaian yang kamu kenakan untuk pelajaran berenang.",
-      "neText": "यी तपाईंले पौडी खेल्नको लागि लगाउने लुगाहरू हुन्।"
+      "neText": "यी तपाईंले पौडी खेल्नको लागि लगाउने लुगाहरू हुन्।",
+      "deText": "Das ist die Kleidung, die man zum Schwimmunterricht trägt.",
+      "simpleJaText": "水泳の授業で着る服です。"
     },
     {
       "id": "t82",
@@ -2003,7 +2766,7 @@ export const catalog = {
       "reading": "すいえいぼう",
       "en": "This is a cap worn during swimming lessons.",
       "descriptionJa": "水泳の授業でかぶる帽子です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "1",
       "ptText": "Esta é uma touca usada durante as aulas de natação.",
@@ -2013,7 +2776,9 @@ export const catalog = {
       "koText": "수영 수업에서 쓰는 모자입니다.",
       "tlText": "Ito ay isang sombrero na isinusuot tuwing may klase sa paglangoy.",
       "idText": "Ini adalah topi yang dikenakan saat pelajaran berenang.",
-      "neText": "यो पौडी खेल्ने क्रममा लगाउने टोपी हो।"
+      "neText": "यो पौडी खेल्ने क्रममा लगाउने टोपी हो।",
+      "deText": "Dies ist eine Badekappe, die beim Schwimmunterricht getragen wird.",
+      "simpleJaText": "水泳の授業でかぶる帽子です。"
     },
     {
       "id": "t83",
@@ -2021,7 +2786,7 @@ export const catalog = {
       "reading": "しゅうじせっと",
       "en": "This is a set of tools used in calligraphy classes.",
       "descriptionJa": "習字の授業で使う道具のセットです。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "1",
       "ptText": "Este é um conjunto de ferramentas usado em aulas de caligrafia.",
@@ -2031,7 +2796,9 @@ export const catalog = {
       "koText": "습자 수업에서 사용하는 도구 세트입니다.",
       "tlText": "Ito ay isang hanay ng mga kagamitang ginagamit sa mga klase sa kaligrapiya.",
       "idText": "Ini adalah seperangkat alat yang digunakan dalam kelas kaligrafi.",
-      "neText": "यो सुलेखन कक्षाहरूमा प्रयोग हुने उपकरणहरूको सेट हो।"
+      "neText": "यो सुलेखन कक्षाहरूमा प्रयोग हुने उपकरणहरूको सेट हो।",
+      "deText": "Dies ist ein Werkzeugset, das im Kalligrafieunterricht verwendet wird.",
+      "simpleJaText": "習字の授業で使う道具のセットです。"
     },
     {
       "id": "t84",
@@ -2039,7 +2806,7 @@ export const catalog = {
       "reading": "けんばんはーもにか",
       "en": "These are musical instruments used in music class.",
       "descriptionJa": "音楽の授業で使う楽器です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "1",
       "ptText": "Estes são instrumentos musicais usados ​​nas aulas de música.",
@@ -2049,7 +2816,9 @@ export const catalog = {
       "koText": "음악 수업에 사용하는 악기입니다.",
       "tlText": "Ito ay mga instrumentong pangmusika na ginagamit sa klase ng musika.",
       "idText": "Ini adalah alat musik yang digunakan di kelas musik.",
-      "neText": "यी संगीत कक्षामा प्रयोग हुने वाद्ययन्त्रहरू हुन्।"
+      "neText": "यी संगीत कक्षामा प्रयोग हुने वाद्ययन्त्रहरू हुन्।",
+      "deText": "Dies sind Musikinstrumente, die im Musikunterricht verwendet werden.",
+      "simpleJaText": "音楽の授業で使う楽器です。"
     },
     {
       "id": "t85",
@@ -2057,7 +2826,7 @@ export const catalog = {
       "reading": "りこーだー",
       "en": "It's a flute-like instrument used in music class.",
       "descriptionJa": "音楽の授業で使う笛のような楽器です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "1",
       "ptText": "É um instrumento semelhante a uma flauta, usado em aulas de música.",
@@ -2067,7 +2836,9 @@ export const catalog = {
       "koText": "음악 수업에서 사용하는 피리와 같은 악기입니다.",
       "tlText": "Ito ay isang instrumentong parang plawta na ginagamit sa klase ng musika.",
       "idText": "Ini adalah alat musik mirip seruling yang digunakan di kelas musik.",
-      "neText": "यो संगीत कक्षामा प्रयोग हुने बाँसुरी जस्तो बाजा हो।"
+      "neText": "यो संगीत कक्षामा प्रयोग हुने बाँसुरी जस्तो बाजा हो।",
+      "deText": "Es handelt sich um ein flötenähnliches Instrument, das im Musikunterricht verwendet wird.",
+      "simpleJaText": "音楽の授業で使う笛のような楽器です。"
     },
     {
       "id": "t86",
@@ -2075,7 +2846,7 @@ export const catalog = {
       "reading": "さんすうせっと",
       "en": "This is a set of tools used in math class.",
       "descriptionJa": "算数の授業で使う道具のセットです。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "1",
       "ptText": "Este é um conjunto de ferramentas utilizadas nas aulas de matemática.",
@@ -2085,7 +2856,9 @@ export const catalog = {
       "koText": "산수의 수업에서 사용하는 도구 세트입니다.",
       "tlText": "Ito ay isang hanay ng mga kagamitang ginagamit sa klase sa matematika.",
       "idText": "Ini adalah seperangkat alat yang digunakan di kelas matematika.",
-      "neText": "यो गणित कक्षामा प्रयोग हुने उपकरणहरूको सेट हो।"
+      "neText": "यो गणित कक्षामा प्रयोग हुने उपकरणहरूको सेट हो।",
+      "deText": "Dies ist ein Werkzeugsatz, der im Mathematikunterricht verwendet wird.",
+      "simpleJaText": "算数の授業で使う道具のセットです。"
     },
     {
       "id": "t87",
@@ -2093,9 +2866,9 @@ export const catalog = {
       "reading": "きゅうしょくせっと",
       "en": "These are items used during school lunches, such as bags, chopsticks, and napkins.",
       "descriptionJa": "給食のときに使う袋、箸、ナフキンなどです。",
-      "category": "給食",
+      "category": "学校生活・行事",
       "keywords": "",
-      "viewCount": "",
+      "viewCount": "1",
       "ptText": "Esses são itens usados ​​durante o almoço escolar, como sacolas, pauzinhos e guardanapos.",
       "esText": "Se trata de artículos que se utilizan durante la hora del almuerzo escolar, como bolsas, palillos y servilletas.",
       "viText": "Đây là những vật dụng được sử dụng trong giờ ăn trưa ở trường, chẳng hạn như túi đựng đồ, đũa và khăn ăn.",
@@ -2103,7 +2876,9 @@ export const catalog = {
       "koText": "급식시에 사용하는 가방, 젓가락, 나프킨 등입니다.",
       "tlText": "Ito ang mga bagay na ginagamit sa mga pananghalian sa paaralan, tulad ng mga bag, chopstick, at napkin.",
       "idText": "Ini adalah barang-barang yang digunakan saat makan siang di sekolah, seperti kantong, sumpit, dan serbet.",
-      "neText": "यी स्कूलको खाजाको समयमा प्रयोग हुने वस्तुहरू हुन्, जस्तै झोला, चपस्टिक र नेपकिन।"
+      "neText": "यी स्कूलको खाजाको समयमा प्रयोग हुने वस्तुहरू हुन्, जस्तै झोला, चपस्टिक र नेपकिन।",
+      "deText": "Hierbei handelt es sich um Gegenstände, die beim Mittagessen in der Schule verwendet werden, wie zum Beispiel Tüten, Essstäbchen und Servietten.",
+      "simpleJaText": "給食のときに使う袋、箸、ナフキンなどです。"
     },
     {
       "id": "t88",
@@ -2111,9 +2886,9 @@ export const catalog = {
       "reading": "なふきん",
       "en": "This is a cloth used to place on desks during lunchtime at school.",
       "descriptionJa": "給食のときに机に敷く布です。",
-      "category": "給食",
+      "category": "学校生活・行事",
       "keywords": "",
-      "viewCount": "",
+      "viewCount": "1",
       "ptText": "Este é um pano que se usa para cobrir as mesas durante o horário de almoço.",
       "esText": "Se trata de un paño que se utiliza para colocar sobre los pupitres durante la hora del almuerzo.",
       "viText": "Đây là một tấm vải dùng để trải trên bàn học trong giờ ăn trưa.",
@@ -2121,7 +2896,9 @@ export const catalog = {
       "koText": "급식 때 책상에 깔는 천입니다.",
       "tlText": "Ito ay isang tela na ginagamit sa mga mesa tuwing oras ng tanghalian.",
       "idText": "Ini adalah kain yang digunakan untuk diletakkan di atas meja saat waktu makan siang.",
-      "neText": "यो खाजाको समयमा डेस्कहरूमा राख्न प्रयोग गरिने कपडा हो।"
+      "neText": "यो खाजाको समयमा डेस्कहरूमा राख्न प्रयोग गरिने कपडा हो।",
+      "deText": "Dies ist ein Tuch, das in der Schule während der Mittagspause auf die Tische gelegt wird.",
+      "simpleJaText": "給食のときに机に敷く布です。"
     },
     {
       "id": "t89",
@@ -2129,7 +2906,7 @@ export const catalog = {
       "reading": "ますく",
       "en": "It covers the mouth and nose.",
       "descriptionJa": "口や鼻をおおうものです。",
-      "category": "給食",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "É algo que cobre a boca e o nariz.",
@@ -2139,7 +2916,9 @@ export const catalog = {
       "koText": "입이나 코를 모으는 것입니다.",
       "tlText": "Ito ay isang bagay na tumatakip sa iyong bibig at ilong.",
       "idText": "Itu adalah sesuatu yang menutupi mulut dan hidungmu.",
-      "neText": "यो त्यस्तो चीज हो जसले तपाईंको मुख र नाक ढाक्छ।"
+      "neText": "यो त्यस्तो चीज हो जसले तपाईंको मुख र नाक ढाक्छ।",
+      "deText": "Es ist etwas, das Mund und Nase bedeckt.",
+      "simpleJaText": "口や鼻をおおうものです。"
     },
     {
       "id": "t90",
@@ -2147,7 +2926,7 @@ export const catalog = {
       "reading": "えぷろん",
       "en": "It's something you wear over your clothes, like when you're on lunch duty at school.",
       "descriptionJa": "給食当番などで服の上に着るものです。",
-      "category": "給食",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "É algo que você veste por cima da roupa, como quando está de plantão no refeitório da escola.",
@@ -2157,7 +2936,9 @@ export const catalog = {
       "koText": "급식 당번 등으로 옷 위에 입는 것입니다.",
       "tlText": "Ito ay isang bagay na isinusuot mo sa ibabaw ng iyong mga damit, tulad ng kapag naka-duty ka sa paaralan habang kumakain ng tanghalian.",
       "idText": "Ini adalah sesuatu yang kamu kenakan di atas pakaianmu, seperti saat kamu bertugas menjaga jam makan siang di sekolah.",
-      "neText": "यो त्यस्तो चीज हो जुन तपाईंले आफ्नो लुगामाथि लगाउनुहुन्छ, जस्तै जब तपाईं स्कूलमा खाजाको ड्युटीमा हुनुहुन्छ।"
+      "neText": "यो त्यस्तो चीज हो जुन तपाईंले आफ्नो लुगामाथि लगाउनुहुन्छ, जस्तै जब तपाईं स्कूलमा खाजाको ड्युटीमा हुनुहुन्छ।",
+      "deText": "Es ist etwas, das man über seiner Kleidung trägt, zum Beispiel wenn man in der Schule Pausenaufsicht hat.",
+      "simpleJaText": "給食当番などで服の上に着るものです。"
     },
     {
       "id": "t91",
@@ -2165,7 +2946,7 @@ export const catalog = {
       "reading": "とうばん",
       "en": "This is the role of doing assigned tasks in a specific order.",
       "descriptionJa": "順番で決まった仕事をする係です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Essa função consiste em executar as tarefas atribuídas em uma ordem específica.",
@@ -2175,7 +2956,9 @@ export const catalog = {
       "koText": "차례로 정해진 일을 하는 계입니다.",
       "tlText": "Ito ang tungkulin ng pagsasagawa ng mga nakatalagang gawain sa isang tiyak na pagkakasunud-sunod.",
       "idText": "Ini adalah peran untuk melakukan tugas-tugas yang diberikan dalam urutan tertentu.",
-      "neText": "यो तोकिएका कार्यहरू विशेष क्रममा गर्ने भूमिका हो।"
+      "neText": "यो तोकिएका कार्यहरू विशेष क्रममा गर्ने भूमिका हो।",
+      "deText": "Dies ist die Aufgabe, zugewiesene Aufgaben in einer bestimmten Reihenfolge zu erledigen.",
+      "simpleJaText": "順番で決まった仕事をする係です。"
     },
     {
       "id": "t92",
@@ -2183,7 +2966,7 @@ export const catalog = {
       "reading": "にっちょく",
       "en": "This is the person in charge of class duties on that day.",
       "descriptionJa": "その日にクラスの仕事を担当する人です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Essa é a pessoa responsável pelas atividades da turma naquele dia.",
@@ -2193,7 +2976,9 @@ export const catalog = {
       "koText": "그 날에 수업 일을 담당하는 사람입니다.",
       "tlText": "Ito ang taong namamahala sa mga tungkulin sa klase sa araw na iyon.",
       "idText": "Ini adalah orang yang bertanggung jawab atas tugas kelas pada hari itu.",
-      "neText": "त्यो दिन कक्षाको कर्तव्यको जिम्मेवारी लिने व्यक्ति यही हो।"
+      "neText": "त्यो दिन कक्षाको कर्तव्यको जिम्मेवारी लिने व्यक्ति यही हो।",
+      "deText": "Dies ist die Person, die an diesem Tag für den Unterricht zuständig ist.",
+      "simpleJaText": "その日にクラスの仕事を担当する人です。"
     },
     {
       "id": "t93",
@@ -2201,7 +2986,7 @@ export const catalog = {
       "reading": "かかり",
       "en": "This is a task assigned to me within the class.",
       "descriptionJa": "クラスの中で決められた仕事の担当です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma tarefa que me foi atribuída na aula.",
@@ -2211,7 +2996,9 @@ export const catalog = {
       "koText": "클래스 안에서 정해진 일의 담당입니다.",
       "tlText": "Ito ay isang gawain na nakaatas sa akin sa loob ng klase.",
       "idText": "Ini adalah tugas yang diberikan kepada saya di dalam kelas.",
-      "neText": "यो कक्षा भित्र मलाई तोकिएको काम हो।"
+      "neText": "यो कक्षा भित्र मलाई तोकिएको काम हो।",
+      "deText": "Dies ist eine Aufgabe, die mir im Rahmen des Kurses zugewiesen wurde.",
+      "simpleJaText": "クラスの中で決められた仕事の担当です。"
     },
     {
       "id": "t94",
@@ -2219,7 +3006,7 @@ export const catalog = {
       "reading": "そうじ",
       "en": "It's about keeping classrooms and schools clean.",
       "descriptionJa": "教室や学校をきれいにすることです。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de manter as salas de aula e as escolas limpas.",
@@ -2229,7 +3016,9 @@ export const catalog = {
       "koText": "교실과 학교를 청소하는 것입니다.",
       "tlText": "Tungkol ito sa pagpapanatiling malinis ng mga silid-aralan at paaralan.",
       "idText": "Ini tentang menjaga kebersihan ruang kelas dan sekolah.",
-      "neText": "यो कक्षाकोठा र विद्यालयहरू सफा राख्ने बारेमा हो।"
+      "neText": "यो कक्षाकोठा र विद्यालयहरू सफा राख्ने बारेमा हो।",
+      "deText": "Es geht darum, Klassenzimmer und Schulen sauber zu halten.",
+      "simpleJaText": "教室や学校をきれいにすることです。"
     },
     {
       "id": "t95",
@@ -2237,7 +3026,7 @@ export const catalog = {
       "reading": "せいそう",
       "en": "It's about cleaning.",
       "descriptionJa": "そうじをすることです。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Tem a ver com limpeza.",
@@ -2247,7 +3036,9 @@ export const catalog = {
       "koText": "그렇게 하는 것입니다.",
       "tlText": "Tungkol ito sa paglilinis.",
       "idText": "Ini tentang membersihkan.",
-      "neText": "यो सफाईको बारेमा हो।"
+      "neText": "यो सफाईको बारेमा हो।",
+      "deText": "Es geht ums Reinigen.",
+      "simpleJaText": "そうじをすることです。"
     },
     {
       "id": "t96",
@@ -2255,7 +3046,7 @@ export const catalog = {
       "reading": "あさのかい",
       "en": "This is the time in the morning for class announcements and confirmations.",
       "descriptionJa": "朝にクラスで連絡や確認をする時間です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o horário da manhã para anúncios e confirmações de aulas.",
@@ -2265,7 +3056,9 @@ export const catalog = {
       "koText": "아침에 클래스에서 연락이나 확인을 하는 시간입니다.",
       "tlText": "Ito ang oras sa umaga para sa mga anunsyo at kumpirmasyon ng klase.",
       "idText": "Inilah waktu di pagi hari untuk pengumuman dan konfirmasi kelas.",
-      "neText": "यो बिहानको समय हो कक्षा घोषणा र पुष्टिकरणको लागि।"
+      "neText": "यो बिहानको समय हो कक्षा घोषणा र पुष्टिकरणको लागि।",
+      "deText": "Dies ist die Zeit am Morgen für die Ankündigungen und Bestätigungen der Klassen.",
+      "simpleJaText": "朝にクラスで連絡や確認をする時間です。"
     },
     {
       "id": "t97",
@@ -2273,7 +3066,7 @@ export const catalog = {
       "reading": "かえりのかい",
       "en": "This is the time to make announcements and confirm things with the class before going home.",
       "descriptionJa": "帰る前にクラスで連絡や確認をする時間です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o momento de fazer anúncios e confirmar detalhes com a turma antes de ir para casa.",
@@ -2283,7 +3076,9 @@ export const catalog = {
       "koText": "돌아가기 전에 클래스에서 연락이나 확인을 하는 시간입니다.",
       "tlText": "Ito ang oras para mag-anunsyo at kumpirmahin ang mga bagay-bagay sa klase bago umuwi.",
       "idText": "Inilah saatnya untuk membuat pengumuman dan mengkonfirmasi hal-hal dengan kelas sebelum pulang.",
-      "neText": "यो घर जानुअघि कक्षामा घोषणा गर्ने र कुराहरू पुष्टि गर्ने समय हो।"
+      "neText": "यो घर जानुअघि कक्षामा घोषणा गर्ने र कुराहरू पुष्टि गर्ने समय हो।",
+      "deText": "Jetzt ist der richtige Zeitpunkt, um Ankündigungen zu machen und Dinge mit der Klasse zu bestätigen, bevor man nach Hause geht.",
+      "simpleJaText": "帰る前にクラスで連絡や確認をする時間です。"
     },
     {
       "id": "t98",
@@ -2291,7 +3086,7 @@ export const catalog = {
       "reading": "がっきゅうかつどう",
       "en": "This is a time to learn about class life and activities.",
       "descriptionJa": "クラスの生活や活動について学ぶ時間です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um momento para aprender sobre a vida e as atividades da turma.",
@@ -2301,7 +3096,9 @@ export const catalog = {
       "koText": "수업 생활과 활동에 대해 배울 시간입니다.",
       "tlText": "Ito ang panahon para matuto tungkol sa buhay at mga aktibidad sa klase.",
       "idText": "Inilah saatnya untuk mempelajari tentang kehidupan dan kegiatan di kelas.",
-      "neText": "यो कक्षा जीवन र गतिविधिहरूको बारेमा सिक्ने समय हो।"
+      "neText": "यो कक्षा जीवन र गतिविधिहरूको बारेमा सिक्ने समय हो।",
+      "deText": "Dies ist eine Zeit, um das Klassenleben und die Aktivitäten kennenzulernen.",
+      "simpleJaText": "クラスの生活や活動について学ぶ時間です。"
     },
     {
       "id": "t99",
@@ -2309,7 +3106,7 @@ export const catalog = {
       "reading": "いいんかい",
       "en": "This is a group that works to improve school life.",
       "descriptionJa": "学校生活をよくするために活動するグループです。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um grupo que trabalha para melhorar a vida escolar.",
@@ -2319,7 +3116,9 @@ export const catalog = {
       "koText": "학교 생활을 잘하기 위해 활동하는 그룹입니다.",
       "tlText": "Ito ay isang grupo na nagsusumikap na mapabuti ang buhay-paaralan.",
       "idText": "Ini adalah kelompok yang berupaya meningkatkan kehidupan sekolah.",
-      "neText": "यो एउटा समूह हो जसले विद्यालय जीवन सुधार गर्न काम गर्छ।"
+      "neText": "यो एउटा समूह हो जसले विद्यालय जीवन सुधार गर्न काम गर्छ।",
+      "deText": "Dies ist eine Gruppe, die sich für die Verbesserung des Schullebens einsetzt.",
+      "simpleJaText": "学校生活をよくするために活動するグループです。"
     },
     {
       "id": "t100",
@@ -2327,7 +3126,7 @@ export const catalog = {
       "reading": "じどうかい",
       "en": "This is an organization that works to improve children's school life.",
       "descriptionJa": "児童が学校生活をよくするために活動する組織です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma organização que trabalha para melhorar a vida escolar das crianças.",
@@ -2337,7 +3136,9 @@ export const catalog = {
       "koText": "아동이 학교 생활을 잘 하기 위해서 활동하는 조직입니다.",
       "tlText": "Ito ay isang organisasyon na nagsusumikap na mapabuti ang buhay-paaralan ng mga bata.",
       "idText": "Ini adalah organisasi yang berupaya meningkatkan kehidupan sekolah anak-anak.",
-      "neText": "यो बालबालिकाको विद्यालय जीवन सुधार गर्न काम गर्ने संस्था हो।"
+      "neText": "यो बालबालिकाको विद्यालय जीवन सुधार गर्न काम गर्ने संस्था हो।",
+      "deText": "Dies ist eine Organisation, die sich für die Verbesserung des Schullebens von Kindern einsetzt.",
+      "simpleJaText": "児童が学校生活をよくするために活動する組織です。"
     },
     {
       "id": "t101",
@@ -2345,7 +3146,7 @@ export const catalog = {
       "reading": "せいとかい",
       "en": "This is an organization where students work to improve their school life.",
       "descriptionJa": "生徒が学校生活をよくするために活動する組織です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma organização onde os alunos trabalham para melhorar sua vida escolar.",
@@ -2355,7 +3156,9 @@ export const catalog = {
       "koText": "학생들이 학교 생활을 잘하기 위해 활동하는 조직입니다.",
       "tlText": "Ito ay isang organisasyon kung saan ang mga mag-aaral ay nagtatrabaho upang mapabuti ang kanilang buhay sa paaralan.",
       "idText": "Ini adalah organisasi tempat para siswa bekerja untuk meningkatkan kehidupan sekolah mereka.",
-      "neText": "यो एउटा यस्तो संस्था हो जहाँ विद्यार्थीहरूले आफ्नो विद्यालय जीवन सुधार्न काम गर्छन्।"
+      "neText": "यो एउटा यस्तो संस्था हो जहाँ विद्यार्थीहरूले आफ्नो विद्यालय जीवन सुधार्न काम गर्छन्।",
+      "deText": "Dies ist eine Organisation, in der Schüler daran arbeiten, ihr Schulleben zu verbessern.",
+      "simpleJaText": "生徒が学校生活をよくするために活動する組織です。"
     },
     {
       "id": "t102",
@@ -2363,7 +3166,7 @@ export const catalog = {
       "reading": "こうない",
       "en": "It means \"inside the school.\"",
       "descriptionJa": "学校の中という意味です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa \"dentro da escola\".",
@@ -2373,7 +3176,9 @@ export const catalog = {
       "koText": "학교 안이라는 의미입니다.",
       "tlText": "Ang ibig sabihin nito ay \"sa loob ng paaralan.\"",
       "idText": "Artinya \"di dalam sekolah.\"",
-      "neText": "यसको अर्थ \"स्कूल भित्र\" हो।"
+      "neText": "यसको अर्थ \"स्कूल भित्र\" हो।",
+      "deText": "Es bedeutet „innerhalb der Schule“.",
+      "simpleJaText": "学校の中という意味です。"
     },
     {
       "id": "t103",
@@ -2381,7 +3186,7 @@ export const catalog = {
       "reading": "こうがい",
       "en": "It means outside of school.",
       "descriptionJa": "学校の外という意味です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa fora da escola.",
@@ -2391,7 +3196,9 @@ export const catalog = {
       "koText": "학교 밖이라는 의미입니다.",
       "tlText": "Ibig sabihin, labas ng paaralan.",
       "idText": "Artinya di luar sekolah.",
-      "neText": "यसको अर्थ स्कूल बाहिर हो।"
+      "neText": "यसको अर्थ स्कूल बाहिर हो।",
+      "deText": "Es bedeutet außerhalb der Schule.",
+      "simpleJaText": "学校の外という意味です。"
     },
     {
       "id": "t104",
@@ -2399,7 +3206,7 @@ export const catalog = {
       "reading": "きょうしつ",
       "en": "This is the room where classes are held.",
       "descriptionJa": "授業を受ける部屋です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é a sala onde as aulas são ministradas.",
@@ -2409,7 +3216,9 @@ export const catalog = {
       "koText": "수업을 받는 방입니다.",
       "tlText": "Ito ang silid kung saan ginaganap ang mga klase.",
       "idText": "Ini adalah ruangan tempat kelas diadakan.",
-      "neText": "यो त्यो कोठा हो जहाँ कक्षाहरू सञ्चालन हुन्छन्।"
+      "neText": "यो त्यो कोठा हो जहाँ कक्षाहरू सञ्चालन हुन्छन्।",
+      "deText": "Dies ist der Raum, in dem der Unterricht stattfindet.",
+      "simpleJaText": "授業を受ける部屋です。"
     },
     {
       "id": "t105",
@@ -2417,7 +3226,7 @@ export const catalog = {
       "reading": "しょくいんしつ",
       "en": "This is the room where the teachers work.",
       "descriptionJa": "先生たちが仕事をする部屋です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é a sala onde os professores trabalham.",
@@ -2427,7 +3236,9 @@ export const catalog = {
       "koText": "선생님이 일하는 방입니다.",
       "tlText": "Ito ang silid kung saan nagtatrabaho ang mga guro.",
       "idText": "Ini adalah ruangan tempat para guru bekerja.",
-      "neText": "यो शिक्षकहरूले काम गर्ने कोठा हो।"
+      "neText": "यो शिक्षकहरूले काम गर्ने कोठा हो।",
+      "deText": "Dies ist der Raum, in dem die Lehrer arbeiten.",
+      "simpleJaText": "先生たちが仕事をする部屋です。"
     },
     {
       "id": "t106",
@@ -2435,7 +3246,7 @@ export const catalog = {
       "reading": "こうちょうしつ",
       "en": "This is the principal's office.",
       "descriptionJa": "校長先生の部屋です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o gabinete do diretor.",
@@ -2445,7 +3256,9 @@ export const catalog = {
       "koText": "교장 선생님의 방입니다.",
       "tlText": "Ito ang opisina ng punong-guro.",
       "idText": "Ini adalah kantor kepala sekolah.",
-      "neText": "यो प्रिन्सिपलको कार्यालय हो।"
+      "neText": "यो प्रिन्सिपलको कार्यालय हो।",
+      "deText": "Dies ist das Büro des Schulleiters.",
+      "simpleJaText": "校長先生の部屋です。"
     },
     {
       "id": "t107",
@@ -2453,7 +3266,7 @@ export const catalog = {
       "reading": "としょしつ",
       "en": "This is a room for reading or borrowing books.",
       "descriptionJa": "本を読んだり借りたりする部屋です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma sala para leitura ou empréstimo de livros.",
@@ -2463,7 +3276,9 @@ export const catalog = {
       "koText": "책을 읽거나 빌리는 방입니다.",
       "tlText": "Ito ay isang silid para sa pagbabasa o paghiram ng mga libro.",
       "idText": "Ini adalah ruangan untuk membaca atau meminjam buku.",
-      "neText": "यो किताबहरू पढ्न वा सापटी लिनको लागि कोठा हो।"
+      "neText": "यो किताबहरू पढ्न वा सापटी लिनको लागि कोठा हो।",
+      "deText": "Dies ist ein Raum zum Lesen oder Ausleihen von Büchern.",
+      "simpleJaText": "本を読んだり借りたりする部屋です。"
     },
     {
       "id": "t108",
@@ -2471,7 +3286,7 @@ export const catalog = {
       "reading": "たいいくかん",
       "en": "This is a large building used for physical education classes and school events.",
       "descriptionJa": "体育や行事を行う大きな建物です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um prédio grande usado para aulas de educação física e outros eventos.",
@@ -2481,7 +3296,9 @@ export const catalog = {
       "koText": "체육이나 행사를 실시하는 큰 건물입니다.",
       "tlText": "Ito ay isang malaking gusali na ginagamit para sa mga klase sa edukasyong pisikal at iba pang mga kaganapan.",
       "idText": "Ini adalah bangunan besar yang digunakan untuk kelas pendidikan jasmani dan acara lainnya.",
-      "neText": "यो शारीरिक शिक्षा कक्षा र अन्य कार्यक्रमहरूको लागि प्रयोग गरिने ठूलो भवन हो।"
+      "neText": "यो शारीरिक शिक्षा कक्षा र अन्य कार्यक्रमहरूको लागि प्रयोग गरिने ठूलो भवन हो।",
+      "deText": "Es handelt sich um ein großes Gebäude, das für Sportunterricht und Schulveranstaltungen genutzt wird.",
+      "simpleJaText": "体育や行事を行う大きな建物です。"
     },
     {
       "id": "t109",
@@ -2489,7 +3306,7 @@ export const catalog = {
       "reading": "うんどうじょう",
       "en": "This is a place for exercising outdoors.",
       "descriptionJa": "外で運動する場所です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um local para praticar exercícios ao ar livre.",
@@ -2499,7 +3316,9 @@ export const catalog = {
       "koText": "밖에서 운동하는 장소입니다.",
       "tlText": "Ito ay isang lugar para mag-ehersisyo sa labas.",
       "idText": "Ini adalah tempat untuk berolahraga di luar ruangan.",
-      "neText": "यो बाहिर व्यायाम गर्ने ठाउँ हो।"
+      "neText": "यो बाहिर व्यायाम गर्ने ठाउँ हो।",
+      "deText": "Dies ist ein Ort für sportliche Betätigung im Freien.",
+      "simpleJaText": "外で運動する場所です。"
     },
     {
       "id": "t110",
@@ -2507,7 +3326,7 @@ export const catalog = {
       "reading": "こうてい",
       "en": "It's a large open space outside the school.",
       "descriptionJa": "学校の外にある広い場所です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "É um grande espaço aberto fora da escola.",
@@ -2517,7 +3336,9 @@ export const catalog = {
       "koText": "학교 밖에 있는 넓은 장소입니다.",
       "tlText": "Malaki at bukas na espasyo ito sa labas ng paaralan.",
       "idText": "Ini adalah ruang terbuka luas di luar sekolah.",
-      "neText": "यो स्कूल बाहिरको ठूलो खुला ठाउँ हो।"
+      "neText": "यो स्कूल बाहिरको ठूलो खुला ठाउँ हो।",
+      "deText": "Es handelt sich um einen großen, offenen Platz außerhalb der Schule.",
+      "simpleJaText": "学校の外にある広い場所です。"
     },
     {
       "id": "t111",
@@ -2525,7 +3346,7 @@ export const catalog = {
       "reading": "しょうこうぐち",
       "en": "This is the entrance where students change their shoes at school.",
       "descriptionJa": "学校で靴をはきかえる入口です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é a entrada onde os alunos trocam de sapatos na escola.",
@@ -2535,7 +3356,9 @@ export const catalog = {
       "koText": "학교에서 신발을 입는 입구입니다.",
       "tlText": "Ito ang pasukan kung saan nagpapalit ng sapatos ang mga estudyante sa paaralan.",
       "idText": "Ini adalah pintu masuk tempat siswa mengganti sepatu mereka di sekolah.",
-      "neText": "यो विद्यालयमा विद्यार्थीहरूले जुत्ता फेर्ने प्रवेशद्वार हो।"
+      "neText": "यो विद्यालयमा विद्यार्थीहरूले जुत्ता फेर्ने प्रवेशद्वार हो।",
+      "deText": "Dies ist der Eingang, an dem die Schüler in der Schule ihre Schuhe wechseln.",
+      "simpleJaText": "学校で靴をはきかえる入口です。"
     },
     {
       "id": "t112",
@@ -2543,7 +3366,7 @@ export const catalog = {
       "reading": "ろうか",
       "en": "This is a passageway connecting classrooms.",
       "descriptionJa": "教室と教室をつなぐ通路です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um corredor que liga as salas de aula.",
@@ -2553,7 +3376,9 @@ export const catalog = {
       "koText": "교실과 교실을 연결하는 통로입니다.",
       "tlText": "Ito ay isang pasilyo na nagdurugtong sa mga silid-aralan.",
       "idText": "Ini adalah lorong yang menghubungkan ruang kelas.",
-      "neText": "यो कक्षा कोठाहरू जोड्ने बाटो हो।"
+      "neText": "यो कक्षा कोठाहरू जोड्ने बाटो हो।",
+      "deText": "Dies ist ein Verbindungsgang zwischen Klassenzimmern.",
+      "simpleJaText": "教室と教室をつなぐ通路です。"
     },
     {
       "id": "t113",
@@ -2561,7 +3386,7 @@ export const catalog = {
       "reading": "かいだん",
       "en": "This is a place to go to the upper or lower floors.",
       "descriptionJa": "上の階や下の階へ行くための場所です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um local para acessar os andares superiores ou inferiores.",
@@ -2571,7 +3396,9 @@ export const catalog = {
       "koText": "위층이나 아래층으로 가기 위한 장소입니다.",
       "tlText": "Ito ay isang lugar para pumunta sa itaas o mas mababang palapag.",
       "idText": "Ini adalah tempat untuk pergi ke lantai atas atau lantai bawah.",
-      "neText": "यो माथिल्लो वा तल्लो तल्लामा जाने ठाउँ हो।"
+      "neText": "यो माथिल्लो वा तल्लो तल्लामा जाने ठाउँ हो।",
+      "deText": "Dies ist ein Ort, von dem aus man in die oberen oder unteren Stockwerke gelangen kann.",
+      "simpleJaText": "上の階や下の階へ行くための場所です。"
     },
     {
       "id": "t114",
@@ -2579,7 +3406,7 @@ export const catalog = {
       "reading": "けってん",
       "en": "It refers to a score lower than the set minimum.",
       "descriptionJa": "決められた点より低い点数のことです。",
-      "category": "成績",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Refere-se a uma pontuação inferior à mínima estabelecida.",
@@ -2589,7 +3416,9 @@ export const catalog = {
       "koText": "정해진 점보다 낮은 점수입니다.",
       "tlText": "Ito ay tumutukoy sa iskor na mas mababa kaysa sa itinakdang minimum.",
       "idText": "Ini merujuk pada skor yang lebih rendah dari nilai minimum yang ditetapkan.",
-      "neText": "यसले निर्धारित न्यूनतम भन्दा कम अंकलाई जनाउँछ।"
+      "neText": "यसले निर्धारित न्यूनतम भन्दा कम अंकलाई जनाउँछ।",
+      "deText": "Es bezieht sich auf eine Punktzahl, die unterhalb des festgelegten Mindestwerts liegt.",
+      "simpleJaText": "決められた点より低い点数のことです。"
     },
     {
       "id": "t115",
@@ -2597,7 +3426,7 @@ export const catalog = {
       "reading": "へいきんてん",
       "en": "This is the average score of everyone's scores.",
       "descriptionJa": "みんなの点数をならした点です。",
-      "category": "成績",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é a média das pontuações de todos.",
@@ -2607,7 +3436,9 @@ export const catalog = {
       "koText": "모두의 점수를 한 점입니다.",
       "tlText": "Ito ang karaniwang iskor ng mga iskor ng lahat.",
       "idText": "Ini adalah skor rata-rata dari semua skor yang diperoleh.",
-      "neText": "यो सबैको अङ्कको औसत अङ्क हो।"
+      "neText": "यो सबैको अङ्कको औसत अङ्क हो।",
+      "deText": "Dies ist der Durchschnitt aller Einzelwertungen.",
+      "simpleJaText": "みんなの点数をならした点です。"
     },
     {
       "id": "t116",
@@ -2615,7 +3446,7 @@ export const catalog = {
       "reading": "てんすう",
       "en": "Points such as test scores.",
       "descriptionJa": "テストなどの点です。",
-      "category": "成績",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Pontos como notas em provas.",
@@ -2625,7 +3456,9 @@ export const catalog = {
       "koText": "테스트 등의 점입니다.",
       "tlText": "Mga puntos tulad ng mga marka sa pagsusulit.",
       "idText": "Poin-poin seperti nilai ujian.",
-      "neText": "परीक्षा स्कोर जस्ता अंकहरू।"
+      "neText": "परीक्षा स्कोर जस्ता अंकहरू।",
+      "deText": "Punkte wie beispielsweise Testergebnisse.",
+      "simpleJaText": "テストなどの点です。"
     },
     {
       "id": "t117",
@@ -2633,7 +3466,7 @@ export const catalog = {
       "reading": "まんてん",
       "en": "This is the highest point you can get.",
       "descriptionJa": "取ることができる一番高い点です。",
-      "category": "成績",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o ponto mais alto que você pode alcançar.",
@@ -2643,7 +3476,9 @@ export const catalog = {
       "koText": "취할 수 있는 가장 높은 점입니다.",
       "tlText": "Ito ang pinakamataas na punto na maaari mong makuha.",
       "idText": "Ini adalah titik tertinggi yang bisa Anda capai.",
-      "neText": "यो तपाईंले प्राप्त गर्न सक्ने उच्चतम बिन्दु हो।"
+      "neText": "यो तपाईंले प्राप्त गर्न सक्ने उच्चतम बिन्दु हो।",
+      "deText": "Dies ist der höchste Punkt, den man erreichen kann.",
+      "simpleJaText": "取ることができる一番高い点です。"
     },
     {
       "id": "t118",
@@ -2651,7 +3486,7 @@ export const catalog = {
       "reading": "さいてすと",
       "en": "This is a repeat test.",
       "descriptionJa": "もう一度行うテストです。",
-      "category": "成績",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um teste repetido.",
@@ -2661,7 +3496,9 @@ export const catalog = {
       "koText": "다시 할 테스트입니다.",
       "tlText": "Ito ay isang paulit-ulit na pagsubok.",
       "idText": "Ini adalah tes ulang.",
-      "neText": "यो दोहोरिने परीक्षण हो।"
+      "neText": "यो दोहोरिने परीक्षण हो।",
+      "deText": "Dies ist ein weiterer Test.",
+      "simpleJaText": "もう一度行うテストです。"
     },
     {
       "id": "t119",
@@ -2669,7 +3506,7 @@ export const catalog = {
       "reading": "ほしゅう",
       "en": "These are additional lessons designed to assist with learning.",
       "descriptionJa": "学習を助けるために追加で行う授業です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estas são lições adicionais elaboradas para auxiliar na aprendizagem.",
@@ -2679,7 +3516,9 @@ export const catalog = {
       "koText": "학습을 돕기 위해 추가로 실시하는 수업입니다.",
       "tlText": "Ito ay mga karagdagang aralin na idinisenyo upang makatulong sa pagkatuto.",
       "idText": "Ini adalah pelajaran tambahan yang dirancang untuk membantu proses pembelajaran.",
-      "neText": "यी सिक्न सहयोग गर्न डिजाइन गरिएका अतिरिक्त पाठहरू हुन्।"
+      "neText": "यी सिक्न सहयोग गर्न डिजाइन गरिएका अतिरिक्त पाठहरू हुन्।",
+      "deText": "Dies sind zusätzliche Lektionen, die das Lernen unterstützen sollen.",
+      "simpleJaText": "学習を助けるために追加で行う授業です。"
     },
     {
       "id": "t120",
@@ -2687,7 +3526,7 @@ export const catalog = {
       "reading": "こべつしどう",
       "en": "It's about teaching in a way that suits each individual student.",
       "descriptionJa": "一人ひとりに合わせて教えることです。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de ensinar de uma forma que se adapte a cada aluno individualmente.",
@@ -2697,7 +3536,9 @@ export const catalog = {
       "koText": "한 사람 한 사람에 맞게 가르치는 것입니다.",
       "tlText": "Ito ay tungkol sa pagtuturo sa paraang nababagay sa bawat mag-aaral.",
       "idText": "Ini tentang mengajar dengan cara yang sesuai dengan setiap siswa secara individual.",
-      "neText": "यो प्रत्येक विद्यार्थीलाई उपयुक्त हुने तरिकाले पढाउने बारे हो।"
+      "neText": "यो प्रत्येक विद्यार्थीलाई उपयुक्त हुने तरिकाले पढाउने बारे हो।",
+      "deText": "Es geht darum, so zu unterrichten, wie es jedem einzelnen Schüler gerecht wird.",
+      "simpleJaText": "一人ひとりに合わせて教えることです。"
     },
     {
       "id": "t121",
@@ -2705,7 +3546,7 @@ export const catalog = {
       "reading": "にほんごしどう",
       "en": "This is instruction for learning Japanese.",
       "descriptionJa": "日本語を学ぶための指導です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um guia para aprender japonês.",
@@ -2715,7 +3556,9 @@ export const catalog = {
       "koText": "일본어를 배우기 위한 지도입니다.",
       "tlText": "Ito ay panuto para sa pag-aaral ng wikang Hapon.",
       "idText": "Ini adalah petunjuk untuk belajar bahasa Jepang.",
-      "neText": "यो जापानी भाषा सिक्ने निर्देशन हो।"
+      "neText": "यो जापानी भाषा सिक्ने निर्देशन हो।",
+      "deText": "Dies ist eine Anleitung zum Erlernen der japanischen Sprache.",
+      "simpleJaText": "日本語を学ぶための指導です。"
     },
     {
       "id": "t122",
@@ -2723,7 +3566,7 @@ export const catalog = {
       "reading": "とりだしじゅぎょう",
       "en": "These are classes that you take at a different location for only the necessary amount of time.",
       "descriptionJa": "必要な時間だけ別の場所で受ける授業です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "São aulas que você frequenta em um local diferente, apenas pelo tempo necessário.",
@@ -2733,7 +3576,9 @@ export const catalog = {
       "koText": "필요한 시간만 다른 장소에서 받는 수업입니다.",
       "tlText": "Ito ay mga klase na kinukuha mo sa ibang lokasyon sa loob lamang ng kinakailangang tagal ng panahon.",
       "idText": "Ini adalah kelas-kelas yang Anda ikuti di lokasi berbeda hanya untuk jangka waktu yang diperlukan.",
-      "neText": "यी ती कक्षाहरू हुन् जुन तपाईंले आवश्यक समयको लागि मात्र फरक स्थानमा लिनुहुन्छ।"
+      "neText": "यी ती कक्षाहरू हुन् जुन तपाईंले आवश्यक समयको लागि मात्र फरक स्थानमा लिनुहुन्छ।",
+      "deText": "Dies sind Kurse, die Sie an einem anderen Ort und nur für die erforderliche Dauer besuchen.",
+      "simpleJaText": "必要な時間だけ別の場所で受ける授業です。"
     },
     {
       "id": "t123",
@@ -2741,7 +3586,7 @@ export const catalog = {
       "reading": "ほじょ",
       "en": "It's about helping.",
       "descriptionJa": "助けることです。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de ajudar.",
@@ -2751,7 +3596,9 @@ export const catalog = {
       "koText": "도와주는 것입니다.",
       "tlText": "Tungkol ito sa pagtulong.",
       "idText": "Ini tentang membantu.",
-      "neText": "यो मद्दत गर्ने बारे हो।"
+      "neText": "यो मद्दत गर्ने बारे हो।",
+      "deText": "Es geht darum zu helfen.",
+      "simpleJaText": "助けることです。"
     },
     {
       "id": "t124",
@@ -2759,7 +3606,7 @@ export const catalog = {
       "reading": "しえんいん",
       "en": "They are people who help children with their learning and daily lives.",
       "descriptionJa": "子どもの学習や生活を助ける人です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "São pessoas que ajudam as crianças em sua aprendizagem e em seu dia a dia.",
@@ -2769,7 +3616,9 @@ export const catalog = {
       "koText": "아이의 학습이나 생활을 돕는 사람입니다.",
       "tlText": "Sila ay mga taong tumutulong sa mga bata sa kanilang pag-aaral at pang-araw-araw na buhay.",
       "idText": "Mereka adalah orang-orang yang membantu anak-anak dalam belajar dan kehidupan sehari-hari mereka.",
-      "neText": "तिनीहरू ती व्यक्तिहरू हुन् जसले बच्चाहरूलाई उनीहरूको सिकाइ र दैनिक जीवनमा मद्दत गर्छन्।"
+      "neText": "तिनीहरू ती व्यक्तिहरू हुन् जसले बच्चाहरूलाई उनीहरूको सिकाइ र दैनिक जीवनमा मद्दत गर्छन्।",
+      "deText": "Es handelt sich um Menschen, die Kindern beim Lernen und im Alltag helfen.",
+      "simpleJaText": "子どもの学習や生活を助ける人です。"
     },
     {
       "id": "t125",
@@ -2777,7 +3626,7 @@ export const catalog = {
       "reading": "そうだんしつ",
       "en": "This is a room where you can talk about problems you're having.",
       "descriptionJa": "困ったことを相談する部屋です。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma sala onde você pode discutir quaisquer problemas que esteja enfrentando.",
@@ -2787,7 +3636,9 @@ export const catalog = {
       "koText": "곤란한 것을 상담하는 방입니다.",
       "tlText": "Ito ang silid kung saan maaari mong pag-usapan ang anumang problemang kinakaharap mo.",
       "idText": "Ini adalah ruangan tempat Anda dapat mendiskusikan masalah apa pun yang Anda hadapi.",
-      "neText": "यो एउटा कोठा हो जहाँ तपाईंले सामना गरिरहनुभएको कुनै पनि समस्याको बारेमा छलफल गर्न सक्नुहुन्छ।"
+      "neText": "यो एउटा कोठा हो जहाँ तपाईंले सामना गरिरहनुभएको कुनै पनि समस्याको बारेमा छलफल गर्न सक्नुहुन्छ।",
+      "deText": "Dies ist ein Raum, in dem Sie alle Ihre Probleme besprechen können.",
+      "simpleJaText": "困ったことを相談する部屋です。"
     },
     {
       "id": "t126",
@@ -2795,7 +3646,7 @@ export const catalog = {
       "reading": "すくーるかうんせらー",
       "en": "They are specialists who listen to and advise children and their guardians.",
       "descriptionJa": "子どもや保護者の相談を聞く専門の人です。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "São especialistas que ouvem e aconselham crianças e seus responsáveis.",
@@ -2805,7 +3656,9 @@ export const catalog = {
       "koText": "아이나 보호자의 상담을 듣는 전문의 사람입니다.",
       "tlText": "Sila ay mga espesyalista na nakikinig at nagpapayo sa mga bata at sa kanilang mga tagapag-alaga.",
       "idText": "Mereka adalah para spesialis yang mendengarkan dan memberi nasihat kepada anak-anak dan wali mereka.",
-      "neText": "तिनीहरू विशेषज्ञ हुन् जसले बालबालिका र उनीहरूका अभिभावकहरूको कुरा सुन्छन् र सल्लाह दिन्छन्।"
+      "neText": "तिनीहरू विशेषज्ञ हुन् जसले बालबालिका र उनीहरूका अभिभावकहरूको कुरा सुन्छन् र सल्लाह दिन्छन्।",
+      "deText": "Sie sind Spezialisten, die Kindern und ihren Erziehungsberechtigten zuhören und sie beraten.",
+      "simpleJaText": "子どもや保護者の相談を聞く専門の人です。"
     },
     {
       "id": "t127",
@@ -2813,7 +3666,7 @@ export const catalog = {
       "reading": "とくべつしえん",
       "en": "This is special support tailored to each individual.",
       "descriptionJa": "一人ひとりに合った特別な支援です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um apoio especial, adaptado a cada indivíduo.",
@@ -2823,7 +3676,9 @@ export const catalog = {
       "koText": "한 사람 한 사람에게 맞는 특별한 지원입니다.",
       "tlText": "Ito ay isang espesyal na suporta na iniayon sa bawat indibidwal.",
       "idText": "Ini adalah dukungan khusus yang disesuaikan dengan kebutuhan setiap individu.",
-      "neText": "यो प्रत्येक व्यक्तिको लागि तयार पारिएको विशेष सहयोग हो।"
+      "neText": "यो प्रत्येक व्यक्तिको लागि तयार पारिएको विशेष सहयोग हो।",
+      "deText": "Dies ist eine spezielle, individuell zugeschnittene Unterstützung.",
+      "simpleJaText": "一人ひとりに合った特別な支援です。"
     },
     {
       "id": "t128",
@@ -2831,7 +3686,7 @@ export const catalog = {
       "reading": "とくべつしえんがっきゅう",
       "en": "This is a class where students receive special support while learning.",
       "descriptionJa": "特別な支援を受けながら学ぶ学級です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma aula em que os alunos recebem apoio especial durante o aprendizado.",
@@ -2841,7 +3696,9 @@ export const catalog = {
       "koText": "특별한 지원을 받으면서 배우는 학급입니다.",
       "tlText": "Ito ay isang klase kung saan ang mga mag-aaral ay tumatanggap ng espesyal na suporta habang natututo.",
       "idText": "Ini adalah kelas di mana siswa menerima dukungan khusus selama proses pembelajaran.",
-      "neText": "यो त्यस्तो कक्षा हो जहाँ विद्यार्थीहरूले सिक्दै गर्दा विशेष सहयोग पाउँछन्।"
+      "neText": "यो त्यस्तो कक्षा हो जहाँ विद्यार्थीहरूले सिक्दै गर्दा विशेष सहयोग पाउँछन्।",
+      "deText": "Dies ist eine Klasse, in der die Schüler während des Lernprozesses besondere Unterstützung erhalten.",
+      "simpleJaText": "特別な支援を受けながら学ぶ学級です。"
     },
     {
       "id": "t129",
@@ -2849,7 +3706,7 @@ export const catalog = {
       "reading": "つうきゅう",
       "en": "It means staying in your regular classroom while learning in a separate classroom for the necessary amount of time.",
       "descriptionJa": "普段の学級にいながら、必要な時間だけ別の教室で学ぶことです。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa permanecer na sua sala de aula regular enquanto aprende em uma sala de aula separada pelo tempo necessário.",
@@ -2859,7 +3716,9 @@ export const catalog = {
       "koText": "평소의 학급에 있으면서, 필요한 시간만 다른 교실에서 배우는 것입니다.",
       "tlText": "Nangangahulugan ito ng pananatili sa iyong regular na silid-aralan habang natututo sa isang hiwalay na silid-aralan sa loob ng kinakailangang tagal ng panahon.",
       "idText": "Artinya, Anda tetap berada di kelas reguler sambil belajar di kelas terpisah selama waktu yang dibutuhkan.",
-      "neText": "यसको अर्थ आवश्यक समयको लागि छुट्टै कक्षाकोठामा सिक्दै आफ्नो नियमित कक्षाकोठामा बस्नु हो।"
+      "neText": "यसको अर्थ आवश्यक समयको लागि छुट्टै कक्षाकोठामा सिक्दै आफ्नो नियमित कक्षाकोठामा बस्नु हो।",
+      "deText": "Das bedeutet, dass Sie in Ihrem gewohnten Klassenzimmer bleiben, während Sie für die erforderliche Zeit in einem separaten Klassenzimmer lernen.",
+      "simpleJaText": "普段の学級にいながら、必要な時間だけ別の教室で学ぶことです。"
     },
     {
       "id": "t130",
@@ -2867,7 +3726,7 @@ export const catalog = {
       "reading": "ごうりてきはいりょ",
       "en": "It's about making the necessary adjustments to make learning easier for children.",
       "descriptionJa": "子どもが学びやすくなるように必要な工夫をすることです。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de fazer os ajustes necessários para facilitar o aprendizado das crianças.",
@@ -2877,7 +3736,9 @@ export const catalog = {
       "koText": "아이들이 배우기 쉬워지도록 필요한 궁리를 하는 것입니다.",
       "tlText": "Tungkol ito sa paggawa ng mga kinakailangang pagsasaayos upang mas mapadali ang pagkatuto para sa mga bata.",
       "idText": "Ini tentang melakukan penyesuaian yang diperlukan untuk mempermudah pembelajaran bagi anak-anak.",
-      "neText": "यो बालबालिकाको लागि सिकाइ सजिलो बनाउन आवश्यक समायोजन गर्ने बारे हो।"
+      "neText": "यो बालबालिकाको लागि सिकाइ सजिलो बनाउन आवश्यक समायोजन गर्ने बारे हो।",
+      "deText": "Es geht darum, die notwendigen Anpassungen vorzunehmen, um Kindern das Lernen zu erleichtern.",
+      "simpleJaText": "子どもが学びやすくなるように必要な工夫をすることです。"
     },
     {
       "id": "t131",
@@ -2885,9 +3746,9 @@ export const catalog = {
       "reading": "がくようひんひ",
       "en": "This is money to buy things for school.",
       "descriptionJa": "学校で使う物を買うためのお金です。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
-      "viewCount": "",
+      "viewCount": "2",
       "ptText": "Este dinheiro é para comprar material escolar.",
       "esText": "Este dinero es para comprar cosas para la escuela.",
       "viText": "Đây là tiền để mua đồ dùng học tập.",
@@ -2895,7 +3756,9 @@ export const catalog = {
       "koText": "학교에서 사용하는 물건을 사는 돈입니다.",
       "tlText": "Ito ay perang pambili ng mga gamit sa paaralan.",
       "idText": "Ini adalah uang untuk membeli perlengkapan sekolah.",
-      "neText": "यो स्कुलको लागि सामान किन्नको लागि पैसा हो।"
+      "neText": "यो स्कुलको लागि सामान किन्नको लागि पैसा हो।",
+      "deText": "Das ist Geld, um Dinge für die Schule zu kaufen.",
+      "simpleJaText": "学校で使う物を買うためのお金です。"
     },
     {
       "id": "t132",
@@ -2903,9 +3766,9 @@ export const catalog = {
       "reading": "つうがくようひんひ",
       "en": "This is money for things needed to go to school.",
       "descriptionJa": "学校に通うために必要な物のお金です。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
-      "viewCount": "",
+      "viewCount": "2",
       "ptText": "Este dinheiro é para comprar coisas necessárias para ir à escola.",
       "esText": "Este dinero es para cosas necesarias para ir a la escuela.",
       "viText": "Đây là tiền để chi trả cho những thứ cần thiết cho việc đi học.",
@@ -2913,7 +3776,9 @@ export const catalog = {
       "koText": "학교에 다니는 데 필요한 물건의 돈입니다.",
       "tlText": "Ito ay perang pambili ng mga bagay na kailangan sa paaralan.",
       "idText": "Ini adalah uang untuk keperluan sekolah.",
-      "neText": "यो स्कुल जान आवश्यक पर्ने सामानको लागि पैसा हो।"
+      "neText": "यो स्कुल जान आवश्यक पर्ने सामानको लागि पैसा हो।",
+      "deText": "Das ist Geld für Dinge, die man zum Schulbesuch braucht.",
+      "simpleJaText": "学校に通うために必要な物のお金です。"
     },
     {
       "id": "t133",
@@ -2921,9 +3786,9 @@ export const catalog = {
       "reading": "しゅうがくりょこうひ",
       "en": "This is the amount of money needed for the school trip.",
       "descriptionJa": "修学旅行にかかるお金です。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
-      "viewCount": "",
+      "viewCount": "1",
       "ptText": "Essa é a quantia necessária para a viagem escolar.",
       "esText": "Esta es la cantidad de dinero necesaria para la excursión escolar.",
       "viText": "Đây là số tiền cần thiết cho chuyến đi dã ngoại của trường.",
@@ -2931,7 +3796,9 @@ export const catalog = {
       "koText": "수학 여행에 드는 돈입니다.",
       "tlText": "Ito ang halaga ng perang kailangan para sa school trip.",
       "idText": "Ini adalah jumlah uang yang dibutuhkan untuk perjalanan sekolah.",
-      "neText": "यो विद्यालय यात्राको लागि आवश्यक पर्ने रकम हो।"
+      "neText": "यो विद्यालय यात्राको लागि आवश्यक पर्ने रकम हो।",
+      "deText": "Dies ist der Geldbetrag, der für die Klassenfahrt benötigt wird.",
+      "simpleJaText": "修学旅行にかかるお金です。"
     },
     {
       "id": "t134",
@@ -2939,7 +3806,7 @@ export const catalog = {
       "reading": "こうがいかつどうひ",
       "en": "This is money spent on activities conducted outside of school.",
       "descriptionJa": "学校の外で行う活動にかかるお金です。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o dinheiro gasto em atividades realizadas fora do ambiente escolar.",
@@ -2949,7 +3816,9 @@ export const catalog = {
       "koText": "학교 밖에서 실시하는 활동에 걸리는 돈입니다.",
       "tlText": "Ito ay perang ginagastos sa mga aktibidad na isinasagawa sa labas ng paaralan.",
       "idText": "Ini adalah uang yang dihabiskan untuk kegiatan yang dilakukan di luar sekolah.",
-      "neText": "यो रकम विद्यालय बाहिर सञ्चालन हुने गतिविधिहरूमा खर्च गरिन्छ।"
+      "neText": "यो रकम विद्यालय बाहिर सञ्चालन हुने गतिविधिहरूमा खर्च गरिन्छ।",
+      "deText": "Hierbei handelt es sich um Geld, das für Aktivitäten außerhalb der Schule ausgegeben wird.",
+      "simpleJaText": "学校の外で行う活動にかかるお金です。"
     },
     {
       "id": "t135",
@@ -2957,7 +3826,7 @@ export const catalog = {
       "reading": "のうにゅう",
       "en": "It means paying money.",
       "descriptionJa": "お金を支払うことです。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa pagar dinheiro.",
@@ -2967,7 +3836,9 @@ export const catalog = {
       "koText": "돈을 지불하는 것입니다.",
       "tlText": "Nangangahulugan ito ng pagbabayad ng pera.",
       "idText": "Artinya membayar uang.",
-      "neText": "यसको अर्थ पैसा तिर्नु हो।"
+      "neText": "यसको अर्थ पैसा तिर्नु हो।",
+      "deText": "Es bedeutet, Geld zu bezahlen.",
+      "simpleJaText": "お金を支払うことです。"
     },
     {
       "id": "t136",
@@ -2975,7 +3846,7 @@ export const catalog = {
       "reading": "みのう",
       "en": "I haven't paid yet.",
       "descriptionJa": "まだお金を払っていないことです。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Eu ainda não paguei.",
@@ -2985,7 +3856,9 @@ export const catalog = {
       "koText": "아직 돈을 지불하지 않은 것입니다.",
       "tlText": "Hindi pa ako nagbabayad.",
       "idText": "Saya belum membayar.",
-      "neText": "मैले अहिलेसम्म पैसा तिरेको छैन।"
+      "neText": "मैले अहिलेसम्म पैसा तिरेको छैन।",
+      "deText": "Ich habe noch nicht bezahlt.",
+      "simpleJaText": "まだお金を払っていないことです。"
     },
     {
       "id": "t137",
@@ -2993,7 +3866,7 @@ export const catalog = {
       "reading": "ぶんかつ",
       "en": "It should be done in several parts.",
       "descriptionJa": "何回かに分けることです。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Deve ser feito em várias partes.",
@@ -3003,7 +3876,9 @@ export const catalog = {
       "koText": "여러 번으로 나누는 것입니다.",
       "tlText": "Dapat itong gawin sa ilang bahagi.",
       "idText": "Hal ini sebaiknya dilakukan dalam beberapa bagian.",
-      "neText": "यो धेरै भागहरूमा गर्नुपर्छ।"
+      "neText": "यो धेरै भागहरूमा गर्नुपर्छ।",
+      "deText": "Es sollte in mehreren Teilen erfolgen.",
+      "simpleJaText": "何回かに分けることです。"
     },
     {
       "id": "t138",
@@ -3011,7 +3886,7 @@ export const catalog = {
       "reading": "めんじょ",
       "en": "You don't have to pay it.",
       "descriptionJa": "払わなくてもよいことです。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Você não precisa pagar.",
@@ -3021,7 +3896,9 @@ export const catalog = {
       "koText": "지불하지 않아도 되는 것입니다.",
       "tlText": "Hindi mo kailangang bayaran 'yan.",
       "idText": "Anda tidak perlu membayarnya.",
-      "neText": "तपाईंले यो तिर्नु पर्दैन।"
+      "neText": "तपाईंले यो तिर्नु पर्दैन।",
+      "deText": "Du musst es nicht bezahlen.",
+      "simpleJaText": "払わなくてもよいことです。"
     },
     {
       "id": "t139",
@@ -3029,7 +3906,7 @@ export const catalog = {
       "reading": "げんがく",
       "en": "The amount will decrease.",
       "descriptionJa": "金額が少なくなることです。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "O valor irá diminuir.",
@@ -3039,7 +3916,9 @@ export const catalog = {
       "koText": "금액이 적어지는 것입니다.",
       "tlText": "Mababawasan ang dami.",
       "idText": "Jumlahnya akan berkurang.",
-      "neText": "रकम घट्नेछ।"
+      "neText": "रकम घट्नेछ।",
+      "deText": "Der Betrag wird sich verringern.",
+      "simpleJaText": "金額が少なくなることです。"
     },
     {
       "id": "t140",
@@ -3047,7 +3926,7 @@ export const catalog = {
       "reading": "こうざ",
       "en": "This is a place to deposit money, such as in a bank.",
       "descriptionJa": "銀行などのお金を入れる場所です。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um local para depositar dinheiro, como em um banco.",
@@ -3057,7 +3936,9 @@ export const catalog = {
       "koText": "은행 등의 돈을 넣는 장소입니다.",
       "tlText": "Ito ay isang lugar para magdeposito ng pera, tulad ng sa bangko.",
       "idText": "Ini adalah tempat untuk menyimpan uang, seperti di bank.",
-      "neText": "यो पैसा जम्मा गर्ने ठाउँ हो, जस्तै बैंकमा।"
+      "neText": "यो पैसा जम्मा गर्ने ठाउँ हो, जस्तै बैंकमा।",
+      "deText": "Dies ist ein Ort, an dem man Geld einzahlen kann, zum Beispiel bei einer Bank.",
+      "simpleJaText": "銀行などのお金を入れる場所です。"
     },
     {
       "id": "t141",
@@ -3065,7 +3946,7 @@ export const catalog = {
       "reading": "ひきおとし",
       "en": "It means that money is automatically deducted from your bank account.",
       "descriptionJa": "銀行口座から自動でお金が払われることです。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que o dinheiro será debitado automaticamente da sua conta bancária.",
@@ -3075,7 +3956,9 @@ export const catalog = {
       "koText": "은행 계좌에서 자동으로 돈을 지불하는 것입니다.",
       "tlText": "Nangangahulugan ito na awtomatikong ibabawas ang pera mula sa iyong bank account.",
       "idText": "Artinya, uang akan dipotong secara otomatis dari rekening bank Anda.",
-      "neText": "यसको अर्थ तपाईंको बैंक खाताबाट पैसा स्वतः काटिनेछ।"
+      "neText": "यसको अर्थ तपाईंको बैंक खाताबाट पैसा स्वतः काटिनेछ।",
+      "deText": "Das bedeutet, dass automatisch Geld von Ihrem Bankkonto abgebucht wird.",
+      "simpleJaText": "銀行口座から自動でお金が払われることです。"
     },
     {
       "id": "t142",
@@ -3083,7 +3966,7 @@ export const catalog = {
       "reading": "ざんだかぶそく",
       "en": "The problem is that there isn't enough money in the account.",
       "descriptionJa": "口座のお金が足りないことです。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "O problema é que não há dinheiro suficiente na conta.",
@@ -3093,7 +3976,9 @@ export const catalog = {
       "koText": "계좌 돈이 부족한 것입니다.",
       "tlText": "Ang problema ay walang sapat na pera sa account.",
       "idText": "Masalahnya adalah tidak ada cukup uang di rekening tersebut.",
-      "neText": "समस्या यो छ कि खातामा पर्याप्त पैसा छैन।"
+      "neText": "समस्या यो छ कि खातामा पर्याप्त पैसा छैन।",
+      "deText": "Das Problem ist, dass nicht genügend Geld auf dem Konto ist.",
+      "simpleJaText": "口座のお金が足りないことです。"
     },
     {
       "id": "t143",
@@ -3101,7 +3986,7 @@ export const catalog = {
       "reading": "りょうしゅう",
       "en": "I received the money.",
       "descriptionJa": "お金を受け取ったことです。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Eu recebi o dinheiro.",
@@ -3111,7 +3996,9 @@ export const catalog = {
       "koText": "돈을 받은 것입니다.",
       "tlText": "Natanggap ko ang pera.",
       "idText": "Saya sudah menerima uangnya.",
-      "neText": "मैले पैसा पाएँ।"
+      "neText": "मैले पैसा पाएँ।",
+      "deText": "Ich habe das Geld erhalten.",
+      "simpleJaText": "お金を受け取ったことです。"
     },
     {
       "id": "t144",
@@ -3119,7 +4006,7 @@ export const catalog = {
       "reading": "りょうしゅうしょう",
       "en": "This is a piece of paper that shows you have received the money.",
       "descriptionJa": "お金を受け取ったことを示す紙です。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um documento que comprova o recebimento do dinheiro.",
@@ -3129,7 +4016,9 @@ export const catalog = {
       "koText": "돈을 받았음을 나타내는 종이입니다.",
       "tlText": "Ito ay isang piraso ng papel na nagsasaad na natanggap na ang pera.",
       "idText": "Ini adalah selembar kertas yang menunjukkan bahwa uang telah diterima.",
-      "neText": "यो पैसा प्राप्त भएको संकेत गर्ने कागजको टुक्रा हो।"
+      "neText": "यो पैसा प्राप्त भएको संकेत गर्ने कागजको टुक्रा हो।",
+      "deText": "Dies ist ein Dokument, das den Erhalt des Geldes bestätigt.",
+      "simpleJaText": "お金を受け取ったことを示す紙です。"
     },
     {
       "id": "t145",
@@ -3137,7 +4026,7 @@ export const catalog = {
       "reading": "さいがい",
       "en": "This refers to the significant damage caused by earthquakes, heavy rains, and other natural disasters.",
       "descriptionJa": "地震や大雨などで起こる大きな被害です。",
-      "category": "安全",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso se refere aos danos significativos causados ​​por terremotos, chuvas torrenciais e outros desastres naturais.",
@@ -3147,7 +4036,9 @@ export const catalog = {
       "koText": "지진이나 폭우 등에서 일어나는 큰 피해입니다.",
       "tlText": "Ito ay tumutukoy sa malaking pinsalang dulot ng lindol, malalakas na pag-ulan, at iba pang natural na sakuna.",
       "idText": "Ini merujuk pada kerusakan signifikan yang disebabkan oleh gempa bumi, hujan lebat, dan bencana alam lainnya.",
-      "neText": "यसले भूकम्प, भारी वर्षा र अन्य प्राकृतिक प्रकोपबाट हुने उल्लेखनीय क्षतिलाई जनाउँछ।"
+      "neText": "यसले भूकम्प, भारी वर्षा र अन्य प्राकृतिक प्रकोपबाट हुने उल्लेखनीय क्षतिलाई जनाउँछ।",
+      "deText": "Damit sind die erheblichen Schäden gemeint, die durch Erdbeben, Starkregen und andere Naturkatastrophen verursacht werden.",
+      "simpleJaText": "地震や大雨などで起こる大きな被害です。"
     },
     {
       "id": "t146",
@@ -3155,7 +4046,7 @@ export const catalog = {
       "reading": "ぼうさい",
       "en": "It's about preparing for disasters.",
       "descriptionJa": "災害に備えることです。",
-      "category": "安全",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de se preparar para desastres.",
@@ -3165,7 +4056,9 @@ export const catalog = {
       "koText": "재해에 대비하는 것입니다.",
       "tlText": "Tungkol ito sa paghahanda para sa mga sakuna.",
       "idText": "Ini tentang mempersiapkan diri menghadapi bencana.",
-      "neText": "यो प्रकोपको लागि तयारी गर्ने बारे हो।"
+      "neText": "यो प्रकोपको लागि तयारी गर्ने बारे हो।",
+      "deText": "Es geht darum, sich auf Katastrophen vorzubereiten.",
+      "simpleJaText": "災害に備えることです。"
     },
     {
       "id": "t147",
@@ -3173,7 +4066,7 @@ export const catalog = {
       "reading": "ぼうはん",
       "en": "It's about preventing crime.",
       "descriptionJa": "犯罪を防ぐことです。",
-      "category": "安全",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de prevenir o crime.",
@@ -3183,7 +4076,9 @@ export const catalog = {
       "koText": "범죄를 예방하는 것입니다.",
       "tlText": "Tungkol ito sa pagpigil sa krimen.",
       "idText": "Ini tentang mencegah kejahatan.",
-      "neText": "यो अपराध रोक्ने बारे हो।"
+      "neText": "यो अपराध रोक्ने बारे हो।",
+      "deText": "Es geht darum, Verbrechen zu verhindern.",
+      "simpleJaText": "犯罪を防ぐことです。"
     },
     {
       "id": "t148",
@@ -3191,7 +4086,7 @@ export const catalog = {
       "reading": "ふしんしゃ",
       "en": "This person seems suspicious and may be dangerous.",
       "descriptionJa": "あやしい人、危険かもしれない人です。",
-      "category": "安全",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Essa pessoa parece suspeita e pode ser perigosa.",
@@ -3201,7 +4096,9 @@ export const catalog = {
       "koText": "멍청한 사람, 위험할지도 모르는 사람입니다.",
       "tlText": "Mukhang kahina-hinala at maaaring mapanganib ang taong ito.",
       "idText": "Orang ini tampak mencurigakan dan mungkin berbahaya.",
-      "neText": "यो व्यक्ति शंकास्पद देखिन्छ र खतरनाक हुन सक्छ।"
+      "neText": "यो व्यक्ति शंकास्पद देखिन्छ र खतरनाक हुन सक्छ।",
+      "deText": "Diese Person wirkt verdächtig und könnte gefährlich sein.",
+      "simpleJaText": "あやしい人、危険かもしれない人です。"
     },
     {
       "id": "t149",
@@ -3209,7 +4106,7 @@ export const catalog = {
       "reading": "つうがくろ",
       "en": "This is the road I take when I go to and from school.",
       "descriptionJa": "学校に行くときや帰るときに通る道です。",
-      "category": "安全",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o trajeto que faço para ir e voltar da escola.",
@@ -3219,7 +4116,9 @@ export const catalog = {
       "koText": "학교에 갈 때나 돌아갈 때 다니는 길입니다.",
       "tlText": "Ito ang rutang tinatahak ko kapag papasok at pauwi sa paaralan.",
       "idText": "Ini adalah rute yang saya lalui saat pergi dan pulang sekolah.",
-      "neText": "स्कूल जाँदा र फर्कँदा म यही बाटो अपनाउँछु।"
+      "neText": "स्कूल जाँदा र फर्कँदा म यही बाटो अपनाउँछु।",
+      "deText": "Das ist der Weg, den ich auf meinem Schulweg nehme.",
+      "simpleJaText": "学校に行くときや帰るときに通る道です。"
     },
     {
       "id": "t150",
@@ -3227,7 +4126,7 @@ export const catalog = {
       "reading": "みまもり",
       "en": "It's about watching over and helping children to ensure their safety.",
       "descriptionJa": "子どもが安全に過ごせるように見て助けることです。",
-      "category": "安全",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de zelar e ajudar as crianças a garantir sua segurança.",
@@ -3237,7 +4136,9 @@ export const catalog = {
       "koText": "아이가 안전하게 보낼 수 있도록 봐 도움이됩니다.",
       "tlText": "Ito ay tungkol sa pagbabantay at pagtulong sa mga bata upang matiyak ang kanilang kaligtasan.",
       "idText": "Ini tentang mengawasi dan membantu anak-anak untuk memastikan keselamatan mereka.",
-      "neText": "यो बालबालिकाको सुरक्षा सुनिश्चित गर्न उनीहरूको हेरचाह गर्ने र मद्दत गर्ने बारे हो।"
+      "neText": "यो बालबालिकाको सुरक्षा सुनिश्चित गर्न उनीहरूको हेरचाह गर्ने र मद्दत गर्ने बारे हो।",
+      "deText": "Es geht darum, Kinder zu beaufsichtigen und ihnen zu helfen, um ihre Sicherheit zu gewährleisten.",
+      "simpleJaText": "子どもが安全に過ごせるように見て助けることです。"
     },
     {
       "id": "t151",
@@ -3245,7 +4146,7 @@ export const catalog = {
       "reading": "いっせいげこう",
       "en": "It means everyone leaves school at the same time.",
       "descriptionJa": "みんなで同じ時間に学校から帰ることです。",
-      "category": "安全",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que todos saem da escola ao mesmo tempo.",
@@ -3255,7 +4156,9 @@ export const catalog = {
       "koText": "모두 같은 시간에 학교에서 돌아가는 것입니다.",
       "tlText": "Ibig sabihin, sabay-sabay na umaalis ang lahat sa paaralan.",
       "idText": "Artinya semua orang pulang sekolah pada waktu yang sama.",
-      "neText": "यसको अर्थ सबैजना एकै समयमा स्कूल छोड्छन्।"
+      "neText": "यसको अर्थ सबैजना एकै समयमा स्कूल छोड्छन्।",
+      "deText": "Das bedeutet, dass alle gleichzeitig die Schule verlassen.",
+      "simpleJaText": "みんなで同じ時間に学校から帰ることです。"
     },
     {
       "id": "t152",
@@ -3263,7 +4166,7 @@ export const catalog = {
       "reading": "ひきわたしくんれん",
       "en": "This is practice for handing over children to their guardians in the event of a disaster.",
       "descriptionJa": "災害時に保護者へ子どもを渡す練習です。",
-      "category": "安全",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um exercício para entregar crianças aos seus responsáveis ​​em caso de desastre.",
@@ -3273,7 +4176,9 @@ export const catalog = {
       "koText": "재해시에 보호자에게 아이를 건네주는 연습입니다.",
       "tlText": "Ito ay isang kaugalian sa pagbibigay ng mga bata sa kanilang mga tagapag-alaga sakaling magkaroon ng sakuna.",
       "idText": "Ini adalah praktik penyerahan anak kepada wali mereka jika terjadi bencana.",
-      "neText": "यो विपद्को अवस्थामा बालबालिकालाई अभिभावकलाई हस्तान्तरण गर्ने अभ्यास हो।"
+      "neText": "यो विपद्को अवस्थामा बालबालिकालाई अभिभावकलाई हस्तान्तरण गर्ने अभ्यास हो।",
+      "deText": "Dies ist eine Übung für die Übergabe von Kindern an ihre Erziehungsberechtigten im Katastrophenfall.",
+      "simpleJaText": "災害時に保護者へ子どもを渡す練習です。"
     },
     {
       "id": "t153",
@@ -3281,7 +4186,7 @@ export const catalog = {
       "reading": "えいご",
       "en": "This is a subject where you learn the English language.",
       "descriptionJa": "英語の言葉を学ぶ教科です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma disciplina onde você aprende a língua inglesa.",
@@ -3291,7 +4196,9 @@ export const catalog = {
       "koText": "영어 단어를 배우는 교과입니다.",
       "tlText": "Ito ay isang asignaturang kung saan mo matututunan ang wikang Ingles.",
       "idText": "Ini adalah mata kuliah di mana Anda mempelajari bahasa Inggris.",
-      "neText": "यो एउटा विषय हो जहाँ तपाईंले अंग्रेजी भाषा सिक्न सक्नुहुन्छ।"
+      "neText": "यो एउटा विषय हो जहाँ तपाईंले अंग्रेजी भाषा सिक्न सक्नुहुन्छ।",
+      "deText": "Dies ist ein Fach, in dem man die englische Sprache lernt.",
+      "simpleJaText": "英語の言葉を学ぶ教科です。"
     },
     {
       "id": "t154",
@@ -3299,7 +4206,7 @@ export const catalog = {
       "reading": "りか",
       "en": "This subject teaches about nature, living things, and how things work.",
       "descriptionJa": "自然や生き物、物のしくみを学ぶ教科です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta disciplina ensina sobre a natureza, os seres vivos e como as coisas funcionam.",
@@ -3309,7 +4216,9 @@ export const catalog = {
       "koText": "자연과 생물, 물건의 구조를 배우는 교과입니다.",
       "tlText": "Itinuturo ng asignaturang ito ang tungkol sa kalikasan, mga nabubuhay na bagay, at kung paano gumagana ang mga bagay-bagay.",
       "idText": "Mata pelajaran ini mengajarkan tentang alam, makhluk hidup, dan bagaimana segala sesuatu bekerja.",
-      "neText": "यो विषयले प्रकृति, जीवित चीजहरू, र चीजहरूले कसरी काम गर्छन् भन्ने बारेमा सिकाउँछ।"
+      "neText": "यो विषयले प्रकृति, जीवित चीजहरू, र चीजहरूले कसरी काम गर्छन् भन्ने बारेमा सिकाउँछ।",
+      "deText": "In diesem Fach lernt man etwas über die Natur, Lebewesen und wie die Dinge funktionieren.",
+      "simpleJaText": "自然や生き物、物のしくみを学ぶ教科です。"
     },
     {
       "id": "t155",
@@ -3317,7 +4226,7 @@ export const catalog = {
       "reading": "しゃかい",
       "en": "This subject covers topics such as local communities, Japan, the world, history, and politics.",
       "descriptionJa": "地域、日本、世界、歴史、政治などを学ぶ教科です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta disciplina abrange tópicos como comunidades locais, Japão, o mundo, história e política.",
@@ -3327,7 +4236,9 @@ export const catalog = {
       "koText": "지역, 일본, 세계, 역사, 정치 등을 배우는 교과입니다.",
       "tlText": "Saklaw ng asignaturang ito ang mga paksang tulad ng mga lokal na komunidad, Japan, mundo, kasaysayan, at politika.",
       "idText": "Mata kuliah ini mencakup topik-topik seperti komunitas lokal, Jepang, dunia, sejarah, dan politik.",
-      "neText": "यस विषयमा स्थानीय समुदाय, जापान, विश्व, इतिहास र राजनीति जस्ता विषयहरू समेटिएका छन्।"
+      "neText": "यस विषयमा स्थानीय समुदाय, जापान, विश्व, इतिहास र राजनीति जस्ता विषयहरू समेटिएका छन्।",
+      "deText": "Dieses Fachgebiet umfasst Themen wie lokale Gemeinschaften, Japan, die Welt, Geschichte und Politik.",
+      "simpleJaText": "地域、日本、世界、歴史、政治などを学ぶ教科です。"
     },
     {
       "id": "t156",
@@ -3335,7 +4246,7 @@ export const catalog = {
       "reading": "おんがく",
       "en": "This is a subject where students learn music, such as singing and playing musical instruments.",
       "descriptionJa": "歌ったり、楽器を演奏したり、音楽を学ぶ教科です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma disciplina onde os alunos aprendem música, como cantar e tocar instrumentos musicais.",
@@ -3345,7 +4256,9 @@ export const catalog = {
       "koText": "노래하고, 악기를 연주하거나, 음악을 배우는 교과입니다.",
       "tlText": "Ito ay isang asignaturang kung saan natututo ang mga mag-aaral ng musika, tulad ng pag-awit at pagtugtog ng mga instrumentong pangmusika.",
       "idText": "Ini adalah mata pelajaran di mana siswa mempelajari musik, seperti bernyanyi dan memainkan alat musik.",
-      "neText": "यो एउटा यस्तो विषय हो जहाँ विद्यार्थीहरूले संगीत सिक्छन्, जस्तै गाउने र वाद्ययन्त्र बजाउने।"
+      "neText": "यो एउटा यस्तो विषय हो जहाँ विद्यार्थीहरूले संगीत सिक्छन्, जस्तै गाउने र वाद्ययन्त्र बजाउने।",
+      "deText": "Dies ist ein Fach, in dem die Schüler Musik lernen, wie zum Beispiel Singen und das Spielen von Musikinstrumenten.",
+      "simpleJaText": "歌ったり、楽器を演奏したり、音楽を学ぶ教科です。"
     },
     {
       "id": "t157",
@@ -3353,7 +4266,7 @@ export const catalog = {
       "reading": "びじゅつ",
       "en": "This subject involves creating pictures and artwork, and learning about expression.",
       "descriptionJa": "絵や作品を作ったり、表現について学ぶ教科です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta disciplina envolve a criação de imagens e obras de arte, além do aprendizado sobre expressão artística.",
@@ -3363,7 +4276,9 @@ export const catalog = {
       "koText": "그림이나 작품을 만들거나 표현에 대해 배우는 교과입니다.",
       "tlText": "Kabilang sa asignaturang ito ang paglikha ng mga larawan at likhang sining, at pag-aaral tungkol sa ekspresyon.",
       "idText": "Mata pelajaran ini mencakup pembuatan gambar dan karya seni, serta pembelajaran tentang ekspresi.",
-      "neText": "यस विषयमा चित्र र कलाकृति सिर्जना गर्ने, र अभिव्यक्तिको बारेमा सिक्ने समावेश छ।"
+      "neText": "यस विषयमा चित्र र कलाकृति सिर्जना गर्ने, र अभिव्यक्तिको बारेमा सिक्ने समावेश छ।",
+      "deText": "Dieses Fach beinhaltet das Erstellen von Bildern und Kunstwerken sowie das Erlernen von Ausdrucksformen.",
+      "simpleJaText": "絵や作品を作ったり、表現について学ぶ教科です。"
     },
     {
       "id": "t158",
@@ -3371,7 +4286,7 @@ export const catalog = {
       "reading": "ずこう",
       "en": "This is a subject where students draw pictures and make things.",
       "descriptionJa": "絵をかいたり、物を作ったりする教科です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma disciplina em que os alunos desenham e criam objetos.",
@@ -3381,7 +4296,9 @@ export const catalog = {
       "koText": "그림을 쓰거나 물건을 만들거나 하는 교과입니다.",
       "tlText": "Ito ay isang asignaturang kung saan ang mga mag-aaral ay gumuhit ng mga larawan at gumagawa ng mga bagay-bagay.",
       "idText": "Ini adalah mata pelajaran di mana siswa menggambar dan membuat berbagai benda.",
-      "neText": "यो त्यस्तो विषय हो जहाँ विद्यार्थीहरूले चित्र कोर्छन् र चीजहरू बनाउँछन्।"
+      "neText": "यो त्यस्तो विषय हो जहाँ विद्यार्थीहरूले चित्र कोर्छन् र चीजहरू बनाउँछन्।",
+      "deText": "Dies ist ein Fach, in dem die Schüler Bilder zeichnen und Dinge herstellen.",
+      "simpleJaText": "絵をかいたり、物を作ったりする教科です。"
     },
     {
       "id": "t159",
@@ -3389,7 +4306,7 @@ export const catalog = {
       "reading": "ぎじゅつ",
       "en": "This subject teaches manufacturing, computers, and technologies useful in everyday life.",
       "descriptionJa": "ものづくりやコンピュータ、生活に役立つ技術を学ぶ教科です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta disciplina ensina sobre manufatura, informática e tecnologias úteis no dia a dia.",
@@ -3399,7 +4316,9 @@ export const catalog = {
       "koText": "제조와 컴퓨터, 생활에 도움이 되는 기술을 배우는 교과입니다.",
       "tlText": "Itinuturo ng asignaturang ito ang pagmamanupaktura, mga kompyuter, at mga teknolohiyang kapaki-pakinabang sa pang-araw-araw na buhay.",
       "idText": "Mata kuliah ini mengajarkan tentang manufaktur, komputer, dan teknologi yang berguna dalam kehidupan sehari-hari.",
-      "neText": "यस विषयमा उत्पादन, कम्प्युटर र दैनिक जीवनमा उपयोगी प्रविधिहरू सिकाइन्छ।"
+      "neText": "यस विषयमा उत्पादन, कम्प्युटर र दैनिक जीवनमा उपयोगी प्रविधिहरू सिकाइन्छ।",
+      "deText": "Dieses Fach vermittelt Kenntnisse in Fertigung, Computertechnik und Technologien, die im Alltag nützlich sind.",
+      "simpleJaText": "ものづくりやコンピュータ、生活に役立つ技術を学ぶ教科です。"
     },
     {
       "id": "t160",
@@ -3407,7 +4326,7 @@ export const catalog = {
       "reading": "かていか",
       "en": "This subject teaches about food, clothing, housing, and family life.",
       "descriptionJa": "食事、衣服、住まい、家庭生活について学ぶ教科です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta disciplina aborda temas como alimentação, vestuário, habitação e vida familiar.",
@@ -3417,7 +4336,9 @@ export const catalog = {
       "koText": "식사, 의복, 거주지, 가정 생활에 대해 배우는 교과입니다.",
       "tlText": "Itinuturo ng asignaturang ito ang tungkol sa pagkain, pananamit, pabahay, at buhay pamilya.",
       "idText": "Mata pelajaran ini mengajarkan tentang makanan, pakaian, perumahan, dan kehidupan keluarga.",
-      "neText": "यो विषयले खाना, लुगाफाटा, आवास र पारिवारिक जीवनको बारेमा सिकाउँछ।"
+      "neText": "यो विषयले खाना, लुगाफाटा, आवास र पारिवारिक जीवनको बारेमा सिकाउँछ।",
+      "deText": "In diesem Fach geht es um Ernährung, Kleidung, Wohnen und Familienleben.",
+      "simpleJaText": "食事、衣服、住まい、家庭生活について学ぶ教科です。"
     },
     {
       "id": "t161",
@@ -3425,7 +4346,7 @@ export const catalog = {
       "reading": "たいいく",
       "en": "This subject involves exercise and learning how to move your body.",
       "descriptionJa": "運動をしたり、体の動かし方を学ぶ教科です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta disciplina envolve exercícios e aprender a movimentar o corpo.",
@@ -3435,7 +4356,9 @@ export const catalog = {
       "koText": "운동을 하거나 몸을 움직이는 방법을 배우는 교과입니다.",
       "tlText": "Ang asignaturang ito ay nagsasangkot ng ehersisyo at pag-aaral kung paano igalaw ang iyong katawan.",
       "idText": "Mata pelajaran ini mencakup olahraga dan mempelajari cara menggerakkan tubuh.",
-      "neText": "यस विषयमा व्यायाम र आफ्नो शरीर कसरी चलाउने भनेर सिक्ने कुरा समावेश छ।"
+      "neText": "यस विषयमा व्यायाम र आफ्नो शरीर कसरी चलाउने भनेर सिक्ने कुरा समावेश छ।",
+      "deText": "Dieses Thema beinhaltet Übungen und das Erlernen von Bewegungstechniken.",
+      "simpleJaText": "運動をしたり、体の動かし方を学ぶ教科です。"
     },
     {
       "id": "t162",
@@ -3443,7 +4366,7 @@ export const catalog = {
       "reading": "ほけんたいいく",
       "en": "This is a subject where students learn about exercise and health.",
       "descriptionJa": "運動と健康について学ぶ教科です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma disciplina onde os alunos aprendem sobre exercícios físicos e saúde.",
@@ -3453,7 +4376,9 @@ export const catalog = {
       "koText": "운동과 건강에 대해 배우는 교과입니다.",
       "tlText": "Ito ay isang asignaturang kung saan natututo ang mga mag-aaral tungkol sa ehersisyo at kalusugan.",
       "idText": "Ini adalah mata pelajaran di mana siswa belajar tentang olahraga dan kesehatan.",
-      "neText": "यो एउटा यस्तो विषय हो जहाँ विद्यार्थीहरूले व्यायाम र स्वास्थ्यको बारेमा सिक्छन्।"
+      "neText": "यो एउटा यस्तो विषय हो जहाँ विद्यार्थीहरूले व्यायाम र स्वास्थ्यको बारेमा सिक्छन्।",
+      "deText": "Dies ist ein Fach, in dem die Schüler etwas über Bewegung und Gesundheit lernen.",
+      "simpleJaText": "運動と健康について学ぶ教科です。"
     },
     {
       "id": "t163",
@@ -3461,7 +4386,7 @@ export const catalog = {
       "reading": "どうとく",
       "en": "This is a time to reflect on how we interact with others and how we can live better lives.",
       "descriptionJa": "人との関わり方や、よりよく生きることについて考える時間です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um momento para refletirmos sobre como interagimos com os outros e como podemos viver melhor.",
@@ -3471,7 +4396,9 @@ export const catalog = {
       "koText": "사람과의 관계와 더 나은 생활에 대해 생각하는 시간입니다.",
       "tlText": "Ito ang panahon para pagnilayan kung paano tayo nakikipag-ugnayan sa iba at kung paano tayo mamumuhay nang mas maayos.",
       "idText": "Inilah saatnya untuk merenungkan bagaimana kita berinteraksi dengan orang lain dan bagaimana kita dapat menjalani hidup yang lebih baik.",
-      "neText": "यो समय हामी अरूसँग कसरी अन्तरक्रिया गर्छौं र कसरी राम्रो जीवन बिताउन सक्छौं भन्ने बारेमा मनन गर्ने समय हो।"
+      "neText": "यो समय हामी अरूसँग कसरी अन्तरक्रिया गर्छौं र कसरी राम्रो जीवन बिताउन सक्छौं भन्ने बारेमा मनन गर्ने समय हो।",
+      "deText": "Dies ist eine Zeit, um darüber nachzudenken, wie wir mit anderen umgehen und wie wir ein besseres Leben führen können.",
+      "simpleJaText": "人との関わり方や、よりよく生きることについて考える時間です。"
     },
     {
       "id": "t164",
@@ -3479,7 +4406,7 @@ export const catalog = {
       "reading": "そうごう",
       "en": "This type of learning involves connecting various subjects and engaging in research and critical thinking.",
       "descriptionJa": "いろいろな教科をつなげて、調べたり考えたりする学習です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esse tipo de aprendizado envolve conectar diversas disciplinas e se engajar em pesquisa e pensamento crítico.",
@@ -3489,7 +4416,9 @@ export const catalog = {
       "koText": "다양한 교과를 연결하여 조사하거나 생각하는 학습입니다.",
       "tlText": "Ang ganitong uri ng pagkatuto ay kinabibilangan ng pag-uugnay ng iba't ibang paksa at pakikilahok sa pananaliksik at kritikal na pag-iisip.",
       "idText": "Jenis pembelajaran ini melibatkan menghubungkan berbagai mata pelajaran dan terlibat dalam penelitian serta pemikiran kritis.",
-      "neText": "यस प्रकारको सिकाइमा विभिन्न विषयहरूलाई जोड्ने र अनुसन्धान र आलोचनात्मक सोचमा संलग्न हुने समावेश छ।"
+      "neText": "यस प्रकारको सिकाइमा विभिन्न विषयहरूलाई जोड्ने र अनुसन्धान र आलोचनात्मक सोचमा संलग्न हुने समावेश छ।",
+      "deText": "Diese Art des Lernens beinhaltet die Verknüpfung verschiedener Fächer sowie die Auseinandersetzung mit Forschung und kritischem Denken.",
+      "simpleJaText": "いろいろな教科をつなげて、調べたり考えたりする学習です。"
     },
     {
       "id": "t165",
@@ -3497,7 +4426,7 @@ export const catalog = {
       "reading": "しゅくだい",
       "en": "This is home-based learning.",
       "descriptionJa": "家でやる学習です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um método de aprendizagem em casa.",
@@ -3507,7 +4436,8 @@ export const catalog = {
       "koText": "집에서 하는 학습입니다.",
       "tlText": "Ito ay pag-aaral na nakabase sa bahay.",
       "idText": "Ini adalah pembelajaran berbasis rumah.",
-      "neText": "यो घरमै सिकाइ हो।"
+      "neText": "यो घरमै सिकाइ हो।",
+      "deText": "Dies ist Lernen zu Hause."
     },
     {
       "id": "t166",
@@ -3515,7 +4445,7 @@ export const catalog = {
       "reading": "かだい",
       "en": "These are things you have to study or submit.",
       "descriptionJa": "やらなければならない学習や提出するものです。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "São coisas que você precisa estudar ou entregar.",
@@ -3525,7 +4455,9 @@ export const catalog = {
       "koText": "해야 하는 학습이나 제출하는 것입니다.",
       "tlText": "Ito ang mga bagay na kailangan mong pag-aralan o ipasa.",
       "idText": "Ini adalah hal-hal yang harus Anda pelajari atau serahkan.",
-      "neText": "यी तपाईंले अध्ययन गर्नुपर्ने वा बुझाउनुपर्ने कुराहरू हुन्।"
+      "neText": "यी तपाईंले अध्ययन गर्नुपर्ने वा बुझाउनुपर्ने कुराहरू हुन्।",
+      "deText": "Das sind Dinge, die Sie lernen oder einreichen müssen.",
+      "simpleJaText": "やらなければならない学習や提出するものです。"
     },
     {
       "id": "t167",
@@ -3533,7 +4465,7 @@ export const catalog = {
       "reading": "よしゅう",
       "en": "You should study beforehand before class.",
       "descriptionJa": "授業の前に、先に勉強しておくことです。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Você deve estudar com antecedência antes da aula.",
@@ -3543,7 +4475,9 @@ export const catalog = {
       "koText": "수업 전에 먼저 공부해 두는 것입니다.",
       "tlText": "Dapat kang mag-aral nang maaga bago ang klase.",
       "idText": "Kamu sebaiknya belajar terlebih dahulu sebelum kelas dimulai.",
-      "neText": "कक्षा सुरु हुनुभन्दा पहिले नै अध्ययन गर्नुपर्छ।"
+      "neText": "कक्षा सुरु हुनुभन्दा पहिले नै अध्ययन गर्नुपर्छ।",
+      "deText": "Du solltest vor dem Unterricht lernen.",
+      "simpleJaText": "授業の前に、先に勉強しておくことです。"
     },
     {
       "id": "t168",
@@ -3551,7 +4485,7 @@ export const catalog = {
       "reading": "ふくしゅう",
       "en": "It means studying again after class.",
       "descriptionJa": "授業の後に、もう一度勉強することです。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa estudar novamente depois da aula.",
@@ -3561,7 +4495,9 @@ export const catalog = {
       "koText": "수업 후 다시 공부하는 것입니다.",
       "tlText": "Ibig sabihin, mag-aral ulit pagkatapos ng klase.",
       "idText": "Artinya, belajar lagi setelah kelas.",
-      "neText": "यसको अर्थ कक्षा पछि फेरि पढ्नु हो।"
+      "neText": "यसको अर्थ कक्षा पछि फेरि पढ्नु हो।",
+      "deText": "Das bedeutet, nach dem Unterricht noch einmal zu lernen.",
+      "simpleJaText": "授業の後に、もう一度勉強することです。"
     },
     {
       "id": "t169",
@@ -3569,7 +4505,7 @@ export const catalog = {
       "reading": "ていしゅつかだい",
       "en": "This is an assignment that needs to be submitted to the teacher.",
       "descriptionJa": "先生に出す必要がある課題です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma tarefa que precisa ser entregue ao professor.",
@@ -3579,7 +4515,9 @@ export const catalog = {
       "koText": "선생님에게 내야 할 과제입니다.",
       "tlText": "Ito ay isang takdang-aralin na kailangang ipasa sa guro.",
       "idText": "Ini adalah tugas yang perlu dikumpulkan oleh guru.",
-      "neText": "यो एउटा असाइनमेन्ट हो जुन शिक्षकलाई बुझाउनु पर्छ।"
+      "neText": "यो एउटा असाइनमेन्ट हो जुन शिक्षकलाई बुझाउनु पर्छ।",
+      "deText": "Dies ist eine Aufgabe, die beim Lehrer eingereicht werden muss.",
+      "simpleJaText": "先生に出す必要がある課題です。"
     },
     {
       "id": "t170",
@@ -3587,7 +4525,7 @@ export const catalog = {
       "reading": "しょうてすと",
       "en": "This is a short test.",
       "descriptionJa": "短いテストです。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um teste curto.",
@@ -3597,7 +4535,9 @@ export const catalog = {
       "koText": "짧은 테스트입니다.",
       "tlText": "Ito ay isang maikling pagsusulit.",
       "idText": "Ini adalah tes singkat.",
-      "neText": "यो छोटो परीक्षण हो।"
+      "neText": "यो छोटो परीक्षण हो।",
+      "deText": "Dies ist ein kurzer Test.",
+      "simpleJaText": "短いテストです。"
     },
     {
       "id": "t171",
@@ -3605,7 +4545,7 @@ export const catalog = {
       "reading": "ていきてすと",
       "en": "It's a major test that takes place at a set time.",
       "descriptionJa": "決まった時期に行う大きなテストです。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "É um teste importante que ocorre em um horário determinado.",
@@ -3615,7 +4555,9 @@ export const catalog = {
       "koText": "정해진 시기에 실시하는 큰 테스트입니다.",
       "tlText": "Ito ay isang malaking pagsubok na nagaganap sa isang takdang oras.",
       "idText": "Ini adalah ujian besar yang berlangsung pada waktu yang telah ditentukan.",
-      "neText": "यो एउटा प्रमुख परीक्षा हो जुन निश्चित समयमा हुन्छ।"
+      "neText": "यो एउटा प्रमुख परीक्षा हो जुन निश्चित समयमा हुन्छ।",
+      "deText": "Es handelt sich um eine wichtige Prüfung, die zu einem festgelegten Zeitpunkt stattfindet.",
+      "simpleJaText": "決まった時期に行う大きなテストです。"
     },
     {
       "id": "t172",
@@ -3623,7 +4565,7 @@ export const catalog = {
       "reading": "ちゅうかんてすと",
       "en": "This is a test that will be given in the middle of the semester.",
       "descriptionJa": "学期の途中に行うテストです。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um teste que será aplicado no meio do semestre.",
@@ -3633,7 +4575,9 @@ export const catalog = {
       "koText": "학기 도중에 실시하는 테스트입니다.",
       "tlText": "Ito ay isang pagsusulit na ibibigay sa kalagitnaan ng semestre.",
       "idText": "Ini adalah ujian yang akan diberikan di tengah semester.",
-      "neText": "यो सेमेस्टरको बीचमा दिइने परीक्षा हो।"
+      "neText": "यो सेमेस्टरको बीचमा दिइने परीक्षा हो।",
+      "deText": "Dies ist ein Test, der in der Mitte des Semesters stattfindet.",
+      "simpleJaText": "学期の途中に行うテストです。"
     },
     {
       "id": "t173",
@@ -3641,7 +4585,7 @@ export const catalog = {
       "reading": "きまくてすと",
       "en": "This is a test that will be given at the end of the semester.",
       "descriptionJa": "学期の終わりに行うテストです。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um teste que será aplicado no final do semestre.",
@@ -3651,7 +4595,9 @@ export const catalog = {
       "koText": "학기의 끝에 실시하는 테스트입니다.",
       "tlText": "Ito ay isang pagsusulit na ibibigay sa katapusan ng semestre.",
       "idText": "Ini adalah ujian yang akan diberikan di akhir semester.",
-      "neText": "यो सेमेस्टरको अन्त्यमा दिइने परीक्षा हो।"
+      "neText": "यो सेमेस्टरको अन्त्यमा दिइने परीक्षा हो।",
+      "deText": "Dies ist ein Test, der am Ende des Semesters abgelegt wird.",
+      "simpleJaText": "学期の終わりに行うテストです。"
     },
     {
       "id": "t174",
@@ -3659,7 +4605,7 @@ export const catalog = {
       "reading": "じつりょくてすと",
       "en": "This is a test to assess your current academic ability.",
       "descriptionJa": "今の学力を確認するためのテストです。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um teste para avaliar sua capacidade acadêmica atual.",
@@ -3669,7 +4615,9 @@ export const catalog = {
       "koText": "지금의 학력을 확인하는 테스트입니다.",
       "tlText": "Ito ay isang pagsusulit upang masuri ang iyong kasalukuyang kakayahan sa akademiko.",
       "idText": "Ini adalah tes untuk menilai kemampuan akademis Anda saat ini.",
-      "neText": "यो तपाईंको हालको शैक्षिक क्षमताको मूल्याङ्कन गर्ने परीक्षण हो।"
+      "neText": "यो तपाईंको हालको शैक्षिक क्षमताको मूल्याङ्कन गर्ने परीक्षण हो।",
+      "deText": "Dies ist ein Test zur Beurteilung Ihrer aktuellen akademischen Fähigkeiten.",
+      "simpleJaText": "今の学力を確認するためのテストです。"
     },
     {
       "id": "t175",
@@ -3677,7 +4625,7 @@ export const catalog = {
       "reading": "つうちひょう",
       "en": "This is a document that informs parents about their child's learning and daily life at school.",
       "descriptionJa": "学校での学習や生活の様子を知らせる紙です。",
-      "category": "成績",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este documento informa os pais sobre a aprendizagem e o dia a dia dos seus filhos na escola.",
@@ -3687,7 +4635,8 @@ export const catalog = {
       "koText": "학교에서의 학습이나 생활의 모습을 알리는 종이입니다.",
       "tlText": "Ito ay isang dokumentong nagbibigay-alam sa mga magulang tungkol sa pag-aaral at pang-araw-araw na buhay ng kanilang anak sa paaralan.",
       "idText": "Ini adalah dokumen yang memberikan informasi kepada orang tua tentang pembelajaran dan kehidupan sehari-hari anak mereka di sekolah.",
-      "neText": "यो एउटा कागजात हो जसले अभिभावकहरूलाई उनीहरूको बच्चाको सिकाइ र स्कूलमा दैनिक जीवनको बारेमा जानकारी दिन्छ।"
+      "neText": "यो एउटा कागजात हो जसले अभिभावकहरूलाई उनीहरूको बच्चाको सिकाइ र स्कूलमा दैनिक जीवनको बारेमा जानकारी दिन्छ।",
+      "deText": "Dies ist ein Dokument, das Eltern über das Lernen und den Schulalltag ihres Kindes informiert."
     },
     {
       "id": "t176",
@@ -3695,7 +4644,7 @@ export const catalog = {
       "reading": "せいせき",
       "en": "This refers to the results and evaluation of learning.",
       "descriptionJa": "学習の結果や評価のことです。",
-      "category": "成績",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso se refere aos resultados e à avaliação da aprendizagem.",
@@ -3705,7 +4654,9 @@ export const catalog = {
       "koText": "학습 결과와 평가입니다.",
       "tlText": "Ito ay tumutukoy sa mga resulta at ebalwasyon ng pagkatuto.",
       "idText": "Ini merujuk pada hasil dan evaluasi pembelajaran.",
-      "neText": "यसले सिकाइको नतिजा र मूल्याङ्कनलाई जनाउँछ।"
+      "neText": "यसले सिकाइको नतिजा र मूल्याङ्कनलाई जनाउँछ।",
+      "deText": "Dies bezieht sich auf die Ergebnisse und die Bewertung des Lernprozesses.",
+      "simpleJaText": "学習の結果や評価のことです。"
     },
     {
       "id": "t177",
@@ -3713,7 +4664,7 @@ export const catalog = {
       "reading": "ひょうてい",
       "en": "This represents grades for each subject using numbers or other visual aids.",
       "descriptionJa": "教科ごとの成績を数字などで表したものです。",
-      "category": "成績",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso representa as notas de cada disciplina usando números ou outros recursos visuais.",
@@ -3723,7 +4674,9 @@ export const catalog = {
       "koText": "교과마다의 성적을 숫자 등으로 나타낸 것입니다.",
       "tlText": "Kinakatawan nito ang mga marka para sa bawat asignatura gamit ang mga numero o iba pang biswal na pantulong.",
       "idText": "Ini menampilkan nilai untuk setiap mata pelajaran menggunakan angka atau alat bantu visual lainnya.",
-      "neText": "यसले संख्या वा अन्य दृश्य सामग्री प्रयोग गरेर प्रत्येक विषयको लागि ग्रेडहरू प्रतिनिधित्व गर्दछ।"
+      "neText": "यसले संख्या वा अन्य दृश्य सामग्री प्रयोग गरेर प्रत्येक विषयको लागि ग्रेडहरू प्रतिनिधित्व गर्दछ।",
+      "deText": "Dies stellt die Noten für jedes Fach mithilfe von Zahlen oder anderen visuellen Hilfsmitteln dar.",
+      "simpleJaText": "教科ごとの成績を数字などで表したものです。"
     },
     {
       "id": "t178",
@@ -3731,7 +4684,7 @@ export const catalog = {
       "reading": "ひょうか",
       "en": "It involves observing their learning and activities to make a judgment.",
       "descriptionJa": "学習や活動の様子を見て判断することです。",
-      "category": "成績",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Consiste em observar a aprendizagem e as atividades deles para formar uma opinião.",
@@ -3741,7 +4694,9 @@ export const catalog = {
       "koText": "학습이나 활동의 모습을 보고 판단하는 것입니다.",
       "tlText": "Kabilang dito ang pagmamasid sa kanilang pagkatuto at mga aktibidad upang makagawa ng paghatol.",
       "idText": "Hal ini melibatkan pengamatan terhadap pembelajaran dan aktivitas mereka untuk membuat penilaian.",
-      "neText": "यसमा निर्णय गर्न उनीहरूको सिकाइ र गतिविधिहरू अवलोकन गर्नु समावेश छ।"
+      "neText": "यसमा निर्णय गर्न उनीहरूको सिकाइ र गतिविधिहरू अवलोकन गर्नु समावेश छ।",
+      "deText": "Dabei geht es darum, ihr Lernen und ihre Aktivitäten zu beobachten, um eine Beurteilung vorzunehmen.",
+      "simpleJaText": "学習や活動の様子を見て判断することです。"
     },
     {
       "id": "t179",
@@ -3749,7 +4704,7 @@ export const catalog = {
       "reading": "かんてん",
       "en": "These are the points to consider when evaluating something.",
       "descriptionJa": "評価するときに見るポイントです。",
-      "category": "成績",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esses são os pontos a serem considerados ao avaliar algo.",
@@ -3759,7 +4714,9 @@ export const catalog = {
       "koText": "평가할 때 보는 포인트입니다.",
       "tlText": "Ito ang mga puntong dapat isaalang-alang kapag sinusuri ang isang bagay.",
       "idText": "Berikut adalah poin-poin yang perlu dipertimbangkan saat mengevaluasi sesuatu.",
-      "neText": "कुनै कुराको मूल्याङ्कन गर्दा विचार गर्नुपर्ने बुँदाहरू यी हुन्।"
+      "neText": "कुनै कुराको मूल्याङ्कन गर्दा विचार गर्नुपर्ने बुँदाहरू यी हुन्।",
+      "deText": "Dies sind die Punkte, die bei der Bewertung einer Sache zu berücksichtigen sind.",
+      "simpleJaText": "評価するときに見るポイントです。"
     },
     {
       "id": "t180",
@@ -3767,7 +4724,7 @@ export const catalog = {
       "reading": "がくしゅうじょうきょう",
       "en": "This shows how they study and how well they understand the material.",
       "descriptionJa": "勉強の様子や理解の様子です。",
-      "category": "成績",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso demonstra como eles estudam e o quão bem compreendem a matéria.",
@@ -3777,7 +4734,9 @@ export const catalog = {
       "koText": "공부의 모습이나 이해의 모습입니다.",
       "tlText": "Ipinapakita nito kung paano sila nag-aaral at kung gaano nila kahusay na nauunawaan ang materyal.",
       "idText": "Ini menunjukkan bagaimana mereka belajar dan seberapa baik mereka memahami materi tersebut.",
-      "neText": "यसले उनीहरूले कसरी अध्ययन गर्छन् र सामग्री कति राम्ररी बुझ्छन् भन्ने देखाउँछ।"
+      "neText": "यसले उनीहरूले कसरी अध्ययन गर्छन् र सामग्री कति राम्ररी बुझ्छन् भन्ने देखाउँछ।",
+      "deText": "Dies zeigt, wie sie lernen und wie gut sie den Stoff verstehen.",
+      "simpleJaText": "勉強の様子や理解の様子です。"
     },
     {
       "id": "t181",
@@ -3785,7 +4744,7 @@ export const catalog = {
       "reading": "せいかつじょうきょう",
       "en": "This is a glimpse into school life.",
       "descriptionJa": "学校生活の様子です。",
-      "category": "成績",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isto é um vislumbre da vida escolar.",
@@ -3795,7 +4754,9 @@ export const catalog = {
       "koText": "학교 생활의 모습입니다.",
       "tlText": "Ito ay isang sulyap sa buhay-paaralan.",
       "idText": "Inilah sekilas gambaran kehidupan sekolah.",
-      "neText": "यो स्कुले जीवनको एक झलक हो।"
+      "neText": "यो स्कुले जीवनको एक झलक हो।",
+      "deText": "Dies ist ein Einblick in das Schulleben.",
+      "simpleJaText": "学校生活の様子です。"
     },
     {
       "id": "t182",
@@ -3803,7 +4764,7 @@ export const catalog = {
       "reading": "しょけん",
       "en": "These are comments written by the teacher about what they saw and felt.",
       "descriptionJa": "先生が見たことや感じたことを書いたコメントです。",
-      "category": "成績",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estes são comentários escritos pelo professor sobre o que ele viu e sentiu.",
@@ -3813,7 +4774,9 @@ export const catalog = {
       "koText": "선생님이 본 것과 느낀 것을 쓴 코멘트입니다.",
       "tlText": "Ito ay mga komentong isinulat ng guro tungkol sa kanilang nakita at naramdaman.",
       "idText": "Ini adalah komentar yang ditulis oleh guru tentang apa yang mereka lihat dan rasakan.",
-      "neText": "यी शिक्षकले देखेका र महसुस गरेका कुराहरूको बारेमा लेखेका टिप्पणीहरू हुन्।"
+      "neText": "यी शिक्षकले देखेका र महसुस गरेका कुराहरूको बारेमा लेखेका टिप्पणीहरू हुन्।",
+      "deText": "Dies sind Kommentare der Lehrkraft über das, was sie gesehen und gefühlt hat.",
+      "simpleJaText": "先生が見たことや感じたことを書いたコメントです。"
     },
     {
       "id": "t183",
@@ -3821,7 +4784,7 @@ export const catalog = {
       "reading": "しんろ",
       "en": "This refers to the path you will take after graduation and your future direction.",
       "descriptionJa": "卒業後に進む道や、将来の方向のことです。",
-      "category": "進路",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso se refere ao caminho que você seguirá após a formatura e à sua direção futura.",
@@ -3831,7 +4794,8 @@ export const catalog = {
       "koText": "졸업 후 진행되는 길과 미래의 방향입니다.",
       "tlText": "Ito ay tumutukoy sa landas na iyong tatahakin pagkatapos ng iyong pagtatapos at sa iyong magiging direksyon sa hinaharap.",
       "idText": "Ini merujuk pada jalur yang akan Anda tempuh setelah lulus dan arah masa depan Anda.",
-      "neText": "यसले स्नातक पछि तपाईंले लिनुहुने बाटो र तपाईंको भविष्यको दिशालाई जनाउँछ।"
+      "neText": "यसले स्नातक पछि तपाईंले लिनुहुने बाटो र तपाईंको भविष्यको दिशालाई जनाउँछ।",
+      "deText": "Dies bezieht sich auf den Weg, den Sie nach Ihrem Abschluss einschlagen werden, und Ihre zukünftige Ausrichtung."
     },
     {
       "id": "t184",
@@ -3839,7 +4803,7 @@ export const catalog = {
       "reading": "しんろきぼう",
       "en": "This refers to the school or career path you hope to pursue in the future.",
       "descriptionJa": "将来どの学校や道に進みたいかという希望です。",
-      "category": "進路",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso se refere à escola ou à carreira que você espera seguir no futuro.",
@@ -3849,7 +4813,9 @@ export const catalog = {
       "koText": "장래 어느 학교나 길로 나아가고 싶은가 하는 희망입니다.",
       "tlText": "Ito ay tumutukoy sa paaralan o landas ng karera na inaasam mong tahakin sa hinaharap.",
       "idText": "Ini merujuk pada jalur sekolah atau karier yang ingin Anda tempuh di masa depan.",
-      "neText": "यसले भविष्यमा तपाईंले पछ्याउने आशा राख्नुभएको स्कूल वा करियर मार्गलाई जनाउँछ।"
+      "neText": "यसले भविष्यमा तपाईंले पछ्याउने आशा राख्नुभएको स्कूल वा करियर मार्गलाई जनाउँछ।",
+      "deText": "Dies bezieht sich auf den Schul- oder Berufsweg, den Sie in Zukunft einschlagen möchten.",
+      "simpleJaText": "将来どの学校や道に進みたいかという希望です。"
     },
     {
       "id": "t185",
@@ -3857,7 +4823,7 @@ export const catalog = {
       "reading": "しぼうこう",
       "en": "This is the school I would like to attend.",
       "descriptionJa": "入学したいと思っている学校です。",
-      "category": "進路",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é a escola que eu gostaria de frequentar.",
@@ -3867,7 +4833,9 @@ export const catalog = {
       "koText": "입학하고 싶은 학교입니다.",
       "tlText": "Ito ang paaralang gusto kong pasukan.",
       "idText": "Inilah sekolah yang ingin saya hadiri.",
-      "neText": "यो त्यही स्कूल हो जहाँ म जान चाहन्छु।"
+      "neText": "यो त्यही स्कूल हो जहाँ म जान चाहन्छु।",
+      "deText": "Das ist die Schule, die ich gerne besuchen würde.",
+      "simpleJaText": "入学したいと思っている学校です。"
     },
     {
       "id": "t186",
@@ -3875,7 +4843,7 @@ export const catalog = {
       "reading": "こうこう",
       "en": "It's one of the schools you attend after graduating from junior high school.",
       "descriptionJa": "中学校を卒業した後に行く学校の一つです。",
-      "category": "進路",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "É uma das escolas que você frequenta depois de se formar no ensino fundamental II.",
@@ -3885,7 +4853,9 @@ export const catalog = {
       "koText": "중학교를 졸업한 후 가는 학교 중 하나입니다.",
       "tlText": "Isa ito sa mga paaralang pinapasukan mo pagkatapos mong makapagtapos ng junior high school.",
       "idText": "Ini adalah salah satu sekolah yang bisa kamu masuki setelah lulus dari sekolah menengah pertama.",
-      "neText": "यो जुनियर हाई स्कूलबाट स्नातक गरेपछि तपाईंले पढ्ने स्कूलहरू मध्ये एक हो।"
+      "neText": "यो जुनियर हाई स्कूलबाट स्नातक गरेपछि तपाईंले पढ्ने स्कूलहरू मध्ये एक हो।",
+      "deText": "Es ist eine der Schulen, die man nach dem Abschluss der Junior High School besucht.",
+      "simpleJaText": "中学校を卒業した後に行く学校の一つです。"
     },
     {
       "id": "t187",
@@ -3893,7 +4863,7 @@ export const catalog = {
       "reading": "こうとうがっこう",
       "en": "This is the formal way to refer to high school.",
       "descriptionJa": "高校の正式な言い方です。",
-      "category": "進路",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Essa é a forma formal de se referir ao ensino médio.",
@@ -3903,7 +4873,9 @@ export const catalog = {
       "koText": "고등학교의 공식적인 방법입니다.",
       "tlText": "Ito ang pormal na paraan upang tumukoy sa hayskul.",
       "idText": "Ini adalah cara formal untuk menyebut sekolah menengah atas.",
-      "neText": "यो हाई स्कूललाई ​​जनाउने औपचारिक तरिका हो।"
+      "neText": "यो हाई स्कूललाई ​​जनाउने औपचारिक तरिका हो।",
+      "deText": "Dies ist die offizielle Bezeichnung für die High School.",
+      "simpleJaText": "高校の正式な言い方です。"
     },
     {
       "id": "t188",
@@ -3911,7 +4883,7 @@ export const catalog = {
       "reading": "にゅうし",
       "en": "This is an entrance exam for the school.",
       "descriptionJa": "学校に入るための試験です。",
-      "category": "進路",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um exame de admissão para a escola.",
@@ -3921,7 +4893,9 @@ export const catalog = {
       "koText": "학교에 들어가는 시험입니다.",
       "tlText": "Ito ay isang pagsusulit sa pasukan para sa paaralan.",
       "idText": "Ini adalah ujian masuk sekolah.",
-      "neText": "यो स्कूलको लागि प्रवेश परीक्षा हो।"
+      "neText": "यो स्कूलको लागि प्रवेश परीक्षा हो।",
+      "deText": "Dies ist eine Aufnahmeprüfung für die Schule.",
+      "simpleJaText": "学校に入るための試験です。"
     },
     {
       "id": "t189",
@@ -3929,7 +4903,7 @@ export const catalog = {
       "reading": "じゅけん",
       "en": "It means taking an entrance exam.",
       "descriptionJa": "入学試験を受けることです。",
-      "category": "進路",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa fazer um exame de admissão.",
@@ -3939,7 +4913,9 @@ export const catalog = {
       "koText": "입학시험을 받는 것입니다.",
       "tlText": "Ibig sabihin, kukuha ka ng entrance exam.",
       "idText": "Artinya mengikuti ujian masuk.",
-      "neText": "यसको अर्थ प्रवेश परीक्षा दिनु हो।"
+      "neText": "यसको अर्थ प्रवेश परीक्षा दिनु हो।",
+      "deText": "Das bedeutet, eine Aufnahmeprüfung abzulegen.",
+      "simpleJaText": "入学試験を受けることです。"
     },
     {
       "id": "t190",
@@ -3947,7 +4923,7 @@ export const catalog = {
       "reading": "めんせつ",
       "en": "This is a place to talk with teachers and staff and share your thoughts and observations.",
       "descriptionJa": "先生や担当者と話して、考えや様子を伝える場です。",
-      "category": "進路",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um espaço para conversar com professores e funcionários e compartilhar suas ideias e observações.",
@@ -3957,7 +4933,9 @@ export const catalog = {
       "koText": "선생님이나 담당자와 이야기하여 생각이나 모습을 전하는 장소입니다.",
       "tlText": "Ito ay isang lugar para makipag-usap sa mga guro at kawani at ibahagi ang iyong mga saloobin at obserbasyon.",
       "idText": "Ini adalah tempat untuk berbicara dengan guru dan staf serta berbagi pemikiran dan pengamatan Anda.",
-      "neText": "यो शिक्षक र कर्मचारीहरूसँग कुरा गर्ने र आफ्ना विचार र अवलोकनहरू साझा गर्ने ठाउँ हो।"
+      "neText": "यो शिक्षक र कर्मचारीहरूसँग कुरा गर्ने र आफ्ना विचार र अवलोकनहरू साझा गर्ने ठाउँ हो।",
+      "deText": "Hier können Sie mit Lehrern und Mitarbeitern ins Gespräch kommen und Ihre Gedanken und Beobachtungen austauschen.",
+      "simpleJaText": "先生や担当者と話して、考えや様子を伝える場です。"
     },
     {
       "id": "t191",
@@ -3965,7 +4943,7 @@ export const catalog = {
       "reading": "がんしょ",
       "en": "This is the application form for those wishing to enroll in the school.",
       "descriptionJa": "学校に入りたいと申し込むための書類です。",
-      "category": "進路",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o formulário de inscrição para quem deseja se matricular na escola.",
@@ -3975,7 +4953,9 @@ export const catalog = {
       "koText": "학교에 들어가고 싶다고 신청하기 위한 서류입니다.",
       "tlText": "Ito ang application form para sa mga nais mag-enroll sa paaralan.",
       "idText": "Ini adalah formulir pendaftaran bagi mereka yang ingin mendaftar di sekolah ini.",
-      "neText": "यो विद्यालयमा भर्ना हुन चाहनेहरूका लागि आवेदन फारम हो।"
+      "neText": "यो विद्यालयमा भर्ना हुन चाहनेहरूका लागि आवेदन फारम हो।",
+      "deText": "Dies ist das Anmeldeformular für diejenigen, die sich an der Schule einschreiben möchten.",
+      "simpleJaText": "学校に入りたいと申し込むための書類です。"
     },
     {
       "id": "t192",
@@ -3983,7 +4963,7 @@ export const catalog = {
       "reading": "ちょうさしょ",
       "en": "This is a document containing records of academic performance and daily life at school.",
       "descriptionJa": "学校での成績や生活の記録を書いた書類です。",
-      "category": "進路",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este documento contém registros do desempenho acadêmico e da vida diária na escola.",
@@ -3993,7 +4973,9 @@ export const catalog = {
       "koText": "학교에서의 성적이나 생활의 기록을 쓴 서류입니다.",
       "tlText": "Ito ay isang dokumentong naglalaman ng mga talaan ng akademikong pagganap at pang-araw-araw na buhay sa paaralan.",
       "idText": "Ini adalah dokumen yang berisi catatan prestasi akademik dan kehidupan sehari-hari di sekolah.",
-      "neText": "यो एउटा कागजात हो जसमा विद्यालयको शैक्षिक प्रदर्शन र दैनिक जीवनको रेकर्ड समावेश छ।"
+      "neText": "यो एउटा कागजात हो जसमा विद्यालयको शैक्षिक प्रदर्शन र दैनिक जीवनको रेकर्ड समावेश छ।",
+      "deText": "Dies ist ein Dokument, das Aufzeichnungen über die schulischen Leistungen und das tägliche Leben in der Schule enthält.",
+      "simpleJaText": "学校での成績や生活の記録を書いた書類です。"
     },
     {
       "id": "t193",
@@ -4001,7 +4983,7 @@ export const catalog = {
       "reading": "すいせん",
       "en": "It's something that schools and teachers approve of and recommend.",
       "descriptionJa": "学校や先生がよいと認めて、すすめることです。",
-      "category": "進路",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "É algo que escolas e professores aprovam e recomendam.",
@@ -4011,7 +4993,9 @@ export const catalog = {
       "koText": "학교나 선생님이 좋다고 인정하고, 진행하는 것입니다.",
       "tlText": "Ito ay isang bagay na sinasang-ayunan at inirerekomenda ng mga paaralan at mga guro.",
       "idText": "Ini adalah sesuatu yang disetujui dan direkomendasikan oleh sekolah dan guru.",
-      "neText": "यो त्यस्तो कुरा हो जुन स्कूल र शिक्षकहरूले अनुमोदन गर्छन् र सिफारिस गर्छन्।"
+      "neText": "यो त्यस्तो कुरा हो जुन स्कूल र शिक्षकहरूले अनुमोदन गर्छन् र सिफारिस गर्छन्।",
+      "deText": "Es ist etwas, das von Schulen und Lehrern befürwortet und empfohlen wird.",
+      "simpleJaText": "学校や先生がよいと認めて、すすめることです。"
     },
     {
       "id": "t194",
@@ -4019,7 +5003,7 @@ export const catalog = {
       "reading": "こうりつ",
       "en": "These are schools established by the prefecture, city, or other local government bodies.",
       "descriptionJa": "県や市などが作った学校です。",
-      "category": "進路",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "São escolas estabelecidas pela prefeitura, cidade ou outros órgãos governamentais locais.",
@@ -4029,7 +5013,9 @@ export const catalog = {
       "koText": "현이나 시 등이 만든 학교입니다.",
       "tlText": "Ito ay mga paaralang itinatag ng prefecture, lungsod, o iba pang lokal na pamahalaan.",
       "idText": "Ini adalah sekolah-sekolah yang didirikan oleh prefektur, kota, atau badan pemerintahan lokal lainnya.",
-      "neText": "यी प्रिफेक्चर, शहर, वा अन्य स्थानीय सरकारी निकायहरू द्वारा स्थापित विद्यालयहरू हुन्।"
+      "neText": "यी प्रिफेक्चर, शहर, वा अन्य स्थानीय सरकारी निकायहरू द्वारा स्थापित विद्यालयहरू हुन्।",
+      "deText": "Hierbei handelt es sich um Schulen, die von der Präfektur, der Stadt oder anderen lokalen Regierungsbehörden eingerichtet wurden.",
+      "simpleJaText": "県や市などが作った学校です。"
     },
     {
       "id": "t195",
@@ -4037,7 +5023,7 @@ export const catalog = {
       "reading": "しりつ",
       "en": "These are schools established by educational corporations or similar organizations.",
       "descriptionJa": "学校法人などが作った学校です。",
-      "category": "進路",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "São escolas criadas por empresas educacionais ou organizações similares.",
@@ -4047,7 +5033,9 @@ export const catalog = {
       "koText": "학교법인 등이 만든 학교입니다.",
       "tlText": "Ito ay mga paaralang itinatag ng mga korporasyong pang-edukasyon o mga katulad na organisasyon.",
       "idText": "Ini adalah sekolah-sekolah yang didirikan oleh perusahaan pendidikan atau organisasi serupa.",
-      "neText": "यी शैक्षिक निगमहरू वा समान संस्थाहरूद्वारा स्थापित विद्यालयहरू हुन्।"
+      "neText": "यी शैक्षिक निगमहरू वा समान संस्थाहरूद्वारा स्थापित विद्यालयहरू हुन्।",
+      "deText": "Hierbei handelt es sich um Schulen, die von Bildungsunternehmen oder ähnlichen Organisationen gegründet wurden.",
+      "simpleJaText": "学校法人などが作った学校です。"
     },
     {
       "id": "t196",
@@ -4055,9 +5043,9 @@ export const catalog = {
       "reading": "ぎょうじ",
       "en": "These are special activities or events held at school.",
       "descriptionJa": "学校で行う特別な活動やイベントです。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
-      "viewCount": "",
+      "viewCount": "1",
       "ptText": "São atividades ou eventos especiais realizados na escola.",
       "esText": "Se trata de actividades o eventos especiales que se realizan en la escuela.",
       "viText": "Đây là những hoạt động hoặc sự kiện đặc biệt được tổ chức tại trường.",
@@ -4065,7 +5053,9 @@ export const catalog = {
       "koText": "학교에서 실시하는 특별한 활동이나 이벤트입니다.",
       "tlText": "Ito ay mga espesyal na aktibidad o kaganapan na ginaganap sa paaralan.",
       "idText": "Ini adalah kegiatan atau acara khusus yang diadakan di sekolah.",
-      "neText": "यी विद्यालयमा आयोजना हुने विशेष गतिविधि वा कार्यक्रमहरू हुन्।"
+      "neText": "यी विद्यालयमा आयोजना हुने विशेष गतिविधि वा कार्यक्रमहरू हुन्।",
+      "deText": "Hierbei handelt es sich um besondere Aktivitäten oder Veranstaltungen, die in der Schule stattfinden.",
+      "simpleJaText": "学校で行う特別な活動やイベントです。"
     },
     {
       "id": "t197",
@@ -4073,7 +5063,7 @@ export const catalog = {
       "reading": "がっこうぎょうじ",
       "en": "These are events held for the entire school or for individual grades.",
       "descriptionJa": "学校全体や学年で行うイベントです。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "São eventos realizados para toda a escola ou para turmas específicas.",
@@ -4083,7 +5073,9 @@ export const catalog = {
       "koText": "학교 전체나 학년에서 실시하는 이벤트입니다.",
       "tlText": "Ito ay mga kaganapang ginaganap para sa buong paaralan o para sa mga indibidwal na baitang.",
       "idText": "Ini adalah acara yang diadakan untuk seluruh sekolah atau untuk setiap tingkatan kelas.",
-      "neText": "यी सम्पूर्ण विद्यालय वा व्यक्तिगत कक्षाहरूको लागि आयोजित कार्यक्रमहरू हुन्।"
+      "neText": "यी सम्पूर्ण विद्यालय वा व्यक्तिगत कक्षाहरूको लागि आयोजित कार्यक्रमहरू हुन्।",
+      "deText": "Hierbei handelt es sich um Veranstaltungen, die für die gesamte Schule oder für einzelne Klassenstufen abgehalten werden.",
+      "simpleJaText": "学校全体や学年で行うイベントです。"
     },
     {
       "id": "t198",
@@ -4091,7 +5083,7 @@ export const catalog = {
       "reading": "にゅうがくしき",
       "en": "This is a ceremony to celebrate new students entering school.",
       "descriptionJa": "新しく学校に入ることをお祝いする式です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma cerimônia para celebrar a entrada de novos alunos na escola.",
@@ -4101,7 +5093,9 @@ export const catalog = {
       "koText": "새롭게 학교에 들어가기를 축하하는 식입니다.",
       "tlText": "Ito ay isang seremonya upang ipagdiwang ang pagpasok ng mga bagong estudyante sa paaralan.",
       "idText": "Ini adalah upacara untuk merayakan masuknya siswa baru ke sekolah.",
-      "neText": "यो विद्यालयमा प्रवेश गर्ने नयाँ विद्यार्थीहरूको उत्सव मनाउने समारोह हो।"
+      "neText": "यो विद्यालयमा प्रवेश गर्ने नयाँ विद्यार्थीहरूको उत्सव मनाउने समारोह हो।",
+      "deText": "Dies ist eine Zeremonie zur Feier des Schuleintritts neuer Schüler.",
+      "simpleJaText": "新しく学校に入ることをお祝いする式です。"
     },
     {
       "id": "t199",
@@ -4109,7 +5103,7 @@ export const catalog = {
       "reading": "しぎょうしき",
       "en": "This is a ceremony held at the beginning of the school term.",
       "descriptionJa": "学期の始まりに行う式です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma cerimônia realizada no início do período letivo.",
@@ -4119,7 +5113,9 @@ export const catalog = {
       "koText": "학기의 시작에 실시하는 식입니다.",
       "tlText": "Ito ay isang seremonya na ginaganap sa simula ng termino ng paaralan.",
       "idText": "Ini adalah upacara yang diadakan di awal semester sekolah.",
-      "neText": "यो स्कूल सत्रको सुरुमा आयोजना गरिने समारोह हो।"
+      "neText": "यो स्कूल सत्रको सुरुमा आयोजना गरिने समारोह हो।",
+      "deText": "Dies ist eine Zeremonie, die zu Beginn des Schuljahres stattfindet.",
+      "simpleJaText": "学期の始まりに行う式です。"
     },
     {
       "id": "t200",
@@ -4127,7 +5123,7 @@ export const catalog = {
       "reading": "しゅうりょうしき",
       "en": "This is a ceremony held at the end of the semester.",
       "descriptionJa": "学期の終わりに行う式です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma cerimônia realizada no final do semestre.",
@@ -4137,7 +5133,9 @@ export const catalog = {
       "koText": "학기의 끝에 실시하는 식입니다.",
       "tlText": "Ito ay isang seremonya na ginaganap sa katapusan ng semestre.",
       "idText": "Ini adalah upacara yang diadakan di akhir semester.",
-      "neText": "यो सेमेस्टरको अन्त्यमा आयोजना गरिने समारोह हो।"
+      "neText": "यो सेमेस्टरको अन्त्यमा आयोजना गरिने समारोह हो।",
+      "deText": "Dies ist eine Zeremonie, die am Ende des Semesters stattfindet.",
+      "simpleJaText": "学期の終わりに行う式です。"
     },
     {
       "id": "t201",
@@ -4145,7 +5143,7 @@ export const catalog = {
       "reading": "しゅうりょうしき",
       "en": "This is a formula used to confirm that the learning for that grade level has been completed.",
       "descriptionJa": "その学年の学習が終わったことを確認する式です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma fórmula usada para confirmar que a aprendizagem para aquele nível escolar foi concluída.",
@@ -4155,7 +5153,9 @@ export const catalog = {
       "koText": "그 학년의 학습이 끝난 것을 확인하는 식입니다.",
       "tlText": "Ito ay isang pormulang ginagamit upang kumpirmahin na natapos na ang pagkatuto para sa antas na iyon.",
       "idText": "Ini adalah rumus yang digunakan untuk memastikan bahwa pembelajaran untuk tingkat kelas tersebut telah selesai.",
-      "neText": "यो त्यो ग्रेड स्तरको सिकाइ पूरा भएको पुष्टि गर्न प्रयोग गरिने सूत्र हो।"
+      "neText": "यो त्यो ग्रेड स्तरको सिकाइ पूरा भएको पुष्टि गर्न प्रयोग गरिने सूत्र हो।",
+      "deText": "Dies ist eine Formel, mit der bestätigt wird, dass der Lernstoff für diese Klassenstufe vollständig vermittelt wurde.",
+      "simpleJaText": "その学年の学習が終わったことを確認する式です。"
     },
     {
       "id": "t202",
@@ -4163,7 +5163,7 @@ export const catalog = {
       "reading": "そつぎょうしき",
       "en": "This is a ceremony to celebrate graduating from school.",
       "descriptionJa": "学校を卒業することをお祝いする式です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma cerimônia para celebrar a formatura do ensino médio.",
@@ -4173,7 +5173,9 @@ export const catalog = {
       "koText": "학교를 졸업하는 것을 축하하는 식입니다.",
       "tlText": "Ito ay isang seremonya upang ipagdiwang ang pagtatapos sa paaralan.",
       "idText": "Ini adalah upacara untuk merayakan kelulusan dari sekolah.",
-      "neText": "यो स्कूलबाट स्नातक भएको उत्सव मनाउने समारोह हो।"
+      "neText": "यो स्कूलबाट स्नातक भएको उत्सव मनाउने समारोह हो।",
+      "deText": "Dies ist eine Zeremonie zur Feier des Schulabschlusses.",
+      "simpleJaText": "学校を卒業することをお祝いする式です。"
     },
     {
       "id": "t203",
@@ -4181,7 +5183,7 @@ export const catalog = {
       "reading": "うんどうかい",
       "en": "It's a school event that involves running and competing in sports.",
       "descriptionJa": "走ったり競技をしたりする学校行事です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "É um evento escolar que envolve corrida e competição esportiva.",
@@ -4191,7 +5193,9 @@ export const catalog = {
       "koText": "달리거나 경기를 하는 학교 행사입니다.",
       "tlText": "Ito ay isang kaganapan sa paaralan na kinabibilangan ng pagtakbo at pakikipagkumpitensya sa mga isport.",
       "idText": "Ini adalah acara sekolah yang melibatkan lari dan berkompetisi dalam olahraga.",
-      "neText": "यो एउटा स्कूल कार्यक्रम हो जसमा दौडनु र खेलकुदमा प्रतिस्पर्धा गर्नु समावेश छ।"
+      "neText": "यो एउटा स्कूल कार्यक्रम हो जसमा दौडनु र खेलकुदमा प्रतिस्पर्धा गर्नु समावेश छ।",
+      "deText": "Es handelt sich um eine Schulveranstaltung, bei der es um Laufen und sportliche Wettkämpfe geht.",
+      "simpleJaText": "走ったり競技をしたりする学校行事です。"
     },
     {
       "id": "t204",
@@ -4199,7 +5203,7 @@ export const catalog = {
       "reading": "たいいくさい",
       "en": "These are school events that involve sports or competitions.",
       "descriptionJa": "運動や競技を行う学校行事です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "São eventos escolares que envolvem esportes ou competições.",
@@ -4209,7 +5213,9 @@ export const catalog = {
       "koText": "운동이나 경기를 하는 학교 행사입니다.",
       "tlText": "Ito ay mga kaganapan sa paaralan na may kasamang palakasan o mga kompetisyon.",
       "idText": "Ini adalah acara sekolah yang melibatkan olahraga atau kompetisi.",
-      "neText": "यी खेलकुद वा प्रतियोगिताहरू समावेश गर्ने स्कूल कार्यक्रमहरू हुन्।"
+      "neText": "यी खेलकुद वा प्रतियोगिताहरू समावेश गर्ने स्कूल कार्यक्रमहरू हुन्।",
+      "deText": "Hierbei handelt es sich um Schulveranstaltungen, die Sport oder Wettkämpfe beinhalten.",
+      "simpleJaText": "運動や競技を行う学校行事です。"
     },
     {
       "id": "t205",
@@ -4217,7 +5223,7 @@ export const catalog = {
       "reading": "たいいくたいかい",
       "en": "These are school events that involve sports or competitions.",
       "descriptionJa": "運動や競技を行う学校行事です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "São eventos escolares que envolvem esportes ou competições.",
@@ -4227,7 +5233,9 @@ export const catalog = {
       "koText": "운동이나 경기를 하는 학교 행사입니다.",
       "tlText": "Ito ay mga kaganapan sa paaralan na may kasamang palakasan o mga kompetisyon.",
       "idText": "Ini adalah acara sekolah yang melibatkan olahraga atau kompetisi.",
-      "neText": "यी खेलकुद वा प्रतियोगिताहरू समावेश गर्ने स्कूल कार्यक्रमहरू हुन्।"
+      "neText": "यी खेलकुद वा प्रतियोगिताहरू समावेश गर्ने स्कूल कार्यक्रमहरू हुन्।",
+      "deText": "Hierbei handelt es sich um Schulveranstaltungen, die Sport oder Wettkämpfe beinhalten.",
+      "simpleJaText": "運動や競技を行う学校行事です。"
     },
     {
       "id": "t206",
@@ -4235,7 +5243,7 @@ export const catalog = {
       "reading": "ぶんかさい",
       "en": "This is a school event that involves presentations, exhibitions, and other activities.",
       "descriptionJa": "発表や展示などを行う学校行事です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um evento escolar que inclui apresentações, exposições e outras atividades.",
@@ -4245,7 +5253,9 @@ export const catalog = {
       "koText": "발표나 전시 등을 실시하는 학교 행사입니다.",
       "tlText": "Ito ay isang kaganapan sa paaralan na kinabibilangan ng mga presentasyon, eksibisyon, at iba pang mga aktibidad.",
       "idText": "Ini adalah acara sekolah yang meliputi presentasi, pameran, dan kegiatan lainnya.",
-      "neText": "यो एक स्कूल कार्यक्रम हो जसमा प्रस्तुतीकरण, प्रदर्शनी र अन्य गतिविधिहरू समावेश छन्।"
+      "neText": "यो एक स्कूल कार्यक्रम हो जसमा प्रस्तुतीकरण, प्रदर्शनी र अन्य गतिविधिहरू समावेश छन्।",
+      "deText": "Dies ist eine Schulveranstaltung mit Präsentationen, Ausstellungen und anderen Aktivitäten.",
+      "simpleJaText": "発表や展示などを行う学校行事です。"
     },
     {
       "id": "t207",
@@ -4253,7 +5263,7 @@ export const catalog = {
       "reading": "がっしょうさい",
       "en": "This is an event where classes or grades present songs.",
       "descriptionJa": "クラスや学年で歌を発表する行事です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um evento onde turmas ou séries apresentam músicas.",
@@ -4263,7 +5273,9 @@ export const catalog = {
       "koText": "클래스나 학년으로 노래를 발표하는 행사입니다.",
       "tlText": "Ito ay isang kaganapan kung saan ang mga klase o baitang ay nagtatanghal ng mga awitin.",
       "idText": "Ini adalah acara di mana kelas atau tingkatan kelas menampilkan lagu.",
-      "neText": "यो त्यस्तो कार्यक्रम हो जहाँ कक्षा वा ग्रेडहरूले गीतहरू प्रस्तुत गर्छन्।"
+      "neText": "यो त्यस्तो कार्यक्रम हो जहाँ कक्षा वा ग्रेडहरूले गीतहरू प्रस्तुत गर्छन्।",
+      "deText": "Hierbei handelt es sich um eine Veranstaltung, bei der Klassen oder Jahrgänge Lieder vortragen.",
+      "simpleJaText": "クラスや学年で歌を発表する行事です。"
     },
     {
       "id": "t208",
@@ -4271,7 +5283,7 @@ export const catalog = {
       "reading": "こうがいがくしゅう",
       "en": "This is an activity where students go outside of school to learn.",
       "descriptionJa": "学校の外へ行って学ぶ活動です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma atividade em que os alunos saem da escola para aprender.",
@@ -4281,7 +5293,8 @@ export const catalog = {
       "koText": "학교 밖으로 가서 배우는 활동입니다.",
       "tlText": "Ito ay isang aktibidad kung saan ang mga mag-aaral ay lumalabas sa labas ng paaralan upang mag-aral.",
       "idText": "Ini adalah kegiatan di mana siswa pergi ke luar sekolah untuk belajar.",
-      "neText": "यो एउटा यस्तो गतिविधि हो जहाँ विद्यार्थीहरूले विद्यालय बाहिर गएर सिक्ने गर्छन्।"
+      "neText": "यो एउटा यस्तो गतिविधि हो जहाँ विद्यार्थीहरूले विद्यालय बाहिर गएर सिक्ने गर्छन्।",
+      "deText": "Hierbei handelt es sich um eine Aktivität, bei der die Schüler außerhalb der Schule lernen."
     },
     {
       "id": "t209",
@@ -4289,7 +5302,7 @@ export const catalog = {
       "reading": "しゃかいけんがく",
       "en": "This activity involves visiting facilities and local communities to learn about society.",
       "descriptionJa": "施設や地域を見学して社会について学ぶ活動です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta atividade envolve visitar instalações e comunidades locais para aprender sobre a sociedade.",
@@ -4299,7 +5312,9 @@ export const catalog = {
       "koText": "시설이나 지역을 견학해 사회에 대해 배우는 활동입니다.",
       "tlText": "Kabilang sa aktibidad na ito ang pagbisita sa mga pasilidad at mga lokal na komunidad upang matuto tungkol sa lipunan.",
       "idText": "Kegiatan ini melibatkan kunjungan ke fasilitas dan komunitas lokal untuk mempelajari tentang masyarakat.",
-      "neText": "यस गतिविधिमा समाजको बारेमा जान्न सुविधाहरू र स्थानीय समुदायहरूको भ्रमण समावेश छ।"
+      "neText": "यस गतिविधिमा समाजको बारेमा जान्न सुविधाहरू र स्थानीय समुदायहरूको भ्रमण समावेश छ।",
+      "deText": "Diese Aktivität beinhaltet den Besuch von Einrichtungen und lokalen Gemeinschaften, um mehr über die Gesellschaft zu erfahren.",
+      "simpleJaText": "施設や地域を見学して社会について学ぶ活動です。"
     },
     {
       "id": "t210",
@@ -4307,7 +5322,7 @@ export const catalog = {
       "reading": "えんそく",
       "en": "This is an event where students go outside of school to learn and have fun.",
       "descriptionJa": "学校の外へ出かけて学んだり楽しんだりする行事です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um evento onde os alunos saem da escola para aprender e se divertir.",
@@ -4317,7 +5332,9 @@ export const catalog = {
       "koText": "학교 밖으로 나가서 배우거나 즐기는 행사입니다.",
       "tlText": "Ito ay isang kaganapan kung saan ang mga mag-aaral ay lumalabas sa labas ng paaralan upang mag-aral at magsaya.",
       "idText": "Ini adalah acara di mana siswa pergi ke luar sekolah untuk belajar dan bersenang-senang.",
-      "neText": "यो एउटा यस्तो कार्यक्रम हो जहाँ विद्यार्थीहरू विद्यालय बाहिर गएर सिक्न र रमाइलो गर्छन्।"
+      "neText": "यो एउटा यस्तो कार्यक्रम हो जहाँ विद्यार्थीहरू विद्यालय बाहिर गएर सिक्न र रमाइलो गर्छन्।",
+      "deText": "Hierbei handelt es sich um eine Veranstaltung, bei der Schüler die Schule verlassen, um zu lernen und Spaß zu haben.",
+      "simpleJaText": "学校の外へ出かけて学んだり楽しんだりする行事です。"
     },
     {
       "id": "t211",
@@ -4325,7 +5342,7 @@ export const catalog = {
       "reading": "しゅうがくりょこう",
       "en": "It's a major school trip where the entire grade level goes on an overnight trip.",
       "descriptionJa": "学年で泊まりがけで行く大きな旅行行事です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "É uma grande viagem escolar onde todos os alunos da mesma série participam de uma viagem com pernoite.",
@@ -4335,7 +5352,9 @@ export const catalog = {
       "koText": "학년에 머물러 가는 큰 여행 행사입니다.",
       "tlText": "Isa itong malaking school trip kung saan ang buong baitang ay sasama sa isang overnight trip.",
       "idText": "Ini adalah perjalanan sekolah besar di mana seluruh siswa satu tingkat kelas pergi berlibur semalam.",
-      "neText": "यो एउटा प्रमुख स्कूल यात्रा हो जहाँ सम्पूर्ण कक्षा स्तर रात्रिकालीन यात्रामा जान्छ।"
+      "neText": "यो एउटा प्रमुख स्कूल यात्रा हो जहाँ सम्पूर्ण कक्षा स्तर रात्रिकालीन यात्रामा जान्छ।",
+      "deText": "Es handelt sich um eine große Klassenfahrt, bei der die gesamte Jahrgangsstufe eine Übernachtungsfahrt unternimmt.",
+      "simpleJaText": "学年で泊まりがけで行く大きな旅行行事です。"
     },
     {
       "id": "t212",
@@ -4343,7 +5362,7 @@ export const catalog = {
       "reading": "しぜんきょうしつ",
       "en": "This is an activity where you learn through hands-on experiences in nature.",
       "descriptionJa": "自然の中で体験しながら学ぶ活動です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma atividade onde você aprende através de experiências práticas na natureza.",
@@ -4353,7 +5372,9 @@ export const catalog = {
       "koText": "자연 속에서 체험하면서 배우는 활동입니다.",
       "tlText": "Ito ay isang aktibidad kung saan natututo ka sa pamamagitan ng mga praktikal na karanasan sa kalikasan.",
       "idText": "Ini adalah kegiatan di mana Anda belajar melalui pengalaman langsung di alam.",
-      "neText": "यो एउटा यस्तो गतिविधि हो जहाँ तपाईंले प्रकृतिमा व्यावहारिक अनुभवहरू मार्फत सिक्नुहुन्छ।"
+      "neText": "यो एउटा यस्तो गतिविधि हो जहाँ तपाईंले प्रकृतिमा व्यावहारिक अनुभवहरू मार्फत सिक्नुहुन्छ।",
+      "deText": "Hierbei handelt es sich um eine Aktivität, bei der man durch praktische Erfahrungen in der Natur lernt.",
+      "simpleJaText": "自然の中で体験しながら学ぶ活動です。"
     },
     {
       "id": "t213",
@@ -4361,7 +5382,7 @@ export const catalog = {
       "reading": "やがいがくしゅう",
       "en": "These are learning activities that take place outdoors or in nature.",
       "descriptionJa": "外や自然の中で行う学習活動です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "São atividades de aprendizagem que acontecem ao ar livre ou em contato com a natureza.",
@@ -4371,7 +5392,9 @@ export const catalog = {
       "koText": "밖이나 자연 속에서 실시하는 학습 활동입니다.",
       "tlText": "Ito ay mga aktibidad sa pagkatuto na nagaganap sa labas o sa kalikasan.",
       "idText": "Ini adalah kegiatan pembelajaran yang berlangsung di luar ruangan atau di alam.",
-      "neText": "यी बाहिर वा प्रकृतिमा हुने सिकाइ गतिविधिहरू हुन्।"
+      "neText": "यी बाहिर वा प्रकृतिमा हुने सिकाइ गतिविधिहरू हुन्।",
+      "deText": "Dies sind Lernaktivitäten, die im Freien oder in der Natur stattfinden.",
+      "simpleJaText": "外や自然の中で行う学習活動です。"
     },
     {
       "id": "t214",
@@ -4379,7 +5402,7 @@ export const catalog = {
       "reading": "しょくばたいけん",
       "en": "This activity involves learning through hands-on experience in a real work environment.",
       "descriptionJa": "仕事の場所で実際に体験して学ぶ活動です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta atividade envolve aprendizado por meio da experiência prática em um ambiente de trabalho real.",
@@ -4389,7 +5412,9 @@ export const catalog = {
       "koText": "일의 장소에서 실제로 체험해 배우는 활동입니다.",
       "tlText": "Ang aktibidad na ito ay kinabibilangan ng pagkatuto sa pamamagitan ng praktikal na karanasan sa isang totoong kapaligiran sa trabaho.",
       "idText": "Aktivitas ini melibatkan pembelajaran melalui pengalaman langsung di lingkungan kerja nyata.",
-      "neText": "यो गतिविधिमा वास्तविक कार्य वातावरणमा व्यावहारिक अनुभव मार्फत सिक्ने समावेश छ।"
+      "neText": "यो गतिविधिमा वास्तविक कार्य वातावरणमा व्यावहारिक अनुभव मार्फत सिक्ने समावेश छ।",
+      "deText": "Diese Aktivität beinhaltet das Lernen durch praktische Erfahrung in einem realen Arbeitsumfeld.",
+      "simpleJaText": "仕事の場所で実際に体験して学ぶ活動です。"
     },
     {
       "id": "t215",
@@ -4397,7 +5422,7 @@ export const catalog = {
       "reading": "じゅぎょうさんかん",
       "en": "This is an event where parents come to school to observe classes.",
       "descriptionJa": "保護者が学校に来て授業を見る行事です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um evento em que os pais vêm à escola para observar as aulas.",
@@ -4407,7 +5432,8 @@ export const catalog = {
       "koText": "보호자가 학교에 와서 수업을 보는 행사입니다.",
       "tlText": "Ito ay isang kaganapan kung saan pumupunta ang mga magulang sa paaralan upang obserbahan ang mga klase.",
       "idText": "Ini adalah acara di mana orang tua datang ke sekolah untuk mengamati kelas.",
-      "neText": "यो त्यस्तो कार्यक्रम हो जहाँ अभिभावकहरू कक्षाहरू अवलोकन गर्न स्कूल आउँछन्।"
+      "neText": "यो त्यस्तो कार्यक्रम हो जहाँ अभिभावकहरू कक्षाहरू अवलोकन गर्न स्कूल आउँछन्।",
+      "deText": "Hierbei handelt es sich um eine Veranstaltung, bei der Eltern in die Schule kommen, um den Unterricht zu beobachten."
     },
     {
       "id": "t216",
@@ -4415,7 +5441,7 @@ export const catalog = {
       "reading": "ほごしゃかい",
       "en": "This is a meeting to explain and discuss school matters with parents.",
       "descriptionJa": "保護者に学校のことを説明したり話し合ったりする会です。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta reunião tem como objetivo explicar e discutir assuntos escolares com os pais.",
@@ -4425,7 +5451,8 @@ export const catalog = {
       "koText": "보호자에게 학교를 설명하거나 토론하는 모임입니다.",
       "tlText": "Ito ay isang pagpupulong upang ipaliwanag at talakayin ang mga bagay na may kinalaman sa paaralan kasama ang mga magulang.",
       "idText": "Pertemuan ini bertujuan untuk menjelaskan dan mendiskusikan hal-hal terkait sekolah dengan para orang tua.",
-      "neText": "यो अभिभावकहरूसँग स्कूलका मामिलाहरू व्याख्या गर्न र छलफल गर्नको लागि बैठक हो।"
+      "neText": "यो अभिभावकहरूसँग स्कूलका मामिलाहरू व्याख्या गर्न र छलफल गर्नको लागि बैठक हो।",
+      "deText": "Dies ist ein Treffen, um schulische Angelegenheiten mit den Eltern zu erläutern und zu besprechen."
     },
     {
       "id": "t217",
@@ -4433,7 +5460,7 @@ export const catalog = {
       "reading": "がっきゅうこんだんかい",
       "en": "This is a meeting for parents and teachers of the class to discuss matters.",
       "descriptionJa": "クラスの保護者と先生が話し合う会です。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma reunião para pais e professores da turma discutirem assuntos diversos.",
@@ -4443,7 +5470,9 @@ export const catalog = {
       "koText": "클래스의 보호자와 선생님이 토론하는 모임입니다.",
       "tlText": "Ito ay isang pagpupulong para sa mga magulang at guro ng klase upang pag-usapan ang mga bagay-bagay.",
       "idText": "Ini adalah pertemuan bagi orang tua dan guru kelas untuk membahas berbagai hal.",
-      "neText": "यो कक्षाका अभिभावक र शिक्षकहरूको लागि छलफल गर्नको लागि बैठक हो।"
+      "neText": "यो कक्षाका अभिभावक र शिक्षकहरूको लागि छलफल गर्नको लागि बैठक हो।",
+      "deText": "Dies ist ein Treffen für Eltern und Lehrer der Klasse, um Angelegenheiten zu besprechen.",
+      "simpleJaText": "クラスの保護者と先生が話し合う会です。"
     },
     {
       "id": "t218",
@@ -4451,7 +5480,7 @@ export const catalog = {
       "reading": "こじんこんだん",
       "en": "This is a meeting where each parent speaks with a teacher individually.",
       "descriptionJa": "保護者と先生が一人ずつ話す面談です。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma reunião onde cada pai/mãe conversa individualmente com um(a) professor(a).",
@@ -4461,7 +5490,8 @@ export const catalog = {
       "koText": "보호자와 선생님이 한 사람씩 말하는 면담입니다.",
       "tlText": "Ito ay isang pagpupulong kung saan ang bawat magulang ay makikipag-usap sa isang guro nang paisa-isa.",
       "idText": "Ini adalah pertemuan di mana setiap orang tua berbicara dengan guru secara individual.",
-      "neText": "यो एउटा बैठक हो जहाँ प्रत्येक अभिभावकले शिक्षकसँग व्यक्तिगत रूपमा कुरा गर्छन्।"
+      "neText": "यो एउटा बैठक हो जहाँ प्रत्येक अभिभावकले शिक्षकसँग व्यक्तिगत रूपमा कुरा गर्छन्।",
+      "deText": "Hierbei handelt es sich um ein Treffen, bei dem jedes Elternteil einzeln mit einer Lehrkraft spricht."
     },
     {
       "id": "t219",
@@ -4469,7 +5499,7 @@ export const catalog = {
       "reading": "さんしゃこんだん",
       "en": "This is a meeting involving the student, parent, and teacher.",
       "descriptionJa": "生徒、保護者、先生の三人で話す面談です。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma reunião que envolve o aluno, os pais e o professor.",
@@ -4479,7 +5509,8 @@ export const catalog = {
       "koText": "학생, 보호자, 선생님의 세 사람이 말하는 면담입니다.",
       "tlText": "Ito ay isang pagpupulong na kinasasangkutan ng mga mag-aaral, magulang, at guro.",
       "idText": "Ini adalah pertemuan yang melibatkan siswa, orang tua, dan guru.",
-      "neText": "यो विद्यार्थी, अभिभावक र शिक्षक सम्मिलित बैठक हो।"
+      "neText": "यो विद्यार्थी, अभिभावक र शिक्षक सम्मिलित बैठक हो।",
+      "deText": "Dies ist ein Treffen zwischen Schüler, Elternteil und Lehrer."
     },
     {
       "id": "t220",
@@ -4487,7 +5518,7 @@ export const catalog = {
       "reading": "きょういくそうだん",
       "en": "It's about discussing things like studies, daily life, and any worries you might have.",
       "descriptionJa": "学習や生活、心配なことについて相談することです。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de discutir assuntos como estudos, vida cotidiana e quaisquer preocupações que você possa ter.",
@@ -4497,7 +5528,9 @@ export const catalog = {
       "koText": "학습이나 생활, 걱정스러운 것에 대해 상담하는 것입니다.",
       "tlText": "Tungkol ito sa pagtalakay sa mga bagay tulad ng pag-aaral, pang-araw-araw na buhay, at anumang mga alalahanin na maaaring mayroon ka.",
       "idText": "Ini tentang membahas hal-hal seperti studi, kehidupan sehari-hari, dan kekhawatiran apa pun yang mungkin Anda miliki.",
-      "neText": "यो अध्ययन, दैनिक जीवन, र तपाईंलाई हुन सक्ने कुनै पनि चिन्ता जस्ता कुराहरूमा छलफल गर्ने बारे हो।"
+      "neText": "यो अध्ययन, दैनिक जीवन, र तपाईंलाई हुन सक्ने कुनै पनि चिन्ता जस्ता कुराहरूमा छलफल गर्ने बारे हो।",
+      "deText": "Es geht darum, über Dinge wie das Studium, den Alltag und eventuelle Sorgen zu sprechen.",
+      "simpleJaText": "学習や生活、心配なことについて相談することです。"
     },
     {
       "id": "t221",
@@ -4505,7 +5538,7 @@ export const catalog = {
       "reading": "めんだん",
       "en": "This involves teachers talking directly with parents and students.",
       "descriptionJa": "先生と保護者や生徒が直接話すことです。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso envolve professores conversando diretamente com pais e alunos.",
@@ -4515,7 +5548,9 @@ export const catalog = {
       "koText": "교사와 학부모와 학생이 직접 말하는 것입니다.",
       "tlText": "Kabilang dito ang direktang pakikipag-usap ng mga guro sa mga magulang at mga mag-aaral.",
       "idText": "Hal ini melibatkan guru yang berbicara langsung dengan orang tua dan siswa.",
-      "neText": "यसमा शिक्षकहरूले अभिभावक र विद्यार्थीहरूसँग प्रत्यक्ष कुराकानी गर्नु समावेश छ।"
+      "neText": "यसमा शिक्षकहरूले अभिभावक र विद्यार्थीहरूसँग प्रत्यक्ष कुराकानी गर्नु समावेश छ।",
+      "deText": "Dies beinhaltet, dass Lehrer direkt mit Eltern und Schülern sprechen.",
+      "simpleJaText": "先生と保護者や生徒が直接話すことです。"
     },
     {
       "id": "t222",
@@ -4523,7 +5558,7 @@ export const catalog = {
       "reading": "そうだん",
       "en": "It means talking about your problems and worries and asking for help.",
       "descriptionJa": "困っていることや心配なことを話して助けを求めることです。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa falar sobre seus problemas e preocupações e pedir ajuda.",
@@ -4533,7 +5568,9 @@ export const catalog = {
       "koText": "어려움이나 걱정스러운 것을 말하고 도움을 요청하는 것입니다.",
       "tlText": "Nangangahulugan ito ng pag-uusap tungkol sa iyong mga problema at alalahanin at paghingi ng tulong.",
       "idText": "Artinya, bicarakan masalah dan kekhawatiran Anda serta mintalah bantuan.",
-      "neText": "यसको अर्थ आफ्ना समस्या र चिन्ताहरूको बारेमा कुरा गर्नु र मद्दत माग्नु हो।"
+      "neText": "यसको अर्थ आफ्ना समस्या र चिन्ताहरूको बारेमा कुरा गर्नु र मद्दत माग्नु हो।",
+      "deText": "Es bedeutet, über seine Probleme und Sorgen zu sprechen und um Hilfe zu bitten.",
+      "simpleJaText": "困っていることや心配なことを話して助けを求めることです。"
     },
     {
       "id": "t223",
@@ -4541,7 +5578,7 @@ export const catalog = {
       "reading": "にってい",
       "en": "This is the planned date and time.",
       "descriptionJa": "行う日や時間の予定です。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é a data e hora previstas.",
@@ -4551,7 +5588,9 @@ export const catalog = {
       "koText": "할 날이나 시간의 예정입니다.",
       "tlText": "Ito ang nakatakdang petsa at oras.",
       "idText": "Ini adalah tanggal dan waktu yang direncanakan.",
-      "neText": "यो योजना गरिएको मिति र समय हो।"
+      "neText": "यो योजना गरिएको मिति र समय हो।",
+      "deText": "Dies ist das geplante Datum und die geplante Uhrzeit.",
+      "simpleJaText": "行う日や時間の予定です。"
     },
     {
       "id": "t224",
@@ -4559,7 +5598,7 @@ export const catalog = {
       "reading": "つごう",
       "en": "It depends on whether it can be done on that day or time.",
       "descriptionJa": "その日や時間にできるかどうかの事情です。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Depende se isso pode ser feito naquele dia e horário.",
@@ -4569,7 +5608,9 @@ export const catalog = {
       "koText": "그날이나 시간에 할 수 있는지의 사정입니다.",
       "tlText": "Depende kung magagawa ito sa araw o oras na iyon.",
       "idText": "Itu tergantung pada apakah hal tersebut dapat dilakukan pada hari atau waktu tersebut.",
-      "neText": "त्यो दिन वा समयमा गर्न सकिन्छ कि सकिँदैन भन्ने कुरामा निर्भर गर्दछ।"
+      "neText": "त्यो दिन वा समयमा गर्न सकिन्छ कि सकिँदैन भन्ने कुरामा निर्भर गर्दछ।",
+      "deText": "Das hängt davon ab, ob es an diesem Tag bzw. zu dieser Uhrzeit möglich ist.",
+      "simpleJaText": "その日や時間にできるかどうかの事情です。"
     },
     {
       "id": "t225",
@@ -4577,7 +5618,7 @@ export const catalog = {
       "reading": "さんか",
       "en": "It means attending events or gatherings.",
       "descriptionJa": "行事や会に出ることです。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa participar de eventos ou encontros.",
@@ -4587,7 +5628,9 @@ export const catalog = {
       "koText": "행사나 모임에 나가는 것입니다.",
       "tlText": "Nangangahulugan ito ng pagdalo sa mga kaganapan o pagtitipon.",
       "idText": "Artinya menghadiri acara atau pertemuan.",
-      "neText": "यसको अर्थ कार्यक्रम वा जमघटमा भाग लिनु हो।"
+      "neText": "यसको अर्थ कार्यक्रम वा जमघटमा भाग लिनु हो।",
+      "deText": "Es bedeutet, an Veranstaltungen oder Zusammenkünften teilzunehmen.",
+      "simpleJaText": "行事や会に出ることです。"
     },
     {
       "id": "t226",
@@ -4595,7 +5638,7 @@ export const catalog = {
       "reading": "けっせきかくにん",
       "en": "The goal is to confirm whether or not they will be absent.",
       "descriptionJa": "欠席するかどうかを確認することです。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "O objetivo é confirmar se eles estarão ausentes ou não.",
@@ -4605,7 +5648,9 @@ export const catalog = {
       "koText": "결석 여부를 확인하는 것입니다.",
       "tlText": "Ang layunin ay kumpirmahin kung sila ay aabsent o hindi.",
       "idText": "Tujuannya adalah untuk memastikan apakah mereka akan absen atau tidak.",
-      "neText": "लक्ष्य भनेको उनीहरू अनुपस्थित हुनेछन् वा छैनन् भनेर पुष्टि गर्नु हो।"
+      "neText": "लक्ष्य भनेको उनीहरू अनुपस्थित हुनेछन् वा छैनन् भनेर पुष्टि गर्नु हो।",
+      "deText": "Ziel ist es, zu bestätigen, ob sie abwesend sein werden oder nicht.",
+      "simpleJaText": "欠席するかどうかを確認することです。"
     },
     {
       "id": "t227",
@@ -4613,7 +5658,7 @@ export const catalog = {
       "reading": "しゅうきん",
       "en": "It's about raising money for school expenses.",
       "descriptionJa": "学校で必要なお金を集めることです。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de arrecadar dinheiro para as despesas escolares.",
@@ -4623,7 +5668,8 @@ export const catalog = {
       "koText": "학교에서 필요한 돈을 모으는 것입니다.",
       "tlText": "Tungkol ito sa pangangalap ng pondo para sa mga gastusin sa paaralan.",
       "idText": "Ini tentang mengumpulkan uang untuk biaya sekolah.",
-      "neText": "यो स्कूलको खर्चको लागि पैसा जुटाउने बारेमा हो।"
+      "neText": "यो स्कूलको खर्चको लागि पैसा जुटाउने बारेमा हो।",
+      "deText": "Es geht darum, Geld für Schulkosten zu sammeln."
     },
     {
       "id": "t228",
@@ -4631,7 +5677,7 @@ export const catalog = {
       "reading": "きょうざいひ",
       "en": "This money is for teaching materials used in class.",
       "descriptionJa": "授業で使う教材のためのお金です。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esse dinheiro é para materiais didáticos usados ​​em sala de aula.",
@@ -4641,7 +5687,9 @@ export const catalog = {
       "koText": "수업에서 사용하는 교재를 위한 돈입니다.",
       "tlText": "Ang perang ito ay para sa mga kagamitang ginagamit sa klase.",
       "idText": "Uang ini untuk membeli bahan ajar yang digunakan di kelas.",
-      "neText": "यो पैसा कक्षामा प्रयोग हुने शिक्षण सामग्रीहरूको लागि हो।"
+      "neText": "यो पैसा कक्षामा प्रयोग हुने शिक्षण सामग्रीहरूको लागि हो।",
+      "deText": "Dieses Geld ist für Unterrichtsmaterialien bestimmt.",
+      "simpleJaText": "授業で使う教材のためのお金です。"
     },
     {
       "id": "t229",
@@ -4649,7 +5697,7 @@ export const catalog = {
       "reading": "がくねんひ",
       "en": "This money is for activities and supplies used by the school grade.",
       "descriptionJa": "学年で使う活動や物のためのお金です。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esse dinheiro destina-se a atividades e materiais utilizados pela turma escolar.",
@@ -4659,7 +5707,9 @@ export const catalog = {
       "koText": "학년에서 사용하는 활동이나 물건을 위한 돈입니다.",
       "tlText": "Ang perang ito ay para sa mga aktibidad at suplay na ginagamit ng mga mag-aaral sa paaralan.",
       "idText": "Uang ini diperuntukkan untuk kegiatan dan perlengkapan yang digunakan oleh siswa di kelas tersebut.",
-      "neText": "यो पैसा स्कूलका विद्यार्थीहरूले प्रयोग गर्ने गतिविधिहरू र सामग्रीहरूको लागि हो।"
+      "neText": "यो पैसा स्कूलका विद्यार्थीहरूले प्रयोग गर्ने गतिविधिहरू र सामग्रीहरूको लागि हो।",
+      "deText": "Dieses Geld ist für Aktivitäten und Materialien bestimmt, die von der jeweiligen Schulklasse genutzt werden.",
+      "simpleJaText": "学年で使う活動や物のためのお金です。"
     },
     {
       "id": "t230",
@@ -4667,7 +5717,7 @@ export const catalog = {
       "reading": "きゅうしょくひ",
       "en": "This is the money paid for school lunches.",
       "descriptionJa": "給食のために払うお金です。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o dinheiro usado para pagar o almoço escolar.",
@@ -4677,7 +5727,9 @@ export const catalog = {
       "koText": "급식을 위해 지불하는 돈입니다.",
       "tlText": "Ito ang perang ibinabayad para sa mga pananghalian sa paaralan.",
       "idText": "Ini adalah uang yang dibayarkan untuk makan siang sekolah.",
-      "neText": "यो स्कूलको खाजाको लागि तिरिएको पैसा हो।"
+      "neText": "यो स्कूलको खाजाको लागि तिरिएको पैसा हो।",
+      "deText": "Das ist das Geld, das für das Mittagessen in der Schule ausgegeben wird.",
+      "simpleJaText": "給食のために払うお金です。"
     },
     {
       "id": "t231",
@@ -4685,7 +5737,7 @@ export const catalog = {
       "reading": "つみたてきん",
       "en": "This is money that is saved little by little for events and such.",
       "descriptionJa": "行事などのために少しずつためるお金です。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "É um dinheiro que vai sendo guardado aos poucos para eventos e coisas do tipo.",
@@ -4695,7 +5747,9 @@ export const catalog = {
       "koText": "행사 등을 위해 조금씩 돈을 벌 수 있습니다.",
       "tlText": "Ito ay perang unti-unting naiipon para sa mga okasyon at iba pa.",
       "idText": "Ini adalah uang yang ditabung sedikit demi sedikit untuk acara-acara dan sebagainya.",
-      "neText": "यो पैसा कार्यक्रम र यस्तै अन्य कार्यक्रमहरूको लागि अलि-अलि गरेर बचत गरिन्छ।"
+      "neText": "यो पैसा कार्यक्रम र यस्तै अन्य कार्यक्रमहरूको लागि अलि-अलि गरेर बचत गरिन्छ।",
+      "deText": "Das ist Geld, das nach und nach für Veranstaltungen und Ähnliches gespart wird.",
+      "simpleJaText": "行事などのために少しずつためるお金です。"
     },
     {
       "id": "t232",
@@ -4703,7 +5757,7 @@ export const catalog = {
       "reading": "ふりこみ",
       "en": "It means sending money from a bank or other financial institution.",
       "descriptionJa": "銀行などからお金を送ることです。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa enviar dinheiro de um banco ou outra instituição financeira.",
@@ -4713,7 +5767,9 @@ export const catalog = {
       "koText": "은행 등에서 돈을 보내는 것입니다.",
       "tlText": "Nangangahulugan ito ng pagpapadala ng pera mula sa isang bangko o iba pang institusyong pinansyal.",
       "idText": "Artinya mengirim uang dari bank atau lembaga keuangan lainnya.",
-      "neText": "यसको अर्थ बैंक वा अन्य वित्तीय संस्थाबाट पैसा पठाउनु हो।"
+      "neText": "यसको अर्थ बैंक वा अन्य वित्तीय संस्थाबाट पैसा पठाउनु हो।",
+      "deText": "Es bedeutet, Geld von einer Bank oder einem anderen Finanzinstitut zu überweisen.",
+      "simpleJaText": "銀行などからお金を送ることです。"
     },
     {
       "id": "t233",
@@ -4721,7 +5777,7 @@ export const catalog = {
       "reading": "こうざふりかえ",
       "en": "This is a method of automatically paying money from your bank account.",
       "descriptionJa": "銀行口座から自動でお金を払う方法です。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um método para transferir dinheiro automaticamente da sua conta bancária.",
@@ -4731,7 +5787,9 @@ export const catalog = {
       "koText": "은행 계좌에서 자동으로 돈을 지불하는 방법입니다.",
       "tlText": "Ito ay isang paraan ng awtomatikong pagbabayad ng pera mula sa iyong bank account.",
       "idText": "Ini adalah metode untuk membayar uang secara otomatis dari rekening bank Anda.",
-      "neText": "यो तपाईंको बैंक खाताबाट स्वचालित रूपमा पैसा भुक्तानी गर्ने तरिका हो।"
+      "neText": "यो तपाईंको बैंक खाताबाट स्वचालित रूपमा पैसा भुक्तानी गर्ने तरिका हो।",
+      "deText": "Dies ist eine Methode, um Geld automatisch von Ihrem Bankkonto abzubuchen.",
+      "simpleJaText": "銀行口座から自動でお金を払う方法です。"
     },
     {
       "id": "t234",
@@ -4739,7 +5797,7 @@ export const catalog = {
       "reading": "ぎんこうこうざ",
       "en": "This is a bank account used for depositing and withdrawing money.",
       "descriptionJa": "銀行にあるお金の出し入れをする口座です。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma conta bancária utilizada para depositar e sacar dinheiro.",
@@ -4749,7 +5807,9 @@ export const catalog = {
       "koText": "은행에 있는 돈의 출납을 하는 계좌입니다.",
       "tlText": "Ito ay isang bank account na ginagamit para sa pagdeposito at pagwi-withdraw ng pera.",
       "idText": "Ini adalah rekening bank yang digunakan untuk menyetor dan menarik uang.",
-      "neText": "यो पैसा जम्मा गर्न र झिक्न प्रयोग गरिने बैंक खाता हो।"
+      "neText": "यो पैसा जम्मा गर्न र झिक्न प्रयोग गरिने बैंक खाता हो।",
+      "deText": "Dies ist ein Bankkonto, das zum Einzahlen und Abheben von Geld verwendet wird.",
+      "simpleJaText": "銀行にあるお金の出し入れをする口座です。"
     },
     {
       "id": "t235",
@@ -4757,7 +5817,7 @@ export const catalog = {
       "reading": "ふうとう",
       "en": "This is a bag for putting paper and money in.",
       "descriptionJa": "紙やお金を入れる袋です。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma sacola para guardar papel e dinheiro.",
@@ -4767,7 +5827,9 @@ export const catalog = {
       "koText": "종이와 돈을 넣는 가방입니다.",
       "tlText": "Ito ay isang supot para sa paglalagay ng papel at pera.",
       "idText": "Ini adalah tas untuk menyimpan kertas dan uang.",
-      "neText": "यो कागज र पैसा राख्ने झोला हो।"
+      "neText": "यो कागज र पैसा राख्ने झोला हो।",
+      "deText": "Das ist eine Tasche, in die man Papier und Geld legt.",
+      "simpleJaText": "紙やお金を入れる袋です。"
     },
     {
       "id": "t236",
@@ -4775,7 +5837,7 @@ export const catalog = {
       "reading": "きんがく",
       "en": "It refers to the amount or price of money.",
       "descriptionJa": "お金の量や値段のことです。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Refere-se à quantia ou ao preço do dinheiro.",
@@ -4785,7 +5847,9 @@ export const catalog = {
       "koText": "돈의 양과 가격입니다.",
       "tlText": "Ito ay tumutukoy sa halaga o presyo ng pera.",
       "idText": "Ini merujuk pada jumlah atau harga uang.",
-      "neText": "यसले पैसाको मात्रा वा मूल्यलाई जनाउँछ।"
+      "neText": "यसले पैसाको मात्रा वा मूल्यलाई जनाउँछ।",
+      "deText": "Es bezieht sich auf den Geldbetrag oder den Preis.",
+      "simpleJaText": "お金の量や値段のことです。"
     },
     {
       "id": "t237",
@@ -4793,7 +5857,7 @@ export const catalog = {
       "reading": "へんきん",
       "en": "It means returning the money that was paid.",
       "descriptionJa": "払ったお金を返すことです。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa devolver o dinheiro que foi pago.",
@@ -4803,7 +5867,9 @@ export const catalog = {
       "koText": "지불한 돈을 반환하는 것입니다.",
       "tlText": "Ibig sabihin nito ay ang pagbabalik ng perang ibinayad.",
       "idText": "Artinya mengembalikan uang yang telah dibayarkan.",
-      "neText": "यसको अर्थ तिरेको पैसा फिर्ता गर्नु हो।"
+      "neText": "यसको अर्थ तिरेको पैसा फिर्ता गर्नु हो।",
+      "deText": "Es bedeutet, das gezahlte Geld zurückzuerstatten.",
+      "simpleJaText": "払ったお金を返すことです。"
     },
     {
       "id": "t238",
@@ -4811,7 +5877,7 @@ export const catalog = {
       "reading": "りょうしゅうしょ",
       "en": "This is a piece of paper that shows you have received the money.",
       "descriptionJa": "お金を受け取ったことを示す紙です。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um documento que comprova o recebimento do dinheiro.",
@@ -4821,7 +5887,9 @@ export const catalog = {
       "koText": "돈을 받았음을 나타내는 종이입니다.",
       "tlText": "Ito ay isang piraso ng papel na nagsasaad na natanggap na ang pera.",
       "idText": "Ini adalah selembar kertas yang menunjukkan bahwa uang telah diterima.",
-      "neText": "यो पैसा प्राप्त भएको संकेत गर्ने कागजको टुक्रा हो।"
+      "neText": "यो पैसा प्राप्त भएको संकेत गर्ने कागजको टुक्रा हो।",
+      "deText": "Dies ist ein Dokument, das den Erhalt des Geldes bestätigt.",
+      "simpleJaText": "お金を受け取ったことを示す紙です。"
     },
     {
       "id": "t239",
@@ -4829,7 +5897,7 @@ export const catalog = {
       "reading": "ぶかつどう",
       "en": "These are sports and cultural activities that take place after classes.",
       "descriptionJa": "授業の後などに行うスポーツや文化の活動です。",
-      "category": "部活動",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "São atividades esportivas e culturais que acontecem após as aulas.",
@@ -4839,7 +5907,8 @@ export const catalog = {
       "koText": "수업 후 등에 실시하는 스포츠나 문화의 활동입니다.",
       "tlText": "Ito ay mga aktibidad na pampalakasan at pangkultura na nagaganap pagkatapos ng klase.",
       "idText": "Ini adalah kegiatan olahraga dan budaya yang berlangsung setelah jam pelajaran.",
-      "neText": "यी खेलकुद र सांस्कृतिक गतिविधिहरू हुन् जुन कक्षा पछि हुन्छन्।"
+      "neText": "यी खेलकुद र सांस्कृतिक गतिविधिहरू हुन् जुन कक्षा पछि हुन्छन्।",
+      "deText": "Hierbei handelt es sich um Sport- und Kulturaktivitäten, die nach dem Unterricht stattfinden."
     },
     {
       "id": "t240",
@@ -4847,7 +5916,7 @@ export const catalog = {
       "reading": "ぶかつ",
       "en": "It's a shortened way of saying \"club activities.\"",
       "descriptionJa": "部活動を短く言った言葉です。",
-      "category": "部活動",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "É uma forma abreviada de dizer \"atividades do clube\".",
@@ -4857,7 +5926,9 @@ export const catalog = {
       "koText": "부활동을 짧게 말한 말입니다.",
       "tlText": "Ito ay isang pinaikling paraan ng pagsasabing \"mga aktibidad ng club.\"",
       "idText": "Ini adalah bentuk singkat dari \"kegiatan klub.\"",
-      "neText": "यो \"क्लब गतिविधिहरू\" भन्ने छोटो तरिका हो।"
+      "neText": "यो \"क्लब गतिविधिहरू\" भन्ने छोटो तरिका हो।",
+      "deText": "Es ist eine Kurzform für „Clubaktivitäten“.",
+      "simpleJaText": "部活動を短く言った言葉です。"
     },
     {
       "id": "t241",
@@ -4865,7 +5936,7 @@ export const catalog = {
       "reading": "こもん",
       "en": "This is the teacher in charge of extracurricular activities.",
       "descriptionJa": "部活動を担当する先生です。",
-      "category": "部活動",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o professor responsável pelas atividades extracurriculares.",
@@ -4875,7 +5946,9 @@ export const catalog = {
       "koText": "부활동을 담당하는 선생님입니다.",
       "tlText": "Ito ang gurong namamahala sa mga ekstrakurikular na aktibidad.",
       "idText": "Ini adalah guru yang bertanggung jawab atas kegiatan ekstrakurikuler.",
-      "neText": "यो अतिरिक्त क्रियाकलापहरूको जिम्मेवार शिक्षक हो।"
+      "neText": "यो अतिरिक्त क्रियाकलापहरूको जिम्मेवार शिक्षक हो।",
+      "deText": "Dies ist die Lehrkraft, die für die außerunterrichtlichen Aktivitäten zuständig ist.",
+      "simpleJaText": "部活動を担当する先生です。"
     },
     {
       "id": "t242",
@@ -4883,7 +5956,7 @@ export const catalog = {
       "reading": "れんしゅう",
       "en": "To become proficient, you need to practice repeatedly.",
       "descriptionJa": "上手になるためにくり返し行うことです。",
-      "category": "部活動",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Para se tornar proficiente, você precisa praticar repetidamente.",
@@ -4893,7 +5966,9 @@ export const catalog = {
       "koText": "잘하기 위해 반복하는 것입니다.",
       "tlText": "Para maging mahusay, kailangan mong magsanay nang paulit-ulit.",
       "idText": "Untuk menjadi mahir, Anda perlu berlatih berulang kali.",
-      "neText": "दक्ष बन्नको लागि, तपाईंले बारम्बार अभ्यास गर्नुपर्छ।"
+      "neText": "दक्ष बन्नको लागि, तपाईंले बारम्बार अभ्यास गर्नुपर्छ।",
+      "deText": "Um darin gut zu werden, muss man wiederholt üben.",
+      "simpleJaText": "上手になるためにくり返し行うことです。"
     },
     {
       "id": "t243",
@@ -4901,7 +5976,7 @@ export const catalog = {
       "reading": "たいかい",
       "en": "It's a large event where matches and presentations are held.",
       "descriptionJa": "試合や発表を行う大きな会です。",
-      "category": "部活動",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "É um grande evento onde são realizadas partidas e apresentações.",
@@ -4911,7 +5986,9 @@ export const catalog = {
       "koText": "경기나 발표를 하는 큰 모임입니다.",
       "tlText": "Ito ay isang malaking kaganapan kung saan ginaganap ang mga paligsahan at mga presentasyon.",
       "idText": "Ini adalah acara besar di mana pertandingan dan presentasi diadakan.",
-      "neText": "यो एउटा ठूलो कार्यक्रम हो जहाँ खेल र प्रस्तुतीकरणहरू आयोजना गरिन्छ।"
+      "neText": "यो एउटा ठूलो कार्यक्रम हो जहाँ खेल र प्रस्तुतीकरणहरू आयोजना गरिन्छ।",
+      "deText": "Es handelt sich um eine Großveranstaltung mit Spielen und Siegerehrungen.",
+      "simpleJaText": "試合や発表を行う大きな会です。"
     },
     {
       "id": "t244",
@@ -4919,7 +5996,7 @@ export const catalog = {
       "reading": "しあい",
       "en": "It's about competing with others.",
       "descriptionJa": "相手と競い合うことです。",
-      "category": "部活動",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de competir com os outros.",
@@ -4929,7 +6006,9 @@ export const catalog = {
       "koText": "상대와 경쟁하는 것입니다.",
       "tlText": "Tungkol ito sa pakikipagkumpitensya sa iba.",
       "idText": "Ini tentang bersaing dengan orang lain.",
-      "neText": "यो अरूसँग प्रतिस्पर्धा गर्ने बारेमा हो।"
+      "neText": "यो अरूसँग प्रतिस्पर्धा गर्ने बारेमा हो।",
+      "deText": "Es geht darum, sich mit anderen zu messen.",
+      "simpleJaText": "相手と競い合うことです。"
     },
     {
       "id": "t245",
@@ -4937,7 +6016,7 @@ export const catalog = {
       "reading": "えんせい",
       "en": "It involves going to a location away from school to play games or participate in activities.",
       "descriptionJa": "学校から離れた場所へ行って試合や活動をすることです。",
-      "category": "部活動",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Consiste em ir a um local fora da escola para jogar ou participar de atividades.",
@@ -4947,7 +6026,9 @@ export const catalog = {
       "koText": "학교에서 떨어진 곳으로 가서 경기나 활동을 하는 것입니다.",
       "tlText": "Kabilang dito ang pagpunta sa isang lokasyon na malayo sa paaralan upang maglaro o lumahok sa mga aktibidad.",
       "idText": "Ini melibatkan pergi ke lokasi di luar sekolah untuk bermain game atau berpartisipasi dalam kegiatan.",
-      "neText": "यसमा खेल खेल्न वा गतिविधिहरूमा भाग लिन स्कूलभन्दा टाढाको स्थानमा जानु समावेश छ।"
+      "neText": "यसमा खेल खेल्न वा गतिविधिहरूमा भाग लिन स्कूलभन्दा टाढाको स्थानमा जानु समावेश छ।",
+      "deText": "Dabei geht es darum, einen Ort außerhalb der Schule aufzusuchen, um Spiele zu spielen oder an Aktivitäten teilzunehmen.",
+      "simpleJaText": "学校から離れた場所へ行って試合や活動をすることです。"
     },
     {
       "id": "t246",
@@ -4955,7 +6036,7 @@ export const catalog = {
       "reading": "しゅうごうばしょ",
       "en": "It's a place where everyone gathers.",
       "descriptionJa": "みんなが集まる場所です。",
-      "category": "部活動",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "É um lugar onde todos se reúnem.",
@@ -4965,7 +6046,8 @@ export const catalog = {
       "koText": "모두가 모이는 곳입니다.",
       "tlText": "Ito ay isang lugar kung saan nagtitipon ang lahat.",
       "idText": "Ini adalah tempat di mana semua orang berkumpul.",
-      "neText": "यो सबैजना भेला हुने ठाउँ हो।"
+      "neText": "यो सबैजना भेला हुने ठाउँ हो।",
+      "deText": "Es ist ein Ort, an dem sich alle versammeln."
     },
     {
       "id": "t247",
@@ -4973,7 +6055,7 @@ export const catalog = {
       "reading": "かいさんばしょ",
       "en": "This is the place where we part ways after our activities have ended.",
       "descriptionJa": "活動が終わって別れる場所です。",
-      "category": "部活動",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o local onde nos despedimos após o término de nossas atividades.",
@@ -4983,7 +6065,8 @@ export const catalog = {
       "koText": "활동이 끝나고 헤어지는 곳입니다.",
       "tlText": "Dito tayo naghihiwalay ng landas pagkatapos ng ating mga aktibidad.",
       "idText": "Di sinilah kita berpisah setelah kegiatan kita selesai.",
-      "neText": "यो त्यो ठाउँ हो जहाँ हामी हाम्रा गतिविधिहरू समाप्त भएपछि अलग हुन्छौं।"
+      "neText": "यो त्यो ठाउँ हो जहाँ हामी हाम्रा गतिविधिहरू समाप्त भएपछि अलग हुन्छौं।",
+      "deText": "Hier trennen sich unsere Wege, nachdem unsere Aktivitäten beendet sind."
     },
     {
       "id": "t248",
@@ -4991,7 +6074,7 @@ export const catalog = {
       "reading": "かつどうよてい",
       "en": "This is the schedule for the days and times when club activities will be held.",
       "descriptionJa": "部活動を行う日や時間の予定です。",
-      "category": "部活動",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o cronograma com os dias e horários em que as atividades do clube serão realizadas.",
@@ -5001,7 +6084,9 @@ export const catalog = {
       "koText": "부활동을 실시하는 날이나 시간의 예정입니다.",
       "tlText": "Ito ang iskedyul para sa mga araw at oras kung kailan gaganapin ang mga aktibidad ng club.",
       "idText": "Berikut adalah jadwal hari dan waktu pelaksanaan kegiatan klub.",
-      "neText": "क्लब गतिविधिहरू आयोजना हुने दिन र समयहरूको तालिका यो हो।"
+      "neText": "क्लब गतिविधिहरू आयोजना हुने दिन र समयहरूको तालिका यो हो।",
+      "deText": "Dies ist der Zeitplan für die Tage und Uhrzeiten, an denen die Clubaktivitäten stattfinden.",
+      "simpleJaText": "部活動を行う日や時間の予定です。"
     },
     {
       "id": "t249",
@@ -5009,7 +6094,7 @@ export const catalog = {
       "reading": "せいかつ",
       "en": "This describes how I spend my days at school and at home.",
       "descriptionJa": "学校や家での毎日の過ごし方です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso descreve como passo meus dias na escola e em casa.",
@@ -5019,7 +6104,9 @@ export const catalog = {
       "koText": "학교와 집에서 매일 보내는 방법입니다.",
       "tlText": "Inilalarawan nito kung paano ko ginugugol ang aking mga araw sa paaralan at sa bahay.",
       "idText": "Ini menggambarkan bagaimana saya menghabiskan hari-hari saya di sekolah dan di rumah.",
-      "neText": "यसले म स्कूल र घरमा मेरा दिनहरू कसरी बिताउँछु भनेर वर्णन गर्दछ।"
+      "neText": "यसले म स्कूल र घरमा मेरा दिनहरू कसरी बिताउँछु भनेर वर्णन गर्दछ।",
+      "deText": "Dies beschreibt, wie ich meine Tage in der Schule und zu Hause verbringe.",
+      "simpleJaText": "学校や家での毎日の過ごし方です。"
     },
     {
       "id": "t250",
@@ -5027,7 +6114,7 @@ export const catalog = {
       "reading": "こうそく",
       "en": "It's a rule that must be followed at school.",
       "descriptionJa": "学校で守る決まりです。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "É uma regra que deve ser seguida na escola.",
@@ -5037,7 +6124,8 @@ export const catalog = {
       "koText": "학교에서 지키는 결정입니다.",
       "tlText": "Isa itong tuntunin na dapat sundin sa paaralan.",
       "idText": "Ini adalah aturan yang harus dipatuhi di sekolah.",
-      "neText": "यो स्कूलमा पालना गर्नुपर्ने नियम हो।"
+      "neText": "यो स्कूलमा पालना गर्नुपर्ने नियम हो।",
+      "deText": "Das ist eine Regel, die in der Schule befolgt werden muss."
     },
     {
       "id": "t251",
@@ -5045,7 +6133,7 @@ export const catalog = {
       "reading": "きそく",
       "en": "These are rules that must be followed.",
       "descriptionJa": "守らなければならない決まりです。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estas são regras que devem ser seguidas.",
@@ -5055,7 +6143,9 @@ export const catalog = {
       "koText": "지켜야 할 결정입니다.",
       "tlText": "Ito ang mga patakarang dapat sundin.",
       "idText": "Ini adalah aturan yang harus dipatuhi.",
-      "neText": "यी पालना गर्नुपर्ने नियमहरू हुन्।"
+      "neText": "यी पालना गर्नुपर्ने नियमहरू हुन्।",
+      "deText": "Dies sind Regeln, die befolgt werden müssen.",
+      "simpleJaText": "守らなければならない決まりです。"
     },
     {
       "id": "t252",
@@ -5063,7 +6153,7 @@ export const catalog = {
       "reading": "やくそく",
       "en": "It's something I've decided to protect.",
       "descriptionJa": "守ると決めたことです。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "É algo que decidi proteger.",
@@ -5073,7 +6163,9 @@ export const catalog = {
       "koText": "지키기로 결정한 것입니다.",
       "tlText": "Ito ay isang bagay na napagdesisyunan kong protektahan.",
       "idText": "Ini adalah sesuatu yang telah saya putuskan untuk dilindungi.",
-      "neText": "यो त्यस्तो चीज हो जसलाई मैले जोगाउने निर्णय गरेको छु।"
+      "neText": "यो त्यस्तो चीज हो जसलाई मैले जोगाउने निर्णय गरेको छु।",
+      "deText": "Das ist etwas, das ich zu schützen beschlossen habe.",
+      "simpleJaText": "守ると決めたことです。"
     },
     {
       "id": "t253",
@@ -5081,7 +6173,7 @@ export const catalog = {
       "reading": "みだしなみ",
       "en": "It means getting your clothes and hair in order.",
       "descriptionJa": "服装や髪などを整えることです。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa arrumar suas roupas e seu cabelo.",
@@ -5091,7 +6183,9 @@ export const catalog = {
       "koText": "복장이나 머리 등을 정돈하는 것입니다.",
       "tlText": "Ibig sabihin nito ay ayusin mo ang iyong mga damit at buhok.",
       "idText": "Artinya, merapikan pakaian dan rambut Anda.",
-      "neText": "यसको अर्थ आफ्नो लुगा र कपाल मिलाउनु हो।"
+      "neText": "यसको अर्थ आफ्नो लुगा र कपाल मिलाउनु हो।",
+      "deText": "Es bedeutet, Kleidung und Haare in Ordnung zu bringen.",
+      "simpleJaText": "服装や髪などを整えることです。"
     },
     {
       "id": "t254",
@@ -5099,7 +6193,7 @@ export const catalog = {
       "reading": "とうはつ",
       "en": "It's about hair.",
       "descriptionJa": "髪の毛のことです。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Tem a ver com cabelo.",
@@ -5109,7 +6203,9 @@ export const catalog = {
       "koText": "머리카락입니다.",
       "tlText": "Tungkol ito sa buhok.",
       "idText": "Ini tentang rambut.",
-      "neText": "यो कपालको बारेमा हो।"
+      "neText": "यो कपालको बारेमा हो।",
+      "deText": "Es geht um Haare.",
+      "simpleJaText": "髪の毛のことです。"
     },
     {
       "id": "t255",
@@ -5117,7 +6213,7 @@ export const catalog = {
       "reading": "ふくそう",
       "en": "It refers to the clothes one is wearing and their appearance.",
       "descriptionJa": "着ている服や身なりのことです。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Refere-se às roupas que alguém está vestindo e à sua aparência.",
@@ -5127,7 +6223,9 @@ export const catalog = {
       "koText": "입고 있는 옷이나 옷차림입니다.",
       "tlText": "Ito ay tumutukoy sa mga damit na suot ng isang tao at sa kanilang anyo.",
       "idText": "Ini merujuk pada pakaian yang dikenakan seseorang dan penampilan mereka.",
-      "neText": "यसले व्यक्तिले लगाएको लुगा र त्यसको उपस्थितिलाई जनाउँछ।"
+      "neText": "यसले व्यक्तिले लगाएको लुगा र त्यसको उपस्थितिलाई जनाउँछ।",
+      "deText": "Es bezieht sich auf die Kleidung, die man trägt, und deren Erscheinungsbild.",
+      "simpleJaText": "着ている服や身なりのことです。"
     },
     {
       "id": "t256",
@@ -5135,7 +6233,7 @@ export const catalog = {
       "reading": "じさん",
       "en": "Bring the things you need.",
       "descriptionJa": "必要な物を持ってくることです。",
-      "category": "生活",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Traga tudo o que você precisa.",
@@ -5145,7 +6243,9 @@ export const catalog = {
       "koText": "필요한 것을 가져오는 것입니다.",
       "tlText": "Dalhin mo na ang mga bagay na kailangan mo.",
       "idText": "Bawalah barang-barang yang Anda butuhkan.",
-      "neText": "तपाईंलाई चाहिने सामानहरू ल्याउनुहोस्।"
+      "neText": "तपाईंलाई चाहिने सामानहरू ल्याउनुहोस्।",
+      "deText": "Bringen Sie die Dinge mit, die Sie benötigen.",
+      "simpleJaText": "学校などに持ってくることです。"
     },
     {
       "id": "t257",
@@ -5153,7 +6253,7 @@ export const catalog = {
       "reading": "きんし",
       "en": "It means you shouldn't do it.",
       "descriptionJa": "してはいけないという意味です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que você não deveria fazer isso.",
@@ -5163,7 +6263,9 @@ export const catalog = {
       "koText": "해서는 안된다는 의미입니다.",
       "tlText": "Ibig sabihin, hindi mo dapat ginawa 'yon.",
       "idText": "Artinya kamu tidak seharusnya melakukan itu.",
-      "neText": "यसको अर्थ तपाईंले यो गर्नु हुँदैन।"
+      "neText": "यसको अर्थ तपाईंले यो गर्नु हुँदैन।",
+      "deText": "Es bedeutet, dass du es nicht tun solltest.",
+      "simpleJaText": "してはいけないという意味です。"
     },
     {
       "id": "t258",
@@ -5171,7 +6273,7 @@ export const catalog = {
       "reading": "きょか",
       "en": "It means acknowledging that it is permissible to do so.",
       "descriptionJa": "してもよいと認めることです。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa reconhecer que é permitido fazê-lo.",
@@ -5181,7 +6283,9 @@ export const catalog = {
       "koText": "할 수 있다고 인정하는 것입니다.",
       "tlText": "Nangangahulugan ito ng pagkilala na pinahihintulutan itong gawin.",
       "idText": "Artinya, mengakui bahwa hal itu diperbolehkan.",
-      "neText": "यसको अर्थ त्यसो गर्न अनुमति छ भनेर स्वीकार गर्नु हो।"
+      "neText": "यसको अर्थ त्यसो गर्न अनुमति छ भनेर स्वीकार गर्नु हो।",
+      "deText": "Es bedeutet, anzuerkennen, dass dies zulässig ist.",
+      "simpleJaText": "してもよいと認めることです。"
     },
     {
       "id": "t259",
@@ -5189,7 +6293,7 @@ export const catalog = {
       "reading": "あんぜん",
       "en": "It's not dangerous.",
       "descriptionJa": "危なくないことです。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Não é perigoso.",
@@ -5199,7 +6303,9 @@ export const catalog = {
       "koText": "위험하지 않은 것입니다.",
       "tlText": "Hindi ito mapanganib.",
       "idText": "Ini tidak berbahaya.",
-      "neText": "यो खतरनाक छैन।"
+      "neText": "यो खतरनाक छैन।",
+      "deText": "Es ist nicht gefährlich.",
+      "simpleJaText": "危なくないことです。"
     },
     {
       "id": "t260",
@@ -5207,7 +6313,7 @@ export const catalog = {
       "reading": "きけん",
       "en": "This could lead to injuries or accidents.",
       "descriptionJa": "けがや事故につながるおそれがあることです。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso pode causar ferimentos ou acidentes.",
@@ -5217,7 +6323,9 @@ export const catalog = {
       "koText": "부상이나 사고로 이어질 수 있습니다.",
       "tlText": "Maaari itong humantong sa mga pinsala o aksidente.",
       "idText": "Hal ini dapat menyebabkan cedera atau kecelakaan.",
-      "neText": "यसले चोटपटक वा दुर्घटना निम्त्याउन सक्छ।"
+      "neText": "यसले चोटपटक वा दुर्घटना निम्त्याउन सक्छ।",
+      "deText": "Dies könnte zu Verletzungen oder Unfällen führen.",
+      "simpleJaText": "けがや事故につながるおそれがあることです。"
     },
     {
       "id": "t261",
@@ -5225,7 +6333,7 @@ export const catalog = {
       "reading": "ひなん",
       "en": "It means moving from a dangerous place to a safe place.",
       "descriptionJa": "危ない場所から安全な場所へ移動することです。",
-      "category": "安全",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa sair de um lugar perigoso e ir para um lugar seguro.",
@@ -5235,7 +6343,9 @@ export const catalog = {
       "koText": "위험한 장소에서 안전한 장소로 이동하는 것입니다.",
       "tlText": "Nangangahulugan ito ng paglipat mula sa isang mapanganib na lugar patungo sa isang ligtas na lugar.",
       "idText": "Artinya berpindah dari tempat berbahaya ke tempat yang aman.",
-      "neText": "यसको अर्थ खतरनाक ठाउँबाट सुरक्षित ठाउँमा सर्नु हो।"
+      "neText": "यसको अर्थ खतरनाक ठाउँबाट सुरक्षित ठाउँमा सर्नु हो।",
+      "deText": "Es bedeutet, sich von einem gefährlichen Ort an einen sicheren Ort zu begeben.",
+      "simpleJaText": "危ない場所から安全な場所へ移動することです。"
     },
     {
       "id": "t262",
@@ -5243,7 +6353,7 @@ export const catalog = {
       "reading": "ひなんくんれん",
       "en": "This is practice for safely evacuating during a disaster.",
       "descriptionJa": "災害のときに安全に逃げるための練習です。",
-      "category": "安全",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um exercício de evacuação segura durante um desastre.",
@@ -5253,7 +6363,9 @@ export const catalog = {
       "koText": "재해 때 안전하게 도망치는 연습입니다.",
       "tlText": "Ito ay isang kasanayan para sa ligtas na paglikas sa panahon ng sakuna.",
       "idText": "Ini adalah latihan untuk evakuasi yang aman selama bencana.",
-      "neText": "यो प्रकोपको समयमा सुरक्षित रूपमा बाहिर निस्कने अभ्यास हो।"
+      "neText": "यो प्रकोपको समयमा सुरक्षित रूपमा बाहिर निस्कने अभ्यास हो।",
+      "deText": "Dies ist eine Übung für die sichere Evakuierung im Katastrophenfall.",
+      "simpleJaText": "災害のときに安全に逃げるための練習です。"
     },
     {
       "id": "t263",
@@ -5261,7 +6373,7 @@ export const catalog = {
       "reading": "じしん",
       "en": "This is a natural disaster where the ground shakes.",
       "descriptionJa": "地面がゆれる自然災害です。",
-      "category": "安全",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de um desastre natural em que a terra treme.",
@@ -5271,7 +6383,9 @@ export const catalog = {
       "koText": "지면이 흔들리는 자연 재해입니다.",
       "tlText": "Ito ay isang natural na sakuna kung saan ang lupa ay nayayanig.",
       "idText": "Ini adalah bencana alam di mana tanah bergetar.",
-      "neText": "यो एउटा प्राकृतिक प्रकोप हो जहाँ जमिन हल्लिन्छ।"
+      "neText": "यो एउटा प्राकृतिक प्रकोप हो जहाँ जमिन हल्लिन्छ।",
+      "deText": "Dies ist eine Naturkatastrophe, bei der die Erde bebt.",
+      "simpleJaText": "地面がゆれる自然災害です。"
     },
     {
       "id": "t264",
@@ -5279,7 +6393,7 @@ export const catalog = {
       "reading": "かさい",
       "en": "It's about a fire.",
       "descriptionJa": "火事のことです。",
-      "category": "安全",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "É sobre um incêndio.",
@@ -5289,7 +6403,9 @@ export const catalog = {
       "koText": "화재입니다.",
       "tlText": "Tungkol ito sa sunog.",
       "idText": "Ini tentang kebakaran.",
-      "neText": "यो आगोको बारेमा हो।"
+      "neText": "यो आगोको बारेमा हो।",
+      "deText": "Es geht um ein Feuer.",
+      "simpleJaText": "火事のことです。"
     },
     {
       "id": "t265",
@@ -5297,7 +6413,7 @@ export const catalog = {
       "reading": "けいほう",
       "en": "This is important information to warn of potential danger.",
       "descriptionJa": "危険があることを知らせる大切な情報です。",
-      "category": "安全",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma informação importante para alertar sobre um perigo potencial.",
@@ -5307,7 +6423,9 @@ export const catalog = {
       "koText": "위험이 있음을 알리는 중요한 정보입니다.",
       "tlText": "Ito ay mahalagang impormasyon upang magbigay babala sa mga posibleng panganib.",
       "idText": "Ini adalah informasi penting untuk memperingatkan potensi bahaya.",
-      "neText": "सम्भावित खतराको बारेमा चेतावनी दिन यो महत्त्वपूर्ण जानकारी हो।"
+      "neText": "सम्भावित खतराको बारेमा चेतावनी दिन यो महत्त्वपूर्ण जानकारी हो।",
+      "deText": "Dies sind wichtige Informationen, um vor potenziellen Gefahren zu warnen.",
+      "simpleJaText": "危険があることを知らせる大切な情報です。"
     },
     {
       "id": "t266",
@@ -5315,7 +6433,7 @@ export const catalog = {
       "reading": "ぼうふうけいほう",
       "en": "This is a warning indicating the danger of very strong winds.",
       "descriptionJa": "とても強い風の危険を知らせる警報です。",
-      "category": "安全",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um aviso que indica o perigo de ventos muito fortes.",
@@ -5325,7 +6443,9 @@ export const catalog = {
       "koText": "매우 강한 바람의 위험을 알리는 경보입니다.",
       "tlText": "Ito ay isang babala na nagpapahiwatig ng panganib ng napakalakas na hangin.",
       "idText": "Ini adalah peringatan yang menunjukkan bahaya angin yang sangat kencang.",
-      "neText": "यो धेरै तेज हावाको खतरालाई संकेत गर्ने चेतावनी हो।"
+      "neText": "यो धेरै तेज हावाको खतरालाई संकेत गर्ने चेतावनी हो।",
+      "deText": "Dies ist eine Warnung vor der Gefahr sehr starker Winde.",
+      "simpleJaText": "とても強い風の危険を知らせる警報です。"
     },
     {
       "id": "t267",
@@ -5333,7 +6453,7 @@ export const catalog = {
       "reading": "おおあめけいほう",
       "en": "This is a warning indicating the danger of heavy rain.",
       "descriptionJa": "強い雨の危険を知らせる警報です。",
-      "category": "安全",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um aviso que indica o perigo de chuva forte.",
@@ -5343,7 +6463,9 @@ export const catalog = {
       "koText": "강한 비의 위험을 알리는 경보입니다.",
       "tlText": "Ito ay isang babala na nagpapahiwatig ng panganib ng malakas na ulan.",
       "idText": "Ini adalah peringatan yang menunjukkan bahaya hujan lebat.",
-      "neText": "यो भारी वर्षाको खतरालाई संकेत गर्ने चेतावनी हो।"
+      "neText": "यो भारी वर्षाको खतरालाई संकेत गर्ने चेतावनी हो।",
+      "deText": "Dies ist eine Warnung vor der Gefahr von Starkregen.",
+      "simpleJaText": "強い雨の危険を知らせる警報です。"
     },
     {
       "id": "t268",
@@ -5351,7 +6473,7 @@ export const catalog = {
       "reading": "りんじきゅうこう",
       "en": "This refers to a sudden school closure due to reasons such as a natural disaster.",
       "descriptionJa": "災害などの理由で、急に学校が休みになることです。",
-      "category": "安全",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso se refere ao fechamento repentino de uma escola devido a motivos como um desastre natural.",
@@ -5361,7 +6483,9 @@ export const catalog = {
       "koText": "재해 등의 이유로 갑자기 학교가 쉬는 것입니다.",
       "tlText": "Ito ay tumutukoy sa biglaang pagsasara ng paaralan dahil sa mga kadahilanang tulad ng isang natural na sakuna.",
       "idText": "Ini merujuk pada penutupan sekolah secara tiba-tiba karena alasan seperti bencana alam.",
-      "neText": "यसले प्राकृतिक प्रकोप जस्ता कारणले गर्दा अचानक विद्यालय बन्द हुनुलाई जनाउँछ।"
+      "neText": "यसले प्राकृतिक प्रकोप जस्ता कारणले गर्दा अचानक विद्यालय बन्द हुनुलाई जनाउँछ।",
+      "deText": "Dies bezieht sich auf eine plötzliche Schulschließung aufgrund von Gründen wie beispielsweise einer Naturkatastrophe.",
+      "simpleJaText": "災害などの理由で、急に学校が休みになることです。"
     },
     {
       "id": "t269",
@@ -5369,7 +6493,7 @@ export const catalog = {
       "reading": "とうこうみあわせ",
       "en": "Wait to go to school until it is safe to do so.",
       "descriptionJa": "安全が確認できるまで、学校に行くのを待つことです。",
-      "category": "安全",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Aguarde até que seja seguro ir à escola.",
@@ -5379,7 +6503,9 @@ export const catalog = {
       "koText": "안전이 확인 될 때까지 학교에 가기를 기다리는 것입니다.",
       "tlText": "Maghintay bago pumasok sa paaralan hanggang sa ligtas nang gawin ito.",
       "idText": "Tunggu sampai kondisi aman untuk pergi ke sekolah.",
-      "neText": "स्कूल जान सुरक्षित नभएसम्म पर्खनुहोस्।"
+      "neText": "स्कूल जान सुरक्षित नभएसम्म पर्खनुहोस्।",
+      "deText": "Warten Sie mit dem Schulbesuch, bis es sicher ist.",
+      "simpleJaText": "安全が確認できるまで、学校に行くのを待つことです。"
     },
     {
       "id": "t270",
@@ -5387,7 +6513,7 @@ export const catalog = {
       "reading": "ひきわたし",
       "en": "This refers to the school handing over children to their parents in the event of a disaster or other emergency.",
       "descriptionJa": "災害などのときに、学校が子どもを保護者に渡すことです。",
-      "category": "安全",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso se refere à situação em que a escola entrega as crianças aos seus pais em caso de desastre ou outra emergência.",
@@ -5397,7 +6523,9 @@ export const catalog = {
       "koText": "재해 등의 경우에, 학교가 아이를 보호자에게 건네주는 것입니다.",
       "tlText": "Ito ay tumutukoy sa pagpapasa ng paaralan ng mga bata sa kanilang mga magulang sakaling magkaroon ng sakuna o iba pang emergency.",
       "idText": "Ini merujuk pada tindakan sekolah yang menyerahkan anak-anak kepada orang tua mereka jika terjadi bencana atau keadaan darurat lainnya.",
-      "neText": "यसले विपद् वा अन्य आपतकालीन अवस्थामा विद्यालयले बालबालिकालाई अभिभावकलाई हस्तान्तरण गर्ने कुरालाई जनाउँछ।"
+      "neText": "यसले विपद् वा अन्य आपतकालीन अवस्थामा विद्यालयले बालबालिकालाई अभिभावकलाई हस्तान्तरण गर्ने कुरालाई जनाउँछ।",
+      "deText": "Dies bezieht sich auf die Übergabe der Kinder an ihre Eltern durch die Schule im Falle einer Katastrophe oder eines anderen Notfalls.",
+      "simpleJaText": "災害などのときに、学校が子どもを保護者に渡すことです。"
     },
     {
       "id": "t271",
@@ -5405,7 +6533,7 @@ export const catalog = {
       "reading": "ひきとり",
       "en": "It means that parents come to the school and take their children home.",
       "descriptionJa": "保護者が学校へ来て、子どもを連れて帰ることです。",
-      "category": "安全",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que os pais vêm à escola e levam seus filhos para casa.",
@@ -5415,7 +6543,9 @@ export const catalog = {
       "koText": "보호자가 학교에 와서 아이를 데리고 돌아가는 것입니다.",
       "tlText": "Ibig sabihin, ang mga magulang ang pumupunta sa paaralan at iniuuwi ang kanilang mga anak.",
       "idText": "Artinya, orang tua datang ke sekolah dan menjemput anak-anak mereka pulang.",
-      "neText": "यसको अर्थ अभिभावकहरू स्कूल आउँछन् र आफ्ना बच्चाहरूलाई घर लैजान्छन्।"
+      "neText": "यसको अर्थ अभिभावकहरू स्कूल आउँछन् र आफ्ना बच्चाहरूलाई घर लैजान्छन्।",
+      "deText": "Das bedeutet, dass die Eltern zur Schule kommen und ihre Kinder wieder mit nach Hause nehmen.",
+      "simpleJaText": "保護者が学校へ来て、子どもを連れて帰ることです。"
     },
     {
       "id": "t272",
@@ -5423,7 +6553,7 @@ export const catalog = {
       "reading": "ほんじつ",
       "en": "It means today.",
       "descriptionJa": "今日という意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa hoje.",
@@ -5433,7 +6563,9 @@ export const catalog = {
       "koText": "오늘이라는 뜻입니다.",
       "tlText": "Ibig sabihin ngayon.",
       "idText": "Artinya hari ini.",
-      "neText": "यसको अर्थ आज हो।"
+      "neText": "यसको अर्थ आज हो।",
+      "deText": "Es bedeutet heute.",
+      "simpleJaText": "今日という意味です。"
     },
     {
       "id": "t273",
@@ -5441,7 +6573,7 @@ export const catalog = {
       "reading": "きょう",
       "en": "This happened on this day.",
       "descriptionJa": "この日のことです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso aconteceu neste dia.",
@@ -5451,7 +6583,9 @@ export const catalog = {
       "koText": "이 날입니다.",
       "tlText": "Nangyari ito sa araw na ito.",
       "idText": "Ini terjadi pada hari ini.",
-      "neText": "यो घटना यसै दिन घट्यो।"
+      "neText": "यो घटना यसै दिन घट्यो।",
+      "deText": "Dies geschah an diesem Tag.",
+      "simpleJaText": "この日のことです。"
     },
     {
       "id": "t274",
@@ -5459,7 +6593,7 @@ export const catalog = {
       "reading": "まだ",
       "en": "At this point, it means it's not finished, or it hasn't happened yet.",
       "descriptionJa": "今の時点では、終わっていない、来ていないという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Neste ponto, significa que ainda não acabou, ainda não chegou.",
@@ -5469,7 +6603,9 @@ export const catalog = {
       "koText": "지금의 시점에서는, 끝나지 않고, 오지 않았다는 의미입니다.",
       "tlText": "Sa puntong ito, ibig sabihin ay hindi pa tapos, hindi pa dumarating.",
       "idText": "Pada titik ini, artinya belum berakhir, belum tiba.",
-      "neText": "यस बिन्दुमा, यसको अर्थ यो सकिएको छैन, यो अझै आइपुगेको छैन।"
+      "neText": "यस बिन्दुमा, यसको अर्थ यो सकिएको छैन, यो अझै आइपुगेको छैन।",
+      "deText": "Zum jetzigen Zeitpunkt bedeutet es, dass es noch nicht vorbei ist, das Ziel noch nicht erreicht ist.",
+      "simpleJaText": "今の時点では、終わっていない、来ていないという意味です。"
     },
     {
       "id": "t275",
@@ -5477,7 +6613,7 @@ export const catalog = {
       "reading": "ばあい",
       "en": "That's what I mean.",
       "descriptionJa": "そのようなとき、という意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "É isso que eu quero dizer.",
@@ -5487,7 +6623,9 @@ export const catalog = {
       "koText": "그런 때라는 의미입니다.",
       "tlText": "Iyan ang ibig kong sabihin.",
       "idText": "Itulah maksudku.",
-      "neText": "मेरो मतलब त्यही हो।"
+      "neText": "मेरो मतलब त्यही हो।",
+      "deText": "Genau das meine ich.",
+      "simpleJaText": "そのようなとき、という意味です。"
     },
     {
       "id": "t276",
@@ -5495,7 +6633,7 @@ export const catalog = {
       "reading": "とき",
       "en": "It refers to the time or situation in which something happens.",
       "descriptionJa": "何かが起こる時間や場面のことです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Refere-se ao momento ou à situação em que algo acontece.",
@@ -5505,7 +6643,9 @@ export const catalog = {
       "koText": "무언가가 일어나는 시간과 장면입니다.",
       "tlText": "Ito ay tumutukoy sa panahon o sitwasyon kung kailan nangyayari ang isang bagay.",
       "idText": "Ini merujuk pada waktu atau situasi di mana sesuatu terjadi.",
-      "neText": "यसले कुनै घटना घट्ने समय वा परिस्थितिलाई जनाउँछ।"
+      "neText": "यसले कुनै घटना घट्ने समय वा परिस्थितिलाई जनाउँछ।",
+      "deText": "Es bezieht sich auf den Zeitpunkt oder die Situation, in der etwas geschieht.",
+      "simpleJaText": "何かが起こる時間や場面のことです。"
     },
     {
       "id": "t277",
@@ -5513,7 +6653,7 @@ export const catalog = {
       "reading": "やすみ",
       "en": "It means not coming to school.",
       "descriptionJa": "学校に来ないことです。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa faltar à aula.",
@@ -5523,7 +6663,9 @@ export const catalog = {
       "koText": "학교에 오지 않는 것입니다.",
       "tlText": "Ibig sabihin, hindi na papasok sa paaralan.",
       "idText": "Artinya tidak datang ke sekolah.",
-      "neText": "यसको अर्थ स्कूल नआउने हो।"
+      "neText": "यसको अर्थ स्कूल नआउने हो।",
+      "deText": "Das bedeutet, nicht zur Schule zu kommen.",
+      "simpleJaText": "学校に来ないことです。"
     },
     {
       "id": "t278",
@@ -5531,7 +6673,7 @@ export const catalog = {
       "reading": "がっこうへ",
       "en": "It means \"to school.\"",
       "descriptionJa": "学校に、という意味です。",
-      "category": "基本",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa \"ir para a escola\".",
@@ -5541,7 +6683,9 @@ export const catalog = {
       "koText": "학교에, 라는 의미입니다.",
       "tlText": "Ang ibig sabihin nito ay \"papunta sa paaralan.\"",
       "idText": "Artinya \"pergi ke sekolah.\"",
-      "neText": "यसको अर्थ \"स्कूल जाने\" हो।"
+      "neText": "यसको अर्थ \"स्कूल जाने\" हो।",
+      "deText": "Es bedeutet „zur Schule“.",
+      "simpleJaText": "学校に、という意味です。"
     },
     {
       "id": "t279",
@@ -5549,7 +6693,7 @@ export const catalog = {
       "reading": "れんらく",
       "en": "This means please inform the school by phone or email.",
       "descriptionJa": "学校に電話やメールなどで知らせてくださいという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso significa que você deve informar a escola por telefone ou e-mail.",
@@ -5559,7 +6703,9 @@ export const catalog = {
       "koText": "학교에 전화나 메일 등으로 알려주세요라는 의미입니다.",
       "tlText": "Ibig sabihin nito ay mangyaring ipaalam sa paaralan sa pamamagitan ng telepono o email.",
       "idText": "Artinya, mohon informasikan kepada pihak sekolah melalui telepon atau email.",
-      "neText": "यसको अर्थ कृपया स्कूललाई ​​फोन वा इमेल मार्फत जानकारी दिनुहोस्।"
+      "neText": "यसको अर्थ कृपया स्कूललाई ​​फोन वा इमेल मार्फत जानकारी दिनुहोस्।",
+      "deText": "Das bedeutet, bitte informieren Sie die Schule telefonisch oder per E-Mail.",
+      "simpleJaText": "学校に電話やメールなどで知らせてくださいという意味です。"
     },
     {
       "id": "t280",
@@ -5567,7 +6713,7 @@ export const catalog = {
       "reading": "おくれて",
       "en": "It means being later than the scheduled time.",
       "descriptionJa": "決められた時間より後になることです。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa chegar atrasado em relação ao horário previsto.",
@@ -5577,7 +6723,9 @@ export const catalog = {
       "koText": "정해진 시간보다 늦게 되는 것입니다.",
       "tlText": "Nangangahulugan ito na mas huli kaysa sa itinakdang oras.",
       "idText": "Artinya datang terlambat dari waktu yang dijadwalkan.",
-      "neText": "यसको अर्थ निर्धारित समयभन्दा ढिलो हुनु हो।"
+      "neText": "यसको अर्थ निर्धारित समयभन्दा ढिलो हुनु हो।",
+      "deText": "Es bedeutet, später als geplant zu sein.",
+      "simpleJaText": "決められた時間より後になることです。"
     },
     {
       "id": "t281",
@@ -5585,7 +6733,7 @@ export const catalog = {
       "reading": "おくれてとうこう",
       "en": "It means coming to school later than usual.",
       "descriptionJa": "いつもの時間より遅く学校に来ることです。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa chegar à escola mais tarde do que o habitual.",
@@ -5595,7 +6743,9 @@ export const catalog = {
       "koText": "평소보다 늦게 학교에 오는 것입니다.",
       "tlText": "Ibig sabihin, mas huli ang pagpasok sa paaralan kaysa sa dati.",
       "idText": "Artinya datang ke sekolah lebih lambat dari biasanya.",
-      "neText": "यसको अर्थ सधैं भन्दा ढिलो स्कूल आउनु हो।"
+      "neText": "यसको अर्थ सधैं भन्दा ढिलो स्कूल आउनु हो।",
+      "deText": "Das bedeutet, später als gewöhnlich zur Schule zu kommen.",
+      "simpleJaText": "いつもの時間より遅く学校に来ることです。"
     },
     {
       "id": "t282",
@@ -5603,7 +6753,7 @@ export const catalog = {
       "reading": "がっこうにつく",
       "en": "It's about arriving at school.",
       "descriptionJa": "学校に到着することです。",
-      "category": "欠席・遅刻",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de chegar à escola.",
@@ -5613,7 +6763,9 @@ export const catalog = {
       "koText": "학교에 도착하는 것입니다.",
       "tlText": "Tungkol ito sa pagdating sa paaralan.",
       "idText": "Ini tentang tiba di sekolah.",
-      "neText": "यो स्कूल पुग्ने बारेमा हो।"
+      "neText": "यो स्कूल पुग्ने बारेमा हो।",
+      "deText": "Es geht darum, pünktlich in der Schule anzukommen.",
+      "simpleJaText": "学校に到着することです。"
     },
     {
       "id": "t283",
@@ -5621,7 +6773,7 @@ export const catalog = {
       "reading": "つく",
       "en": "The goal is to arrive at the destination.",
       "descriptionJa": "目的の場所に到着することです。",
-      "category": "欠席・遅刻",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "O objetivo é chegar ao destino.",
@@ -5631,7 +6783,9 @@ export const catalog = {
       "koText": "원하는 위치에 도착하는 것입니다.",
       "tlText": "Ang layunin ay makarating sa destinasyon.",
       "idText": "Tujuannya adalah untuk sampai ke tujuan.",
-      "neText": "लक्ष्य भनेको गन्तव्यमा पुग्नु हो।"
+      "neText": "लक्ष्य भनेको गन्तव्यमा पुग्नु हो।",
+      "deText": "Das Ziel ist es, am Zielort anzukommen.",
+      "simpleJaText": "目的の場所に到着することです。"
     },
     {
       "id": "t284",
@@ -5639,7 +6793,7 @@ export const catalog = {
       "reading": "とうちゃく",
       "en": "It's about arriving at your destination.",
       "descriptionJa": "目的の場所に着くことです。",
-      "category": "欠席・遅刻",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de chegar ao seu destino.",
@@ -5649,7 +6803,9 @@ export const catalog = {
       "koText": "원하는 장소에 도착하는 것입니다.",
       "tlText": "Tungkol ito sa pagdating sa iyong destinasyon.",
       "idText": "Ini tentang sampai ke tujuan Anda.",
-      "neText": "यो तपाईंको गन्तव्यमा पुग्ने बारेमा हो।"
+      "neText": "यो तपाईंको गन्तव्यमा पुग्ने बारेमा हो।",
+      "deText": "Es geht darum, am Ziel anzukommen.",
+      "simpleJaText": "目的の場所に着くことです。"
     },
     {
       "id": "t285",
@@ -5657,7 +6813,7 @@ export const catalog = {
       "reading": "よていのじかん",
       "en": "This is the expected arrival time or planned time for the activity.",
       "descriptionJa": "着く予定や行う予定の時間です。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o horário previsto de chegada ou o horário planejado para a atividade.",
@@ -5667,7 +6823,9 @@ export const catalog = {
       "koText": "도착할 예정이나 할 예정의 시간입니다.",
       "tlText": "Ito ang inaasahang oras ng pagdating o nakaplanong oras para sa aktibidad.",
       "idText": "Ini adalah perkiraan waktu kedatangan atau waktu yang direncanakan untuk kegiatan tersebut.",
-      "neText": "यो गतिविधिको लागि अपेक्षित आगमन समय वा योजनाबद्ध समय हो।"
+      "neText": "यो गतिविधिको लागि अपेक्षित आगमन समय वा योजनाबद्ध समय हो।",
+      "deText": "Dies ist die voraussichtliche Ankunftszeit bzw. die geplante Zeit für die Aktivität.",
+      "simpleJaText": "着く予定や行う予定の時間です。"
     },
     {
       "id": "t286",
@@ -5675,7 +6833,7 @@ export const catalog = {
       "reading": "あとで",
       "en": "It means not now, but a little later.",
       "descriptionJa": "今ではなく、少し後でという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa não agora, mas um pouco mais tarde.",
@@ -5685,7 +6843,9 @@ export const catalog = {
       "koText": "지금이 아니라 조금 나중에 의미합니다.",
       "tlText": "Ibig sabihin hindi pa ngayon, kundi maya-maya pa.",
       "idText": "Artinya bukan sekarang, tapi nanti sedikit lebih lama.",
-      "neText": "यसको अर्थ अहिले होइन, तर अलि पछि।"
+      "neText": "यसको अर्थ अहिले होइन, तर अलि पछि।",
+      "deText": "Es bedeutet nicht jetzt, sondern etwas später.",
+      "simpleJaText": "今ではなく、少し後でという意味です。"
     },
     {
       "id": "t287",
@@ -5693,7 +6853,7 @@ export const catalog = {
       "reading": "あとで",
       "en": "It means not now, but a little later.",
       "descriptionJa": "今ではなく、少し後でという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa não agora, mas um pouco mais tarde.",
@@ -5703,7 +6863,9 @@ export const catalog = {
       "koText": "지금이 아니라 조금 나중에 의미합니다.",
       "tlText": "Ibig sabihin hindi pa ngayon, kundi maya-maya pa.",
       "idText": "Artinya bukan sekarang, tapi nanti sedikit lebih lama.",
-      "neText": "यसको अर्थ अहिले होइन, तर अलि पछि।"
+      "neText": "यसको अर्थ अहिले होइन, तर अलि पछि।",
+      "deText": "Es bedeutet nicht jetzt, sondern etwas später.",
+      "simpleJaText": "今ではなく、少し後でという意味です。"
     },
     {
       "id": "t288",
@@ -5711,7 +6873,7 @@ export const catalog = {
       "reading": "あすまで",
       "en": "It means by the end of tomorrow.",
       "descriptionJa": "明日が終わるまでに、という意味です。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa até o final de amanhã.",
@@ -5721,7 +6883,9 @@ export const catalog = {
       "koText": "내일이 끝날 때까지라는 의미입니다.",
       "tlText": "Ibig sabihin, sa pagtatapos ng bukas.",
       "idText": "Artinya paling lambat besok.",
-      "neText": "यसको अर्थ भोलिको अन्त्यसम्ममा।"
+      "neText": "यसको अर्थ भोलिको अन्त्यसम्ममा।",
+      "deText": "Das bedeutet bis morgen Abend.",
+      "simpleJaText": "明日が終わるまでに、という意味です。"
     },
     {
       "id": "t289",
@@ -5729,7 +6893,7 @@ export const catalog = {
       "reading": "だすかみ",
       "en": "These are printouts and documents that you submit to school.",
       "descriptionJa": "学校に提出するプリントや書類のことです。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "São impressões e documentos que você entrega à escola.",
@@ -5739,7 +6903,9 @@ export const catalog = {
       "koText": "학교에 제출하는 프린트나 서류입니다.",
       "tlText": "Ito ay mga printout at dokumentong isinusumite mo sa paaralan.",
       "idText": "Ini adalah hasil cetakan dan dokumen yang Anda serahkan ke sekolah.",
-      "neText": "यी तपाईंले स्कूलमा बुझाउनुहुने प्रिन्टआउट र कागजातहरू हुन्।"
+      "neText": "यी तपाईंले स्कूलमा बुझाउनुहुने प्रिन्टआउट र कागजातहरू हुन्।",
+      "deText": "Dies sind Ausdrucke und Dokumente, die Sie in der Schule einreichen.",
+      "simpleJaText": "学校に提出するプリントや書類のことです。"
     },
     {
       "id": "t290",
@@ -5747,7 +6913,7 @@ export const catalog = {
       "reading": "でていません",
       "en": "It means it hasn't been submitted to school yet.",
       "descriptionJa": "まだ学校に提出されていないという意味です。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que ainda não foi entregue à escola.",
@@ -5757,7 +6923,9 @@ export const catalog = {
       "koText": "아직 학교에 제출되지 않았다는 뜻입니다.",
       "tlText": "Ibig sabihin, hindi pa ito naipapasa sa paaralan.",
       "idText": "Artinya, tugas tersebut belum diserahkan ke sekolah.",
-      "neText": "यसको अर्थ यो अझै स्कूलमा पेश गरिएको छैन।"
+      "neText": "यसको अर्थ यो अझै स्कूलमा पेश गरिएको छैन।",
+      "deText": "Das bedeutet, dass es noch nicht an die Schule übermittelt wurde.",
+      "simpleJaText": "まだ学校に提出されていないという意味です。"
     },
     {
       "id": "t291",
@@ -5765,7 +6933,7 @@ export const catalog = {
       "reading": "ていしゅつされていません",
       "en": "It means it hasn't been released yet.",
       "descriptionJa": "まだ出されていないという意味です。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que ainda não foi lançado.",
@@ -5775,7 +6943,9 @@ export const catalog = {
       "koText": "아직 나오지 않았다는 의미입니다.",
       "tlText": "Ibig sabihin hindi pa ito nailalabas.",
       "idText": "Artinya, itu belum dirilis.",
-      "neText": "यसको अर्थ यो अझै जारी भएको छैन।"
+      "neText": "यसको अर्थ यो अझै जारी भएको छैन।",
+      "deText": "Das bedeutet, dass es noch nicht veröffentlicht wurde.",
+      "simpleJaText": "まだ出されていないという意味です。"
     },
     {
       "id": "t292",
@@ -5783,7 +6953,7 @@ export const catalog = {
       "reading": "ひつようなしょるい",
       "en": "These are papers and documents that need to be submitted to the school.",
       "descriptionJa": "学校に出す必要がある紙や文書です。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "São documentos que precisam ser entregues à escola.",
@@ -5793,7 +6963,9 @@ export const catalog = {
       "koText": "학교에 낼 필요가 있는 종이나 문서입니다.",
       "tlText": "Ito ay mga papeles at dokumentong kailangang isumite sa paaralan.",
       "idText": "Ini adalah kertas dan dokumen yang perlu diserahkan ke sekolah.",
-      "neText": "यी कागजातहरू र कागजातहरू हुन् जुन स्कूलमा बुझाउनु पर्छ।"
+      "neText": "यी कागजातहरू र कागजातहरू हुन् जुन स्कूलमा बुझाउनु पर्छ।",
+      "deText": "Hierbei handelt es sich um Unterlagen, die der Schule vorgelegt werden müssen.",
+      "simpleJaText": "学校に出す必要がある紙や文書です。"
     },
     {
       "id": "t293",
@@ -5801,7 +6973,7 @@ export const catalog = {
       "reading": "ひつようなもの",
       "en": "These are items you need to bring to school.",
       "descriptionJa": "学校に持ってくる必要がある物です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "5",
       "ptText": "Estes são os itens que você precisa trazer para a escola.",
@@ -5811,7 +6983,9 @@ export const catalog = {
       "koText": "학교에 가져올 필요가 있는 것입니다.",
       "tlText": "Ito ang mga bagay na kailangan mong dalhin sa paaralan.",
       "idText": "Ini adalah barang-barang yang perlu kamu bawa ke sekolah.",
-      "neText": "यी तपाईंले स्कूलमा ल्याउनुपर्ने सामानहरू हुन्।"
+      "neText": "यी तपाईंले स्कूलमा ल्याउनुपर्ने सामानहरू हुन्।",
+      "deText": "Dies sind Gegenstände, die du zur Schule mitbringen musst.",
+      "simpleJaText": "学校に持ってくる必要がある物です。"
     },
     {
       "id": "t294",
@@ -5819,7 +6993,7 @@ export const catalog = {
       "reading": "もたせてください",
       "en": "It means, \"Please have a child bring it.\"",
       "descriptionJa": "子どもに持ってこさせてくださいという意味です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa: \"Por favor, peça a uma criança que traga.\"",
@@ -5829,7 +7003,9 @@ export const catalog = {
       "koText": "아이에게 가져오게 한다는 의미입니다.",
       "tlText": "Ang ibig sabihin nito ay, \"Pakidala po ito sa isang bata.\"",
       "idText": "Artinya, \"Silakan minta anak untuk membawanya.\"",
-      "neText": "यसको अर्थ हो, \"कृपया बच्चालाई ल्याउन लगाउनुहोस्।\""
+      "neText": "यसको अर्थ हो, \"कृपया बच्चालाई ल्याउन लगाउनुहोस्।\"",
+      "deText": "Es bedeutet: „Bitte lassen Sie es von einem Kind bringen.“",
+      "simpleJaText": "子どもに持ってこさせてくださいという意味です。"
     },
     {
       "id": "t295",
@@ -5837,7 +7013,7 @@ export const catalog = {
       "reading": "もってきてください",
       "en": "It means \"Please bring it to school.\"",
       "descriptionJa": "学校に持ってきてくださいという意味です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "1",
       "ptText": "Significa \"Por favor, traga para a escola\".",
@@ -5847,7 +7023,9 @@ export const catalog = {
       "koText": "학교에 가져오라는 의미입니다.",
       "tlText": "Ang ibig sabihin nito ay \"Pakidala mo ito sa paaralan.\"",
       "idText": "Artinya \"Silakan bawa ke sekolah.\"",
-      "neText": "यसको अर्थ \"कृपया यसलाई स्कूलमा ल्याउनुहोस्।\""
+      "neText": "यसको अर्थ \"कृपया यसलाई स्कूलमा ल्याउनुहोस्।\"",
+      "deText": "Es bedeutet: „Bitte bring es mit zur Schule.“",
+      "simpleJaText": "学校に持ってきてくださいという意味です。"
     },
     {
       "id": "t296",
@@ -5855,7 +7033,7 @@ export const catalog = {
       "reading": "きゅうしょくがありません",
       "en": "That means there will be no school lunch on that day.",
       "descriptionJa": "その日は学校の給食がないという意味です。",
-      "category": "給食",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso significa que não haverá almoço escolar nesse dia.",
@@ -5865,7 +7043,9 @@ export const catalog = {
       "koText": "그날은 학교 급식이 없다는 뜻입니다.",
       "tlText": "Ibig sabihin, walang pananghalian sa paaralan sa araw na iyon.",
       "idText": "Itu artinya tidak akan ada makan siang sekolah pada hari itu.",
-      "neText": "यसको अर्थ त्यो दिन स्कूलमा खाजा हुनेछैन।"
+      "neText": "यसको अर्थ त्यो दिन स्कूलमा खाजा हुनेछैन।",
+      "deText": "Das bedeutet, dass es an diesem Tag kein Mittagessen in der Schule geben wird.",
+      "simpleJaText": "その日は学校の給食がないという意味です。"
     },
     {
       "id": "t297",
@@ -5873,7 +7053,7 @@ export const catalog = {
       "reading": "おべんとうがひつよう",
       "en": "This means that you need to bring a packed lunch to school.",
       "descriptionJa": "学校にお弁当を持ってくる必要があるという意味です。",
-      "category": "給食",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso significa que você precisa trazer um almoço de casa para a escola.",
@@ -5883,7 +7063,9 @@ export const catalog = {
       "koText": "학교에 도시락을 가져올 필요가 있다는 의미입니다.",
       "tlText": "Ibig sabihin nito ay kailangan mong magdala ng baon sa paaralan.",
       "idText": "Ini berarti kamu perlu membawa bekal makan siang ke sekolah.",
-      "neText": "यसको अर्थ तपाईंले स्कूलमा प्याक गरिएको खाजा ल्याउनु पर्छ।"
+      "neText": "यसको अर्थ तपाईंले स्कूलमा प्याक गरिएको खाजा ल्याउनु पर्छ।",
+      "deText": "Das bedeutet, dass die Schüler ihr eigenes Mittagessen mit zur Schule bringen müssen.",
+      "simpleJaText": "学校にお弁当を持ってくる必要があるという意味です。"
     },
     {
       "id": "t298",
@@ -5891,7 +7073,7 @@ export const catalog = {
       "reading": "おべんとうをもたせてください",
       "en": "This means please have your child bring a packed lunch.",
       "descriptionJa": "子どもにお弁当を持ってこさせてくださいという意味です。",
-      "category": "給食",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso significa que, por favor, peça ao seu filho que traga um almoço de casa.",
@@ -5901,7 +7083,9 @@ export const catalog = {
       "koText": "아이에게 도시락을 가지고 문지른다는 의미입니다.",
       "tlText": "Ibig sabihin nito, pakidala ang inyong anak ng baon.",
       "idText": "Artinya, mohon agar anak Anda membawa bekal makan siang.",
-      "neText": "यसको अर्थ कृपया तपाईंको बच्चालाई प्याक गरिएको खाजा ल्याउन लगाउनुहोस्।"
+      "neText": "यसको अर्थ कृपया तपाईंको बच्चालाई प्याक गरिएको खाजा ल्याउन लगाउनुहोस्।",
+      "deText": "Das bedeutet, bitte geben Sie Ihrem Kind ein Lunchpaket mit.",
+      "simpleJaText": "子どもにお弁当を持ってこさせてくださいという意味です。"
     },
     {
       "id": "t299",
@@ -5909,7 +7093,7 @@ export const catalog = {
       "reading": "えんぴつ",
       "en": "It is a tool used for writing.",
       "descriptionJa": "文字を書くために使う道具です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "É uma ferramenta usada para escrever.",
@@ -5919,7 +7103,9 @@ export const catalog = {
       "koText": "문자를 쓰는 데 사용하는 도구입니다.",
       "tlText": "Ito ay isang kagamitang ginagamit sa pagsusulat.",
       "idText": "Ini adalah alat yang digunakan untuk menulis.",
-      "neText": "यो लेखनको लागि प्रयोग गरिने उपकरण हो।"
+      "neText": "यो लेखनको लागि प्रयोग गरिने उपकरण हो।",
+      "deText": "Es handelt sich um ein Werkzeug zum Schreiben.",
+      "simpleJaText": "文字を書くために使う道具です。"
     },
     {
       "id": "t300",
@@ -5927,7 +7113,7 @@ export const catalog = {
       "reading": "えんぴつなど",
       "en": "It means pencils or similar learning tools.",
       "descriptionJa": "えんぴつや、それに近い学習道具という意味です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "1",
       "ptText": "Significa lápis ou materiais de aprendizagem semelhantes.",
@@ -5937,7 +7123,9 @@ export const catalog = {
       "koText": "엔피츠야, 그것에 가까운 학습 도구라는 의미입니다.",
       "tlText": "Nangangahulugan ito ng mga lapis o katulad na mga kagamitan sa pag-aaral.",
       "idText": "Artinya pensil atau alat belajar serupa.",
-      "neText": "यसको अर्थ पेन्सिल वा यस्तै सिकाइ उपकरणहरू हो।"
+      "neText": "यसको अर्थ पेन्सिल वा यस्तै सिकाइ उपकरणहरू हो।",
+      "deText": "Es bedeutet Bleistifte oder ähnliche Lernmittel.",
+      "simpleJaText": "えんぴつや、それに近い学習道具という意味です。"
     },
     {
       "id": "t301",
@@ -5945,7 +7133,7 @@ export const catalog = {
       "reading": "たいいくのじゅぎょう",
       "en": "This is a class that involves physical activity.",
       "descriptionJa": "体を動かす授業です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma aula que envolve atividade física.",
@@ -5955,7 +7143,9 @@ export const catalog = {
       "koText": "몸을 움직이는 수업입니다.",
       "tlText": "Ito ay isang klase na kinabibilangan ng pisikal na aktibidad.",
       "idText": "Ini adalah kelas yang melibatkan aktivitas fisik.",
-      "neText": "यो एउटा यस्तो कक्षा हो जसमा शारीरिक गतिविधि समावेश हुन्छ।"
+      "neText": "यो एउटा यस्तो कक्षा हो जसमा शारीरिक गतिविधि समावेश हुन्छ।",
+      "deText": "Dies ist ein Kurs, der körperliche Aktivität beinhaltet.",
+      "simpleJaText": "体を動かす授業です。"
     },
     {
       "id": "t302",
@@ -5963,7 +7153,7 @@ export const catalog = {
       "reading": "くわしいないよう",
       "en": "This refers to detailed explanations or specific information.",
       "descriptionJa": "細かい説明や詳しい情報のことです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso se refere a explicações detalhadas ou informações específicas.",
@@ -5973,7 +7163,9 @@ export const catalog = {
       "koText": "세세한 설명이나 자세한 정보입니다.",
       "tlText": "Ito ay tumutukoy sa mga detalyadong paliwanag o tiyak na impormasyon.",
       "idText": "Ini merujuk pada penjelasan rinci atau informasi spesifik.",
-      "neText": "यसले विस्तृत व्याख्या वा विशिष्ट जानकारीलाई जनाउँछ।"
+      "neText": "यसले विस्तृत व्याख्या वा विशिष्ट जानकारीलाई जनाउँछ।",
+      "deText": "Dies bezieht sich auf detaillierte Erklärungen oder spezifische Informationen.",
+      "simpleJaText": "細かい説明や詳しい情報のことです。"
     },
     {
       "id": "t303",
@@ -5981,7 +7173,7 @@ export const catalog = {
       "reading": "くわしいないよう",
       "en": "This refers to detailed explanations or specific information.",
       "descriptionJa": "細かい説明や詳しい情報のことです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso se refere a explicações detalhadas ou informações específicas.",
@@ -5991,7 +7183,9 @@ export const catalog = {
       "koText": "세세한 설명이나 자세한 정보입니다.",
       "tlText": "Ito ay tumutukoy sa mga detalyadong paliwanag o tiyak na impormasyon.",
       "idText": "Ini merujuk pada penjelasan rinci atau informasi spesifik.",
-      "neText": "यसले विस्तृत व्याख्या वा विशिष्ट जानकारीलाई जनाउँछ।"
+      "neText": "यसले विस्तृत व्याख्या वा विशिष्ट जानकारीलाई जनाउँछ।",
+      "deText": "Dies bezieht sich auf detaillierte Erklärungen oder spezifische Informationen.",
+      "simpleJaText": "細かい説明や詳しい情報のことです。"
     },
     {
       "id": "t304",
@@ -5999,7 +7193,7 @@ export const catalog = {
       "reading": "くわしいこと",
       "en": "This refers to detailed explanations or specific information.",
       "descriptionJa": "細かい説明や詳しい情報のことです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso se refere a explicações detalhadas ou informações específicas.",
@@ -6009,7 +7203,9 @@ export const catalog = {
       "koText": "세세한 설명이나 자세한 정보입니다.",
       "tlText": "Ito ay tumutukoy sa mga detalyadong paliwanag o tiyak na impormasyon.",
       "idText": "Ini merujuk pada penjelasan rinci atau informasi spesifik.",
-      "neText": "यसले विस्तृत व्याख्या वा विशिष्ट जानकारीलाई जनाउँछ।"
+      "neText": "यसले विस्तृत व्याख्या वा विशिष्ट जानकारीलाई जनाउँछ।",
+      "deText": "Dies bezieht sich auf detaillierte Erklärungen oder spezifische Informationen.",
+      "simpleJaText": "細かい説明や詳しい情報のことです。"
     },
     {
       "id": "t305",
@@ -6017,7 +7213,7 @@ export const catalog = {
       "reading": "はいふしたおしらせ",
       "en": "This is an important notice distributed by the school.",
       "descriptionJa": "学校が配った大切な連絡の紙です。",
-      "category": "提出物",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um aviso importante divulgado pela escola.",
@@ -6027,7 +7223,9 @@ export const catalog = {
       "koText": "학교가 배부한 소중한 연락의 종이입니다.",
       "tlText": "Ito ay isang mahalagang paunawa na ipinamahagi ng paaralan.",
       "idText": "Ini adalah pengumuman penting yang disebarkan oleh sekolah.",
-      "neText": "यो विद्यालयले वितरण गरेको एउटा महत्त्वपूर्ण सूचना हो।"
+      "neText": "यो विद्यालयले वितरण गरेको एउटा महत्त्वपूर्ण सूचना हो।",
+      "deText": "Dies ist eine wichtige Mitteilung der Schule.",
+      "simpleJaText": "学校が配った大切な連絡の紙です。"
     },
     {
       "id": "t306",
@@ -6035,7 +7233,7 @@ export const catalog = {
       "reading": "がっこうからのかみ",
       "en": "These are handouts and documents distributed by the school.",
       "descriptionJa": "学校から配られたプリントや書類です。",
-      "category": "提出物",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esses são folhetos e documentos distribuídos pela escola.",
@@ -6045,7 +7243,9 @@ export const catalog = {
       "koText": "학교에서 배부된 프린트나 서류입니다.",
       "tlText": "Ito ay mga handout at dokumentong ipinamamahagi ng paaralan.",
       "idText": "Ini adalah selebaran dan dokumen yang dibagikan oleh sekolah.",
-      "neText": "यी विद्यालयद्वारा वितरण गरिएका ह्यान्डआउट र कागजातहरू हुन्।"
+      "neText": "यी विद्यालयद्वारा वितरण गरिएका ह्यान्डआउट र कागजातहरू हुन्।",
+      "deText": "Hierbei handelt es sich um Handzettel und Dokumente, die von der Schule verteilt werden.",
+      "simpleJaText": "学校から配られたプリントや書類です。"
     },
     {
       "id": "t307",
@@ -6053,7 +7253,7 @@ export const catalog = {
       "reading": "みてください",
       "en": "This means please check the contents.",
       "descriptionJa": "内容を確認してくださいという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso significa que você deve verificar o conteúdo.",
@@ -6063,7 +7263,9 @@ export const catalog = {
       "koText": "내용을 확인하시기 바랍니다.",
       "tlText": "Ibig sabihin nito, pakisuri ang mga nilalaman.",
       "idText": "Artinya, mohon periksa isinya.",
-      "neText": "यसको अर्थ कृपया सामग्री जाँच गर्नुहोस्।"
+      "neText": "यसको अर्थ कृपया सामग्री जाँच गर्नुहोस्।",
+      "deText": "Das bedeutet, bitte überprüfen Sie den Inhalt.",
+      "simpleJaText": "内容を確認してくださいという意味です。"
     },
     {
       "id": "t308",
@@ -6071,7 +7273,7 @@ export const catalog = {
       "reading": "かくにんしてください",
       "en": "It means, \"Please review the content and make sure there are no mistakes.\"",
       "descriptionJa": "内容を見て、まちがいがないか確かめてくださいという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa: \"Por favor, revise o conteúdo e certifique-se de que não há erros.\"",
@@ -6081,7 +7283,9 @@ export const catalog = {
       "koText": "내용을 보고, 틀림이 있는지 확인해 주세요라는 의미입니다.",
       "tlText": "Ang ibig sabihin nito ay, \"Pakisuri ang nilalaman at siguraduhing walang mga pagkakamali.\"",
       "idText": "Artinya, \"Mohon periksa kembali kontennya dan pastikan tidak ada kesalahan.\"",
-      "neText": "यसको अर्थ हो, \"कृपया सामग्री समीक्षा गर्नुहोस् र कुनै गल्ती नभएको निश्चित गर्नुहोस्।\""
+      "neText": "यसको अर्थ हो, \"कृपया सामग्री समीक्षा गर्नुहोस् र कुनै गल्ती नभएको निश्चित गर्नुहोस्।\"",
+      "deText": "Es bedeutet: „Bitte überprüfen Sie den Inhalt und stellen Sie sicher, dass er keine Fehler enthält.“",
+      "simpleJaText": "内容を見て、まちがいがないか確かめてくださいという意味です。"
     },
     {
       "id": "t309",
@@ -6089,7 +7293,7 @@ export const catalog = {
       "reading": "おしえてください",
       "en": "This means \"Please inform the school.\"",
       "descriptionJa": "学校に知らせてくださいという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso significa \"Por favor, informe a escola\".",
@@ -6099,7 +7303,9 @@ export const catalog = {
       "koText": "학교에 알려주세요라는 의미입니다.",
       "tlText": "Ang ibig sabihin nito ay \"Pakisabihan ang paaralan.\"",
       "idText": "Ini berarti \"Mohon informasikan kepada pihak sekolah.\"",
-      "neText": "यसको अर्थ \"कृपया स्कूललाई ​​जानकारी दिनुहोस्\" हो।"
+      "neText": "यसको अर्थ \"कृपया स्कूललाई ​​जानकारी दिनुहोस्\" हो।",
+      "deText": "Das bedeutet: „Bitte informieren Sie die Schule.“",
+      "simpleJaText": "学校に知らせてくださいという意味です。"
     },
     {
       "id": "t310",
@@ -6107,7 +7313,7 @@ export const catalog = {
       "reading": "おしらせください",
       "en": "This is a polite way of asking them to inform the school.",
       "descriptionJa": "学校に知らせてくださいという丁寧な言い方です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Essa é uma forma educada de pedir que eles informem a escola.",
@@ -6117,7 +7323,9 @@ export const catalog = {
       "koText": "학교에 알려주세요라는 정중한 말입니다.",
       "tlText": "Ito ay isang magalang na paraan ng paghingi sa kanila na ipaalam ito sa paaralan.",
       "idText": "Ini adalah cara sopan untuk meminta mereka memberi tahu pihak sekolah.",
-      "neText": "यो उनीहरूलाई स्कूललाई ​​जानकारी गराउन आग्रह गर्ने विनम्र तरिका हो।"
+      "neText": "यो उनीहरूलाई स्कूललाई ​​जानकारी गराउन आग्रह गर्ने विनम्र तरिका हो।",
+      "deText": "Dies ist eine höfliche Art, sie zu bitten, die Schule zu informieren.",
+      "simpleJaText": "学校に知らせてくださいという丁寧な言い方です。"
     },
     {
       "id": "t311",
@@ -6125,7 +7333,7 @@ export const catalog = {
       "reading": "さんかできる",
       "en": "It means you are able to attend events and gatherings.",
       "descriptionJa": "行事や会に出ることができるという意味です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que você está apto a participar de eventos e encontros.",
@@ -6135,7 +7343,9 @@ export const catalog = {
       "koText": "행사나 모임에 나올 수 있다는 의미입니다.",
       "tlText": "Nangangahulugan ito na maaari kang dumalo sa mga kaganapan at pagtitipon.",
       "idText": "Artinya Anda dapat menghadiri acara dan pertemuan.",
-      "neText": "यसको अर्थ तपाईं कार्यक्रम र जमघटहरूमा भाग लिन सक्नुहुन्छ।"
+      "neText": "यसको अर्थ तपाईं कार्यक्रम र जमघटहरूमा भाग लिन सक्नुहुन्छ।",
+      "deText": "Es bedeutet, dass Sie an Veranstaltungen und Treffen teilnehmen können.",
+      "simpleJaText": "行事や会に出ることができるという意味です。"
     },
     {
       "id": "t312",
@@ -6143,7 +7353,7 @@ export const catalog = {
       "reading": "さんかできない",
       "en": "It means that I cannot attend the event or gathering.",
       "descriptionJa": "行事や会に出ることができないという意味です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que não poderei comparecer ao evento ou reunião.",
@@ -6153,7 +7363,9 @@ export const catalog = {
       "koText": "행사나 모임에 나갈 수 없다는 뜻입니다.",
       "tlText": "Ibig sabihin, hindi ako makakadalo sa kaganapan o pagtitipon.",
       "idText": "Artinya saya tidak dapat menghadiri acara atau pertemuan tersebut.",
-      "neText": "यसको अर्थ म कार्यक्रम वा भेलामा उपस्थित हुन सक्दिन।"
+      "neText": "यसको अर्थ म कार्यक्रम वा भेलामा उपस्थित हुन सक्दिन।",
+      "deText": "Das bedeutet, dass ich an der Veranstaltung oder dem Treffen nicht teilnehmen kann.",
+      "simpleJaText": "行事や会に出ることができないという意味です。"
     },
     {
       "id": "t313",
@@ -6161,7 +7373,7 @@ export const catalog = {
       "reading": "こられる",
       "en": "It means they are able to come to school or meetings.",
       "descriptionJa": "学校や会に来ることができるという意味です。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que eles podem vir à escola ou às reuniões.",
@@ -6171,7 +7383,9 @@ export const catalog = {
       "koText": "학교나 모임에 올 수 있다는 뜻입니다.",
       "tlText": "Nangangahulugan ito na maaari silang pumunta sa paaralan o sa mga pulong.",
       "idText": "Artinya mereka bisa datang ke sekolah atau pertemuan.",
-      "neText": "यसको अर्थ उनीहरू स्कूल वा बैठकहरूमा आउन सक्षम छन्।"
+      "neText": "यसको अर्थ उनीहरू स्कूल वा बैठकहरूमा आउन सक्षम छन्।",
+      "deText": "Es bedeutet, dass sie in der Lage sind, zur Schule oder zu Treffen zu kommen.",
+      "simpleJaText": "学校や会に来ることができるという意味です。"
     },
     {
       "id": "t314",
@@ -6179,7 +7393,7 @@ export const catalog = {
       "reading": "こられない",
       "en": "It means they are unable to come to school or meetings.",
       "descriptionJa": "学校や会に来ることができないという意味です。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que eles não podem vir à escola ou às reuniões.",
@@ -6189,7 +7403,9 @@ export const catalog = {
       "koText": "학교나 모임에 올 수 없다는 뜻입니다.",
       "tlText": "Nangangahulugan ito na hindi sila makakapunta sa paaralan o mga pulong.",
       "idText": "Artinya mereka tidak bisa datang ke sekolah atau pertemuan.",
-      "neText": "यसको अर्थ उनीहरू स्कूल वा बैठकहरूमा आउन असमर्थ छन्।"
+      "neText": "यसको अर्थ उनीहरू स्कूल वा बैठकहरूमा आउन असमर्थ छन्।",
+      "deText": "Das bedeutet, dass sie nicht zur Schule oder zu Treffen kommen können.",
+      "simpleJaText": "学校や会に来ることができないという意味です。"
     },
     {
       "id": "t315",
@@ -6197,7 +7413,7 @@ export const catalog = {
       "reading": "つごうがわるい",
       "en": "It means that it will be difficult for me to come on that day or at that time.",
       "descriptionJa": "その日や時間に来ることが難しいという意味です。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que será difícil para mim comparecer nesse dia ou nesse horário.",
@@ -6207,7 +7423,9 @@ export const catalog = {
       "koText": "그날이나 시간에 오기가 어렵다는 의미입니다.",
       "tlText": "Ibig sabihin, mahihirapan akong pumunta sa araw na iyon o sa oras na iyon.",
       "idText": "Artinya, akan sulit bagi saya untuk datang pada hari atau waktu itu.",
-      "neText": "यसको अर्थ त्यो दिन वा त्यो समयमा आउन मलाई गाह्रो हुनेछ।"
+      "neText": "यसको अर्थ त्यो दिन वा त्यो समयमा आउन मलाई गाह्रो हुनेछ।",
+      "deText": "Das bedeutet, dass es mir an diesem Tag oder zu dieser Uhrzeit schwerfallen wird zu kommen.",
+      "simpleJaText": "その日や時間に来ることが難しいという意味です。"
     },
     {
       "id": "t316",
@@ -6215,7 +7433,7 @@ export const catalog = {
       "reading": "つごうがよい",
       "en": "It means you can come on that day or at that time.",
       "descriptionJa": "その日や時間に来ることができるという意味です。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que você pode vir nesse dia ou nesse horário.",
@@ -6225,7 +7443,9 @@ export const catalog = {
       "koText": "그날이나 시간에 올 수 있다는 의미입니다.",
       "tlText": "Ibig sabihin, puwede kang pumunta sa araw na iyon o sa oras na iyon.",
       "idText": "Artinya, Anda bisa datang pada hari atau waktu tersebut.",
-      "neText": "यसको अर्थ तपाईं त्यो दिन वा त्यो समयमा आउन सक्नुहुन्छ।"
+      "neText": "यसको अर्थ तपाईं त्यो दिन वा त्यो समयमा आउन सक्नुहुन्छ।",
+      "deText": "Das bedeutet, dass Sie an diesem Tag oder zu dieser Uhrzeit kommen können.",
+      "simpleJaText": "その日や時間に来ることができるという意味です。"
     },
     {
       "id": "t317",
@@ -6233,7 +7453,7 @@ export const catalog = {
       "reading": "にっていをかくにん",
       "en": "This involves confirming the date and time of the event.",
       "descriptionJa": "行う日や時間を確かめることです。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso envolve confirmar a data e a hora do evento.",
@@ -6243,7 +7463,9 @@ export const catalog = {
       "koText": "할 일과 시간을 확인하는 것입니다.",
       "tlText": "Kabilang dito ang pagkumpirma ng petsa at oras ng kaganapan.",
       "idText": "Ini termasuk mengkonfirmasi tanggal dan waktu acara tersebut.",
-      "neText": "यसमा कार्यक्रमको मिति र समय पुष्टि गर्नु समावेश छ।"
+      "neText": "यसमा कार्यक्रमको मिति र समय पुष्टि गर्नु समावेश छ।",
+      "deText": "Dies beinhaltet die Bestätigung von Datum und Uhrzeit der Veranstaltung.",
+      "simpleJaText": "行う日や時間を確かめることです。"
     },
     {
       "id": "t318",
@@ -6251,7 +7473,7 @@ export const catalog = {
       "reading": "こじんめんだんのにってい",
       "en": "The schedule is for a day when the teacher and each parent will speak individually.",
       "descriptionJa": "先生と保護者が一人ずつ話す日の予定です。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "O cronograma prevê um dia em que o professor e cada pai/mãe conversarão individualmente.",
@@ -6261,7 +7483,9 @@ export const catalog = {
       "koText": "선생님과 보호자가 한 사람씩 말하는 날의 예정입니다.",
       "tlText": "Ang iskedyul ay para sa isang araw kung saan ang guro at bawat magulang ay mag-uusap nang paisa-isa.",
       "idText": "Jadwal ini adalah untuk hari di mana guru dan setiap orang tua akan berbicara secara individual.",
-      "neText": "तालिका शिक्षक र प्रत्येक अभिभावकले व्यक्तिगत रूपमा बोल्ने दिनको लागि हो।"
+      "neText": "तालिका शिक्षक र प्रत्येक अभिभावकले व्यक्तिगत रूपमा बोल्ने दिनको लागि हो।",
+      "deText": "Der Zeitplan sieht einen Tag vor, an dem die Lehrkraft und jeder Elternteil einzeln miteinander sprechen.",
+      "simpleJaText": "先生と保護者が一人ずつ話す日の予定です。"
     },
     {
       "id": "t319",
@@ -6269,7 +7493,7 @@ export const catalog = {
       "reading": "せんせいとはなすひ",
       "en": "It was the day I was scheduled to meet with my teacher.",
       "descriptionJa": "先生と面談する日のことです。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Era o dia em que eu tinha agendado um encontro com meu professor.",
@@ -6279,7 +7503,9 @@ export const catalog = {
       "koText": "선생님과 면담하는 날입니다.",
       "tlText": "Ito ang araw na nakatakda akong makipagkita sa aking guro.",
       "idText": "Hari itu adalah hari di mana saya dijadwalkan bertemu dengan guru saya.",
-      "neText": "त्यो दिन मेरो शिक्षकसँग भेट्ने तालिका थियो।"
+      "neText": "त्यो दिन मेरो शिक्षकसँग भेट्ने तालिका थियो।",
+      "deText": "Es war der Tag, an dem ich ein Treffen mit meinem Lehrer hatte.",
+      "simpleJaText": "先生と面談する日のことです。"
     },
     {
       "id": "t320",
@@ -6287,7 +7513,7 @@ export const catalog = {
       "reading": "はやめに",
       "en": "It means as soon as possible.",
       "descriptionJa": "できるだけ早く、という意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa o mais breve possível.",
@@ -6297,7 +7523,9 @@ export const catalog = {
       "koText": "가능한 한 빨리, 라는 의미입니다.",
       "tlText": "Ibig sabihin, sa lalong madaling panahon.",
       "idText": "Artinya sesegera mungkin.",
-      "neText": "यसको अर्थ सकेसम्म चाँडो।"
+      "neText": "यसको अर्थ सकेसम्म चाँडो।",
+      "deText": "Es bedeutet so schnell wie möglich.",
+      "simpleJaText": "できるだけ早く、という意味です。"
     },
     {
       "id": "t321",
@@ -6305,7 +7533,7 @@ export const catalog = {
       "reading": "できるだけはやく",
       "en": "It means as soon as possible.",
       "descriptionJa": "可能な範囲で早く、という意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa o mais breve possível.",
@@ -6315,7 +7543,9 @@ export const catalog = {
       "koText": "가능한 범위에서 빠르다는 의미입니다.",
       "tlText": "Ibig sabihin, sa lalong madaling panahon.",
       "idText": "Artinya sesegera mungkin.",
-      "neText": "यसको अर्थ सकेसम्म चाँडो।"
+      "neText": "यसको अर्थ सकेसम्म चाँडो।",
+      "deText": "Es bedeutet so schnell wie möglich.",
+      "simpleJaText": "可能な範囲で早く、という意味です。"
     },
     {
       "id": "t322",
@@ -6323,7 +7553,7 @@ export const catalog = {
       "reading": "からだのちょうし",
       "en": "This refers to one's physical condition, such as whether they are feeling well or unwell.",
       "descriptionJa": "元気か、具合が悪いかなど、体の状態です。",
-      "category": "体調",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso se refere à condição física de alguém, como por exemplo, se a pessoa está se sentindo bem ou mal.",
@@ -6333,7 +7563,9 @@ export const catalog = {
       "koText": "건강한지, 상태가 나쁜지 등, 몸의 상태입니다.",
       "tlText": "Ito ay tumutukoy sa pisikal na kondisyon ng isang tao, tulad ng kung sila ay mabuti o masama ang pakiramdam.",
       "idText": "Ini merujuk pada kondisi fisik seseorang, seperti apakah mereka merasa sehat atau tidak sehat.",
-      "neText": "यसले कसैको शारीरिक अवस्थालाई जनाउँछ, जस्तै कि उनीहरू स्वस्थ छन् वा अस्वस्थ छन्।"
+      "neText": "यसले कसैको शारीरिक अवस्थालाई जनाउँछ, जस्तै कि उनीहरू स्वस्थ छन् वा अस्वस्थ छन्।",
+      "deText": "Dies bezieht sich auf den körperlichen Zustand einer Person, beispielsweise ob sie sich wohl oder unwohl fühlt.",
+      "simpleJaText": "元気か、具合が悪いかなど、体の状態です。"
     },
     {
       "id": "t323",
@@ -6341,7 +7573,7 @@ export const catalog = {
       "reading": "からだのちょうしがよくありません",
       "en": "It means I'm not feeling well.",
       "descriptionJa": "具合が悪いという意味です。",
-      "category": "体調",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que não estou me sentindo bem.",
@@ -6351,7 +7583,9 @@ export const catalog = {
       "koText": "상태가 나쁘다는 의미입니다.",
       "tlText": "Ibig sabihin hindi maganda ang pakiramdam ko.",
       "idText": "Artinya aku sedang tidak enak badan.",
-      "neText": "यसको अर्थ मलाई ठीक छैन।"
+      "neText": "यसको अर्थ मलाई ठीक छैन।",
+      "deText": "Es bedeutet, dass es mir nicht gut geht.",
+      "simpleJaText": "具合が悪いという意味です。"
     },
     {
       "id": "t324",
@@ -6359,7 +7593,7 @@ export const catalog = {
       "reading": "でんわで",
       "en": "It means to communicate by phone.",
       "descriptionJa": "電話を使って伝えるという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa comunicar por telefone.",
@@ -6369,7 +7603,9 @@ export const catalog = {
       "koText": "전화를 사용하여 전한다는 의미입니다.",
       "tlText": "Ang ibig sabihin nito ay makipag-ugnayan sa pamamagitan ng telepono.",
       "idText": "Artinya berkomunikasi melalui telepon.",
-      "neText": "यसको अर्थ फोनबाट कुराकानी गर्नु हो।"
+      "neText": "यसको अर्थ फोनबाट कुराकानी गर्नु हो।",
+      "deText": "Es bedeutet, telefonisch zu kommunizieren.",
+      "simpleJaText": "電話を使って伝えるという意味です。"
     },
     {
       "id": "t325",
@@ -6377,7 +7613,7 @@ export const catalog = {
       "reading": "でんわではなします",
       "en": "It means I will give you more details over the phone.",
       "descriptionJa": "くわしいことを電話で伝えるという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que lhe darei mais detalhes por telefone.",
@@ -6387,7 +7623,9 @@ export const catalog = {
       "koText": "자세한 것을 전화로 전한다는 의미입니다.",
       "tlText": "Ibig sabihin, bibigyan kita ng mas maraming detalye sa telepono.",
       "idText": "Artinya, saya akan memberikan detail lebih lanjut melalui telepon.",
-      "neText": "यसको अर्थ म तपाईंलाई फोनमा थप विवरण दिनेछु।"
+      "neText": "यसको अर्थ म तपाईंलाई फोनमा थप विवरण दिनेछु।",
+      "deText": "Das bedeutet, dass ich Ihnen telefonisch weitere Details mitteilen werde.",
+      "simpleJaText": "くわしいことを電話で伝えるという意味です。"
     },
     {
       "id": "t326",
@@ -6395,7 +7633,7 @@ export const catalog = {
       "reading": "じょうきょう",
       "en": "This describes the circumstances and events that occurred at that time.",
       "descriptionJa": "そのときの様子や、起きたことの内容です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este documento descreve as circunstâncias e os eventos que ocorreram naquele momento.",
@@ -6405,7 +7643,9 @@ export const catalog = {
       "koText": "그 때의 모습이나 일어난 일의 내용입니다.",
       "tlText": "Inilalarawan nito ang mga pangyayari at sitwasyon na naganap noong panahong iyon.",
       "idText": "Ini menjelaskan keadaan dan peristiwa yang terjadi pada waktu itu.",
-      "neText": "यसले त्यस समयमा घटेका परिस्थिति र घटनाहरूको वर्णन गर्दछ।"
+      "neText": "यसले त्यस समयमा घटेका परिस्थिति र घटनाहरूको वर्णन गर्दछ।",
+      "deText": "Hier werden die Umstände und Ereignisse beschrieben, die sich zu dieser Zeit ereignet haben.",
+      "simpleJaText": "そのときの様子や、起きたことの内容です。"
     },
     {
       "id": "t327",
@@ -6413,7 +7653,7 @@ export const catalog = {
       "reading": "くわしいじょうきょう",
       "en": "Here are the details of what happened.",
       "descriptionJa": "起きたことの詳しい内容です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Seguem os detalhes do ocorrido.",
@@ -6423,7 +7663,9 @@ export const catalog = {
       "koText": "일어난 일의 자세한 내용입니다.",
       "tlText": "Narito ang mga detalye ng nangyari.",
       "idText": "Berikut detail kejadiannya.",
-      "neText": "के भयो भन्ने विवरण यहाँ दिइएको छ।"
+      "neText": "के भयो भन्ने विवरण यहाँ दिइएको छ।",
+      "deText": "Hier die Einzelheiten des Geschehens.",
+      "simpleJaText": "起きたことの詳しい内容です。"
     },
     {
       "id": "t328",
@@ -6431,7 +7673,7 @@ export const catalog = {
       "reading": "がっこうでけが",
       "en": "It means that the injury occurred while at school.",
       "descriptionJa": "学校にいるときにけがをしたという意味です。",
-      "category": "体調",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que a lesão ocorreu enquanto o aluno estava na escola.",
@@ -6441,7 +7683,9 @@ export const catalog = {
       "koText": "학교에 있을 때 부상을 당했다는 뜻입니다.",
       "tlText": "Nangangahulugan ito na ang pinsala ay naganap habang nasa paaralan.",
       "idText": "Artinya, cedera tersebut terjadi saat berada di sekolah.",
-      "neText": "यसको अर्थ चोटपटक स्कूलमा हुँदा लागेको थियो।"
+      "neText": "यसको अर्थ चोटपटक स्कूलमा हुँदा लागेको थियो।",
+      "deText": "Das bedeutet, dass sich die Verletzung in der Schule ereignet hat.",
+      "simpleJaText": "学校にいるときにけがをしたという意味です。"
     },
     {
       "id": "t329",
@@ -6449,7 +7693,7 @@ export const catalog = {
       "reading": "がっこうでけがをしました",
       "en": "It means that the injury occurred while at school.",
       "descriptionJa": "学校にいるときにけがをしたという意味です。",
-      "category": "体調",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que a lesão ocorreu enquanto o aluno estava na escola.",
@@ -6459,7 +7703,9 @@ export const catalog = {
       "koText": "학교에 있을 때 부상을 당했다는 뜻입니다.",
       "tlText": "Nangangahulugan ito na ang pinsala ay naganap habang nasa paaralan.",
       "idText": "Artinya, cedera tersebut terjadi saat berada di sekolah.",
-      "neText": "यसको अर्थ चोटपटक स्कूलमा हुँदा लागेको थियो।"
+      "neText": "यसको अर्थ चोटपटक स्कूलमा हुँदा लागेको थियो।",
+      "deText": "Das bedeutet, dass sich die Verletzung in der Schule ereignet hat.",
+      "simpleJaText": "学校にいるときにけがをしたという意味です。"
     },
     {
       "id": "t330",
@@ -6467,7 +7713,7 @@ export const catalog = {
       "reading": "いつもより",
       "en": "It means compared to the usual.",
       "descriptionJa": "ふだんと比べて、という意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa em comparação com o normal.",
@@ -6477,7 +7723,9 @@ export const catalog = {
       "koText": "평소와 비교해, 라는 의미입니다.",
       "tlText": "Ibig sabihin nito ay inihahambing sa karaniwan.",
       "idText": "Artinya dibandingkan dengan biasanya.",
-      "neText": "यसको अर्थ सामान्यसँग तुलना गर्नु हो।"
+      "neText": "यसको अर्थ सामान्यसँग तुलना गर्नु हो।",
+      "deText": "Es bedeutet im Vergleich zum Üblichen.",
+      "simpleJaText": "ふだんと比べて、という意味です。"
     },
     {
       "id": "t331",
@@ -6485,7 +7733,7 @@ export const catalog = {
       "reading": "おそくなります",
       "en": "It means it will be later than usual.",
       "descriptionJa": "いつもより時間が後になるという意味です。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que será mais tarde do que o habitual.",
@@ -6495,7 +7743,9 @@ export const catalog = {
       "koText": "평소보다 시간이 늦어지는 의미입니다.",
       "tlText": "Ibig sabihin, mas huli ito kaysa sa dati.",
       "idText": "Artinya akan lebih lambat dari biasanya.",
-      "neText": "यसको अर्थ यो सामान्य भन्दा ढिलो हुनेछ।"
+      "neText": "यसको अर्थ यो सामान्य भन्दा ढिलो हुनेछ।",
+      "deText": "Das bedeutet, es wird später als üblich sein.",
+      "simpleJaText": "いつもより時間が後になるという意味です。"
     },
     {
       "id": "t332",
@@ -6503,7 +7753,7 @@ export const catalog = {
       "reading": "げこうがおそくなります",
       "en": "It means that I will be coming home from school later than usual.",
       "descriptionJa": "学校から帰る時間がいつもより遅くなるという意味です。",
-      "category": "部活動",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que chegarei da escola mais tarde do que o habitual.",
@@ -6513,7 +7763,9 @@ export const catalog = {
       "koText": "학교에서 돌아가는 시간이 평소보다 느려진다는 의미입니다.",
       "tlText": "Ibig sabihin, mas huli akong uuwi galing paaralan kaysa dati.",
       "idText": "Artinya, aku akan pulang sekolah lebih larut dari biasanya.",
-      "neText": "यसको अर्थ म स्कूलबाट सधैं भन्दा ढिलो घर आउनेछु।"
+      "neText": "यसको अर्थ म स्कूलबाट सधैं भन्दा ढिलो घर आउनेछु।",
+      "deText": "Das bedeutet, dass ich später als gewöhnlich von der Schule nach Hause kommen werde.",
+      "simpleJaText": "学校から帰る時間がいつもより遅くなるという意味です。"
     },
     {
       "id": "t333",
@@ -6521,7 +7773,7 @@ export const catalog = {
       "reading": "いえにかえるじかｎ",
       "en": "It's time to go home from school.",
       "descriptionJa": "学校から家に帰る時間です。",
-      "category": "部活動",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Está na hora de ir para casa depois da escola.",
@@ -6531,7 +7783,9 @@ export const catalog = {
       "koText": "학교에서 집으로 돌아갈 시간입니다.",
       "tlText": "Oras na para umuwi galing paaralan.",
       "idText": "Sudah waktunya pulang sekolah.",
-      "neText": "स्कूलबाट घर जाने समय भयो।"
+      "neText": "स्कूलबाट घर जाने समय भयो।",
+      "deText": "Es ist Zeit, von der Schule nach Hause zu gehen.",
+      "simpleJaText": "学校から家に帰る時間です。"
     },
     {
       "id": "t334",
@@ -6539,7 +7793,7 @@ export const catalog = {
       "reading": "ほうかご",
       "en": "This is the time after classes have ended.",
       "descriptionJa": "授業が終わった後の時間です。",
-      "category": "部活動",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o período após o término das aulas.",
@@ -6549,7 +7803,9 @@ export const catalog = {
       "koText": "수업이 끝난 후의 시간입니다.",
       "tlText": "Ito ang oras pagkatapos ng klase.",
       "idText": "Ini adalah waktu setelah jam pelajaran berakhir.",
-      "neText": "यो कक्षा समाप्त भएपछिको समय हो।"
+      "neText": "यो कक्षा समाप्त भएपछिको समय हो।",
+      "deText": "Dies ist die Zeit nach dem Unterricht.",
+      "simpleJaText": "授業が終わった後の時間です。"
     },
     {
       "id": "t335",
@@ -6557,7 +7813,7 @@ export const catalog = {
       "reading": "がっこうでつかうおかね",
       "en": "This is money needed for school supplies, activities, and other school-related expenses.",
       "descriptionJa": "教材や活動など、学校で必要なお金です。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este dinheiro é necessário para material escolar, atividades e outras despesas relacionadas à escola.",
@@ -6567,7 +7823,9 @@ export const catalog = {
       "koText": "교재나 활동 등, 학교에서 필요한 돈입니다.",
       "tlText": "Ito ay perang kailangan para sa mga gamit sa paaralan, mga aktibidad, at iba pang gastusin na may kaugnayan sa paaralan.",
       "idText": "Ini adalah uang yang dibutuhkan untuk perlengkapan sekolah, kegiatan, dan pengeluaran lain yang berkaitan dengan sekolah.",
-      "neText": "यो विद्यालयका सामान, गतिविधिहरू र अन्य विद्यालयसँग सम्बन्धित खर्चहरूको लागि आवश्यक पर्ने पैसा हो।"
+      "neText": "यो विद्यालयका सामान, गतिविधिहरू र अन्य विद्यालयसँग सम्बन्धित खर्चहरूको लागि आवश्यक पर्ने पैसा हो।",
+      "deText": "Dieses Geld wird für Schulmaterialien, Aktivitäten und andere schulbezogene Ausgaben benötigt.",
+      "simpleJaText": "教材や活動など、学校で必要なお金です。"
     },
     {
       "id": "t336",
@@ -6575,7 +7833,7 @@ export const catalog = {
       "reading": "ふうとうにいれて",
       "en": "It means putting money or documents into an envelope.",
       "descriptionJa": "お金や書類を封筒の中に入れることです。",
-      "category": "お金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa colocar dinheiro ou documentos em um envelope.",
@@ -6585,7 +7843,9 @@ export const catalog = {
       "koText": "돈이나 서류를 봉투 안에 넣는 것입니다.",
       "tlText": "Nangangahulugan ito ng paglalagay ng pera o mga dokumento sa isang sobre.",
       "idText": "Artinya memasukkan uang atau dokumen ke dalam amplop.",
-      "neText": "यसको अर्थ पैसा वा कागजातहरू खाममा राख्नु हो।"
+      "neText": "यसको अर्थ पैसा वा कागजातहरू खाममा राख्नु हो।",
+      "deText": "Es bedeutet, Geld oder Dokumente in einen Umschlag zu stecken.",
+      "simpleJaText": "お金や書類を封筒の中に入れることです。"
     },
     {
       "id": "t337",
@@ -6593,7 +7853,7 @@ export const catalog = {
       "reading": "いれて",
       "en": "It means to put it inside.",
       "descriptionJa": "中に入れるという意味です。",
-      "category": "基本",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa colocá-lo dentro.",
@@ -6603,7 +7863,9 @@ export const catalog = {
       "koText": "안에 넣는다는 뜻입니다.",
       "tlText": "Ibig sabihin, ilagay ito sa loob.",
       "idText": "Artinya, masukkan ke dalam.",
-      "neText": "यसको अर्थ भित्र राख्नु हो।"
+      "neText": "यसको अर्थ भित्र राख्नु हो।",
+      "deText": "Es bedeutet, es hineinzulegen.",
+      "simpleJaText": "中に入れるという意味です。"
     },
     {
       "id": "t338",
@@ -6611,7 +7873,7 @@ export const catalog = {
       "reading": "あれるぎー",
       "en": "This refers to adverse reactions in the body caused by food or other substances.",
       "descriptionJa": "食べ物などで体に悪い反応が出ることです。",
-      "category": "給食",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso se refere a reações adversas no organismo causadas por alimentos ou outras substâncias.",
@@ -6621,7 +7883,8 @@ export const catalog = {
       "koText": "음식 등으로 몸에 나쁜 반응이 나오는 것입니다.",
       "tlText": "Ito ay tumutukoy sa mga masamang reaksiyon sa katawan na dulot ng pagkain o iba pang sangkap.",
       "idText": "Ini merujuk pada reaksi merugikan dalam tubuh yang disebabkan oleh makanan atau zat lainnya.",
-      "neText": "यसले खाना वा अन्य पदार्थहरूको कारणले शरीरमा हुने प्रतिकूल प्रतिक्रियाहरूलाई जनाउँछ।"
+      "neText": "यसले खाना वा अन्य पदार्थहरूको कारणले शरीरमा हुने प्रतिकूल प्रतिक्रियाहरूलाई जनाउँछ।",
+      "deText": "Dies bezieht sich auf unerwünschte Reaktionen im Körper, die durch Nahrungsmittel oder andere Substanzen hervorgerufen werden."
     },
     {
       "id": "t339",
@@ -6629,7 +7892,7 @@ export const catalog = {
       "reading": "きゅうしょくのあれるぎー",
       "en": "These are foods that cannot be eaten in school lunches or require special attention.",
       "descriptionJa": "給食で食べられないものや注意が必要なもののことです。",
-      "category": "給食",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esses são alimentos que não podem ser consumidos nas refeições escolares ou que exigem atenção especial.",
@@ -6639,7 +7902,9 @@ export const catalog = {
       "koText": "급식으로 먹을 수 없는 것나 주의가 필요한 것입니다.",
       "tlText": "Ito ang mga pagkaing hindi maaaring kainin sa mga tanghalian sa paaralan o nangangailangan ng espesyal na atensyon.",
       "idText": "Ini adalah makanan yang tidak dapat dikonsumsi dalam bekal sekolah atau memerlukan perhatian khusus.",
-      "neText": "यी यस्ता खानेकुराहरू हुन् जुन स्कूलको खाजामा खान सकिँदैन वा विशेष ध्यान दिनु आवश्यक पर्दछ।"
+      "neText": "यी यस्ता खानेकुराहरू हुन् जुन स्कूलको खाजामा खान सकिँदैन वा विशेष ध्यान दिनु आवश्यक पर्दछ।",
+      "deText": "Dies sind Lebensmittel, die nicht im Rahmen des Schulmittagessens verzehrt werden dürfen oder besondere Aufmerksamkeit erfordern.",
+      "simpleJaText": "給食で食べられないものや注意が必要なもののことです。"
     },
     {
       "id": "t340",
@@ -6647,7 +7912,7 @@ export const catalog = {
       "reading": "かくにんしたいこと",
       "en": "This is something the school wants to verify.",
       "descriptionJa": "学校が確かめたい内容です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso é algo que a escola deseja verificar.",
@@ -6657,7 +7922,9 @@ export const catalog = {
       "koText": "학교가 확인하고 싶은 내용입니다.",
       "tlText": "Ito ay isang bagay na gustong beripikahin ng paaralan.",
       "idText": "Ini adalah sesuatu yang ingin diverifikasi oleh sekolah.",
-      "neText": "यो विद्यालयले प्रमाणित गर्न चाहेको कुरा हो।"
+      "neText": "यो विद्यालयले प्रमाणित गर्न चाहेको कुरा हो।",
+      "deText": "Dies möchte die Schule überprüfen.",
+      "simpleJaText": "学校が確かめたい内容です。"
     },
     {
       "id": "t341",
@@ -6665,7 +7932,7 @@ export const catalog = {
       "reading": "かならず",
       "en": "It means absolutely, without fail, that it will be done.",
       "descriptionJa": "絶対に、必ず行うという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa, sem sombra de dúvida, que será feito.",
@@ -6675,7 +7942,9 @@ export const catalog = {
       "koText": "절대로 반드시 한다는 의미입니다.",
       "tlText": "Nangangahulugan ito nang walang pagsala, na ito ay magagawa.",
       "idText": "Artinya, mutlak dan tanpa gagal, hal itu akan dilakukan.",
-      "neText": "यसको अर्थ पूर्ण रूपमा, निश्चित रूपमा, यो पूरा हुनेछ।"
+      "neText": "यसको अर्थ पूर्ण रूपमा, निश्चित रूपमा, यो पूरा हुनेछ।",
+      "deText": "Es bedeutet absolut und ohne Ausnahme, dass es getan wird.",
+      "simpleJaText": "絶対に、必ず行うという意味です。"
     },
     {
       "id": "t342",
@@ -6683,7 +7952,7 @@ export const catalog = {
       "reading": "ひとがかくにん",
       "en": "It's not just about machines or translation; it's about having people verify the content.",
       "descriptionJa": "機械や翻訳だけでなく、人が内容を確かめることです。",
-      "category": "体調",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Não se trata apenas de máquinas ou tradução; trata-se de ter pessoas que verifiquem o conteúdo.",
@@ -6693,7 +7962,9 @@ export const catalog = {
       "koText": "기계와 번역뿐만 아니라 사람이 내용을 확인하는 것입니다.",
       "tlText": "Hindi lang ito tungkol sa mga makina o pagsasalin; tungkol ito sa pagpapa-verify sa mga tao ng nilalaman.",
       "idText": "Ini bukan hanya tentang mesin atau penerjemahan; ini tentang melibatkan orang untuk memverifikasi kontennya.",
-      "neText": "यो केवल मेसिन वा अनुवादको बारेमा होइन; यो मानिसहरूलाई सामग्री प्रमाणित गराउने बारेमा हो।"
+      "neText": "यो केवल मेसिन वा अनुवादको बारेमा होइन; यो मानिसहरूलाई सामग्री प्रमाणित गराउने बारेमा हो।",
+      "deText": "Es geht nicht nur um Maschinen oder Übersetzung; es geht darum, dass Menschen den Inhalt überprüfen.",
+      "simpleJaText": "機械や翻訳だけでなく、人が内容を確かめることです。"
     },
     {
       "id": "t343",
@@ -6701,7 +7972,7 @@ export const catalog = {
       "reading": "じゅぎょうをみるひ",
       "en": "This refers to the day when parents come to school to observe classes.",
       "descriptionJa": "保護者が学校に来て授業を見る日のことです。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso se refere ao dia em que os pais vêm à escola para observar as aulas.",
@@ -6711,7 +7982,9 @@ export const catalog = {
       "koText": "보호자가 학교에 와서 수업을 보는 날입니다.",
       "tlText": "Ito ay tumutukoy sa araw kung kailan pumupunta ang mga magulang sa paaralan upang magbantay sa mga klase.",
       "idText": "Ini merujuk pada hari ketika orang tua datang ke sekolah untuk mengamati kegiatan belajar mengajar.",
-      "neText": "यसले त्यो दिनलाई जनाउँछ जब अभिभावकहरू कक्षा अवलोकन गर्न स्कूल आउँछन्।"
+      "neText": "यसले त्यो दिनलाई जनाउँछ जब अभिभावकहरू कक्षा अवलोकन गर्न स्कूल आउँछन्।",
+      "deText": "Es ist ein Tag, an dem Eltern in die Schule kommen, um den Unterricht zu beobachten.",
+      "simpleJaText": "保護者が学校に来て授業を見る日のことです。"
     },
     {
       "id": "t344",
@@ -6719,7 +7992,7 @@ export const catalog = {
       "reading": "こんしゅう",
       "en": "This happened this week.",
       "descriptionJa": "この週のことです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso aconteceu esta semana.",
@@ -6729,7 +8002,9 @@ export const catalog = {
       "koText": "이번 주입니다.",
       "tlText": "Nangyari ito ngayong linggo.",
       "idText": "Ini terjadi minggu ini.",
-      "neText": "यो हप्ता भयो।"
+      "neText": "यो हप्ता भयो।",
+      "deText": "Das ist diese Woche passiert.",
+      "simpleJaText": "この週のことです。"
     },
     {
       "id": "t345",
@@ -6737,7 +8012,7 @@ export const catalog = {
       "reading": "らいげつ",
       "en": "It was the following month.",
       "descriptionJa": "次の月のことです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Foi no mês seguinte.",
@@ -6747,7 +8022,9 @@ export const catalog = {
       "koText": "다음 달입니다.",
       "tlText": "Nang sumunod na buwan iyon.",
       "idText": "Itu terjadi bulan berikutnya.",
-      "neText": "यो अर्को महिना थियो।"
+      "neText": "यो अर्को महिना थियो।",
+      "deText": "Es war im darauffolgenden Monat.",
+      "simpleJaText": "次の月のことです。"
     },
     {
       "id": "t346",
@@ -6755,7 +8032,7 @@ export const catalog = {
       "reading": "かていで",
       "en": "It means \"at home.\"",
       "descriptionJa": "家で、という意味です。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa \"em casa\".",
@@ -6765,7 +8042,9 @@ export const catalog = {
       "koText": "집에서, 라는 의미입니다.",
       "tlText": "Ang ibig sabihin nito ay \"nasa bahay.\"",
       "idText": "Artinya \"di rumah.\"",
-      "neText": "यसको अर्थ \"घरमा\" हो।"
+      "neText": "यसको अर्थ \"घरमा\" हो।",
+      "deText": "Es bedeutet „zu Hause“.",
+      "simpleJaText": "家で、という意味です。"
     },
     {
       "id": "t347",
@@ -6773,7 +8052,7 @@ export const catalog = {
       "reading": "しゅくだいがおわっている",
       "en": "This means that the homework has been completed to the very end.",
       "descriptionJa": "宿題を最後までやった状態です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso significa que a tarefa de casa foi concluída por completo.",
@@ -6783,7 +8062,9 @@ export const catalog = {
       "koText": "숙제를 끝까지 한 상태입니다.",
       "tlText": "Nangangahulugan ito na natapos na ang takdang-aralin hanggang sa pinakadulo.",
       "idText": "Ini berarti bahwa pekerjaan rumah telah diselesaikan hingga tuntas.",
-      "neText": "यसको अर्थ गृहकार्य अन्त्यसम्मै पूरा भइसकेको छ।"
+      "neText": "यसको अर्थ गृहकार्य अन्त्यसम्मै पूरा भइसकेको छ।",
+      "deText": "Das bedeutet, dass die Hausaufgaben bis zum Schluss erledigt wurden.",
+      "simpleJaText": "宿題を最後までやった状態です。"
     },
     {
       "id": "t348",
@@ -6791,7 +8072,7 @@ export const catalog = {
       "reading": "おわっている",
       "en": "It's completely finished.",
       "descriptionJa": "最後まで終わった状態です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Está completamente terminado.",
@@ -6801,7 +8082,9 @@ export const catalog = {
       "koText": "끝까지 끝난 상태입니다.",
       "tlText": "Tapos na ito nang tuluyan.",
       "idText": "Sudah selesai sepenuhnya.",
-      "neText": "यो पूर्ण रूपमा सकियो।"
+      "neText": "यो पूर्ण रूपमा सकियो।",
+      "deText": "Es ist komplett fertig.",
+      "simpleJaText": "最後まで終わった状態です。"
     },
     {
       "id": "t349",
@@ -6809,7 +8092,7 @@ export const catalog = {
       "reading": "たいせつなおしらせ",
       "en": "This is a message from the school that you absolutely must read.",
       "descriptionJa": "必ず見てほしい学校からの連絡です。",
-      "category": "提出物",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma mensagem da escola que você absolutamente precisa ler.",
@@ -6819,7 +8102,9 @@ export const catalog = {
       "koText": "반드시 보고 싶은 학교로부터의 연락입니다.",
       "tlText": "Ito ay isang mensahe mula sa paaralan na dapat mong basahin.",
       "idText": "Ini adalah pesan dari sekolah yang wajib kamu baca.",
-      "neText": "यो स्कूलबाट आएको सन्देश हो जुन तपाईंले अवश्य पढ्नै पर्छ।"
+      "neText": "यो स्कूलबाट आएको सन्देश हो जुन तपाईंले अवश्य पढ्नै पर्छ।",
+      "deText": "Dies ist eine Nachricht der Schule, die Sie unbedingt lesen müssen.",
+      "simpleJaText": "必ず見てほしい学校からの連絡です。"
     },
     {
       "id": "t350",
@@ -6827,7 +8112,7 @@ export const catalog = {
       "reading": "たいせつなこと",
       "en": "This is something you absolutely must know.",
       "descriptionJa": "必ず知っておいてほしいことです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isto é algo que você precisa absolutamente saber.",
@@ -6837,7 +8122,9 @@ export const catalog = {
       "koText": "반드시 알아두면 좋겠습니다.",
       "tlText": "Ito ay isang bagay na talagang dapat mong malaman.",
       "idText": "Ini adalah sesuatu yang mutlak harus Anda ketahui.",
-      "neText": "यो तपाईंले अवश्य जान्नै पर्ने कुरा हो।"
+      "neText": "यो तपाईंले अवश्य जान्नै पर्ने कुरा हो।",
+      "deText": "Das ist etwas, was Sie unbedingt wissen müssen.",
+      "simpleJaText": "必ず知っておいてほしいことです。"
     },
     {
       "id": "t351",
@@ -6845,7 +8132,7 @@ export const catalog = {
       "reading": "かていのつごう",
       "en": "It means that it's due to family circumstances.",
       "descriptionJa": "家の事情が理由という意味です。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que se deve a circunstâncias familiares.",
@@ -6855,7 +8142,9 @@ export const catalog = {
       "koText": "집의 사정이 이유라는 뜻입니다.",
       "tlText": "Ibig sabihin, ito ay dahil sa mga pangyayari sa pamilya.",
       "idText": "Artinya hal itu disebabkan oleh keadaan keluarga.",
-      "neText": "यसको अर्थ पारिवारिक परिस्थितिको कारणले हो।"
+      "neText": "यसको अर्थ पारिवारिक परिस्थितिको कारणले हो।",
+      "deText": "Es bedeutet, dass es an familiären Umständen liegt.",
+      "simpleJaText": "家の事情が理由という意味です。"
     },
     {
       "id": "t352",
@@ -6863,7 +8152,7 @@ export const catalog = {
       "reading": "いえのようじ",
       "en": "This is about things you need to do or have planned at home.",
       "descriptionJa": "家で必要なことや予定のことです。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de coisas que você precisa fazer ou planejou para fazer em casa.",
@@ -6873,7 +8162,9 @@ export const catalog = {
       "koText": "집에서 필요한 일이나 예정입니다.",
       "tlText": "Ito ay tungkol sa mga bagay na kailangan mong gawin o naplano mo na sa bahay.",
       "idText": "Ini tentang hal-hal yang perlu Anda lakukan atau rencanakan di rumah.",
-      "neText": "यो तपाईंले घरमा गर्नुपर्ने वा योजना बनाएका कुराहरूको बारेमा हो।"
+      "neText": "यो तपाईंले घरमा गर्नुपर्ने वा योजना बनाएका कुराहरूको बारेमा हो।",
+      "deText": "Hier geht es um Dinge, die Sie zu Hause erledigen oder geplant haben.",
+      "simpleJaText": "家で必要なことや予定のことです。"
     },
     {
       "id": "t353",
@@ -6881,9 +8172,9 @@ export const catalog = {
       "reading": "はやくかえります",
       "en": "It means going home earlier than usual.",
       "descriptionJa": "いつもより早い時間に家へ帰るという意味です。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
-      "viewCount": "1",
+      "viewCount": "3",
       "ptText": "Significa ir para casa mais cedo do que o habitual.",
       "esText": "Significa volver a casa antes de lo habitual.",
       "viText": "Điều đó có nghĩa là về nhà sớm hơn thường lệ.",
@@ -6891,7 +8182,9 @@ export const catalog = {
       "koText": "평소보다 빠른 시간에 집으로 돌아간다는 의미입니다.",
       "tlText": "Ibig sabihin, mas maaga ang pag-uwi kaysa dati.",
       "idText": "Artinya pulang lebih awal dari biasanya.",
-      "neText": "यसको अर्थ सामान्य भन्दा छिटो घर जानु हो।"
+      "neText": "यसको अर्थ सामान्य भन्दा छिटो घर जानु हो।",
+      "deText": "Das bedeutet, früher als gewöhnlich nach Hause zu gehen.",
+      "simpleJaText": "いつもより早い時間に家へ帰るという意味です。"
     },
     {
       "id": "t354",
@@ -6899,7 +8192,7 @@ export const catalog = {
       "reading": "むかえにいく",
       "en": "It means that a parent or guardian goes to school and brings their child home.",
       "descriptionJa": "保護者が学校へ行って、子どもを連れて帰ることです。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que um dos pais ou o responsável vai à escola e traz o filho de volta para casa.",
@@ -6909,7 +8202,9 @@ export const catalog = {
       "koText": "보호자가 학교에 가서 아이를 데리고 돌아가는 것입니다.",
       "tlText": "Nangangahulugan ito na ang isang magulang o tagapag-alaga ay pumapasok sa paaralan at iniuuwi ang kanilang anak.",
       "idText": "Artinya, orang tua atau wali pergi ke sekolah dan menjemput anak mereka pulang.",
-      "neText": "यसको अर्थ अभिभावक वा अभिभावकले स्कूल जान्छन् र आफ्नो बच्चालाई घर ल्याउँछन्।"
+      "neText": "यसको अर्थ अभिभावक वा अभिभावकले स्कूल जान्छन् र आफ्नो बच्चालाई घर ल्याउँछन्।",
+      "deText": "Es bedeutet, dass ein Elternteil oder Erziehungsberechtigter zur Schule geht und sein Kind wieder nach Hause bringt.",
+      "simpleJaText": "保護者が学校へ行って、子どもを連れて帰ることです。"
     },
     {
       "id": "t355",
@@ -6917,7 +8212,7 @@ export const catalog = {
       "reading": "むかえにいくじかん",
       "en": "It's time for parents to pick up their children from school.",
       "descriptionJa": "保護者が学校へ子どもを迎えに来る時間です。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Chegou a hora dos pais buscarem seus filhos na escola.",
@@ -6927,7 +8222,9 @@ export const catalog = {
       "koText": "보호자가 학교에 아이를 맞이하러 오는 시간입니다.",
       "tlText": "Panahon na para sunduin ng mga magulang ang kanilang mga anak galing sa paaralan.",
       "idText": "Sudah waktunya orang tua menjemput anak-anak mereka dari sekolah.",
-      "neText": "अभिभावकहरूले आफ्ना बच्चाहरूलाई स्कूलबाट लिन जाने समय भयो।"
+      "neText": "अभिभावकहरूले आफ्ना बच्चाहरूलाई स्कूलबाट लिन जाने समय भयो।",
+      "deText": "Es ist Zeit für die Eltern, ihre Kinder von der Schule abzuholen.",
+      "simpleJaText": "保護者が学校へ子どもを迎えに来る時間です。"
     },
     {
       "id": "t356",
@@ -6935,7 +8232,7 @@ export const catalog = {
       "reading": "がっこうのそと",
       "en": "It refers to a place other than school.",
       "descriptionJa": "学校ではない場所のことです。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Refere-se a um lugar que não seja a escola.",
@@ -6945,7 +8242,9 @@ export const catalog = {
       "koText": "학교가 아닌 곳입니다.",
       "tlText": "Ito ay tumutukoy sa ibang lugar maliban sa paaralan.",
       "idText": "Ini merujuk pada tempat selain sekolah.",
-      "neText": "यसले विद्यालय बाहेक अन्य ठाउँलाई जनाउँछ।"
+      "neText": "यसले विद्यालय बाहेक अन्य ठाउँलाई जनाउँछ।",
+      "deText": "Es bezeichnet einen anderen Ort als die Schule.",
+      "simpleJaText": "学校ではない場所のことです。"
     },
     {
       "id": "t357",
@@ -6953,7 +8252,7 @@ export const catalog = {
       "reading": "がくしゅうにいく",
       "en": "It means going outside of school to study.",
       "descriptionJa": "勉強のために学校の外へ行くことです。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa sair da escola para estudar.",
@@ -6963,7 +8262,9 @@ export const catalog = {
       "koText": "공부를 위해 학교 밖으로 가는 것입니다.",
       "tlText": "Nangangahulugan ito ng paglabas sa paaralan para mag-aral.",
       "idText": "Artinya, pergi ke luar sekolah untuk belajar.",
-      "neText": "यसको अर्थ पढ्नको लागि स्कूल बाहिर जानु हो।"
+      "neText": "यसको अर्थ पढ्नको लागि स्कूल बाहिर जानु हो।",
+      "deText": "Es bedeutet, außerhalb der Schule zu lernen.",
+      "simpleJaText": "勉強のために学校の外へ行くことです。"
     },
     {
       "id": "t358",
@@ -6971,7 +8272,7 @@ export const catalog = {
       "reading": "あめのどうぐ",
       "en": "This refers to umbrellas, rain gear, and other items used on rainy days.",
       "descriptionJa": "雨の日に使う傘や雨具などのことです。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "1",
       "ptText": "Isso se refere a guarda-chuvas, capas de chuva e outros itens usados ​​em dias chuvosos.",
@@ -6981,7 +8282,9 @@ export const catalog = {
       "koText": "비오는 날에 사용하는 우산이나 비구 등입니다.",
       "tlText": "Ito ay tumutukoy sa mga payong, kagamitang pang-ulan, at iba pang mga bagay na ginagamit sa mga araw ng tag-ulan.",
       "idText": "Ini merujuk pada payung, perlengkapan hujan, dan barang-barang lain yang digunakan pada hari hujan.",
-      "neText": "यसले छाता, वर्षाको गियर, र वर्षाको दिनमा प्रयोग हुने अन्य वस्तुहरूलाई जनाउँछ।"
+      "neText": "यसले छाता, वर्षाको गियर, र वर्षाको दिनमा प्रयोग हुने अन्य वस्तुहरूलाई जनाउँछ।",
+      "deText": "Dies bezieht sich auf Regenschirme, Regenkleidung und andere Gegenstände, die an Regentagen verwendet werden.",
+      "simpleJaText": "雨の日に使う傘や雨具などのことです。"
     },
     {
       "id": "t359",
@@ -6989,7 +8292,7 @@ export const catalog = {
       "reading": "がっこうのきまり",
       "en": "These are the rules that must be followed at school.",
       "descriptionJa": "学校で守るルールです。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estas são regras a seguir na escola.",
@@ -6999,7 +8302,9 @@ export const catalog = {
       "koText": "학교에서 지키는 규칙입니다.",
       "tlText": "Ito ang mga patakarang dapat sundin sa paaralan.",
       "idText": "Ini adalah peraturan yang harus diikuti di sekolah.",
-      "neText": "यी स्कूलमा पालना गर्नुपर्ने नियमहरू हुन्।"
+      "neText": "यी स्कूलमा पालना गर्नुपर्ने नियमहरू हुन्।",
+      "deText": "Dies sind die Regeln, die in der Schule befolgt werden müssen.",
+      "simpleJaText": "学校で守るルールです。"
     },
     {
       "id": "t360",
@@ -7007,7 +8312,7 @@ export const catalog = {
       "reading": "るーる",
       "en": "These are rules that must be followed.",
       "descriptionJa": "守る必要がある決まりです。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estas são regras que devem ser seguidas.",
@@ -7017,7 +8322,9 @@ export const catalog = {
       "koText": "지켜야 할 결정입니다.",
       "tlText": "Ito ang mga patakarang dapat sundin.",
       "idText": "Ini adalah aturan yang harus dipatuhi.",
-      "neText": "यी पालना गर्नुपर्ने नियमहरू हुन्।"
+      "neText": "यी पालना गर्नुपर्ने नियमहरू हुन्।",
+      "deText": "Dies sind Regeln, die befolgt werden müssen.",
+      "simpleJaText": "守る必要がある決まりです。"
     },
     {
       "id": "t361",
@@ -7025,7 +8332,7 @@ export const catalog = {
       "reading": "いっしょに",
       "en": "It means doing something the same way as someone else, or doing it together with someone else.",
       "descriptionJa": "だれかと同じように、または一緒にするという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa fazer algo da mesma maneira que outra pessoa, ou fazer isso junto com outra pessoa.",
@@ -7035,7 +8342,9 @@ export const catalog = {
       "koText": "누군가와 마찬가지로, 또는 함께하는 의미입니다.",
       "tlText": "Nangangahulugan ito ng paggawa ng isang bagay sa parehong paraan na ginagawa ng ibang tao, o paggawa nito kasama ang ibang tao.",
       "idText": "Artinya melakukan sesuatu dengan cara yang sama seperti orang lain, atau melakukannya bersama-sama dengan orang lain.",
-      "neText": "यसको अर्थ अरू कसैसँग मिलेर केही गर्नु हो, वा अरू कसैसँग मिलेर गर्नु हो।"
+      "neText": "यसको अर्थ अरू कसैसँग मिलेर केही गर्नु हो, वा अरू कसैसँग मिलेर गर्नु हो।",
+      "deText": "Es bedeutet, etwas auf die gleiche Weise wie jemand anderes zu tun oder es gemeinsam mit jemand anderem zu tun.",
+      "simpleJaText": "だれかと同じように、または一緒にするという意味です。"
     },
     {
       "id": "t362",
@@ -7043,7 +8352,7 @@ export const catalog = {
       "reading": "おこさんといっしょ",
       "en": "It's about checking and doing things together with your child.",
       "descriptionJa": "子どもと一緒に確認したり行ったりすることです。",
-      "category": "生活",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de verificar e fazer as coisas junto com seu filho.",
@@ -7053,7 +8362,9 @@ export const catalog = {
       "koText": "아이와 함께 확인하거나 가는 것입니다.",
       "tlText": "Tungkol ito sa pagsuri at paggawa ng mga bagay-bagay kasama ang iyong anak.",
       "idText": "Ini tentang memeriksa dan melakukan berbagai hal bersama anak Anda.",
-      "neText": "यो तपाईंको बच्चासँग मिलेर जाँच गर्ने र काम गर्ने बारे हो।"
+      "neText": "यो तपाईंको बच्चासँग मिलेर जाँच गर्ने र काम गर्ने बारे हो।",
+      "deText": "Es geht darum, Dinge gemeinsam mit dem Kind zu überprüfen und zu unternehmen.",
+      "simpleJaText": "子どもと一緒に確認したり行ったりすることです。"
     },
     {
       "id": "t363",
@@ -7061,7 +8372,7 @@ export const catalog = {
       "reading": "いっしょにかくにん",
       "en": "It's about watching the content together with your children or family.",
       "descriptionJa": "子どもや家族と一緒に内容を見ることです。",
-      "category": "生活",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de assistir ao conteúdo junto com seus filhos ou familiares.",
@@ -7071,7 +8382,9 @@ export const catalog = {
       "koText": "아이나 가족과 함께 내용을 보는 것입니다.",
       "tlText": "Tungkol ito sa panonood ng nilalaman kasama ang iyong mga anak o pamilya.",
       "idText": "Ini tentang menonton konten bersama anak-anak atau keluarga Anda.",
-      "neText": "यो तपाईंका बच्चाहरू वा परिवारसँग मिलेर सामग्री हेर्ने बारेमा हो।"
+      "neText": "यो तपाईंका बच्चाहरू वा परिवारसँग मिलेर सामग्री हेर्ने बारेमा हो।",
+      "deText": "Es geht darum, die Inhalte gemeinsam mit Ihren Kindern oder Ihrer Familie anzusehen.",
+      "simpleJaText": "子どもや家族と一緒に内容を見ることです。"
     },
     {
       "id": "t364",
@@ -7079,7 +8392,7 @@ export const catalog = {
       "reading": "がっこうのるーる",
       "en": "It's a rule that must be followed at school.",
       "descriptionJa": "学校で守る決まりです。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "É uma regra que deve ser seguida na escola.",
@@ -7089,7 +8402,9 @@ export const catalog = {
       "koText": "학교에서 지키는 결정입니다.",
       "tlText": "Isa itong tuntunin na dapat sundin sa paaralan.",
       "idText": "Ini adalah aturan yang harus dipatuhi di sekolah.",
-      "neText": "यो स्कूलमा पालना गर्नुपर्ने नियम हो।"
+      "neText": "यो स्कूलमा पालना गर्नुपर्ने नियम हो।",
+      "deText": "Das ist eine Regel, die in der Schule befolgt werden muss.",
+      "simpleJaText": "学校で守る決まりです。"
     },
     {
       "id": "t365",
@@ -7097,7 +8412,7 @@ export const catalog = {
       "reading": "うわがき",
       "en": "These are shoes for use inside the school.",
       "descriptionJa": "学校の中で使うくつです。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estes são sapatos para uso dentro da escola.",
@@ -7107,7 +8422,8 @@ export const catalog = {
       "koText": "학교에서 사용하는 쓰레기입니다.",
       "tlText": "Ito ay mga sapatos na ginagamit sa loob ng paaralan.",
       "idText": "Ini adalah sepatu yang digunakan di dalam sekolah.",
-      "neText": "यी जुत्ताहरू स्कूल भित्र प्रयोगको लागि हुन्।"
+      "neText": "यी जुत्ताहरू स्कूल भित्र प्रयोगको लागि हुन्।",
+      "deText": "Dies sind Schuhe für den Gebrauch innerhalb der Schule."
     },
     {
       "id": "t366",
@@ -7115,7 +8431,7 @@ export const catalog = {
       "reading": "ふりがな",
       "en": "Simple and easy-to-understand Japanese explanation",
       "descriptionJa": "かんたんでやさしい日本語の説明",
-      "category": "カテゴリー",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Explicação em japonês simples e fácil de entender",
@@ -7125,7 +8441,9 @@ export const catalog = {
       "koText": "간단하고 쉬운 일본어 설명",
       "tlText": "Simple at madaling intindihing paliwanag sa wikang Hapon",
       "idText": "Penjelasan bahasa Jepang yang sederhana dan mudah dipahami.",
-      "neText": "सरल र बुझ्न सजिलो जापानी व्याख्या"
+      "neText": "सरल र बुझ्न सजिलो जापानी व्याख्या",
+      "deText": "Einfache und leicht verständliche japanische Erklärung",
+      "simpleJaText": "かんたんでやさしい日本語の説明"
     },
     {
       "id": "t367",
@@ -7133,7 +8451,7 @@ export const catalog = {
       "reading": "はんかち",
       "en": "It's a small cloth for wiping your hands and face.",
       "descriptionJa": "手や顔をふくための小さい布です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "É um pequeno pano para limpar as mãos e o rosto.",
@@ -7143,7 +8461,9 @@ export const catalog = {
       "koText": "손과 얼굴을 닦기위한 작은 천입니다.",
       "tlText": "Ito ay isang maliit na tela para punasan ang iyong mga kamay at mukha.",
       "idText": "Ini adalah kain kecil untuk menyeka tangan dan wajah Anda.",
-      "neText": "यो हात र अनुहार पुछ्नको लागि एउटा सानो कपडा हो।"
+      "neText": "यो हात र अनुहार पुछ्नको लागि एउटा सानो कपडा हो।",
+      "deText": "Es ist ein kleines Tuch zum Abwischen von Händen und Gesicht.",
+      "simpleJaText": "手や顔をふくための小さい布です。"
     },
     {
       "id": "t368",
@@ -7151,7 +8471,7 @@ export const catalog = {
       "reading": "てぃっしゅ",
       "en": "These are papers used for blowing your nose or wiping away dirt.",
       "descriptionJa": "鼻をかんだり、よごれをふいたりする紙です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "São papéis usados ​​para assoar o nariz ou limpar a sujeira.",
@@ -7161,7 +8481,9 @@ export const catalog = {
       "koText": "코를 씹거나 흔들림을 닦는 종이입니다.",
       "tlText": "Ito ay mga papel na ginagamit para sa pagsinghot ng ilong o pagpunas ng dumi.",
       "idText": "Ini adalah kertas yang digunakan untuk membersihkan hidung atau menyeka kotoran.",
-      "neText": "यी कागजहरू नाक फुक्न वा फोहोर पुछ्न प्रयोग गरिन्छ।"
+      "neText": "यी कागजहरू नाक फुक्न वा फोहोर पुछ्न प्रयोग गरिन्छ।",
+      "deText": "Das sind Papiere, die man zum Naseputzen oder zum Abwischen von Schmutz verwendet.",
+      "simpleJaText": "鼻をかんだり、よごれをふいたりする紙です。"
     },
     {
       "id": "t369",
@@ -7169,7 +8491,7 @@ export const catalog = {
       "reading": "らんどせる",
       "en": "This is a backpack that elementary school students carry to hold their textbooks and notebooks.",
       "descriptionJa": "小学生が教科書やノートを入れて背負うかばんです。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma mochila que os alunos do ensino fundamental carregam para guardar seus livros didáticos e cadernos.",
@@ -7179,7 +8501,9 @@ export const catalog = {
       "koText": "초등학생이 교과서나 노트를 넣어 짊어지는 가방입니다.",
       "tlText": "Ito ay isang backpack na dala ng mga mag-aaral sa elementarya para paglagyan ng kanilang mga aklat-aralin at kuwaderno.",
       "idText": "Ini adalah tas ransel yang dibawa oleh siswa sekolah dasar untuk menyimpan buku pelajaran dan buku catatan mereka.",
-      "neText": "यो एउटा झोला हो जुन प्राथमिक विद्यालयका विद्यार्थीहरूले आफ्ना पाठ्यपुस्तकहरू र नोटबुकहरू बोक्न बोक्छन्।"
+      "neText": "यो एउटा झोला हो जुन प्राथमिक विद्यालयका विद्यार्थीहरूले आफ्ना पाठ्यपुस्तकहरू र नोटबुकहरू बोक्न बोक्छन्।",
+      "deText": "Dies ist ein Rucksack, den Grundschüler tragen, um ihre Lehrbücher und Hefte darin zu verstauen.",
+      "simpleJaText": "小学生が教科書やノートを入れて背負うかばんです。"
     },
     {
       "id": "t370",
@@ -7187,7 +8511,7 @@ export const catalog = {
       "reading": "ふでばこ",
       "en": "These are boxes or containers for holding pencils, erasers, and other small items.",
       "descriptionJa": "えんぴつや消しゴムなどを入れる箱や入れ物です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "1",
       "ptText": "São caixas ou recipientes para guardar lápis, borrachas e outros objetos pequenos.",
@@ -7197,7 +8521,9 @@ export const catalog = {
       "koText": "연필이나 지우개 등을 넣는 상자나 넣어입니다.",
       "tlText": "Ito ay mga kahon o lalagyan para sa mga lapis, pambura, at iba pang maliliit na bagay.",
       "idText": "Ini adalah kotak atau wadah untuk menyimpan pensil, penghapus, dan barang-barang kecil lainnya.",
-      "neText": "यी पेन्सिल, इरेजर र अन्य साना वस्तुहरू राख्नका लागि बक्स वा कन्टेनरहरू हुन्।"
+      "neText": "यी पेन्सिल, इरेजर र अन्य साना वस्तुहरू राख्नका लागि बक्स वा कन्टेनरहरू हुन्।",
+      "deText": "Hierbei handelt es sich um Schachteln oder Behälter zur Aufbewahrung von Stiften, Radiergummis und anderen kleinen Gegenständen.",
+      "simpleJaText": "えんぴつや消しゴムなどを入れる箱や入れ物です。"
     },
     {
       "id": "t371",
@@ -7205,7 +8531,7 @@ export const catalog = {
       "reading": "えんぴつ",
       "en": "It is a tool used for writing.",
       "descriptionJa": "文字を書くために使う道具です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "1",
       "ptText": "É uma ferramenta usada para escrever.",
@@ -7215,7 +8541,9 @@ export const catalog = {
       "koText": "문자를 쓰는 데 사용하는 도구입니다.",
       "tlText": "Ito ay isang kagamitang ginagamit sa pagsusulat.",
       "idText": "Ini adalah alat yang digunakan untuk menulis.",
-      "neText": "यो लेखनको लागि प्रयोग गरिने उपकरण हो।"
+      "neText": "यो लेखनको लागि प्रयोग गरिने उपकरण हो।",
+      "deText": "Es handelt sich um ein Werkzeug zum Schreiben.",
+      "simpleJaText": "文字を書くために使う道具です。"
     },
     {
       "id": "t372",
@@ -7223,7 +8551,7 @@ export const catalog = {
       "reading": "けしごむ",
       "en": "This is a tool for erasing writing done with a pencil.",
       "descriptionJa": "えんぴつで書いた文字を消す道具です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma ferramenta para apagar escritas feitas a lápis.",
@@ -7233,7 +8561,9 @@ export const catalog = {
       "koText": "연필로 쓴 문자를 지우는 도구입니다.",
       "tlText": "Ito ay isang kagamitan para sa pagbura ng mga sulating ginagamitan ng lapis.",
       "idText": "Ini adalah alat untuk menghapus tulisan yang dibuat dengan pensil.",
-      "neText": "यो पेन्सिलले लेखिएको लेखन मेटाउने उपकरण हो।"
+      "neText": "यो पेन्सिलले लेखिएको लेखन मेटाउने उपकरण हो।",
+      "deText": "Dies ist ein Werkzeug zum Radieren von mit Bleistift geschriebenen Texten.",
+      "simpleJaText": "えんぴつで書いた文字を消す道具です。"
     },
     {
       "id": "t373",
@@ -7241,7 +8571,7 @@ export const catalog = {
       "reading": "じょうぎ",
       "en": "It's a tool used for drawing straight lines and measuring lengths.",
       "descriptionJa": "まっすぐな線を引いたり、長さを測ったりする道具です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "1",
       "ptText": "É uma ferramenta usada para desenhar linhas retas e medir comprimentos.",
@@ -7251,7 +8581,9 @@ export const catalog = {
       "koText": "똑바른 선을 그리거나 길이를 측정하는 도구입니다.",
       "tlText": "Ito ay isang kagamitang ginagamit sa pagguhit ng mga tuwid na linya at pagsukat ng haba.",
       "idText": "Ini adalah alat yang digunakan untuk menggambar garis lurus dan mengukur panjang.",
-      "neText": "यो सिधा रेखाहरू कोर्न र लम्बाइ नाप्न प्रयोग गरिने उपकरण हो।"
+      "neText": "यो सिधा रेखाहरू कोर्न र लम्बाइ नाप्न प्रयोग गरिने उपकरण हो।",
+      "deText": "Es handelt sich um ein Werkzeug zum Zeichnen gerader Linien und zum Messen von Längen.",
+      "simpleJaText": "まっすぐな線を引いたり、長さを測ったりする道具です。"
     },
     {
       "id": "t374",
@@ -7259,7 +8591,7 @@ export const catalog = {
       "reading": "ぶんどき",
       "en": "This is a tool for measuring angles.",
       "descriptionJa": "角度を測るための道具です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "1",
       "ptText": "Esta é uma ferramenta para medir ângulos.",
@@ -7269,7 +8601,9 @@ export const catalog = {
       "koText": "각도를 측정하는 도구입니다.",
       "tlText": "Ito ay isang kagamitan para sa pagsukat ng mga anggulo.",
       "idText": "Ini adalah alat untuk mengukur sudut.",
-      "neText": "यो कोण नाप्ने उपकरण हो।"
+      "neText": "यो कोण नाप्ने उपकरण हो।",
+      "deText": "Dies ist ein Werkzeug zur Winkelmessung.",
+      "simpleJaText": "角度を測るための道具です。"
     },
     {
       "id": "t375",
@@ -7277,7 +8611,7 @@ export const catalog = {
       "reading": "こんぱす",
       "en": "This is a tool for drawing circles.",
       "descriptionJa": "円をかくための道具です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma ferramenta para desenhar círculos.",
@@ -7287,7 +8621,9 @@ export const catalog = {
       "koText": "원을 걸기 위한 도구입니다.",
       "tlText": "Ito ay isang kagamitan para sa pagguhit ng mga bilog.",
       "idText": "Ini adalah alat untuk menggambar lingkaran.",
-      "neText": "यो वृत्तहरू कोर्ने उपकरण हो।"
+      "neText": "यो वृत्तहरू कोर्ने उपकरण हो।",
+      "deText": "Dies ist ein Werkzeug zum Zeichnen von Kreisen.",
+      "simpleJaText": "円をかくための道具です。"
     },
     {
       "id": "t376",
@@ -7295,7 +8631,7 @@ export const catalog = {
       "reading": "さんかくじょうぎ",
       "en": "This is a triangular ruler. It's used for drawing lines and using angles.",
       "descriptionJa": "三角形の形をした定規です。線を引いたり角度を使ったりします。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma régua triangular. Ela é usada para desenhar linhas e medir ângulos.",
@@ -7305,7 +8641,9 @@ export const catalog = {
       "koText": "삼각형 모양의 눈금자입니다. 선을 그리거나 각도를 사용합니다.",
       "tlText": "Ito ay isang triangular ruler. Ginagamit ito para sa pagguhit ng mga linya at paggamit ng mga anggulo.",
       "idText": "Ini adalah penggaris segitiga. Digunakan untuk menggambar garis dan mengukur sudut.",
-      "neText": "यो त्रिकोणीय रुलर हो। यो रेखाहरू कोर्न र कोणहरू प्रयोग गर्न प्रयोग गरिन्छ।"
+      "neText": "यो त्रिकोणीय रुलर हो। यो रेखाहरू कोर्न र कोणहरू प्रयोग गर्न प्रयोग गरिन्छ।",
+      "deText": "Dies ist ein Dreiecklineal. Es dient zum Zeichnen von Linien und zum Verwenden von Winkeln.",
+      "simpleJaText": "三角形の形をした定規です。線を引いたり角度を使ったりします。"
     },
     {
       "id": "t377",
@@ -7313,7 +8651,7 @@ export const catalog = {
       "reading": "のーと",
       "en": "This is a paper book in which I write down what I heard and thought about in class.",
       "descriptionJa": "授業で聞いたことや考えたことを書く紙の本です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um caderno de papel no qual anoto o que ouvi e pensei durante as aulas.",
@@ -7323,7 +8661,9 @@ export const catalog = {
       "koText": "수업에서 들은 것과 생각한 것을 쓰는 종이의 책입니다.",
       "tlText": "Ito ay isang aklat na papel kung saan isinusulat ko ang aking mga narinig at naisip sa klase.",
       "idText": "Ini adalah buku kertas tempat saya menuliskan apa yang saya dengar dan pikirkan di kelas.",
-      "neText": "यो एउटा कागजी किताब हो जसमा म कक्षामा सुनेका र सोचेका कुराहरू लेख्छु।"
+      "neText": "यो एउटा कागजी किताब हो जसमा म कक्षामा सुनेका र सोचेका कुराहरू लेख्छु।",
+      "deText": "Dies ist ein Notizbuch, in dem ich aufschreibe, was ich im Unterricht gehört und worüber ich nachgedacht habe.",
+      "simpleJaText": "授業で聞いたことや考えたことを書く紙の本です。"
     },
     {
       "id": "t378",
@@ -7331,9 +8671,9 @@ export const catalog = {
       "reading": "きょうかしょ",
       "en": "This is a study book used in class.",
       "descriptionJa": "授業で使う勉強の本です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
-      "viewCount": "",
+      "viewCount": "2",
       "ptText": "Este é um livro de estudo usado em sala de aula.",
       "esText": "Este es un libro de estudio que se utiliza en clase.",
       "viText": "Đây là sách giáo khoa dùng trong lớp học.",
@@ -7341,7 +8681,9 @@ export const catalog = {
       "koText": "수업에서 사용하는 공부의 책입니다.",
       "tlText": "Ito ay isang aklat-aralin na ginagamit sa klase.",
       "idText": "Ini adalah buku pelajaran yang digunakan di kelas.",
-      "neText": "यो कक्षामा प्रयोग हुने अध्ययन पुस्तक हो।"
+      "neText": "यो कक्षामा प्रयोग हुने अध्ययन पुस्तक हो।",
+      "deText": "Dies ist ein im Unterricht verwendetes Studienbuch.",
+      "simpleJaText": "授業で使う勉強の本です。"
     },
     {
       "id": "t379",
@@ -7349,7 +8691,7 @@ export const catalog = {
       "reading": "あまがっぱ",
       "en": "It's something you wear to keep your clothes from getting wet on rainy days.",
       "descriptionJa": "雨の日に服がぬれないように着るものです。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "É uma peça que você usa para evitar que suas roupas se molhem em dias de chuva.",
@@ -7359,7 +8701,9 @@ export const catalog = {
       "koText": "비오는 날에 옷이 젖지 않도록 입는 것입니다.",
       "tlText": "Ito ay isang bagay na isinusuot mo para hindi mabasa ang iyong mga damit sa mga araw ng tag-ulan.",
       "idText": "Ini adalah sesuatu yang Anda kenakan untuk mencegah pakaian Anda basah saat hujan.",
-      "neText": "यो त्यस्तो चीज हो जुन तपाईंले वर्षाको दिनमा आफ्नो लुगा भिज्नबाट जोगाउन लगाउनुहुन्छ।"
+      "neText": "यो त्यस्तो चीज हो जुन तपाईंले वर्षाको दिनमा आफ्नो लुगा भिज्नबाट जोगाउन लगाउनुहुन्छ।",
+      "deText": "Es ist etwas, das man trägt, um seine Kleidung an Regentagen vor Nässe zu schützen.",
+      "simpleJaText": "雨の日に服がぬれないように着るものです。"
     },
     {
       "id": "t380",
@@ -7367,7 +8711,7 @@ export const catalog = {
       "reading": "かさ",
       "en": "This is a tool used to keep your body dry on rainy days.",
       "descriptionJa": "雨の日に体がぬれないように使う道具です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "1",
       "ptText": "Este é um acessório usado para manter o corpo seco em dias de chuva.",
@@ -7377,7 +8721,9 @@ export const catalog = {
       "koText": "비오는 날에 몸이 젖지 않도록 사용하는 도구입니다.",
       "tlText": "Ito ay isang kagamitang ginagamit upang mapanatiling tuyo ang iyong katawan sa mga araw ng tag-ulan.",
       "idText": "Ini adalah alat yang digunakan untuk menjaga tubuh tetap kering pada hari hujan.",
-      "neText": "यो वर्षाको दिनमा तपाईंको शरीरलाई सुख्खा राख्न प्रयोग गरिने उपकरण हो।"
+      "neText": "यो वर्षाको दिनमा तपाईंको शरीरलाई सुख्खा राख्न प्रयोग गरिने उपकरण हो।",
+      "deText": "Dies ist ein Hilfsmittel, um den Körper an Regentagen trocken zu halten.",
+      "simpleJaText": "雨の日に体がぬれないように使う道具です。"
     },
     {
       "id": "t381",
@@ -7385,7 +8731,7 @@ export const catalog = {
       "reading": "きゅうしょくぎ",
       "en": "These are the clothes worn when preparing school lunches.",
       "descriptionJa": "給食の準備をするときに着る服です。",
-      "category": "給食",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Essas são as roupas usadas na preparação do lanche escolar.",
@@ -7395,7 +8741,9 @@ export const catalog = {
       "koText": "급식 준비를 할 때 입는 옷입니다.",
       "tlText": "Ito ang mga damit na isinusuot kapag naghahanda ng pananghalian sa paaralan.",
       "idText": "Ini adalah pakaian yang dikenakan saat menyiapkan bekal makan siang sekolah.",
-      "neText": "यी स्कूलको खाजा तयार गर्दा लगाउने लुगाहरू हुन्।"
+      "neText": "यी स्कूलको खाजा तयार गर्दा लगाउने लुगाहरू हुन्।",
+      "deText": "Dies ist die Kleidung, die beim Zubereiten des Schulessens getragen wird.",
+      "simpleJaText": "給食の準備をするときに着る服です。"
     },
     {
       "id": "t382",
@@ -7403,7 +8751,7 @@ export const catalog = {
       "reading": "べんとうばこ",
       "en": "This is a box for putting lunch in.",
       "descriptionJa": "お弁当を入れる箱です。",
-      "category": "給食",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma caixa para colocar o almoço.",
@@ -7413,7 +8761,9 @@ export const catalog = {
       "koText": "도시락을 넣는 상자입니다.",
       "tlText": "Ito ay isang kahon para sa paglalagay ng tanghalian.",
       "idText": "Ini adalah kotak untuk menaruh bekal makan siang.",
-      "neText": "यो खाजा राख्नको लागि एउटा बक्स हो।"
+      "neText": "यो खाजा राख्नको लागि एउटा बक्स हो।",
+      "deText": "Das ist eine Box zum Einpacken des Mittagessens.",
+      "simpleJaText": "お弁当を入れる箱です。"
     },
     {
       "id": "t383",
@@ -7421,7 +8771,7 @@ export const catalog = {
       "reading": "はし",
       "en": "These are two tools used when eating a meal.",
       "descriptionJa": "ごはんを食べるときに使う二本の道具です。",
-      "category": "給食",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esses são dois utensílios usados ​​durante as refeições.",
@@ -7431,7 +8781,9 @@ export const catalog = {
       "koText": "밥을 먹을 때 사용하는 두 개의 도구입니다.",
       "tlText": "Ito ang dalawang kagamitang ginagamit kapag kumakain.",
       "idText": "Ini adalah dua alat yang digunakan saat makan.",
-      "neText": "यी खाना खाँदा प्रयोग हुने दुई उपकरणहरू हुन्।"
+      "neText": "यी खाना खाँदा प्रयोग हुने दुई उपकरणहरू हुन्।",
+      "deText": "Dies sind zwei Essbestecke.",
+      "simpleJaText": "ごはんを食べるときに使う二本の道具です。"
     },
     {
       "id": "t384",
@@ -7439,7 +8791,7 @@ export const catalog = {
       "reading": "すぷーん",
       "en": "These are tools used when eating rice or soup.",
       "descriptionJa": "ごはんやスープを食べるときに使う道具です。",
-      "category": "給食",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "São utensílios usados ​​para comer arroz ou sopa.",
@@ -7449,7 +8801,9 @@ export const catalog = {
       "koText": "밥이나 스프를 먹을 때 사용하는 도구입니다.",
       "tlText": "Ito ay mga kagamitang ginagamit kapag kumakain ng kanin o sopas.",
       "idText": "Ini adalah alat yang digunakan saat makan nasi atau sup.",
-      "neText": "यी भात वा सुप खाँदा प्रयोग हुने उपकरणहरू हुन्।"
+      "neText": "यी भात वा सुप खाँदा प्रयोग हुने उपकरणहरू हुन्।",
+      "deText": "Dies sind Essbestecke, die beim Essen von Reis oder Suppe verwendet werden.",
+      "simpleJaText": "ごはんやスープを食べるときに使う道具です。"
     },
     {
       "id": "t385",
@@ -7457,7 +8811,7 @@ export const catalog = {
       "reading": "ふぉーく",
       "en": "It's a tool used to stab food when eating.",
       "descriptionJa": "食べ物をさして食べるときに使う道具です。",
-      "category": "給食",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "É um utensílio usado para espetar alimentos na hora de comer.",
@@ -7467,7 +8821,9 @@ export const catalog = {
       "koText": "음식을 자르고 먹을 때 사용하는 도구입니다.",
       "tlText": "Ito ay isang kagamitang ginagamit sa pagsalok ng pagkain habang kumakain.",
       "idText": "Ini adalah alat yang digunakan untuk menusuk makanan saat makan.",
-      "neText": "यो खाना खाँदा छुरा प्रहार गर्न प्रयोग गरिने औजार हो।"
+      "neText": "यो खाना खाँदा छुरा प्रहार गर्न प्रयोग गरिने औजार हो।",
+      "deText": "Es handelt sich um ein Werkzeug, das zum Aufspießen von Lebensmitteln beim Essen verwendet wird.",
+      "simpleJaText": "食べ物をさして食べるときに使う道具です。"
     },
     {
       "id": "t386",
@@ -7475,7 +8831,7 @@ export const catalog = {
       "reading": "あかしろぼうし",
       "en": "These are red and white hats used for physical education classes and sports days.",
       "descriptionJa": "体育や運動会で使う、赤と白の帽子です。",
-      "category": "体育",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estes são chapéus vermelhos e brancos usados ​​nas aulas de educação física e nos dias de esportes.",
@@ -7485,7 +8841,9 @@ export const catalog = {
       "koText": "체육이나 운동회에서 사용하는 빨간색과 흰색 모자입니다.",
       "tlText": "Ito ay mga pula at puting sombrero na ginagamit para sa mga klase sa edukasyong pisikal at mga araw ng palakasan.",
       "idText": "Ini adalah topi merah dan putih yang digunakan untuk kelas pendidikan jasmani dan hari olahraga.",
-      "neText": "यी रातो र सेतो टोपीहरू हुन् जुन शारीरिक शिक्षा कक्षा र खेलकुद दिनहरूमा प्रयोग गरिन्छ।"
+      "neText": "यी रातो र सेतो टोपीहरू हुन् जुन शारीरिक शिक्षा कक्षा र खेलकुद दिनहरूमा प्रयोग गरिन्छ।",
+      "deText": "Dies sind rot-weiße Hüte, die im Sportunterricht und bei Sportfesten getragen werden.",
+      "simpleJaText": "体育や運動会で使う、赤と白の帽子です。"
     },
     {
       "id": "t387",
@@ -7493,7 +8851,7 @@ export const catalog = {
       "reading": "たいそうぎ",
       "en": "These are the clothes you wear for physical education class.",
       "descriptionJa": "体育の授業で着る服です。",
-      "category": "体育",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Essas são as roupas que você usa para a aula de educação física.",
@@ -7503,7 +8861,9 @@ export const catalog = {
       "koText": "체육 수업으로 입는 옷입니다.",
       "tlText": "Ito ang mga damit na isusuot mo para sa klase ng edukasyong pisikal.",
       "idText": "Ini adalah pakaian yang kamu kenakan untuk kelas pendidikan jasmani.",
-      "neText": "यी तपाईंले शारीरिक शिक्षा कक्षाको लागि लगाउने लुगाहरू हुन्।"
+      "neText": "यी तपाईंले शारीरिक शिक्षा कक्षाको लागि लगाउने लुगाहरू हुन्।",
+      "deText": "Das ist die Kleidung, die wir im Sportunterricht tragen.",
+      "simpleJaText": "体育の授業で着る服です。"
     },
     {
       "id": "t388",
@@ -7511,7 +8871,7 @@ export const catalog = {
       "reading": "ながそで",
       "en": "It's a garment that covers the arms long.",
       "descriptionJa": "うでを長くおおう服です。",
-      "category": "服装",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "É uma peça de roupa que cobre os braços por um longo período.",
@@ -7521,7 +8881,9 @@ export const catalog = {
       "koText": "우데를 오랫동안 모으는 옷입니다.",
       "tlText": "Ito ay isang damit na natatakpan nang mahaba ang mga braso.",
       "idText": "Ini adalah pakaian yang menutupi lengan panjang.",
-      "neText": "यो एउटा यस्तो लुगा हो जसले हात लामो समयसम्म ढाक्छ।"
+      "neText": "यो एउटा यस्तो लुगा हो जसले हात लामो समयसम्म ढाक्छ।",
+      "deText": "Es handelt sich um ein Kleidungsstück, das die Arme lang bedeckt.",
+      "simpleJaText": "うでを長くおおう服です。"
     },
     {
       "id": "t389",
@@ -7529,7 +8891,7 @@ export const catalog = {
       "reading": "ながずぼん",
       "en": "These are trousers that cover the legs long.",
       "descriptionJa": "足を長くおおうズボンです。",
-      "category": "服装",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "São calças compridas que cobrem as pernas.",
@@ -7539,7 +8901,9 @@ export const catalog = {
       "koText": "다리를 오랫동안 모자를 씌우는 바지입니다.",
       "tlText": "Ito ay mga pantalon na natatakpan nang mahaba ang mga binti.",
       "idText": "Ini adalah celana panjang yang menutupi kaki.",
-      "neText": "यी पाइन्टहरू हुन् जसले खुट्टा लामो समयसम्म ढाक्छ।"
+      "neText": "यी पाइन्टहरू हुन् जसले खुट्टा लामो समयसम्म ढाक्छ।",
+      "deText": "Das sind Hosen, die die Beine lang bedecken.",
+      "simpleJaText": "足を長くおおうズボンです。"
     },
     {
       "id": "t390",
@@ -7547,7 +8911,7 @@ export const catalog = {
       "reading": "はんそで",
       "en": "It's a garment with short sleeves that only reach partway up the arm.",
       "descriptionJa": "うでの途中までの短いそでの服です。",
-      "category": "服装",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "É uma peça de roupa com mangas curtas que chegam apenas até a metade do braço.",
@@ -7557,7 +8921,9 @@ export const catalog = {
       "koText": "우데의 도중까지의 짧은 옷장입니다.",
       "tlText": "Ito ay isang damit na may maiikling manggas na umaabot lamang sa bahagyang bahagi ng braso.",
       "idText": "Ini adalah pakaian dengan lengan pendek yang hanya mencapai sebagian lengan.",
-      "neText": "यो छोटो बाहुला भएको लुगा हो जुन पाखुराको आधा भाग मात्र माथि पुग्छ।"
+      "neText": "यो छोटो बाहुला भएको लुगा हो जुन पाखुराको आधा भाग मात्र माथि पुग्छ।",
+      "deText": "Es handelt sich um ein Kleidungsstück mit kurzen Ärmeln, die nur bis zur Hälfte des Arms reichen.",
+      "simpleJaText": "うでの途中までの短いそでの服です。"
     },
     {
       "id": "t391",
@@ -7565,7 +8931,7 @@ export const catalog = {
       "reading": "はんずぼん",
       "en": "These are short pants that come down to about the knees.",
       "descriptionJa": "ひざくらいまでの短いズボンです。",
-      "category": "服装",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "São calças curtas que chegam até os joelhos.",
@@ -7575,7 +8941,9 @@ export const catalog = {
       "koText": "무릎 정도까지 짧은 바지입니다.",
       "tlText": "Ito ay mga maikling pantalon na umaabot hanggang halos tuhod.",
       "idText": "Ini adalah celana pendek yang panjangnya sampai sekitar lutut.",
-      "neText": "यी छोटो पाइन्टहरू हुन् जुन घुँडासम्म आउँछन्।"
+      "neText": "यी छोटो पाइन्टहरू हुन् जुन घुँडासम्म आउँछन्।",
+      "deText": "Das sind kurze Hosen, die bis etwa zu den Knien reichen.",
+      "simpleJaText": "ひざくらいまでの短いズボンです。"
     },
     {
       "id": "t392",
@@ -7583,7 +8951,7 @@ export const catalog = {
       "reading": "なわとび",
       "en": "It's an exercise where you swing a rope and jump. It also refers to the equipment used for that exercise.",
       "descriptionJa": "なわを回してジャンプする運動です。また、その道具です。",
-      "category": "体育",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "É um exercício em que se balança uma corda e se salta. Também se refere ao equipamento utilizado para esse exercício.",
@@ -7593,7 +8961,9 @@ export const catalog = {
       "koText": "나와를 돌려 점프하는 운동입니다. 또한 그 도구입니다.",
       "tlText": "Ito ay isang ehersisyo kung saan ikaw ay nag-iispay ng lubid at tumatalon. Ito rin ay tumutukoy sa kagamitang ginagamit para sa ehersisyong iyon.",
       "idText": "Ini adalah latihan di mana Anda mengayunkan tali dan melompat. Istilah ini juga merujuk pada peralatan yang digunakan untuk latihan tersebut.",
-      "neText": "यो एउटा व्यायाम हो जहाँ तपाईंले डोरी हल्लाउनुहुन्छ र हाम फाल्नुहुन्छ। यसले त्यो व्यायामको लागि प्रयोग हुने उपकरणहरूलाई पनि जनाउँछ।"
+      "neText": "यो एउटा व्यायाम हो जहाँ तपाईंले डोरी हल्लाउनुहुन्छ र हाम फाल्नुहुन्छ। यसले त्यो व्यायामको लागि प्रयोग हुने उपकरणहरूलाई पनि जनाउँछ।",
+      "deText": "Es handelt sich um eine Übung, bei der man ein Seil schwingt und springt. Der Begriff bezeichnet auch die für diese Übung verwendete Ausrüstung.",
+      "simpleJaText": "なわを回してジャンプする運動です。また、その道具です。"
     },
     {
       "id": "t393",
@@ -7601,7 +8971,7 @@ export const catalog = {
       "reading": "しゅうじどうぐ",
       "en": "These are the tools used in calligraphy, such as brushes, ink, and inkstones.",
       "descriptionJa": "筆、すみ、すずりなど、習字で使う道具です。",
-      "category": "学習",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Essas são as ferramentas usadas na caligrafia, como pincéis, tinta e tinteiros.",
@@ -7611,7 +8981,9 @@ export const catalog = {
       "koText": "붓, 스미, 스즈리 등, 습자로 사용하는 도구입니다.",
       "tlText": "Ito ang mga kagamitang ginagamit sa kaligrapiya, tulad ng mga brush, tinta, at mga inkstone.",
       "idText": "Ini adalah alat-alat yang digunakan dalam kaligrafi, seperti kuas, tinta, dan batu tinta.",
-      "neText": "यी सुलेखनमा प्रयोग हुने उपकरणहरू हुन्, जस्तै ब्रश, मसी र मसीका ढुङ्गाहरू।"
+      "neText": "यी सुलेखनमा प्रयोग हुने उपकरणहरू हुन्, जस्तै ब्रश, मसी र मसीका ढुङ्गाहरू।",
+      "deText": "Dies sind die Werkzeuge, die in der Kalligrafie verwendet werden, wie Pinsel, Tinte und Reibsteine.",
+      "simpleJaText": "筆、すみ、すずりなど、習字で使う道具です。"
     },
     {
       "id": "t394",
@@ -7619,7 +8991,7 @@ export const catalog = {
       "reading": "えのぐせっと",
       "en": "This is a set of paints, brushes, and other supplies for painting.",
       "descriptionJa": "絵をかくための絵の具や筆などのセットです。",
-      "category": "図工",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um conjunto de tintas, pincéis e outros materiais para pintura.",
@@ -7629,7 +9001,9 @@ export const catalog = {
       "koText": "그림을 쓰는 페인트와 붓 등의 세트입니다.",
       "tlText": "Ito ay isang set ng mga pintura, brush, at iba pang mga kagamitan para sa pagpipinta.",
       "idText": "Ini adalah seperangkat cat, kuas, dan perlengkapan lain untuk melukis.",
-      "neText": "यो पेन्टिङको लागि पेन्ट, ब्रस र अन्य सामग्रीहरूको सेट हो।"
+      "neText": "यो पेन्टिङको लागि पेन्ट, ब्रस र अन्य सामग्रीहरूको सेट हो।",
+      "deText": "Dies ist ein Set aus Farben, Pinseln und anderem Malzubehör.",
+      "simpleJaText": "絵をかくための絵の具や筆などのセットです。"
     },
     {
       "id": "t395",
@@ -7637,7 +9011,7 @@ export const catalog = {
       "reading": "りゅっく",
       "en": "It's a bag that you put your belongings in and carry on your back.",
       "descriptionJa": "荷物を入れて背中に背負うかばんです。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "É uma bolsa onde você coloca seus pertences e carrega nas costas.",
@@ -7647,7 +9021,9 @@ export const catalog = {
       "koText": "짐을 넣고 등에 짊어지는 가방입니다.",
       "tlText": "Ito ay isang bag kung saan mo ilalagay ang iyong mga gamit at dadalhin sa iyong likod.",
       "idText": "Ini adalah tas yang Anda gunakan untuk menyimpan barang-barang Anda dan membawanya di punggung Anda.",
-      "neText": "यो एउटा झोला हो जसमा तपाईंले आफ्ना सामानहरू राख्नुहुन्छ र आफ्नो पछाडि बोक्नुहुन्छ।"
+      "neText": "यो एउटा झोला हो जसमा तपाईंले आफ्ना सामानहरू राख्नुहुन्छ र आफ्नो पछाडि बोक्नुहुन्छ।",
+      "deText": "Es ist eine Tasche, in die man seine Sachen packt und die man auf dem Rücken trägt.",
+      "simpleJaText": "荷物を入れて背中に背負うかばんです。"
     },
     {
       "id": "t396",
@@ -7655,7 +9031,7 @@ export const catalog = {
       "reading": "しきもの",
       "en": "These are mats that you lay on the ground to sit on during school trips and other outings.",
       "descriptionJa": "遠足などで地面にしいて座るものです。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "São esteiras que você estende no chão para sentar durante excursões escolares e outros passeios.",
@@ -7665,7 +9041,9 @@ export const catalog = {
       "koText": "소풍 등으로 땅에 앉고 앉아있는 것입니다.",
       "tlText": "Ito ay mga banig na inilalatag mo sa lupa para mauupuan habang may mga school trip at iba pang pamamasyal.",
       "idText": "Ini adalah tikar yang Anda gelar di tanah untuk duduk saat perjalanan sekolah dan kegiatan di luar ruangan lainnya.",
-      "neText": "यी ती म्याटहरू हुन् जुन तपाईंले स्कूल यात्रा र अन्य घुमफिरको समयमा भुइँमा बिछ्याउनुहुन्छ।"
+      "neText": "यी ती म्याटहरू हुन् जुन तपाईंले स्कूल यात्रा र अन्य घुमफिरको समयमा भुइँमा बिछ्याउनुहुन्छ।",
+      "deText": "Das sind Matten, die man bei Schulausflügen und anderen Unternehmungen auf den Boden legt, um darauf zu sitzen.",
+      "simpleJaText": "遠足などで地面にしいて座るものです。"
     },
     {
       "id": "t397",
@@ -7673,7 +9051,7 @@ export const catalog = {
       "reading": "じゅうよう",
       "en": "It means it's very important.",
       "descriptionJa": "とても大切という意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que é muito importante.",
@@ -7683,7 +9061,9 @@ export const catalog = {
       "koText": "매우 중요하다는 의미입니다.",
       "tlText": "Ibig sabihin nito ay napakahalaga nito.",
       "idText": "Artinya, ini sangat penting.",
-      "neText": "यसको अर्थ यो धेरै महत्त्वपूर्ण छ।"
+      "neText": "यसको अर्थ यो धेरै महत्त्वपूर्ण छ।",
+      "deText": "Es bedeutet, dass es sehr wichtig ist.",
+      "simpleJaText": "とても大切という意味です。"
     },
     {
       "id": "t398",
@@ -7691,7 +9071,7 @@ export const catalog = {
       "reading": "ちゅうい",
       "en": "It means \"Please be careful.\"",
       "descriptionJa": "気をつけてくださいという意味です。",
-      "category": "安全",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa \"Por favor, tenha cuidado\".",
@@ -7701,7 +9081,9 @@ export const catalog = {
       "koText": "조심하시기 바랍니다.",
       "tlText": "Ang ibig sabihin nito ay \"Mag-ingat po kayo.\"",
       "idText": "Artinya \"Harap berhati-hati.\"",
-      "neText": "यसको अर्थ \"कृपया सावधान रहनुहोस्।\""
+      "neText": "यसको अर्थ \"कृपया सावधान रहनुहोस्।\"",
+      "deText": "Es bedeutet „Bitte sei vorsichtig“.",
+      "simpleJaText": "気をつけてくださいという意味です。"
     },
     {
       "id": "t399",
@@ -7709,7 +9091,7 @@ export const catalog = {
       "reading": "げた",
       "en": "These are traditional Japanese footwear made of wood.",
       "descriptionJa": "木でできた日本の昔からあるはきものです。",
-      "category": "服装",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estes são calçados tradicionais japoneses feitos de madeira.",
@@ -7719,7 +9101,9 @@ export const catalog = {
       "koText": "나무로 만든 일본의 옛날부터있는 기모노입니다.",
       "tlText": "Ito ay mga tradisyonal na sapatos na Hapones na gawa sa kahoy.",
       "idText": "Ini adalah alas kaki tradisional Jepang yang terbuat dari kayu.",
-      "neText": "यी काठबाट बनेका परम्परागत जापानी जुत्ता हुन्।"
+      "neText": "यी काठबाट बनेका परम्परागत जापानी जुत्ता हुन्।",
+      "deText": "Dies sind traditionelle japanische Schuhe aus Holz.",
+      "simpleJaText": "木でできた日本の昔からあるはきものです。"
     },
     {
       "id": "t400",
@@ -7727,7 +9111,7 @@ export const catalog = {
       "reading": "ていしゅつ",
       "en": "It means submitting documents, homework, etc., to the school.",
       "descriptionJa": "書類や宿題などを学校に出すことです。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa entregar documentos, trabalhos de casa, etc., à escola.",
@@ -7737,7 +9121,9 @@ export const catalog = {
       "koText": "서류나 숙제 등을 학교에 내는 것입니다.",
       "tlText": "Nangangahulugan ito ng pagsusumite ng mga dokumento, takdang-aralin, atbp., sa paaralan.",
       "idText": "Artinya, menyerahkan dokumen, pekerjaan rumah, dan lain sebagainya, ke sekolah.",
-      "neText": "यसको अर्थ कागजातहरू, गृहकार्य, आदि स्कूलमा बुझाउनु हो।"
+      "neText": "यसको अर्थ कागजातहरू, गृहकार्य, आदि स्कूलमा बुझाउनु हो।",
+      "deText": "Es bedeutet, Dokumente, Hausaufgaben usw. in der Schule einzureichen.",
+      "simpleJaText": "書類や宿題などを学校に出すことです。"
     },
     {
       "id": "t401",
@@ -7745,7 +9131,7 @@ export const catalog = {
       "reading": "れんらく",
       "en": "It's about conveying important information.",
       "descriptionJa": "大切なことを知らせることです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de transmitir informações importantes.",
@@ -7755,7 +9141,9 @@ export const catalog = {
       "koText": "중요한 것을 알리는 것입니다.",
       "tlText": "Tungkol ito sa paghahatid ng mahahalagang impormasyon.",
       "idText": "Ini tentang menyampaikan informasi penting.",
-      "neText": "यो महत्त्वपूर्ण जानकारी पुर्‍याउने बारेमा हो।"
+      "neText": "यो महत्त्वपूर्ण जानकारी पुर्‍याउने बारेमा हो।",
+      "deText": "Es geht darum, wichtige Informationen zu vermitteln.",
+      "simpleJaText": "大切なことを知らせることです。"
     },
     {
       "id": "t402",
@@ -7763,7 +9151,7 @@ export const catalog = {
       "reading": "しはらい",
       "en": "It means paying money.",
       "descriptionJa": "お金を払うことです。",
-      "category": "支払い",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa pagar dinheiro.",
@@ -7773,7 +9161,9 @@ export const catalog = {
       "koText": "돈을 지불하는 것입니다.",
       "tlText": "Nangangahulugan ito ng pagbabayad ng pera.",
       "idText": "Artinya membayar uang.",
-      "neText": "यसको अर्थ पैसा तिर्नु हो।"
+      "neText": "यसको अर्थ पैसा तिर्नु हो।",
+      "deText": "Es bedeutet, Geld zu bezahlen.",
+      "simpleJaText": "お金を払うことです。"
     },
     {
       "id": "t403",
@@ -7781,7 +9171,7 @@ export const catalog = {
       "reading": "ちゅうしゃ",
       "en": "It means parking your car in the designated spot.",
       "descriptionJa": "車を決められた場所に止めることです。",
-      "category": "交通",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa estacionar o carro no local designado.",
@@ -7791,7 +9181,9 @@ export const catalog = {
       "koText": "차를 정해진 장소에 멈추는 것입니다.",
       "tlText": "Ibig sabihin, iparada ang iyong sasakyan sa itinalagang lugar.",
       "idText": "Artinya, parkirkan mobil Anda di tempat yang telah ditentukan.",
-      "neText": "यसको अर्थ आफ्नो कार तोकिएको ठाउँमा पार्किङ गर्नु हो।"
+      "neText": "यसको अर्थ आफ्नो कार तोकिएको ठाउँमा पार्किङ गर्नु हो।",
+      "deText": "Das bedeutet, Ihr Auto auf dem dafür vorgesehenen Parkplatz abzustellen.",
+      "simpleJaText": "車を決められた場所に止めることです。"
     },
     {
       "id": "t404",
@@ -7799,7 +9191,7 @@ export const catalog = {
       "reading": "ほけんしつ",
       "en": "This is the room you go to when you are injured or feeling unwell.",
       "descriptionJa": "けがをしたときや体調が悪いときに行く部屋です。",
-      "category": "校内",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o quarto para onde você deve ir quando estiver ferido ou se sentindo mal.",
@@ -7809,7 +9201,9 @@ export const catalog = {
       "koText": "부상을 입거나 몸이 좋지 않을 때 가는 방입니다.",
       "tlText": "Ito ang silid na pinupuntahan mo kapag ikaw ay nasugatan o masama ang pakiramdam.",
       "idText": "Ini adalah ruangan yang Anda datangi ketika Anda cedera atau merasa tidak enak badan.",
-      "neText": "यो त्यो कोठा हो जहाँ तपाईं घाइते हुँदा वा अस्वस्थ महसुस गर्दा जानुहुन्छ।"
+      "neText": "यो त्यो कोठा हो जहाँ तपाईं घाइते हुँदा वा अस्वस्थ महसुस गर्दा जानुहुन्छ।",
+      "deText": "Dies ist der Raum, in den man geht, wenn man verletzt ist oder sich unwohl fühlt.",
+      "simpleJaText": "けがをしたときや体調が悪いときに行く部屋です。"
     },
     {
       "id": "t405",
@@ -7817,7 +9211,7 @@ export const catalog = {
       "reading": "たんにん",
       "en": "This is the teacher in charge of the class.",
       "descriptionJa": "クラスを担当する先生です。",
-      "category": "学校",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o professor responsável pela turma.",
@@ -7827,7 +9221,8 @@ export const catalog = {
       "koText": "수업을 담당하는 선생님입니다.",
       "tlText": "Ito ang gurong namamahala sa klase.",
       "idText": "Ini adalah guru yang bertanggung jawab atas kelas tersebut.",
-      "neText": "उहाँ कक्षाको इन्चार्ज शिक्षक हुनुहुन्छ।"
+      "neText": "उहाँ कक्षाको इन्चार्ज शिक्षक हुनुहुन्छ।",
+      "deText": "Dies ist der für die Klasse zuständige Lehrer."
     },
     {
       "id": "t406",
@@ -7835,7 +9230,7 @@ export const catalog = {
       "reading": "げこう",
       "en": "It's about going home from school.",
       "descriptionJa": "学校から家に帰ることです。",
-      "category": "登下校",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "É sobre voltar para casa depois da escola.",
@@ -7845,7 +9240,9 @@ export const catalog = {
       "koText": "학교에서 집으로 돌아가는 것입니다.",
       "tlText": "Tungkol ito sa pag-uwi galing sa paaralan.",
       "idText": "Ini tentang pulang sekolah.",
-      "neText": "यो स्कूलबाट घर जाने बारेमा हो।"
+      "neText": "यो स्कूलबाट घर जाने बारेमा हो।",
+      "deText": "Es geht darum, von der Schule nach Hause zu kommen.",
+      "simpleJaText": "学校から家に帰ることです。"
     },
     {
       "id": "t407",
@@ -7853,7 +9250,7 @@ export const catalog = {
       "reading": "きたく",
       "en": "It means going home.",
       "descriptionJa": "家に帰ることです。",
-      "category": "生活",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa ir para casa.",
@@ -7863,7 +9260,9 @@ export const catalog = {
       "koText": "집으로 돌아가는 것입니다.",
       "tlText": "Ibig sabihin ay uuwi na.",
       "idText": "Artinya pulang ke rumah.",
-      "neText": "यसको अर्थ घर जानु हो।"
+      "neText": "यसको अर्थ घर जानु हो।",
+      "deText": "Es bedeutet, nach Hause zu gehen.",
+      "simpleJaText": "家に帰ることです。"
     },
     {
       "id": "t408",
@@ -7871,7 +9270,7 @@ export const catalog = {
       "reading": "ねつ",
       "en": "Your body temperature is high. This can occur when you're feeling unwell.",
       "descriptionJa": "体温が高い状態です。体調が悪いときに出ることがあります。",
-      "category": "健康",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Sua temperatura corporal está alta. Isso pode ocorrer quando você não está se sentindo bem.",
@@ -7881,7 +9280,9 @@ export const catalog = {
       "koText": "체온이 높은 상태입니다. 건강이 좋지 않을 때 나올 수 있습니다.",
       "tlText": "Mataas ang temperatura ng iyong katawan. Maaari itong mangyari kapag masama ang iyong pakiramdam.",
       "idText": "Suhu tubuh Anda tinggi. Ini bisa terjadi ketika Anda merasa tidak enak badan.",
-      "neText": "तपाईंको शरीरको तापक्रम उच्च छ। यो तपाईं अस्वस्थ महसुस गर्दा हुन सक्छ।"
+      "neText": "तपाईंको शरीरको तापक्रम उच्च छ। यो तपाईं अस्वस्थ महसुस गर्दा हुन सक्छ।",
+      "deText": "Ihre Körpertemperatur ist erhöht. Dies kann vorkommen, wenn Sie sich unwohl fühlen.",
+      "simpleJaText": "体温が高い状態です。体調が悪いときに出ることがあります。"
     },
     {
       "id": "t409",
@@ -7889,7 +9290,7 @@ export const catalog = {
       "reading": "はつねつ",
       "en": "It means developing a fever.",
       "descriptionJa": "熱が出ることです。",
-      "category": "健康",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa desenvolver febre.",
@@ -7899,7 +9300,9 @@ export const catalog = {
       "koText": "열이 나오는 것입니다.",
       "tlText": "Nangangahulugan ito ng pagkakaroon ng lagnat.",
       "idText": "Artinya mengalami demam.",
-      "neText": "यसको अर्थ ज्वरो आउनु हो।"
+      "neText": "यसको अर्थ ज्वरो आउनु हो।",
+      "deText": "Es bedeutet, Fieber zu bekommen.",
+      "simpleJaText": "熱が出ることです。"
     },
     {
       "id": "t410",
@@ -7907,7 +9310,7 @@ export const catalog = {
       "reading": "せき",
       "en": "It's a coughing or hacking sound that comes from the throat or chest.",
       "descriptionJa": "のどや胸から出る、コンコンという症状です。",
-      "category": "健康",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "É um som de tosse ou engasgo que vem da garganta ou do peito.",
@@ -7917,7 +9320,9 @@ export const catalog = {
       "koText": "목구멍이나 가슴에서 나오는 콩콩이라는 증상입니다.",
       "tlText": "Ito ay tunog ng pag-ubo o pagsinghot na nagmumula sa lalamunan o dibdib.",
       "idText": "Ini adalah suara batuk atau terbatuk-batuk yang berasal dari tenggorokan atau dada.",
-      "neText": "यो घाँटी वा छातीबाट आउने खोकी वा काँप्ने आवाज हो।"
+      "neText": "यो घाँटी वा छातीबाट आउने खोकी वा काँप्ने आवाज हो।",
+      "deText": "Es ist ein hustendes oder röchelndes Geräusch, das aus dem Hals oder der Brust kommt.",
+      "simpleJaText": "のどや胸から出る、コンコンという症状です。"
     },
     {
       "id": "t411",
@@ -7925,7 +9330,7 @@ export const catalog = {
       "reading": "はなみず",
       "en": "It's like water coming out of your nose.",
       "descriptionJa": "鼻から出る水のようなものです。",
-      "category": "健康",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "É como se estivesse saindo água pelo nariz.",
@@ -7935,7 +9340,9 @@ export const catalog = {
       "koText": "코에서 나오는 물과 같습니다.",
       "tlText": "Parang tubig na lumalabas sa ilong mo.",
       "idText": "Ini seperti air yang keluar dari hidungmu.",
-      "neText": "यो नाकबाट पानी निस्किए जस्तै हो।"
+      "neText": "यो नाकबाट पानी निस्किए जस्तै हो।",
+      "deText": "Es ist, als würde Wasser aus deiner Nase kommen.",
+      "simpleJaText": "鼻から出る水のようなものです。"
     },
     {
       "id": "t412",
@@ -7943,7 +9350,7 @@ export const catalog = {
       "reading": "ふくつう",
       "en": "I have a stomach ache.",
       "descriptionJa": "おなかが痛いことです。",
-      "category": "健康",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estou com dor de barriga.",
@@ -7953,7 +9360,9 @@ export const catalog = {
       "koText": "배가 아파요.",
       "tlText": "Masakit ang tiyan ko.",
       "idText": "Aku sakit perut.",
-      "neText": "मलाई पेट दुखेको छ।"
+      "neText": "मलाई पेट दुखेको छ।",
+      "deText": "Ich habe Bauchschmerzen.",
+      "simpleJaText": "おなかが痛いことです。"
     },
     {
       "id": "t413",
@@ -7961,7 +9370,7 @@ export const catalog = {
       "reading": "ずつう",
       "en": "It's a headache.",
       "descriptionJa": "頭が痛いことです。",
-      "category": "健康",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "É uma dor de cabeça.",
@@ -7971,7 +9380,9 @@ export const catalog = {
       "koText": "머리가 아파요.",
       "tlText": "Sakit sa ulo 'yan.",
       "idText": "Ini bikin pusing.",
-      "neText": "टाउको दुख्ने समस्या छ।"
+      "neText": "टाउको दुख्ने समस्या छ।",
+      "deText": "Das ist echt nervig.",
+      "simpleJaText": "頭が痛いことです。"
     },
     {
       "id": "t414",
@@ -7979,7 +9390,7 @@ export const catalog = {
       "reading": "けが",
       "en": "It means getting injured or hurting your body.",
       "descriptionJa": "体に傷ができたり、体を痛めたりすることです。",
-      "category": "健康",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa sofrer uma lesão ou machucar o corpo.",
@@ -7989,7 +9400,9 @@ export const catalog = {
       "koText": "몸에 상처가 생기거나 몸을 아프게 하는 것입니다.",
       "tlText": "Nangangahulugan ito ng pagkasugat o pananakit ng iyong katawan.",
       "idText": "Artinya mengalami cedera atau melukai tubuh.",
-      "neText": "यसको अर्थ तपाईंको शरीरमा चोट लाग्नु वा चोट पुर्‍याउनु हो।"
+      "neText": "यसको अर्थ तपाईंको शरीरमा चोट लाग्नु वा चोट पुर्‍याउनु हो।",
+      "deText": "Es bedeutet, sich zu verletzen oder dem Körper Schaden zuzufügen.",
+      "simpleJaText": "体に傷ができたり、体を痛めたりすることです。"
     },
     {
       "id": "t415",
@@ -7997,7 +9410,7 @@ export const catalog = {
       "reading": "すりきず",
       "en": "This is an injury where the skin is slightly scraped, such as when you fall.",
       "descriptionJa": "ころんだときなどに、皮ふが少しけずれるけがです。",
-      "category": "健康",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de uma lesão em que a pele é levemente arranhada, como acontece quando você cai.",
@@ -8007,7 +9420,9 @@ export const catalog = {
       "koText": "넘어졌을 때 등에 피부가 조금 어긋나는 부상입니다.",
       "tlText": "Ito ay isang pinsala kung saan ang balat ay bahagyang nagasgas, tulad ng kapag ikaw ay nadapa.",
       "idText": "Ini adalah cedera di mana kulit sedikit tergores, misalnya saat Anda terjatuh.",
-      "neText": "यो त्यस्तो चोट हो जहाँ छालामा थोरै चाउरी परेको हुन्छ, जस्तै तपाईं लड्दा।"
+      "neText": "यो त्यस्तो चोट हो जहाँ छालामा थोरै चाउरी परेको हुन्छ, जस्तै तपाईं लड्दा।",
+      "deText": "Hierbei handelt es sich um eine Verletzung, bei der die Haut leicht aufgeschürft wird, beispielsweise bei einem Sturz.",
+      "simpleJaText": "ころんだときなどに、皮ふが少しけずれるけがです。"
     },
     {
       "id": "t416",
@@ -8015,7 +9430,7 @@ export const catalog = {
       "reading": "だぼく",
       "en": "It's when you get hit hard and it hurts.",
       "descriptionJa": "体を強くぶつけて痛くなることです。",
-      "category": "健康",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "É quando você leva um golpe forte e dói.",
@@ -8025,7 +9440,9 @@ export const catalog = {
       "koText": "몸을 강하게 부딪치고 아파지는 것입니다.",
       "tlText": "Ganun talaga kapag malakas ang tama sa'yo at masakit.",
       "idText": "Saat itulah kamu terkena pukulan keras dan terasa sakit.",
-      "neText": "जब तपाईंलाई कडा चोट लाग्छ र दुख्छ तब हुन्छ।"
+      "neText": "जब तपाईंलाई कडा चोट लाग्छ र दुख्छ तब हुन्छ।",
+      "deText": "Das ist, wenn man einen harten Schlag abbekommt und es weh tut.",
+      "simpleJaText": "体を強くぶつけて痛くなることです。"
     },
     {
       "id": "t417",
@@ -8033,7 +9450,7 @@ export const catalog = {
       "reading": "ほごしゃ",
       "en": "This refers to an adult who takes care of children and handles paperwork.",
       "descriptionJa": "子どもの世話や手続きをする大人の人です。",
-      "category": "家庭",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso se refere a um adulto que cuida de crianças e lida com a papelada.",
@@ -8043,7 +9460,9 @@ export const catalog = {
       "koText": "어린이의 돌보거나 수속을 하는 어른의 사람입니다.",
       "tlText": "Ito ay tumutukoy sa isang nasa hustong gulang na nag-aalaga ng mga bata at humahawak ng mga papeles.",
       "idText": "Ini merujuk pada orang dewasa yang mengurus anak-anak dan menangani urusan administrasi.",
-      "neText": "यसले बालबालिकाको हेरचाह गर्ने र कागजी कार्यहरू सम्हाल्ने वयस्कलाई जनाउँछ।"
+      "neText": "यसले बालबालिकाको हेरचाह गर्ने र कागजी कार्यहरू सम्हाल्ने वयस्कलाई जनाउँछ।",
+      "deText": "Damit ist ein Erwachsener gemeint, der sich um Kinder kümmert und Papierkram erledigt.",
+      "simpleJaText": "子どもの世話や手続きをする大人の人です。"
     },
     {
       "id": "t418",
@@ -8051,7 +9470,7 @@ export const catalog = {
       "reading": "きょうだい",
       "en": "These are boys and girls born to the same parents.",
       "descriptionJa": "同じ親から生まれた男の子や女の子です。",
-      "category": "家庭",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esses são meninos e meninas nascidos dos mesmos pais.",
@@ -8061,7 +9480,9 @@ export const catalog = {
       "koText": "같은 부모로부터 태어난 소년과 소녀입니다.",
       "tlText": "Ito ay mga batang lalaki at babae na ipinanganak sa iisang magulang.",
       "idText": "Ini adalah anak laki-laki dan perempuan yang lahir dari orang tua yang sama.",
-      "neText": "यी एउटै आमाबाबुबाट जन्मेका केटा र केटीहरू हुन्।"
+      "neText": "यी एउटै आमाबाबुबाट जन्मेका केटा र केटीहरू हुन्।",
+      "deText": "Das sind Jungen und Mädchen, die von denselben Eltern geboren wurden.",
+      "simpleJaText": "同じ親から生まれた男の子や女の子です。"
     },
     {
       "id": "t419",
@@ -8069,7 +9490,7 @@ export const catalog = {
       "reading": "しまい",
       "en": "These are girls born to the same parents.",
       "descriptionJa": "同じ親から生まれた女の子たちです。",
-      "category": "家庭",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Essas são meninas que nasceram dos mesmos pais.",
@@ -8079,7 +9500,9 @@ export const catalog = {
       "koText": "같은 부모로부터 태어난 소녀들입니다.",
       "tlText": "Ito ang mga batang babae na ipinanganak sa iisang magulang.",
       "idText": "Ini adalah anak perempuan yang lahir dari orang tua yang sama.",
-      "neText": "यी एउटै आमाबाबुबाट जन्मेका केटीहरू हुन्।"
+      "neText": "यी एउटै आमाबाबुबाट जन्मेका केटीहरू हुन्।",
+      "deText": "Es handelt sich um Mädchen, die von denselben Eltern geboren wurden.",
+      "simpleJaText": "同じ親から生まれた女の子たちです。"
     },
     {
       "id": "t420",
@@ -8087,7 +9510,7 @@ export const catalog = {
       "reading": "そふ",
       "en": "I'm talking about my grandfather.",
       "descriptionJa": "おじいさんのことです。",
-      "category": "家庭",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estou falando do meu avô.",
@@ -8097,7 +9520,9 @@ export const catalog = {
       "koText": "할아버지입니다.",
       "tlText": "Ang tinutukoy ko ay ang lolo ko.",
       "idText": "Saya sedang berbicara tentang kakek saya.",
-      "neText": "म मेरो हजुरबुबाको बारेमा कुरा गर्दैछु।"
+      "neText": "म मेरो हजुरबुबाको बारेमा कुरा गर्दैछु।",
+      "deText": "Ich spreche von meinem Großvater.",
+      "simpleJaText": "おじいさんのことです。"
     },
     {
       "id": "t421",
@@ -8105,7 +9530,7 @@ export const catalog = {
       "reading": "そぼ",
       "en": "I'm talking about my grandmother.",
       "descriptionJa": "おばあさんのことです。",
-      "category": "家庭",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estou falando da minha avó.",
@@ -8115,7 +9540,9 @@ export const catalog = {
       "koText": "할머니입니다.",
       "tlText": "Ang tinutukoy ko ay ang lola ko.",
       "idText": "Saya sedang berbicara tentang nenek saya.",
-      "neText": "म मेरी हजुरआमाको बारेमा कुरा गर्दैछु।"
+      "neText": "म मेरी हजुरआमाको बारेमा कुरा गर्दैछु।",
+      "deText": "Ich spreche von meiner Großmutter.",
+      "simpleJaText": "おばあさんのことです。"
     },
     {
       "id": "t422",
@@ -8123,7 +9550,7 @@ export const catalog = {
       "reading": "かぞく",
       "en": "These are the people who live with you and are close to you.",
       "descriptionJa": "いっしょに生活する身近な人たちです。",
-      "category": "家庭",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Essas são as pessoas que moram com você e são próximas a você.",
@@ -8133,7 +9560,9 @@ export const catalog = {
       "koText": "함께 생활하는 친밀한 사람들입니다.",
       "tlText": "Ito ang mga taong nakatira kasama mo at malapit sa iyo.",
       "idText": "Mereka adalah orang-orang yang tinggal bersama Anda dan dekat dengan Anda.",
-      "neText": "यी ती मानिसहरू हुन् जो तपाईंसँग बस्छन् र तपाईंको नजिक छन्।"
+      "neText": "यी ती मानिसहरू हुन् जो तपाईंसँग बस्छन् र तपाईंको नजिक छन्।",
+      "deText": "Das sind die Menschen, die mit dir zusammenleben und dir nahestehen.",
+      "simpleJaText": "いっしょに生活する身近な人たちです。"
     },
     {
       "id": "t423",
@@ -8141,7 +9570,7 @@ export const catalog = {
       "reading": "かていれんらく",
       "en": "It's about communicating important things between school and home.",
       "descriptionJa": "学校と家庭の間で大切なことを知らせることです。",
-      "category": "連絡",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de comunicar coisas importantes entre a escola e a casa.",
@@ -8151,7 +9580,9 @@ export const catalog = {
       "koText": "학교와 가정 사이에서 중요한 것을 알리는 것입니다.",
       "tlText": "Tungkol ito sa pagpapabatid ng mahahalagang bagay sa pagitan ng paaralan at tahanan.",
       "idText": "Ini tentang mengkomunikasikan hal-hal penting antara sekolah dan rumah.",
-      "neText": "यो स्कूल र घर बीचको महत्त्वपूर्ण कुराहरू सञ्चार गर्ने बारे हो।"
+      "neText": "यो स्कूल र घर बीचको महत्त्वपूर्ण कुराहरू सञ्चार गर्ने बारे हो।",
+      "deText": "Es geht darum, wichtige Dinge zwischen Schule und Elternhaus zu kommunizieren.",
+      "simpleJaText": "学校と家庭の間で大切なことを知らせることです。"
     },
     {
       "id": "t424",
@@ -8159,7 +9590,7 @@ export const catalog = {
       "reading": "れんらくちょう",
       "en": "This is a notebook for schools and families to use for communication.",
       "descriptionJa": "学校と家庭が連絡を書くノートです。",
-      "category": "連絡",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um caderno para escolas e famílias usarem para comunicação.",
@@ -8169,7 +9600,8 @@ export const catalog = {
       "koText": "학교와 가정이 연락을 쓰는 노트입니다.",
       "tlText": "Ito ay isang kuwaderno para sa mga paaralan at pamilya na magagamit para sa komunikasyon.",
       "idText": "Ini adalah buku catatan yang dapat digunakan oleh sekolah dan keluarga untuk berkomunikasi.",
-      "neText": "यो विद्यालय र परिवारहरूको लागि सञ्चारको लागि प्रयोग गर्नको लागि एउटा नोटबुक हो।"
+      "neText": "यो विद्यालय र परिवारहरूको लागि सञ्चारको लागि प्रयोग गर्नको लागि एउटा नोटबुक हो।",
+      "deText": "Dies ist ein Notizbuch, das Schulen und Familien zur Kommunikation nutzen können."
     },
     {
       "id": "t425",
@@ -8177,7 +9609,7 @@ export const catalog = {
       "reading": "けっせきれんらく",
       "en": "This means informing the school that you will be absent from school.",
       "descriptionJa": "学校を休むことを学校に知らせることです。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso significa informar a escola que você estará ausente das aulas.",
@@ -8187,7 +9619,8 @@ export const catalog = {
       "koText": "학교를 쉬는 것을 학교에 알리는 것입니다.",
       "tlText": "Nangangahulugan ito ng pagpapaalam sa paaralan na ikaw ay liliban sa paaralan.",
       "idText": "Ini berarti memberitahukan kepada pihak sekolah bahwa Anda akan absen.",
-      "neText": "यसको अर्थ तपाईं स्कूलमा अनुपस्थित हुनुहुनेछ भनेर स्कूललाई ​​जानकारी गराउनु हो।"
+      "neText": "यसको अर्थ तपाईं स्कूलमा अनुपस्थित हुनुहुनेछ भनेर स्कूललाई ​​जानकारी गराउनु हो।",
+      "deText": "Das bedeutet, dass Sie die Schule darüber informieren müssen, dass Sie dem Unterricht fernbleiben werden."
     },
     {
       "id": "t426",
@@ -8195,7 +9628,7 @@ export const catalog = {
       "reading": "ちこくれんらく",
       "en": "This means informing the school that you will be late.",
       "descriptionJa": "学校に遅れることを学校に知らせることです。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso significa informar a escola que você chegará atrasado(a).",
@@ -8205,7 +9638,9 @@ export const catalog = {
       "koText": "학교에 늦어지는 것을 학교에 알리는 것입니다.",
       "tlText": "Nangangahulugan ito ng pagpapaalam sa paaralan na mahuhuli ka.",
       "idText": "Ini berarti memberitahukan kepada pihak sekolah bahwa Anda akan terlambat.",
-      "neText": "यसको अर्थ तपाईं ढिलो आउनुहुनेछ भनेर स्कूललाई ​​जानकारी गराउनु हो।"
+      "neText": "यसको अर्थ तपाईं ढिलो आउनुहुनेछ भनेर स्कूललाई ​​जानकारी गराउनु हो।",
+      "deText": "Das bedeutet, die Schule darüber zu informieren, dass Sie sich verspäten werden.",
+      "simpleJaText": "学校に遅れることを学校に知らせることです。"
     },
     {
       "id": "t427",
@@ -8213,7 +9648,7 @@ export const catalog = {
       "reading": "そうたい",
       "en": "It means going home before school ends.",
       "descriptionJa": "学校が終わる前に帰ることです。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa ir para casa antes do fim das aulas.",
@@ -8223,7 +9658,8 @@ export const catalog = {
       "koText": "학교가 끝나기 전에 돌아가는 것입니다.",
       "tlText": "Ibig sabihin, uuwi na ako bago matapos ang klase.",
       "idText": "Artinya pulang ke rumah sebelum sekolah berakhir.",
-      "neText": "यसको अर्थ स्कूल सकिनु अघि घर जानु हो।"
+      "neText": "यसको अर्थ स्कूल सकिनु अघि घर जानु हो।",
+      "deText": "Das bedeutet, vor Schulschluss nach Hause zu gehen."
     },
     {
       "id": "t428",
@@ -8231,7 +9667,7 @@ export const catalog = {
       "reading": "そうたいします",
       "en": "It means I'll go home before school ends.",
       "descriptionJa": "学校が終わる前に帰ります、という意味です。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que irei para casa antes do fim das aulas.",
@@ -8241,7 +9677,9 @@ export const catalog = {
       "koText": "학교가 끝나기 전에 돌아갑니다, 라는 의미입니다.",
       "tlText": "Ibig sabihin uuwi na ako bago matapos ang klase.",
       "idText": "Artinya aku akan pulang sebelum sekolah berakhir.",
-      "neText": "यसको अर्थ म स्कूल सकिनु अघि नै घर जान्छु।"
+      "neText": "यसको अर्थ म स्कूल सकिनु अघि नै घर जान्छु।",
+      "deText": "Das bedeutet, dass ich vor Schulschluss nach Hause komme.",
+      "simpleJaText": "学校が終わる前に帰ります、という意味です。"
     },
     {
       "id": "t429",
@@ -8249,7 +9687,7 @@ export const catalog = {
       "reading": "とうこう",
       "en": "It's about going from home to school.",
       "descriptionJa": "家から学校へ行くことです。",
-      "category": "登下校",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de ir de casa para a escola.",
@@ -8259,7 +9697,9 @@ export const catalog = {
       "koText": "집에서 학교에 가는 것입니다.",
       "tlText": "Tungkol ito sa pagpunta mula bahay papuntang paaralan.",
       "idText": "Ini tentang perjalanan dari rumah ke sekolah.",
-      "neText": "यो घरबाट स्कूल जाने बारेमा हो।"
+      "neText": "यो घरबाट स्कूल जाने बारेमा हो।",
+      "deText": "Es geht um den Schulweg von zu Hause.",
+      "simpleJaText": "家から学校へ行くことです。"
     },
     {
       "id": "t430",
@@ -8267,7 +9707,7 @@ export const catalog = {
       "reading": "つうがく",
       "en": "It's about going back and forth between home and school.",
       "descriptionJa": "家と学校の間を行き来することです。",
-      "category": "登下校",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de ir e vir entre casa e escola.",
@@ -8277,7 +9717,9 @@ export const catalog = {
       "koText": "집과 학교 사이를 오가는 것입니다.",
       "tlText": "Tungkol ito sa pagpapabalik-balik sa pagitan ng bahay at paaralan.",
       "idText": "Ini tentang bolak-balik antara rumah dan sekolah.",
-      "neText": "यो घर र स्कूल बीच यताउता जाने बारेमा हो।"
+      "neText": "यो घर र स्कूल बीच यताउता जाने बारेमा हो।",
+      "deText": "Es geht darum, zwischen Zuhause und Schule hin und her zu pendeln.",
+      "simpleJaText": "家と学校の間を行き来することです。"
     },
     {
       "id": "t431",
@@ -8285,7 +9727,7 @@ export const catalog = {
       "reading": "とほ",
       "en": "I'll go on foot.",
       "descriptionJa": "歩いて行くことです。",
-      "category": "登下校",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Eu irei a pé.",
@@ -8295,7 +9737,9 @@ export const catalog = {
       "koText": "걸어가는 것입니다.",
       "tlText": "Maglalakad ako.",
       "idText": "Saya akan berjalan kaki.",
-      "neText": "म पैदलै जान्छु।"
+      "neText": "म पैदलै जान्छु।",
+      "deText": "Ich werde zu Fuß gehen.",
+      "simpleJaText": "歩いて行くことです。"
     },
     {
       "id": "t432",
@@ -8303,7 +9747,7 @@ export const catalog = {
       "reading": "じてんしゃ",
       "en": "It's a vehicle that moves by pedaling.",
       "descriptionJa": "ペダルをこいで進む乗り物です。",
-      "category": "登下校",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "É um veículo que se move pedalando.",
@@ -8313,7 +9757,9 @@ export const catalog = {
       "koText": "페달을 밟아 나가는 차량입니다.",
       "tlText": "Ito ay isang sasakyan na gumagalaw sa pamamagitan ng pagpedal.",
       "idText": "Ini adalah kendaraan yang bergerak dengan mengayuh pedal.",
-      "neText": "यो पेडल चलाएर चल्ने सवारी साधन हो।"
+      "neText": "यो पेडल चलाएर चल्ने सवारी साधन हो।",
+      "deText": "Es handelt sich um ein Fahrzeug, das sich durch Treten der Pedale fortbewegt.",
+      "simpleJaText": "ペダルをこいで進む乗り物です。"
     },
     {
       "id": "t433",
@@ -8321,7 +9767,7 @@ export const catalog = {
       "reading": "ばす",
       "en": "It's a large vehicle that can carry many people.",
       "descriptionJa": "多くの人が乗る大きな車です。",
-      "category": "登下校",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "É um veículo grande que pode transportar muitas pessoas.",
@@ -8331,7 +9777,9 @@ export const catalog = {
       "koText": "많은 사람들이 타는 큰 차입니다.",
       "tlText": "Isa itong malaking sasakyan na kayang magsakay ng maraming tao.",
       "idText": "Ini adalah kendaraan besar yang dapat mengangkut banyak orang.",
-      "neText": "यो धेरै मानिसहरू बोक्न सक्ने ठूलो गाडी हो।"
+      "neText": "यो धेरै मानिसहरू बोक्न सक्ने ठूलो गाडी हो।",
+      "deText": "Es handelt sich um ein großes Fahrzeug, das viele Personen befördern kann.",
+      "simpleJaText": "多くの人が乗る大きな車です。"
     },
     {
       "id": "t434",
@@ -8339,7 +9787,7 @@ export const catalog = {
       "reading": "でんしゃ",
       "en": "It's a vehicle that runs on train tracks.",
       "descriptionJa": "線路の上を走る乗り物です。",
-      "category": "登下校",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "É um veículo que se move sobre trilhos de trem.",
@@ -8349,7 +9797,9 @@ export const catalog = {
       "koText": "선로 위를 달리는 차량입니다.",
       "tlText": "Ito ay isang sasakyan na tumatakbo sa mga riles ng tren.",
       "idText": "Ini adalah kendaraan yang berjalan di atas rel kereta api.",
-      "neText": "यो रेलको ट्र्याकमा चल्ने गाडी हो।"
+      "neText": "यो रेलको ट्र्याकमा चल्ने गाडी हो।",
+      "deText": "Es handelt sich um ein Fahrzeug, das auf Bahngleisen fährt.",
+      "simpleJaText": "線路の上を走る乗り物です。"
     },
     {
       "id": "t435",
@@ -8357,7 +9807,7 @@ export const catalog = {
       "reading": "しゅうごう",
       "en": "It means gathering in a designated place.",
       "descriptionJa": "決められた場所に集まることです。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa reunir-se em um local designado.",
@@ -8367,7 +9817,9 @@ export const catalog = {
       "koText": "정해진 장소에 모이는 것입니다.",
       "tlText": "Nangangahulugan ito ng pagtitipon sa isang itinalagang lugar.",
       "idText": "Artinya berkumpul di tempat yang telah ditentukan.",
-      "neText": "यसको अर्थ तोकिएको ठाउँमा भेला हुनु हो।"
+      "neText": "यसको अर्थ तोकिएको ठाउँमा भेला हुनु हो।",
+      "deText": "Es bedeutet, sich an einem festgelegten Ort zu versammeln.",
+      "simpleJaText": "決められた場所に集まることです。"
     },
     {
       "id": "t436",
@@ -8375,7 +9827,7 @@ export const catalog = {
       "reading": "かいさん",
       "en": "It means that the gathering is over and everyone is going home.",
       "descriptionJa": "集まりが終わって、それぞれ帰ることです。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que a reunião terminou e que todos estão indo para seus respectivos caminhos.",
@@ -8385,7 +9837,9 @@ export const catalog = {
       "koText": "모임이 끝나고, 각각 돌아가는 것입니다.",
       "tlText": "Ibig sabihin, tapos na ang pagtitipon at ang lahat ay may kanya-kanyang lakad na.",
       "idText": "Artinya, acara kumpul-kumpul telah usai dan semua orang akan berpencar ke tempat masing-masing.",
-      "neText": "यसको अर्थ भेला सकियो र सबैजना आ-आफ्नो बाटो लागे।"
+      "neText": "यसको अर्थ भेला सकियो र सबैजना आ-आफ्नो बाटो लागे।",
+      "deText": "Es bedeutet, dass die Zusammenkunft beendet ist und jeder seiner Wege geht.",
+      "simpleJaText": "集まりが終わって、それぞれ帰ることです。"
     },
     {
       "id": "t437",
@@ -8393,7 +9847,7 @@ export const catalog = {
       "reading": "しゅうごうじかん",
       "en": "It's time to gather.",
       "descriptionJa": "集まる時間です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "É hora de nos reunirmos.",
@@ -8403,7 +9857,9 @@ export const catalog = {
       "koText": "모이는 시간입니다.",
       "tlText": "Panahon na para magtipon.",
       "idText": "Saatnya berkumpul.",
-      "neText": "जम्मा हुने समय भयो।"
+      "neText": "जम्मा हुने समय भयो।",
+      "deText": "Es ist Zeit, sich zu versammeln.",
+      "simpleJaText": "集まる時間です。"
     },
     {
       "id": "t438",
@@ -8411,7 +9867,7 @@ export const catalog = {
       "reading": "しゅうごうばしょ",
       "en": "It's a place to gather.",
       "descriptionJa": "集まる場所です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "É um lugar para se reunir.",
@@ -8421,7 +9877,9 @@ export const catalog = {
       "koText": "모이는 장소입니다.",
       "tlText": "Ito ay isang lugar para magtipon-tipon.",
       "idText": "Ini adalah tempat untuk berkumpul.",
-      "neText": "यो भेला हुने ठाउँ हो।"
+      "neText": "यो भेला हुने ठाउँ हो।",
+      "deText": "Es ist ein Ort der Begegnung.",
+      "simpleJaText": "みんなが集まる場所です。"
     },
     {
       "id": "t439",
@@ -8429,7 +9887,7 @@ export const catalog = {
       "reading": "かいさんじかん",
       "en": "It's time to finish and go home.",
       "descriptionJa": "終わって帰る時間です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Chegou a hora de terminar e ir para casa.",
@@ -8439,7 +9897,9 @@ export const catalog = {
       "koText": "끝나고 돌아갈 시간입니다.",
       "tlText": "Oras na para matapos at umuwi.",
       "idText": "Sudah waktunya untuk mengakhiri dan pulang.",
-      "neText": "काम सकेर घर जाने समय भयो।"
+      "neText": "काम सकेर घर जाने समय भयो।",
+      "deText": "Es ist Zeit, Feierabend zu machen und nach Hause zu gehen.",
+      "simpleJaText": "終わって帰る時間です。"
     },
     {
       "id": "t440",
@@ -8447,7 +9907,7 @@ export const catalog = {
       "reading": "かいさんばしょ",
       "en": "This is where you go home after it's all over.",
       "descriptionJa": "終わって帰る場所です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "É aqui que você volta para casa depois que tudo acabar.",
@@ -8457,7 +9917,9 @@ export const catalog = {
       "koText": "끝나고 돌아갈 곳입니다.",
       "tlText": "Dito ka uuwi pagkatapos ng lahat.",
       "idText": "Di sinilah kamu pulang setelah semuanya berakhir.",
-      "neText": "सबै काम सकिएपछि तपाईं घर जानुहुन्छ।"
+      "neText": "सबै काम सकिएपछि तपाईं घर जानुहुन्छ।",
+      "deText": "Hierher gehst du nach Hause, wenn alles vorbei ist.",
+      "simpleJaText": "活動が終わって別れる場所です。"
     },
     {
       "id": "t441",
@@ -8465,7 +9927,7 @@ export const catalog = {
       "reading": "もちかえりぶくろ",
       "en": "This is a bag for carrying things home from school.",
       "descriptionJa": "学校から持って帰る物を入れる袋です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma mochila para levar coisas da escola para casa.",
@@ -8475,7 +9937,9 @@ export const catalog = {
       "koText": "학교에서 가져 오는 물건을 넣는 가방입니다.",
       "tlText": "Ito ay isang bag para sa pagdadala ng mga gamit pauwi galing paaralan.",
       "idText": "Ini adalah tas untuk membawa barang-barang pulang dari sekolah.",
-      "neText": "यो स्कूलबाट घरमा सामान लैजानको लागि बनाइएको झोला हो।"
+      "neText": "यो स्कूलबाट घरमा सामान लैजानको लागि बनाइएको झोला हो।",
+      "deText": "Das ist eine Tasche, um Schulsachen nach Hause zu transportieren.",
+      "simpleJaText": "学校から持って帰る物を入れる袋です。"
     },
     {
       "id": "t442",
@@ -8483,7 +9947,7 @@ export const catalog = {
       "reading": "びにーるぶくろ",
       "en": "This is a bag for putting wet or dirty items in.",
       "descriptionJa": "ぬれた物やよごれた物を入れる袋です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma sacola para colocar itens molhados ou sujos.",
@@ -8493,7 +9957,9 @@ export const catalog = {
       "koText": "젖은 물건이나 부드러운 물건을 넣는 가방입니다.",
       "tlText": "Ito ay isang supot para sa paglalagay ng basa o maruruming bagay.",
       "idText": "Ini adalah tas untuk menyimpan barang-barang basah atau kotor.",
-      "neText": "यो भिजेको वा फोहोर सामान राख्नको लागि बनाइएको झोला हो।"
+      "neText": "यो भिजेको वा फोहोर सामान राख्नको लागि बनाइएको झोला हो।",
+      "deText": "Dies ist ein Beutel zum Einpacken von nassen oder schmutzigen Gegenständen.",
+      "simpleJaText": "ぬれた物やよごれた物を入れる袋です。"
     },
     {
       "id": "t443",
@@ -8501,7 +9967,7 @@ export const catalog = {
       "reading": "すいとう",
       "en": "It's a container for carrying drinks.",
       "descriptionJa": "飲み物を入れて持っていく入れ物です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "1",
       "ptText": "É um recipiente para transportar bebidas.",
@@ -8511,7 +9977,8 @@ export const catalog = {
       "koText": "음료를 넣어 가져가는 옷입니다.",
       "tlText": "Ito ay isang lalagyan para sa paglalagay ng mga inumin.",
       "idText": "Ini adalah wadah untuk membawa minuman.",
-      "neText": "यो पेय पदार्थ बोक्ने कन्टेनर हो।"
+      "neText": "यो पेय पदार्थ बोक्ने कन्टेनर हो।",
+      "deText": "Es handelt sich um einen Behälter zum Transport von Getränken."
     },
     {
       "id": "t444",
@@ -8519,7 +9986,7 @@ export const catalog = {
       "reading": "たおる",
       "en": "This is a cloth for wiping away sweat and water.",
       "descriptionJa": "汗や水をふくための布です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um pano para enxugar suor e água.",
@@ -8529,7 +9996,9 @@ export const catalog = {
       "koText": "땀과 물을 닦는 천입니다.",
       "tlText": "Ito ay isang tela para sa pagpunas ng pawis at tubig.",
       "idText": "Ini adalah kain untuk menyeka keringat dan air.",
-      "neText": "यो पसिना र पानी पुछ्ने कपडा हो।"
+      "neText": "यो पसिना र पानी पुछ्ने कपडा हो।",
+      "deText": "Dies ist ein Tuch zum Abwischen von Schweiß und Wasser.",
+      "simpleJaText": "汗や水をふくための布です。"
     },
     {
       "id": "t445",
@@ -8537,7 +10006,7 @@ export const catalog = {
       "reading": "きがえ",
       "en": "These are extra clothes to wear when you get wet or dirty.",
       "descriptionJa": "ぬれたりよごれたりしたときに着る別の服です。",
-      "category": "服装",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "São roupas extras para vestir quando você se molha ou se suja.",
@@ -8547,7 +10016,9 @@ export const catalog = {
       "koText": "젖거나 젖을 때 입는 또 다른 옷입니다.",
       "tlText": "Ito ay mga karagdagang damit na maisusuot kapag nabasa o nadumihan ka.",
       "idText": "Ini adalah pakaian tambahan untuk dikenakan saat Anda basah atau kotor.",
-      "neText": "यी भिजेको वा फोहोर हुँदा लगाउनको लागि अतिरिक्त लुगा हुन्।"
+      "neText": "यी भिजेको वा फोहोर हुँदा लगाउनको लागि अतिरिक्त लुगा हुन्।",
+      "deText": "Dies sind zusätzliche Kleidungsstücke, die man anzieht, wenn man nass oder schmutzig wird.",
+      "simpleJaText": "ぬれたりよごれたりしたときに着る別の服です。"
     },
     {
       "id": "t446",
@@ -8555,7 +10026,7 @@ export const catalog = {
       "reading": "なふだ",
       "en": "This is a tag with a name written on it.",
       "descriptionJa": "名前が書いてある札です。",
-      "category": "服装",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma etiqueta com um nome escrito nela.",
@@ -8565,7 +10036,9 @@ export const catalog = {
       "koText": "이름이 적혀있는 지폐입니다.",
       "tlText": "Ito ay isang tag na may nakasulat na pangalan.",
       "idText": "Ini adalah label dengan nama yang tertulis di atasnya.",
-      "neText": "यो एउटा नाम लेखिएको ट्याग हो।"
+      "neText": "यो एउटा नाम लेखिएको ट्याग हो।",
+      "deText": "Das ist ein Namensschild.",
+      "simpleJaText": "名前が書いてある札です。"
     },
     {
       "id": "t447",
@@ -8573,7 +10046,7 @@ export const catalog = {
       "reading": "せいふく",
       "en": "This is the uniform prescribed by the school.",
       "descriptionJa": "学校で決められた服です。",
-      "category": "服装",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o uniforme prescrito pela escola.",
@@ -8583,7 +10056,9 @@ export const catalog = {
       "koText": "학교에서 정해진 옷입니다.",
       "tlText": "Ito ang uniporme na itinakda ng paaralan.",
       "idText": "Ini adalah seragam yang ditentukan oleh sekolah.",
-      "neText": "यो स्कूलले तोकेको पोशाक हो।"
+      "neText": "यो स्कूलले तोकेको पोशाक हो।",
+      "deText": "Dies ist die von der Schule vorgeschriebene Uniform.",
+      "simpleJaText": "学校で決められた服です。"
     },
     {
       "id": "t448",
@@ -8591,7 +10066,7 @@ export const catalog = {
       "reading": "くつした",
       "en": "These are cloth items worn on the feet.",
       "descriptionJa": "足にはく布のものです。",
-      "category": "服装",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "São peças de tecido usadas nos pés.",
@@ -8601,7 +10076,9 @@ export const catalog = {
       "koText": "다리에 끼는 천의 것입니다.",
       "tlText": "Ito ay mga bagay na gawa sa tela na isinusuot sa paa.",
       "idText": "Ini adalah barang-barang berbahan kain yang dikenakan di kaki.",
-      "neText": "यी खुट्टामा लगाइने कपडाका सामानहरू हुन्।"
+      "neText": "यी खुट्टामा लगाइने कपडाका सामानहरू हुन्।",
+      "deText": "Dies sind Kleidungsstücke, die an den Füßen getragen werden.",
+      "simpleJaText": "足にはく布のものです。"
     },
     {
       "id": "t449",
@@ -8609,7 +10086,7 @@ export const catalog = {
       "reading": "うんどうぐつ",
       "en": "These are shoes you wear when exercising.",
       "descriptionJa": "運動するときにはく靴です。",
-      "category": "体育",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "São sapatos que você usa para se exercitar.",
@@ -8619,7 +10096,9 @@ export const catalog = {
       "koText": "운동할 때는 신발입니다.",
       "tlText": "Ito ang mga sapatos na isinusuot mo kapag nag-eehersisyo.",
       "idText": "Ini adalah sepatu yang Anda kenakan saat berolahraga.",
-      "neText": "यी तपाईंले व्यायाम गर्दा लगाउने जुत्ताहरू हुन्।"
+      "neText": "यी तपाईंले व्यायाम गर्दा लगाउने जुत्ताहरू हुन्।",
+      "deText": "Das sind Schuhe, die man beim Sport trägt.",
+      "simpleJaText": "運動するときにはく靴です。"
     },
     {
       "id": "t450",
@@ -8627,7 +10106,7 @@ export const catalog = {
       "reading": "そとぐつ",
       "en": "These are shoes for outdoor use.",
       "descriptionJa": "外で使う靴です。",
-      "category": "服装",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estes são sapatos para uso externo.",
@@ -8637,7 +10116,9 @@ export const catalog = {
       "koText": "밖에서 사용하는 신발입니다.",
       "tlText": "Ito ay mga sapatos para sa panlabas na gamit.",
       "idText": "Ini adalah sepatu untuk penggunaan di luar ruangan.",
-      "neText": "यी बाहिरी प्रयोगको लागि जुत्ता हुन्।"
+      "neText": "यी बाहिरी प्रयोगको लागि जुत्ता हुन्।",
+      "deText": "Dies sind Schuhe für den Außenbereich.",
+      "simpleJaText": "外で使う靴です。"
     },
     {
       "id": "t451",
@@ -8645,7 +10126,7 @@ export const catalog = {
       "reading": "ぼうし",
       "en": "It's something you wear on your head.",
       "descriptionJa": "頭にかぶるものです。",
-      "category": "服装",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "É algo que você usa na cabeça.",
@@ -8655,7 +10136,9 @@ export const catalog = {
       "koText": "머리에 쓰는 것입니다.",
       "tlText": "Ito ay isang bagay na isinusuot mo sa iyong ulo.",
       "idText": "Itu adalah sesuatu yang Anda kenakan di kepala.",
-      "neText": "यो तपाईंले आफ्नो टाउकोमा लगाउने कुरा हो।"
+      "neText": "यो तपाईंले आफ्नो टाउकोमा लगाउने कुरा हो।",
+      "deText": "Es ist etwas, das man auf dem Kopf trägt.",
+      "simpleJaText": "頭にかぶるものです。"
     },
     {
       "id": "t452",
@@ -8663,7 +10146,7 @@ export const catalog = {
       "reading": "ぼうかんぎ",
       "en": "These are clothes that keep you warm when it's cold.",
       "descriptionJa": "寒いときに体をあたたかくする服です。",
-      "category": "服装",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "São roupas que te mantêm aquecido quando está frio.",
@@ -8673,7 +10156,9 @@ export const catalog = {
       "koText": "추울 때 몸을 따뜻하게하는 옷입니다.",
       "tlText": "Ito ang mga damit na nagpapanatili sa iyo ng init kapag malamig.",
       "idText": "Ini adalah pakaian yang membuatmu tetap hangat saat cuaca dingin.",
-      "neText": "यी ती लुगाहरू हुन् जसले चिसो हुँदा तपाईंलाई न्यानो राख्छन्।"
+      "neText": "यी ती लुगाहरू हुन् जसले चिसो हुँदा तपाईंलाई न्यानो राख्छन्।",
+      "deText": "Das sind Kleidungsstücke, die dich warm halten, wenn es kalt ist.",
+      "simpleJaText": "寒いときに体をあたたかくする服です。"
     },
     {
       "id": "t453",
@@ -8681,7 +10166,7 @@ export const catalog = {
       "reading": "てぶくろ",
       "en": "These are things you put on your hands when it's cold.",
       "descriptionJa": "寒いときなどに手につけるものです。",
-      "category": "服装",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "São coisas que você coloca nas mãos quando está frio.",
@@ -8691,7 +10176,9 @@ export const catalog = {
       "koText": "추울 때 등에 손에 넣는 것입니다.",
       "tlText": "Ito ang mga bagay na inilalagay mo sa iyong mga kamay kapag malamig.",
       "idText": "Ini adalah hal-hal yang Anda oleskan di tangan saat cuaca dingin.",
-      "neText": "यी चिसो हुँदा हातमा लगाउने चीजहरू हुन्।"
+      "neText": "यी चिसो हुँदा हातमा लगाउने चीजहरू हुन्।",
+      "deText": "Das sind Dinge, die man sich bei Kälte auf die Hände legt.",
+      "simpleJaText": "寒いときなどに手につけるものです。"
     },
     {
       "id": "t454",
@@ -8699,7 +10186,7 @@ export const catalog = {
       "reading": "すいえいばっぐ",
       "en": "This is a bag for carrying things like swimsuits and towels.",
       "descriptionJa": "水着やタオルなどを入れるかばんです。",
-      "category": "水泳",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma bolsa para transportar itens como fatos de banho e toalhas.",
@@ -8709,7 +10196,9 @@ export const catalog = {
       "koText": "수영복이나 수건 등을 넣는 가방입니다.",
       "tlText": "Ito ay isang bag para sa pagdadala ng mga bagay tulad ng mga damit panlangoy at mga tuwalya.",
       "idText": "Ini adalah tas untuk membawa barang-barang seperti baju renang dan handuk.",
-      "neText": "यो स्विमसूट र तौलिया जस्ता सामान बोक्ने झोला हो।"
+      "neText": "यो स्विमसूट र तौलिया जस्ता सामान बोक्ने झोला हो।",
+      "deText": "Dies ist eine Tasche zum Transportieren von Dingen wie Badeanzügen und Handtüchern.",
+      "simpleJaText": "水着やタオルなどを入れるかばんです。"
     },
     {
       "id": "t455",
@@ -8717,7 +10206,7 @@ export const catalog = {
       "reading": "ごーぐる",
       "en": "This is a device to protect your eyes while swimming.",
       "descriptionJa": "水泳のときに目を守る道具です。",
-      "category": "水泳",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um dispositivo para proteger seus olhos enquanto você nada.",
@@ -8727,7 +10216,9 @@ export const catalog = {
       "koText": "수영 때 눈을 지키는 도구입니다.",
       "tlText": "Ito ay isang aparato upang protektahan ang iyong mga mata habang lumalangoy.",
       "idText": "Ini adalah alat untuk melindungi mata Anda saat berenang.",
-      "neText": "यो पौडी खेल्दा तपाईंको आँखालाई जोगाउने उपकरण हो।"
+      "neText": "यो पौडी खेल्दा तपाईंको आँखालाई जोगाउने उपकरण हो।",
+      "deText": "Dies ist ein Gerät zum Schutz Ihrer Augen beim Schwimmen.",
+      "simpleJaText": "水泳のときに目を守る道具です。"
     },
     {
       "id": "t456",
@@ -8735,7 +10226,7 @@ export const catalog = {
       "reading": "ぷーるかーど",
       "en": "This is a card to confirm whether it is okay to enter the pool.",
       "descriptionJa": "プールに入ってよいかを確認するカードです。",
-      "category": "水泳",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este cartão serve para confirmar se você tem permissão para entrar na piscina.",
@@ -8745,7 +10236,9 @@ export const catalog = {
       "koText": "수영장에 들어갈 수 있는지 확인하는 카드입니다.",
       "tlText": "Ito ay isang kard para kumpirmahin kung pwede bang pumasok sa pool.",
       "idText": "Ini adalah kartu untuk mengkonfirmasi apakah boleh memasuki kolam renang.",
-      "neText": "यो पोखरीमा प्रवेश गर्न ठीक छ कि छैन भनेर पुष्टि गर्ने कार्ड हो।"
+      "neText": "यो पोखरीमा प्रवेश गर्न ठीक छ कि छैन भनेर पुष्टि गर्ने कार्ड हो।",
+      "deText": "Dies ist eine Karte zur Bestätigung, ob der Zutritt zum Pool erlaubt ist.",
+      "simpleJaText": "プールに入ってよいかを確認するカードです。"
     },
     {
       "id": "t457",
@@ -8753,7 +10246,7 @@ export const catalog = {
       "reading": "たいおん",
       "en": "It's body temperature.",
       "descriptionJa": "体の温度です。",
-      "category": "健康",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "É a temperatura corporal.",
@@ -8763,7 +10256,9 @@ export const catalog = {
       "koText": "몸의 온도입니다.",
       "tlText": "Temperatura ng katawan 'yan.",
       "idText": "Itu suhu tubuh.",
-      "neText": "यो शरीरको तापक्रम हो।"
+      "neText": "यो शरीरको तापक्रम हो।",
+      "deText": "Es ist Körpertemperatur.",
+      "simpleJaText": "体の温度です。"
     },
     {
       "id": "t458",
@@ -8771,7 +10266,7 @@ export const catalog = {
       "reading": "けんおん",
       "en": "It's about taking your temperature.",
       "descriptionJa": "体温を測ることです。",
-      "category": "健康",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de medir sua temperatura.",
@@ -8781,7 +10276,9 @@ export const catalog = {
       "koText": "체온을 측정하는 것입니다.",
       "tlText": "Tungkol ito sa pagkuha ng iyong temperatura.",
       "idText": "Ini tentang mengukur suhu tubuh Anda.",
-      "neText": "यो तपाईंको तापक्रम लिने बारेमा हो।"
+      "neText": "यो तपाईंको तापक्रम लिने बारेमा हो।",
+      "deText": "Es geht darum, Ihre Temperatur zu messen.",
+      "simpleJaText": "体温を測ることです。"
     },
     {
       "id": "t459",
@@ -8789,7 +10286,7 @@ export const catalog = {
       "reading": "けっせきします",
       "en": "It means I will be absent from school.",
       "descriptionJa": "学校を休みます、という意味です。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que estarei ausente da escola.",
@@ -8799,7 +10296,9 @@ export const catalog = {
       "koText": "학교를 쉬고 있다는 뜻입니다.",
       "tlText": "Ibig sabihin, aabsent ako sa school.",
       "idText": "Artinya saya akan absen dari sekolah.",
-      "neText": "यसको अर्थ म स्कूलबाट अनुपस्थित हुनेछु।"
+      "neText": "यसको अर्थ म स्कूलबाट अनुपस्थित हुनेछु।",
+      "deText": "Das bedeutet, dass ich der Schule fernbleiben werde.",
+      "simpleJaText": "学校を休みます、という意味です。"
     },
     {
       "id": "t460",
@@ -8807,7 +10306,7 @@ export const catalog = {
       "reading": "ちこくします",
       "en": "It means I will be late for school.",
       "descriptionJa": "学校に遅れて行きます、という意味です。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que vou chegar atrasado à escola.",
@@ -8817,7 +10316,9 @@ export const catalog = {
       "koText": "학교에 늦게 간다는 의미입니다.",
       "tlText": "Ibig sabihin mahuhuli na ako sa eskwela.",
       "idText": "Artinya aku akan terlambat ke sekolah.",
-      "neText": "यसको अर्थ म स्कूल ढिलो हुनेछु।"
+      "neText": "यसको अर्थ म स्कूल ढिलो हुनेछु।",
+      "deText": "Das bedeutet, dass ich zu spät zur Schule komme.",
+      "simpleJaText": "学校に遅れて行きます、という意味です。"
     },
     {
       "id": "t461",
@@ -8825,7 +10326,7 @@ export const catalog = {
       "reading": "むかえがひつよう",
       "en": "This means that a parent or guardian needs to pick up their child from school.",
       "descriptionJa": "保護者が学校へ迎えに来る必要があるという意味です。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso significa que um dos pais ou responsável precisa buscar seu filho na escola.",
@@ -8835,7 +10336,9 @@ export const catalog = {
       "koText": "학부모가 학교에 데리러 와야 한다는 의미입니다.",
       "tlText": "Nangangahulugan ito na kailangang sunduin ng magulang o tagapag-alaga ang kanilang anak mula sa paaralan.",
       "idText": "Ini berarti bahwa orang tua atau wali perlu menjemput anak mereka dari sekolah.",
-      "neText": "यसको अर्थ अभिभावक वा अभिभावकले आफ्नो बच्चालाई स्कूलबाट लिनु पर्छ।"
+      "neText": "यसको अर्थ अभिभावक वा अभिभावकले आफ्नो बच्चालाई स्कूलबाट लिनु पर्छ।",
+      "deText": "Das bedeutet, dass ein Elternteil oder Erziehungsberechtigter sein Kind von der Schule abholen muss.",
+      "simpleJaText": "保護者が学校へ迎えに来る必要があるという意味です。"
     },
     {
       "id": "t462",
@@ -8843,7 +10346,7 @@ export const catalog = {
       "reading": "びょういん",
       "en": "This is a place where you can get checked out for illnesses and injuries.",
       "descriptionJa": "病気やけがを見てもらう場所です。",
-      "category": "健康",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um local onde você pode ser examinado para detectar doenças e lesões.",
@@ -8853,7 +10356,9 @@ export const catalog = {
       "koText": "병이나 부상을 보는 곳입니다.",
       "tlText": "Ito ay isang lugar kung saan maaari kang magpatingin sa doktor para sa mga sakit at pinsala.",
       "idText": "Ini adalah tempat di mana Anda dapat diperiksa untuk penyakit dan cedera.",
-      "neText": "यो त्यस्तो ठाउँ हो जहाँ तपाईंले रोग र चोटपटकको जाँच गराउन सक्नुहुन्छ।"
+      "neText": "यो त्यस्तो ठाउँ हो जहाँ तपाईंले रोग र चोटपटकको जाँच गराउन सक्नुहुन्छ।",
+      "deText": "Dies ist ein Ort, an dem man sich auf Krankheiten und Verletzungen untersuchen lassen kann.",
+      "simpleJaText": "病気やけがを見てもらう場所です。"
     },
     {
       "id": "t463",
@@ -8861,7 +10366,7 @@ export const catalog = {
       "reading": "くすり",
       "en": "These are things you drink or use to treat illnesses or pain.",
       "descriptionJa": "病気や痛みをよくするために飲んだり使ったりするものです。",
-      "category": "健康",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "São substâncias que você bebe ou usa para tratar doenças ou dores.",
@@ -8871,7 +10376,9 @@ export const catalog = {
       "koText": "질병과 통증을 좋게하기 위해 마시거나 사용하는 것입니다.",
       "tlText": "Ito ay mga bagay na iniinom o ginagamit mo upang gamutin ang mga sakit o kirot.",
       "idText": "Ini adalah hal-hal yang Anda minum atau gunakan untuk mengobati penyakit atau rasa sakit.",
-      "neText": "यी ती चीजहरू हुन् जुन तपाईंले पिउनुहुन्छ वा रोग वा पीडाको उपचार गर्न प्रयोग गर्नुहुन्छ।"
+      "neText": "यी ती चीजहरू हुन् जुन तपाईंले पिउनुहुन्छ वा रोग वा पीडाको उपचार गर्न प्रयोग गर्नुहुन्छ।",
+      "deText": "Das sind Dinge, die man trinkt oder zur Behandlung von Krankheiten oder Schmerzen verwendet.",
+      "simpleJaText": "病気や痛みをよくするために飲んだり使ったりするものです。"
     },
     {
       "id": "t464",
@@ -8879,7 +10386,7 @@ export const catalog = {
       "reading": "ふくやく",
       "en": "It involves taking medicine.",
       "descriptionJa": "薬を飲むことです。",
-      "category": "健康",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Envolve tomar medicamentos.",
@@ -8889,7 +10396,9 @@ export const catalog = {
       "koText": "마약을 마시는 것입니다.",
       "tlText": "Kabilang dito ang pag-inom ng gamot.",
       "idText": "Ini melibatkan minum obat.",
-      "neText": "यसमा औषधि सेवन गर्नु समावेश छ।"
+      "neText": "यसमा औषधि सेवन गर्नु समावेश छ।",
+      "deText": "Es beinhaltet die Einnahme von Medikamenten.",
+      "simpleJaText": "薬を飲むことです。"
     },
     {
       "id": "t465",
@@ -8897,7 +10406,7 @@ export const catalog = {
       "reading": "くすりをのみました",
       "en": "It means that the medicine has already been taken.",
       "descriptionJa": "すでに薬を飲んだという意味です。",
-      "category": "健康",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que o medicamento já foi tomado.",
@@ -8907,7 +10416,9 @@ export const catalog = {
       "koText": "이미 약을 마셨다는 의미입니다.",
       "tlText": "Ibig sabihin ay nainom na ang gamot.",
       "idText": "Artinya obat tersebut sudah diminum.",
-      "neText": "यसको अर्थ औषधि पहिले नै लिइएको छ।"
+      "neText": "यसको अर्थ औषधि पहिले नै लिइएको छ।",
+      "deText": "Das bedeutet, dass das Medikament bereits eingenommen wurde.",
+      "simpleJaText": "すでに薬を飲んだという意味です。"
     },
     {
       "id": "t466",
@@ -8915,7 +10426,7 @@ export const catalog = {
       "reading": "ようすをみる",
       "en": "Don't make a decision right away; observe the situation for a while.",
       "descriptionJa": "すぐに決めず、しばらく状態を確認することです。",
-      "category": "健康",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Não tome uma decisão precipitada; observe a situação por um tempo.",
@@ -8925,7 +10436,9 @@ export const catalog = {
       "koText": "즉시 결정하지 않고 잠시 상태를 확인하는 것입니다.",
       "tlText": "Huwag agad magdesisyon; obserbahan muna ang sitwasyon nang ilang sandali.",
       "idText": "Jangan langsung mengambil keputusan; amati situasinya terlebih dahulu.",
-      "neText": "तुरुन्तै निर्णय नगर्नुहोस्; केही समयको लागि परिस्थितिलाई अवलोकन गर्नुहोस्।"
+      "neText": "तुरुन्तै निर्णय नगर्नुहोस्; केही समयको लागि परिस्थितिलाई अवलोकन गर्नुहोस्।",
+      "deText": "Treffen Sie keine voreilige Entscheidung; beobachten Sie die Situation erst einmal.",
+      "simpleJaText": "すぐに決めず、しばらく状態を確認することです。"
     },
     {
       "id": "t467",
@@ -8933,7 +10446,7 @@ export const catalog = {
       "reading": "あんせい",
       "en": "It's about getting your body to rest.",
       "descriptionJa": "体を休ませることです。",
-      "category": "健康",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de fazer com que seu corpo descanse.",
@@ -8943,7 +10456,9 @@ export const catalog = {
       "koText": "몸을 쉬게하는 것입니다.",
       "tlText": "Tungkol ito sa pagpapahinga ng iyong katawan.",
       "idText": "Ini tentang memberi tubuh Anda waktu istirahat.",
-      "neText": "यो तपाईंको शरीरलाई आराम दिलाउने बारेमा हो।"
+      "neText": "यो तपाईंको शरीरलाई आराम दिलाउने बारेमा हो।",
+      "deText": "Es geht darum, dem Körper Ruhe zu gönnen.",
+      "simpleJaText": "体を休ませることです。"
     },
     {
       "id": "t468",
@@ -8951,7 +10466,7 @@ export const catalog = {
       "reading": "けんか",
       "en": "It's about arguing or fighting with friends or others.",
       "descriptionJa": "友達などと言い合ったり、争ったりすることです。",
-      "category": "友達",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de discutir ou brigar com amigos ou outras pessoas.",
@@ -8961,7 +10476,9 @@ export const catalog = {
       "koText": "친구 등이라고 말하거나 싸우는 것입니다.",
       "tlText": "Tungkol ito sa pakikipagtalo o pakikipag-away sa mga kaibigan o sa iba.",
       "idText": "Ini tentang berdebat atau berkelahi dengan teman atau orang lain.",
-      "neText": "यो साथीहरू वा अरूसँग बहस गर्ने वा झगडा गर्ने बारेमा हो।"
+      "neText": "यो साथीहरू वा अरूसँग बहस गर्ने वा झगडा गर्ने बारेमा हो।",
+      "deText": "Es geht um Streitereien oder Auseinandersetzungen mit Freunden oder anderen.",
+      "simpleJaText": "友達などと言い合ったり、争ったりすることです。"
     },
     {
       "id": "t469",
@@ -8969,7 +10486,7 @@ export const catalog = {
       "reading": "なかなおり",
       "en": "It's about getting back to a good relationship after a fight.",
       "descriptionJa": "けんかのあと、またよい関係にもどることです。",
-      "category": "友達",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de retomar um bom relacionamento após uma briga.",
@@ -8979,7 +10496,9 @@ export const catalog = {
       "koText": "싸움 후, 또 좋은 관계로 돌아가는 것입니다.",
       "tlText": "Tungkol ito sa pagbabalik sa isang magandang relasyon pagkatapos ng isang away.",
       "idText": "Ini tentang bagaimana kembali menjalin hubungan yang baik setelah bertengkar.",
-      "neText": "यो झगडा पछि राम्रो सम्बन्धमा फर्कने बारे हो।"
+      "neText": "यो झगडा पछि राम्रो सम्बन्धमा फर्कने बारे हो।",
+      "deText": "Es geht darum, nach einem Streit wieder eine gute Beziehung aufzubauen.",
+      "simpleJaText": "けんかのあと、またよい関係にもどることです。"
     },
     {
       "id": "t470",
@@ -8987,7 +10506,7 @@ export const catalog = {
       "reading": "ともだちかんけい",
       "en": "It's about my relationships with friends.",
       "descriptionJa": "友達との関係のことです。",
-      "category": "友達",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se dos meus relacionamentos com os amigos.",
@@ -8997,7 +10516,9 @@ export const catalog = {
       "koText": "친구와의 관계입니다.",
       "tlText": "Tungkol ito sa relasyon ko sa mga kaibigan ko.",
       "idText": "Ini tentang hubungan saya dengan teman-teman.",
-      "neText": "यो साथीहरूसँगको मेरो सम्बन्धको बारेमा हो।"
+      "neText": "यो साथीहरूसँगको मेरो सम्बन्धको बारेमा हो।",
+      "deText": "Es geht um meine Beziehungen zu Freunden.",
+      "simpleJaText": "友達との関係のことです。"
     },
     {
       "id": "t471",
@@ -9005,7 +10526,7 @@ export const catalog = {
       "reading": "いやなこと",
       "en": "These are things that are painful to experience or that you don't want to experience.",
       "descriptionJa": "されるとつらいことや、されたくないことです。",
-      "category": "友達",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "São coisas dolorosas de se vivenciar ou que você não quer vivenciar.",
@@ -9015,7 +10536,9 @@ export const catalog = {
       "koText": "되면 힘들거나 되고 싶지 않은 것입니다.",
       "tlText": "Ito ang mga bagay na masakit maranasan o mga bagay na ayaw mong maranasan.",
       "idText": "Ini adalah hal-hal yang menyakitkan untuk dialami atau yang tidak ingin Anda alami.",
-      "neText": "यी त्यस्ता चीजहरू हुन् जुन अनुभव गर्न पीडादायी हुन्छन् वा जुन तपाईं अनुभव गर्न चाहनुहुन्न।"
+      "neText": "यी त्यस्ता चीजहरू हुन् जुन अनुभव गर्न पीडादायी हुन्छन् वा जुन तपाईं अनुभव गर्न चाहनुहुन्न।",
+      "deText": "Das sind Dinge, die schmerzhaft zu erleben sind oder die man nicht erleben möchte.",
+      "simpleJaText": "されるとつらいことや、されたくないことです。"
     },
     {
       "id": "t472",
@@ -9023,7 +10546,7 @@ export const catalog = {
       "reading": "こまっている",
       "en": "I don't know what to do and I need help.",
       "descriptionJa": "どうしたらよいかわからず、助けが必要な状態です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Não sei o que fazer e preciso de ajuda.",
@@ -9033,7 +10556,9 @@ export const catalog = {
       "koText": "어떻게 해야할지 모르고 도움이 필요한 상태입니다.",
       "tlText": "Hindi ko alam ang gagawin ko at kailangan ko ng tulong.",
       "idText": "Saya tidak tahu harus berbuat apa dan saya butuh bantuan.",
-      "neText": "मलाई के गर्ने थाहा छैन र मलाई मद्दत चाहिन्छ।"
+      "neText": "मलाई के गर्ने थाहा छैन र मलाई मद्दत चाहिन्छ।",
+      "deText": "Ich weiß nicht, was ich tun soll und brauche Hilfe.",
+      "simpleJaText": "どうしたらよいかわからず、助けが必要な状態です。"
     },
     {
       "id": "t473",
@@ -9041,7 +10566,7 @@ export const catalog = {
       "reading": "そうだんしてください",
       "en": "This means that you should talk to your teacher or the school about any problems you are experiencing.",
       "descriptionJa": "困ったことを先生や学校に話してくださいという意味です。",
-      "category": "相談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso significa que você deve conversar com seu professor ou com a escola sobre quaisquer problemas que esteja enfrentando.",
@@ -9051,7 +10576,9 @@ export const catalog = {
       "koText": "곤란한 것을 선생님이나 학교에 말해 주세요라는 의미입니다.",
       "tlText": "Nangangahulugan ito na dapat mong kausapin ang iyong guro o ang paaralan tungkol sa anumang mga problemang iyong nararanasan.",
       "idText": "Artinya, Anda harus berbicara dengan guru atau pihak sekolah tentang masalah apa pun yang Anda alami.",
-      "neText": "यसको अर्थ तपाईंले अनुभव गरिरहनुभएको कुनै पनि समस्याको बारेमा आफ्नो शिक्षक वा विद्यालयसँग कुरा गर्नुपर्छ।"
+      "neText": "यसको अर्थ तपाईंले अनुभव गरिरहनुभएको कुनै पनि समस्याको बारेमा आफ्नो शिक्षक वा विद्यालयसँग कुरा गर्नुपर्छ।",
+      "deText": "Das bedeutet, dass Sie mit Ihrem Lehrer oder der Schule über alle Probleme sprechen sollten, die Sie haben.",
+      "simpleJaText": "困ったことを先生や学校に話してくださいという意味です。"
     },
     {
       "id": "t474",
@@ -9059,7 +10586,7 @@ export const catalog = {
       "reading": "むりをしない",
       "en": "Don't push yourself too hard; give your body and mind a rest.",
       "descriptionJa": "がんばりすぎず、体や心を休ませることです。",
-      "category": "健康",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Não se esforce demais; dê um descanso ao seu corpo e à sua mente.",
@@ -9069,7 +10596,9 @@ export const catalog = {
       "koText": "너무 노력하지 않고 몸과 마음을 쉬게하는 것입니다.",
       "tlText": "Huwag mong masyadong pilitin ang sarili mo; bigyan mo ng pahinga ang katawan at isipan mo.",
       "idText": "Jangan memaksakan diri terlalu keras; beri tubuh dan pikiranmu istirahat.",
-      "neText": "आफूलाई धेरै दबाब नदिनुहोस्; आफ्नो शरीर र मनलाई आराम दिनुहोस्।"
+      "neText": "आफूलाई धेरै दबाब नदिनुहोस्; आफ्नो शरीर र मनलाई आराम दिनुहोस्।",
+      "deText": "Überanstrengen Sie sich nicht; gönnen Sie Ihrem Körper und Geist eine Pause.",
+      "simpleJaText": "がんばりすぎず、体や心を休ませることです。"
     },
     {
       "id": "t475",
@@ -9077,7 +10606,7 @@ export const catalog = {
       "reading": "あんしんしてください",
       "en": "It means you don't need to worry too much.",
       "descriptionJa": "心配しすぎなくて大丈夫です、という意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que você não precisa se preocupar muito.",
@@ -9087,7 +10616,9 @@ export const catalog = {
       "koText": "너무 걱정하지 않아도 괜찮다는 의미입니다.",
       "tlText": "Ibig sabihin, hindi mo kailangang mag-alala nang sobra.",
       "idText": "Artinya kamu tidak perlu terlalu khawatir.",
-      "neText": "यसको मतलब तपाईंले धेरै चिन्ता लिनु पर्दैन।"
+      "neText": "यसको मतलब तपाईंले धेरै चिन्ता लिनु पर्दैन।",
+      "deText": "Das bedeutet, dass Sie sich keine allzu großen Sorgen machen müssen.",
+      "simpleJaText": "心配しすぎなくて大丈夫です、という意味です。"
     },
     {
       "id": "t476",
@@ -9095,7 +10626,7 @@ export const catalog = {
       "reading": "わすれもの",
       "en": "It's forgetting things you need to bring.",
       "descriptionJa": "持ってくる必要がある物を忘れることです。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "É esquecer coisas que você precisa levar.",
@@ -9105,7 +10636,9 @@ export const catalog = {
       "koText": "가져올 필요가있는 것을 잊는 것입니다.",
       "tlText": "Nakakalimutan mo na ang mga bagay na kailangan mong dalhin.",
       "idText": "Itu artinya lupa membawa barang-barang yang dibutuhkan.",
-      "neText": "ल्याउनुपर्ने सामानहरू बिर्सनु हो।"
+      "neText": "ल्याउनुपर्ने सामानहरू बिर्सनु हो।",
+      "deText": "Man vergisst Dinge, die man mitbringen muss.",
+      "simpleJaText": "持ってくる必要がある物を忘れることです。"
     },
     {
       "id": "t477",
@@ -9113,7 +10646,7 @@ export const catalog = {
       "reading": "おとしもの",
       "en": "These are items that you've lost or that someone else has dropped.",
       "descriptionJa": "なくした物や、だれかが落とした物です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "2",
       "ptText": "São itens que você perdeu ou que alguém deixou cair.",
@@ -9123,7 +10656,9 @@ export const catalog = {
       "koText": "잃어버린 물건이나 누군가가 떨어 뜨린 물건입니다.",
       "tlText": "Ito ay mga bagay na nawala mo o nahulog ng iba.",
       "idText": "Ini adalah barang-barang yang hilang milik Anda atau yang terjatuh karena kesalahan orang lain.",
-      "neText": "यी तपाईंले हराएका वा अरू कसैले खसालेका वस्तुहरू हुन्।"
+      "neText": "यी तपाईंले हराएका वा अरू कसैले खसालेका वस्तुहरू हुन्।",
+      "deText": "Dies sind Gegenstände, die Sie verloren haben oder die jemand anderes fallen gelassen hat.",
+      "simpleJaText": "なくした物や、だれかが落とした物です。"
     },
     {
       "id": "t478",
@@ -9131,7 +10666,7 @@ export const catalog = {
       "reading": "なくしました",
       "en": "It means that the item you had cannot be found.",
       "descriptionJa": "持っていた物が見つからないという意味です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que o item que você solicitou não foi encontrado.",
@@ -9141,7 +10676,9 @@ export const catalog = {
       "koText": "가지고 있던 것을 찾을 수 없다는 의미입니다.",
       "tlText": "Ibig sabihin, hindi mo na mahanap ang gamit na hawak mo.",
       "idText": "Artinya barang yang Anda miliki tidak dapat ditemukan.",
-      "neText": "यसको अर्थ तपाईंसँग भएको वस्तु फेला पार्न सकिएन।"
+      "neText": "यसको अर्थ तपाईंसँग भएको वस्तु फेला पार्न सकिएन।",
+      "deText": "Das bedeutet, dass der von Ihnen bestellte Artikel nicht gefunden werden kann.",
+      "simpleJaText": "持っていた物が見つからないという意味です。"
     },
     {
       "id": "t479",
@@ -9149,7 +10686,7 @@ export const catalog = {
       "reading": "みつかりました",
       "en": "It means that something that was lost has been found.",
       "descriptionJa": "なくした物などが見つかったという意味です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "1",
       "ptText": "Significa que algo que estava perdido foi encontrado.",
@@ -9159,7 +10696,9 @@ export const catalog = {
       "koText": "잃어버린 물건 등이 발견되었다는 의미입니다.",
       "tlText": "Ibig sabihin, may natagpuan nang isang bagay na nawala.",
       "idText": "Artinya, sesuatu yang hilang telah ditemukan kembali.",
-      "neText": "यसको अर्थ हराएको कुरा फेला परेको छ।"
+      "neText": "यसको अर्थ हराएको कुरा फेला परेको छ।",
+      "deText": "Es bedeutet, dass etwas Verlorenes wiedergefunden wurde.",
+      "simpleJaText": "なくした物などが見つかったという意味です。"
     },
     {
       "id": "t480",
@@ -9167,7 +10706,7 @@ export const catalog = {
       "reading": "かしだし",
       "en": "It means temporarily borrowing school supplies or other items.",
       "descriptionJa": "学校の物などを一時的に借りることです。",
-      "category": "基本",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa pedir emprestado temporariamente material escolar ou outros itens.",
@@ -9177,7 +10716,9 @@ export const catalog = {
       "koText": "학교의 물건 등을 일시적으로 빌리는 것입니다.",
       "tlText": "Nangangahulugan ito ng pansamantalang paghiram ng mga gamit sa paaralan o iba pang mga bagay.",
       "idText": "Artinya meminjam perlengkapan sekolah atau barang-barang lainnya untuk sementara waktu.",
-      "neText": "यसको अर्थ अस्थायी रूपमा स्कूलका सामान वा अन्य वस्तुहरू सापटी लिनु हो।"
+      "neText": "यसको अर्थ अस्थायी रूपमा स्कूलका सामान वा अन्य वस्तुहरू सापटी लिनु हो।",
+      "deText": "Es bedeutet, Schulmaterialien oder andere Gegenstände vorübergehend auszuleihen.",
+      "simpleJaText": "学校の物などを一時的に借りることです。"
     },
     {
       "id": "t481",
@@ -9185,7 +10726,7 @@ export const catalog = {
       "reading": "へんきゃく",
       "en": "It means returning something you borrowed.",
       "descriptionJa": "借りた物を返すことです。",
-      "category": "基本",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa devolver algo que você pegou emprestado.",
@@ -9195,7 +10736,9 @@ export const catalog = {
       "koText": "빌린 물건을 반환하는 것입니다.",
       "tlText": "Ibig sabihin nito ay ang pagbabalik ng isang bagay na hiniram mo.",
       "idText": "Artinya mengembalikan sesuatu yang Anda pinjam.",
-      "neText": "यसको अर्थ तपाईंले सापटी लिएको कुरा फिर्ता गर्नु हो।"
+      "neText": "यसको अर्थ तपाईंले सापटी लिएको कुरा फिर्ता गर्नु हो।",
+      "deText": "Es bedeutet, etwas zurückzugeben, das man geliehen hat.",
+      "simpleJaText": "借りた物を返すことです。"
     },
     {
       "id": "t482",
@@ -9203,7 +10746,7 @@ export const catalog = {
       "reading": "はそん",
       "en": "It's when things break.",
       "descriptionJa": "物がこわれることです。",
-      "category": "基本",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "É quando as coisas quebram.",
@@ -9213,7 +10756,9 @@ export const catalog = {
       "koText": "물건이 깨지는 것입니다.",
       "tlText": "Iyon ay kapag may nasisira.",
       "idText": "Saat itulah barang-barang rusak.",
-      "neText": "कुरा बिग्रने बेला हुन्छ।"
+      "neText": "कुरा बिग्रने बेला हुन्छ।",
+      "deText": "Das passiert, wenn Dinge kaputtgehen.",
+      "simpleJaText": "物がこわれることです。"
     },
     {
       "id": "t483",
@@ -9221,7 +10766,7 @@ export const catalog = {
       "reading": "よごれ",
       "en": "It means that things and clothes get dirty.",
       "descriptionJa": "物や服がきたなくなることです。",
-      "category": "基本",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que as coisas e as roupas ficam sujas.",
@@ -9231,7 +10776,9 @@ export const catalog = {
       "koText": "물건이나 옷이 오지 않게 되는 것입니다.",
       "tlText": "Nangangahulugan ito na ang mga bagay at damit ay nagiging marumi.",
       "idText": "Artinya, barang-barang dan pakaian menjadi kotor.",
-      "neText": "यसको अर्थ चीजहरू र लुगाहरू फोहोर हुन्छन्।"
+      "neText": "यसको अर्थ चीजहरू र लुगाहरू फोहोर हुन्छन्।",
+      "deText": "Das bedeutet, dass Dinge und Kleidung schmutzig werden.",
+      "simpleJaText": "物や服がきたなくなることです。"
     },
     {
       "id": "t484",
@@ -9239,7 +10786,7 @@ export const catalog = {
       "reading": "せんたく",
       "en": "It means washing clothes, etc.",
       "descriptionJa": "服などを洗うことです。",
-      "category": "家庭",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa lavar roupa, etc.",
@@ -9249,7 +10796,9 @@ export const catalog = {
       "koText": "옷 등을 씻는 것입니다.",
       "tlText": "Ibig sabihin nito ay paglalaba ng mga damit, atbp.",
       "idText": "Artinya mencuci pakaian, dan lain sebagainya.",
-      "neText": "यसको अर्थ लुगा धुनु आदि हो।"
+      "neText": "यसको अर्थ लुगा धुनु आदि हो।",
+      "deText": "Es bedeutet Wäsche waschen usw.",
+      "simpleJaText": "服などを洗うことです。"
     },
     {
       "id": "t485",
@@ -9257,7 +10806,7 @@ export const catalog = {
       "reading": "きめい",
       "en": "It's about writing your name.",
       "descriptionJa": "名前を書くことです。",
-      "category": "基本",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de escrever seu nome.",
@@ -9267,7 +10816,9 @@ export const catalog = {
       "koText": "이름을 쓰는 것입니다.",
       "tlText": "Tungkol ito sa pagsusulat ng iyong pangalan.",
       "idText": "Ini tentang menulis namamu.",
-      "neText": "यो तपाईंको नाम लेख्ने बारेमा हो।"
+      "neText": "यो तपाईंको नाम लेख्ने बारेमा हो।",
+      "deText": "Es geht darum, seinen Namen zu schreiben.",
+      "simpleJaText": "名前を書くことです。"
     },
     {
       "id": "t486",
@@ -9275,7 +10826,7 @@ export const catalog = {
       "reading": "なまえをかいてください",
       "en": "This means you should write your child's name on their belongings.",
       "descriptionJa": "持ち物などに子どもの名前を書いてくださいという意味です。",
-      "category": "基本",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso significa que você deve escrever o nome do seu filho em seus pertences.",
@@ -9285,7 +10836,9 @@ export const catalog = {
       "koText": "소지품 등에 아이의 이름을 적어주세요라는 의미입니다.",
       "tlText": "Nangangahulugan ito na dapat mong isulat ang pangalan ng iyong anak sa kanilang mga gamit.",
       "idText": "Artinya, Anda harus menulis nama anak Anda pada barang-barang miliknya.",
-      "neText": "यसको अर्थ तपाईंले आफ्नो बच्चाको नाम उनीहरूको सामानमा लेख्नुपर्छ।"
+      "neText": "यसको अर्थ तपाईंले आफ्नो बच्चाको नाम उनीहरूको सामानमा लेख्नुपर्छ।",
+      "deText": "Das bedeutet, dass Sie den Namen Ihres Kindes auf seine Sachen schreiben sollten.",
+      "simpleJaText": "持ち物などに子どもの名前を書いてくださいという意味です。"
     },
     {
       "id": "t487",
@@ -9293,7 +10846,7 @@ export const catalog = {
       "reading": "ほかん",
       "en": "To avoid losing it, keep it in a designated place.",
       "descriptionJa": "なくさないように、決めた場所に置いておくことです。",
-      "category": "基本",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Para evitar perdê-lo, guarde-o em um local específico.",
@@ -9303,7 +10856,9 @@ export const catalog = {
       "koText": "사라지지 않도록 결정한 장소에 두는 것입니다.",
       "tlText": "Para maiwasan ang pagkawala nito, itago ito sa isang itinalagang lugar.",
       "idText": "Untuk menghindari kehilangan, simpan di tempat yang telah ditentukan.",
-      "neText": "यसलाई हराउनबाट बच्नको लागि, यसलाई तोकिएको ठाउँमा राख्नुहोस्।"
+      "neText": "यसलाई हराउनबाट बच्नको लागि, यसलाई तोकिएको ठाउँमा राख्नुहोस्।",
+      "deText": "Damit Sie es nicht verlieren, bewahren Sie es an einem dafür vorgesehenen Ort auf.",
+      "simpleJaText": "なくさないように、決めた場所に置いておくことです。"
     },
     {
       "id": "t488",
@@ -9311,7 +10866,7 @@ export const catalog = {
       "reading": "がっこうほかん",
       "en": "The school will keep them for them.",
       "descriptionJa": "学校で預かっておくことです。",
-      "category": "基本",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "A escola ficará com eles.",
@@ -9321,7 +10876,9 @@ export const catalog = {
       "koText": "학교에서 맡겨 두는 것입니다.",
       "tlText": "Itatago sila ng paaralan.",
       "idText": "Pihak sekolah akan tetap menyimpan barang-barang tersebut.",
-      "neText": "विद्यालयले तिनीहरूलाई राख्नेछ।"
+      "neText": "विद्यालयले तिनीहरूलाई राख्नेछ।",
+      "deText": "Die Schule wird sie für sie aufbewahren.",
+      "simpleJaText": "学校で預かっておくことです。"
     },
     {
       "id": "t489",
@@ -9329,7 +10886,7 @@ export const catalog = {
       "reading": "かていほかん",
       "en": "It means please keep it at home.",
       "descriptionJa": "家で持っていてくださいという意味です。",
-      "category": "基本",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa, por favor, guarde-o em casa.",
@@ -9339,7 +10896,9 @@ export const catalog = {
       "koText": "집에서 가져가라는 의미입니다.",
       "tlText": "Ibig sabihin, pakitago na lang ito sa bahay.",
       "idText": "Artinya, harap simpan di rumah.",
-      "neText": "यसको अर्थ कृपया यसलाई घरमै राख्नुहोस्।"
+      "neText": "यसको अर्थ कृपया यसलाई घरमै राख्नुहोस्।",
+      "deText": "Das bedeutet: Bitte behalten Sie es zu Hause.",
+      "simpleJaText": "家で持っていてくださいという意味です。"
     },
     {
       "id": "t490",
@@ -9347,7 +10906,7 @@ export const catalog = {
       "reading": "きにゅう",
       "en": "It's about writing down what you need to on paper or a form.",
       "descriptionJa": "紙やフォームに必要なことを書くことです。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de anotar no papel ou em um formulário o que você precisa saber.",
@@ -9357,7 +10916,9 @@ export const catalog = {
       "koText": "종이와 양식에 필요한 것을 쓰는 것입니다.",
       "tlText": "Tungkol ito sa pagsulat ng mga kailangan mong malaman sa papel o sa isang form.",
       "idText": "Ini tentang menuliskan apa yang perlu Anda ketahui di atas kertas atau formulir.",
-      "neText": "यो तपाईंलाई जान्न आवश्यक पर्ने कुराहरू कागज वा फारममा लेख्ने बारे हो।"
+      "neText": "यो तपाईंलाई जान्न आवश्यक पर्ने कुराहरू कागज वा फारममा लेख्ने बारे हो।",
+      "deText": "Es geht darum, das Notwendige auf Papier oder in ein Formular aufzuschreiben.",
+      "simpleJaText": "紙やフォームに必要なことを書くことです。"
     },
     {
       "id": "t491",
@@ -9365,7 +10926,7 @@ export const catalog = {
       "reading": "みきにゅう",
       "en": "It means there are still parts that haven't been written yet.",
       "descriptionJa": "まだ書いていないところがあるという意味です。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que ainda há partes que não foram escritas.",
@@ -9375,7 +10936,9 @@ export const catalog = {
       "koText": "아직 쓰지 않은 곳이 있다는 의미입니다.",
       "tlText": "Ibig sabihin, may mga bahagi pa rin na hindi pa nasusulat.",
       "idText": "Artinya masih ada bagian-bagian yang belum ditulis.",
-      "neText": "यसको अर्थ अझै पनि केही भागहरू छन् जुन लेखिएका छैनन्।"
+      "neText": "यसको अर्थ अझै पनि केही भागहरू छन् जुन लेखिएका छैनन्।",
+      "deText": "Das bedeutet, dass es noch Teile gibt, die noch nicht geschrieben wurden.",
+      "simpleJaText": "まだ書いていないところがあるという意味です。"
     },
     {
       "id": "t492",
@@ -9383,7 +10946,7 @@ export const catalog = {
       "reading": "しょめい",
       "en": "You need to write your name. A parent's name may also be required.",
       "descriptionJa": "名前を書くことです。保護者の名前が必要なことがあります。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Você precisa escrever seu nome. O nome de um dos pais também pode ser necessário.",
@@ -9393,7 +10956,9 @@ export const catalog = {
       "koText": "이름을 쓰는 것입니다. 부모의 이름이 필요할 수 있습니다.",
       "tlText": "Kailangan mong isulat ang iyong pangalan. Maaaring kailanganin din ang pangalan ng magulang.",
       "idText": "Anda perlu menulis nama Anda. Nama orang tua mungkin juga diperlukan.",
-      "neText": "तपाईंले आफ्नो नाम लेख्नु पर्छ। आमाबाबुको नाम पनि आवश्यक पर्न सक्छ।"
+      "neText": "तपाईंले आफ्नो नाम लेख्नु पर्छ। आमाबाबुको नाम पनि आवश्यक पर्न सक्छ।",
+      "deText": "Sie müssen Ihren Namen angeben. Gegebenenfalls wird auch der Name eines Elternteils benötigt.",
+      "simpleJaText": "名前を書くことです。保護者の名前が必要なことがあります。"
     },
     {
       "id": "t493",
@@ -9401,7 +10966,7 @@ export const catalog = {
       "reading": "おういん",
       "en": "It's about stamping something with a seal.",
       "descriptionJa": "はんこを押すことです。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de carimbar algo com um selo.",
@@ -9411,7 +10976,9 @@ export const catalog = {
       "koText": "도장을 누르는 것입니다.",
       "tlText": "Tungkol ito sa pagtatatak ng isang bagay gamit ang isang selyo.",
       "idText": "Ini tentang membubuhkan stempel pada sesuatu.",
-      "neText": "यो कुनै चीजमा छाप लगाउने बारेमा हो।"
+      "neText": "यो कुनै चीजमा छाप लगाउने बारेमा हो।",
+      "deText": "Es geht darum, etwas abzustempeln.",
+      "simpleJaText": "はんこを押すことです。"
     },
     {
       "id": "t494",
@@ -9419,7 +10986,7 @@ export const catalog = {
       "reading": "はんこ",
       "en": "It's a tool used to stamp as a mark of one's name.",
       "descriptionJa": "名前のしるしとして押す道具です。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "É uma ferramenta usada para carimbar seu nome como uma marca.",
@@ -9429,7 +10996,9 @@ export const catalog = {
       "koText": "이름의 표시로 누르는 도구입니다.",
       "tlText": "Ito ay isang kagamitang ginagamit upang markahan ang iyong pangalan.",
       "idText": "Ini adalah alat yang digunakan untuk membubuhkan cap nama Anda sebagai tanda.",
-      "neText": "यो तपाईंको नाम छाप्न प्रयोग गरिने उपकरण हो।"
+      "neText": "यो तपाईंको नाम छाप्न प्रयोग गरिने उपकरण हो।",
+      "deText": "Es handelt sich um ein Werkzeug, mit dem man seinen Namen als Kennzeichen einprägen kann.",
+      "simpleJaText": "名前のしるしとして押す道具です。"
     },
     {
       "id": "t495",
@@ -9437,7 +11006,7 @@ export const catalog = {
       "reading": "どうい",
       "en": "It means reviewing the content and acknowledging that it is acceptable.",
       "descriptionJa": "内容を確認して、よいと認めることです。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa analisar o conteúdo e reconhecer que ele é aceitável.",
@@ -9447,7 +11016,9 @@ export const catalog = {
       "koText": "내용을 확인하고 좋다고 인정하는 것입니다.",
       "tlText": "Nangangahulugan ito ng pagsusuri sa nilalaman at pagkilala na ito ay katanggap-tanggap.",
       "idText": "Artinya meninjau isi dan mengakui bahwa isi tersebut dapat diterima.",
-      "neText": "यसको अर्थ सामग्रीको समीक्षा गर्नु र यो स्वीकार्य छ भनेर स्वीकार गर्नु हो।"
+      "neText": "यसको अर्थ सामग्रीको समीक्षा गर्नु र यो स्वीकार्य छ भनेर स्वीकार गर्नु हो।",
+      "deText": "Es bedeutet, den Inhalt zu prüfen und zu bestätigen, dass er akzeptabel ist.",
+      "simpleJaText": "内容を確認して、よいと認めることです。"
     },
     {
       "id": "t496",
@@ -9455,7 +11026,7 @@ export const catalog = {
       "reading": "どういしょ",
       "en": "This document informs the school that you agree to the contents.",
       "descriptionJa": "内容に同意することを学校に知らせる書類です。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este documento informa a escola que você concorda com o seu conteúdo.",
@@ -9465,7 +11036,9 @@ export const catalog = {
       "koText": "내용에 동의하는 것을 학교에 알리는 서류입니다.",
       "tlText": "Ipinapaalam ng dokumentong ito sa paaralan na sumasang-ayon ka sa mga nilalaman.",
       "idText": "Dokumen ini memberitahukan kepada sekolah bahwa Anda menyetujui isi dokumen tersebut.",
-      "neText": "यो कागजातले विद्यालयलाई जानकारी दिन्छ कि तपाईं सामग्रीहरूमा सहमत हुनुहुन्छ।"
+      "neText": "यो कागजातले विद्यालयलाई जानकारी दिन्छ कि तपाईं सामग्रीहरूमा सहमत हुनुहुन्छ।",
+      "deText": "Mit diesem Dokument teilen Sie der Schule mit, dass Sie dem Inhalt zustimmen.",
+      "simpleJaText": "内容に同意することを学校に知らせる書類です。"
     },
     {
       "id": "t497",
@@ -9473,7 +11046,7 @@ export const catalog = {
       "reading": "もうしこみ",
       "en": "This is the procedure for informing people that you would like to participate or use the service.",
       "descriptionJa": "参加したいことや使いたいことを伝える手続きです。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o procedimento para informar as pessoas de que você gostaria de participar ou usar o serviço.",
@@ -9483,7 +11056,9 @@ export const catalog = {
       "koText": "참가하고 싶은 일이나 사용하고 싶은 것을 전하는 수속입니다.",
       "tlText": "Ito ang proseso para ipaalam sa mga tao na nais nilang lumahok o gumamit ng serbisyo.",
       "idText": "Berikut adalah prosedur untuk memberitahukan kepada orang lain bahwa Anda ingin berpartisipasi atau menggunakan layanan ini.",
-      "neText": "यो सेवामा भाग लिन वा प्रयोग गर्न चाहनुहुने कुरा मानिसहरूलाई जानकारी गराउने प्रक्रिया हो।"
+      "neText": "यो सेवामा भाग लिन वा प्रयोग गर्न चाहनुहुने कुरा मानिसहरूलाई जानकारी गराउने प्रक्रिया हो।",
+      "deText": "Dies ist die Vorgehensweise, um Personen darüber zu informieren, dass Sie an der Teilnahme oder Nutzung des Dienstes interessiert sind.",
+      "simpleJaText": "参加したいことや使いたいことを伝える手続きです。"
     },
     {
       "id": "t498",
@@ -9491,7 +11066,7 @@ export const catalog = {
       "reading": "もうしこみしょ",
       "en": "These are the documents required for application.",
       "descriptionJa": "申し込みをするための書類です。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estes são os documentos necessários para a candidatura.",
@@ -9501,7 +11076,9 @@ export const catalog = {
       "koText": "신청을 하기 위한 서류입니다.",
       "tlText": "Ito ang mga dokumentong kinakailangan para sa aplikasyon.",
       "idText": "Berikut adalah dokumen-dokumen yang dibutuhkan untuk pendaftaran.",
-      "neText": "आवेदनको लागि आवश्यक कागजातहरू यी हुन्।"
+      "neText": "आवेदनको लागि आवश्यक कागजातहरू यी हुन्।",
+      "deText": "Dies sind die für die Bewerbung erforderlichen Dokumente.",
+      "simpleJaText": "申し込みをするための書類です。"
     },
     {
       "id": "t499",
@@ -9509,7 +11086,7 @@ export const catalog = {
       "reading": "しめきり",
       "en": "This is the last day or time you can submit it.",
       "descriptionJa": "出すことができる最後の日や時間です。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o último dia ou horário para você enviar.",
@@ -9519,7 +11096,9 @@ export const catalog = {
       "koText": "낼 수 있는 마지막 날이나 시간입니다.",
       "tlText": "Ito ang huling araw o oras na maaari mo itong isumite.",
       "idText": "Ini adalah hari atau waktu terakhir Anda dapat mengirimkannya.",
-      "neText": "यो तपाईंले पेश गर्न सक्ने अन्तिम दिन वा समय हो।"
+      "neText": "यो तपाईंले पेश गर्न सक्ने अन्तिम दिन वा समय हो।",
+      "deText": "Dies ist der letzte Tag bzw. die letzte Uhrzeit, zu der Sie es einreichen können.",
+      "simpleJaText": "出すことができる最後の日や時間です。"
     },
     {
       "id": "t500",
@@ -9527,7 +11106,7 @@ export const catalog = {
       "reading": "きげん",
       "en": "These are the days and times that need to be completed by then.",
       "descriptionJa": "それまでにしなければならない日や時間です。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esses são os dias e horários em que as tarefas precisam ser concluídas até lá.",
@@ -9537,7 +11116,9 @@ export const catalog = {
       "koText": "그때까지 해야 할 날과 시간입니다.",
       "tlText": "Ito ang mga araw at oras na kailangang makumpleto pagdating ng panahong iyon.",
       "idText": "Inilah hari dan waktu yang perlu diselesaikan pada saat itu.",
-      "neText": "त्यतिन्जेलसम्म पूरा गरिसक्नुपर्ने दिन र समय यी हुन्।"
+      "neText": "त्यतिन्जेलसम्म पूरा गरिसक्नुपर्ने दिन र समय यी हुन्।",
+      "deText": "Dies sind die Tage und Uhrzeiten, die bis dahin abgeschlossen sein müssen.",
+      "simpleJaText": "それまでにしなければならない日や時間です。"
     },
     {
       "id": "t501",
@@ -9545,7 +11126,7 @@ export const catalog = {
       "reading": "きげんをすぎています",
       "en": "It means that the deadline or time for submission has passed.",
       "descriptionJa": "出す日や時間を過ぎているという意味です。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que o prazo ou o período para envio já expirou.",
@@ -9555,7 +11136,9 @@ export const catalog = {
       "koText": "내는 날이나 시간이 지났다는 의미입니다.",
       "tlText": "Nangangahulugan ito na lumipas na ang deadline o oras para sa pagsusumite.",
       "idText": "Artinya, batas waktu pengumpulan telah terlewati.",
-      "neText": "यसको अर्थ बुझाउने अन्तिम मिति वा समय बितिसकेको छ।"
+      "neText": "यसको अर्थ बुझाउने अन्तिम मिति वा समय बितिसकेको छ।",
+      "deText": "Es bedeutet, dass die Frist für die Einreichung abgelaufen ist.",
+      "simpleJaText": "出す日や時間を過ぎているという意味です。"
     },
     {
       "id": "t502",
@@ -9563,7 +11146,7 @@ export const catalog = {
       "reading": "さいていしゅつ",
       "en": "The solution is to submit it again.",
       "descriptionJa": "もう一度出すことです。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "A solução é submeter novamente.",
@@ -9573,7 +11156,9 @@ export const catalog = {
       "koText": "다시 꺼내는 것입니다.",
       "tlText": "Ang solusyon ay isumite itong muli.",
       "idText": "Solusinya adalah mengirimkannya lagi.",
-      "neText": "समाधान भनेको यसलाई फेरि पेश गर्नु हो।"
+      "neText": "समाधान भनेको यसलाई फेरि पेश गर्नु हो।",
+      "deText": "Die Lösung besteht darin, es erneut einzureichen.",
+      "simpleJaText": "もう一度出すことです。"
     },
     {
       "id": "t503",
@@ -9581,7 +11166,7 @@ export const catalog = {
       "reading": "みていしゅつ",
       "en": "It's something I haven't released yet.",
       "descriptionJa": "まだ出していないことです。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "É algo que eu ainda não lancei.",
@@ -9591,7 +11176,9 @@ export const catalog = {
       "koText": "아직 나오지 않은 것입니다.",
       "tlText": "Ito ay isang bagay na hindi ko pa nailalabas.",
       "idText": "Ini adalah sesuatu yang belum saya rilis.",
-      "neText": "यो त्यस्तो चीज हो जुन मैले अहिलेसम्म जारी गरेको छैन।"
+      "neText": "यो त्यस्तो चीज हो जुन मैले अहिलेसम्म जारी गरेको छैन।",
+      "deText": "Es ist etwas, das ich noch nicht veröffentlicht habe.",
+      "simpleJaText": "まだ出していないことです。"
     },
     {
       "id": "t504",
@@ -9599,7 +11186,7 @@ export const catalog = {
       "reading": "きにゅうれい",
       "en": "This is an example of how to write it.",
       "descriptionJa": "書き方の見本です。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um exemplo de como escrever isso.",
@@ -9609,7 +11196,9 @@ export const catalog = {
       "koText": "쓰는 방법의 견본입니다.",
       "tlText": "Ito ay isang halimbawa kung paano ito isulat.",
       "idText": "Ini adalah contoh cara menuliskannya.",
-      "neText": "यो कसरी लेख्ने भन्ने एउटा उदाहरण हो।"
+      "neText": "यो कसरी लेख्ने भन्ने एउटा उदाहरण हो।",
+      "deText": "Hier ist ein Beispiel, wie man es schreibt.",
+      "simpleJaText": "書き方の見本です。"
     },
     {
       "id": "t505",
@@ -9617,7 +11206,7 @@ export const catalog = {
       "reading": "せんたくしてください",
       "en": "It means \"Please choose one from several options.\"",
       "descriptionJa": "いくつかの中から一つ選んでくださいという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa \"Por favor, escolha uma entre várias opções\".",
@@ -9627,7 +11216,9 @@ export const catalog = {
       "koText": "몇 가지 중에서 하나 선택해 주세요라는 의미입니다.",
       "tlText": "Ang ibig sabihin nito ay \"Pumili ng isa mula sa ilang mga opsyon.\"",
       "idText": "Artinya \"Silakan pilih salah satu dari beberapa pilihan.\"",
-      "neText": "यसको अर्थ \"कृपया धेरै विकल्पहरूबाट एउटा छनौट गर्नुहोस्।\""
+      "neText": "यसको अर्थ \"कृपया धेरै विकल्पहरूबाट एउटा छनौट गर्नुहोस्।\"",
+      "deText": "Es bedeutet: „Bitte wählen Sie eine von mehreren Optionen aus.“",
+      "simpleJaText": "いくつかの中から一つ選んでくださいという意味です。"
     },
     {
       "id": "t506",
@@ -9635,7 +11226,7 @@ export const catalog = {
       "reading": "まるをつけてください",
       "en": "This means, please circle the option that applies to you.",
       "descriptionJa": "当てはまるものに丸を書いてくださいという意味です。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso significa que você deve circular a opção que se aplica a você.",
@@ -9645,7 +11236,9 @@ export const catalog = {
       "koText": "해당되는 것에 원을 적어 주십시오.",
       "tlText": "Ibig sabihin, pakibilugan ang opsyon na naaangkop sa iyo.",
       "idText": "Artinya, silakan lingkari pilihan yang sesuai dengan Anda.",
-      "neText": "यसको अर्थ, कृपया तपाईंलाई लागू हुने विकल्पमा गोलो लगाउनुहोस्।"
+      "neText": "यसको अर्थ, कृपया तपाईंलाई लागू हुने विकल्पमा गोलो लगाउनुहोस्।",
+      "deText": "Das heißt, bitte kreisen Sie die für Sie zutreffende Option ein.",
+      "simpleJaText": "当てはまるものに丸を書いてくださいという意味です。"
     },
     {
       "id": "t507",
@@ -9653,7 +11246,7 @@ export const catalog = {
       "reading": "ちぇっくしてください",
       "en": "It means to check the contents and confirm them.",
       "descriptionJa": "内容を見て確認してくださいという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa verificar o conteúdo e confirmar.",
@@ -9663,7 +11256,9 @@ export const catalog = {
       "koText": "내용을 보고 확인해 주세요라는 의미입니다.",
       "tlText": "Nangangahulugan ito ng pagsuri at pagkumpirma sa mga nilalaman.",
       "idText": "Artinya memeriksa isi dan mengkonfirmasinya.",
-      "neText": "यसको अर्थ सामग्री जाँच गर्नु र पुष्टि गर्नु हो।"
+      "neText": "यसको अर्थ सामग्री जाँच गर्नु र पुष्टि गर्नु हो।",
+      "deText": "Es bedeutet, den Inhalt zu prüfen und zu bestätigen.",
+      "simpleJaText": "内容を見て確認してくださいという意味です。"
     },
     {
       "id": "t508",
@@ -9671,7 +11266,7 @@ export const catalog = {
       "reading": "ていしゅつばこ",
       "en": "This is a box for putting papers and homework to submit.",
       "descriptionJa": "提出する紙や宿題を入れる箱です。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma caixa para colocar trabalhos e tarefas de casa para entregar.",
@@ -9681,7 +11276,9 @@ export const catalog = {
       "koText": "제출하는 종이와 숙제를 넣는 상자입니다.",
       "tlText": "Ito ay isang kahon para sa paglalagay ng mga papel at takdang-aralin na isusumite.",
       "idText": "Ini adalah kotak untuk menaruh kertas dan tugas rumah yang akan dikumpulkan.",
-      "neText": "यो कागजातहरू राख्ने र गृहकार्य बुझाउने बाकस हो।"
+      "neText": "यो कागजातहरू राख्ने र गृहकार्य बुझाउने बाकस हो।",
+      "deText": "Dies ist ein Kasten zum Einlegen von abzugebenden Unterlagen und Hausaufgaben.",
+      "simpleJaText": "提出する紙や宿題を入れる箱です。"
     },
     {
       "id": "t509",
@@ -9689,7 +11286,7 @@ export const catalog = {
       "reading": "れんらくぶくろ",
       "en": "This is a bag for carrying home communication notebooks and printouts.",
       "descriptionJa": "連絡帳やプリントを入れて持ち帰る袋です。",
-      "category": "連絡",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma bolsa para transportar cadernos e impressões para comunicação doméstica.",
@@ -9699,7 +11296,9 @@ export const catalog = {
       "koText": "연락장이나 프린트를 넣어 가지고 돌아가는 봉투입니다.",
       "tlText": "Ito ay isang bag para sa pagdadala ng mga notebook at printout para sa komunikasyon sa bahay.",
       "idText": "Ini adalah tas untuk membawa pulang buku catatan komunikasi dan hasil cetakan.",
-      "neText": "यो घरमा सञ्चार नोटबुक र प्रिन्टआउट बोक्न प्रयोग गरिने झोला हो।"
+      "neText": "यो घरमा सञ्चार नोटबुक र प्रिन्टआउट बोक्न प्रयोग गरिने झोला हो।",
+      "deText": "Dies ist eine Tasche zum Transport von Notizbüchern und Ausdrucken für die Kommunikation zu Hause.",
+      "simpleJaText": "連絡帳やプリントを入れて持ち帰る袋です。"
     },
     {
       "id": "t510",
@@ -9707,7 +11306,7 @@ export const catalog = {
       "reading": "けっせきあつかい",
       "en": "This means that it will be recorded as an absence from school.",
       "descriptionJa": "学校を休んだものとして記録されることです。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso significa que será registrado como uma ausência escolar.",
@@ -9717,7 +11316,9 @@ export const catalog = {
       "koText": "학교를 쉬는 것으로 기록되는 것입니다.",
       "tlText": "Nangangahulugan ito na ito ay maitatala bilang pagliban sa paaralan.",
       "idText": "Ini berarti bahwa hal tersebut akan tercatat sebagai ketidakhadiran di sekolah.",
-      "neText": "यसको अर्थ यो विद्यालयबाट अनुपस्थितिको रूपमा रेकर्ड गरिनेछ।"
+      "neText": "यसको अर्थ यो विद्यालयबाट अनुपस्थितिको रूपमा रेकर्ड गरिनेछ।",
+      "deText": "Das bedeutet, dass es als Schulabwesenheit vermerkt wird.",
+      "simpleJaText": "学校を休んだものとして記録されることです。"
     },
     {
       "id": "t511",
@@ -9725,7 +11326,7 @@ export const catalog = {
       "reading": "しゅっせきあつかい",
       "en": "This means being recorded as having attended school.",
       "descriptionJa": "学校に来たものとして記録されることです。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso significa ter o registro de frequência escolar.",
@@ -9735,7 +11336,9 @@ export const catalog = {
       "koText": "학교에 온 것으로 기록되는 것입니다.",
       "tlText": "Nangangahulugan ito ng pagiging naitatala bilang nag-aral sa paaralan.",
       "idText": "Ini berarti tercatat sebagai pernah bersekolah.",
-      "neText": "यसको अर्थ स्कूल गएको रूपमा रेकर्ड हुनु हो।"
+      "neText": "यसको अर्थ स्कूल गएको रूपमा रेकर्ड हुनु हो।",
+      "deText": "Das bedeutet, dass der Schulbesuch registriert ist.",
+      "simpleJaText": "学校に来たものとして記録されることです。"
     },
     {
       "id": "t512",
@@ -9743,7 +11346,7 @@ export const catalog = {
       "reading": "ちこくあつかい",
       "en": "This means being recorded as having arrived late to school.",
       "descriptionJa": "学校に遅れて来たものとして記録されることです。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso significa ser registrado como tendo chegado atrasado à escola.",
@@ -9753,7 +11356,9 @@ export const catalog = {
       "koText": "학교에 늦게 온 것으로 기록되는 것입니다.",
       "tlText": "Nangangahulugan ito ng pagtatala bilang nahuli sa paaralan.",
       "idText": "Ini berarti tercatat sebagai datang terlambat ke sekolah.",
-      "neText": "यसको अर्थ स्कूल ढिलो आइपुगेको रूपमा रेकर्ड गरिएको छ।"
+      "neText": "यसको अर्थ स्कूल ढिलो आइपुगेको रूपमा रेकर्ड गरिएको छ।",
+      "deText": "Das bedeutet, dass man als zu spät zur Schule gekommen registriert wird.",
+      "simpleJaText": "学校に遅れて来たものとして記録されることです。"
     },
     {
       "id": "t513",
@@ -9761,7 +11366,7 @@ export const catalog = {
       "reading": "そうたいあつかい",
       "en": "This means that it will be recorded as having left before school ended.",
       "descriptionJa": "学校が終わる前に帰ったものとして記録されることです。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso significa que ficará registrado que a pessoa saiu antes do término das aulas.",
@@ -9771,7 +11376,9 @@ export const catalog = {
       "koText": "학교가 끝나기 전에 돌아온 것으로 기록되는 것입니다.",
       "tlText": "Nangangahulugan ito na maitatala ito bilang pag-alis bago matapos ang klase.",
       "idText": "Ini berarti bahwa akan tercatat sebagai telah meninggalkan sekolah sebelum jam sekolah berakhir.",
-      "neText": "यसको अर्थ यो स्कूल सकिनुभन्दा अगाडि नै गएको रेकर्ड गरिनेछ।"
+      "neText": "यसको अर्थ यो स्कूल सकिनुभन्दा अगाडि नै गएको रेकर्ड गरिनेछ।",
+      "deText": "Das bedeutet, dass es so vermerkt wird, als hätte die Schule vor Schulschluss das Gelände verlassen.",
+      "simpleJaText": "学校が終わる前に帰ったものとして記録されることです。"
     },
     {
       "id": "t514",
@@ -9779,7 +11386,7 @@ export const catalog = {
       "reading": "ちゅうしゃじょう",
       "en": "This is a place to park your car.",
       "descriptionJa": "車を止める場所です。",
-      "category": "交通",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um local para estacionar seu carro.",
@@ -9789,7 +11396,9 @@ export const catalog = {
       "koText": "차를 멈추는 장소입니다.",
       "tlText": "Ito ang lugar para iparada ang iyong sasakyan.",
       "idText": "Ini adalah tempat untuk memarkir mobil Anda.",
-      "neText": "यो तपाईंको कार पार्क गर्ने ठाउँ हो।"
+      "neText": "यो तपाईंको कार पार्क गर्ने ठाउँ हो।",
+      "deText": "Hier können Sie Ihr Auto parken.",
+      "simpleJaText": "車を止める場所です。"
     },
     {
       "id": "t515",
@@ -9797,7 +11406,7 @@ export const catalog = {
       "reading": "ちゅうりんじょう",
       "en": "This is a place to park bicycles.",
       "descriptionJa": "自転車を止める場所です。",
-      "category": "交通",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um local para estacionar bicicletas.",
@@ -9807,7 +11416,9 @@ export const catalog = {
       "koText": "자전거를 멈추는 장소입니다.",
       "tlText": "Ito ay isang lugar para mag-park ng mga bisikleta.",
       "idText": "Ini adalah tempat untuk memarkir sepeda.",
-      "neText": "यो साइकल पार्क गर्ने ठाउँ हो।"
+      "neText": "यो साइकल पार्क गर्ने ठाउँ हो।",
+      "deText": "Hier können Fahrräder abgestellt werden.",
+      "simpleJaText": "自転車を止める場所です。"
     },
     {
       "id": "t516",
@@ -9815,7 +11426,7 @@ export const catalog = {
       "reading": "そうげい",
       "en": "It involves dropping off and picking up children.",
       "descriptionJa": "子どもを送ったり迎えに行ったりすることです。",
-      "category": "登下校",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Consiste em deixar e buscar crianças.",
@@ -9825,7 +11436,9 @@ export const catalog = {
       "koText": "아이를 보내거나 데리러 가는 것입니다.",
       "tlText": "Kabilang dito ang paghatid at pagsundo sa mga bata.",
       "idText": "Ini mencakup mengantar dan menjemput anak-anak.",
-      "neText": "यसमा बच्चाहरूलाई छोड्ने र उठाउने समावेश छ।"
+      "neText": "यसमा बच्चाहरूलाई छोड्ने र उठाउने समावेश छ।",
+      "deText": "Es beinhaltet das Bringen und Abholen von Kindern.",
+      "simpleJaText": "子どもを送ったり迎えに行ったりすることです。"
     },
     {
       "id": "t517",
@@ -9833,7 +11446,7 @@ export const catalog = {
       "reading": "くるまでおくる",
       "en": "It means taking them to school or other places by car.",
       "descriptionJa": "車で学校などへ連れて行くことです。",
-      "category": "登下校",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa levá-los para a escola ou outros lugares de carro.",
@@ -9843,7 +11456,9 @@ export const catalog = {
       "koText": "차로 학교 등으로 데려가는 것입니다.",
       "tlText": "Ibig sabihin nito ay ihatid sila sa paaralan o iba pang lugar gamit ang kotse.",
       "idText": "Artinya mengantar mereka ke sekolah atau tempat lain dengan mobil.",
-      "neText": "यसको अर्थ उनीहरूलाई कारबाट स्कूल वा अन्य ठाउँमा लैजानु हो।"
+      "neText": "यसको अर्थ उनीहरूलाई कारबाट स्कूल वा अन्य ठाउँमा लैजानु हो।",
+      "deText": "Das bedeutet, sie mit dem Auto zur Schule oder an andere Orte zu bringen.",
+      "simpleJaText": "車で学校などへ連れて行くことです。"
     },
     {
       "id": "t518",
@@ -9851,7 +11466,7 @@ export const catalog = {
       "reading": "くるまでむかえる",
       "en": "It means picking up children from school or other places by car.",
       "descriptionJa": "車で学校などへ迎えに行くことです。",
-      "category": "登下校",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa buscar crianças na escola ou em outros lugares de carro.",
@@ -9861,7 +11476,9 @@ export const catalog = {
       "koText": "차로 학교 등에 맞이하러 가는 것입니다.",
       "tlText": "Nangangahulugan ito ng pagsundo sa mga bata mula sa paaralan o iba pang lugar gamit ang kotse.",
       "idText": "Artinya menjemput anak-anak dari sekolah atau tempat lain dengan mobil.",
-      "neText": "यसको अर्थ स्कूल वा अन्य ठाउँबाट बच्चाहरूलाई कारबाट लैजानु हो।"
+      "neText": "यसको अर्थ स्कूल वा अन्य ठाउँबाट बच्चाहरूलाई कारबाट लैजानु हो।",
+      "deText": "Es bedeutet, Kinder mit dem Auto von der Schule oder anderen Orten abzuholen.",
+      "simpleJaText": "車で学校などへ迎えに行くことです。"
     },
     {
       "id": "t519",
@@ -9869,7 +11486,7 @@ export const catalog = {
       "reading": "こうもん",
       "en": "This is the entrance gate to the school.",
       "descriptionJa": "学校の入り口の門です。",
-      "category": "校内",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o portão de entrada da escola.",
@@ -9879,7 +11496,9 @@ export const catalog = {
       "koText": "학교 입구의 문입니다.",
       "tlText": "Ito ang gate papasok sa paaralan.",
       "idText": "Ini adalah gerbang masuk ke sekolah.",
-      "neText": "यो विद्यालयको प्रवेशद्वार हो।"
+      "neText": "यो विद्यालयको प्रवेशद्वार हो।",
+      "deText": "Dies ist das Eingangstor zur Schule.",
+      "simpleJaText": "学校の入り口の門です。"
     },
     {
       "id": "t520",
@@ -9887,7 +11506,7 @@ export const catalog = {
       "reading": "せいもん",
       "en": "This is the main entrance to the school.",
       "descriptionJa": "学校の主な入り口です。",
-      "category": "校内",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é a entrada principal da escola.",
@@ -9897,7 +11516,9 @@ export const catalog = {
       "koText": "학교의 주요 입구입니다.",
       "tlText": "Ito ang pangunahing pasukan papasok sa paaralan.",
       "idText": "Ini adalah pintu masuk utama ke sekolah.",
-      "neText": "यो विद्यालयको मुख्य प्रवेशद्वार हो।"
+      "neText": "यो विद्यालयको मुख्य प्रवेशद्वार हो।",
+      "deText": "Dies ist der Haupteingang der Schule.",
+      "simpleJaText": "学校の主な入り口です。"
     },
     {
       "id": "t521",
@@ -9905,7 +11526,7 @@ export const catalog = {
       "reading": "うらもん",
       "en": "This is another entrance to the school.",
       "descriptionJa": "学校の別の入り口です。",
-      "category": "校内",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é outra entrada para a escola.",
@@ -9915,7 +11536,9 @@ export const catalog = {
       "koText": "학교의 또 다른 입구입니다.",
       "tlText": "Isa na naman itong pasukan papasok sa paaralan.",
       "idText": "Ini adalah pintu masuk lain ke sekolah.",
-      "neText": "यो विद्यालयको अर्को प्रवेशद्वार हो।"
+      "neText": "यो विद्यालयको अर्को प्रवेशद्वार हो।",
+      "deText": "Dies ist ein weiterer Eingang zur Schule.",
+      "simpleJaText": "学校の別の入り口です。"
     },
     {
       "id": "t522",
@@ -9923,7 +11546,7 @@ export const catalog = {
       "reading": "うけつけ",
       "en": "This is the place and procedure for verifying who has arrived.",
       "descriptionJa": "来た人を確認する場所や手続きです。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o local e o procedimento para verificar quem chegou.",
@@ -9933,7 +11556,9 @@ export const catalog = {
       "koText": "온 사람을 확인하는 장소나 수속입니다.",
       "tlText": "Ito ang lugar at pamamaraan para sa pag-verify kung sino ang dumating.",
       "idText": "Inilah tempat dan prosedur untuk memverifikasi siapa yang telah tiba.",
-      "neText": "यो को आइपुगेको छ भनेर प्रमाणित गर्ने ठाउँ र प्रक्रिया हो।"
+      "neText": "यो को आइपुगेको छ भनेर प्रमाणित गर्ने ठाउँ र प्रक्रिया हो।",
+      "deText": "Hier wird überprüft, wer angekommen ist.",
+      "simpleJaText": "来た人を確認する場所や手続きです。"
     },
     {
       "id": "t523",
@@ -9941,7 +11566,7 @@ export const catalog = {
       "reading": "らいこう",
       "en": "It's about coming to school.",
       "descriptionJa": "学校に来ることです。",
-      "category": "学校",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de vir para a escola.",
@@ -9951,7 +11576,9 @@ export const catalog = {
       "koText": "학교에 오는 것입니다.",
       "tlText": "Tungkol ito sa pagpasok sa paaralan.",
       "idText": "Ini tentang datang ke sekolah.",
-      "neText": "यो स्कूल आउने बारेमा हो।"
+      "neText": "यो स्कूल आउने बारेमा हो।",
+      "deText": "Es geht darum, zur Schule zu gehen.",
+      "simpleJaText": "学校に来ることです。"
     },
     {
       "id": "t524",
@@ -9959,7 +11586,7 @@ export const catalog = {
       "reading": "らいこうしゃ",
       "en": "It refers to people who come to school.",
       "descriptionJa": "学校に来た人のことです。",
-      "category": "学校",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Refere-se às pessoas que vêm à escola.",
@@ -9969,7 +11596,9 @@ export const catalog = {
       "koText": "학교에 온 사람입니다.",
       "tlText": "Ito ay tumutukoy sa mga taong pumapasok sa paaralan.",
       "idText": "Ini merujuk pada orang-orang yang datang ke sekolah.",
-      "neText": "यसले विद्यालय आउने मानिसहरूलाई जनाउँछ।"
+      "neText": "यसले विद्यालय आउने मानिसहरूलाई जनाउँछ।",
+      "deText": "Es bezieht sich auf Personen, die zur Schule kommen.",
+      "simpleJaText": "学校に来た人のことです。"
     },
     {
       "id": "t525",
@@ -9977,7 +11606,7 @@ export const catalog = {
       "reading": "ほごしゃせき",
       "en": "This is where parents sit.",
       "descriptionJa": "保護者が座る場所です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "É aqui que os pais se sentam.",
@@ -9987,7 +11616,9 @@ export const catalog = {
       "koText": "학부모가 앉아있는 곳입니다.",
       "tlText": "Dito nakaupo ang mga magulang.",
       "idText": "Di sinilah orang tua duduk.",
-      "neText": "यो त्यहीँ हो जहाँ आमाबाबु बस्छन्।"
+      "neText": "यो त्यहीँ हो जहाँ आमाबाबु बस्छन्।",
+      "deText": "Hier sitzen die Eltern.",
+      "simpleJaText": "保護者が座る場所です。"
     },
     {
       "id": "t526",
@@ -9995,7 +11626,7 @@ export const catalog = {
       "reading": "しゃしんさつえい",
       "en": "It's about taking pictures.",
       "descriptionJa": "写真を撮ることです。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de tirar fotos.",
@@ -10005,7 +11636,9 @@ export const catalog = {
       "koText": "사진을 찍는 것입니다.",
       "tlText": "Tungkol ito sa pagkuha ng mga litrato.",
       "idText": "Ini tentang mengambil gambar.",
-      "neText": "यो तस्विर खिच्ने बारेमा हो।"
+      "neText": "यो तस्विर खिच्ने बारेमा हो।",
+      "deText": "Es geht ums Fotografieren.",
+      "simpleJaText": "写真を撮ることです。"
     },
     {
       "id": "t527",
@@ -10013,7 +11646,7 @@ export const catalog = {
       "reading": "さつえいきんし",
       "en": "This means you are not allowed to take photos or videos.",
       "descriptionJa": "写真や動画を撮ってはいけないという意味です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso significa que você não tem permissão para tirar fotos ou gravar vídeos.",
@@ -10023,7 +11656,9 @@ export const catalog = {
       "koText": "사진이나 동영상을 찍지 말아야 한다는 의미입니다.",
       "tlText": "Ibig sabihin, hindi ka pinapayagang kumuha ng mga litrato o video.",
       "idText": "Artinya, Anda tidak diperbolehkan mengambil foto atau video.",
-      "neText": "यसको अर्थ तपाईंलाई फोटो वा भिडियो खिच्न अनुमति छैन।"
+      "neText": "यसको अर्थ तपाईंलाई फोटो वा भिडियो खिच्न अनुमति छैन।",
+      "deText": "Das bedeutet, dass es Ihnen nicht gestattet ist, Fotos oder Videos aufzunehmen.",
+      "simpleJaText": "写真や動画を撮ってはいけないという意味です。"
     },
     {
       "id": "t528",
@@ -10031,7 +11666,7 @@ export const catalog = {
       "reading": "どうがさつえい",
       "en": "It's about taking a video.",
       "descriptionJa": "動画を撮ることです。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de gravar um vídeo.",
@@ -10041,7 +11676,9 @@ export const catalog = {
       "koText": "동영상을 찍는 것입니다.",
       "tlText": "Tungkol ito sa pagkuha ng video.",
       "idText": "Ini tentang merekam video.",
-      "neText": "यो भिडियो खिच्ने बारेमा हो।"
+      "neText": "यो भिडियो खिच्ने बारेमा हो।",
+      "deText": "Es geht darum, ein Video aufzunehmen.",
+      "simpleJaText": "動画を撮ることです。"
     },
     {
       "id": "t529",
@@ -10049,7 +11686,7 @@ export const catalog = {
       "reading": "ろくおん",
       "en": "It involves recording audio.",
       "descriptionJa": "音声を記録することです。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Envolve a gravação de áudio.",
@@ -10059,7 +11696,9 @@ export const catalog = {
       "koText": "음성을 기록하는 것입니다.",
       "tlText": "Kabilang dito ang pagre-record ng audio.",
       "idText": "Ini melibatkan perekaman audio.",
-      "neText": "यसमा अडियो रेकर्डिङ समावेश छ।"
+      "neText": "यसमा अडियो रेकर्डिङ समावेश छ।",
+      "deText": "Es beinhaltet die Aufnahme von Audio.",
+      "simpleJaText": "音声を記録することです。"
     },
     {
       "id": "t530",
@@ -10067,7 +11706,7 @@ export const catalog = {
       "reading": "こじんじょうほう",
       "en": "This includes important information that identifies the person, such as their name, address, and phone number.",
       "descriptionJa": "名前、住所、電話番号など、その人がわかる大切な情報です。",
-      "category": "基本",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso inclui informações importantes que identificam a pessoa, como nome, endereço e número de telefone.",
@@ -10077,7 +11716,9 @@ export const catalog = {
       "koText": "이름, 주소, 전화번호 등 그 사람이 아는 중요한 정보입니다.",
       "tlText": "Kabilang dito ang mahahalagang impormasyon na nagpapakilala sa tao, tulad ng kanilang pangalan, tirahan, at numero ng telepono.",
       "idText": "Ini termasuk informasi penting yang mengidentifikasi orang tersebut, seperti nama, alamat, dan nomor telepon mereka.",
-      "neText": "यसमा व्यक्तिको पहिचान गर्ने महत्त्वपूर्ण जानकारी समावेश छ, जस्तै उनीहरूको नाम, ठेगाना, र फोन नम्बर।"
+      "neText": "यसमा व्यक्तिको पहिचान गर्ने महत्त्वपूर्ण जानकारी समावेश छ, जस्तै उनीहरूको नाम, ठेगाना, र फोन नम्बर।",
+      "deText": "Dazu gehören wichtige Informationen, die die Person identifizieren, wie Name, Adresse und Telefonnummer.",
+      "simpleJaText": "名前、住所、電話番号など、その人がわかる大切な情報です。"
     },
     {
       "id": "t531",
@@ -10085,7 +11726,7 @@ export const catalog = {
       "reading": "こうかい",
       "en": "The goal is to make it visible to many people.",
       "descriptionJa": "多くの人に見えるようにすることです。",
-      "category": "基本",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "O objetivo é torná-lo visível para muitas pessoas.",
@@ -10095,7 +11736,9 @@ export const catalog = {
       "koText": "많은 사람들이 볼 수 있도록하는 것입니다.",
       "tlText": "Ang layunin ay gawing nakikita ito ng maraming tao.",
       "idText": "Tujuannya adalah untuk membuatnya terlihat oleh banyak orang.",
-      "neText": "लक्ष्य भनेको यसलाई धेरै मानिसहरूलाई देख्न सकिने बनाउनु हो।"
+      "neText": "लक्ष्य भनेको यसलाई धेरै मानिसहरूलाई देख्न सकिने बनाउनु हो।",
+      "deText": "Das Ziel ist es, es vielen Menschen sichtbar zu machen.",
+      "simpleJaText": "多くの人に見えるようにすることです。"
     },
     {
       "id": "t532",
@@ -10103,7 +11746,7 @@ export const catalog = {
       "reading": "ひこうかい",
       "en": "The goal is to make it invisible to most people.",
       "descriptionJa": "多くの人には見えないようにすることです。",
-      "category": "基本",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "O objetivo é torná-lo invisível para a maioria das pessoas.",
@@ -10113,7 +11756,9 @@ export const catalog = {
       "koText": "많은 사람들에게는 보이지 않게하는 것입니다.",
       "tlText": "Ang layunin ay gawin itong hindi nakikita ng karamihan.",
       "idText": "Tujuannya adalah untuk membuatnya tidak terlihat oleh kebanyakan orang.",
-      "neText": "लक्ष्य भनेको यसलाई धेरैजसो मानिसहरूको लागि अदृश्य बनाउनु हो।"
+      "neText": "लक्ष्य भनेको यसलाई धेरैजसो मानिसहरूको लागि अदृश्य बनाउनु हो।",
+      "deText": "Das Ziel ist, es für die meisten Menschen unsichtbar zu machen.",
+      "simpleJaText": "多くの人には見えないようにすることです。"
     },
     {
       "id": "t533",
@@ -10121,7 +11766,7 @@ export const catalog = {
       "reading": "しゃしんけいさい",
       "en": "This involves posting photos in announcements, on websites, etc.",
       "descriptionJa": "写真をお知らせやホームページなどにのせることです。",
-      "category": "基本",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso envolve a publicação de fotos em anúncios, em sites, etc.",
@@ -10131,7 +11776,9 @@ export const catalog = {
       "koText": "사진을 알림이나 홈페이지 등에 올리는 것입니다.",
       "tlText": "Kabilang dito ang pag-post ng mga larawan sa mga anunsyo, sa mga website, atbp.",
       "idText": "Ini termasuk mengunggah foto dalam pengumuman, di situs web, dan lain sebagainya.",
-      "neText": "यसमा घोषणाहरू, वेबसाइटहरू, आदिमा फोटोहरू पोस्ट गर्नु समावेश छ।"
+      "neText": "यसमा घोषणाहरू, वेबसाइटहरू, आदिमा फोटोहरू पोस्ट गर्नु समावेश छ।",
+      "deText": "Dies beinhaltet das Veröffentlichen von Fotos in Anzeigen, auf Webseiten usw.",
+      "simpleJaText": "写真をお知らせやホームページなどにのせることです。"
     },
     {
       "id": "t534",
@@ -10139,7 +11786,7 @@ export const catalog = {
       "reading": "しょうだく",
       "en": "It means reviewing the content and acknowledging that it is acceptable.",
       "descriptionJa": "内容を確認して、よいと認めることです。",
-      "category": "基本",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa analisar o conteúdo e reconhecer que ele é aceitável.",
@@ -10149,7 +11796,9 @@ export const catalog = {
       "koText": "내용을 확인하고 좋다고 인정하는 것입니다.",
       "tlText": "Nangangahulugan ito ng pagsusuri sa nilalaman at pagkilala na ito ay katanggap-tanggap.",
       "idText": "Artinya meninjau isi dan mengakui bahwa isi tersebut dapat diterima.",
-      "neText": "यसको अर्थ सामग्रीको समीक्षा गर्नु र यो स्वीकार्य छ भनेर स्वीकार गर्नु हो।"
+      "neText": "यसको अर्थ सामग्रीको समीक्षा गर्नु र यो स्वीकार्य छ भनेर स्वीकार गर्नु हो।",
+      "deText": "Es bedeutet, den Inhalt zu prüfen und zu bestätigen, dass er akzeptabel ist.",
+      "simpleJaText": "内容を確認して、よいと認めることです。"
     },
     {
       "id": "t535",
@@ -10157,7 +11806,7 @@ export const catalog = {
       "reading": "じたい",
       "en": "Do not participate or register.",
       "descriptionJa": "参加や申し込みをしないことです。",
-      "category": "基本",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Não participe nem se registre.",
@@ -10167,7 +11816,9 @@ export const catalog = {
       "koText": "참가나 신청을 하지 않는 것입니다.",
       "tlText": "Huwag sumali o magparehistro.",
       "idText": "Jangan berpartisipasi atau mendaftar.",
-      "neText": "भाग नलिनुहोस् वा दर्ता नगर्नुहोस्।"
+      "neText": "भाग नलिनुहोस् वा दर्ता नगर्नुहोस्।",
+      "deText": "Nicht teilnehmen oder registrieren.",
+      "simpleJaText": "参加や申し込みをしないことです。"
     },
     {
       "id": "t536",
@@ -10175,7 +11826,7 @@ export const catalog = {
       "reading": "きぼう",
       "en": "These are things I want to do or would like done.",
       "descriptionJa": "こうしたい、こうしてほしいと思うことです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estas são coisas que eu quero fazer ou gostaria que fossem feitas.",
@@ -10185,7 +11836,9 @@ export const catalog = {
       "koText": "이런, 이렇게 하고 싶은 것입니다.",
       "tlText": "Ito ang mga bagay na gusto kong gawin o gustong-gusto kong gawin.",
       "idText": "Ini adalah hal-hal yang ingin saya lakukan atau ingin diselesaikan.",
-      "neText": "यी ती कुराहरू हुन् जुन म गर्न चाहन्छु वा गर्न चाहन्छु।"
+      "neText": "यी ती कुराहरू हुन् जुन म गर्न चाहन्छु वा गर्न चाहन्छु।",
+      "deText": "Das sind Dinge, die ich tun möchte oder die ich gerne erledigt sehen würde.",
+      "simpleJaText": "こうしたい、こうしてほしいと思うことです。"
     },
     {
       "id": "t537",
@@ -10193,7 +11846,7 @@ export const catalog = {
       "reading": "きぼうしません",
       "en": "It means I don't want to do that.",
       "descriptionJa": "それをしたいと思わない、という意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que eu não quero fazer isso.",
@@ -10203,7 +11856,9 @@ export const catalog = {
       "koText": "그것을하고 싶지 않다는 의미입니다.",
       "tlText": "Ibig sabihin ayaw ko nang gawin iyon.",
       "idText": "Artinya saya tidak mau melakukan itu.",
-      "neText": "यसको अर्थ म त्यो गर्न चाहन्न।"
+      "neText": "यसको अर्थ म त्यो गर्न चाहन्न।",
+      "deText": "Das bedeutet, dass ich das nicht tun möchte.",
+      "simpleJaText": "それをしたいと思わない、という意味です。"
     },
     {
       "id": "t538",
@@ -10211,7 +11866,7 @@ export const catalog = {
       "reading": "せんたくし",
       "en": "These are the answers or options you can choose from.",
       "descriptionJa": "選ぶことができる答えや内容です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estas são as respostas ou opções que você pode escolher.",
@@ -10221,7 +11876,9 @@ export const catalog = {
       "koText": "선택할 수 있는 대답이나 내용입니다.",
       "tlText": "Ito ang mga sagot o opsyon na maaari mong pagpilian.",
       "idText": "Berikut adalah jawaban atau pilihan yang dapat Anda pilih.",
-      "neText": "यी तपाईंले छनौट गर्न सक्ने उत्तरहरू वा विकल्पहरू हुन्।"
+      "neText": "यी तपाईंले छनौट गर्न सक्ने उत्तरहरू वा विकल्पहरू हुन्।",
+      "deText": "Dies sind die Antworten bzw. Optionen, aus denen Sie wählen können.",
+      "simpleJaText": "選ぶことができる答えや内容です。"
     },
     {
       "id": "t539",
@@ -10229,7 +11886,7 @@ export const catalog = {
       "reading": "かいとう",
       "en": "It's about answering questions.",
       "descriptionJa": "質問に答えることです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de responder a perguntas.",
@@ -10239,7 +11896,9 @@ export const catalog = {
       "koText": "질문에 대답하는 것입니다.",
       "tlText": "Tungkol ito sa pagsagot sa mga tanong.",
       "idText": "Ini tentang menjawab pertanyaan.",
-      "neText": "यो प्रश्नहरूको जवाफ दिने बारेमा हो।"
+      "neText": "यो प्रश्नहरूको जवाफ दिने बारेमा हो।",
+      "deText": "Es geht darum, Fragen zu beantworten.",
+      "simpleJaText": "質問に答えることです。"
     },
     {
       "id": "t540",
@@ -10247,7 +11906,7 @@ export const catalog = {
       "reading": "みかいとう",
       "en": "That's something I haven't answered yet.",
       "descriptionJa": "まだ答えていないことです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Essa é uma pergunta que eu ainda não respondi.",
@@ -10257,7 +11916,9 @@ export const catalog = {
       "koText": "아직 대답하지 않은 것입니다.",
       "tlText": "Iyan ang isang bagay na hindi ko pa nasasagot.",
       "idText": "Itu adalah sesuatu yang belum saya jawab.",
-      "neText": "त्यो त्यस्तो कुरा हो जसको मैले अहिलेसम्म जवाफ दिएको छैन।"
+      "neText": "त्यो त्यस्तो कुरा हो जसको मैले अहिलेसम्म जवाफ दिएको छैन।",
+      "deText": "Das ist eine Frage, die ich noch nicht beantwortet habe.",
+      "simpleJaText": "まだ答えていないことです。"
     },
     {
       "id": "t541",
@@ -10265,7 +11926,7 @@ export const catalog = {
       "reading": "あんけーと",
       "en": "These are questions to gather your opinions and requests.",
       "descriptionJa": "意見や希望を聞くための質問です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estas são perguntas para coletar suas opiniões e solicitações.",
@@ -10275,7 +11936,9 @@ export const catalog = {
       "koText": "의견이나 희망을 듣는 질문입니다.",
       "tlText": "Ito ay mga tanong upang makuha ang inyong mga opinyon at kahilingan.",
       "idText": "Ini adalah pertanyaan-pertanyaan untuk mengumpulkan pendapat dan permintaan Anda.",
-      "neText": "यी तपाईंको विचार र अनुरोधहरू सङ्कलन गर्नका लागि प्रश्नहरू हुन्।"
+      "neText": "यी तपाईंको विचार र अनुरोधहरू सङ्कलन गर्नका लागि प्रश्नहरू हुन्।",
+      "deText": "Dies sind Fragen, um Ihre Meinungen und Wünsche zu erfahren.",
+      "simpleJaText": "意見や希望を聞くための質問です。"
     },
     {
       "id": "t542",
@@ -10283,7 +11946,7 @@ export const catalog = {
       "reading": "ふぉーむ",
       "en": "This is the screen where you enter your answer on your smartphone or computer.",
       "descriptionJa": "スマホやパソコンで答えを書く画面です。",
-      "category": "基本",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é a tela onde você insere sua resposta em seu smartphone ou computador.",
@@ -10293,7 +11956,9 @@ export const catalog = {
       "koText": "스마트 폰이나 PC로 대답을 쓰는 화면입니다.",
       "tlText": "Ito ang screen kung saan mo ilalagay ang iyong sagot sa iyong smartphone o computer.",
       "idText": "Ini adalah layar tempat Anda memasukkan jawaban Anda di ponsel pintar atau komputer Anda.",
-      "neText": "यो त्यो स्क्रिन हो जहाँ तपाईंले आफ्नो स्मार्टफोन वा कम्प्युटरमा आफ्नो उत्तर प्रविष्ट गर्नुहुन्छ।"
+      "neText": "यो त्यो स्क्रिन हो जहाँ तपाईंले आफ्नो स्मार्टफोन वा कम्प्युटरमा आफ्नो उत्तर प्रविष्ट गर्नुहुन्छ।",
+      "deText": "Dies ist der Bildschirm, auf dem Sie Ihre Antwort auf Ihrem Smartphone oder Computer eingeben.",
+      "simpleJaText": "スマホやパソコンで答えを書く画面です。"
     },
     {
       "id": "t543",
@@ -10301,7 +11966,7 @@ export const catalog = {
       "reading": "そうしん",
       "en": "It means sending a form, email, or other similar message to someone.",
       "descriptionJa": "フォームやメールなどを相手に送ることです。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa enviar um formulário, e-mail ou outra mensagem para alguém.",
@@ -10311,7 +11976,9 @@ export const catalog = {
       "koText": "양식이나 메일 등을 상대에게 보내는 것입니다.",
       "tlText": "Nangangahulugan ito ng pagpapadala ng form, email, o iba pang mensahe sa isang tao.",
       "idText": "Artinya mengirimkan formulir, email, atau pesan lain kepada seseorang.",
-      "neText": "यसको अर्थ कसैलाई फारम, इमेल, वा अन्य सन्देश पठाउनु हो।"
+      "neText": "यसको अर्थ कसैलाई फारम, इमेल, वा अन्य सन्देश पठाउनु हो।",
+      "deText": "Es bedeutet, jemandem ein Formular, eine E-Mail oder eine andere Nachricht zu senden.",
+      "simpleJaText": "フォームやメールなどを相手に送ることです。"
     },
     {
       "id": "t544",
@@ -10319,7 +11986,7 @@ export const catalog = {
       "reading": "そうしんしてください",
       "en": "This means please send a form or email.",
       "descriptionJa": "フォームやメールなどを送ってくださいという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso significa que você deve enviar um formulário ou um e-mail.",
@@ -10329,7 +11996,9 @@ export const catalog = {
       "koText": "양식이나 메일 등을 보내주세요 의미합니다.",
       "tlText": "Ibig sabihin nito ay mangyaring magpadala ng form o email.",
       "idText": "Artinya, silakan kirim formulir atau email.",
-      "neText": "यसको अर्थ कृपया फारम वा इमेल पठाउनुहोस्।"
+      "neText": "यसको अर्थ कृपया फारम वा इमेल पठाउनुहोस्।",
+      "deText": "Das bedeutet, bitte senden Sie ein Formular oder eine E-Mail.",
+      "simpleJaText": "フォームやメールなどを送ってくださいという意味です。"
     },
     {
       "id": "t545",
@@ -10337,7 +12006,7 @@ export const catalog = {
       "reading": "うけとり",
       "en": "It means receiving goods or documents.",
       "descriptionJa": "物や書類を受けることです。",
-      "category": "基本",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa receber mercadorias ou documentos.",
@@ -10347,7 +12016,9 @@ export const catalog = {
       "koText": "물건이나 서류를 받는 것입니다.",
       "tlText": "Nangangahulugan ito ng pagtanggap ng mga produkto o dokumento.",
       "idText": "Artinya menerima barang atau dokumen.",
-      "neText": "यसको अर्थ सामान वा कागजातहरू प्राप्त गर्नु हो।"
+      "neText": "यसको अर्थ सामान वा कागजातहरू प्राप्त गर्नु हो।",
+      "deText": "Es bedeutet, Waren oder Dokumente zu erhalten.",
+      "simpleJaText": "物や書類を受けることです。"
     },
     {
       "id": "t546",
@@ -10355,7 +12026,7 @@ export const catalog = {
       "reading": "うけとりました",
       "en": "It means I received the goods or documents.",
       "descriptionJa": "物や書類を受けました、という意味です。",
-      "category": "基本",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que recebi os bens ou documentos.",
@@ -10365,7 +12036,9 @@ export const catalog = {
       "koText": "물건이나 서류를 받았습니다, 라는 의미입니다.",
       "tlText": "Ibig sabihin, natanggap ko na ang mga produkto o dokumento.",
       "idText": "Artinya saya telah menerima barang atau dokumen tersebut.",
-      "neText": "यसको अर्थ मैले सामान वा कागजातहरू प्राप्त गरें।"
+      "neText": "यसको अर्थ मैले सामान वा कागजातहरू प्राप्त गरें।",
+      "deText": "Es bedeutet, dass ich die Ware oder die Dokumente erhalten habe.",
+      "simpleJaText": "物や書類を受けました、という意味です。"
     },
     {
       "id": "t547",
@@ -10373,7 +12046,7 @@ export const catalog = {
       "reading": "ふんしつ",
       "en": "It's about losing things.",
       "descriptionJa": "物をなくすことです。",
-      "category": "基本",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de perder coisas.",
@@ -10383,7 +12056,9 @@ export const catalog = {
       "koText": "물건을 없애는 것입니다.",
       "tlText": "Tungkol ito sa pagkawala ng mga bagay-bagay.",
       "idText": "Ini tentang kehilangan sesuatu.",
-      "neText": "यो चीजहरू गुमाउने बारे हो।"
+      "neText": "यो चीजहरू गुमाउने बारे हो।",
+      "deText": "Es geht darum, Dinge zu verlieren.",
+      "simpleJaText": "物をなくすことです。"
     },
     {
       "id": "t548",
@@ -10391,7 +12066,7 @@ export const catalog = {
       "reading": "さいはいふ",
       "en": "We'll distribute them again.",
       "descriptionJa": "もう一度配ることです。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Vamos distribuí-los novamente.",
@@ -10401,7 +12076,9 @@ export const catalog = {
       "koText": "다시 배부하는 것입니다.",
       "tlText": "Ipapamahagi namin ulit ang mga ito.",
       "idText": "Kami akan mendistribusikannya lagi.",
-      "neText": "हामी तिनीहरूलाई फेरि वितरण गर्नेछौं।"
+      "neText": "हामी तिनीहरूलाई फेरि वितरण गर्नेछौं।",
+      "deText": "Wir werden sie erneut verteilen.",
+      "simpleJaText": "もう一度配ることです。"
     },
     {
       "id": "t549",
@@ -10409,7 +12086,7 @@ export const catalog = {
       "reading": "よび",
       "en": "It's something you should keep on hand for when you need it.",
       "descriptionJa": "必要なときのために、余分に用意しておくものです。",
-      "category": "基本",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "É algo que você deve ter à mão para quando precisar.",
@@ -10419,7 +12096,9 @@ export const catalog = {
       "koText": "필요할 때를 위해 여분으로 준비해 두는 것입니다.",
       "tlText": "Ito ay isang bagay na dapat mong laging handa para sa oras na kailanganin mo ito.",
       "idText": "Ini adalah sesuatu yang sebaiknya Anda siapkan untuk berjaga-jaga saat dibutuhkan.",
-      "neText": "यो त्यस्तो चीज हो जुन तपाईंलाई आवश्यक पर्दा हातमा राख्नु पर्छ।"
+      "neText": "यो त्यस्तो चीज हो जुन तपाईंलाई आवश्यक पर्दा हातमा राख्नु पर्छ।",
+      "deText": "Es ist etwas, das man griffbereit haben sollte, falls man es braucht.",
+      "simpleJaText": "必要なときのために、余分に用意しておくものです。"
     },
     {
       "id": "t550",
@@ -10427,7 +12106,7 @@ export const catalog = {
       "reading": "ふそく",
       "en": "It's a lack.",
       "descriptionJa": "足りないことです。",
-      "category": "基本",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "É uma carência.",
@@ -10437,7 +12116,9 @@ export const catalog = {
       "koText": "부족한 일입니다.",
       "tlText": "Ito ay isang kakulangan.",
       "idText": "Ini adalah sebuah kekurangan.",
-      "neText": "यो अभाव हो।"
+      "neText": "यो अभाव हो।",
+      "deText": "Es ist ein Mangel.",
+      "simpleJaText": "足りないことです。"
     },
     {
       "id": "t551",
@@ -10445,7 +12126,7 @@ export const catalog = {
       "reading": "ついか",
       "en": "You can increase it later.",
       "descriptionJa": "あとから増やすことです。",
-      "category": "基本",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Você pode aumentá-lo mais tarde.",
@@ -10455,7 +12136,9 @@ export const catalog = {
       "koText": "나중에 늘리는 것입니다.",
       "tlText": "Maaari mo itong dagdagan mamaya.",
       "idText": "Anda bisa meningkatkannya nanti.",
-      "neText": "तपाईं यसलाई पछि बढाउन सक्नुहुन्छ।"
+      "neText": "तपाईं यसलाई पछि बढाउन सक्नुहुन्छ।",
+      "deText": "Sie können es später erhöhen.",
+      "simpleJaText": "あとから増やすことです。"
     },
     {
       "id": "t552",
@@ -10463,7 +12146,7 @@ export const catalog = {
       "reading": "へんこうなし",
       "en": "It means that nothing will change.",
       "descriptionJa": "変わることはありません、という意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa que nada vai mudar.",
@@ -10473,7 +12156,9 @@ export const catalog = {
       "koText": "바뀌지 않을 것이라는 의미입니다.",
       "tlText": "Ibig sabihin, walang magbabago.",
       "idText": "Itu artinya tidak akan ada perubahan apa pun.",
-      "neText": "यसको अर्थ केही पनि परिवर्तन हुनेछैन।"
+      "neText": "यसको अर्थ केही पनि परिवर्तन हुनेछैन।",
+      "deText": "Das bedeutet, dass sich nichts ändern wird.",
+      "simpleJaText": "変わることはありません、という意味です。"
     },
     {
       "id": "t553",
@@ -10481,7 +12166,7 @@ export const catalog = {
       "reading": "つうじょうどおり",
       "en": "It means doing things the same way as always.",
       "descriptionJa": "いつもと同じように行うという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa fazer as coisas da mesma maneira de sempre.",
@@ -10491,7 +12176,9 @@ export const catalog = {
       "koText": "평소와 같이 한다는 의미입니다.",
       "tlText": "Nangangahulugan ito ng paggawa ng mga bagay-bagay sa parehong paraan gaya ng dati.",
       "idText": "Artinya melakukan segala sesuatu dengan cara yang sama seperti biasanya.",
-      "neText": "यसको अर्थ सधैं जस्तै कामहरू गर्नु हो।"
+      "neText": "यसको अर्थ सधैं जस्तै कामहरू गर्नु हो।",
+      "deText": "Es bedeutet, die Dinge so zu tun wie immer.",
+      "simpleJaText": "いつもと同じように行うという意味です。"
     },
     {
       "id": "t554",
@@ -10499,7 +12186,7 @@ export const catalog = {
       "reading": "いつもどおり",
       "en": "It means the same as usual.",
       "descriptionJa": "ふだんと同じという意味です。",
-      "category": "基本",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa o mesmo que de costume.",
@@ -10509,7 +12196,9 @@ export const catalog = {
       "koText": "평소와 같다는 의미입니다.",
       "tlText": "Pareho lang ang ibig sabihin nito gaya ng dati.",
       "idText": "Artinya sama seperti biasanya.",
-      "neText": "यसको अर्थ सामान्य जस्तै हो।"
+      "neText": "यसको अर्थ सामान्य जस्तै हो।",
+      "deText": "Es bedeutet dasselbe wie immer.",
+      "simpleJaText": "ふだんと同じという意味です。"
     },
     {
       "id": "t555",
@@ -10517,7 +12206,7 @@ export const catalog = {
       "reading": "うわばき",
       "en": "indoor shoes used inside school",
       "descriptionJa": "学校の建物の中で使う靴です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estes são sapatos para serem usados ​​dentro dos edifícios escolares.",
@@ -10527,7 +12216,9 @@ export const catalog = {
       "koText": "학교 건물 안에서 사용하는 신발입니다.",
       "tlText": "Ito ang mga sapatos na dapat isuot sa loob ng mga gusali ng paaralan.",
       "idText": "Ini adalah sepatu yang harus dikenakan di dalam gedung sekolah.",
-      "neText": "यी जुत्ताहरू स्कूल भवन भित्र लगाउनु पर्छ।"
+      "neText": "यी जुत्ताहरू स्कूल भवन भित्र लगाउनु पर्छ।",
+      "deText": "Dies sind Schuhe, die in Schulgebäuden getragen werden.",
+      "simpleJaText": "学校の中で使うくつです。"
     },
     {
       "id": "t556",
@@ -10535,7 +12226,7 @@ export const catalog = {
       "reading": "たいいくかんしゅーず",
       "en": "gym shoes",
       "descriptionJa": "体育館で使う専用の靴です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estes são sapatos específicos para uso em ginásios.",
@@ -10545,7 +12236,9 @@ export const catalog = {
       "koText": "체육관에서 사용하는 전용 신발입니다.",
       "tlText": "Ito ay mga sapatos na sadyang ginagamit sa gymnasium.",
       "idText": "Ini adalah sepatu yang dirancang khusus untuk digunakan di gimnasium.",
-      "neText": "यी जुत्ताहरू विशेष गरी व्यायामशालामा प्रयोगको लागि हुन्।"
+      "neText": "यी जुत्ताहरू विशेष गरी व्यायामशालामा प्रयोगको लागि हुन्।",
+      "deText": "Dies sind Schuhe, die speziell für den Einsatz in der Turnhalle entwickelt wurden.",
+      "simpleJaText": "体育館で使う靴です。"
     },
     {
       "id": "t557",
@@ -10553,7 +12246,7 @@ export const catalog = {
       "reading": "たいそうふく",
       "en": "PE clothes",
       "descriptionJa": "体育の授業で着る服です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Essas são as roupas que você usa para a aula de educação física.",
@@ -10563,7 +12256,9 @@ export const catalog = {
       "koText": "체육 수업으로 입는 옷입니다.",
       "tlText": "Ito ang mga damit na isusuot mo para sa klase ng edukasyong pisikal.",
       "idText": "Ini adalah pakaian yang kamu kenakan untuk kelas pendidikan jasmani.",
-      "neText": "यी तपाईंले शारीरिक शिक्षा कक्षाको लागि लगाउने लुगाहरू हुन्।"
+      "neText": "यी तपाईंले शारीरिक शिक्षा कक्षाको लागि लगाउने लुगाहरू हुन्।",
+      "deText": "Das ist die Kleidung, die wir im Sportunterricht tragen.",
+      "simpleJaText": "体育の授業で着る服です。"
     },
     {
       "id": "t558",
@@ -10571,7 +12266,7 @@ export const catalog = {
       "reading": "きゅうしょく",
       "en": "school lunch",
       "descriptionJa": "学校で出る昼ごはんです。",
-      "category": "給食",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o almoço servido na escola.",
@@ -10581,7 +12276,9 @@ export const catalog = {
       "koText": "학교에서 나오는 점심입니다.",
       "tlText": "Ito ang tanghalian na inihahain sa paaralan.",
       "idText": "Ini adalah menu makan siang yang disajikan di sekolah.",
-      "neText": "यो स्कूलमा दिइने खाजा हो।"
+      "neText": "यो स्कूलमा दिइने खाजा हो।",
+      "deText": "Dies ist das Mittagessen, das in der Schule serviert wird.",
+      "simpleJaText": "学校で食べる昼ごはんです。"
     },
     {
       "id": "t559",
@@ -10589,7 +12286,7 @@ export const catalog = {
       "reading": "れんらくちょう",
       "en": "contact notebook",
       "descriptionJa": "学校と家庭が連絡を書くノートです。",
-      "category": "提出物",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um caderno para escolas e famílias usarem para comunicação.",
@@ -10599,7 +12296,9 @@ export const catalog = {
       "koText": "학교와 가정이 연락을 쓰는 노트입니다.",
       "tlText": "Ito ay isang kuwaderno para sa mga paaralan at pamilya na magagamit para sa komunikasyon.",
       "idText": "Ini adalah buku catatan yang dapat digunakan oleh sekolah dan keluarga untuk berkomunikasi.",
-      "neText": "यो विद्यालय र परिवारहरूको लागि सञ्चारको लागि प्रयोग गर्नको लागि एउटा नोटबुक हो।"
+      "neText": "यो विद्यालय र परिवारहरूको लागि सञ्चारको लागि प्रयोग गर्नको लागि एउटा नोटबुक हो।",
+      "deText": "Dies ist ein Notizbuch, das Schulen und Familien zur Kommunikation nutzen können.",
+      "simpleJaText": "学校と家庭が連絡を書くノートです。"
     },
     {
       "id": "t560",
@@ -10607,7 +12306,7 @@ export const catalog = {
       "reading": "つうちひょう",
       "en": "report card",
       "descriptionJa": "学習や学校生活の様子を知らせる表です。",
-      "category": "その他",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um gráfico que fornece informações sobre aprendizagem e vida escolar.",
@@ -10617,7 +12316,9 @@ export const catalog = {
       "koText": "학습이나 학교 생활의 모습을 알리는 표입니다.",
       "tlText": "Ito ay isang tsart na nagbibigay ng impormasyon tungkol sa pag-aaral at buhay-paaralan.",
       "idText": "Ini adalah bagan yang memberikan informasi tentang pembelajaran dan kehidupan sekolah.",
-      "neText": "यो एउटा चार्ट हो जसले सिकाइ र विद्यालय जीवनको बारेमा जानकारी प्रदान गर्दछ।"
+      "neText": "यो एउटा चार्ट हो जसले सिकाइ र विद्यालय जीवनको बारेमा जानकारी प्रदान गर्दछ।",
+      "deText": "Dies ist eine Grafik, die Informationen über das Lernen und das Schulleben enthält.",
+      "simpleJaText": "学校での学習や生活の様子を知らせる紙です。"
     },
     {
       "id": "t561",
@@ -10625,7 +12326,7 @@ export const catalog = {
       "reading": "こじんこんだん",
       "en": "individual parent-teacher meeting",
       "descriptionJa": "保護者と先生が個別に話す時間です。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um momento para pais e professores conversarem individualmente.",
@@ -10635,7 +12336,9 @@ export const catalog = {
       "koText": "보호자와 선생님이 개별적으로 말하는 시간입니다.",
       "tlText": "Ito ang panahon para makapag-usap nang paisa-isa ang mga magulang at guro.",
       "idText": "Ini adalah waktu bagi orang tua dan guru untuk berbicara secara pribadi.",
-      "neText": "यो अभिभावक र शिक्षकहरूले व्यक्तिगत रूपमा कुरा गर्ने समय हो।"
+      "neText": "यो अभिभावक र शिक्षकहरूले व्यक्तिगत रूपमा कुरा गर्ने समय हो।",
+      "deText": "Dies ist ein Zeitpunkt für Eltern und Lehrer, um einzeln miteinander zu sprechen.",
+      "simpleJaText": "保護者と先生が一人ずつ話す面談です。"
     },
     {
       "id": "t562",
@@ -10643,7 +12346,7 @@ export const catalog = {
       "reading": "ほごしゃかい",
       "en": "parents meeting",
       "descriptionJa": "保護者が学校で説明を聞く会です。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma reunião onde os pais podem ouvir uma explicação na escola.",
@@ -10653,7 +12356,9 @@ export const catalog = {
       "koText": "보호자가 학교에서 설명을 듣는 모임입니다.",
       "tlText": "Ito ay isang pagpupulong kung saan maaaring makinig ang mga magulang ng paliwanag sa paaralan.",
       "idText": "Ini adalah pertemuan di mana orang tua dapat mendengarkan penjelasan di sekolah.",
-      "neText": "यो एउटा बैठक हो जहाँ अभिभावकहरूले स्कूलमा स्पष्टीकरण सुन्न सक्छन्।"
+      "neText": "यो एउटा बैठक हो जहाँ अभिभावकहरूले स्कूलमा स्पष्टीकरण सुन्न सक्छन्।",
+      "deText": "Dies ist ein Treffen, bei dem Eltern eine Erklärung in der Schule erhalten können.",
+      "simpleJaText": "保護者に学校のことを説明したり話し合ったりする会です。"
     },
     {
       "id": "t563",
@@ -10661,7 +12366,7 @@ export const catalog = {
       "reading": "こうがいがくしゅう",
       "en": "school trip for learning",
       "descriptionJa": "学校の外へ行って学ぶ活動です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma atividade em que os alunos saem da escola para aprender.",
@@ -10671,7 +12376,9 @@ export const catalog = {
       "koText": "학교 밖으로 가서 배우는 활동입니다.",
       "tlText": "Ito ay isang aktibidad kung saan ang mga mag-aaral ay lumalabas sa labas ng paaralan upang mag-aral.",
       "idText": "Ini adalah kegiatan di mana siswa pergi ke luar sekolah untuk belajar.",
-      "neText": "यो एउटा यस्तो गतिविधि हो जहाँ विद्यार्थीहरूले विद्यालय बाहिर गएर सिक्ने गर्छन्।"
+      "neText": "यो एउटा यस्तो गतिविधि हो जहाँ विद्यार्थीहरूले विद्यालय बाहिर गएर सिक्ने गर्छन्।",
+      "deText": "Hierbei handelt es sich um eine Aktivität, bei der die Schüler außerhalb der Schule lernen.",
+      "simpleJaText": "学校の外へ行って学ぶ活動です。"
     },
     {
       "id": "t564",
@@ -10679,7 +12386,7 @@ export const catalog = {
       "reading": "じゅぎょうさんかん",
       "en": "class observation",
       "descriptionJa": "保護者が授業を見る日です。",
-      "category": "行事",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um dia em que os pais podem observar as aulas.",
@@ -10689,7 +12396,9 @@ export const catalog = {
       "koText": "학부모가 수업을 보는 날입니다.",
       "tlText": "Ito ang araw kung kailan maaaring mag-obserba ang mga magulang sa mga klase.",
       "idText": "Ini adalah hari di mana orang tua dapat mengamati kegiatan belajar mengajar di kelas.",
-      "neText": "यो त्यस्तो दिन हो जब अभिभावकहरूले कक्षाहरू अवलोकन गर्न सक्छन्।"
+      "neText": "यो त्यस्तो दिन हो जब अभिभावकहरूले कक्षाहरू अवलोकन गर्न सक्छन्।",
+      "deText": "An diesem Tag können Eltern den Unterricht beobachten.",
+      "simpleJaText": "保護者が学校に来て授業を見る行事です。"
     },
     {
       "id": "t565",
@@ -10697,7 +12406,7 @@ export const catalog = {
       "reading": "けっせき",
       "en": "absence",
       "descriptionJa": "学校を休むことです。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa tirar um tempo de folga da escola.",
@@ -10707,7 +12416,9 @@ export const catalog = {
       "koText": "학교를 쉬는 것입니다.",
       "tlText": "Ibig sabihin nito ay ang pagliban sa paaralan.",
       "idText": "Artinya mengambil cuti dari sekolah.",
-      "neText": "यसको अर्थ स्कूलबाट समय बिदा लिनु हो।"
+      "neText": "यसको अर्थ स्कूलबाट समय बिदा लिनु हो।",
+      "deText": "Das bedeutet, sich vom Schulbesuch freizunehmen.",
+      "simpleJaText": "学校や授業を休むことです。"
     },
     {
       "id": "t566",
@@ -10715,7 +12426,7 @@ export const catalog = {
       "reading": "ちこく",
       "en": "lateness",
       "descriptionJa": "学校に来る時間が遅れることです。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa chegar atrasado à escola.",
@@ -10725,7 +12436,9 @@ export const catalog = {
       "koText": "학교에 오는 시간이 지연되는 것입니다.",
       "tlText": "Ibig sabihin, mahuhuli sa pagpasok sa paaralan.",
       "idText": "Artinya terlambat ke sekolah.",
-      "neText": "यसको अर्थ स्कूल ढिलो हुनु हो।"
+      "neText": "यसको अर्थ स्कूल ढिलो हुनु हो।",
+      "deText": "Das bedeutet, zu spät zur Schule zu kommen.",
+      "simpleJaText": "決まった時間に遅れることです。"
     },
     {
       "id": "t567",
@@ -10733,7 +12446,7 @@ export const catalog = {
       "reading": "そうたい",
       "en": "leaving school early",
       "descriptionJa": "学校をいつもより早く帰ることです。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Significa sair da escola mais cedo do que o habitual.",
@@ -10743,7 +12456,9 @@ export const catalog = {
       "koText": "학교를 평소보다 빨리 돌아가는 것입니다.",
       "tlText": "Ibig sabihin, mas maaga kaysa dati ang pag-alis sa paaralan.",
       "idText": "Artinya pulang sekolah lebih awal dari biasanya.",
-      "neText": "यसको अर्थ सामान्य भन्दा छिटो स्कूल छोड्नु हो।"
+      "neText": "यसको अर्थ सामान्य भन्दा छिटो स्कूल छोड्नु हो।",
+      "deText": "Das bedeutet, die Schule früher als üblich zu verlassen.",
+      "simpleJaText": "学校が終わる前に帰ることです。"
     },
     {
       "id": "t568",
@@ -10751,7 +12466,7 @@ export const catalog = {
       "reading": "たんにん",
       "en": "homeroom teacher",
       "descriptionJa": "クラスを主に担当する先生です。",
-      "category": "その他",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o professor que ministra as aulas principalmente.",
@@ -10761,7 +12476,9 @@ export const catalog = {
       "koText": "클래스를 주로 담당하는 선생님입니다.",
       "tlText": "Ito ang guro na pangunahing nagtuturo sa klase.",
       "idText": "Ini adalah guru yang terutama mengajar di kelas tersebut.",
-      "neText": "उहाँ शिक्षक हुनुहुन्छ जसले मुख्यतया कक्षा पढाउनुहुन्छ।"
+      "neText": "उहाँ शिक्षक हुनुहुन्छ जसले मुख्यतया कक्षा पढाउनुहुन्छ।",
+      "deText": "Dies ist der Lehrer, der hauptsächlich den Unterricht in dieser Klasse erteilt.",
+      "simpleJaText": "クラスを担当する先生です。"
     },
     {
       "id": "t569",
@@ -10769,7 +12486,7 @@ export const catalog = {
       "reading": "がっきゅう",
       "en": "class",
       "descriptionJa": "同じ教室で学ぶ子どもたちのまとまりです。",
-      "category": "その他",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um grupo de crianças que aprendem juntas na mesma sala de aula.",
@@ -10779,7 +12496,8 @@ export const catalog = {
       "koText": "같은 교실에서 배우는 아이들의 정리입니다.",
       "tlText": "Ito ay isang grupo ng mga bata na sama-samang natututo sa iisang silid-aralan.",
       "idText": "Ini adalah sekelompok anak-anak yang belajar bersama di kelas yang sama.",
-      "neText": "यो एउटै कक्षाकोठामा सँगै सिक्ने बालबालिकाहरूको समूह हो।"
+      "neText": "यो एउटै कक्षाकोठामा सँगै सिक्ने बालबालिकाहरूको समूह हो।",
+      "deText": "Dies ist eine Gruppe von Kindern, die gemeinsam im selben Klassenzimmer lernen."
     },
     {
       "id": "t570",
@@ -10787,7 +12505,7 @@ export const catalog = {
       "reading": "がくねん",
       "en": "grade level",
       "descriptionJa": "1年生、2年生などのまとまりです。",
-      "category": "その他",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "São grupos de estudantes, como alunos do primeiro ano e alunos do segundo ano.",
@@ -10797,7 +12515,8 @@ export const catalog = {
       "koText": "1학년, 2학년 등의 정리입니다.",
       "tlText": "Ito ay mga grupo ng mga estudyante, tulad ng mga estudyante sa unang taon at mga estudyante sa ikalawang taon.",
       "idText": "Ini adalah kelompok-kelompok mahasiswa, seperti mahasiswa tahun pertama dan mahasiswa tahun kedua.",
-      "neText": "यी विद्यार्थीहरूको समूह हुन्, जस्तै प्रथम वर्षका विद्यार्थीहरू र दोस्रो वर्षका विद्यार्थीहरू।"
+      "neText": "यी विद्यार्थीहरूको समूह हुन्, जस्तै प्रथम वर्षका विद्यार्थीहरू र दोस्रो वर्षका विद्यार्थीहरू।",
+      "deText": "Hierbei handelt es sich um Gruppen von Studierenden, wie zum Beispiel Studierende im ersten Studienjahr und Studierende im zweiten Studienjahr."
     },
     {
       "id": "t571",
@@ -10805,7 +12524,7 @@ export const catalog = {
       "reading": "しゅっせきばんごう",
       "en": "student attendance number",
       "descriptionJa": "クラスで使う児童生徒の番号です。",
-      "category": "その他",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o número de matrícula utilizado na turma.",
@@ -10815,7 +12534,8 @@ export const catalog = {
       "koText": "클래스에서 사용하는 아동 학생의 번호입니다.",
       "tlText": "Ito ang numero ng estudyante na ginagamit sa loob ng klase.",
       "idText": "Ini adalah nomor siswa yang digunakan di dalam kelas.",
-      "neText": "यो कक्षा भित्र प्रयोग हुने विद्यार्थी संख्या हो।"
+      "neText": "यो कक्षा भित्र प्रयोग हुने विद्यार्थी संख्या हो।",
+      "deText": "Dies ist die innerhalb der Klasse verwendete Schülernummer."
     },
     {
       "id": "t572",
@@ -10823,7 +12543,7 @@ export const catalog = {
       "reading": "ていしゅつぶつ",
       "en": "items to submit",
       "descriptionJa": "学校に出す書類や物です。",
-      "category": "提出物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estes são documentos e itens que devem ser entregues à escola.",
@@ -10833,7 +12553,9 @@ export const catalog = {
       "koText": "학교에 내는 서류나 물건입니다.",
       "tlText": "Ito ay mga dokumento at bagay na kailangang isumite sa paaralan.",
       "idText": "Ini adalah dokumen dan barang-barang yang harus diserahkan ke sekolah.",
-      "neText": "यी कागजातहरू र वस्तुहरू हुन् जुन विद्यालयमा पेश गर्नुपर्नेछ।"
+      "neText": "यी कागजातहरू र वस्तुहरू हुन् जुन विद्यालयमा पेश गर्नुपर्नेछ।",
+      "deText": "Hierbei handelt es sich um Dokumente und Gegenstände, die der Schule vorgelegt werden müssen.",
+      "simpleJaText": "先生に出すものです。"
     },
     {
       "id": "t573",
@@ -10841,7 +12563,7 @@ export const catalog = {
       "reading": "しゅうきん",
       "en": "money collection",
       "descriptionJa": "学校で必要なお金を集めることです。",
-      "category": "集金",
+      "category": "お金・手続き",
       "keywords": "",
       "viewCount": "",
       "ptText": "Trata-se de arrecadar dinheiro para as despesas escolares.",
@@ -10851,7 +12573,9 @@ export const catalog = {
       "koText": "학교에서 필요한 돈을 모으는 것입니다.",
       "tlText": "Tungkol ito sa pangangalap ng pondo para sa mga gastusin sa paaralan.",
       "idText": "Ini tentang mengumpulkan uang untuk biaya sekolah.",
-      "neText": "यो स्कूलको खर्चको लागि पैसा जुटाउने बारेमा हो।"
+      "neText": "यो स्कूलको खर्चको लागि पैसा जुटाउने बारेमा हो।",
+      "deText": "Es geht darum, Geld für Schulkosten zu sammeln.",
+      "simpleJaText": "学校で必要なお金を集めることです。"
     },
     {
       "id": "t574",
@@ -10859,7 +12583,7 @@ export const catalog = {
       "reading": "ぶかつどう",
       "en": "club activity",
       "descriptionJa": "放課後などに行うスポーツや文化活動です。",
-      "category": "部活動",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "São atividades esportivas e culturais que acontecem depois da escola.",
@@ -10869,7 +12593,9 @@ export const catalog = {
       "koText": "방과후 등에 실시하는 스포츠나 문화 활동입니다.",
       "tlText": "Ito ay mga aktibidad na pampalakasan at pangkultura na nagaganap pagkatapos ng klase.",
       "idText": "Ini adalah kegiatan olahraga dan budaya yang berlangsung setelah jam sekolah.",
-      "neText": "यी खेलकुद र सांस्कृतिक गतिविधिहरू हुन् जुन स्कूल पछि हुन्छन्।"
+      "neText": "यी खेलकुद र सांस्कृतिक गतिविधिहरू हुन् जुन स्कूल पछि हुन्छन्।",
+      "deText": "Hierbei handelt es sich um Sport- und Kulturaktivitäten, die nach der Schule stattfinden.",
+      "simpleJaText": "授業の後などに行うスポーツや文化の活動です。"
     },
     {
       "id": "t575",
@@ -10877,7 +12603,7 @@ export const catalog = {
       "reading": "すいとう",
       "en": "water bottle",
       "descriptionJa": "飲み物を入れて持ってくる入れ物です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um recipiente para transportar bebidas.",
@@ -10887,7 +12613,9 @@ export const catalog = {
       "koText": "음료를 넣어 가져오는 옷입니다.",
       "tlText": "Ito ay isang lalagyan para sa paglalagay ng mga inumin.",
       "idText": "Ini adalah wadah untuk membawa minuman.",
-      "neText": "यो पेय पदार्थ ल्याउने कन्टेनर हो।"
+      "neText": "यो पेय पदार्थ ल्याउने कन्टेनर हो।",
+      "deText": "Dies ist ein Behälter zum Mitbringen von Getränken.",
+      "simpleJaText": "飲み物を入れて持っていく入れ物です。"
     },
     {
       "id": "t576",
@@ -10895,7 +12623,7 @@ export const catalog = {
       "reading": "おべんとう",
       "en": "lunch box",
       "descriptionJa": "家から持ってくる昼ごはんです。",
-      "category": "給食",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o almoço que trago de casa.",
@@ -10905,7 +12633,8 @@ export const catalog = {
       "koText": "집에서 가져오는 낮 밥입니다.",
       "tlText": "Ito ang tanghalian na dala ko galing bahay.",
       "idText": "Ini bekal makan siang yang saya bawa dari rumah.",
-      "neText": "यो खाजा म घरबाट ल्याउँछु।"
+      "neText": "यो खाजा म घरबाट ल्याउँछु।",
+      "deText": "Das ist mein Mittagessen, das ich von zu Hause mitgebracht habe."
     },
     {
       "id": "t577",
@@ -10913,7 +12642,7 @@ export const catalog = {
       "reading": "あれるぎー",
       "en": "allergy",
       "descriptionJa": "食べ物などで体に症状が出ることです。必ず学校に知らせてください。",
-      "category": "体調",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso se refere a sintomas físicos causados ​​por alimentos ou outras substâncias ingeridas. Por favor, certifique-se de informar a escola.",
@@ -10923,7 +12652,9 @@ export const catalog = {
       "koText": "음식 등으로 몸에 증상이 나오는 것입니다. 반드시 학교에 알려주십시오.",
       "tlText": "Ito ay tumutukoy sa mga pisikal na sintomas na dulot ng pagkain o iba pang nakain na sangkap. Pakitiyak na ipaalam ito sa paaralan.",
       "idText": "Ini merujuk pada gejala fisik yang disebabkan oleh makanan atau zat lain yang tertelan. Pastikan untuk memberi tahu pihak sekolah.",
-      "neText": "यसले खाना वा अन्य निलिएका पदार्थहरूबाट हुने शारीरिक लक्षणहरूलाई जनाउँछ। कृपया विद्यालयलाई जानकारी गराउन निश्चित हुनुहोस्।"
+      "neText": "यसले खाना वा अन्य निलिएका पदार्थहरूबाट हुने शारीरिक लक्षणहरूलाई जनाउँछ। कृपया विद्यालयलाई जानकारी गराउन निश्चित हुनुहोस्।",
+      "deText": "Dies bezieht sich auf körperliche Symptome, die durch Nahrungsmittel oder andere aufgenommene Substanzen verursacht werden. Bitte informieren Sie unbedingt die Schule.",
+      "simpleJaText": "食べ物などで体に悪い反応が出ることです。"
     },
     {
       "id": "t578",
@@ -10931,7 +12662,7 @@ export const catalog = {
       "reading": "きんきゅうれんらくさき",
       "en": "emergency contact",
       "descriptionJa": "急なときに学校から連絡する電話番号です。",
-      "category": "その他",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é o número de telefone que a escola usará para entrar em contato com você em caso de emergência.",
@@ -10941,7 +12672,8 @@ export const catalog = {
       "koText": "갑자기 학교에서 연락하는 전화 번호입니다.",
       "tlText": "Ito ang numero ng telepono na gagamitin ng paaralan upang makipag-ugnayan sa iyo sakaling magkaroon ng emergency.",
       "idText": "Ini adalah nomor telepon yang akan digunakan sekolah untuk menghubungi Anda jika terjadi keadaan darurat.",
-      "neText": "आपतकालीन अवस्थामा विद्यालयले तपाईंलाई सम्पर्क गर्न यो फोन नम्बर प्रयोग गर्नेछ।"
+      "neText": "आपतकालीन अवस्थामा विद्यालयले तपाईंलाई सम्पर्क गर्न यो फोन नम्बर प्रयोग गर्नेछ।",
+      "deText": "Dies ist die Telefonnummer, unter der die Schule Sie im Notfall kontaktieren wird."
     },
     {
       "id": "t579",
@@ -10949,7 +12681,7 @@ export const catalog = {
       "reading": "しんろ",
       "en": "future educational or career path",
       "descriptionJa": "卒業後に進む学校や仕事の方向です。",
-      "category": "面談",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Isso se refere ao tipo de escola ou carreira que você planeja seguir após a formatura.",
@@ -10959,7 +12691,9 @@ export const catalog = {
       "koText": "졸업 후 진행하는 학교와 직업의 방향입니다.",
       "tlText": "Ito ay tumutukoy sa uri ng paaralan o landas ng karera na plano mong tahakin pagkatapos ng graduation.",
       "idText": "Ini merujuk pada jenis sekolah atau jalur karier yang ingin Anda tempuh setelah lulus.",
-      "neText": "यसले तपाईंले स्नातक पछि पछ्याउने योजना बनाउनुभएको स्कूल वा करियर मार्गको प्रकारलाई जनाउँछ।"
+      "neText": "यसले तपाईंले स्नातक पछि पछ्याउने योजना बनाउनुभएको स्कूल वा करियर मार्गको प्रकारलाई जनाउँछ।",
+      "deText": "Dies bezieht sich auf die Art der Schule oder den Karriereweg, den Sie nach Ihrem Abschluss einschlagen möchten.",
+      "simpleJaText": "卒業後に進む道や、将来の方向のことです。"
     },
     {
       "id": "t580",
@@ -10967,7 +12701,7 @@ export const catalog = {
       "reading": "さんしゃこんだん",
       "en": "three-way meeting with student, parent, and teacher",
       "descriptionJa": "生徒、保護者、先生の3人で話す面談です。",
-      "category": "面談",
+      "category": "連絡・相談",
       "keywords": "",
       "viewCount": "",
       "ptText": "Esta é uma reunião que envolve o aluno, os pais e o professor.",
@@ -10977,7 +12711,9 @@ export const catalog = {
       "koText": "학생, 보호자, 선생님의 3명이 말하는 면담입니다.",
       "tlText": "Ito ay isang pagpupulong na kinasasangkutan ng mga mag-aaral, magulang, at guro.",
       "idText": "Ini adalah pertemuan yang melibatkan siswa, orang tua, dan guru.",
-      "neText": "यो विद्यार्थी, अभिभावक र शिक्षक सम्मिलित बैठक हो।"
+      "neText": "यो विद्यार्थी, अभिभावक र शिक्षक सम्मिलित बैठक हो।",
+      "deText": "Dies ist ein Treffen zwischen Schüler, Elternteil und Lehrer.",
+      "simpleJaText": "生徒、保護者、先生の三人で話す面談です。"
     },
     {
       "id": "t581",
@@ -10985,7 +12721,7 @@ export const catalog = {
       "reading": "しゅくだい",
       "en": "homework",
       "descriptionJa": "家で取り組む学習です。",
-      "category": "その他",
+      "category": "授業・勉強",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um aprendizado que pode ser feito em casa.",
@@ -10995,7 +12731,9 @@ export const catalog = {
       "koText": "집에서 일하는 학습입니다.",
       "tlText": "Ito ay pag-aaral na maaaring gawin sa bahay.",
       "idText": "Ini adalah pembelajaran yang dapat dilakukan di rumah.",
-      "neText": "यो घरमै गर्न सकिने सिकाइ हो।"
+      "neText": "यो घरमै गर्न सकिने सिकाइ हो।",
+      "deText": "Dies ist eine Lernmethode, die man zu Hause anwenden kann.",
+      "simpleJaText": "家でやる学習です。"
     },
     {
       "id": "t582",
@@ -11003,7 +12741,7 @@ export const catalog = {
       "reading": "もちもの",
       "en": "things to bring",
       "descriptionJa": "学校に持ってくる必要がある物です。",
-      "category": "持ち物",
+      "category": "持ち物・提出",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estes são os itens que você precisa trazer para a escola.",
@@ -11013,7 +12751,9 @@ export const catalog = {
       "koText": "학교에 가져올 필요가 있는 것입니다.",
       "tlText": "Ito ang mga bagay na kailangan mong dalhin sa paaralan.",
       "idText": "Ini adalah barang-barang yang perlu kamu bawa ke sekolah.",
-      "neText": "यी तपाईंले स्कूलमा ल्याउनुपर्ने सामानहरू हुन्।"
+      "neText": "यी तपाईंले स्कूलमा ल्याउनुपर्ने सामानहरू हुन्।",
+      "deText": "Dies sind Gegenstände, die du zur Schule mitbringen musst.",
+      "simpleJaText": "学校に持ってくるものです。"
     },
     {
       "id": "t583",
@@ -11021,7 +12761,7 @@ export const catalog = {
       "reading": "こうそく",
       "en": "school rules",
       "descriptionJa": "学校生活で守るきまりです。",
-      "category": "その他",
+      "category": "学校生活・行事",
       "keywords": "",
       "viewCount": "",
       "ptText": "Estas são regras a seguir durante a vida escolar.",
@@ -11031,7 +12771,9 @@ export const catalog = {
       "koText": "학교 생활에서 지키는 것입니다.",
       "tlText": "Ito ang mga tuntuning dapat sundin habang nasa paaralan.",
       "idText": "Ini adalah peraturan yang harus diikuti selama kehidupan sekolah.",
-      "neText": "यी स्कूल जीवनमा पालना गर्नुपर्ने नियमहरू हुन्।"
+      "neText": "यी स्कूल जीवनमा पालना गर्नुपर्ने नियमहरू हुन्।",
+      "deText": "Dies sind Regeln, die während der Schulzeit befolgt werden sollten.",
+      "simpleJaText": "学校で守る決まりです。"
     },
     {
       "id": "t584",
@@ -11039,7 +12781,7 @@ export const catalog = {
       "reading": "けっせきれんらく",
       "en": "absence notification",
       "descriptionJa": "学校を休むことを学校に知らせる連絡です。",
-      "category": "欠席・遅刻",
+      "category": "健康・安全",
       "keywords": "",
       "viewCount": "",
       "ptText": "Este é um comunicado para informar a escola que você estará ausente das aulas.",
@@ -11049,7 +12791,1168 @@ export const catalog = {
       "koText": "학교를 쉬는 것을 학교에 알리는 연락입니다.",
       "tlText": "Ito ay isang abiso upang ipaalam sa paaralan na kayo ay liliban sa paaralan.",
       "idText": "Ini adalah pemberitahuan untuk menginformasikan kepada sekolah bahwa Anda akan absen dari sekolah.",
-      "neText": "यो सूचना विद्यालयलाई तपाईं विद्यालयमा अनुपस्थित हुनुहुनेछ भन्ने जानकारी गराउनको लागि हो।"
+      "neText": "यो सूचना विद्यालयलाई तपाईं विद्यालयमा अनुपस्थित हुनुहुनेछ भन्ने जानकारी गराउनको लागि हो।",
+      "deText": "Dies ist eine Benachrichtigung an die Schule, dass Sie dem Unterricht fernbleiben werden.",
+      "simpleJaText": "学校を休むことを学校に知らせることです。"
+    },
+    {
+      "id": "web_school_20261007_t01",
+      "ja": "就学援助",
+      "reading": "しゅうがくえんじょ",
+      "en": "Financial help for families who have difficulty paying school expenses.",
+      "descriptionJa": "学校で必要なお金に困っている家庭を助ける制度です。",
+      "category": "お金・手続き",
+      "keywords": "就学援助,しゅうがくえんじょ,就学援助,保護者,申請",
+      "viewCount": "1",
+      "ptText": "Ajuda financeira para famílias com dificuldade para pagar despesas escolares.",
+      "esText": "Ayuda económica para familias con dificultades para pagar los gastos escolares.",
+      "viText": "Hỗ trợ tài chính cho gia đình gặp khó khăn trong việc chi trả chi phí học tập.",
+      "zhText": "为难以支付学校费用的家庭提供的经济援助制度。",
+      "koText": "학교 비용을 내기 어려운 가정을 돕는 제도입니다.",
+      "tlText": "Tulong pinansyal para sa mga pamilyang nahihirapang magbayad ng gastos sa paaralan.",
+      "idText": "Bantuan keuangan bagi keluarga yang kesulitan membayar biaya sekolah.",
+      "neText": "विद्यालयको खर्च तिर्न कठिनाइ भएका परिवारलाई आर्थिक सहायता दिने व्यवस्था हो。",
+      "deText": "Dies ist ein System zur Unterstützung von Familien, die Schwierigkeiten haben, die Schulkosten zu tragen."
+    },
+    {
+      "id": "web_school_20261007_t02",
+      "ja": "就学援助申請書",
+      "reading": "しゅうがくえんじょしんせいしょ",
+      "en": "A form used to apply for financial help with school expenses.",
+      "descriptionJa": "学校で必要なお金の援助を申し込むための書類です。",
+      "category": "お金・手続き",
+      "keywords": "就学援助申請書,しゅうがくえんじょしんせいしょ,就学援助,保護者,申請",
+      "viewCount": "0",
+      "ptText": "Formulário para solicitar ajuda financeira com despesas escolares.",
+      "esText": "Formulario para solicitar ayuda económica para gastos escolares.",
+      "viText": "Đơn xin hỗ trợ tài chính cho chi phí học tập.",
+      "zhText": "申请学校费用补助的表格。",
+      "koText": "학교 비용 지원을 신청하는 서류입니다.",
+      "tlText": "Form para humiling ng tulong pinansyal sa gastos sa paaralan.",
+      "idText": "Formulir untuk mengajukan bantuan biaya sekolah.",
+      "neText": "विद्यालय खर्चको आर्थिक सहायता माग्न भर्ने फाराम हो।",
+      "deText": "Dies ist das Formular zur Beantragung finanzieller Unterstützung für Schulkosten."
+    },
+    {
+      "id": "web_school_20261007_t03",
+      "ja": "入学準備費",
+      "reading": "にゅうがくじゅんびひ",
+      "en": "Money needed to prepare school supplies before starting school.",
+      "descriptionJa": "学校に入る前に、学用品などを用意するためのお金です。",
+      "category": "お金・手続き",
+      "keywords": "入学準備費,にゅうがくじゅんびひ,就学援助,保護者,申請",
+      "viewCount": "0",
+      "ptText": "Dinheiro para preparar materiais antes de começar a escola.",
+      "esText": "Dinero para preparar los materiales antes de empezar la escuela.",
+      "viText": "Khoản tiền để chuẩn bị đồ dùng trước khi vào trường.",
+      "zhText": "入学前准备学习用品等所需的费用。",
+      "koText": "입학 전에 학용품 등을 준비하는 데 드는 돈입니다.",
+      "tlText": "Pera para sa mga gamit na kailangang ihanda bago magsimula sa paaralan.",
+      "idText": "Uang untuk menyiapkan perlengkapan sebelum mulai bersekolah.",
+      "neText": "विद्यालय भर्ना हुनुअघि आवश्यक सामग्री तयार गर्न लाग्ने पैसा हो।",
+      "deText": "Dieses Geld dient der Beschaffung von Schulmaterialien und anderen Dingen vor Schulbeginn."
+    },
+    {
+      "id": "web_school_20261007_t04",
+      "ja": "転入学",
+      "reading": "てんにゅうがく",
+      "en": "Moving from another school to this school.",
+      "descriptionJa": "別の学校から、この学校に移ってくることです。",
+      "category": "お金・手続き",
+      "keywords": "転入学,てんにゅうがく,お金・手続き",
+      "viewCount": "0",
+      "ptText": "Mudar de outra escola para esta escola.",
+      "esText": "Trasladarse de otra escuela a esta.",
+      "viText": "Chuyển từ trường khác đến trường này.",
+      "zhText": "从其他学校转入这所学校。",
+      "koText": "다른 학교에서 이 학교로 옮겨 오는 것입니다.",
+      "tlText": "Paglipat mula sa ibang paaralan papunta sa paaralang ito.",
+      "idText": "Pindah dari sekolah lain ke sekolah ini.",
+      "neText": "अर्को विद्यालयबाट यस विद्यालयमा सर्नु हो।",
+      "deText": "Dies bezieht sich auf den Wechsel von einer anderen Schule zu dieser Schule."
+    },
+    {
+      "id": "web_school_20261007_t05",
+      "ja": "転校",
+      "reading": "てんこう",
+      "en": "Moving from the current school to another school.",
+      "descriptionJa": "今の学校から、別の学校に移ることです。",
+      "category": "お金・手続き",
+      "keywords": "転校,てんこう,転校,保護者,手続き",
+      "viewCount": "0",
+      "ptText": "Mudar da escola atual para outra escola.",
+      "esText": "Cambiar de la escuela actual a otra.",
+      "viText": "Chuyển từ trường hiện tại sang trường khác.",
+      "zhText": "从现在的学校转到另一所学校。",
+      "koText": "현재 학교에서 다른 학교로 옮기는 것입니다.",
+      "tlText": "Paglipat mula sa kasalukuyang paaralan patungo sa ibang paaralan.",
+      "idText": "Pindah dari sekolah sekarang ke sekolah lain.",
+      "neText": "हालको विद्यालयबाट अर्को विद्यालयमा सर्नु हो।",
+      "deText": "Das bedeutet, von meiner jetzigen Schule zu einer anderen Schule zu wechseln."
+    },
+    {
+      "id": "web_school_20261007_t06",
+      "ja": "編入学",
+      "reading": "へんにゅうがく",
+      "en": "Joining a school at a later grade or partway through a course.",
+      "descriptionJa": "途中の学年などから、その学校に入ることです。",
+      "category": "お金・手続き",
+      "keywords": "編入学,へんにゅうがく,お金・手続き",
+      "viewCount": "0",
+      "ptText": "Entrar em uma escola em uma série mais avançada ou com o curso já em andamento.",
+      "esText": "Incorporarse a una escuela en un curso posterior o con los estudios ya iniciados.",
+      "viText": "Vào học tại trường từ một lớp cao hơn hoặc khi chương trình đã bắt đầu.",
+      "zhText": "从中途的年级等进入该学校学习。",
+      "koText": "중간 학년 등부터 그 학교에 들어가는 것입니다.",
+      "tlText": "Pagpasok sa isang paaralan sa mas mataas na baitang o habang nagpapatuloy na ang kurso.",
+      "idText": "Masuk ke sekolah pada tingkat kelas lanjutan atau saat program sudah berjalan.",
+      "neText": "बीचको कक्षा वा पढाइको बीचबाट त्यस विद्यालयमा भर्ना हुनु हो।",
+      "deText": "Das bedeutet, mitten im Schuljahr in die Schule einzutreten."
+    },
+    {
+      "id": "web_school_20261007_t07",
+      "ja": "在学証明書",
+      "reading": "ざいがくしょうめいしょ",
+      "en": "A document showing that a child is enrolled at a school.",
+      "descriptionJa": "その学校で学んでいることを証明する書類です。",
+      "category": "お金・手続き",
+      "keywords": "在学証明書,ざいがくしょうめいしょ,転校,保護者,手続き",
+      "viewCount": "0",
+      "ptText": "Documento que comprova que a criança está matriculada em uma escola.",
+      "esText": "Documento que acredita que el niño está matriculado en una escuela.",
+      "viText": "Giấy xác nhận học sinh đang theo học tại trường.",
+      "zhText": "证明孩子在该学校就读的文件。",
+      "koText": "그 학교에 다니고 있음을 증명하는 서류입니다.",
+      "tlText": "Dokumentong nagpapatunay na naka-enrol ang bata sa isang paaralan.",
+      "idText": "Dokumen yang membuktikan bahwa anak terdaftar di suatu sekolah.",
+      "neText": "बच्चा त्यस विद्यालयमा पढिरहेको छ भन्ने प्रमाणित गर्ने कागजात हो।",
+      "deText": "Dies ist ein Dokument, das beweist, dass Sie an dieser Schule studieren."
+    },
+    {
+      "id": "web_school_20261007_t08",
+      "ja": "教科用図書給与証明書",
+      "reading": "きょうかようとしょきゅうよしょうめいしょ",
+      "en": "A document listing textbooks provided by the school, used when transferring schools.",
+      "descriptionJa": "学校から受け取った教科書を確認する書類です。転校の手続きで使います。",
+      "category": "お金・手続き",
+      "keywords": "教科用図書給与証明書,きょうかようとしょきゅうよしょうめいしょ,転校,保護者,手続き",
+      "viewCount": "0",
+      "ptText": "Documento que informa quais livros didáticos a escola forneceu, usado na transferência escolar.",
+      "esText": "Documento que indica los libros de texto entregados por la escuela y se utiliza al cambiar de escuela.",
+      "viText": "Giấy xác nhận các sách giáo khoa đã được trường cấp, dùng khi chuyển trường.",
+      "zhText": "确认学校已发放哪些教科书的文件，转学时使用。",
+      "koText": "학교에서 받은 교과서를 확인하는 서류로, 전학할 때 사용합니다.",
+      "tlText": "Dokumentong naglilista ng mga aklat na ibinigay ng paaralan, na ginagamit sa paglipat ng paaralan.",
+      "idText": "Dokumen tentang buku pelajaran yang sudah diberikan sekolah, digunakan saat pindah sekolah.",
+      "neText": "विद्यालयबाट पाएका पाठ्यपुस्तक पुष्टि गर्ने कागजात हो। विद्यालय सर्ने प्रक्रियामा प्रयोग हुन्छ।",
+      "deText": "Dieses Dokument dient der Bestätigung der von der Schule erhaltenen Lehrbücher. Es wird für den Überweisungsprozess verwendet."
+    },
+    {
+      "id": "web_school_20261007_t09",
+      "ja": "学区",
+      "reading": "がっく",
+      "en": "An area used to determine a child's school based on where the child lives.",
+      "descriptionJa": "住んでいる場所に応じて、通う学校を決める地域の区分です。",
+      "category": "お金・手続き",
+      "keywords": "学区,がっく,お金・手続き",
+      "viewCount": "0",
+      "ptText": "Área usada para definir a escola conforme o local onde a criança mora.",
+      "esText": "Zona que determina la escuela según el lugar donde vive el niño.",
+      "viText": "Khu vực dùng để xác định trường học theo nơi ở của trẻ.",
+      "zhText": "根据孩子居住地点划分就读学校的区域。",
+      "koText": "사는 곳에 따라 다닐 학교를 정하는 지역 구분입니다.",
+      "tlText": "Lugar na ginagamit upang matukoy ang paaralan batay sa tirahan ng bata.",
+      "idText": "Wilayah untuk menentukan sekolah berdasarkan tempat tinggal anak.",
+      "neText": "बसोबासको ठाउँअनुसार पढ्ने विद्यालय तोक्न बनाइएको क्षेत्र हो।",
+      "deText": "Hierbei handelt es sich um eine regionale Klassifizierung, die anhand des Wohnorts festlegt, welche Schule ein Schüler besucht."
+    },
+    {
+      "id": "web_school_20261007_t10",
+      "ja": "指定校変更",
+      "reading": "していこうへんこう",
+      "en": "A procedure to change the assigned school to another school with permission.",
+      "descriptionJa": "決められた学校を、許可を受けて別の学校に変える手続きです。",
+      "category": "お金・手続き",
+      "keywords": "指定校変更,していこうへんこう,お金・手続き",
+      "viewCount": "0",
+      "ptText": "Procedimento para mudar, com autorização, a escola indicada para outra.",
+      "esText": "Trámite para cambiar, con autorización, la escuela asignada por otra.",
+      "viText": "Thủ tục xin phép đổi từ trường được chỉ định sang trường khác.",
+      "zhText": "经批准将指定学校变更为其他学校的手续。",
+      "koText": "허가를 받아 지정된 학교를 다른 학교로 바꾸는 절차입니다.",
+      "tlText": "Proseso ng pagpapalit ng itinalagang paaralan sa ibang paaralan na may pahintulot.",
+      "idText": "Prosedur mengganti sekolah yang ditetapkan ke sekolah lain dengan izin.",
+      "neText": "अनुमति लिएर तोकिएको विद्यालयलाई अर्को विद्यालयमा परिवर्तन गर्ने प्रक्रिया हो।",
+      "deText": "Dies ist das Verfahren, um mit Genehmigung von der zugewiesenen Schule zu einer anderen Schule zu wechseln."
+    },
+    {
+      "id": "web_school_20261007_t11",
+      "ja": "就学時健康診断",
+      "reading": "しゅうがくじけんこうしんだん",
+      "en": "A health check before a child starts elementary school.",
+      "descriptionJa": "小学校に入る前に、子どもの健康を確認する検査です。",
+      "category": "健康・安全",
+      "keywords": "就学時健康診断,しゅうがくじけんこうしんだん,健康,保護者",
+      "viewCount": "0",
+      "ptText": "Exame de saúde antes de a criança entrar na escola primária.",
+      "esText": "Revisión de salud antes de que el niño entre en la escuela primaria.",
+      "viText": "Khám sức khỏe trước khi trẻ vào tiểu học.",
+      "zhText": "孩子上小学前进行的健康检查。",
+      "koText": "초등학교에 입학하기 전에 받는 건강검진입니다.",
+      "tlText": "Pagsusuri sa kalusugan bago magsimula ang bata sa elementarya.",
+      "idText": "Pemeriksaan kesehatan sebelum anak masuk sekolah dasar.",
+      "neText": "प्राथमिक विद्यालयमा भर्ना हुनुअघि बच्चाको स्वास्थ्य जाँच हो।",
+      "deText": "Dies ist eine Gesundheitsuntersuchung für Kinder vor dem Schuleintritt."
+    },
+    {
+      "id": "web_school_20261007_t12",
+      "ja": "健康調査票",
+      "reading": "けんこうちょうさひょう",
+      "en": "A form informing the school about a child's health, including illnesses and allergies.",
+      "descriptionJa": "病気やアレルギーなど、子どもの健康について学校に知らせる書類です。",
+      "category": "健康・安全",
+      "keywords": "健康調査票,けんこうちょうさひょう,健康,保護者",
+      "viewCount": "0",
+      "ptText": "Formulário para informar à escola sobre a saúde da criança, incluindo doenças e alergias.",
+      "esText": "Formulario para informar a la escuela sobre la salud del niño, incluidas enfermedades y alergias.",
+      "viText": "Phiếu thông báo cho trường về sức khỏe của trẻ, gồm bệnh và dị ứng.",
+      "zhText": "向学校说明孩子的疾病、过敏等健康情况的表格。",
+      "koText": "질병이나 알레르기 등 아이의 건강 상태를 학교에 알리는 서류입니다.",
+      "tlText": "Form na nagpapaalam sa paaralan tungkol sa kalusugan ng bata, kabilang ang mga sakit at allergy.",
+      "idText": "Formulir untuk memberi tahu sekolah tentang kesehatan anak, termasuk penyakit dan alergi.",
+      "neText": "रोग र एलर्जी लगायत बच्चाको स्वास्थ्यबारे विद्यालयलाई जानकारी दिने फाराम हो।",
+      "deText": "Dieses Dokument dient dazu, die Schule über den Gesundheitszustand Ihres Kindes, einschließlich etwaiger Krankheiten oder Allergien, zu informieren."
+    },
+    {
+      "id": "web_school_20261007_t13",
+      "ja": "食物アレルギー",
+      "reading": "しょくもつあれるぎー",
+      "en": "A reaction to certain foods. Please inform the school.",
+      "descriptionJa": "特定の食べ物で体に症状が出ることです。学校に知らせてください。",
+      "category": "健康・安全",
+      "keywords": "食物アレルギー,しょくもつあれるぎー,健康,保護者",
+      "viewCount": "0",
+      "ptText": "Reação a determinados alimentos. Avise a escola.",
+      "esText": "Reacción a ciertos alimentos. Informe a la escuela.",
+      "viText": "Phản ứng của cơ thể với một số thực phẩm. Hãy thông báo cho trường.",
+      "zhText": "因特定食物出现身体症状。请告知学校。",
+      "koText": "특정 음식 때문에 몸에 증상이 나타나는 것입니다. 학교에 알려 주세요.",
+      "tlText": "Reaksiyon ng katawan sa ilang pagkain. Ipaalam ito sa paaralan.",
+      "idText": "Reaksi tubuh terhadap makanan tertentu. Beri tahu sekolah.",
+      "neText": "केही खानेकुराले शरीरमा लक्षण देखिनु हो। विद्यालयलाई जानकारी दिनुहोस्।",
+      "deText": "Dies bezieht sich auf das Auftreten von Symptomen nach dem Verzehr bestimmter Lebensmittel. Bitte informieren Sie die Schule."
+    },
+    {
+      "id": "web_school_20261007_t14",
+      "ja": "出席停止",
+      "reading": "しゅっせきていし",
+      "en": "Staying away from school as instructed, for example because of an infectious illness. It is recorded separately from ordinary absence.",
+      "descriptionJa": "感染症などを理由に、学校の指示で登校を控えることです。通常の欠席とは区別されます。",
+      "category": "健康・安全",
+      "keywords": "出席停止,しゅっせきていし,健康,保護者",
+      "viewCount": "0",
+      "ptText": "Não ir à escola por orientação, por exemplo devido a uma doença infecciosa. O registro é diferente de uma falta comum.",
+      "esText": "No asistir a la escuela por indicación, por ejemplo por una enfermedad infecciosa. Se registra de forma distinta a una ausencia ordinaria.",
+      "viText": "Tạm thời không đến trường theo hướng dẫn, chẳng hạn do bệnh truyền nhiễm. Được ghi nhận khác với nghỉ học thông thường.",
+      "zhText": "因传染病等按学校要求暂不返校，与普通缺席分别记录。",
+      "koText": "감염병 등의 이유로 학교의 지시에 따라 등교를 하지 않는 것입니다. 일반 결석과 구분됩니다.",
+      "tlText": "Hindi muna pagpasok ayon sa tagubilin ng paaralan, halimbawa dahil sa nakahahawang sakit. Iba ang tala nito sa karaniwang pagliban.",
+      "idText": "Tidak masuk sekolah sesuai arahan, misalnya karena penyakit menular. Dicatat berbeda dari ketidakhadiran biasa.",
+      "neText": "संक्रामक रोग जस्ता कारणले विद्यालयको निर्देशनअनुसार विद्यालय नजानु हो। सामान्य अनुपस्थितिभन्दा फरक रूपमा अभिलेख राखिन्छ।",
+      "deText": "Dies bezieht sich auf das Fernbleiben vom Unterricht aufgrund von ansteckenden Krankheiten oder anderen Gründen, wie von der Schule angeordnet. Es ist zu unterscheiden von einer regelmäßigen Abwesenheit."
+    },
+    {
+      "id": "web_school_20261007_t15",
+      "ja": "口座振替依頼書",
+      "reading": "こうざふりかえいらいしょ",
+      "en": "A form authorizing automatic payment of school fees from a bank account.",
+      "descriptionJa": "学校の費用を銀行口座から自動で払うために出す書類です。",
+      "category": "お金・手続き",
+      "keywords": "口座振替依頼書,こうざふりかえいらいしょ,お金・手続き",
+      "viewCount": "0",
+      "ptText": "Formulário para autorizar o pagamento automático das despesas escolares pela conta bancária.",
+      "esText": "Formulario para autorizar el pago automático de gastos escolares desde una cuenta bancaria.",
+      "viText": "Giấy đăng ký tự động trích tiền từ tài khoản ngân hàng để trả chi phí trường học.",
+      "zhText": "申请从银行账户自动扣缴学校费用的表格。",
+      "koText": "학교 비용을 은행 계좌에서 자동으로 납부하도록 신청하는 서류입니다.",
+      "tlText": "Form para pahintulutan ang awtomatikong pagbabayad ng gastos sa paaralan mula sa bank account.",
+      "idText": "Formulir untuk mengizinkan pembayaran biaya sekolah otomatis dari rekening bank.",
+      "neText": "विद्यालयको खर्च बैंक खाताबाट स्वचालित रूपमा तिर्न बुझाउने फाराम हो।",
+      "deText": "Dies ist ein Dokument, das Sie einreichen, um die automatische Abbuchung der Schulgebühren von Ihrem Bankkonto einzurichten."
+    },
+    {
+      "id": "web_school_20261007_t16",
+      "ja": "添付書類",
+      "reading": "てんぷしょるい",
+      "en": "Required documents submitted together with an application form.",
+      "descriptionJa": "申請書などと一緒に出す、必要な書類です。",
+      "category": "お金・手続き",
+      "keywords": "添付書類,てんぷしょるい,就学援助,保護者,申請",
+      "viewCount": "0",
+      "ptText": "Documentos necessários entregues junto com o formulário de solicitação.",
+      "esText": "Documentos necesarios que se entregan junto con la solicitud.",
+      "viText": "Các giấy tờ cần thiết nộp kèm đơn.",
+      "zhText": "与申请表等一起提交的必要文件。",
+      "koText": "신청서 등과 함께 내는 필요한 서류입니다.",
+      "tlText": "Mga kailangang dokumentong isinasama sa aplikasyon.",
+      "idText": "Dokumen yang diperlukan dan diserahkan bersama formulir permohonan.",
+      "neText": "निवेदनसँगै बुझाउनुपर्ने आवश्यक कागजात हुन्।",
+      "deText": "Dies sind notwendige Dokumente, die Sie zusammen mit Ihrem Antragsformular einreichen müssen."
+    },
+    {
+      "id": "web_school_20261007_t17",
+      "ja": "認定結果",
+      "reading": "にんていけっか",
+      "en": "A decision stating whether an application for assistance has been approved.",
+      "descriptionJa": "申し込んだ援助などが認められたかどうかを知らせる結果です。",
+      "category": "お金・手続き",
+      "keywords": "認定結果,にんていけっか,就学援助,保護者,申請",
+      "viewCount": "0",
+      "ptText": "Resultado que informa se o pedido de auxílio foi aprovado.",
+      "esText": "Resultado que indica si la solicitud de ayuda fue aprobada.",
+      "viText": "Kết quả cho biết đơn xin hỗ trợ có được chấp thuận hay không.",
+      "zhText": "说明所申请的补助等是否获批的结果。",
+      "koText": "신청한 지원 등이 승인되었는지 알려 주는 결과입니다.",
+      "tlText": "Resultang nagsasaad kung naaprubahan ang hinihinging tulong.",
+      "idText": "Hasil yang menyatakan apakah permohonan bantuan disetujui.",
+      "neText": "मागिएको सहायता स्वीकृत भयो कि भएन भन्ने निर्णय हो।",
+      "deText": "Dieses Ergebnis informiert Sie darüber, ob die von Ihnen beantragte Unterstützung bewilligt wurde."
+    },
+    {
+      "id": "web_school_20261007_t18",
+      "ja": "母語",
+      "reading": "ぼご",
+      "en": "A language learned from early childhood. A person may have more than one.",
+      "descriptionJa": "幼いころから身につけたことばです。一つとは限りません。",
+      "category": "連絡・相談",
+      "keywords": "母語,ぼご,会話・連絡",
+      "viewCount": "0",
+      "ptText": "Língua aprendida desde a infância. Uma pessoa pode ter mais de uma.",
+      "esText": "Lengua aprendida desde la infancia. Una persona puede tener más de una.",
+      "viText": "Ngôn ngữ được học từ nhỏ. Một người có thể có nhiều hơn một tiếng mẹ đẻ.",
+      "zhText": "从幼年起学会的语言。一个人可能有不止一种母语。",
+      "koText": "어릴 때부터 배운 언어입니다. 하나 이상일 수도 있습니다.",
+      "tlText": "Wikang natutuhan mula sa pagkabata. Maaaring higit sa isa ang wikang ito.",
+      "idText": "Bahasa yang dipelajari sejak kecil. Seseorang bisa memiliki lebih dari satu.",
+      "neText": "सानैदेखि सिकेको भाषा हो। एकभन्दा बढी पनि हुन सक्छन्।",
+      "deText": "Das sind Wörter, die ich seit meiner Kindheit gelernt habe. Es gibt nicht nur eines."
+    },
+    {
+      "id": "web_school_20261007_t19",
+      "ja": "通訳派遣",
+      "reading": "つうやくはけん",
+      "en": "Arranging for an interpreter to come and help people communicate.",
+      "descriptionJa": "話を伝えるために、通訳をする人に来てもらうことです。",
+      "category": "連絡・相談",
+      "keywords": "通訳派遣,つうやくはけん,会話・連絡",
+      "viewCount": "0",
+      "ptText": "Solicitar a presença de um intérprete para ajudar na comunicação.",
+      "esText": "Solicitar que acuda un intérprete para facilitar la comunicación.",
+      "viText": "Sắp xếp người phiên dịch đến hỗ trợ giao tiếp.",
+      "zhText": "安排口译人员前来帮助沟通。",
+      "koText": "의사소통을 돕는 통역사가 오도록 요청하는 것입니다.",
+      "tlText": "Pag-aayos na dumating ang isang interpreter upang tumulong sa pag-uusap.",
+      "idText": "Mengatur kedatangan penerjemah lisan untuk membantu komunikasi.",
+      "neText": "कुराकानीमा सहयोग गर्न दोभाषेलाई बोलाउने व्यवस्था हो।",
+      "deText": "Um die Botschaft zu übermitteln, benötigen wir einen Dolmetscher."
+    },
+    {
+      "id": "web_school_20261007_t20",
+      "ja": "就学相談",
+      "reading": "しゅうがくそうだん",
+      "en": "Consultation about a child's schooling and the support the child needs.",
+      "descriptionJa": "子どもが学校に通うことや、必要な支援について相談することです。",
+      "category": "連絡・相談",
+      "keywords": "就学相談,しゅうがくそうだん,家族・相談",
+      "viewCount": "0",
+      "ptText": "Consulta sobre a escolarização da criança e o apoio de que ela precisa.",
+      "esText": "Consulta sobre la escolarización del niño y los apoyos que necesita.",
+      "viText": "Tư vấn về việc đi học và hỗ trợ cần thiết cho trẻ.",
+      "zhText": "咨询孩子入学、就读及所需支持的事项。",
+      "koText": "아이의 취학과 필요한 지원에 대해 상담하는 것입니다.",
+      "tlText": "Pagkonsulta tungkol sa pag-aaral ng bata at sa suportang kailangan niya.",
+      "idText": "Konsultasi tentang pendidikan anak dan dukungan yang diperlukan.",
+      "neText": "बच्चाको विद्यालय शिक्षा र आवश्यक सहयोगबारे परामर्श गर्नु हो।",
+      "deText": "Dabei geht es unter anderem um die Schulpflicht von Kindern und die Unterstützung, die sie benötigen."
+    },
+    {
+      "id": "web_school_20261007_t21",
+      "ja": "学童保育",
+      "reading": "がくどうほいく",
+      "en": "Care for elementary school children after school or at other times when their parents are away.",
+      "descriptionJa": "放課後など、保護者が家にいない時間に小学生を預かるサービスです。",
+      "category": "学校生活・行事",
+      "keywords": "学童保育,がくどうほいく,学校生活",
+      "viewCount": "0",
+      "ptText": "Serviço que cuida de crianças do ensino fundamental após as aulas ou quando os responsáveis estão ausentes.",
+      "esText": "Servicio de cuidado para niños de primaria después de clase o cuando sus responsables no están en casa.",
+      "viText": "Dịch vụ trông trẻ tiểu học sau giờ học hoặc khi phụ huynh vắng nhà.",
+      "zhText": "放学后等家长不在家时照看小学生的服务。",
+      "koText": "방과 후 등 보호자가 집에 없는 시간에 초등학생을 돌보는 서비스입니다.",
+      "tlText": "Serbisyo ng pag-aalaga sa mga batang nasa elementarya pagkatapos ng klase o kapag wala sa bahay ang magulang.",
+      "idText": "Layanan pengasuhan anak sekolah dasar setelah sekolah atau saat orang tua tidak di rumah.",
+      "neText": "विद्यालयपछि वा अभिभावक घरमा नभएको समयमा प्राथमिक तहका बच्चाको हेरचाह गर्ने सेवा हो।",
+      "deText": "Dieser Service bietet Kinderbetreuung für Grundschulkinder nach der Schule oder zu anderen Zeiten, wenn deren Eltern nicht zu Hause sind."
+    },
+    {
+      "id": "web_school_20261007_t22",
+      "ja": "家庭訪問",
+      "reading": "かていほうもん",
+      "en": "A teacher visits a child's home to talk with the parents about the child.",
+      "descriptionJa": "先生が家庭を訪ねて、子どもの様子などを保護者と話すことです。",
+      "category": "連絡・相談",
+      "keywords": "家庭訪問,かていほうもん,家族・相談",
+      "viewCount": "0",
+      "ptText": "Visita do professor à casa da criança para conversar com os responsáveis sobre ela.",
+      "esText": "Visita del docente al hogar para hablar con los responsables sobre el niño.",
+      "viText": "Giáo viên đến nhà để trao đổi với phụ huynh về tình hình của trẻ.",
+      "zhText": "老师到家中与家长交流孩子的情况等。",
+      "koText": "선생님이 가정을 방문해 보호자와 아이의 생활 등에 대해 이야기하는 것입니다.",
+      "tlText": "Pagbisita ng guro sa bahay upang kausapin ang magulang tungkol sa bata.",
+      "idText": "Guru mengunjungi rumah untuk berbicara dengan orang tua tentang keadaan anak.",
+      "neText": "शिक्षकले घरमा आएर बच्चाको अवस्थाबारे अभिभावकसँग कुराकानी गर्नु हो।",
+      "deText": "Dabei besucht die Lehrkraft das Elternhaus und spricht mit den Eltern über das Wohlbefinden des Kindes."
+    },
+    {
+      "id": "web_school_20261007_t23",
+      "ja": "PTA",
+      "reading": "ぴーてぃーえー",
+      "en": "A parent-teacher association that works together to support children and the school.",
+      "descriptionJa": "保護者と先生が協力して、子どもや学校のために活動する団体です。",
+      "category": "連絡・相談",
+      "keywords": "PTA,ぴーてぃーえー,家族・相談",
+      "viewCount": "0",
+      "ptText": "Associação de pais e professores que coopera em atividades para apoiar as crianças e a escola.",
+      "esText": "Asociación de familias y docentes que colaboran para apoyar a los niños y a la escuela.",
+      "viText": "Hội phụ huynh và giáo viên cùng hoạt động để hỗ trợ trẻ và nhà trường.",
+      "zhText": "家长与老师合作，为孩子和学校开展活动的组织。",
+      "koText": "보호자와 선생님이 협력해 아이들과 학교를 돕는 단체입니다.",
+      "tlText": "Samahan ng mga magulang at guro na nagtutulungan para sa mga bata at paaralan.",
+      "idText": "Perkumpulan orang tua dan guru yang bekerja sama mendukung anak dan sekolah.",
+      "neText": "बच्चा र विद्यालयका लागि अभिभावक तथा शिक्षक मिलेर काम गर्ने संस्था हो।",
+      "deText": "Dies ist eine Organisation, in der Eltern und Lehrer zum Wohle der Kinder und Schulen zusammenarbeiten."
+    },
+    {
+      "id": "web_school_20261007_t24",
+      "ja": "連絡アプリ",
+      "reading": "れんらくあぷり",
+      "en": "An app used to read school notices and contact the school.",
+      "descriptionJa": "学校からのお知らせを見たり、学校へ連絡したりするアプリです。",
+      "category": "連絡・相談",
+      "keywords": "連絡アプリ,れんらくあぷり,会話・連絡",
+      "viewCount": "0",
+      "ptText": "Aplicativo para ler avisos e entrar em contato com a escola.",
+      "esText": "Aplicación para leer avisos y comunicarse con la escuela.",
+      "viText": "Ứng dụng để xem thông báo và liên hệ với trường.",
+      "zhText": "查看学校通知、与学校联系的应用程序。",
+      "koText": "학교 공지를 확인하거나 학교에 연락하는 앱입니다.",
+      "tlText": "App para basahin ang mga anunsiyo at makipag-ugnayan sa paaralan.",
+      "idText": "Aplikasi untuk membaca pengumuman dan menghubungi sekolah.",
+      "neText": "विद्यालयका सूचना हेर्न र विद्यालयसँग सम्पर्क गर्न प्रयोग गरिने एप हो।",
+      "deText": "Mit dieser App können Sie Mitteilungen der Schule einsehen und die Schule kontaktieren."
+    },
+    {
+      "id": "ruby:おはよう",
+      "ja": "おはよう",
+      "reading": "おはよう",
+      "category": "連絡・相談",
+      "descriptionJa": "朝のあいさつです。",
+      "simpleJaText": "朝のあいさつです。",
+      "source": "ruby_dictionary",
+      "enText": "good morning",
+      "ptText": "bom dia",
+      "esText": "buen día",
+      "viText": "Chào buổi sáng",
+      "zhText": "早上好",
+      "koText": "좋은 아침",
+      "tlText": "magandang umaga",
+      "idText": "Selamat pagi",
+      "neText": "शुभ बिहानी",
+      "deText": "Guten Morgen."
+    },
+    {
+      "id": "ruby:片付け",
+      "ja": "片付け",
+      "reading": "かたづけ",
+      "category": "学校生活・行事",
+      "descriptionJa": "使ったものを元に戻すことです。",
+      "simpleJaText": "使ったものを元に戻すことです。",
+      "source": "ruby_dictionary",
+      "enText": "To put things away.",
+      "ptText": "arrumando",
+      "esText": "ordenar",
+      "viText": "dọn dẹp",
+      "zhText": "收拾整理",
+      "koText": "정리",
+      "tlText": "pag-aayos",
+      "idText": "merapikan",
+      "neText": "मिलाउँदै",
+      "deText": "Es bedeutet, die Dinge nach Gebrauch wieder an ihren Platz zurückzustellen."
+    },
+    {
+      "id": "ruby:整列",
+      "ja": "整列",
+      "reading": "せいれつ",
+      "category": "学校生活・行事",
+      "descriptionJa": "順番に並ぶことです。",
+      "simpleJaText": "順番に並ぶことです。",
+      "source": "ruby_dictionary",
+      "enText": "To stand in line.",
+      "ptText": "Alinhar",
+      "esText": "Póngase en fila",
+      "viText": "Xếp hàng",
+      "zhText": "排队",
+      "koText": "정렬",
+      "tlText": "Pumila",
+      "idText": "Berbaris",
+      "neText": "लाइन अप गर्नुहोस्",
+      "deText": "Es bedeutet, sich in einer Reihe aufzustellen."
+    },
+    {
+      "id": "ruby:移動",
+      "ja": "移動",
+      "reading": "いどう",
+      "category": "学校生活・行事",
+      "descriptionJa": "別の場所へ行くことです。",
+      "simpleJaText": "別の場所へ行くことです。",
+      "source": "ruby_dictionary",
+      "enText": "To move to another place.",
+      "ptText": "mover",
+      "esText": "mover",
+      "viText": "di chuyển",
+      "zhText": "移动",
+      "koText": "이동",
+      "tlText": "ilipat",
+      "idText": "bergerak",
+      "neText": "सार्नु",
+      "deText": "Es bedeutet, an einen anderen Ort zu gehen."
+    },
+    {
+      "id": "ruby:着席",
+      "ja": "着席",
+      "reading": "ちゃくせき",
+      "category": "学校生活・行事",
+      "descriptionJa": "席に座ることです。",
+      "simpleJaText": "席に座ることです。",
+      "source": "ruby_dictionary",
+      "enText": "To sit down.",
+      "ptText": "Sentado",
+      "esText": "Sentado",
+      "viText": "Ngồi",
+      "zhText": "坐着",
+      "koText": "착석",
+      "tlText": "Nakaupo",
+      "idText": "Duduk",
+      "neText": "बसेको",
+      "deText": "Es bedeutet, sich hinzusetzen."
+    },
+    {
+      "id": "ruby:起立",
+      "ja": "起立",
+      "reading": "きりつ",
+      "category": "学校生活・行事",
+      "descriptionJa": "立つことです。",
+      "simpleJaText": "立つことです。",
+      "source": "ruby_dictionary",
+      "enText": "To stand up.",
+      "ptText": "ficar de pé",
+      "esText": "ponerse de pie",
+      "viText": "đứng lên",
+      "zhText": "起来",
+      "koText": "기립",
+      "tlText": "tumayo",
+      "idText": "berdiri",
+      "neText": "उठ्नुहोस्",
+      "deText": "Es geht ums Stehen."
+    },
+    {
+      "id": "ruby:礼",
+      "ja": "礼",
+      "reading": "れい",
+      "category": "学校生活・行事",
+      "descriptionJa": "あいさつで頭を下げることです。",
+      "simpleJaText": "あいさつで頭を下げることです。",
+      "source": "ruby_dictionary",
+      "enText": "To bow as a greeting.",
+      "ptText": "Arco",
+      "esText": "Arco",
+      "viText": "Cây cung",
+      "zhText": "弓",
+      "koText": "예",
+      "tlText": "Pana",
+      "idText": "Busur",
+      "neText": "धनुष",
+      "deText": "Es geht darum, den Kopf zu senken, wenn man jemanden begrüßt."
+    },
+    {
+      "id": "ruby:発表",
+      "ja": "発表",
+      "reading": "はっぴょう",
+      "category": "授業・勉強",
+      "descriptionJa": "みんなの前で話すことです。",
+      "simpleJaText": "みんなの前で話すことです。",
+      "source": "ruby_dictionary",
+      "enText": "To speak in front of others.",
+      "ptText": "anúncio",
+      "esText": "anuncio",
+      "viText": "thông báo",
+      "zhText": "公告",
+      "koText": "발표",
+      "tlText": "anunsyo",
+      "idText": "pengumuman",
+      "neText": "घोषणा",
+      "deText": "Es geht darum, vor allen zu sprechen."
+    },
+    {
+      "id": "ruby:意見",
+      "ja": "意見",
+      "reading": "いけん",
+      "category": "授業・勉強",
+      "descriptionJa": "自分の考えです。",
+      "simpleJaText": "自分の考えです。",
+      "source": "ruby_dictionary",
+      "enText": "One's own idea or opinion.",
+      "ptText": "opinião",
+      "esText": "opinión",
+      "viText": "ý kiến",
+      "zhText": "观点",
+      "koText": "의견",
+      "tlText": "opinyon",
+      "idText": "pendapat",
+      "neText": "विचार",
+      "deText": "Das ist nur meine Meinung."
+    },
+    {
+      "id": "ruby:理由",
+      "ja": "理由",
+      "reading": "りゆう",
+      "category": "授業・勉強",
+      "descriptionJa": "なぜそう思うかです。",
+      "simpleJaText": "なぜそう思うかです。",
+      "source": "ruby_dictionary",
+      "enText": "Why someone thinks so.",
+      "ptText": "razão",
+      "esText": "razón",
+      "viText": "lý do",
+      "zhText": "原因",
+      "koText": "이유",
+      "tlText": "dahilan",
+      "idText": "alasan",
+      "neText": "कारण",
+      "deText": "Warum denkst du das?"
+    },
+    {
+      "id": "ruby:説明",
+      "ja": "説明",
+      "reading": "せつめい",
+      "category": "授業・勉強",
+      "descriptionJa": "わかるように話すことです。",
+      "simpleJaText": "わかるように話すことです。",
+      "source": "ruby_dictionary",
+      "enText": "To explain clearly.",
+      "ptText": "explicação",
+      "esText": "explicación",
+      "viText": "giải thích",
+      "zhText": "解释",
+      "koText": "설명",
+      "tlText": "paliwanag",
+      "idText": "penjelasan",
+      "neText": "व्याख्या",
+      "deText": "Der Schlüssel liegt darin, so zu sprechen, dass es leicht verständlich ist."
+    },
+    {
+      "id": "ruby:確認",
+      "ja": "確認",
+      "reading": "かくにん",
+      "category": "授業・勉強",
+      "descriptionJa": "合っているか見ることです。",
+      "simpleJaText": "合っているか見ることです。",
+      "source": "ruby_dictionary",
+      "enText": "To check if something is correct.",
+      "ptText": "confirmação",
+      "esText": "confirmación",
+      "viText": "xác nhận",
+      "zhText": "确认",
+      "koText": "확인",
+      "tlText": "kumpirmasyon",
+      "idText": "konfirmasi",
+      "neText": "पुष्टिकरण",
+      "deText": "Ziel ist es zu überprüfen, ob es korrekt ist."
+    },
+    {
+      "id": "ruby:解答",
+      "ja": "解答",
+      "reading": "かいとう",
+      "category": "授業・勉強",
+      "descriptionJa": "問題の答えです。",
+      "simpleJaText": "問題の答えです。",
+      "source": "ruby_dictionary",
+      "enText": "The answer to a question.",
+      "ptText": "responder",
+      "esText": "respuesta",
+      "viText": "trả lời",
+      "zhText": "回答",
+      "koText": "답",
+      "tlText": "sagot",
+      "idText": "menjawab",
+      "neText": "उत्तर",
+      "deText": "Hier ist die Antwort auf die Frage."
+    },
+    {
+      "id": "ruby:答え",
+      "ja": "答え",
+      "reading": "こたえ",
+      "category": "授業・勉強",
+      "descriptionJa": "問題に対する返事です。",
+      "simpleJaText": "問題に対する返事です。",
+      "source": "ruby_dictionary",
+      "enText": "The answer to a question.",
+      "ptText": "responder",
+      "esText": "respuesta",
+      "viText": "trả lời",
+      "zhText": "回答",
+      "koText": "대답",
+      "tlText": "sagot",
+      "idText": "menjawab",
+      "neText": "उत्तर",
+      "deText": "Das ist die Antwort auf Ihre Frage."
+    },
+    {
+      "id": "ruby:丸付け",
+      "ja": "丸付け",
+      "reading": "まるつけ",
+      "category": "授業・勉強",
+      "descriptionJa": "答えが合っているか見ることです。",
+      "simpleJaText": "答えが合っているか見ることです。",
+      "source": "ruby_dictionary",
+      "enText": "Checking answers.",
+      "ptText": "Classificação",
+      "esText": "Calificación",
+      "viText": "Chấm điểm",
+      "zhText": "等级",
+      "koText": "둥근",
+      "tlText": "Pagmamarka",
+      "idText": "Penilaian",
+      "neText": "ग्रेडिङ",
+      "deText": "Ziel ist es zu überprüfen, ob die Antwort richtig ist."
+    },
+    {
+      "id": "ruby:直し",
+      "ja": "直し",
+      "reading": "なおし",
+      "category": "授業・勉強",
+      "descriptionJa": "まちがいを直すことです。",
+      "simpleJaText": "まちがいを直すことです。",
+      "source": "ruby_dictionary",
+      "enText": "To correct mistakes.",
+      "ptText": "Reparar",
+      "esText": "Reparar",
+      "viText": "Sửa",
+      "zhText": "维修",
+      "koText": "고치다",
+      "tlText": "Pagkukumpuni",
+      "idText": "Memperbaiki",
+      "neText": "मर्मत",
+      "deText": "Es geht darum, Fehler zu korrigieren."
+    },
+    {
+      "id": "ruby:途中式",
+      "ja": "途中式",
+      "reading": "とちゅうしき",
+      "category": "授業・勉強",
+      "descriptionJa": "答えまでの計算の流れです。",
+      "simpleJaText": "答えまでの計算の流れです。",
+      "source": "ruby_dictionary",
+      "enText": "The steps used to solve a math problem.",
+      "ptText": "Cerimônia do meio do caminho",
+      "esText": "Ceremonia de mitad de camino",
+      "viText": "Lễ hội giữa chừng",
+      "zhText": "中途仪式",
+      "koText": "도중식",
+      "tlText": "Seremonya sa kalagitnaan ng daan",
+      "idText": "Upacara pertengahan jalan",
+      "neText": "मिडवे समारोह",
+      "deText": "Dies ist der Berechnungsprozess, um zur Antwort zu gelangen."
+    },
+    {
+      "id": "ruby:計算",
+      "ja": "計算",
+      "reading": "けいさん",
+      "category": "授業・勉強",
+      "descriptionJa": "数を使って答えを出すことです。",
+      "simpleJaText": "数を使って答えを出すことです。",
+      "source": "ruby_dictionary",
+      "enText": "Using numbers to find an answer.",
+      "ptText": "cálculo",
+      "esText": "cálculo",
+      "viText": "tính toán",
+      "zhText": "计算",
+      "koText": "계산",
+      "tlText": "kalkulasyon",
+      "idText": "perhitungan",
+      "neText": "गणना",
+      "deText": "Dabei werden Zahlen verwendet, um zur Antwort zu gelangen."
+    },
+    {
+      "id": "ruby:式",
+      "ja": "式",
+      "reading": "しき",
+      "category": "授業・勉強",
+      "descriptionJa": "数字や記号で表したものです。",
+      "simpleJaText": "数字や記号で表したものです。",
+      "source": "ruby_dictionary",
+      "enText": "Numbers and symbols written together.",
+      "ptText": "fórmula",
+      "esText": "fórmula",
+      "viText": "công thức",
+      "zhText": "公式",
+      "koText": "수식",
+      "tlText": "pormula",
+      "idText": "rumus",
+      "neText": "सूत्र",
+      "deText": "Diese werden mithilfe von Zahlen und Symbolen dargestellt."
+    },
+    {
+      "id": "ruby:答案",
+      "ja": "答案",
+      "reading": "とうあん",
+      "category": "授業・勉強",
+      "descriptionJa": "テストの答えを書く紙です。",
+      "simpleJaText": "テストの答えを書く紙です。",
+      "source": "ruby_dictionary",
+      "enText": "A sheet for writing test answers.",
+      "ptText": "responder",
+      "esText": "respuesta",
+      "viText": "trả lời",
+      "zhText": "回答",
+      "koText": "답안",
+      "tlText": "sagot",
+      "idText": "menjawab",
+      "neText": "उत्तर",
+      "deText": "Dies ist das Papier, auf dem Sie Ihre Testantworten schreiben."
+    },
+    {
+      "id": "ruby:テスト",
+      "ja": "テスト",
+      "reading": "てすと",
+      "category": "授業・勉強",
+      "descriptionJa": "学習したことを確認するものです。",
+      "simpleJaText": "学習したことを確認するものです。",
+      "source": "ruby_dictionary",
+      "enText": "A test to check learning.",
+      "ptText": "teste",
+      "esText": "prueba",
+      "viText": "Bài kiểm tra",
+      "zhText": "测试",
+      "koText": "테스트",
+      "tlText": "pagsubok",
+      "idText": "tes",
+      "neText": "परीक्षण",
+      "deText": "Dies dient der Bestätigung dessen, was Sie gelernt haben."
+    },
+    {
+      "id": "ruby:採点",
+      "ja": "採点",
+      "reading": "さいてん",
+      "category": "授業・勉強",
+      "descriptionJa": "答えを見て点数をつけることです。",
+      "simpleJaText": "答えを見て点数をつけることです。",
+      "source": "ruby_dictionary",
+      "enText": "To grade answers.",
+      "ptText": "Classificação",
+      "esText": "Calificación",
+      "viText": "Chấm điểm",
+      "zhText": "等级",
+      "koText": "채점",
+      "tlText": "Pagmamarka",
+      "idText": "Penilaian",
+      "neText": "ग्रेडिङ",
+      "deText": "Dabei geht es darum, die Antworten anzusehen und Punkte zu vergeben."
+    },
+    {
+      "id": "ruby:出席",
+      "ja": "出席",
+      "reading": "しゅっせき",
+      "category": "健康・安全",
+      "descriptionJa": "学校や授業に来ることです。",
+      "simpleJaText": "学校や授業に来ることです。",
+      "source": "ruby_dictionary",
+      "enText": "Being present at school or class.",
+      "ptText": "presença",
+      "esText": "asistencia",
+      "viText": "sự tham dự",
+      "zhText": "出席",
+      "koText": "출석",
+      "tlText": "pagdalo",
+      "idText": "kehadiran",
+      "neText": "उपस्थिति",
+      "deText": "Es bedeutet, zur Schule und zum Unterricht zu gehen."
+    },
+    {
+      "id": "ruby:体調",
+      "ja": "体調",
+      "reading": "たいちょう",
+      "category": "健康・安全",
+      "descriptionJa": "体の調子です。",
+      "simpleJaText": "体の調子です。",
+      "source": "ruby_dictionary",
+      "enText": "One's physical condition.",
+      "ptText": "condição física",
+      "esText": "condición física",
+      "viText": "tình trạng thể chất",
+      "zhText": "身体状况",
+      "koText": "컨디션",
+      "tlText": "pisikal na kondisyon",
+      "idText": "kondisi fisik",
+      "neText": "शारीरिक अवस्था",
+      "deText": "Wie ist mein körperlicher Zustand?"
+    },
+    {
+      "id": "ruby:出血",
+      "ja": "出血",
+      "reading": "しゅっけつ",
+      "category": "健康・安全",
+      "descriptionJa": "血が出ることです。",
+      "simpleJaText": "血が出ることです。",
+      "source": "ruby_dictionary",
+      "enText": "Blood coming out of the body.",
+      "ptText": "sangramento",
+      "esText": "sangría",
+      "viText": "chảy máu",
+      "zhText": "出血",
+      "koText": "출혈",
+      "tlText": "pagdurugo",
+      "idText": "perdarahan",
+      "neText": "रक्तस्राव",
+      "deText": "Es bedeutet bluten."
+    },
+    {
+      "id": "ruby:弁当",
+      "ja": "弁当",
+      "reading": "べんとう",
+      "category": "学校生活・行事",
+      "descriptionJa": "家から持ってくる食事です。",
+      "simpleJaText": "家から持ってくる食事です。",
+      "source": "ruby_dictionary",
+      "enText": "A meal brought from home.",
+      "ptText": "bento",
+      "esText": "bento",
+      "viText": "hộp cơm bento",
+      "zhText": "便当",
+      "koText": "도시락",
+      "tlText": "bento",
+      "idText": "bento",
+      "neText": "बेन्टो",
+      "deText": "Das sind Mahlzeiten, die ich von zu Hause mitbringe."
+    },
+    {
+      "id": "ruby:食器",
+      "ja": "食器",
+      "reading": "しょっき",
+      "category": "学校生活・行事",
+      "descriptionJa": "食べるときに使う皿や道具です。",
+      "simpleJaText": "食べるときに使う皿や道具です。",
+      "source": "ruby_dictionary",
+      "enText": "Plates and tools used for eating.",
+      "ptText": "utensílios de mesa",
+      "esText": "vajilla",
+      "viText": "bộ đồ ăn",
+      "zhText": "餐具",
+      "koText": "식기",
+      "tlText": "mga kagamitan sa hapag-kainan",
+      "idText": "peralatan makan",
+      "neText": "टेबलवेयर",
+      "deText": "Dies sind Teller und Besteck, die beim Essen verwendet werden."
+    },
+    {
+      "id": "ruby:参観",
+      "ja": "参観",
+      "reading": "さんかん",
+      "category": "連絡・相談",
+      "descriptionJa": "保護者が授業を見ることです。",
+      "simpleJaText": "保護者が授業を見ることです。",
+      "source": "ruby_dictionary",
+      "enText": "Parents visiting a class.",
+      "ptText": "visita",
+      "esText": "visita",
+      "viText": "thăm nom",
+      "zhText": "访问",
+      "koText": "참관",
+      "tlText": "bumisita",
+      "idText": "mengunjungi",
+      "neText": "भ्रमण गर्नुहोस्",
+      "deText": "Dies beinhaltet, dass die Eltern den Unterricht beobachten."
+    },
+    {
+      "id": "ruby:懇談",
+      "ja": "懇談",
+      "reading": "こんだん",
+      "category": "連絡・相談",
+      "descriptionJa": "先生と保護者が話すことです。",
+      "simpleJaText": "先生と保護者が話すことです。",
+      "source": "ruby_dictionary",
+      "enText": "A meeting between teacher and parent.",
+      "ptText": "Discussão",
+      "esText": "Discusión",
+      "viText": "Cuộc thảo luận",
+      "zhText": "讨论",
+      "koText": "간담",
+      "tlText": "Talakayan",
+      "idText": "Diskusi",
+      "neText": "छलफल",
+      "deText": "Es handelt sich um ein Gespräch zwischen der Lehrkraft und den Eltern."
+    },
+    {
+      "id": "ruby:はさみ",
+      "ja": "はさみ",
+      "reading": "はさみ",
+      "category": "持ち物・提出",
+      "descriptionJa": "紙などを切る道具です。",
+      "simpleJaText": "紙などを切る道具です。",
+      "source": "ruby_dictionary",
+      "enText": "A tool for cutting paper.",
+      "ptText": "tesoura",
+      "esText": "tijeras",
+      "viText": "kéo",
+      "zhText": "剪刀",
+      "koText": "가위",
+      "tlText": "gunting",
+      "idText": "gunting",
+      "neText": "कैंची",
+      "deText": "Es ist ein Werkzeug zum Schneiden von Papier und anderen Materialien."
+    },
+    {
+      "id": "ruby:のり",
+      "ja": "のり",
+      "reading": "のり",
+      "category": "持ち物・提出",
+      "descriptionJa": "紙を貼るものです。",
+      "simpleJaText": "紙を貼るものです。",
+      "source": "ruby_dictionary",
+      "enText": "Something used to stick paper.",
+      "ptText": "alga",
+      "esText": "alga",
+      "viText": "rong biển",
+      "zhText": "海藻",
+      "koText": "풀",
+      "tlText": "damong-dagat",
+      "idText": "rumput laut",
+      "neText": "समुद्री शैवाल",
+      "deText": "Es dient zum Aufkleben von Papier."
+    },
+    {
+      "id": "ruby:住所",
+      "ja": "住所",
+      "reading": "じゅうしょ",
+      "category": "連絡・相談",
+      "descriptionJa": "住んでいる場所です。",
+      "simpleJaText": "住んでいる場所です。",
+      "source": "ruby_dictionary",
+      "enText": "The place where someone lives.",
+      "ptText": "endereço",
+      "esText": "DIRECCIÓN",
+      "viText": "Địa chỉ",
+      "zhText": "地址",
+      "koText": "주소",
+      "tlText": "tirahan",
+      "idText": "alamat",
+      "neText": "ठेगाना",
+      "deText": "Hier wohne ich."
+    },
+    {
+      "id": "ruby:電話番号",
+      "ja": "電話番号",
+      "reading": "でんわばんごう",
+      "category": "連絡・相談",
+      "descriptionJa": "電話をかけるための番号です。",
+      "simpleJaText": "電話をかけるための番号です。",
+      "source": "ruby_dictionary",
+      "enText": "A number used to call someone.",
+      "ptText": "número de telefone",
+      "esText": "número telefónico",
+      "viText": "số điện thoại",
+      "zhText": "电话号码",
+      "koText": "전화번호",
+      "tlText": "numero ng telepono",
+      "idText": "nomor telepon",
+      "neText": "टेलिफोन नम्बर",
+      "deText": "Dies ist eine Telefonnummer, um anzurufen."
+    },
+    {
+      "id": "ruby:変更",
+      "ja": "変更",
+      "reading": "へんこう",
+      "category": "学校生活・行事",
+      "descriptionJa": "予定や内容を変えることです。",
+      "simpleJaText": "予定や内容を変えることです。",
+      "source": "ruby_dictionary",
+      "enText": "To change a plan or content.",
+      "ptText": "mudar",
+      "esText": "cambiar",
+      "viText": "thay đổi",
+      "zhText": "改变",
+      "koText": "변경",
+      "tlText": "pagbabago",
+      "idText": "mengubah",
+      "neText": "परिवर्तन",
+      "deText": "Das bedeutet, den Zeitplan oder die Inhalte zu ändern."
+    },
+    {
+      "id": "ruby:費用",
+      "ja": "費用",
+      "reading": "ひよう",
+      "category": "お金・手続き",
+      "descriptionJa": "必要なお金です。",
+      "simpleJaText": "必要なお金です。",
+      "source": "ruby_dictionary",
+      "enText": "The money needed for something.",
+      "ptText": "custo",
+      "esText": "costo",
+      "viText": "trị giá",
+      "zhText": "成本",
+      "koText": "비용",
+      "tlText": "gastos",
+      "idText": "biaya",
+      "neText": "लागत",
+      "deText": "Das ist das Geld, das ich brauche."
+    },
+    {
+      "id": "ruby:遅刻届",
+      "ja": "遅刻届",
+      "reading": "ちこくとどけ",
+      "category": "健康・安全",
+      "descriptionJa": "遅刻を知らせる紙です。",
+      "simpleJaText": "遅刻を知らせる紙です。",
+      "source": "ruby_dictionary",
+      "enText": "A form to report being late.",
+      "ptText": "Aviso de chegada tardia",
+      "esText": "Aviso de llegada tardía",
+      "viText": "Thông báo đến muộn",
+      "zhText": "迟到通知",
+      "koText": "지각신고",
+      "tlText": "Abiso ng nahuling pagdating",
+      "idText": "Pemberitahuan kedatangan terlambat",
+      "neText": "ढिलो आगमन सूचना",
+      "deText": "Dies ist eine Nachricht, um jemanden über seine Verspätung zu informieren."
+    },
+    {
+      "id": "ruby:早退届",
+      "ja": "早退届",
+      "reading": "そうたいとどけ",
+      "category": "健康・安全",
+      "descriptionJa": "早く帰ることを知らせる紙です。",
+      "simpleJaText": "早く帰ることを知らせる紙です。",
+      "source": "ruby_dictionary",
+      "enText": "A form to report leaving early.",
+      "ptText": "Aviso de partida antecipada",
+      "esText": "Notificación de salida anticipada",
+      "viText": "Thông báo về việc khởi hành sớm",
+      "zhText": "提前离境通知",
+      "koText": "조퇴신고",
+      "tlText": "Abiso ng maagang pag-alis",
+      "idText": "Pemberitahuan keberangkatan lebih awal",
+      "neText": "चाँडै प्रस्थानको सूचना",
+      "deText": "Dies ist eine kurze Mitteilung, um jemanden darüber zu informieren, dass ich früher abreisen werde."
     }
   ],
   "corrections": [
@@ -11402,288 +14305,505 @@ export const catalog = {
       "ja": "係数",
       "reading": "けいすう",
       "en": "coefficient",
-      "enText": "coefficient",
       "descriptionJa": "文字にかけられている数。3xの係数は3。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "coeficiente",
+      "esText": "coeficiente",
+      "viText": "hệ số",
+      "zhText": "系数",
+      "koText": "계수",
+      "tlText": "koepisyente",
+      "idText": "koefisien",
+      "neText": "गुणांक",
+      "deText": "Koeffizient",
+      "enText": "coefficient"
     },
     {
       "id": "math_002",
       "ja": "定数項",
       "reading": "ていすうこう",
       "en": "constant term",
-      "enText": "constant term",
       "descriptionJa": "文字を含まない項。3x+2の定数項は2。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "termo constante",
+      "esText": "término independiente",
+      "viText": "hạng tử tự do",
+      "zhText": "常数项",
+      "koText": "상수항",
+      "tlText": "konstanteng termino",
+      "idText": "suku konstanta",
+      "neText": "अचर पद",
+      "deText": "konstantes Glied",
+      "enText": "constant term"
     },
     {
       "id": "math_003",
       "ja": "一次方程式",
       "reading": "いちじほうていしき",
       "en": "linear equation",
-      "enText": "linear equation",
       "descriptionJa": "未知数の次数が1の方程式。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "equação do primeiro grau",
+      "esText": "ecuación de primer grado",
+      "viText": "phương trình bậc nhất",
+      "zhText": "一元一次方程",
+      "koText": "일차방정식",
+      "tlText": "ekwasyong linear",
+      "idText": "persamaan linear",
+      "neText": "रेखीय समीकरण",
+      "deText": "lineare Gleichung",
+      "enText": "linear equation"
     },
     {
       "id": "math_004",
       "ja": "二次方程式",
       "reading": "にじほうていしき",
       "en": "quadratic equation",
-      "enText": "quadratic equation",
       "descriptionJa": "未知数の最高次数が2の方程式。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "equação do segundo grau",
+      "esText": "ecuación de segundo grado",
+      "viText": "phương trình bậc hai",
+      "zhText": "一元二次方程",
+      "koText": "이차방정식",
+      "tlText": "ekwasyong kwadratiko",
+      "idText": "persamaan kuadrat",
+      "neText": "द्विघात समीकरण",
+      "deText": "quadratische Gleichung",
+      "enText": "quadratic equation"
     },
     {
       "id": "math_005",
       "ja": "連立方程式",
       "reading": "れんりつほうていしき",
       "en": "system of simultaneous equations",
-      "enText": "system of simultaneous equations",
       "descriptionJa": "同時に成り立つ複数の方程式。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "sistema de equações",
+      "esText": "sistema de ecuaciones",
+      "viText": "hệ phương trình",
+      "zhText": "方程组",
+      "koText": "연립방정식",
+      "tlText": "sistema ng mga ekwasyon",
+      "idText": "sistem persamaan",
+      "neText": "युगपत् समीकरण",
+      "deText": "lineares Gleichungssystem",
+      "enText": "system of simultaneous equations"
     },
     {
       "id": "math_006",
       "ja": "移項",
       "reading": "いこう",
       "en": "transposition",
-      "enText": "transposition",
       "descriptionJa": "等式の項を反対側へ移す操作。加減の符号が変わる。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "transposição de termos (com mudança de sinal)",
+      "esText": "transposición de términos (con cambio de signo)",
+      "viText": "chuyển vế (đổi dấu)",
+      "zhText": "移项（改变符号）",
+      "koText": "이항 (부호 변경)",
+      "tlText": "paglilipat ng termino sa kabilang panig (pagbabago ng tanda)",
+      "idText": "pemindahan suku ke ruas lain (mengubah tanda)",
+      "neText": "पदलाई अर्को पक्षमा सार्ने (चिह्न परिवर्तन गर्ने)",
+      "deText": "Umstellen einer Gleichung",
+      "enText": "transposition"
     },
     {
       "id": "math_007",
       "ja": "因数分解",
       "reading": "いんすうぶんかい",
       "en": "factorization",
-      "enText": "factorization",
       "descriptionJa": "式を因数の積の形に表すこと。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "fatoração",
+      "esText": "factorización",
+      "viText": "phân tích thành nhân tử",
+      "zhText": "因式分解",
+      "koText": "인수분해",
+      "tlText": "pagsasalik",
+      "idText": "faktorisasi",
+      "neText": "गुणनखण्डन",
+      "deText": "Faktorisierung",
+      "enText": "factorization"
     },
     {
       "id": "math_008",
       "ja": "平方根",
       "reading": "へいほうこん",
       "en": "square root",
-      "enText": "square root",
       "descriptionJa": "2乗すると元の数になる数。9の平方根は3と−3。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "raiz quadrada",
+      "esText": "raíz cuadrada",
+      "viText": "căn bậc hai",
+      "zhText": "平方根",
+      "koText": "제곱근",
+      "tlText": "ugat na parisukat",
+      "idText": "akar kuadrat",
+      "neText": "वर्गमूल",
+      "deText": "Quadratwurzel",
+      "enText": "square root"
     },
     {
       "id": "math_009",
       "ja": "正の平方根",
       "reading": "せいのへいほうこん",
       "en": "positive square root",
-      "enText": "positive square root",
       "descriptionJa": "平方根のうち正の数。√9は3を表す。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "raiz quadrada positiva",
+      "esText": "raíz cuadrada positiva",
+      "viText": "căn bậc hai dương",
+      "zhText": "正平方根",
+      "koText": "양의 제곱근",
+      "tlText": "positibong ugat na parisukat",
+      "idText": "akar kuadrat positif",
+      "neText": "धनात्मक वर्गमूल",
+      "deText": "positive Quadratwurzel",
+      "enText": "positive square root"
     },
     {
       "id": "math_010",
       "ja": "分母",
       "reading": "ぶんぼ",
       "en": "denominator",
-      "enText": "denominator",
       "descriptionJa": "分数の分数線の下にある数。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "denominador",
+      "esText": "denominador",
+      "viText": "mẫu số",
+      "zhText": "分母",
+      "koText": "분모",
+      "tlText": "denominador",
+      "idText": "penyebut",
+      "neText": "हर",
+      "deText": "Nenner",
+      "enText": "denominator"
     },
     {
       "id": "math_011",
       "ja": "分子",
       "reading": "ぶんし",
       "en": "numerator",
-      "enText": "numerator",
       "descriptionJa": "分数の分数線の上にある数。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "numerador",
+      "esText": "numerador",
+      "viText": "tử số",
+      "zhText": "分子",
+      "koText": "분자",
+      "tlText": "numerador",
+      "idText": "pembilang",
+      "neText": "अंश",
+      "deText": "Zähler",
+      "enText": "numerator"
     },
     {
       "id": "math_012",
       "ja": "約分",
       "reading": "やくぶん",
       "en": "reducing a fraction",
-      "enText": "reducing a fraction",
       "descriptionJa": "分子と分母を同じ0でない数で割り、分数を簡単にすること。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "simplificação de frações",
+      "esText": "simplificación de fracciones",
+      "viText": "rút gọn phân số",
+      "zhText": "约分",
+      "koText": "약분",
+      "tlText": "pagpapasimple ng mga praksyon",
+      "idText": "penyederhanaan pecahan",
+      "neText": "भिन्नको सरलीकरण",
+      "deText": "Kürzen eines Bruchs",
+      "enText": "reducing a fraction"
     },
     {
       "id": "math_013",
       "ja": "通分",
       "reading": "つうぶん",
       "en": "finding a common denominator",
-      "enText": "finding a common denominator",
       "descriptionJa": "複数の分数の分母をそろえること。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "redução ao mesmo denominador",
+      "esText": "reducción a un denominador común",
+      "viText": "quy đồng mẫu số",
+      "zhText": "通分",
+      "koText": "통분",
+      "tlText": "paggamit ng magkakaparehong denominador",
+      "idText": "menyamakan penyebut",
+      "neText": "समान हर बनाउने",
+      "deText": "Auf-einen-gemeinsamen-Nenner-Bringen",
+      "enText": "finding a common denominator"
     },
     {
       "id": "math_014",
       "ja": "比例",
       "reading": "ひれい",
       "en": "direct proportion",
-      "enText": "direct proportion",
       "descriptionJa": "y=axで表される関係。aは0でない定数。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "proporcionalidade direta",
+      "esText": "proporcionalidad directa",
+      "viText": "tỉ lệ thuận",
+      "zhText": "正比例",
+      "koText": "정비례",
+      "tlText": "tuwirang proporsyon",
+      "idText": "perbandingan senilai",
+      "neText": "प्रत्यक्ष समानुपात",
+      "deText": "direkte Proportionalität",
+      "enText": "direct proportion"
     },
     {
       "id": "math_015",
       "ja": "反比例",
       "reading": "はんぴれい",
       "en": "inverse proportion",
-      "enText": "inverse proportion",
       "descriptionJa": "y=a/xで表される関係。aは0でない定数。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "proporcionalidade inversa",
+      "esText": "proporcionalidad inversa",
+      "viText": "tỉ lệ nghịch",
+      "zhText": "反比例",
+      "koText": "반비례",
+      "tlText": "baligtarang proporsyon",
+      "idText": "perbandingan berbalik nilai",
+      "neText": "व्युत्क्रम समानुपात",
+      "deText": "umgekehrte Proportionalität",
+      "enText": "inverse proportion"
     },
     {
       "id": "math_016",
       "ja": "傾き",
       "reading": "かたむき",
       "en": "slope",
-      "enText": "slope",
       "descriptionJa": "一次関数で、xの増加量に対するyの増加量の割合。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "coeficiente angular (inclinação da reta)",
+      "esText": "pendiente de la recta",
+      "viText": "hệ số góc",
+      "zhText": "斜率",
+      "koText": "기울기",
+      "tlText": "slope ng tuwid na linya",
+      "idText": "gradien garis",
+      "neText": "रेखाको ढलान",
+      "deText": "Steigung",
+      "enText": "slope"
     },
     {
       "id": "math_017",
       "ja": "切片",
       "reading": "せっぺん",
       "en": "intercept",
-      "enText": "intercept",
       "descriptionJa": "グラフが座標軸と交わる位置の座標。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "intercepto no eixo y",
+      "esText": "ordenada al origen",
+      "viText": "tung độ gốc",
+      "zhText": "纵截距",
+      "koText": "y절편",
+      "tlText": "y-intercept",
+      "idText": "titik potong sumbu y",
+      "neText": "y-अन्तःखण्ड",
+      "deText": "y-Achsenabschnitt",
+      "enText": "intercept"
     },
     {
       "id": "math_018",
       "ja": "合同",
       "reading": "ごうどう",
       "en": "congruence",
-      "enText": "congruence",
       "descriptionJa": "形も大きさも同じで、重ね合わせられること。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "congruência",
+      "esText": "congruencia",
+      "viText": "bằng nhau (hình học)",
+      "zhText": "全等",
+      "koText": "합동",
+      "tlText": "pagkakapareho ng hugis at sukat",
+      "idText": "kongruensi",
+      "neText": "सर्वाङ्गसमता",
+      "deText": "Kongruenz",
+      "enText": "congruence"
     },
     {
       "id": "math_019",
       "ja": "相似",
       "reading": "そうじ",
       "en": "similarity",
-      "enText": "similarity",
       "descriptionJa": "拡大または縮小すると重ね合わせられる形の関係。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "semelhança",
+      "esText": "semejanza",
+      "viText": "đồng dạng",
+      "zhText": "相似",
+      "koText": "닮음",
+      "tlText": "pagkakatulad ng hugis",
+      "idText": "kesebangunan",
+      "neText": "समरूपता",
+      "deText": "Ähnlichkeit",
+      "enText": "similarity"
     },
     {
       "id": "math_020",
       "ja": "三平方の定理",
       "reading": "さんへいほうのていり",
       "en": "Pythagorean theorem",
-      "enText": "Pythagorean theorem",
       "descriptionJa": "直角三角形で、斜辺をcとするとa²+b²=c²が成り立つ。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "teorema de Pitágoras",
+      "esText": "teorema de Pitágoras",
+      "viText": "định lý Pythagore",
+      "zhText": "勾股定理",
+      "koText": "피타고라스 정리",
+      "tlText": "teorema ni Pythagoras",
+      "idText": "teorema Pythagoras",
+      "neText": "पाइथागोरसको प्रमेय",
+      "deText": "Satz des Pythagoras",
+      "enText": "Pythagorean theorem"
     },
     {
       "id": "math_021",
       "ja": "不等式",
       "reading": "ふとうしき",
       "en": "inequality",
-      "enText": "inequality",
       "descriptionJa": "大小関係を不等号で表した式。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "inequação",
+      "esText": "inecuación",
+      "viText": "bất phương trình",
+      "zhText": "不等式",
+      "koText": "부등식",
+      "tlText": "di-pagkakapantay",
+      "idText": "pertidaksamaan",
+      "neText": "असमीकरण",
+      "deText": "Ungleichung",
+      "enText": "inequality"
     },
     {
       "id": "math_022",
       "ja": "中央値",
       "reading": "ちゅうおうち",
       "en": "median",
-      "enText": "median",
       "descriptionJa": "データを小さい順に並べたときの中央の値。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "mediana",
+      "esText": "mediana",
+      "viText": "trung vị",
+      "zhText": "中位数",
+      "koText": "중앙값",
+      "tlText": "medyan",
+      "idText": "median",
+      "neText": "मध्यक",
+      "deText": "Median",
+      "enText": "median"
     },
     {
       "id": "math_023",
       "ja": "最頻値",
       "reading": "さいひんち",
       "en": "mode",
-      "enText": "mode",
       "descriptionJa": "データで最も多く現れる値。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "moda",
+      "esText": "moda",
+      "viText": "mốt",
+      "zhText": "众数",
+      "koText": "최빈값",
+      "tlText": "moda",
+      "idText": "modus",
+      "neText": "बहुलक",
+      "deText": "Modalwert",
+      "enText": "mode"
     },
     {
       "id": "math_024",
       "ja": "確率",
       "reading": "かくりつ",
       "en": "probability",
-      "enText": "probability",
       "descriptionJa": "ある事象が起こる見込みを数で表したもの。",
-      "category": "数学",
+      "category": "授業・勉強",
       "subject": "math",
       "status": "approved",
-      "source": "通訳君 初期数学辞書"
+      "source": "通訳君 初期数学辞書",
+      "ptText": "probabilidade",
+      "esText": "probabilidad",
+      "viText": "xác suất",
+      "zhText": "概率",
+      "koText": "확률",
+      "tlText": "probabilidad",
+      "idText": "peluang",
+      "neText": "सम्भाव्यता",
+      "deText": "Wahrscheinlichkeit",
+      "enText": "probability"
     }
-  ]
+  ],
+  "databaseVersion": "20261020-german-fallback-1"
 };
