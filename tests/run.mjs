@@ -1,3 +1,4 @@
+import './ui-english.mjs';
 import {wordStats,validateWordEvents} from '../server/word-stats.js';
 import {SharedWordUsage} from '../web/shared-word-usage.js';
 import './reviewed-memory.mjs';

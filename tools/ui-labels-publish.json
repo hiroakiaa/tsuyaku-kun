@@ -1,0 +1,6026 @@
+{
+  "・新しい授業ログはまだありません。": {
+    "en": "There are no new lesson logs yet.",
+    "source": "ui_translations!424"
+  },
+  "・新しい授業ログを表示しました。": {
+    "en": "・A new lesson log has been displayed.",
+    "source": "ui_translations!421"
+  },
+  "「それ」などは、何を指すかを書き足すと誤訳が減ります。": {
+    "en": "Adding a description of what \"it\" refers to will reduce mistranslations.",
+    "source": "ui_translations!75"
+  },
+  "「接続を確認」で診断できます。": {
+    "en": "Choose Check connection for diagnostics.",
+    "source": "通訳君 画面表記"
+  },
+  "「通訳する」では、先生から保護者へ、保護者から先生へを切り替えて使います。": {
+    "en": "The phrase \"to interpret\" is used when switching between communication from the teacher to the parent and from the parent to the teacher.",
+    "source": "ui_translations!282"
+  },
+  "① じぶんのことば / Your language": {
+    "en": "1. My language",
+    "source": "通訳君 画面表記"
+  },
+  "1つずつ分けると、相手が行動しやすくなります。": {
+    "en": "Dividing it into individual parts makes it easier for the other person to take action.",
+    "source": "ui_translations!72"
+  },
+  "1文を短く分けると、翻訳が安定します。": {
+    "en": "Breaking down sentences into shorter ones improves the accuracy of the translation.",
+    "source": "ui_translations!69"
+  },
+  "② ルームID / Room ID": {
+    "en": "2. Room ID",
+    "source": "通訳君 画面表記"
+  },
+  "50分経過したため停止しました。「自動取得」で再開できます。": {
+    "en": "The process has stopped because 50 minutes have elapsed. You can resume it by selecting \"Automatic Acquisition\".",
+    "source": "ui_translations!830"
+  },
+  "60日より前のログを非表示にする": {
+    "en": "Hide logs older than 60 days.",
+    "source": "ui_translations!662"
+  },
+  "60日より前の授業ログを画面に出ない状態にし、処理済みの補正候補を整理します。": {
+    "en": "Class logs older than 60 days will be hidden from the screen, and processed correction candidates will be organized.",
+    "source": "ui_translations!632"
+  },
+  "after": {
+    "en": "After",
+    "source": "ui_translations!857"
+  },
+  "aid": {
+    "en": "A",
+    "source": "ui_translations!853"
+  },
+  "AIエラーコードを観測": {
+    "en": "AI error code observed",
+    "source": "通訳君 画面表記"
+  },
+  "AIサービスのアクセス拒否": {
+    "en": "AI access denied",
+    "source": "通訳君 画面表記"
+  },
+  "AIサービスの混雑": {
+    "en": "AI service busy",
+    "source": "通訳君 画面表記"
+  },
+  "AIサービス側の制限を検知したため、本日のAI処理は停止中です。": {
+    "en": "AI is stopped today because the provider reported a limit.",
+    "source": "通訳君 画面表記"
+  },
+  "AIなしで訳せた割合：": {
+    "en": "Share translated without AI:",
+    "source": "通訳君 画面表記"
+  },
+  "AIの無料枠上限": {
+    "en": "AI allowance limit",
+    "source": "通訳君 画面表記"
+  },
+  "AIへの入力形式": {
+    "en": "AI input format",
+    "source": "通訳君 画面表記"
+  },
+  "AIモデルの有料プラン要件": {
+    "en": "AI model requires a paid plan",
+    "source": "通訳君 画面表記"
+  },
+  "AIモデルの利用不可": {
+    "en": "AI model unavailable",
+    "source": "通訳君 画面表記"
+  },
+  "AI応答の解析": {
+    "en": "Parse AI response",
+    "source": "通訳君 画面表記"
+  },
+  "AI応答の待ち時間": {
+    "en": "AI response wait",
+    "source": "通訳君 画面表記"
+  },
+  "AI処理の時間切れ": {
+    "en": "AI timeout",
+    "source": "通訳君 画面表記"
+  },
+  "AI側の報告・残量は未確認": {
+    "en": "Provider report; balance unverified",
+    "source": "通訳君 画面表記"
+  },
+  "AI側は上限を報告しています。管理画面の当日残量・アカウント・時刻と照合してください。この診断だけで実際の残量は断定しません。": {
+    "en": "The provider reported a limit. Check today's account and budget; this diagnosis does not prove the balance.",
+    "source": "通訳君 画面表記"
+  },
+  "AI内部エラー": {
+    "en": "AI internal error",
+    "source": "通訳君 画面表記"
+  },
+  "AI予算の確保": {
+    "en": "Reserve AI budget",
+    "source": "通訳君 画面表記"
+  },
+  "AI予算の精算": {
+    "en": "Settle AI budget",
+    "source": "通訳君 画面表記"
+  },
+  "AI利用の停止上限": {
+    "en": "AI safety limits",
+    "source": "通訳君 画面表記"
+  },
+  "AI料金表": {
+    "en": "AI pricing",
+    "source": "通訳君 画面表記"
+  },
+  "Android": {
+    "en": "Android",
+    "source": "ui_translations!570"
+  },
+  "AndroidやPCでは、マイクボタンで入力できます。動かない場合はキーボードのマイクを使ってください。": {
+    "en": "On Android and PC, you can input using the microphone button. If it doesn't work, please use the microphone on your keyboard.",
+    "source": "ui_translations!578"
+  },
+  "APIが成功してからルーム作成、相手の参加、WebSocket、最後に音声のTURN経路を順に確認する。": {
+    "en": "Check API, room creation, joining, WebSocket, then audio relay.",
+    "source": "通訳君 画面表記"
+  },
+  "APIの通常通信": {
+    "en": "Normal API request",
+    "source": "通訳君 画面表記"
+  },
+  "APIの認証ヘッダー付き通信": {
+    "en": "API request with authentication header",
+    "source": "通訳君 画面表記"
+  },
+  "approvedにした候補を、よく使う文カードに追加します。": {
+    "en": "The candidates you've marked as approved will be added to your frequently used phrase cards.",
+    "source": "ui_translations!786"
+  },
+  "Cloudflareの無料枠残高や請求額ではありません。「本日の利用」は処理中の予約と失敗時の確保分も含む予算消費額です。実際の請求額ではありません。TURN・外部音声認識・サーバー保存等は別です。認証IDが変わると端末側の値も変わります。": {
+    "en": "This is the app's reserved budget, not a Cloudflare bill or free balance. Relay, external recognition and storage are separate.",
+    "source": "通訳君 画面表記"
+  },
+  "CORSの詳細な拒否理由": {
+    "en": "Detailed CORS rejection reason",
+    "source": "通訳君 画面表記"
+  },
+  "DNSの解決結果": {
+    "en": "DNS results",
+    "source": "通訳君 画面表記"
+  },
+  "enroll": {
+    "en": "Enroll",
+    "source": "ui_translations!851"
+  },
+  "Firebaseルール案": {
+    "en": "Proposed Firebase rules",
+    "source": "ui_translations!749"
+  },
+  "health": {
+    "en": "Health",
+    "source": "ui_translations!856"
+  },
+  "HTTPエラー": {
+    "en": "HTTP error",
+    "source": "通訳君 画面表記"
+  },
+  "HTTP状態のみ確定": {
+    "en": "HTTP status confirmed only",
+    "source": "通訳君 画面表記"
+  },
+  "iPhone / iPad": {
+    "en": "IPhone / iPad",
+    "source": "ui_translations!569"
+  },
+  "iPhone/iPadでは入力欄を選び、キーボードのマイクで話してください。": {
+    "en": "On iPhone/iPad, select the input field and speak into the keyboard's microphone.",
+    "source": "ui_translations!586"
+  },
+  "JSONを保存": {
+    "en": "Save JSON",
+    "source": "通訳君 画面表記"
+  },
+  "network_or_corsはブラウザーが理由を開示しない通信失敗。学校の制限・DNS・TLS・CORSのどれかは、この値だけでは断定できません。接続キー・token・発言・氏名は含みません。": {
+    "en": "The browser hid the failure reason. This code does not identify whether filters, DNS, TLS or CORS caused it.",
+    "source": "通訳君 画面表記"
+  },
+  "payment": {
+    "en": "Payment",
+    "source": "ui_translations!855"
+  },
+  "PC": {
+    "en": "PC",
+    "source": "ui_translations!567"
+  },
+  "PCの開発者ツールのNetwork/Consoleで失敗したリクエストのHTTP状態・CORS表示・証明書エラーを確認する。共有時はAuthorization・token・招待URL・本文を削除する。": {
+    "en": "Check HTTP, CORS and certificate errors in developer tools. Remove tokens, invite links and conversation text before sharing.",
+    "source": "通訳君 画面表記"
+  },
+  "QRコードが出る前の失敗は、参加の認証やルーム作成の通信が原因です。音声中継（TURN）より前の段階です。": {
+    "en": "A failure before the QR code concerns sign-in or room setup, before audio relay.",
+    "source": "通訳君 画面表記"
+  },
+  "support": {
+    "en": "Support",
+    "source": "ui_translations!852"
+  },
+  "TLS証明書・ハンドシェイク": {
+    "en": "TLS certificate & handshake",
+    "source": "通訳君 画面表記"
+  },
+  "transfer": {
+    "en": "Transfer",
+    "source": "ui_translations!854"
+  },
+  "TURN情報を取得できないため、音声中継の利用を確認できません。": {
+    "en": "TURN credentials are unavailable; audio relay cannot be confirmed.",
+    "source": "通訳君 画面表記"
+  },
+  "TURN接続情報の取得": {
+    "en": "TURN credentials",
+    "source": "通訳君 画面表記"
+  },
+  "TURN料金表": {
+    "en": "TURN pricing",
+    "source": "通訳君 画面表記"
+  },
+  "アクセスの拒否": {
+    "en": "Access denied",
+    "source": "通訳君 画面表記"
+  },
+  "あとで": {
+    "en": "Later",
+    "source": "ruby_dictionary!287"
+  },
+  "あなた": {
+    "en": "You",
+    "source": "通訳君 画面表記"
+  },
+  "あなたのよく使う文": {
+    "en": "Your phrases",
+    "source": "通訳君 画面表記"
+  },
+  "あなたの端末": {
+    "en": "Your device",
+    "source": "通訳君 画面表記"
+  },
+  "アプリ全体を母語で表示する": {
+    "en": "Display the entire app in your native language.",
+    "source": "ui_translations!27"
+  },
+  "アプリ内で観測": {
+    "en": "Observed in the app",
+    "source": "通訳君 画面表記"
+  },
+  "アプリ内マイク対応": {
+    "en": "In-app microphone support",
+    "source": "ui_translations!571"
+  },
+  "アプリ用の応答ではありません": {
+    "en": "Unexpected app response",
+    "source": "通訳君 画面表記"
+  },
+  "アレルギー": {
+    "en": "Allergy",
+    "source": "ui_translations!100"
+  },
+  "アンケート": {
+    "en": "Questionnaire",
+    "source": "ruby_dictionary!542"
+  },
+  "いつもより": {
+    "en": "More than",
+    "source": "ruby_dictionary!331"
+  },
+  "いつも通り": {
+    "en": "As usual",
+    "source": "ruby_dictionary!555"
+  },
+  "イベントを観測・原因は未確定": {
+    "en": "Event observed; cause unknown",
+    "source": "通訳君 画面表記"
+  },
+  "いやなこと": {
+    "en": "Unpleasant things",
+    "source": "ruby_dictionary!472"
+  },
+  "インドネシア語": {
+    "en": "Indonesian",
+    "source": "ui_translations!443"
+  },
+  "うまく伝わらないときは、1文を短くして、名前や日時を分けて書くと翻訳しやすくなります。": {
+    "en": "If you're having trouble getting your point across, try shortening sentences and separating names and dates; this will make them easier to translate.",
+    "source": "ui_translations!55"
+  },
+  "エプロン": {
+    "en": "Apron",
+    "source": "ruby_dictionary!91"
+  },
+  "エラー": {
+    "en": "Error",
+    "source": "ui_translations!152"
+  },
+  "えんぴつ": {
+    "en": "Pencil",
+    "source": "ruby_dictionary!300"
+  },
+  "えんぴつなど": {
+    "en": "Pencils, etc.",
+    "source": "ruby_dictionary!301"
+  },
+  "おうちの人": {
+    "en": "Parents",
+    "source": "ui_translations!237"
+  },
+  "おはよう": {
+    "en": "Good morning",
+    "source": "ruby_dictionary!556"
+  },
+  "お願いが多めです": {
+    "en": "I have quite a few requests.",
+    "source": "ui_translations!71"
+  },
+  "お願いします": {
+    "en": "Please",
+    "source": "ruby_dictionary!19"
+  },
+  "お金": {
+    "en": "Money",
+    "source": "ui_translations!102"
+  },
+  "お金・手続き": {
+    "en": "Payments & forms",
+    "source": "ui_translations!845"
+  },
+  "お迎え": {
+    "en": "Pick-up",
+    "source": "ruby_dictionary!9"
+  },
+  "お子さんと一緒": {
+    "en": "With your",
+    "source": "ruby_dictionary!363"
+  },
+  "お知らせ": {
+    "en": "Notice",
+    "source": "ruby_dictionary!39"
+  },
+  "お知らせください": {
+    "en": "Please let",
+    "source": "ruby_dictionary!311"
+  },
+  "お弁当が必要": {
+    "en": "I need",
+    "source": "ruby_dictionary!298"
+  },
+  "お弁当を持たせてください": {
+    "en": "Please pack",
+    "source": "ruby_dictionary!299"
+  },
+  "カテゴリ：": {
+    "en": "Category:",
+    "source": "ui_translations!322"
+  },
+  "カテゴリー": {
+    "en": "Category",
+    "source": "ui_translations!479"
+  },
+  "カテゴリー：": {
+    "en": "Category:",
+    "source": "ui_translations!218"
+  },
+  "かなり大きめ": {
+    "en": "Quite large",
+    "source": "ui_translations!680"
+  },
+  "キーボードのマイクで話してください。": {
+    "en": "Please speak into the microphone on your keyboard.",
+    "source": "ui_translations!385"
+  },
+  "キーボードマイク推奨": {
+    "en": "Keyboard and microphone recommended",
+    "source": "ui_translations!572"
+  },
+  "くわしいこと": {
+    "en": "Details",
+    "source": "ruby_dictionary!305"
+  },
+  "くわしい状況": {
+    "en": "Detailed situation",
+    "source": "ruby_dictionary!328"
+  },
+  "くわしい内容": {
+    "en": "Detailed information",
+    "source": "ruby_dictionary!303"
+  },
+  "けが": {
+    "en": "Injury",
+    "source": "ui_translations!535"
+  },
+  "けが、病気、アレルギー、お金、進路、個人情報に関する内容は、人が確認してください。": {
+    "en": "Information regarding injuries, illnesses, allergies, finances, career paths, and personal information must be verified by a human.",
+    "source": "ui_translations!285"
+  },
+  "けんか": {
+    "en": "Fight",
+    "source": "ruby_dictionary!469"
+  },
+  "ゴーグル": {
+    "en": "Goggles",
+    "source": "ruby_dictionary!456"
+  },
+  "ここから新着": {
+    "en": "New arrivals start here",
+    "source": "ui_translations!611"
+  },
+  "ここを選んで、キーボードのマイクで話してください。話すと入力されますが、3秒空白が続くと、それまでの内容を生徒側に送られて、翻訳されます。": {
+    "en": "Select this option and speak into the keyboard microphone. Your speech will be entered, but if there is a 3-second pause, the content up to that point will be sent to the student and translated.",
+    "source": "ui_translations!310"
+  },
+  "ことば・訳の候補": {
+    "en": "Word suggestion",
+    "source": "通訳君 画面表記"
+  },
+  "ことばでつながる学校生活": {
+    "en": "School life connected through words",
+    "source": "ui_translations!277"
+  },
+  "ことばの意味": {
+    "en": "Meaning of words",
+    "source": "ui_translations!210"
+  },
+  "ことばを検索": {
+    "en": "Search words",
+    "source": "通訳君 画面表記"
+  },
+  "ことばを調べる": {
+    "en": "Searching for words",
+    "source": "ui_translations!818"
+  },
+  "ことばを入力して送る": {
+    "en": "Type and send",
+    "source": "通訳君 画面表記"
+  },
+  "ことば辞書": {
+    "en": "Word dictionary",
+    "source": "ui_translations!4"
+  },
+  "このログを削除": {
+    "en": "Delete this log",
+    "source": "ui_translations!386"
+  },
+  "この確認ではAPIへ接続できました。認証やルーム作成そのものの成功までは保証しません。": {
+    "en": "The API responded. Sign-in and room creation still need checking.",
+    "source": "通訳君 画面表記"
+  },
+  "この言語で参加 / Join": {
+    "en": "Join in this language",
+    "source": "通訳君 画面表記"
+  },
+  "この言語で進む": {
+    "en": "Proceed in this language",
+    "source": "ui_translations!14"
+  },
+  "この言語の音声が使えません。端末の読み上げ設定で、この言語の音声を追加してください。": {
+    "en": "Add this language's voice in the device's speech settings.",
+    "source": "通訳君 画面表記"
+  },
+  "この言語の訳はスプレッドシートにまだ登録されていません。": {
+    "en": "This translation is not in the spreadsheet yet.",
+    "source": "通訳君 画面表記"
+  },
+  "この使い方なら、あとどのくらい？": {
+    "en": "How much more can I use?",
+    "source": "通訳君 画面表記"
+  },
+  "この端末・直近90日の利用ランキングです。辞書はカードを開いた回数、会話は確定した原文1件につき同じことばを1回数えます。再送・修正は重複計上しません。": {
+    "en": "Local ranking for the last 90 days. Cards count opens; conversations count each word once per final caption.",
+    "source": "通訳君 画面表記"
+  },
+  "この端末からAPIへ正常に接続できない項目があります。結果をコピーして、このチャットへ貼り付けてください。": {
+    "en": "Some API checks failed. Copy the results into this chat.",
+    "source": "通訳君 画面表記"
+  },
+  "この端末では読み上げを使えません。": {
+    "en": "Speech playback is unavailable on this device.",
+    "source": "通訳君 画面表記"
+  },
+  "この端末では入力欄を選び、キーボードのマイクで話してください。": {
+    "en": "On this device, select an input field and speak into the keyboard's microphone.",
+    "source": "ui_translations!577"
+  },
+  "この端末で記録した利用の目安です。": {
+    "en": "Estimated use recorded on this device.",
+    "source": "通訳君 画面表記"
+  },
+  "この端末で利用中": {
+    "en": "Using this device",
+    "source": "通訳君 画面表記"
+  },
+  "この端末の用語集計を削除しますか？": {
+    "en": "Reset this device's word counts?",
+    "source": "通訳君 画面表記"
+  },
+  "この端末の利用履歴と、無料枠適用前の変動費の目安です。パスワードは画面を開くための端末内の確認です。": {
+    "en": "Local usage and estimated variable costs before free allowances. This password only locks this device's admin view.",
+    "source": "通訳君 画面表記"
+  },
+  "この文をもう一度翻訳します。": {
+    "en": "Translate this sentence again.",
+    "source": "通訳君 画面表記"
+  },
+  "この文を再試行": {
+    "en": "Retry this sentence",
+    "source": "通訳君 画面表記"
+  },
+  "この訳を覚える": {
+    "en": "Remember translation",
+    "source": "通訳君 画面表記"
+  },
+  "コピーしました": {
+    "en": "Copied",
+    "source": "ui_translations!62"
+  },
+  "コピーする": {
+    "en": "Copy",
+    "source": "ui_translations!121"
+  },
+  "これから進む学校や仕事のこと": {
+    "en": "Things about school and work that you will be doing in the future",
+    "source": "ui_translations!91"
+  },
+  "コンパス": {
+    "en": "Compass",
+    "source": "ruby_dictionary!376"
+  },
+  "ご確認ください": {
+    "en": "Please check",
+    "source": "ruby_dictionary!20"
+  },
+  "ご了承ください": {
+    "en": "Note that",
+    "source": "ruby_dictionary!21"
+  },
+  "サーバーの辞書検索": {
+    "en": "Server dictionary lookup",
+    "source": "通訳君 画面表記"
+  },
+  "サーバーの本日の利用上限に達しています。日本時間の翌朝9時以降に再度お試しください。": {
+    "en": "Daily server limit reached. Try after 9 am Japan time tomorrow.",
+    "source": "通訳君 画面表記"
+  },
+  "サーバー音声認識：従量課金対象": {
+    "en": "Server speech recognition: usage-based cost",
+    "source": "通訳君 画面表記"
+  },
+  "サーバー側のエラー": {
+    "en": "Server error",
+    "source": "通訳君 画面表記"
+  },
+  "サーバー認証": {
+    "en": "Server authentication",
+    "source": "通訳君 画面表記"
+  },
+  "シート上で翻訳が終わった数式を文字として固定します。": {
+    "en": "The translated formulas are fixed as text on the sheet.",
+    "source": "ui_translations!779"
+  },
+  "じしょ": {
+    "en": "Dictionary",
+    "source": "通訳君 画面表記"
+  },
+  "じぶんが話すことば": {
+    "en": "My language",
+    "source": "通訳君 画面表記"
+  },
+  "じぶんが話すことば / Your language": {
+    "en": "My language",
+    "source": "通訳君 画面表記"
+  },
+  "じぶんだけホームにもどる": {
+    "en": "Leave class",
+    "source": "通訳君 画面表記"
+  },
+  "じぶんのことば": {
+    "en": "My language",
+    "source": "通訳君 画面表記"
+  },
+  "じぶんのことば / Your language": {
+    "en": "My language",
+    "source": "通訳君 画面表記"
+  },
+  "ジャージ": {
+    "en": "Jersey",
+    "source": "ruby_dictionary!80"
+  },
+  "じゅぎょう": {
+    "en": "Class",
+    "source": "通訳君 画面表記"
+  },
+  "スクールカウンセラー": {
+    "en": "School counselor",
+    "source": "ruby_dictionary!127"
+  },
+  "スプーン": {
+    "en": "Spoon",
+    "source": "ruby_dictionary!385"
+  },
+  "スプレッドシートに候補を追加しました。": {
+    "en": "Suggestion saved to the spreadsheet.",
+    "source": "通訳君 画面表記"
+  },
+  "スペイン語": {
+    "en": "Spanish",
+    "source": "ui_translations!434"
+  },
+  "すべて": {
+    "en": "All",
+    "source": "ui_translations!299"
+  },
+  "すり傷": {
+    "en": "Scratch",
+    "source": "ruby_dictionary!416"
+  },
+  "せき": {
+    "en": "Cough",
+    "source": "ruby_dictionary!411"
+  },
+  "その他": {
+    "en": "Others",
+    "source": "ui_translations!467"
+  },
+  "タオル": {
+    "en": "Towel",
+    "source": "ruby_dictionary!445"
+  },
+  "タガログ語": {
+    "en": "Tagalog",
+    "source": "ui_translations!438"
+  },
+  "タグを選ぶ": {
+    "en": "Select a tag",
+    "source": "ui_translations!303"
+  },
+  "チェックしてください": {
+    "en": "Please check",
+    "source": "ruby_dictionary!508"
+  },
+  "つうやく": {
+    "en": "Translate",
+    "source": "通訳君 画面表記"
+  },
+  "つうわ": {
+    "en": "Call",
+    "source": "通訳君 画面表記"
+  },
+  "ティッシュ": {
+    "en": "Tissue",
+    "source": "ruby_dictionary!369"
+  },
+  "ていねいな表現が長めです": {
+    "en": "The polite expressions are rather long.",
+    "source": "ui_translations!606"
+  },
+  "データの状態": {
+    "en": "Data status",
+    "source": "ui_translations!245"
+  },
+  "データ健康診断": {
+    "en": "Data Health Check",
+    "source": "ui_translations!138"
+  },
+  "できるだけ早く": {
+    "en": "As soon",
+    "source": "ruby_dictionary!322"
+  },
+  "テスト": {
+    "en": "Test",
+    "source": "ruby_dictionary!596"
+  },
+  "テンプレートはまだありません。": {
+    "en": "There are no templates yet.",
+    "source": "ui_translations!772"
+  },
+  "テンプレート再利用": {
+    "en": "Reuse templates",
+    "source": "ui_translations!764"
+  },
+  "テンプレート素材": {
+    "en": "Template materials",
+    "source": "ui_translations!762"
+  },
+  "テンプレート素材シートの文を翻訳バンクに登録します。": {
+    "en": "The text from the template material sheet will be registered in the translation bank.",
+    "source": "ui_translations!785"
+  },
+  "テンプレート素材シートを用意": {
+    "en": "Prepare a template material sheet.",
+    "source": "ui_translations!765"
+  },
+  "テンプレート素材シートを用意しています…": {
+    "en": "We have prepared a template material sheet...",
+    "source": "ui_translations!767"
+  },
+  "テンプレート素材シートを用意できませんでした。": {
+    "en": "The template material sheet could not be prepared.",
+    "source": "ui_translations!768"
+  },
+  "テンプレート素材を取り込む": {
+    "en": "Import template materials",
+    "source": "ui_translations!766"
+  },
+  "テンプレート素材を取り込めませんでした。": {
+    "en": "The template material could not be imported.",
+    "source": "ui_translations!769"
+  },
+  "テンプレート素材を取り込んでいます…": {
+    "en": "Importing template materials...",
+    "source": "ui_translations!776"
+  },
+  "で表示する": {
+    "en": "Display",
+    "source": "ui_translations!29"
+  },
+  "ドイツ語": {
+    "en": "German",
+    "source": "通訳君 画面表記"
+  },
+  "とき": {
+    "en": "Time",
+    "source": "ruby_dictionary!277"
+  },
+  "なくしました": {
+    "en": "I lost",
+    "source": "ruby_dictionary!479"
+  },
+  "ナフキン": {
+    "en": "Napkin",
+    "source": "ruby_dictionary!89"
+  },
+  "に入室しました。授業ログを自動取得しています。": {
+    "en": "You have entered the classroom. The class log is being automatically retrieved.",
+    "source": "ui_translations!418"
+  },
+  "に入室しました。授業ログを自動取得しています。役割を変えるときは退室してください。": {
+    "en": "You have entered the room. The class log is being automatically retrieved. Please leave the room if you wish to change roles.",
+    "source": "ui_translations!519"
+  },
+  "に入室しました。授業内容を取得しています。": {
+    "en": "I have entered the classroom. I am acquiring the lesson content.",
+    "source": "ui_translations!826"
+  },
+  "に入室中・": {
+    "en": "Currently in the room.",
+    "source": "ui_translations!420"
+  },
+  "に入室中です。ルームIDを生徒に伝えてください。": {
+    "en": "The room is currently occupied. Please inform the student of the room ID.",
+    "source": "ui_translations!827"
+  },
+  "に入室中です。生徒に伝えて、「授業開始（外部マイク使用）」を押してください。": {
+    "en": "The classroom is currently open. Please inform the students and press \"Start Lesson (Use External Microphone)\".",
+    "source": "ui_translations!794"
+  },
+  "に入室中です。生徒に伝えて、「授業開始（外部マイク使用）」を押してください。役割を変えるときは退室してください。": {
+    "en": "I am currently in the room. Please inform the students and press \"Start Lesson (Use External Microphone)\". Please leave the room when you change roles.",
+    "source": "ui_translations!796"
+  },
+  "に入室中です。生徒に伝えて、授業開始ボタンを押してください。": {
+    "en": "The classroom is currently occupied. Please inform the students and press the \"Start Class\" button.",
+    "source": "ui_translations!417"
+  },
+  "に入室中です。生徒に伝えて、授業開始ボタンを押してください。役割を変えるときは退室してください。": {
+    "en": "The room is currently occupied. Please inform the students and press the start lesson button. Please leave the room when changing roles.",
+    "source": "ui_translations!554"
+  },
+  "ネットワーク管理者に下記接続先のDNS解決・HTTPS/TLS・フィルターの拒否ログを確認してもらう。": {
+    "en": "Ask the network administrator to check DNS, HTTPS/TLS and filter logs for these endpoints.",
+    "source": "通訳君 画面表記"
+  },
+  "ネパール語": {
+    "en": "Nepali",
+    "source": "ui_translations!445"
+  },
+  "ノート": {
+    "en": "Notebook",
+    "source": "ruby_dictionary!378"
+  },
+  "のり": {
+    "en": "Glue",
+    "source": "ruby_dictionary!654"
+  },
+  "の授業内容": {
+    "en": "Course content",
+    "source": "ui_translations!801"
+  },
+  "はい、翻訳する": {
+    "en": "Yes, translate",
+    "source": "ui_translations!221"
+  },
+  "はさみ": {
+    "en": "Scissors",
+    "source": "ruby_dictionary!653"
+  },
+  "バス": {
+    "en": "Bus",
+    "source": "ruby_dictionary!434"
+  },
+  "パスワード": {
+    "en": "Password",
+    "source": "通訳君 画面表記"
+  },
+  "パスワードを確認してください。": {
+    "en": "Check the password.",
+    "source": "通訳君 画面表記"
+  },
+  "ハンカチ": {
+    "en": "Handkerchief",
+    "source": "ruby_dictionary!368"
+  },
+  "はんこ": {
+    "en": "Hanko",
+    "source": "ruby_dictionary!495"
+  },
+  "ビニール袋": {
+    "en": "Plastic bag",
+    "source": "ruby_dictionary!443"
+  },
+  "ひらく": {
+    "en": "Open",
+    "source": "通訳君 画面表記"
+  },
+  "フィリピノ語": {
+    "en": "Filipino",
+    "source": "ui_translations!441"
+  },
+  "フィルター画面・プロキシ・想定外の応答": {
+    "en": "Filter, proxy or unexpected response",
+    "source": "通訳君 画面表記"
+  },
+  "プールカード": {
+    "en": "Pool card",
+    "source": "ruby_dictionary!457"
+  },
+  "フォーク": {
+    "en": "Fork",
+    "source": "ruby_dictionary!386"
+  },
+  "フォーム": {
+    "en": "Form",
+    "source": "ruby_dictionary!543"
+  },
+  "ブラウザーのfetchは通信失敗の詳細を公開しません。network_or_corsだけでは原因を確定できません。過去の失敗記録は現在の障害を証明しません。健康確認はルームを作成せず、音声・WebSocketも検査しません。": {
+    "en": "Browser network details are limited. Past failures do not prove a current fault. A health check does not test rooms or audio.",
+    "source": "通訳君 画面表記"
+  },
+  "ブラウザー音声認識": {
+    "en": "Browser speech recognition",
+    "source": "通訳君 画面表記"
+  },
+  "ブラウザー音声認識：アプリの認識API費用なし": {
+    "en": "Browser speech recognition: no app recognition API fee",
+    "source": "通訳君 画面表記"
+  },
+  "ふりがな": {
+    "en": "Furigana",
+    "source": "ui_translations!124"
+  },
+  "ふりがなを消す": {
+    "en": "Remove the furigana (phonetic readings).",
+    "source": "ui_translations!200"
+  },
+  "ふりがな再読込": {
+    "en": "Reload phonetic readings",
+    "source": "ui_translations!202"
+  },
+  "ふりがな準備中": {
+    "en": "Pronunciation guides are being prepared.",
+    "source": "ui_translations!129"
+  },
+  "プリント": {
+    "en": "Print",
+    "source": "ruby_dictionary!69"
+  },
+  "ベトナム語": {
+    "en": "Vietnamese",
+    "source": "ui_translations!442"
+  },
+  "ホームにもどる": {
+    "en": "Back to home",
+    "source": "通訳君 画面表記"
+  },
+  "ポルトガル語": {
+    "en": "Portuguese",
+    "source": "ui_translations!431"
+  },
+  "マイクOFF": {
+    "en": "Mic off",
+    "source": "通訳君 画面表記"
+  },
+  "マイクアイコンが機能しない場合は、キーボードのマイクで話してください。": {
+    "en": "If the microphone icon isn't working, please use the microphone on your keyboard.",
+    "source": "ui_translations!561"
+  },
+  "マイクが許可されていません。ブラウザと端末のマイク許可を確認してください。": {
+    "en": "Your microphone is not permitted. Please check the microphone permissions for your browser and device.",
+    "source": "ui_translations!694"
+  },
+  "マイクが見つかりません。Chromebook/PCの入力デバイスでワイヤレスマイク受信機を選んでください。": {
+    "en": "Microphone not found. Please select a wireless microphone receiver in your Chromebook/PC's input devices.",
+    "source": "ui_translations!696"
+  },
+  "マイクで音声入力できます。スマホやタブレットなどでマイクアイコンが機能しない場合は、キーボードのマイクで話してください。": {
+    "en": "You can use the microphone for voice input. If the microphone icon doesn't work on your smartphone or tablet, please use the microphone on your keyboard.",
+    "source": "ui_translations!562"
+  },
+  "マイクで入力": {
+    "en": "Input via microphone",
+    "source": "ui_translations!559"
+  },
+  "マイクで話せます。短い文に分けると伝わりやすくなります。": {
+    "en": "You can speak into the microphone. Breaking your message into short sentences will make it easier to understand.",
+    "source": "ui_translations!811"
+  },
+  "マイクボタンで音声入力できます。動かない場合はキーボードのマイクを使ってください。": {
+    "en": "You can use the microphone button for voice input. If it doesn't work, please use the microphone on your keyboard.",
+    "source": "ui_translations!576"
+  },
+  "マイクをONにする": {
+    "en": "Turn mic on",
+    "source": "通訳君 画面表記"
+  },
+  "マイクをとめる": {
+    "en": "Stop mic",
+    "source": "通訳君 画面表記"
+  },
+  "マイクを開始できません。別のアプリがマイクを使っていないか、Chromebook/PCの入力デバイスを確認してください。": {
+    "en": "The microphone cannot be started. Please check your Chromebook/PC's input devices to ensure another app is not using the microphone.",
+    "source": "ui_translations!697"
+  },
+  "マイクを確認しています。話し始めてください。": {
+    "en": "Checking the microphone. Please start speaking.",
+    "source": "ui_translations!689"
+  },
+  "マイクを許可して、もう一度押してください。": {
+    "en": "Allow microphone access, then try again.",
+    "source": "通訳君 画面表記"
+  },
+  "マイクを準備しています": {
+    "en": "Preparing mic",
+    "source": "通訳君 画面表記"
+  },
+  "マイク入力で問題が起きました。キーボードのマイク、または端末の音声入力設定を確認してください。": {
+    "en": "There was a problem with the microphone input. Please check the microphone on your keyboard or the voice input settings on your device.",
+    "source": "ui_translations!701"
+  },
+  "マイク入力を開始しました。話し始めてください。": {
+    "en": "Microphone input has started. Please begin speaking.",
+    "source": "ui_translations!709"
+  },
+  "マイク入力を開始します。話し始めてください。": {
+    "en": "Microphone input will now begin. Please start speaking.",
+    "source": "ui_translations!707"
+  },
+  "マイク入力中です。話した内容が入力欄に入ります。": {
+    "en": "Microphone input is in progress. What you say will be entered into the input field.",
+    "source": "ui_translations!704"
+  },
+  "マイク入力中です。話してください。": {
+    "en": "Microphone input is in progress. Please speak.",
+    "source": "ui_translations!691"
+  },
+  "マイことばに保存": {
+    "en": "Save to My Words",
+    "source": "ui_translations!623"
+  },
+  "マスク": {
+    "en": "Mask",
+    "source": "ruby_dictionary!90"
+  },
+  "まだ": {
+    "en": "Still",
+    "source": "ruby_dictionary!275"
+  },
+  "まだありません": {
+    "en": "Not yet.",
+    "source": "ui_translations!594"
+  },
+  "まだ開始していません。": {
+    "en": "It hasn't started yet.",
+    "source": "ui_translations!404"
+  },
+  "まだ記録がありません。更新後の利用から集計します。": {
+    "en": "No records yet. New activity will be recorded.",
+    "source": "通訳君 画面表記"
+  },
+  "まだ集計がありません。更新後の利用から数えます。": {
+    "en": "No counts yet. New activity will be counted.",
+    "source": "通訳君 画面表記"
+  },
+  "もう一度伝えてください。": {
+    "en": "Please say it again.",
+    "source": "通訳君 画面表記"
+  },
+  "もう一度翻訳": {
+    "en": "Translate again",
+    "source": "ui_translations!274"
+  },
+  "モード": {
+    "en": "Mode",
+    "source": "通訳君 画面表記"
+  },
+  "もとの文": {
+    "en": "Original text",
+    "source": "ui_translations!234"
+  },
+  "もどる": {
+    "en": "Back",
+    "source": "通訳君 画面表記"
+  },
+  "やさしい日本語": {
+    "en": "Easy Japanese",
+    "source": "ui_translations!211"
+  },
+  "やさしい日本語にする": {
+    "en": "Use simplified Japanese",
+    "source": "ui_translations!67"
+  },
+  "やさしい日本語にすると、翻訳が伝わりやすくなります。": {
+    "en": "Using simpler Japanese makes the translation easier to understand.",
+    "source": "ui_translations!81"
+  },
+  "よく見られる": {
+    "en": "Commonly seen",
+    "source": "ui_translations!287"
+  },
+  "よく使うことばの種類": {
+    "en": "Phrase or word",
+    "source": "通訳君 画面表記"
+  },
+  "よく使うことばを知る": {
+    "en": "Learn commonly used words",
+    "source": "ui_translations!192"
+  },
+  "よく使う文": {
+    "en": "Phrases",
+    "source": "ui_translations!3"
+  },
+  "よく使う文のクリック": {
+    "en": "Phrase opens",
+    "source": "通訳君 画面表記"
+  },
+  "よく使われた通訳文を文例候補シートへ送ります。": {
+    "en": "Frequently used translations will be sent to the example sentence sheet.",
+    "source": "ui_translations!780"
+  },
+  "よく使われるテンプレート": {
+    "en": "Frequently used templates",
+    "source": "ui_translations!771"
+  },
+  "よく使われる通訳文": {
+    "en": "Commonly used translations",
+    "source": "ui_translations!745"
+  },
+  "よく使われる文": {
+    "en": "Commonly used sentences",
+    "source": "ui_translations!582"
+  },
+  "よく使われる文を知る": {
+    "en": "Learn commonly used phrases",
+    "source": "ui_translations!191"
+  },
+  "ランドセル": {
+    "en": "School bag",
+    "source": "ruby_dictionary!370"
+  },
+  "リコーダー": {
+    "en": "Recorder",
+    "source": "ruby_dictionary!86"
+  },
+  "リュック": {
+    "en": "Backpack",
+    "source": "ruby_dictionary!396"
+  },
+  "リンクをコピー": {
+    "en": "Copy link",
+    "source": "通訳君 画面表記"
+  },
+  "ルーム": {
+    "en": "Room",
+    "source": "ui_translations!500"
+  },
+  "ルームID": {
+    "en": "Room ID",
+    "source": "ui_translations!296"
+  },
+  "ルームID：": {
+    "en": "Room ID:",
+    "source": "通訳君 画面表記"
+  },
+  "ルームIDの作成を再試行": {
+    "en": "Retry",
+    "source": "ui_translations!724"
+  },
+  "ルームIDをコピー": {
+    "en": "Copy room ID",
+    "source": "通訳君 画面表記"
+  },
+  "ルームIDをコピー。作成から24時間有効": {
+    "en": "Copy room ID. Valid for 24 hours.",
+    "source": "通訳君 画面表記"
+  },
+  "ルームIDをコピーしました。": {
+    "en": "Room ID copied.",
+    "source": "通訳君 画面表記"
+  },
+  "ルームIDを作成中": {
+    "en": "Creating Room ID",
+    "source": "ui_translations!719"
+  },
+  "ルームIDを生徒に伝えてください。": {
+    "en": "Please provide the room ID to the students.",
+    "source": "ui_translations!721"
+  },
+  "ルームIDを生徒に伝える": {
+    "en": "Tell the students the room ID.",
+    "source": "ui_translations!654"
+  },
+  "ルームIDを入力してください。": {
+    "en": "Please enter the room ID.",
+    "source": "ui_translations!394"
+  },
+  "ルームが閉じられました。": {
+    "en": "The room has been closed.",
+    "source": "ui_translations!348"
+  },
+  "ルームに入室しています。": {
+    "en": "You are now in the room.",
+    "source": "ui_translations!352"
+  },
+  "ルームに入室できませんでした：": {
+    "en": "Could not enter the room:",
+    "source": "ui_translations!413"
+  },
+  "ルームに入室できませんでした。": {
+    "en": "I was unable to enter the room.",
+    "source": "ui_translations!396"
+  },
+  "ルームの入室状態を確認しています。": {
+    "en": "We are checking the room's occupancy status.",
+    "source": "ui_translations!517"
+  },
+  "ルームの翻訳待ち": {
+    "en": "Room translation queue",
+    "source": "通訳君 画面表記"
+  },
+  "ルームの有効期限が切れました。タブを選び直して開始してください。": {
+    "en": "The room expired. Select the mode to start again.",
+    "source": "通訳君 画面表記"
+  },
+  "ルームを作成または入室": {
+    "en": "Create or join a room",
+    "source": "ui_translations!343"
+  },
+  "ルーム作成と同じ通信形式": {
+    "en": "Same request format as room creation",
+    "source": "通訳君 画面表記"
+  },
+  "ルーム作成の失敗記録があります。QR表示前の段階です。": {
+    "en": "Room creation failed before the QR code was shown.",
+    "source": "通訳君 画面表記"
+  },
+  "ルーム未入力": {
+    "en": "Room not entered",
+    "source": "ui_translations!180"
+  },
+  "ルール": {
+    "en": "Rule",
+    "source": "ruby_dictionary!361"
+  },
+  "ルールによる確認の目印です。誤訳や精度を自動判定したものではありません。": {
+    "en": "Rule-based warning, not an automatic accuracy score.",
+    "source": "通訳君 画面表記"
+  },
+  "ルビON": {
+    "en": "Rubion",
+    "source": "ui_translations!127"
+  },
+  "ルビなし": {
+    "en": "No furigana (pronunciation guides)",
+    "source": "ui_translations!181"
+  },
+  "ルビ辞書": {
+    "en": "Ruby dictionary",
+    "source": "ui_translations!160"
+  },
+  "ルビ表示をオフにします": {
+    "en": "Turn off ruby ​​text display.",
+    "source": "ui_translations!194"
+  },
+  "ログアウト": {
+    "en": "Log out",
+    "source": "ui_translations!279"
+  },
+  "ログインの更新に失敗しました。": {
+    "en": "Could not refresh sign-in.",
+    "source": "通訳君 画面表記"
+  },
+  "ログが1件送信される": {
+    "en": "One log entry is sent.",
+    "source": "ui_translations!651"
+  },
+  "ログ数": {
+    "en": "Number of logs",
+    "source": "ui_translations!588"
+  },
+  "ワーク": {
+    "en": "Work",
+    "source": "ruby_dictionary!68"
+  },
+  "わかりました": {
+    "en": "Got it",
+    "source": "ui_translations!207"
+  },
+  "安心してください": {
+    "en": "Rest assured",
+    "source": "ruby_dictionary!476"
+  },
+  "安静": {
+    "en": "Rest",
+    "source": "ruby_dictionary!468"
+  },
+  "安全": {
+    "en": "Safety",
+    "source": "ui_translations!551"
+  },
+  "案内": {
+    "en": "Guidance",
+    "source": "ruby_dictionary!38"
+  },
+  "委員会": {
+    "en": "Committee",
+    "source": "ruby_dictionary!100"
+  },
+  "意見": {
+    "en": "Opinion",
+    "source": "ruby_dictionary!581"
+  },
+  "移動": {
+    "en": "Move",
+    "source": "ruby_dictionary!576"
+  },
+  "一時停止": {
+    "en": "Pause",
+    "source": "ui_translations!326"
+  },
+  "一時停止しました。再開するときは「授業再開」を押してください。": {
+    "en": "The lesson has been paused. Please press \"Resume Lesson\" to resume.",
+    "source": "ui_translations!401"
+  },
+  "一時停止中": {
+    "en": "Paused",
+    "source": "ui_translations!263"
+  },
+  "一緒に": {
+    "en": "Together",
+    "source": "ruby_dictionary!362"
+  },
+  "一緒に確認": {
+    "en": "Let's check",
+    "source": "ruby_dictionary!364"
+  },
+  "一斉下校": {
+    "en": "All students",
+    "source": "ruby_dictionary!152"
+  },
+  "引き取り": {
+    "en": "Pickup",
+    "source": "ruby_dictionary!272"
+  },
+  "引き渡し": {
+    "en": "Handover",
+    "source": "ruby_dictionary!271"
+  },
+  "引き渡し訓練": {
+    "en": "Handover training",
+    "source": "ruby_dictionary!153"
+  },
+  "引落": {
+    "en": "Direct debit",
+    "source": "ruby_dictionary!142"
+  },
+  "雨の道具": {
+    "en": "Rain gear",
+    "source": "ruby_dictionary!359"
+  },
+  "雨合羽": {
+    "en": "Raincoat",
+    "source": "ruby_dictionary!380"
+  },
+  "運動会": {
+    "en": "Sports day",
+    "source": "ruby_dictionary!204"
+  },
+  "運動靴": {
+    "en": "Athletic shoes",
+    "source": "ruby_dictionary!450"
+  },
+  "運動場": {
+    "en": "Playground",
+    "source": "ruby_dictionary!110"
+  },
+  "英語": {
+    "en": "English",
+    "source": "ui_translations!317"
+  },
+  "英語ガイド": {
+    "en": "English guides",
+    "source": "通訳君 画面表記"
+  },
+  "英語ルビを使う": {
+    "en": "Use English furigana (pronunciation guides).",
+    "source": "ui_translations!201"
+  },
+  "英語を準備しています…": {
+    "en": "I'm preparing in English...",
+    "source": "ui_translations!321"
+  },
+  "閲覧数を保存できませんでした：": {
+    "en": "Could not save view count:",
+    "source": "ui_translations!376"
+  },
+  "延期": {
+    "en": "Postponement",
+    "source": "ruby_dictionary!36"
+  },
+  "遠征": {
+    "en": "Expedition",
+    "source": "ruby_dictionary!246"
+  },
+  "遠足": {
+    "en": "Field trip",
+    "source": "ruby_dictionary!211"
+  },
+  "鉛筆": {
+    "en": "Pencil",
+    "source": "ruby_dictionary!372"
+  },
+  "汚れ": {
+    "en": "Dirt",
+    "source": "ruby_dictionary!484"
+  },
+  "応答の遅延・無応答": {
+    "en": "Slow or missing response",
+    "source": "通訳君 画面表記"
+  },
+  "押印": {
+    "en": "Seal",
+    "source": "ruby_dictionary!494"
+  },
+  "音楽": {
+    "en": "Music",
+    "source": "ruby_dictionary!157"
+  },
+  "音声の再生が端末に制限されています。もう一度再生ボタンを押してください。": {
+    "en": "Playback was blocked. Press Play again.",
+    "source": "通訳君 画面表記"
+  },
+  "音声の接続に失敗しました。": {
+    "en": "Audio connection failed.",
+    "source": "通訳君 画面表記"
+  },
+  "音声の中継を利用できません。字幕は利用できますが、音声は直接接続のみになります。": {
+    "en": "Audio relay is unavailable. Captions still work; audio needs a direct connection.",
+    "source": "通訳君 画面表記"
+  },
+  "音声をログにする": {
+    "en": "Log audio",
+    "source": "ui_translations!319"
+  },
+  "音声を開始できませんでした。もう一度再生するか、端末の読み上げ音声・音量・通信状態を確認してください。": {
+    "en": "Playback did not start. Try again or check the voice, volume and connection.",
+    "source": "通訳君 画面表記"
+  },
+  "音声を検出できませんでした。マイク入力デバイスと受信機の電源を確認してください。": {
+    "en": "No sound was detected. Please check the power on your microphone input device and receiver.",
+    "source": "ui_translations!698"
+  },
+  "音声を準備しています。押すと取り消し": {
+    "en": "Preparing audio. Press to cancel.",
+    "source": "通訳君 画面表記"
+  },
+  "音声を聞き取っています。": {
+    "en": "I am listening to the audio.",
+    "source": "ui_translations!695"
+  },
+  "音声形式・モデルの入力仕様を確認してください。回線の変更だけで直るとは限りません。": {
+    "en": "Check the audio format and model input. Changing networks may not fix it.",
+    "source": "通訳君 画面表記"
+  },
+  "音声再接続待ち": {
+    "en": "Waiting to reconnect audio",
+    "source": "通訳君 画面表記"
+  },
+  "音声接続を確認": {
+    "en": "Check audio connection",
+    "source": "通訳君 画面表記"
+  },
+  "音声接続を確認してください。": {
+    "en": "Check the audio connection.",
+    "source": "通訳君 画面表記"
+  },
+  "音声接続中": {
+    "en": "Audio connected",
+    "source": "通訳君 画面表記"
+  },
+  "音声接続中：TURN経由の場合は通信費": {
+    "en": "Audio connected: TURN relay may incur cost",
+    "source": "通訳君 画面表記"
+  },
+  "音声接続中…": {
+    "en": "Connecting audio…",
+    "source": "通訳君 画面表記"
+  },
+  "音声中継サーバー": {
+    "en": "Audio relay server",
+    "source": "通訳君 画面表記"
+  },
+  "音声通話の接続・接続応答の失敗": {
+    "en": "Audio connection or signaling failed",
+    "source": "通訳君 画面表記"
+  },
+  "音声停止": {
+    "en": "Audio stopped",
+    "source": "通訳君 画面表記"
+  },
+  "音声入力": {
+    "en": "Voice input",
+    "source": "ui_translations!584"
+  },
+  "音声入力を停止": {
+    "en": "Stop voice input",
+    "source": "ui_translations!560"
+  },
+  "音声入力欄に文字が入る": {
+    "en": "Text is entered into the voice input field.",
+    "source": "ui_translations!647"
+  },
+  "音声認識API": {
+    "en": "Speech recognition API",
+    "source": "通訳君 画面表記"
+  },
+  "音声認識サービスに接続できません。ネットワークやChromeの音声入力設定を確認してください。": {
+    "en": "Unable to connect to the speech recognition service. Please check your network and Chrome speech input settings.",
+    "source": "ui_translations!699"
+  },
+  "音声認識の自動復旧回数と復旧後の字幕を確認してください。": {
+    "en": "Check speech recognition restarts and captions after recovery.",
+    "source": "通訳君 画面表記"
+  },
+  "音声認識の通信を再試行しています。もう一度話してください。": {
+    "en": "Retrying speech recognition. Please speak again.",
+    "source": "通訳君 画面表記"
+  },
+  "音声認識をつなぎ直しています。": {
+    "en": "Reconnecting speech recognition.",
+    "source": "通訳君 画面表記"
+  },
+  "音声認識を準備中": {
+    "en": "Preparing speech recognition",
+    "source": "通訳君 画面表記"
+  },
+  "音声認識中": {
+    "en": "Recognizing speech",
+    "source": "通訳君 画面表記"
+  },
+  "下校": {
+    "en": "Going home",
+    "source": "ruby_dictionary!407"
+  },
+  "下校が遅くなります": {
+    "en": "School dismissal",
+    "source": "ruby_dictionary!333"
+  },
+  "下駄": {
+    "en": "Geta",
+    "source": "ruby_dictionary!400"
+  },
+  "可能": {
+    "en": "Possible",
+    "source": "ruby_dictionary!15"
+  },
+  "家に帰る時間": {
+    "en": "Time to",
+    "source": "ruby_dictionary!334"
+  },
+  "家の用事": {
+    "en": "Household chores",
+    "source": "ruby_dictionary!353"
+  },
+  "家族": {
+    "en": "Family",
+    "source": "ruby_dictionary!423"
+  },
+  "家族・相談": {
+    "en": "Family/Consultation",
+    "source": "ui_translations!846"
+  },
+  "家庭": {
+    "en": "Home",
+    "source": "ui_translations!469"
+  },
+  "家庭で": {
+    "en": "At home",
+    "source": "ruby_dictionary!347"
+  },
+  "家庭の都合": {
+    "en": "Family reasons",
+    "source": "ruby_dictionary!6"
+  },
+  "家庭科": {
+    "en": "Home economics",
+    "source": "ruby_dictionary!161"
+  },
+  "家庭保管": {
+    "en": "Home storage",
+    "source": "ruby_dictionary!490"
+  },
+  "家庭連絡": {
+    "en": "Family contact",
+    "source": "ruby_dictionary!424"
+  },
+  "火災": {
+    "en": "Fire",
+    "source": "ruby_dictionary!265"
+  },
+  "箇条書きにできます": {
+    "en": "You can use bullet points.",
+    "source": "ui_translations!650"
+  },
+  "課題": {
+    "en": "Assignment",
+    "source": "ruby_dictionary!167"
+  },
+  "画面を離れたためマイクを停止しました。再開するときはマイクをONにしてください。": {
+    "en": "The mic stopped while away. Turn it on to continue.",
+    "source": "通訳君 画面表記"
+  },
+  "画面を離れたため通話を一時停止しました。マイクをONにすると同じルームへ再接続します。": {
+    "en": "The call paused while away. Turn the mic on to reconnect.",
+    "source": "通訳君 画面表記"
+  },
+  "画面移動": {
+    "en": "Away from screen",
+    "source": "通訳君 画面表記"
+  },
+  "会話・連絡": {
+    "en": "Conversation/Contact",
+    "source": "ui_translations!849"
+  },
+  "会話のことばは自動分割した候補です。人名や個人情報、分割の誤りが含まれる場合があります。辞書への採用前に内容と訳を確認してください。全文・参加者名・ルームIDは保存せず、未登録の候補は端末内に保存します。採用候補CSVを確認して、訳を追加してから辞書に取り込んでください。除外は元に戻せます。": {
+    "en": "Automatically extracted words may include mistakes or personal details. Review candidates and translations before adding them to the dictionary.",
+    "source": "通訳君 画面表記"
+  },
+  "会話をおわる": {
+    "en": "End conversation",
+    "source": "通訳君 画面表記"
+  },
+  "解散": {
+    "en": "Dissolution",
+    "source": "ruby_dictionary!437"
+  },
+  "解散時間": {
+    "en": "Dismissal time",
+    "source": "ruby_dictionary!440"
+  },
+  "解散場所": {
+    "en": "Disbandment location",
+    "source": "ruby_dictionary!248"
+  },
+  "解答": {
+    "en": "Answer",
+    "source": "ruby_dictionary!588"
+  },
+  "回数": {
+    "en": "Count",
+    "source": "通訳君 画面表記"
+  },
+  "回数はAI翻訳のみの概算です。文章量・言語数・再試行・音声認識で変わります。呼び出し前に多めの予算を確保するため、表示残額があっても開始できない場合があります。辞書だけの利用はこのAI予算を消費しません。": {
+    "en": "Estimates cover AI translation only. Length, languages and retries affect use. Dictionary lookup does not use this budget.",
+    "source": "通訳君 画面表記"
+  },
+  "回答": {
+    "en": "Answer",
+    "source": "ruby_dictionary!540"
+  },
+  "改善の相談に使う計測結果です。": {
+    "en": "Measurements for troubleshooting.",
+    "source": "通訳君 画面表記"
+  },
+  "改善用の分析結果": {
+    "en": "Analysis results",
+    "source": "通訳君 画面表記"
+  },
+  "改善用の分析出力": {
+    "en": "Analysis export",
+    "source": "通訳君 画面表記"
+  },
+  "絵の具セット": {
+    "en": "Paint set",
+    "source": "ruby_dictionary!395"
+  },
+  "開くコーナーを選んでください。": {
+    "en": "Please select a corner to open.",
+    "source": "ui_translations!11"
+  },
+  "開けませんでした。ポップアップを許可してください。": {
+    "en": "It couldn't be opened. Please allow pop-ups.",
+    "source": "ui_translations!825"
+  },
+  "開始": {
+    "en": "Start",
+    "source": "通訳君 画面表記"
+  },
+  "階段": {
+    "en": "Stairs",
+    "source": "ruby_dictionary!114"
+  },
+  "外靴": {
+    "en": "Outside shoes",
+    "source": "ruby_dictionary!451"
+  },
+  "外部マイクページを開きました。新しいタブでマイク開始を押してください。": {
+    "en": "The external microphone page has opened. Please click \"Start Microphone\" in the new tab.",
+    "source": "ui_translations!716"
+  },
+  "外部マイクページを開くには、ルームIDを入力してください。": {
+    "en": "To open the external microphone page, please enter the room ID.",
+    "source": "ui_translations!712"
+  },
+  "外部マイクページを開けませんでした。ポップアップを許可してください。": {
+    "en": "The external microphone page could not be opened. Please allow pop-ups.",
+    "source": "ui_translations!714"
+  },
+  "外部マイクページを開けませんでした。先にルームへ入室してください。": {
+    "en": "The external microphone page could not be opened. Please enter the room first.",
+    "source": "ui_translations!715"
+  },
+  "外部マイクを開く": {
+    "en": "Open external microphone",
+    "source": "ui_translations!710"
+  },
+  "外部通訳アプリを開く": {
+    "en": "Open an external translation app.",
+    "source": "ui_translations!803"
+  },
+  "概要": {
+    "en": "Overview",
+    "source": "通訳君 画面表記"
+  },
+  "確認": {
+    "en": "Confirmation",
+    "source": "ui_translations!447"
+  },
+  "確認したいこと": {
+    "en": "Things i",
+    "source": "ruby_dictionary!341"
+  },
+  "確認した訳": {
+    "en": "Reviewed translation",
+    "source": "通訳君 画面表記"
+  },
+  "確認した訳を、この端末の次の通訳で使います。": {
+    "en": "Use this reviewed translation again on this device.",
+    "source": "通訳君 画面表記"
+  },
+  "確認した訳を覚えました。": {
+    "en": "Translation remembered.",
+    "source": "通訳君 画面表記"
+  },
+  "確認しています…": {
+    "en": "Checking…",
+    "source": "通訳君 画面表記"
+  },
+  "確認してください": {
+    "en": "Please confirm",
+    "source": "ruby_dictionary!309"
+  },
+  "確認できた事実": {
+    "en": "Observed facts",
+    "source": "通訳君 画面表記"
+  },
+  "確認ポイント": {
+    "en": "Points to check",
+    "source": "ui_translations!618"
+  },
+  "確認済み": {
+    "en": "Reviewed",
+    "source": "通訳君 画面表記"
+  },
+  "確認状態": {
+    "en": "Review status",
+    "source": "通訳君 画面表記"
+  },
+  "確認日": {
+    "en": "Checked on",
+    "source": "通訳君 画面表記"
+  },
+  "確認用": {
+    "en": "For confirmation",
+    "source": "ui_translations!59"
+  },
+  "覚える訳を入力してください。": {
+    "en": "Enter the translation to remember.",
+    "source": "通訳君 画面表記"
+  },
+  "学級活動": {
+    "en": "Class activities",
+    "source": "ruby_dictionary!99"
+  },
+  "学級懇談会": {
+    "en": "Class meeting",
+    "source": "ruby_dictionary!218"
+  },
+  "学校": {
+    "en": "School",
+    "source": "ui_translations!487"
+  },
+  "学校からの紙": {
+    "en": "Paper from",
+    "source": "ruby_dictionary!307"
+  },
+  "学校から帰ること": {
+    "en": "Going home from school",
+    "source": "ui_translations!356"
+  },
+  "学校でけが": {
+    "en": "Injured at",
+    "source": "ruby_dictionary!329"
+  },
+  "学校でけがをしました": {
+    "en": "I got",
+    "source": "ruby_dictionary!330"
+  },
+  "学校で使うお金": {
+    "en": "Money to",
+    "source": "ruby_dictionary!336"
+  },
+  "学校で使うお金を集めること": {
+    "en": "Collecting money to use at school",
+    "source": "ui_translations!123"
+  },
+  "学校で使う物": {
+    "en": "Things used at school",
+    "source": "ui_translations!137"
+  },
+  "学校と家が連絡を書くノート": {
+    "en": "A notebook for school and home to write down messages.",
+    "source": "ui_translations!130"
+  },
+  "学校に着く": {
+    "en": "Arrived at",
+    "source": "ruby_dictionary!283"
+  },
+  "学校に来ること": {
+    "en": "Coming to school",
+    "source": "ui_translations!82"
+  },
+  "学校のきまり": {
+    "en": "School rules",
+    "source": "ruby_dictionary!360"
+  },
+  "学校のルール": {
+    "en": "School rules",
+    "source": "ruby_dictionary!365"
+  },
+  "学校の外": {
+    "en": "Outside of",
+    "source": "ruby_dictionary!357"
+  },
+  "学校の外で勉強する行事": {
+    "en": "School events that involve studying outside of school",
+    "source": "ui_translations!95"
+  },
+  "学校の中で履くくつ": {
+    "en": "Shoes worn inside the school",
+    "source": "ui_translations!98"
+  },
+  "学校フィルター・プロキシの拒否理由": {
+    "en": "School filter or proxy rejection reason",
+    "source": "通訳君 画面表記"
+  },
+  "学校へ": {
+    "en": "To school",
+    "source": "ruby_dictionary!279"
+  },
+  "学校や授業に遅れて来ること": {
+    "en": "Being late to school or classes",
+    "source": "ui_translations!79"
+  },
+  "学校をいつもより早く帰ること": {
+    "en": "Going home from school earlier than usual",
+    "source": "ui_translations!80"
+  },
+  "学校を休むこと": {
+    "en": "Taking time off from school",
+    "source": "ui_translations!78"
+  },
+  "学校行事": {
+    "en": "School events",
+    "source": "ruby_dictionary!198"
+  },
+  "学校生活": {
+    "en": "School life",
+    "source": "ui_translations!539"
+  },
+  "学校生活・行事": {
+    "en": "School life & events",
+    "source": "ui_translations!862"
+  },
+  "学校保管": {
+    "en": "School storage",
+    "source": "ruby_dictionary!489"
+  },
+  "学習": {
+    "en": "Study",
+    "source": "ui_translations!547"
+  },
+  "学習に行く": {
+    "en": "Going to",
+    "source": "ruby_dictionary!358"
+  },
+  "学習状況": {
+    "en": "Learning status",
+    "source": "ruby_dictionary!181"
+  },
+  "学習内容": {
+    "en": "Learning content",
+    "source": "ui_translations!622"
+  },
+  "学年費": {
+    "en": "Academic fee",
+    "source": "ruby_dictionary!230"
+  },
+  "学用品": {
+    "en": "School supplies",
+    "source": "ruby_dictionary!63"
+  },
+  "学用品費": {
+    "en": "School supplies",
+    "source": "ruby_dictionary!132"
+  },
+  "活動予定": {
+    "en": "Activity schedule",
+    "source": "ruby_dictionary!249"
+  },
+  "換算設定（円 / USD）": {
+    "en": "Exchange rate (JPY / USD)",
+    "source": "通訳君 画面表記"
+  },
+  "管理項目": {
+    "en": "Admin sections",
+    "source": "通訳君 画面表記"
+  },
+  "管理者": {
+    "en": "Admin",
+    "source": "通訳君 画面表記"
+  },
+  "管理者パスワード": {
+    "en": "Admin password",
+    "source": "通訳君 画面表記"
+  },
+  "管理者画面": {
+    "en": "Admin",
+    "source": "通訳君 画面表記"
+  },
+  "管理者表示": {
+    "en": "Admin",
+    "source": "通訳君 画面表記"
+  },
+  "管理者表示を閉じて認証解除": {
+    "en": "Close admin and lock",
+    "source": "通訳君 画面表記"
+  },
+  "観点": {
+    "en": "Perspective",
+    "source": "ruby_dictionary!180"
+  },
+  "間に合う": {
+    "en": "I'll make",
+    "source": "ruby_dictionary!12"
+  },
+  "韓国語": {
+    "en": "Korean",
+    "source": "ui_translations!526"
+  },
+  "丸をつけてください": {
+    "en": "Please circle",
+    "source": "ruby_dictionary!507"
+  },
+  "丸付け": {
+    "en": "Marking",
+    "source": "ruby_dictionary!590"
+  },
+  "願書": {
+    "en": "Application form",
+    "source": "ruby_dictionary!192"
+  },
+  "危険": {
+    "en": "Danger",
+    "source": "ruby_dictionary!261"
+  },
+  "基本": {
+    "en": "Basic",
+    "source": "ui_translations!474"
+  },
+  "希望": {
+    "en": "Hope",
+    "source": "ruby_dictionary!537"
+  },
+  "希望しません": {
+    "en": "I do",
+    "source": "ruby_dictionary!538"
+  },
+  "期限": {
+    "en": "Deadline",
+    "source": "ruby_dictionary!501"
+  },
+  "期限を過ぎています": {
+    "en": "The deadline",
+    "source": "ruby_dictionary!502"
+  },
+  "期末テスト": {
+    "en": "Final exams",
+    "source": "ruby_dictionary!174"
+  },
+  "帰りの会": {
+    "en": "Closing meeting",
+    "source": "ruby_dictionary!98"
+  },
+  "帰宅": {
+    "en": "Going home",
+    "source": "ruby_dictionary!408"
+  },
+  "規則": {
+    "en": "Rules",
+    "source": "ruby_dictionary!252"
+  },
+  "記入": {
+    "en": "Fill in",
+    "source": "ruby_dictionary!491"
+  },
+  "記入例": {
+    "en": "Example",
+    "source": "ruby_dictionary!505"
+  },
+  "記名": {
+    "en": "Name",
+    "source": "ruby_dictionary!486"
+  },
+  "記録を続けています。": {
+    "en": "I'm continuing to record.",
+    "source": "ui_translations!515"
+  },
+  "起立": {
+    "en": "Stand up",
+    "source": "ruby_dictionary!578"
+  },
+  "技術": {
+    "en": "Technology",
+    "source": "ruby_dictionary!160"
+  },
+  "却下": {
+    "en": "Rejected",
+    "source": "ui_translations!758"
+  },
+  "休み": {
+    "en": "Holiday",
+    "source": "ruby_dictionary!278"
+  },
+  "休み・健康・安全": {
+    "en": "Rest, health, and safety",
+    "source": "ui_translations!841"
+  },
+  "給食": {
+    "en": "School lunch",
+    "source": "ui_translations!448"
+  },
+  "給食がありません": {
+    "en": "There is",
+    "source": "ruby_dictionary!297"
+  },
+  "給食セット": {
+    "en": "School lunch",
+    "source": "ruby_dictionary!88"
+  },
+  "給食のアレルギー": {
+    "en": "School lunch",
+    "source": "ruby_dictionary!340"
+  },
+  "給食のお金": {
+    "en": "School lunch money",
+    "source": "ui_translations!358"
+  },
+  "給食着": {
+    "en": "School lunch",
+    "source": "ruby_dictionary!382"
+  },
+  "給食費": {
+    "en": "School lunch",
+    "source": "ruby_dictionary!231"
+  },
+  "許可": {
+    "en": "Permission",
+    "source": "ruby_dictionary!259"
+  },
+  "共通": {
+    "en": "Common",
+    "source": "ui_translations!506"
+  },
+  "共有する場合は、人名や連絡先を取り除いてください。候補は確認後に共有辞書へ反映します。": {
+    "en": "Remove names and contact details before sharing. Suggestions are reviewed first.",
+    "source": "通訳君 画面表記"
+  },
+  "共有辞書の候補に送る": {
+    "en": "Suggest for shared dictionary",
+    "source": "通訳君 画面表記"
+  },
+  "共有前に、氏名や連絡先が含まれていないか確認してください。": {
+    "en": "Remove names and contact details before sharing.",
+    "source": "通訳君 画面表記"
+  },
+  "共有端末：確認した訳を次の起動へ保存しない": {
+    "en": "Shared device: do not keep reviewed translations after restart",
+    "source": "通訳君 画面表記"
+  },
+  "共有端末と保存": {
+    "en": "Shared devices and storage",
+    "source": "通訳君 画面表記"
+  },
+  "教えてください": {
+    "en": "Please tell",
+    "source": "ruby_dictionary!310"
+  },
+  "教育委員会": {
+    "en": "Board of",
+    "source": "ruby_dictionary!55"
+  },
+  "教育相談": {
+    "en": "Educational counseling",
+    "source": "ruby_dictionary!221"
+  },
+  "教科": {
+    "en": "Subject",
+    "source": "ui_translations!504"
+  },
+  "教科書": {
+    "en": "Textbook",
+    "source": "ruby_dictionary!379"
+  },
+  "教材": {
+    "en": "Teaching materials",
+    "source": "ruby_dictionary!64"
+  },
+  "教材費": {
+    "en": "Teaching material",
+    "source": "ruby_dictionary!229"
+  },
+  "教室": {
+    "en": "Classroom",
+    "source": "ruby_dictionary!105"
+  },
+  "勤務先": {
+    "en": "Place of",
+    "source": "ruby_dictionary!42"
+  },
+  "勤務先電話番号": {
+    "en": "Work phone",
+    "source": "ruby_dictionary!43"
+  },
+  "禁止": {
+    "en": "Prohibited",
+    "source": "ruby_dictionary!258"
+  },
+  "金額": {
+    "en": "Amount",
+    "source": "ruby_dictionary!237"
+  },
+  "銀行口座": {
+    "en": "Bank account",
+    "source": "ruby_dictionary!235"
+  },
+  "靴下": {
+    "en": "Socks",
+    "source": "ruby_dictionary!449"
+  },
+  "係": {
+    "en": "Person in",
+    "source": "ruby_dictionary!94"
+  },
+  "兄弟": {
+    "en": "Brothers",
+    "source": "ruby_dictionary!419"
+  },
+  "計算": {
+    "en": "Calculation",
+    "source": "ruby_dictionary!593"
+  },
+  "計測結果を作成します。本文はチェックした場合だけ含みます。": {
+    "en": "Create measurements. Conversation text is included only if selected.",
+    "source": "通訳君 画面表記"
+  },
+  "警報": {
+    "en": "Alarm",
+    "source": "ruby_dictionary!266"
+  },
+  "迎え": {
+    "en": "Pick up",
+    "source": "ui_translations!462"
+  },
+  "迎えが必要": {
+    "en": "Need a",
+    "source": "ruby_dictionary!462"
+  },
+  "迎えに行く": {
+    "en": "Go to",
+    "source": "ruby_dictionary!355"
+  },
+  "迎えに行く時間": {
+    "en": "Time to",
+    "source": "ruby_dictionary!356"
+  },
+  "欠席": {
+    "en": "Absence",
+    "source": "ui_translations!163"
+  },
+  "欠席・遅刻": {
+    "en": "Absence/Lateness",
+    "source": "ui_translations!528"
+  },
+  "欠席します": {
+    "en": "I will",
+    "source": "ruby_dictionary!460"
+  },
+  "欠席扱い": {
+    "en": "Absent",
+    "source": "ruby_dictionary!511"
+  },
+  "欠席確認": {
+    "en": "Absence confirmation",
+    "source": "ruby_dictionary!227"
+  },
+  "欠席届": {
+    "en": "Absence form",
+    "source": "ruby_dictionary!2"
+  },
+  "欠席理由": {
+    "en": "Reason for",
+    "source": "ruby_dictionary!5"
+  },
+  "欠席連絡": {
+    "en": "Absence notification",
+    "source": "ruby_dictionary!426"
+  },
+  "欠点": {
+    "en": "Disadvantage",
+    "source": "ruby_dictionary!115"
+  },
+  "結果をコピー": {
+    "en": "Copy results",
+    "source": "通訳君 画面表記"
+  },
+  "件": {
+    "en": "Subject",
+    "source": "ui_translations!135"
+  },
+  "件を見る": {
+    "en": "View items",
+    "source": "ui_translations!688"
+  },
+  "件数と更新時刻を確認": {
+    "en": "Check the number of items and update time.",
+    "source": "ui_translations!243"
+  },
+  "健康": {
+    "en": "Health",
+    "source": "ui_translations!489"
+  },
+  "健康・安全": {
+    "en": "Health & safety",
+    "source": "ui_translations!859"
+  },
+  "健康診断を確認しています…": {
+    "en": "We are reviewing your health checkup...",
+    "source": "ui_translations!147"
+  },
+  "健康診断を取得できませんでした。": {
+    "en": "I was unable to obtain a health checkup.",
+    "source": "ui_translations!254"
+  },
+  "健康保険証": {
+    "en": "Health insurance",
+    "source": "ruby_dictionary!50"
+  },
+  "検温": {
+    "en": "Temperature check",
+    "source": "ruby_dictionary!459"
+  },
+  "検索ワード…": {
+    "en": "Search words…",
+    "source": "通訳君 画面表記"
+  },
+  "検索をクリア": {
+    "en": "Clear search",
+    "source": "通訳君 画面表記"
+  },
+  "検索を開く": {
+    "en": "Open search",
+    "source": "通訳君 画面表記"
+  },
+  "検索を閉じる": {
+    "en": "Close search",
+    "source": "通訳君 画面表記"
+  },
+  "検出": {
+    "en": "Detection",
+    "source": "ui_translations!598"
+  },
+  "見つかりました": {
+    "en": "Found it",
+    "source": "ruby_dictionary!480"
+  },
+  "見つかりませんでした。": {
+    "en": "It was not found.",
+    "source": "ui_translations!320"
+  },
+  "見てください": {
+    "en": "Look",
+    "source": "ruby_dictionary!308"
+  },
+  "見守り": {
+    "en": "Watching over",
+    "source": "ruby_dictionary!151"
+  },
+  "見返し": {
+    "en": "View items",
+    "source": "ui_translations!674"
+  },
+  "鍵盤ハーモニカ": {
+    "en": "Keyboard harmonica",
+    "source": "ruby_dictionary!85"
+  },
+  "元の言語": {
+    "en": "Original language",
+    "source": "ui_translations!223"
+  },
+  "原因の候補": {
+    "en": "Possible causes",
+    "source": "通訳君 画面表記"
+  },
+  "原因不明": {
+    "en": "Cause unknown",
+    "source": "ui_translations!423"
+  },
+  "減額": {
+    "en": "Reduction",
+    "source": "ruby_dictionary!140"
+  },
+  "現在のルビなし": {
+    "en": "No furigana currently available.",
+    "source": "ui_translations!807"
+  },
+  "現在のルビ英語": {
+    "en": "Current English with furigana (pronunciation guides)",
+    "source": "ui_translations!805"
+  },
+  "現在のルビ日本語": {
+    "en": "Current Japanese ruby ​​text",
+    "source": "ui_translations!806"
+  },
+  "現在の処理：": {
+    "en": "Current activity:",
+    "source": "通訳君 画面表記"
+  },
+  "現場でよく聞く文を入れる専用シートを作ります。": {
+    "en": "I will create a dedicated sheet for entering phrases that are frequently heard on-site.",
+    "source": "ui_translations!783"
+  },
+  "現場でよく聞く文を入れる専用シートを作ります。取り込みはスプレッドシート上部の「つたえる君」メニューから行います。": {
+    "en": "We will create a dedicated sheet for frequently heard phrases used on-site. Data can be imported using the \"Communication Tool\" menu at the top of the spreadsheet.",
+    "source": "ui_translations!788"
+  },
+  "言語": {
+    "en": "Language",
+    "source": "通訳君 画面表記"
+  },
+  "言語を確認して「授業に入る」を押してください。": {
+    "en": "Check your language, then choose Join class.",
+    "source": "通訳君 画面表記"
+  },
+  "言語を選ぶ": {
+    "en": "Choose language",
+    "source": "通訳君 画面表記"
+  },
+  "言語を選んでください。": {
+    "en": "Please select a language.",
+    "source": "ui_translations!10"
+  },
+  "個人懇談": {
+    "en": "Personal meeting",
+    "source": "ruby_dictionary!219"
+  },
+  "個人情報": {
+    "en": "Personal information",
+    "source": "ui_translations!105"
+  },
+  "個人面談の日程": {
+    "en": "Individual interview",
+    "source": "ruby_dictionary!319"
+  },
+  "個別指導": {
+    "en": "Individual tutoring",
+    "source": "ruby_dictionary!121"
+  },
+  "古い授業ログを整理": {
+    "en": "Organizing old lesson logs",
+    "source": "ui_translations!638"
+  },
+  "古い待機音声を破棄しました。AIサービスの混雑とは区別しています。": {
+    "en": "Old queued audio was discarded; this is separate from AI service congestion.",
+    "source": "通訳君 画面表記"
+  },
+  "呼び出し制限": {
+    "en": "Request limit",
+    "source": "通訳君 画面表記"
+  },
+  "固定UIの日本語残りは見つかりませんでした。": {
+    "en": "No further Japanese language options for the fixed UI were found.",
+    "source": "ui_translations!600"
+  },
+  "固定費、サーバー処理・共有保存、無料枠、他の端末の音声認識費用は含みません。Cloudflare全体の請求額とは異なります。履歴はこの端末に最大200回、発言本文の保存ボタンはありません。過去に保存した本文は同じ24時間の期限で削除します。発話末尾から表示までの時間は送信端末の音量からの推定です。認識・翻訳・配信を含み、翻訳だけの時間とは異なります。相手端末の発話は測定しません。切断理由の自由文や接続キーは分析へ含めません。": {
+    "en": "Estimates exclude fixed and other-device costs. History is local, up to 200 sessions. Speech timing is an estimate, not translation time alone.",
+    "source": "通訳君 画面表記"
+  },
+  "戸籍": {
+    "en": "Family register",
+    "source": "ruby_dictionary!59"
+  },
+  "顧問": {
+    "en": "Advisor",
+    "source": "ruby_dictionary!242"
+  },
+  "午後": {
+    "en": "Afternoon",
+    "source": "ruby_dictionary!32"
+  },
+  "午前": {
+    "en": "Morning",
+    "source": "ruby_dictionary!31"
+  },
+  "後で": {
+    "en": "Later",
+    "source": "ruby_dictionary!288"
+  },
+  "交代": {
+    "en": "Switch",
+    "source": "通訳君 画面表記"
+  },
+  "交通": {
+    "en": "Traffic",
+    "source": "ui_translations!542"
+  },
+  "候補": {
+    "en": "Suggestion",
+    "source": "通訳君 画面表記"
+  },
+  "候補として送る": {
+    "en": "Suggest",
+    "source": "通訳君 画面表記"
+  },
+  "候補の状態": {
+    "en": "Candidate status",
+    "source": "ui_translations!736"
+  },
+  "公開": {
+    "en": "Public",
+    "source": "ruby_dictionary!532"
+  },
+  "公立": {
+    "en": "Public",
+    "source": "ruby_dictionary!195"
+  },
+  "口座": {
+    "en": "Account",
+    "source": "ruby_dictionary!141"
+  },
+  "口座振替": {
+    "en": "Bank transfer",
+    "source": "ruby_dictionary!234"
+  },
+  "校外": {
+    "en": "Outside school",
+    "source": "ruby_dictionary!104"
+  },
+  "校外学習": {
+    "en": "Field trip",
+    "source": "ui_translations!473"
+  },
+  "校外活動費": {
+    "en": "Extracurricular activity",
+    "source": "ruby_dictionary!135"
+  },
+  "校則": {
+    "en": "School rules",
+    "source": "ruby_dictionary!251"
+  },
+  "校長室": {
+    "en": "Principal's office",
+    "source": "ruby_dictionary!107"
+  },
+  "校庭": {
+    "en": "School grounds",
+    "source": "ruby_dictionary!111"
+  },
+  "校内": {
+    "en": "Inside the school",
+    "source": "ui_translations!486"
+  },
+  "校門": {
+    "en": "School gate",
+    "source": "ruby_dictionary!520"
+  },
+  "行事": {
+    "en": "Events",
+    "source": "ui_translations!362"
+  },
+  "行事・部活動": {
+    "en": "Events/club activities",
+    "source": "ui_translations!844"
+  },
+  "行動": {
+    "en": "Action",
+    "source": "ui_translations!658"
+  },
+  "高校": {
+    "en": "High school",
+    "source": "ruby_dictionary!187"
+  },
+  "高等学校": {
+    "en": "High school",
+    "source": "ruby_dictionary!188"
+  },
+  "合唱祭": {
+    "en": "Chorus festival",
+    "source": "ruby_dictionary!208"
+  },
+  "合理的配慮": {
+    "en": "Reasonable accommodation",
+    "source": "ruby_dictionary!131"
+  },
+  "今月": {
+    "en": "This month",
+    "source": "ruby_dictionary!29"
+  },
+  "今週": {
+    "en": "This week",
+    "source": "ruby_dictionary!27"
+  },
+  "今日": {
+    "en": "Today",
+    "source": "ruby_dictionary!274"
+  },
+  "今日あと使えるAI予算": {
+    "en": "AI budget left today",
+    "source": "通訳君 画面表記"
+  },
+  "今日のAI予算の残り": {
+    "en": "Today's AI budget left",
+    "source": "通訳君 画面表記"
+  },
+  "今日のマイことば": {
+    "en": "Today's word",
+    "source": "ui_translations!627"
+  },
+  "今日の翻訳": {
+    "en": "Today's translation",
+    "source": "ui_translations!144"
+  },
+  "今日出たことば": {
+    "en": "Words that came up today",
+    "source": "ui_translations!592"
+  },
+  "困っている": {
+    "en": "I'm in",
+    "source": "ruby_dictionary!473"
+  },
+  "懇談": {
+    "en": "Conference",
+    "source": "ruby_dictionary!636"
+  },
+  "再テスト": {
+    "en": "Retest",
+    "source": "ruby_dictionary!119"
+  },
+  "再開": {
+    "en": "Resume",
+    "source": "通訳君 画面表記"
+  },
+  "再試行": {
+    "en": "Retry",
+    "source": "ui_translations!723"
+  },
+  "再生": {
+    "en": "Play",
+    "source": "通訳君 画面表記"
+  },
+  "再接続しています": {
+    "en": "Reconnecting",
+    "source": "通訳君 画面表記"
+  },
+  "再接続後に送信します。": {
+    "en": "Will send after reconnecting.",
+    "source": "通訳君 画面表記"
+  },
+  "再接続待ち": {
+    "en": "Waiting to reconnect",
+    "source": "通訳君 画面表記"
+  },
+  "再提出": {
+    "en": "Resubmit",
+    "source": "ruby_dictionary!503"
+  },
+  "再配付": {
+    "en": "Redistribution",
+    "source": "ruby_dictionary!549"
+  },
+  "最近見たことば": {
+    "en": "Words I've seen recently",
+    "source": "ui_translations!107"
+  },
+  "最近見た文": {
+    "en": "Recently seen sentences",
+    "source": "ui_translations!106"
+  },
+  "最終更新": {
+    "en": "Last updated",
+    "source": "ui_translations!157"
+  },
+  "最初にログイン画面で、使いたいコーナーを選びます。": {
+    "en": "First, on the login screen, select the section you want to use.",
+    "source": "ui_translations!281"
+  },
+  "最新の授業内容を上に表示します。": {
+    "en": "The latest lesson content will be displayed at the top.",
+    "source": "ui_translations!670"
+  },
+  "最新の授業内容を表示します。": {
+    "en": "The latest lesson content will be displayed.",
+    "source": "ui_translations!671"
+  },
+  "最新へ ↓": {
+    "en": "Latest ↓",
+    "source": "通訳君 画面表記"
+  },
+  "採点": {
+    "en": "Grading",
+    "source": "ruby_dictionary!599"
+  },
+  "採用候補": {
+    "en": "Suggested",
+    "source": "通訳君 画面表記"
+  },
+  "採用候補CSV": {
+    "en": "Suggestion CSV",
+    "source": "通訳君 画面表記"
+  },
+  "災害": {
+    "en": "Disaster",
+    "source": "ruby_dictionary!146"
+  },
+  "作成・入室": {
+    "en": "Create and enter the room",
+    "source": "ui_translations!313"
+  },
+  "作成できませんでした": {
+    "en": "Could not create.",
+    "source": "ui_translations!726"
+  },
+  "削除": {
+    "en": "Delete",
+    "source": "ui_translations!349"
+  },
+  "削除するログを選べませんでした。": {
+    "en": "I was unable to select which logs to delete.",
+    "source": "ui_translations!407"
+  },
+  "削除できませんでした：": {
+    "en": "Could not delete:",
+    "source": "ui_translations!412"
+  },
+  "削除できませんでした。": {
+    "en": "Could not delete.",
+    "source": "ui_translations!369"
+  },
+  "削除中": {
+    "en": "Deleting",
+    "source": "ui_translations!387"
+  },
+  "昨日": {
+    "en": "Yesterday",
+    "source": "ruby_dictionary!25"
+  },
+  "撮影禁止": {
+    "en": "Photography prohibited",
+    "source": "ruby_dictionary!528"
+  },
+  "三角定規": {
+    "en": "Triangular ruler",
+    "source": "ruby_dictionary!377"
+  },
+  "三者懇談": {
+    "en": "Tripartite meeting",
+    "source": "ruby_dictionary!220"
+  },
+  "傘": {
+    "en": "Umbrella",
+    "source": "ruby_dictionary!381"
+  },
+  "参加": {
+    "en": "Participation",
+    "source": "ruby_dictionary!226"
+  },
+  "参加できない": {
+    "en": "Unable to",
+    "source": "ruby_dictionary!313"
+  },
+  "参加できます": {
+    "en": "Ready to join",
+    "source": "通訳君 画面表記"
+  },
+  "参加できる": {
+    "en": "Can participate",
+    "source": "ruby_dictionary!312"
+  },
+  "参加の認証": {
+    "en": "Join authentication",
+    "source": "通訳君 画面表記"
+  },
+  "参加の認証を確認してください。タブを選び直すと再開できます。": {
+    "en": "Check sign-in. Select the mode again to retry.",
+    "source": "通訳君 画面表記"
+  },
+  "参加者": {
+    "en": "Participants",
+    "source": "通訳君 画面表記"
+  },
+  "参加中・音声準備中": {
+    "en": "Joined; preparing audio",
+    "source": "通訳君 画面表記"
+  },
+  "参観": {
+    "en": "Visit",
+    "source": "ui_translations!466"
+  },
+  "算数セット": {
+    "en": "Math set",
+    "source": "ruby_dictionary!87"
+  },
+  "残り使える額（アプリ内の設定）": {
+    "en": "AI budget left (app limit)",
+    "source": "通訳君 画面表記"
+  },
+  "残高不足": {
+    "en": "Insufficient funds",
+    "source": "ruby_dictionary!143"
+  },
+  "残量を確認しています…": {
+    "en": "Checking budget…",
+    "source": "通訳君 画面表記"
+  },
+  "残量を更新": {
+    "en": "Refresh budget",
+    "source": "通訳君 画面表記"
+  },
+  "残量を取得できませんでした。「残量を更新」で再試行してください。未取得を0円として表示しません。": {
+    "en": "Budget is unavailable. Choose Refresh budget to try again.",
+    "source": "通訳君 画面表記"
+  },
+  "使い方": {
+    "en": "How to use",
+    "source": "ui_translations!119"
+  },
+  "使い方・最近の改善": {
+    "en": "Help & updates",
+    "source": "通訳君 画面表記"
+  },
+  "使う人を選んでください。": {
+    "en": "Please choose who will use it.",
+    "source": "ui_translations!222"
+  },
+  "始業式": {
+    "en": "Opening ceremony",
+    "source": "ruby_dictionary!200"
+  },
+  "姉妹": {
+    "en": "Sisters",
+    "source": "ruby_dictionary!420"
+  },
+  "市役所": {
+    "en": "City hall",
+    "source": "ruby_dictionary!56"
+  },
+  "志望校": {
+    "en": "Desired school",
+    "source": "ruby_dictionary!186"
+  },
+  "指す言葉があります": {
+    "en": "There is a word that refers to it.",
+    "source": "ui_translations!73"
+  },
+  "指示": {
+    "en": "Instructions",
+    "source": "ui_translations!683"
+  },
+  "支援員": {
+    "en": "Support staff",
+    "source": "ruby_dictionary!125"
+  },
+  "支払い": {
+    "en": "Payment",
+    "source": "ui_translations!485"
+  },
+  "私立": {
+    "en": "Private",
+    "source": "ruby_dictionary!196"
+  },
+  "紙などに書くこと": {
+    "en": "Writing on paper or similar",
+    "source": "ui_translations!84"
+  },
+  "至急": {
+    "en": "Urgent",
+    "source": "ruby_dictionary!22"
+  },
+  "試行": {
+    "en": "Attempts",
+    "source": "通訳君 画面表記"
+  },
+  "試合": {
+    "en": "Game",
+    "source": "ruby_dictionary!245"
+  },
+  "資料集": {
+    "en": "Collection of",
+    "source": "ruby_dictionary!66"
+  },
+  "児童会": {
+    "en": "Student council",
+    "source": "ruby_dictionary!101"
+  },
+  "字幕・翻訳サーバー": {
+    "en": "Caption & translation server",
+    "source": "通訳君 画面表記"
+  },
+  "字幕が更新されました。もう一度開いてください。": {
+    "en": "The caption changed. Open it again.",
+    "source": "通訳君 画面表記"
+  },
+  "字幕と通話": {
+    "en": "Captions and call",
+    "source": "通訳君 画面表記"
+  },
+  "字幕の接続が途切れました。マイクを押し直すか文字で伝えてください。": {
+    "en": "Caption connection lost. Restart the mic or type your message.",
+    "source": "通訳君 画面表記"
+  },
+  "字幕履歴": {
+    "en": "Caption history",
+    "source": "通訳君 画面表記"
+  },
+  "持たせてください": {
+    "en": "Please let",
+    "source": "ruby_dictionary!73"
+  },
+  "持ち帰り": {
+    "en": "Takeout",
+    "source": "ruby_dictionary!71"
+  },
+  "持ち帰り袋": {
+    "en": "Takeaway bag",
+    "source": "ruby_dictionary!442"
+  },
+  "持ち帰る": {
+    "en": "Take home",
+    "source": "ruby_dictionary!77"
+  },
+  "持ち物": {
+    "en": "Belongings",
+    "source": "ui_translations!255"
+  },
+  "持ち物・提出": {
+    "en": "Items & forms",
+    "source": "ui_translations!843"
+  },
+  "持ち物や提出物があります": {
+    "en": "There are items to bring and documents to submit.",
+    "source": "ui_translations!602"
+  },
+  "持ってきてください": {
+    "en": "Please bring",
+    "source": "ruby_dictionary!296"
+  },
+  "持ってくること": {
+    "en": "Bring it",
+    "source": "ui_translations!85"
+  },
+  "持ってくる物、出す物は、1つずつ分けると伝わりやすくなります。": {
+    "en": "It's easier to communicate if you separate the items you bring and the items you give away into one item each.",
+    "source": "ui_translations!603"
+  },
+  "持参": {
+    "en": "Bring",
+    "source": "ruby_dictionary!72"
+  },
+  "時間切れ": {
+    "en": "Timeout",
+    "source": "通訳君 画面表記"
+  },
+  "次から同じ聞き間違いを直す": {
+    "en": "Remember this speech correction",
+    "source": "通訳君 画面表記"
+  },
+  "次に見るもの": {
+    "en": "Next thing to see",
+    "source": "ui_translations!253"
+  },
+  "次のリセット：": {
+    "en": "Next reset:",
+    "source": "通訳君 画面表記"
+  },
+  "次の確認": {
+    "en": "Next steps",
+    "source": "通訳君 画面表記"
+  },
+  "次へ": {
+    "en": "To the next",
+    "source": "ui_translations!111"
+  },
+  "自然教室": {
+    "en": "Nature classroom",
+    "source": "ruby_dictionary!213"
+  },
+  "自転車": {
+    "en": "Bicycle",
+    "source": "ruby_dictionary!433"
+  },
+  "自動取得を一時停止する": {
+    "en": "Pause automatic retrieval.",
+    "source": "ui_translations!309"
+  },
+  "自動取得中": {
+    "en": "Automatically retrieving data.",
+    "source": "ui_translations!184"
+  },
+  "自動取得停止中": {
+    "en": "Automatic data acquisition is currently stopped.",
+    "source": "ui_translations!261"
+  },
+  "自分": {
+    "en": "Me",
+    "source": "通訳君 画面表記"
+  },
+  "自分が話す": {
+    "en": "I speak",
+    "source": "通訳君 画面表記"
+  },
+  "自分の言語": {
+    "en": "My language",
+    "source": "ui_translations!30"
+  },
+  "辞書": {
+    "en": "Dictionary",
+    "source": "ui_translations!176"
+  },
+  "辞書の一覧を読み込んでいます…": {
+    "en": "Loading dictionary list...",
+    "source": "ui_translations!380"
+  },
+  "辞書の訳": {
+    "en": "Dictionary translation",
+    "source": "通訳君 画面表記"
+  },
+  "辞書の訳と確認した訳を再利用します。登録した言い換えにも対応します。日付・数字・否定が違う文は区別します。": {
+    "en": "Reuse dictionary and reviewed translations. Dates, numbers and negation are checked separately.",
+    "source": "通訳君 画面表記"
+  },
+  "辞書ページ切り替え": {
+    "en": "Switch dictionary page",
+    "source": "ui_translations!324"
+  },
+  "辞書を読み込んでいます": {
+    "en": "Loading dictionary",
+    "source": "ui_translations!269"
+  },
+  "辞書利用": {
+    "en": "Dictionary use",
+    "source": "通訳君 画面表記"
+  },
+  "辞退": {
+    "en": "Decline",
+    "source": "ruby_dictionary!536"
+  },
+  "辞典": {
+    "en": "Words",
+    "source": "通訳君 画面表記"
+  },
+  "辞典のカテゴリー": {
+    "en": "Word categories",
+    "source": "通訳君 画面表記"
+  },
+  "辞典のクリック": {
+    "en": "Word opens",
+    "source": "通訳君 画面表記"
+  },
+  "式": {
+    "en": "Expression",
+    "source": "ruby_dictionary!594"
+  },
+  "式の確認待ち": {
+    "en": "Waiting for confirmation of the formula",
+    "source": "ui_translations!752"
+  },
+  "失敗・未計測は予約分を残します。アカウントの無料枠や請求額の保証ではありません。音声中継と他のアプリは対象外です。": {
+    "en": "Reservations may remain after failures. This is not a bill or a guaranteed provider balance.",
+    "source": "通訳君 画面表記"
+  },
+  "実際のTURN中継経路と学校端末間の音声到達": {
+    "en": "Actual TURN path and audio delivery",
+    "source": "通訳君 画面表記"
+  },
+  "実施": {
+    "en": "Implementation",
+    "source": "ruby_dictionary!37"
+  },
+  "実力テスト": {
+    "en": "Aptitude test",
+    "source": "ruby_dictionary!175"
+  },
+  "写真掲載": {
+    "en": "Photo included",
+    "source": "ruby_dictionary!534"
+  },
+  "写真撮影": {
+    "en": "Photo shoot",
+    "source": "ruby_dictionary!527"
+  },
+  "社会": {
+    "en": "Society",
+    "source": "ui_translations!509"
+  },
+  "社会見学": {
+    "en": "Field trip",
+    "source": "ruby_dictionary!210"
+  },
+  "車で迎える": {
+    "en": "Pick up",
+    "source": "ruby_dictionary!519"
+  },
+  "車で送る": {
+    "en": "Give me",
+    "source": "ruby_dictionary!518"
+  },
+  "取り出し授業": {
+    "en": "Extraction lesson",
+    "source": "ruby_dictionary!123"
+  },
+  "手続き": {
+    "en": "Procedure",
+    "source": "ui_translations!475"
+  },
+  "手袋": {
+    "en": "Gloves",
+    "source": "ruby_dictionary!454"
+  },
+  "種類": {
+    "en": "Kinds",
+    "source": "ui_translations!775"
+  },
+  "受け取り": {
+    "en": "Receipt",
+    "source": "ruby_dictionary!546"
+  },
+  "受け取りました": {
+    "en": "I received",
+    "source": "ruby_dictionary!547"
+  },
+  "受験": {
+    "en": "Entrance exam",
+    "source": "ruby_dictionary!190"
+  },
+  "受信したデータを確認できませんでした。": {
+    "en": "Could not read the received data.",
+    "source": "通訳君 画面表記"
+  },
+  "受付": {
+    "en": "Reception",
+    "source": "ruby_dictionary!523"
+  },
+  "授業": {
+    "en": "Class",
+    "source": "ui_translations!172"
+  },
+  "授業・勉強": {
+    "en": "Class & study",
+    "source": "ui_translations!848"
+  },
+  "授業が終了しました。": {
+    "en": "Class has ended.",
+    "source": "通訳君 画面表記"
+  },
+  "授業での役割": {
+    "en": "Class role",
+    "source": "通訳君 画面表記"
+  },
+  "授業で使う物のお金": {
+    "en": "Money for things used in class",
+    "source": "ui_translations!93"
+  },
+  "授業に入っています…": {
+    "en": "Joining class…",
+    "source": "通訳君 画面表記"
+  },
+  "授業に入る": {
+    "en": "Join class",
+    "source": "通訳君 画面表記"
+  },
+  "授業のテーマ（任意）": {
+    "en": "Class topic (optional)",
+    "source": "通訳君 画面表記"
+  },
+  "授業のふり返り": {
+    "en": "Lesson review",
+    "source": "ui_translations!587"
+  },
+  "授業の最初から順番に表示します。": {
+    "en": "The lessons will be displayed in order from the beginning.",
+    "source": "ui_translations!687"
+  },
+  "授業モード": {
+    "en": "Class mode",
+    "source": "ui_translations!5"
+  },
+  "授業ログ": {
+    "en": "Class Log",
+    "source": "ui_translations!668"
+  },
+  "授業ログの自動取得は一時停止中です。": {
+    "en": "Automatic retrieval of class logs is currently suspended.",
+    "source": "ui_translations!428"
+  },
+  "授業ログはまだありません。": {
+    "en": "There are no class logs yet.",
+    "source": "ui_translations!511"
+  },
+  "授業ログは保存されませんでした。入室状態を確認してください。": {
+    "en": "The class log was not saved. Please check your class status.",
+    "source": "ui_translations!392"
+  },
+  "授業ログを開始しました。入力欄を選び、キーボードのマイクで話してください。": {
+    "en": "The lesson log has started. Please select an input field and speak into the microphone on your keyboard.",
+    "source": "ui_translations!364"
+  },
+  "授業ログを削除しました。": {
+    "en": "The class log has been deleted.",
+    "source": "ui_translations!403"
+  },
+  "授業ログを自動取得しています。": {
+    "en": "Class logs are being automatically retrieved.",
+    "source": "ui_translations!429"
+  },
+  "授業ログを取得できませんでした：": {
+    "en": "Could not retrieve class logs:",
+    "source": "ui_translations!416"
+  },
+  "授業ログを取得できませんでした。": {
+    "en": "The class log could not be retrieved.",
+    "source": "ui_translations!375"
+  },
+  "授業ログを保存しています。": {
+    "en": "The lesson log is being saved.",
+    "source": "ui_translations!390"
+  },
+  "授業ログを保存しました。": {
+    "en": "The lesson log has been saved.",
+    "source": "ui_translations!359"
+  },
+  "授業ログを保存できませんでした：": {
+    "en": "The class log could not be saved:",
+    "source": "ui_translations!377"
+  },
+  "授業ログを保存できませんでした。": {
+    "en": "The lesson log could not be saved.",
+    "source": "ui_translations!391"
+  },
+  "授業をおわりますか？": {
+    "en": "End this class?",
+    "source": "通訳君 画面表記"
+  },
+  "授業をおわる": {
+    "en": "End class",
+    "source": "通訳君 画面表記"
+  },
+  "授業をおわると、生徒にことばが届かなくなります。": {
+    "en": "Students will stop receiving captions.",
+    "source": "通訳君 画面表記"
+  },
+  "授業を開始しました。キーボードのマイクで話してください。": {
+    "en": "The lesson has begun. Please speak into the microphone on your keyboard.",
+    "source": "ui_translations!822"
+  },
+  "授業を記録": {
+    "en": "Record the lesson",
+    "source": "ui_translations!819"
+  },
+  "授業を見る日": {
+    "en": "Day to",
+    "source": "ruby_dictionary!344"
+  },
+  "授業を翻訳": {
+    "en": "Translate the lesson",
+    "source": "ui_translations!835"
+  },
+  "授業一般": {
+    "en": "General class",
+    "source": "通訳君 画面表記"
+  },
+  "授業音声入力": {
+    "en": "Classroom voice input",
+    "source": "ui_translations!300"
+  },
+  "授業音声入力欄が見つかりません。": {
+    "en": "The audio input field for the lesson cannot be found.",
+    "source": "ui_translations!541"
+  },
+  "授業開始": {
+    "en": "Classes begin",
+    "source": "ui_translations!306"
+  },
+  "授業開始（外部マイク使用）": {
+    "en": "Class begins (using external microphone)",
+    "source": "ui_translations!793"
+  },
+  "授業開始を押す": {
+    "en": "Press \"Start Class\"",
+    "source": "ui_translations!667"
+  },
+  "授業再開": {
+    "en": "Classes resume",
+    "source": "ui_translations!307"
+  },
+  "授業参観": {
+    "en": "Class observation",
+    "source": "ruby_dictionary!216"
+  },
+  "授業前チェック": {
+    "en": "Pre-class check",
+    "source": "ui_translations!644"
+  },
+  "授業中": {
+    "en": "During class",
+    "source": "ui_translations!182"
+  },
+  "授業内容": {
+    "en": "Course content",
+    "source": "ui_translations!799"
+  },
+  "授業内容を自動取得する": {
+    "en": "Automatically retrieve lesson content.",
+    "source": "ui_translations!308"
+  },
+  "授業内容を翻訳する": {
+    "en": "Translate the lesson content",
+    "source": "ui_translations!366"
+  },
+  "就学通知書": {
+    "en": "School attendance",
+    "source": "ruby_dictionary!62"
+  },
+  "修学旅行": {
+    "en": "School trip",
+    "source": "ruby_dictionary!212"
+  },
+  "修学旅行費": {
+    "en": "School trip",
+    "source": "ruby_dictionary!134"
+  },
+  "修正回数は精度の判定ではありません。古い履歴と未計測は割合に含みません。": {
+    "en": "Correction counts are not accuracy scores. Old or unmeasured records are excluded from ratios.",
+    "source": "通訳君 画面表記"
+  },
+  "修了式": {
+    "en": "Graduation ceremony",
+    "source": "ruby_dictionary!202"
+  },
+  "終わっている": {
+    "en": "It's over",
+    "source": "ruby_dictionary!349"
+  },
+  "終業式": {
+    "en": "Closing ceremony",
+    "source": "ruby_dictionary!201"
+  },
+  "終了しました。": {
+    "en": "Ended.",
+    "source": "ui_translations!346"
+  },
+  "終了未記録": {
+    "en": "End not recorded",
+    "source": "通訳君 画面表記"
+  },
+  "習字セット": {
+    "en": "Calligraphy set",
+    "source": "ruby_dictionary!84"
+  },
+  "習字道具": {
+    "en": "Calligraphy tools",
+    "source": "ruby_dictionary!394"
+  },
+  "集金": {
+    "en": "Collection",
+    "source": "ui_translations!464"
+  },
+  "集合": {
+    "en": "Set",
+    "source": "ruby_dictionary!436"
+  },
+  "集合時間": {
+    "en": "Meeting time",
+    "source": "ruby_dictionary!438"
+  },
+  "集合場所": {
+    "en": "Meeting place",
+    "source": "ruby_dictionary!247"
+  },
+  "住所": {
+    "en": "Address",
+    "source": "ruby_dictionary!657"
+  },
+  "住民票": {
+    "en": "Resident record",
+    "source": "ruby_dictionary!58"
+  },
+  "重要": {
+    "en": "Important",
+    "source": "ui_translations!620"
+  },
+  "重要な内容です。必要に応じて、先生・保護者・通訳者と確認してください。": {
+    "en": "This is important information. Please confirm with your teacher, parent, or interpreter as needed.",
+    "source": "ui_translations!63"
+  },
+  "宿題": {
+    "en": "Homework",
+    "source": "ui_translations!259"
+  },
+  "宿題が終わっている": {
+    "en": "I've finished",
+    "source": "ruby_dictionary!348"
+  },
+  "出す紙": {
+    "en": "Paper to",
+    "source": "ruby_dictionary!290"
+  },
+  "出ていません": {
+    "en": "It's not",
+    "source": "ruby_dictionary!291"
+  },
+  "出欠": {
+    "en": "Attendance",
+    "source": "ruby_dictionary!3"
+  },
+  "出欠確認": {
+    "en": "Attendance confirmation",
+    "source": "ruby_dictionary!4"
+  },
+  "出血": {
+    "en": "Bleeding",
+    "source": "ruby_dictionary!615"
+  },
+  "出席": {
+    "en": "Attendance",
+    "source": "ruby_dictionary!603"
+  },
+  "出席扱い": {
+    "en": "Counted as",
+    "source": "ruby_dictionary!512"
+  },
+  "準備": {
+    "en": "Preparation",
+    "source": "ruby_dictionary!74"
+  },
+  "準備しています": {
+    "en": "Getting ready",
+    "source": "通訳君 画面表記"
+  },
+  "準備済み": {
+    "en": "Ready",
+    "source": "ui_translations!257"
+  },
+  "準備中": {
+    "en": "Getting ready",
+    "source": "ui_translations!379"
+  },
+  "準備物": {
+    "en": "Preparations",
+    "source": "ruby_dictionary!75"
+  },
+  "処理しています…": {
+    "en": "Processing...",
+    "source": "ui_translations!334"
+  },
+  "処理待機中": {
+    "en": "Waiting",
+    "source": "通訳君 画面表記"
+  },
+  "初期設定は共有端末です。過去の個人用保存は削除せず、共有端末では読み込みません。次の人へ渡す前に利用を終了してください。": {
+    "en": "Shared-device mode is the default. End the session before handing the device to someone else.",
+    "source": "通訳君 画面表記"
+  },
+  "所見": {
+    "en": "Findings",
+    "source": "ruby_dictionary!183"
+  },
+  "署名": {
+    "en": "Signature",
+    "source": "ruby_dictionary!493"
+  },
+  "除外": {
+    "en": "Excluded",
+    "source": "通訳君 画面表記"
+  },
+  "除外した候補も表示": {
+    "en": "Show excluded suggestions",
+    "source": "通訳君 画面表記"
+  },
+  "小テスト": {
+    "en": "Quiz",
+    "source": "ruby_dictionary!171"
+  },
+  "少なく表示": {
+    "en": "Show less",
+    "source": "通訳君 画面表記"
+  },
+  "承諾": {
+    "en": "Consent",
+    "source": "ruby_dictionary!535"
+  },
+  "承認済み": {
+    "en": "Approved",
+    "source": "ui_translations!741"
+  },
+  "承認済み候補を文例に追加": {
+    "en": "Added approved candidates to example sentences.",
+    "source": "ui_translations!734"
+  },
+  "承認済み候補を文例に追加しています…": {
+    "en": "Approved candidates are being added to the example sentences...",
+    "source": "ui_translations!755"
+  },
+  "承認済み候補を文例に追加できませんでした。": {
+    "en": "The approved candidate could not be added to the example sentences.",
+    "source": "ui_translations!756"
+  },
+  "招待が届いています": {
+    "en": "You are invited",
+    "source": "通訳君 画面表記"
+  },
+  "招待リンクをコピーしてください。": {
+    "en": "Copy the invitation link.",
+    "source": "通訳君 画面表記"
+  },
+  "昇降口": {
+    "en": "Entrance/exit",
+    "source": "ruby_dictionary!112"
+  },
+  "消しゴム": {
+    "en": "Eraser",
+    "source": "ruby_dictionary!373"
+  },
+  "消す": {
+    "en": "Erase",
+    "source": "ui_translations!643"
+  },
+  "詳しい内容": {
+    "en": "Detailed information",
+    "source": "ruby_dictionary!304"
+  },
+  "上靴": {
+    "en": "Indoor shoes",
+    "source": "ruby_dictionary!78"
+  },
+  "上限到達": {
+    "en": "Upper limit reached",
+    "source": "ui_translations!248"
+  },
+  "上履き": {
+    "en": "Indoor shoes",
+    "source": "ruby_dictionary!366"
+  },
+  "場合": {
+    "en": "Case",
+    "source": "ruby_dictionary!276"
+  },
+  "状況": {
+    "en": "Situation",
+    "source": "ruby_dictionary!327"
+  },
+  "職員室": {
+    "en": "Staff room",
+    "source": "ruby_dictionary!106"
+  },
+  "職場体験": {
+    "en": "Work experience",
+    "source": "ruby_dictionary!215"
+  },
+  "食器": {
+    "en": "Tableware",
+    "source": "ruby_dictionary!622"
+  },
+  "振込": {
+    "en": "Transfer",
+    "source": "ruby_dictionary!233"
+  },
+  "新しいタブで「マイク開始」を押してください。": {
+    "en": "Please press \"Start Microphone\" in the new tab.",
+    "source": "ui_translations!824"
+  },
+  "新しい字幕 · 最新へ ↓": {
+    "en": "New captions · Latest ↓",
+    "source": "通訳君 画面表記"
+  },
+  "新しい授業ログはまだありません。": {
+    "en": "There are no new lesson logs yet.",
+    "source": "ui_translations!522"
+  },
+  "新しい授業ログを表示しました。": {
+    "en": "The new lesson log has been displayed.",
+    "source": "ui_translations!555"
+  },
+  "新規": {
+    "en": "New",
+    "source": "ui_translations!737"
+  },
+  "新着": {
+    "en": "New Arrivals",
+    "source": "ui_translations!331"
+  },
+  "新着を見る": {
+    "en": "View new arrivals",
+    "source": "ui_translations!673"
+  },
+  "申込": {
+    "en": "Application",
+    "source": "ruby_dictionary!498"
+  },
+  "申込書": {
+    "en": "Application form",
+    "source": "ruby_dictionary!499"
+  },
+  "診断欄をコピーして、このチャットへ貼り付けてください。": {
+    "en": "Copy the diagnostic results into this chat.",
+    "source": "通訳君 画面表記"
+  },
+  "身だしなみ": {
+    "en": "Personal grooming",
+    "source": "ruby_dictionary!254"
+  },
+  "身分証明書": {
+    "en": "Id card",
+    "source": "ruby_dictionary!49"
+  },
+  "進路": {
+    "en": "Course",
+    "source": "ui_translations!478"
+  },
+  "進路や成績": {
+    "en": "Career path and grades",
+    "source": "ui_translations!104"
+  },
+  "進路希望": {
+    "en": "Career aspirations",
+    "source": "ruby_dictionary!185"
+  },
+  "人が確認": {
+    "en": "Human confirmation",
+    "source": "ruby_dictionary!343"
+  },
+  "図工": {
+    "en": "Art and Craft",
+    "source": "ui_translations!482"
+  },
+  "図書室": {
+    "en": "Library",
+    "source": "ruby_dictionary!108"
+  },
+  "推薦": {
+    "en": "Recommendation",
+    "source": "ruby_dictionary!194"
+  },
+  "推定USD": {
+    "en": "Estimated USD",
+    "source": "通訳君 画面表記"
+  },
+  "推定円": {
+    "en": "Estimated JPY",
+    "source": "通訳君 画面表記"
+  },
+  "水泳": {
+    "en": "Swimming",
+    "source": "ui_translations!490"
+  },
+  "水泳バッグ": {
+    "en": "Swimming bag",
+    "source": "ruby_dictionary!455"
+  },
+  "水泳帽": {
+    "en": "Swimming cap",
+    "source": "ruby_dictionary!83"
+  },
+  "水着": {
+    "en": "Swimsuit",
+    "source": "ruby_dictionary!82"
+  },
+  "水筒": {
+    "en": "Water bottle",
+    "source": "ruby_dictionary!444"
+  },
+  "数学": {
+    "en": "Math",
+    "source": "ui_translations!505"
+  },
+  "数字・日付を確認してください": {
+    "en": "Check numbers and dates.",
+    "source": "通訳君 画面表記"
+  },
+  "世帯": {
+    "en": "Household",
+    "source": "ruby_dictionary!44"
+  },
+  "世帯主": {
+    "en": "Head of",
+    "source": "ruby_dictionary!45"
+  },
+  "制服": {
+    "en": "Uniform",
+    "source": "ruby_dictionary!448"
+  },
+  "成功・失敗を含む記録のP95です。区間は重なるため合算しません。未計測とキャッシュのAI時間は除外します。": {
+    "en": "P95 includes recorded successes and failures. Timings overlap; do not add them. Unmeasured and cached AI times are excluded.",
+    "source": "通訳君 画面表記"
+  },
+  "成績": {
+    "en": "Grades",
+    "source": "ui_translations!550"
+  },
+  "整理が完了しました": {
+    "en": "The organization is complete.",
+    "source": "ui_translations!633"
+  },
+  "整理した補正候補": {
+    "en": "Organized correction candidates",
+    "source": "ui_translations!639"
+  },
+  "整理しています…": {
+    "en": "I'm organizing things...",
+    "source": "ui_translations!634"
+  },
+  "整理する": {
+    "en": "Sort out",
+    "source": "ui_translations!663"
+  },
+  "整理できませんでした。": {
+    "en": "I was unable to organize it.",
+    "source": "ui_translations!664"
+  },
+  "整列": {
+    "en": "Line up",
+    "source": "ruby_dictionary!575"
+  },
+  "正門": {
+    "en": "Main gate",
+    "source": "ruby_dictionary!521"
+  },
+  "清掃": {
+    "en": "Cleaning",
+    "source": "ruby_dictionary!96"
+  },
+  "生活": {
+    "en": "Life",
+    "source": "ui_translations!549"
+  },
+  "生活状況": {
+    "en": "Living situation",
+    "source": "ruby_dictionary!182"
+  },
+  "生徒": {
+    "en": "Student",
+    "source": "ui_translations!9"
+  },
+  "生徒として使います。": {
+    "en": "I will use it as a student.",
+    "source": "ui_translations!17"
+  },
+  "生徒に伝えて、「授業開始（外部マイク使用）」を押してください。": {
+    "en": "Please inform the students and press \"Start Lesson (Use External Microphone)\".",
+    "source": "ui_translations!797"
+  },
+  "生徒に伝えて、授業開始ボタンを押してください。": {
+    "en": "Please inform the students and then press the start button for the lesson.",
+    "source": "ui_translations!556"
+  },
+  "生徒モード": {
+    "en": "Student Mode",
+    "source": "ui_translations!178"
+  },
+  "生徒会": {
+    "en": "Student council",
+    "source": "ruby_dictionary!102"
+  },
+  "積立金": {
+    "en": "Reserve fund",
+    "source": "ruby_dictionary!232"
+  },
+  "赤白帽": {
+    "en": "Red and",
+    "source": "ruby_dictionary!81"
+  },
+  "赤白帽子": {
+    "en": "Red and",
+    "source": "ruby_dictionary!387"
+  },
+  "接続しています": {
+    "en": "Connecting",
+    "source": "通訳君 画面表記"
+  },
+  "接続できないため再試行を停止しました。回線を確認してタブを選び直してください。": {
+    "en": "Retries stopped. Check the network and select the mode again.",
+    "source": "通訳君 画面表記"
+  },
+  "接続できました": {
+    "en": "Connected",
+    "source": "通訳君 画面表記"
+  },
+  "接続できません": {
+    "en": "Cannot connect",
+    "source": "通訳君 画面表記"
+  },
+  "接続できませんでした": {
+    "en": "Connection failed",
+    "source": "通訳君 画面表記"
+  },
+  "接続できませんでした。タブを選び直してください。": {
+    "en": "Connection failed. Select the mode again.",
+    "source": "通訳君 画面表記"
+  },
+  "接続できませんでした。通信環境を確認して、もう一度お試しください。": {
+    "en": "Check your connection and try again.",
+    "source": "通訳君 画面表記"
+  },
+  "接続の確認": {
+    "en": "Connection check",
+    "source": "通訳君 画面表記"
+  },
+  "接続の準備に時間がかかっています。": {
+    "en": "Connection is taking longer than expected.",
+    "source": "通訳君 画面表記"
+  },
+  "接続の準備を取り消しました。": {
+    "en": "Connection setup cancelled.",
+    "source": "通訳君 画面表記"
+  },
+  "接続を確認": {
+    "en": "Check connection",
+    "source": "通訳君 画面表記"
+  },
+  "接続を確認してください。": {
+    "en": "Check the connection.",
+    "source": "通訳君 画面表記"
+  },
+  "接続を準備しています": {
+    "en": "Preparing connection",
+    "source": "通訳君 画面表記"
+  },
+  "接続を準備できませんでした。": {
+    "en": "Could not prepare the connection.",
+    "source": "通訳君 画面表記"
+  },
+  "接続を停止しました": {
+    "en": "Connection stopped",
+    "source": "通訳君 画面表記"
+  },
+  "接続診断の判定対象は過去5分の記録です。利用結果とは別の検査です。": {
+    "en": "Connection diagnosis uses the last five minutes, separately from usage results.",
+    "source": "通訳君 画面表記"
+  },
+  "接続診断結果": {
+    "en": "Connection results",
+    "source": "通訳君 画面表記"
+  },
+  "接続先への通信制限・DNS・TLS・CORS": {
+    "en": "Network limits, DNS, TLS or CORS",
+    "source": "通訳君 画面表記"
+  },
+  "接続中": {
+    "en": "Connected",
+    "source": "通訳君 画面表記"
+  },
+  "設定": {
+    "en": "Setting",
+    "source": "ui_translations!278"
+  },
+  "設定・説明": {
+    "en": "Settings & help",
+    "source": "通訳君 画面表記"
+  },
+  "説明": {
+    "en": "Explanation",
+    "source": "ui_translations!684"
+  },
+  "先に、使う人を選んでください。": {
+    "en": "Please choose who will be using it first.",
+    "source": "ui_translations!12"
+  },
+  "先生": {
+    "en": "Teacher",
+    "source": "ui_translations!6"
+  },
+  "先生 → 保護者": {
+    "en": "Teacher → Parent",
+    "source": "ui_translations!33"
+  },
+  "先生から": {
+    "en": "From the teacher",
+    "source": "ui_translations!228"
+  },
+  "先生から保護者へ伝える内容を入力します。": {
+    "en": "Enter the message the teacher will send to the parents.",
+    "source": "ui_translations!58"
+  },
+  "先生がルームを閉じました。授業が終わったので退室してください。": {
+    "en": "The teacher has closed the room. The class is over, so please leave.",
+    "source": "ui_translations!427"
+  },
+  "先生が伝えたいことを短く入力": {
+    "en": "Enter a short message for the teacher.",
+    "source": "ui_translations!56"
+  },
+  "先生が伝えたいことを入力": {
+    "en": "Enter what the teacher wants to convey.",
+    "source": "ui_translations!52"
+  },
+  "先生が入室中です。": {
+    "en": "The teacher is in the room.",
+    "source": "ui_translations!430"
+  },
+  "先生として使います。": {
+    "en": "I will use it as a teacher.",
+    "source": "ui_translations!15"
+  },
+  "先生と保護者が話す会": {
+    "en": "Meeting for teachers and parents to talk",
+    "source": "ui_translations!88"
+  },
+  "先生と話すこと": {
+    "en": "Talking with the teacher",
+    "source": "ui_translations!357"
+  },
+  "先生と話す日": {
+    "en": "Day to",
+    "source": "ruby_dictionary!320"
+  },
+  "先生に出すこと": {
+    "en": "Give it to the teacher",
+    "source": "ui_translations!83"
+  },
+  "先生に伝える": {
+    "en": "Tell the teacher",
+    "source": "ui_translations!219"
+  },
+  "先生のことばをこの言語で読み、文字入力もこの言語で送ります。": {
+    "en": "Read captions and type replies in this language.",
+    "source": "通訳君 画面表記"
+  },
+  "先生のことばを読む・文字で返事をする言語": {
+    "en": "Read captions and type replies in this language.",
+    "source": "通訳君 画面表記"
+  },
+  "先生のことばを読む・文字で返事をする言語を選びます。": {
+    "en": "Choose the language for captions and typed replies.",
+    "source": "通訳君 画面表記"
+  },
+  "先生へ伝える": {
+    "en": "Tell the teacher",
+    "source": "ui_translations!814"
+  },
+  "先生モード": {
+    "en": "Teacher mode",
+    "source": "ui_translations!499"
+  },
+  "先生側の言語": {
+    "en": "Teacher's language",
+    "source": "ui_translations!48"
+  },
+  "先生側の言語で入力": {
+    "en": "Enter in the teacher's language.",
+    "source": "ui_translations!40"
+  },
+  "先生側の言語で入力し、保護者側の言語にします。": {
+    "en": "Enter the information in the teacher's language, then convert it to the parent's language.",
+    "source": "ui_translations!49"
+  },
+  "先生名": {
+    "en": "Teacher name",
+    "source": "ui_translations!298"
+  },
+  "洗濯": {
+    "en": "Laundry",
+    "source": "ruby_dictionary!485"
+  },
+  "選択したテキストを母語に翻訳しています。": {
+    "en": "The selected text is being translated into your native language.",
+    "source": "ui_translations!273"
+  },
+  "選択したテキストを母語に翻訳しますか？": {
+    "en": "Do you want to translate the selected text into your native language?",
+    "source": "ui_translations!272"
+  },
+  "選択した文を翻訳": {
+    "en": "Translate the selected sentence",
+    "source": "ui_translations!271"
+  },
+  "選択してください": {
+    "en": "Please select",
+    "source": "ruby_dictionary!506"
+  },
+  "選択肢": {
+    "en": "Options",
+    "source": "ruby_dictionary!539"
+  },
+  "選択文を翻訳": {
+    "en": "Translate the selected sentences",
+    "source": "ui_translations!502"
+  },
+  "前へ": {
+    "en": "Previous",
+    "source": "ui_translations!242"
+  },
+  "前回データを表示中・最新版を確認中…": {
+    "en": "Displaying previous data / Checking for latest version...",
+    "source": "ui_translations!256"
+  },
+  "全員": {
+    "en": "All",
+    "source": "ui_translations!316"
+  },
+  "全端末の集計を更新": {
+    "en": "Refresh shared counts",
+    "source": "通訳君 画面表記"
+  },
+  "全端末の集計を取得できませんでした。端末内の記録は残っています。": {
+    "en": "Shared counts are unavailable. Local records are kept.",
+    "source": "通訳君 画面表記"
+  },
+  "全端末の標準辞書利用": {
+    "en": "Standard dictionary use across devices",
+    "source": "通訳君 画面表記"
+  },
+  "全端末共通の設定": {
+    "en": "Shared limit for all devices",
+    "source": "通訳君 画面表記"
+  },
+  "全部": {
+    "en": "All",
+    "source": "ui_translations!616"
+  },
+  "祖父": {
+    "en": "Grandfather",
+    "source": "ruby_dictionary!421"
+  },
+  "祖母": {
+    "en": "Grandmother",
+    "source": "ruby_dictionary!422"
+  },
+  "掃除": {
+    "en": "Cleaning",
+    "source": "ruby_dictionary!95"
+  },
+  "早く帰ります": {
+    "en": "I'll go",
+    "source": "ruby_dictionary!354"
+  },
+  "早め": {
+    "en": "Early",
+    "source": "ruby_dictionary!10"
+  },
+  "早めに": {
+    "en": "Early",
+    "source": "ruby_dictionary!321"
+  },
+  "早急": {
+    "en": "Quickly",
+    "source": "ruby_dictionary!23"
+  },
+  "早退": {
+    "en": "Leaving early",
+    "source": "ruby_dictionary!428"
+  },
+  "早退します": {
+    "en": "I'm leaving",
+    "source": "ruby_dictionary!429"
+  },
+  "早退扱い": {
+    "en": "Early departure",
+    "source": "ruby_dictionary!514"
+  },
+  "早退届": {
+    "en": "Early leave form",
+    "source": "ruby_dictionary!672"
+  },
+  "相手": {
+    "en": "Partner",
+    "source": "通訳君 画面表記"
+  },
+  "相手（あいて）のことば": {
+    "en": "Partner's language",
+    "source": "通訳君 画面表記"
+  },
+  "相手に見せる文": {
+    "en": "A text to show to the other person",
+    "source": "ui_translations!233"
+  },
+  "相手に見せる文をコピー": {
+    "en": "Copy the text to show the other person.",
+    "source": "ui_translations!57"
+  },
+  "相手に送るリンク": {
+    "en": "Invitation link",
+    "source": "通訳君 画面表記"
+  },
+  "相手に伝える": {
+    "en": "Tell the other person",
+    "source": "ui_translations!365"
+  },
+  "相手の言語": {
+    "en": "The other person's language",
+    "source": "ui_translations!227"
+  },
+  "相手の言語ではなく、あなたが話す言語を選んでください。": {
+    "en": "Choose the language you speak.",
+    "source": "通訳君 画面表記"
+  },
+  "相手をよぶ": {
+    "en": "Invite partner",
+    "source": "通訳君 画面表記"
+  },
+  "相談": {
+    "en": "Consultation",
+    "source": "ui_translations!494"
+  },
+  "相談してください": {
+    "en": "Please consult",
+    "source": "ruby_dictionary!474"
+  },
+  "相談室": {
+    "en": "Counseling room",
+    "source": "ruby_dictionary!126"
+  },
+  "総合": {
+    "en": "Overall",
+    "source": "ruby_dictionary!165"
+  },
+  "送迎": {
+    "en": "Pick-up and",
+    "source": "ruby_dictionary!517"
+  },
+  "送信": {
+    "en": "Send",
+    "source": "ruby_dictionary!544"
+  },
+  "送信してください": {
+    "en": "Please send",
+    "source": "ruby_dictionary!545"
+  },
+  "送信回数は端末の試行記録です。完了通知は停止前の送信分も含み、請求額やAI呼出しの成功とは一致しません。": {
+    "en": "Send counts are device attempts, not bills or confirmed AI successes. Completions may arrive after stopping.",
+    "source": "通訳君 画面表記"
+  },
+  "送信済みログはまだありません。": {
+    "en": "There are no sent logs yet.",
+    "source": "ui_translations!338"
+  },
+  "送信待ち": {
+    "en": "Waiting to send",
+    "source": "ui_translations!302"
+  },
+  "速度ログ": {
+    "en": "Speed ​​log",
+    "source": "ui_translations!747"
+  },
+  "速報日本語": {
+    "en": "Breaking News in Japanese",
+    "source": "ui_translations!790"
+  },
+  "続きのことばを待っています": {
+    "en": "Waiting for more words…",
+    "source": "通訳君 画面表記"
+  },
+  "続ける": {
+    "en": "Continue",
+    "source": "通訳君 画面表記"
+  },
+  "続ける場合は「授業内容を自動取得する」を押してください。": {
+    "en": "If you wish to continue, please press \"Automatically retrieve lesson content\".",
+    "source": "ui_translations!525"
+  },
+  "卒業式": {
+    "en": "Graduation ceremony",
+    "source": "ruby_dictionary!203"
+  },
+  "他": {
+    "en": "Others",
+    "source": "ui_translations!537"
+  },
+  "打撲": {
+    "en": "Bruise",
+    "source": "ruby_dictionary!417"
+  },
+  "体の調子": {
+    "en": "Physical condition",
+    "source": "ruby_dictionary!323"
+  },
+  "体の調子がよくありません": {
+    "en": "I'm not",
+    "source": "ruby_dictionary!324"
+  },
+  "体育": {
+    "en": "Physical education",
+    "source": "ui_translations!530"
+  },
+  "体育で着る服": {
+    "en": "Clothes to wear for physical education",
+    "source": "ui_translations!97"
+  },
+  "体育の授業": {
+    "en": "Physical education",
+    "source": "ruby_dictionary!302"
+  },
+  "体育館": {
+    "en": "Gym",
+    "source": "ruby_dictionary!109"
+  },
+  "体育館シューズ": {
+    "en": "Gym shoes",
+    "source": "ruby_dictionary!645"
+  },
+  "体育祭": {
+    "en": "Sports festival",
+    "source": "ruby_dictionary!205"
+  },
+  "体育大会": {
+    "en": "Athletic meet",
+    "source": "ruby_dictionary!206"
+  },
+  "体温": {
+    "en": "Body temperature",
+    "source": "ruby_dictionary!458"
+  },
+  "体操着": {
+    "en": "Gym clothes",
+    "source": "ruby_dictionary!388"
+  },
+  "体操服": {
+    "en": "Gym clothes",
+    "source": "ruby_dictionary!79"
+  },
+  "体調": {
+    "en": "Physical condition",
+    "source": "ui_translations!167"
+  },
+  "体調やけが": {
+    "en": "Health condition or injury",
+    "source": "ui_translations!99"
+  },
+  "体調不良のため": {
+    "en": "Due to",
+    "source": "ruby_dictionary!7"
+  },
+  "待機中": {
+    "en": "Waiting",
+    "source": "ui_translations!186"
+  },
+  "貸し出し": {
+    "en": "Lending",
+    "source": "ruby_dictionary!481"
+  },
+  "退室しました": {
+    "en": "You left the room",
+    "source": "通訳君 画面表記"
+  },
+  "退室しました。": {
+    "en": "I have left the room.",
+    "source": "ui_translations!389"
+  },
+  "退室する": {
+    "en": "Leave the room",
+    "source": "ui_translations!372"
+  },
+  "代理人": {
+    "en": "Agent",
+    "source": "ruby_dictionary!47"
+  },
+  "大きく見せる": {
+    "en": "Make it look bigger",
+    "source": "ui_translations!640"
+  },
+  "大きな注意点はありません。": {
+    "en": "There are no major points to note.",
+    "source": "ui_translations!624"
+  },
+  "大きめ": {
+    "en": "Standard",
+    "source": "ui_translations!678"
+  },
+  "大雨警報": {
+    "en": "Heavy rain",
+    "source": "ruby_dictionary!268"
+  },
+  "大会": {
+    "en": "Tournament",
+    "source": "ruby_dictionary!244"
+  },
+  "大切なお知らせ": {
+    "en": "Important announcement",
+    "source": "ruby_dictionary!350"
+  },
+  "大切なこと": {
+    "en": "Important things",
+    "source": "ruby_dictionary!351"
+  },
+  "大切な内容です。翻訳結果を人と確認してください。": {
+    "en": "This is important information. Please have someone else review the translation.",
+    "source": "ui_translations!235"
+  },
+  "担任": {
+    "en": "Homeroom teacher",
+    "source": "ruby_dictionary!406"
+  },
+  "短い英単語でルビをふります": {
+    "en": "I will add furigana (pronunciation guides) using short English words.",
+    "source": "ui_translations!198"
+  },
+  "短い言葉で、ひらがな・漢字・英語でも検索できます。": {
+    "en": "You can search using short words, including hiragana, kanji, and English.",
+    "source": "ui_translations!109"
+  },
+  "短い文に分けて話す（書く）と、翻訳が伝わりやすくなります。": {
+    "en": "Speaking (or writing) in short sentences makes the translation easier to understand.",
+    "source": "ui_translations!54"
+  },
+  "短い文に分けると、翻訳が伝わりやすくなります。": {
+    "en": "Dividing the text into shorter sentences makes the translation easier to understand.",
+    "source": "ui_translations!231"
+  },
+  "短く「お願いします」「できますか」にすると翻訳が安定します。": {
+    "en": "Using shorter phrases like \"Please\" or \"Can you do it?\" will result in more stable translations.",
+    "source": "ui_translations!609"
+  },
+  "端末": {
+    "en": "Terminal",
+    "source": "ui_translations!565"
+  },
+  "端末がオフラインと報告しています。": {
+    "en": "The device reports it is offline.",
+    "source": "通訳君 画面表記"
+  },
+  "端末の順番待ち": {
+    "en": "Device queue",
+    "source": "通訳君 画面表記"
+  },
+  "端末の保存領域に書き込めません。分析を保存してください。": {
+    "en": "Device storage is unavailable. Save the analysis.",
+    "source": "通訳君 画面表記"
+  },
+  "端末の保存領域に書き込めませんでした。": {
+    "en": "Could not save to device storage.",
+    "source": "通訳君 画面表記"
+  },
+  "端末の訳の検索": {
+    "en": "Local translation lookup",
+    "source": "通訳君 画面表記"
+  },
+  "端末内の音声認識待ち行列の増加": {
+    "en": "Speech recognition queue growth",
+    "source": "通訳君 画面表記"
+  },
+  "値化しています…": {
+    "en": "It's being converted into a value...",
+    "source": "ui_translations!759"
+  },
+  "地震": {
+    "en": "Earthquake",
+    "source": "ruby_dictionary!264"
+  },
+  "遅くなります": {
+    "en": "It will",
+    "source": "ruby_dictionary!332"
+  },
+  "遅れて": {
+    "en": "Late",
+    "source": "ruby_dictionary!281"
+  },
+  "遅れて登校": {
+    "en": "Arriving late",
+    "source": "ruby_dictionary!282"
+  },
+  "遅れる": {
+    "en": "Delayed",
+    "source": "ruby_dictionary!11"
+  },
+  "遅刻": {
+    "en": "Late",
+    "source": "ruby_dictionary!605"
+  },
+  "遅刻します": {
+    "en": "I will",
+    "source": "ruby_dictionary!461"
+  },
+  "遅刻扱い": {
+    "en": "Short-term treatment",
+    "source": "ruby_dictionary!513"
+  },
+  "遅刻届": {
+    "en": "Late form",
+    "source": "ruby_dictionary!671"
+  },
+  "遅刻連絡": {
+    "en": "Late arrival",
+    "source": "ruby_dictionary!427"
+  },
+  "着く": {
+    "en": "Arrive",
+    "source": "ruby_dictionary!284"
+  },
+  "着席": {
+    "en": "Sit down",
+    "source": "ruby_dictionary!577"
+  },
+  "着替え": {
+    "en": "Change of",
+    "source": "ruby_dictionary!446"
+  },
+  "中間テスト": {
+    "en": "Midterm exams",
+    "source": "ruby_dictionary!173"
+  },
+  "中国語": {
+    "en": "Chinese",
+    "source": "ui_translations!439"
+  },
+  "中国語（簡体字）": {
+    "en": "Chinese",
+    "source": "通訳君 画面表記"
+  },
+  "中止": {
+    "en": "Cancel",
+    "source": "ruby_dictionary!35"
+  },
+  "仲直り": {
+    "en": "Reconciliation",
+    "source": "ruby_dictionary!470"
+  },
+  "注意": {
+    "en": "Note",
+    "source": "ui_translations!122"
+  },
+  "駐車": {
+    "en": "Parking",
+    "source": "ruby_dictionary!404"
+  },
+  "駐車場": {
+    "en": "Parking",
+    "source": "ruby_dictionary!515"
+  },
+  "駐輪場": {
+    "en": "Bicycle parking",
+    "source": "ruby_dictionary!516"
+  },
+  "朝の会": {
+    "en": "Morning meeting",
+    "source": "ruby_dictionary!97"
+  },
+  "朝の連絡": {
+    "en": "Morning contact",
+    "source": "ui_translations!529"
+  },
+  "調査書": {
+    "en": "Investigation report",
+    "source": "ruby_dictionary!193"
+  },
+  "長い文章です。名前、日時、持ち物などを分けて入力すると確認しやすくなります。": {
+    "en": "This is a long message. It will be easier to review if you separate the information into sections such as name, date, and items to bring.",
+    "source": "ui_translations!64"
+  },
+  "長ズボン": {
+    "en": "Long pants",
+    "source": "ruby_dictionary!390"
+  },
+  "長袖": {
+    "en": "Long sleeves",
+    "source": "ruby_dictionary!389"
+  },
+  "直し": {
+    "en": "Correction",
+    "source": "ruby_dictionary!591"
+  },
+  "直して翻訳する": {
+    "en": "Edit and translate",
+    "source": "通訳君 画面表記"
+  },
+  "直近90日。アプリに同梱した標準辞書の項目IDと回数だけを送信します。会話は発言元の端末で数え、相手側の受信では加算しません。未登録のことば・会話本文・参加者名は送信しません。端末内ランキングとは範囲が異なります。": {
+    "en": "Last 90 days. Only standard dictionary IDs and counts are sent. Conversation text and participant names are not sent.",
+    "source": "通訳君 画面表記"
+  },
+  "直近の健康確認は成功しています。認証更新・ルーム作成・WebSocket・音声通信の成功は別途確認が必要です。": {
+    "en": "The recent health check passed. Sign-in, room setup, WebSocket and audio still need separate checks.",
+    "source": "通訳君 画面表記"
+  },
+  "追加": {
+    "en": "Addition",
+    "source": "ruby_dictionary!552"
+  },
+  "追加されたことば": {
+    "en": "Added words",
+    "source": "通訳君 画面表記"
+  },
+  "通学": {
+    "en": "Commuting to",
+    "source": "ruby_dictionary!431"
+  },
+  "通学用品費": {
+    "en": "School supplies",
+    "source": "ruby_dictionary!133"
+  },
+  "通学路": {
+    "en": "School route",
+    "source": "ruby_dictionary!150"
+  },
+  "通級": {
+    "en": "Special needs",
+    "source": "ruby_dictionary!130"
+  },
+  "通常": {
+    "en": "Usually",
+    "source": "ui_translations!659"
+  },
+  "通常通り": {
+    "en": "As usual",
+    "source": "ruby_dictionary!554"
+  },
+  "通常通信とヘッダー付き通信の両方が失敗しています。認証ヘッダーだけの問題とは絞れません。": {
+    "en": "Both normal and authenticated requests failed. The header alone is not the confirmed cause.",
+    "source": "通訳君 画面表記"
+  },
+  "通常通信は成功し、ヘッダー付き通信は失敗しています。": {
+    "en": "Normal requests passed; authenticated requests failed.",
+    "source": "通訳君 画面表記"
+  },
+  "通信失敗（制限・CORSなど）": {
+    "en": "Network failure (limits, CORS, etc.)",
+    "source": "通訳君 画面表記"
+  },
+  "通知": {
+    "en": "Notification",
+    "source": "ruby_dictionary!40"
+  },
+  "通知表": {
+    "en": "Report card",
+    "source": "ruby_dictionary!176"
+  },
+  "通訳": {
+    "en": "Translate",
+    "source": "ui_translations!170"
+  },
+  "通訳アプリを開く": {
+    "en": "Open the translation app.",
+    "source": "ui_translations!813"
+  },
+  "通訳キャッシュ状態": {
+    "en": "Interpreter cache status",
+    "source": "ui_translations!770"
+  },
+  "通訳する": {
+    "en": "Translate",
+    "source": "ui_translations!2"
+  },
+  "通訳で使われたことば": {
+    "en": "Words used in translation",
+    "source": "通訳君 画面表記"
+  },
+  "通訳君：管理者画面を開く": {
+    "en": "Open admin",
+    "source": "通訳君 画面表記"
+  },
+  "通訳文の育ち方と速度を確認": {
+    "en": "Check the growth and speed of the interpreted text.",
+    "source": "ui_translations!730"
+  },
+  "通訳欄へ入れる": {
+    "en": "Enter in the interpreter section.",
+    "source": "ui_translations!327"
+  },
+  "通話": {
+    "en": "Call",
+    "source": "通訳君 画面表記"
+  },
+  "通話・授業の同じ発話の再送は、保存済みの結果を返します。失敗した訳は再試行ボタンからやり直します。": {
+    "en": "Repeated captions reuse saved results. Retry failed translations with the retry button.",
+    "source": "通訳君 画面表記"
+  },
+  "通話で使われたことば": {
+    "en": "Words used in calls",
+    "source": "通訳君 画面表記"
+  },
+  "通話に参加するQRコード": {
+    "en": "Scan to join the call",
+    "source": "通訳君 画面表記"
+  },
+  "通話をおわる": {
+    "en": "End call",
+    "source": "通訳君 画面表記"
+  },
+  "通話を一時停止しました": {
+    "en": "Call paused",
+    "source": "通訳君 画面表記"
+  },
+  "通話画面を復元しました。マイクをONにすると同じルームへ再接続します。": {
+    "en": "Call restored. Turn the mic on to reconnect.",
+    "source": "通訳君 画面表記"
+  },
+  "低通信モード": {
+    "en": "Low communication mode",
+    "source": "ui_translations!140"
+  },
+  "低品質ログ": {
+    "en": "Low-quality logs",
+    "source": "ui_translations!151"
+  },
+  "停止": {
+    "en": "Stop",
+    "source": "通訳君 画面表記"
+  },
+  "停止後の通信": {
+    "en": "Activity after stopping",
+    "source": "通訳君 画面表記"
+  },
+  "定期テスト": {
+    "en": "Regular tests",
+    "source": "ruby_dictionary!172"
+  },
+  "定規": {
+    "en": "Ruler",
+    "source": "ruby_dictionary!374"
+  },
+  "提出": {
+    "en": "Submission",
+    "source": "ruby_dictionary!401"
+  },
+  "提出されていません": {
+    "en": "Not submitted",
+    "source": "ruby_dictionary!292"
+  },
+  "提出課題": {
+    "en": "Submitted assignment",
+    "source": "ruby_dictionary!170"
+  },
+  "提出箱": {
+    "en": "Submission box",
+    "source": "ruby_dictionary!509"
+  },
+  "提出物": {
+    "en": "Submission",
+    "source": "ui_translations!452"
+  },
+  "締切": {
+    "en": "Deadline",
+    "source": "ui_translations!533"
+  },
+  "点数": {
+    "en": "Score",
+    "source": "ruby_dictionary!117"
+  },
+  "伝えたいことを短く入力": {
+    "en": "Enter what you want to say in a short message.",
+    "source": "ui_translations!46"
+  },
+  "電車": {
+    "en": "Train",
+    "source": "ruby_dictionary!435"
+  },
+  "電話で": {
+    "en": "By phone",
+    "source": "ruby_dictionary!325"
+  },
+  "電話で話します": {
+    "en": "I'll talk",
+    "source": "ruby_dictionary!326"
+  },
+  "電話番号": {
+    "en": "Phone number",
+    "source": "ruby_dictionary!658"
+  },
+  "徒歩": {
+    "en": "Walking",
+    "source": "ruby_dictionary!432"
+  },
+  "登下校": {
+    "en": "Going to and from school",
+    "source": "ui_translations!544"
+  },
+  "登校": {
+    "en": "Going to",
+    "source": "ruby_dictionary!430"
+  },
+  "登校見合わせ": {
+    "en": "School attendance",
+    "source": "ruby_dictionary!270"
+  },
+  "途中式": {
+    "en": "Working",
+    "source": "ruby_dictionary!592"
+  },
+  "都合": {
+    "en": "Convenience",
+    "source": "ruby_dictionary!225"
+  },
+  "都合がよい": {
+    "en": "Convenient",
+    "source": "ruby_dictionary!14"
+  },
+  "都合が悪い": {
+    "en": "Inconvenient",
+    "source": "ruby_dictionary!13"
+  },
+  "当日の発話から表示までの時間は未計測です。ブラウザー認識には発話時刻がないため、翻訳時間を体感待ち時間として扱いません。": {
+    "en": "Speech-to-display time is not measured today. Translation time alone is not total waiting time.",
+    "source": "通訳君 画面表記"
+  },
+  "当番": {
+    "en": "Duty",
+    "source": "ruby_dictionary!92"
+  },
+  "答え": {
+    "en": "Answer",
+    "source": "ruby_dictionary!589"
+  },
+  "答案": {
+    "en": "Answer sheet",
+    "source": "ruby_dictionary!595"
+  },
+  "到着": {
+    "en": "Arrival",
+    "source": "ruby_dictionary!285"
+  },
+  "頭痛": {
+    "en": "Headache",
+    "source": "ruby_dictionary!414"
+  },
+  "頭髪": {
+    "en": "Hair",
+    "source": "ruby_dictionary!255"
+  },
+  "動画撮影": {
+    "en": "Video recording",
+    "source": "ruby_dictionary!529"
+  },
+  "同じ授業ログは保存済みです。": {
+    "en": "The same class log has already been saved.",
+    "source": "ui_translations!393"
+  },
+  "同じ端末で学校Wi-Fiと許可された別回線を比較し、それぞれの診断結果を保存する。別回線だけ成功する場合は回線側の制限が候補になります。": {
+    "en": "Compare school Wi-Fi with another permitted network on the same device. Save both results.",
+    "source": "通訳君 画面表記"
+  },
+  "同意": {
+    "en": "Consent",
+    "source": "ruby_dictionary!496"
+  },
+  "同意書": {
+    "en": "Consent form",
+    "source": "ruby_dictionary!497"
+  },
+  "道徳": {
+    "en": "Moral",
+    "source": "ruby_dictionary!164"
+  },
+  "匿名認証の準備は完了しています。": {
+    "en": "Anonymous sign-in is ready.",
+    "source": "通訳君 画面表記"
+  },
+  "匿名認証の準備完了を確認できていません。": {
+    "en": "Anonymous sign-in is not confirmed.",
+    "source": "通訳君 画面表記"
+  },
+  "特別支援": {
+    "en": "Special support",
+    "source": "ruby_dictionary!128"
+  },
+  "特別支援学級": {
+    "en": "Special support",
+    "source": "ruby_dictionary!129"
+  },
+  "読み込み状態": {
+    "en": "Loading status",
+    "source": "ui_translations!134"
+  },
+  "読み込み中": {
+    "en": "Loading...",
+    "source": "ui_translations!156"
+  },
+  "読み込んでいます…": {
+    "en": "Loading...",
+    "source": "ui_translations!333"
+  },
+  "読み上げ": {
+    "en": "Read aloud",
+    "source": "ui_translations!125"
+  },
+  "読み上げ位置": {
+    "en": "Reading position",
+    "source": "ui_translations!378"
+  },
+  "内容を確認して送ってください。個人情報は入れないでください。確認後に共有辞書へ反映します。": {
+    "en": "Check the suggestion. Do not include personal details. Suggestions are reviewed before sharing.",
+    "source": "通訳君 画面表記"
+  },
+  "縄跳び": {
+    "en": "Jump rope",
+    "source": "ruby_dictionary!393"
+  },
+  "日": {
+    "en": "Day",
+    "source": "ui_translations!665"
+  },
+  "日にち・時間・持ち物は、相手に見せて確認すると安心です。": {
+    "en": "It's reassuring to show the date, time, and items to the other person for confirmation.",
+    "source": "ui_translations!94"
+  },
+  "日時、場所、持ち物、お願いを行ごとに分けると読みやすくなります。": {
+    "en": "Separating the date, time, location, items to bring, and requests into separate lines makes it easier to read.",
+    "source": "ui_translations!604"
+  },
+  "日時があります": {
+    "en": "There is a date and time.",
+    "source": "ui_translations!76"
+  },
+  "日直": {
+    "en": "Class duty",
+    "source": "ruby_dictionary!93"
+  },
+  "日程": {
+    "en": "Schedule",
+    "source": "ui_translations!460"
+  },
+  "日程を確認": {
+    "en": "Check the",
+    "source": "ruby_dictionary!318"
+  },
+  "日付を押すと詳細が開きます。": {
+    "en": "Choose a date for details.",
+    "source": "通訳君 画面表記"
+  },
+  "日本語": {
+    "en": "Japanese",
+    "source": "ui_translations!513"
+  },
+  "日本語 → 母語表示": {
+    "en": "Japanese → Native language display",
+    "source": "ui_translations!31"
+  },
+  "日本語でルビをふります": {
+    "en": "I will add furigana (pronunciation guides) in Japanese.",
+    "source": "ui_translations!204"
+  },
+  "日本語で聞く": {
+    "en": "Listen in Japanese",
+    "source": "ui_translations!206"
+  },
+  "日本語と母語の両方で表示": {
+    "en": "Display in both Japanese and the native language.",
+    "source": "ui_translations!131"
+  },
+  "日本語に戻す": {
+    "en": "Return to Japanese",
+    "source": "ui_translations!809"
+  },
+  "日本語のみで表示": {
+    "en": "Display in Japanese only",
+    "source": "ui_translations!241"
+  },
+  "日本語の原文": {
+    "en": "Japanese original",
+    "source": "通訳君 画面表記"
+  },
+  "日本語の文字が残っています。訳を確認してください": {
+    "en": "Japanese remains in the translation. Please check it.",
+    "source": "通訳君 画面表記"
+  },
+  "日本語は字幕から直せます。確認した訳を覚えると、この端末の次の通訳で使います。": {
+    "en": "Edit Japanese from its caption. Remember reviewed translations for reuse on this device.",
+    "source": "通訳君 画面表記"
+  },
+  "日本語モードに戻す": {
+    "en": "Return to Japanese mode",
+    "source": "ui_translations!35"
+  },
+  "日本語ルビを使う": {
+    "en": "Use Japanese furigana",
+    "source": "ui_translations!267"
+  },
+  "日本語を直す": {
+    "en": "Edit Japanese",
+    "source": "通訳君 画面表記"
+  },
+  "日本語を入力してください。": {
+    "en": "Please enter Japanese text.",
+    "source": "ui_translations!351"
+  },
+  "日本語を編集できます。編集後に「編集した文を翻訳」を押してください。": {
+    "en": "You can edit the Japanese text. After editing, please press \"Translate edited text\".",
+    "source": "ui_translations!340"
+  },
+  "日本語残り診断": {
+    "en": "Japanese language remaining diagnosis",
+    "source": "ui_translations!595"
+  },
+  "日本語指導": {
+    "en": "Japanese language",
+    "source": "ruby_dictionary!122"
+  },
+  "日本語支援": {
+    "en": "Japanese language",
+    "source": "ruby_dictionary!54"
+  },
+  "日本語表示": {
+    "en": "Japanese display",
+    "source": "ui_translations!24"
+  },
+  "入れて": {
+    "en": "Put it",
+    "source": "ruby_dictionary!338"
+  },
+  "入学式": {
+    "en": "Entrance ceremony",
+    "source": "ruby_dictionary!199"
+  },
+  "入学説明会": {
+    "en": "Entrance information",
+    "source": "ruby_dictionary!60"
+  },
+  "入学通知書": {
+    "en": "Admission notice",
+    "source": "ruby_dictionary!61"
+  },
+  "入試": {
+    "en": "Entrance exam",
+    "source": "ruby_dictionary!189"
+  },
+  "入室": {
+    "en": "Entering the room",
+    "source": "ui_translations!311"
+  },
+  "入室から50分たったため、自動取得を停止しました。続ける場合は「授業内容を自動取得する」を押してください。": {
+    "en": "Automatic data retrieval has stopped because 50 minutes have passed since you entered the room. If you wish to continue, please press \"Automatically retrieve lesson content\".",
+    "source": "ui_translations!432"
+  },
+  "入室する": {
+    "en": "Enter the room",
+    "source": "ui_translations!718"
+  },
+  "入室を中止しました。": {
+    "en": "Entry to the room has been cancelled.",
+    "source": "ui_translations!363"
+  },
+  "入室中": {
+    "en": "Currently in the room",
+    "source": "ui_translations!183"
+  },
+  "入室中は役割を切り替えられません。退室してから切り替えてください。": {
+    "en": "You cannot switch roles while inside the room. Please switch roles after leaving the room.",
+    "source": "ui_translations!516"
+  },
+  "入力した文章を、相手の言語へ翻訳して読み上げます。": {
+    "en": "The text you enter will be translated into the recipient's language and read aloud.",
+    "source": "ui_translations!265"
+  },
+  "入力する言語": {
+    "en": "Input language",
+    "source": "ui_translations!32"
+  },
+  "入力する文章": {
+    "en": "Text to enter",
+    "source": "ui_translations!43"
+  },
+  "入力を待っています。": {
+    "en": "Waiting for input.",
+    "source": "ui_translations!370"
+  },
+  "入力内容を消す": {
+    "en": "Delete input content",
+    "source": "ui_translations!360"
+  },
+  "入力欄に文字が入りました。": {
+    "en": "Text has been entered into the input field.",
+    "source": "ui_translations!706"
+  },
+  "入力例": {
+    "en": "Input example",
+    "source": "ui_translations!165"
+  },
+  "認識待ちが増えています。文字でも伝えられます。": {
+    "en": "Speech recognition is busy. You can type instead.",
+    "source": "通訳君 画面表記"
+  },
+  "認識待ちが増えました。マイクは継続しています。短く区切ってもう一度話してください。": {
+    "en": "Recognition is busy. The mic stays on. Speak again in shorter phrases.",
+    "source": "通訳君 画面表記"
+  },
+  "認証の拒否": {
+    "en": "Authentication denied",
+    "source": "通訳君 画面表記"
+  },
+  "認証ヘッダーを含む通信・CORSプリフライトの制限": {
+    "en": "Authentication header or CORS preflight restriction",
+    "source": "通訳君 画面表記"
+  },
+  "認証を含むHTTP往復": {
+    "en": "HTTP round trip with sign-in",
+    "source": "通訳君 画面表記"
+  },
+  "熱": {
+    "en": "Heat",
+    "source": "ruby_dictionary!409"
+  },
+  "納入": {
+    "en": "Delivery",
+    "source": "ruby_dictionary!136"
+  },
+  "破損": {
+    "en": "Damage",
+    "source": "ruby_dictionary!483"
+  },
+  "背景画像と重い表示を控えます": {
+    "en": "We will minimize the use of background images and heavy content.",
+    "source": "ui_translations!141"
+  },
+  "配付したお知らせ": {
+    "en": "Distributed notice",
+    "source": "ruby_dictionary!306"
+  },
+  "配布物": {
+    "en": "Handouts",
+    "source": "ruby_dictionary!70"
+  },
+  "箸": {
+    "en": "Chopsticks",
+    "source": "ruby_dictionary!384"
+  },
+  "発言・訳の例も含める（現在の字幕と保存済み履歴）": {
+    "en": "Include speech and translation examples",
+    "source": "通訳君 画面表記"
+  },
+  "発熱": {
+    "en": "Fever",
+    "source": "ruby_dictionary!410"
+  },
+  "発表": {
+    "en": "Presentation",
+    "source": "ruby_dictionary!580"
+  },
+  "発話がないため、15秒後にマイクを停止します。": {
+    "en": "No speech detected. The mic will stop in 15 seconds.",
+    "source": "通訳君 画面表記"
+  },
+  "発話がないためマイクを停止しました。再開するときはマイクをONにしてください。": {
+    "en": "The mic stopped after inactivity. Turn it on to continue.",
+    "source": "通訳君 画面表記"
+  },
+  "発話がないと15秒の予告後に停止します。「続ける」で延長できます。辞書の更新後は古い確認済み訳を再確認してください。": {
+    "en": "The mic stops after an idle warning. Choose Continue to keep talking. Recheck saved translations after dictionary updates.",
+    "source": "通訳君 画面表記"
+  },
+  "発話なし": {
+    "en": "No speech",
+    "source": "通訳君 画面表記"
+  },
+  "半ズボン": {
+    "en": "Shorts",
+    "source": "ruby_dictionary!392"
+  },
+  "半袖": {
+    "en": "Short sleeves",
+    "source": "ruby_dictionary!391"
+  },
+  "否定の意味を確認してください": {
+    "en": "Check the negative meaning.",
+    "source": "通訳君 画面表記"
+  },
+  "費用": {
+    "en": "Cost",
+    "source": "ruby_dictionary!667"
+  },
+  "避難": {
+    "en": "Evacuation",
+    "source": "ruby_dictionary!262"
+  },
+  "避難訓練": {
+    "en": "Evacuation drill",
+    "source": "ruby_dictionary!263"
+  },
+  "非公開": {
+    "en": "Private",
+    "source": "ruby_dictionary!533"
+  },
+  "非表示にした授業ログ": {
+    "en": "Hidden class logs",
+    "source": "ui_translations!646"
+  },
+  "美術": {
+    "en": "Art",
+    "source": "ruby_dictionary!158"
+  },
+  "鼻水": {
+    "en": "Snot",
+    "source": "ruby_dictionary!412"
+  },
+  "必ず": {
+    "en": "Surely",
+    "source": "ruby_dictionary!342"
+  },
+  "必要ありません": {
+    "en": "It's not",
+    "source": "ruby_dictionary!17"
+  },
+  "必要です": {
+    "en": "It is",
+    "source": "ruby_dictionary!18"
+  },
+  "必要な書類": {
+    "en": "Required documents",
+    "source": "ruby_dictionary!293"
+  },
+  "必要な物": {
+    "en": "Items needed",
+    "source": "ruby_dictionary!294"
+  },
+  "筆箱": {
+    "en": "Pencil case",
+    "source": "ruby_dictionary!371"
+  },
+  "標準": {
+    "en": "View items",
+    "source": "ui_translations!675"
+  },
+  "表示が遅いときは、ここで読み込み中か確認できます。": {
+    "en": "If the display is slow, you can check here to see if it's loading.",
+    "source": "ui_translations!164"
+  },
+  "表示する": {
+    "en": "Show",
+    "source": "通訳君 画面表記"
+  },
+  "表示モード": {
+    "en": "Display mode",
+    "source": "ui_translations!612"
+  },
+  "表示言語": {
+    "en": "Display language",
+    "source": "ui_translations!21"
+  },
+  "表示言語切替後の残り文言を確認": {
+    "en": "Check the remaining text after switching the display language.",
+    "source": "ui_translations!597"
+  },
+  "表示設定": {
+    "en": "Display settings",
+    "source": "ui_translations!189"
+  },
+  "表示用の設定です。請求額や無料枠は変わりません。": {
+    "en": "Display setting only; billing and allowances do not change.",
+    "source": "通訳君 画面表記"
+  },
+  "評価": {
+    "en": "Evaluation",
+    "source": "ruby_dictionary!179"
+  },
+  "評定": {
+    "en": "Rating",
+    "source": "ruby_dictionary!178"
+  },
+  "病院": {
+    "en": "Hospital",
+    "source": "ruby_dictionary!463"
+  },
+  "不可能": {
+    "en": "Impossible",
+    "source": "ruby_dictionary!16"
+  },
+  "不審者": {
+    "en": "Suspicious person",
+    "source": "ruby_dictionary!149"
+  },
+  "不足": {
+    "en": "Shortage",
+    "source": "ruby_dictionary!551"
+  },
+  "不要": {
+    "en": "Unnecessary",
+    "source": "ruby_dictionary!76"
+  },
+  "敷物": {
+    "en": "Rug",
+    "source": "ruby_dictionary!397"
+  },
+  "部活": {
+    "en": "Club activities",
+    "source": "ruby_dictionary!241"
+  },
+  "部活動": {
+    "en": "Club activities",
+    "source": "ui_translations!534"
+  },
+  "封筒": {
+    "en": "Envelope",
+    "source": "ruby_dictionary!236"
+  },
+  "封筒に入れて": {
+    "en": "Put it",
+    "source": "ruby_dictionary!337"
+  },
+  "副教材": {
+    "en": "Supplementary teaching",
+    "source": "ruby_dictionary!65"
+  },
+  "復習": {
+    "en": "Review",
+    "source": "ui_translations!679"
+  },
+  "服": {
+    "en": "Clothes",
+    "source": "ui_translations!451"
+  },
+  "服装": {
+    "en": "Clothing",
+    "source": "ui_translations!481"
+  },
+  "服薬": {
+    "en": "Medication",
+    "source": "ruby_dictionary!465"
+  },
+  "腹痛": {
+    "en": "Abdominal pain",
+    "source": "ruby_dictionary!413"
+  },
+  "分割": {
+    "en": "Division",
+    "source": "ruby_dictionary!138"
+  },
+  "分析": {
+    "en": "Analysis",
+    "source": "通訳君 画面表記"
+  },
+  "分析をコピー": {
+    "en": "Copy analysis",
+    "source": "通訳君 画面表記"
+  },
+  "分析を作る": {
+    "en": "Create analysis",
+    "source": "通訳君 画面表記"
+  },
+  "分析欄を選択しました。コピーして、このチャットへ貼り付けてください。": {
+    "en": "Analysis selected. Copy it into this chat.",
+    "source": "通訳君 画面表記"
+  },
+  "分度器": {
+    "en": "Protractor",
+    "source": "ruby_dictionary!375"
+  },
+  "分類のみ・未確定": {
+    "en": "Classification only; unconfirmed",
+    "source": "通訳君 画面表記"
+  },
+  "紛失": {
+    "en": "Lost",
+    "source": "ruby_dictionary!548"
+  },
+  "文が確定したら再生できます": {
+    "en": "Playback is available when the sentence is complete.",
+    "source": "通訳君 画面表記"
+  },
+  "文が長めです": {
+    "en": "The text is rather long.",
+    "source": "ui_translations!68"
+  },
+  "文のカテゴリー": {
+    "en": "Phrase categories",
+    "source": "通訳君 画面表記"
+  },
+  "文のクリック": {
+    "en": "Phrase opens",
+    "source": "通訳君 画面表記"
+  },
+  "文を2つか3つに分けると、翻訳が伝わりやすくなります。": {
+    "en": "Dividing a sentence into two or three parts makes the translation easier to understand.",
+    "source": "ui_translations!61"
+  },
+  "文を検索": {
+    "en": "Search phrases",
+    "source": "通訳君 画面表記"
+  },
+  "文を送る": {
+    "en": "Send message",
+    "source": "通訳君 画面表記"
+  },
+  "文化祭": {
+    "en": "Cultural festival",
+    "source": "ruby_dictionary!207"
+  },
+  "文字で入力": {
+    "en": "Type instead",
+    "source": "通訳君 画面表記"
+  },
+  "文字を入力する": {
+    "en": "Type a message",
+    "source": "通訳君 画面表記"
+  },
+  "文字入力を閉じる": {
+    "en": "Close typing",
+    "source": "通訳君 画面表記"
+  },
+  "文章が長すぎます。短く分けて入力してください。": {
+    "en": "The text is too long. Please break it down into shorter sentences.",
+    "source": "ui_translations!337"
+  },
+  "文章を入力してから翻訳してください。": {
+    "en": "Please enter your text before translating.",
+    "source": "ui_translations!215"
+  },
+  "文数": {
+    "en": "Captions",
+    "source": "通訳君 画面表記"
+  },
+  "文例": {
+    "en": "Example sentences",
+    "source": "ui_translations!174"
+  },
+  "文例カード、辞書カード、授業ログ本文は診断対象外です。": {
+    "en": "Example sentence cards, dictionary cards, and lesson log texts are not included in the diagnosis.",
+    "source": "ui_translations!649"
+  },
+  "文例カテゴリ": {
+    "en": "Example sentence categories",
+    "source": "ui_translations!305"
+  },
+  "文例が見つかりませんでした。": {
+    "en": "No example sentences were found.",
+    "source": "ui_translations!155"
+  },
+  "文例の候補をスプレッドシートに追加しました。": {
+    "en": "Phrase suggestion saved.",
+    "source": "通訳君 画面表記"
+  },
+  "文例やことば辞書では、学校生活でよく使う文やことばを確認できます。": {
+    "en": "The example sentences and vocabulary dictionary allow you to check sentences and words commonly used in school life.",
+    "source": "ui_translations!283"
+  },
+  "文例を検索": {
+    "en": "Search for example sentences",
+    "source": "ui_translations!114"
+  },
+  "文例を探す": {
+    "en": "Search for example sentences",
+    "source": "ui_translations!817"
+  },
+  "文例を読み込んでいます…": {
+    "en": "I'm reading through the example sentences...",
+    "source": "ui_translations!336"
+  },
+  "文例化済み": {
+    "en": "Example sentences already provided",
+    "source": "ui_translations!739"
+  },
+  "文例候補を作っています…": {
+    "en": "I'm creating sample sentences...",
+    "source": "ui_translations!760"
+  },
+  "文例候補を作る": {
+    "en": "Create example sentences",
+    "source": "ui_translations!754"
+  },
+  "聞き取った日本語を直す": {
+    "en": "Edit recognized Japanese",
+    "source": "通訳君 画面表記"
+  },
+  "聞く": {
+    "en": "Listen",
+    "source": "通訳君 画面表記"
+  },
+  "聞く側の言語": {
+    "en": "Listening language",
+    "source": "通訳君 画面表記"
+  },
+  "平均点": {
+    "en": "Average score",
+    "source": "ruby_dictionary!116"
+  },
+  "平均品質": {
+    "en": "Average quality",
+    "source": "ui_translations!590"
+  },
+  "閉じる": {
+    "en": "Close",
+    "source": "ui_translations!208"
+  },
+  "変換": {
+    "en": "Conversion",
+    "source": "ui_translations!225"
+  },
+  "変更": {
+    "en": "Change",
+    "source": "ruby_dictionary!659"
+  },
+  "変更があります": {
+    "en": "There are",
+    "source": "ruby_dictionary!34"
+  },
+  "変更なし": {
+    "en": "No changes",
+    "source": "ruby_dictionary!553"
+  },
+  "片付け": {
+    "en": "Clean up",
+    "source": "ruby_dictionary!573"
+  },
+  "編集・確認する": {
+    "en": "Edit and review",
+    "source": "ui_translations!120"
+  },
+  "編集した文を翻訳": {
+    "en": "Translate the edited text.",
+    "source": "ui_translations!329"
+  },
+  "編集する": {
+    "en": "Edit",
+    "source": "ui_translations!325"
+  },
+  "返却": {
+    "en": "Return",
+    "source": "ruby_dictionary!482"
+  },
+  "返金": {
+    "en": "Refund",
+    "source": "ruby_dictionary!238"
+  },
+  "弁当": {
+    "en": "Lunch box",
+    "source": "ruby_dictionary!619"
+  },
+  "弁当箱": {
+    "en": "Lunch box",
+    "source": "ruby_dictionary!383"
+  },
+  "保管": {
+    "en": "Storage",
+    "source": "ruby_dictionary!488"
+  },
+  "保健室": {
+    "en": "Health room",
+    "source": "ui_translations!461"
+  },
+  "保健体育": {
+    "en": "Health and",
+    "source": "ruby_dictionary!163"
+  },
+  "保護者": {
+    "en": "Parent",
+    "source": "ui_translations!7"
+  },
+  "保護者 → 先生": {
+    "en": "Parents → Teachers",
+    "source": "ui_translations!45"
+  },
+  "保護者から": {
+    "en": "From parents",
+    "source": "ui_translations!37"
+  },
+  "保護者として使います。": {
+    "en": "I will use this as a parent/guardian.",
+    "source": "ui_translations!16"
+  },
+  "保護者の言語で入力": {
+    "en": "Enter in parent's language",
+    "source": "ui_translations!39"
+  },
+  "保護者の言語で入力してください。": {
+    "en": "Please enter the information in your parent's language.",
+    "source": "ui_translations!53"
+  },
+  "保護者の言葉を先生向けに日本語へ翻訳します。": {
+    "en": "We will translate the parents' comments into Japanese for teachers.",
+    "source": "ui_translations!230"
+  },
+  "保護者の言葉を入力": {
+    "en": "Enter parent's words",
+    "source": "ui_translations!229"
+  },
+  "保護者への説明に": {
+    "en": "Explanation to parents",
+    "source": "ui_translations!367"
+  },
+  "保護者へ伝える": {
+    "en": "To inform parents/guardians",
+    "source": "ui_translations!836"
+  },
+  "保護者へ伝える内容を入力します。": {
+    "en": "Enter the information to be conveyed to the parents/guardians.",
+    "source": "ui_translations!834"
+  },
+  "保護者会": {
+    "en": "Parents meeting",
+    "source": "ui_translations!546"
+  },
+  "保護者席": {
+    "en": "Parent seat",
+    "source": "ruby_dictionary!526"
+  },
+  "保護者側の言語で入力": {
+    "en": "Enter in the parent's language.",
+    "source": "ui_translations!51"
+  },
+  "保護者側の言語で入力し、先生側の言語にします。": {
+    "en": "Enter the information in the parent's language, then convert it to the teacher's language.",
+    "source": "ui_translations!355"
+  },
+  "保存したことばはまだありません。": {
+    "en": "You haven't saved any words yet.",
+    "source": "ui_translations!631"
+  },
+  "保存した文やことばを確認": {
+    "en": "Check saved sentences and words.",
+    "source": "ui_translations!628"
+  },
+  "保存しました": {
+    "en": "Saved",
+    "source": "ui_translations!660"
+  },
+  "保存できませんでした。入室状態を確認してください。": {
+    "en": "Saving failed. Please check your room status.",
+    "source": "ui_translations!839"
+  },
+  "保存済みの辞書を使っています。": {
+    "en": "Using the saved dictionary.",
+    "source": "通訳君 画面表記"
+  },
+  "保存方法を変更しました。アプリを再読み込みすると適用されます。": {
+    "en": "Storage setting changed. Reload to apply it.",
+    "source": "通訳君 画面表記"
+  },
+  "補習": {
+    "en": "Supplementary lessons",
+    "source": "ruby_dictionary!120"
+  },
+  "補助": {
+    "en": "Auxiliary",
+    "source": "ruby_dictionary!124"
+  },
+  "補正候補": {
+    "en": "Correction candidates",
+    "source": "ui_translations!250"
+  },
+  "補正候補・エラー・低品質ログを確認": {
+    "en": "Check for correction candidates, errors, and low-quality logs.",
+    "source": "ui_translations!246"
+  },
+  "補正効果ログ": {
+    "en": "Correction effect log",
+    "source": "ui_translations!214"
+  },
+  "補正済み": {
+    "en": "Corrected",
+    "source": "ui_translations!617"
+  },
+  "母語": {
+    "en": "Mother tongue",
+    "source": "ui_translations!264"
+  },
+  "母語＋英語": {
+    "en": "Native language + English",
+    "source": "ui_translations!615"
+  },
+  "母語だけ": {
+    "en": "Native language only",
+    "source": "ui_translations!614"
+  },
+  "母語のみで表示": {
+    "en": "Display in native language only.",
+    "source": "ui_translations!244"
+  },
+  "母語の説明を取得できませんでした。": {
+    "en": "The explanation in the native language could not be retrieved.",
+    "source": "ui_translations!275"
+  },
+  "母語の説明を準備しています…": {
+    "en": "I am preparing an explanation in my native language...",
+    "source": "ui_translations!508"
+  },
+  "母語表示": {
+    "en": "Native language display",
+    "source": "ui_translations!23"
+  },
+  "母語訳を取得できませんでした。": {
+    "en": "The native language translation could not be retrieved.",
+    "source": "ui_translations!339"
+  },
+  "母語訳を準備しています…": {
+    "en": "I am preparing a translation in my native language...",
+    "source": "ui_translations!512"
+  },
+  "母語訳を読み込んでいます…": {
+    "en": "I'm reading the translation in my native language...",
+    "source": "ui_translations!381"
+  },
+  "母子健康手帳": {
+    "en": "Maternal and",
+    "source": "ruby_dictionary!51"
+  },
+  "放課後": {
+    "en": "After school",
+    "source": "ui_translations!463"
+  },
+  "帽子": {
+    "en": "Hat",
+    "source": "ruby_dictionary!452"
+  },
+  "忘れ物": {
+    "en": "Lost item",
+    "source": "ruby_dictionary!477"
+  },
+  "暴風警報": {
+    "en": "Storm warning",
+    "source": "ruby_dictionary!267"
+  },
+  "防寒着": {
+    "en": "Winter clothes",
+    "source": "ruby_dictionary!453"
+  },
+  "防災": {
+    "en": "Disaster prevention",
+    "source": "ruby_dictionary!147"
+  },
+  "防犯": {
+    "en": "Crime prevention",
+    "source": "ruby_dictionary!148"
+  },
+  "本人": {
+    "en": "The person",
+    "source": "ruby_dictionary!46"
+  },
+  "本人確認": {
+    "en": "Identity verification",
+    "source": "ruby_dictionary!48"
+  },
+  "本日": {
+    "en": "Today",
+    "source": "ruby_dictionary!24"
+  },
+  "本日のAI利用と設定上限": {
+    "en": "Today's AI use and limits",
+    "source": "通訳君 画面表記"
+  },
+  "本日のAI利用上限です。じしょに登録された訳を使えます。": {
+    "en": "Today's AI limit was reached. Dictionary translations are still available.",
+    "source": "通訳君 画面表記"
+  },
+  "本日の利用：": {
+    "en": "Today's use:",
+    "source": "通訳君 画面表記"
+  },
+  "本日の利用上限": {
+    "en": "Daily limit",
+    "source": "通訳君 画面表記"
+  },
+  "本日の利用上限に達しました。時間をおいてお試しください。": {
+    "en": "Daily limit reached. Please try later.",
+    "source": "通訳君 画面表記"
+  },
+  "翻訳": {
+    "en": "Translation",
+    "source": "ruby_dictionary!53"
+  },
+  "翻訳・中継の観測値です。通話全体が成功したか、相手に聞こえたか、翻訳品質は自動判定しません。": {
+    "en": "These are translation and relay observations, not proof of audio delivery or translation quality.",
+    "source": "通訳君 画面表記"
+  },
+  "翻訳AI": {
+    "en": "Translation AI",
+    "source": "通訳君 画面表記"
+  },
+  "翻訳P95ms": {
+    "en": "Translation P95 (ms)",
+    "source": "通訳君 画面表記"
+  },
+  "翻訳キャッシュ": {
+    "en": "Translation cache",
+    "source": "ui_translations!142"
+  },
+  "翻訳したい言語": {
+    "en": "The language to translate to",
+    "source": "ui_translations!19"
+  },
+  "翻訳しています…": {
+    "en": "Translating...",
+    "source": "ui_translations!216"
+  },
+  "翻訳する": {
+    "en": "Translate",
+    "source": "ui_translations!113"
+  },
+  "翻訳する：日本語 → 母語": {
+    "en": "Translate: Japanese → Native language",
+    "source": "ui_translations!193"
+  },
+  "翻訳する言語": {
+    "en": "Language to translate",
+    "source": "ui_translations!42"
+  },
+  "翻訳できました。": {
+    "en": "Translation complete.",
+    "source": "ui_translations!332"
+  },
+  "翻訳できませんでした。原文を残しています。": {
+    "en": "Translation failed. The original is kept.",
+    "source": "通訳君 画面表記"
+  },
+  "翻訳できませんでした。字幕の原文から、この文だけ再試行できます。": {
+    "en": "Translation failed. Retry this sentence from its original caption.",
+    "source": "通訳君 画面表記"
+  },
+  "翻訳に失敗しました。": {
+    "en": "Translation failed.",
+    "source": "ui_translations!354"
+  },
+  "翻訳に失敗しました。文章を短くして、もう一度試してください。": {
+    "en": "Translation failed. Please shorten the sentence and try again.",
+    "source": "ui_translations!217"
+  },
+  "翻訳に失敗しました。文章を短くしてください。": {
+    "en": "Translation failed. Please shorten the sentence.",
+    "source": "ui_translations!335"
+  },
+  "翻訳の待ち時間の内訳": {
+    "en": "Translation timing",
+    "source": "通訳君 画面表記"
+  },
+  "翻訳バンク": {
+    "en": "Translation Bank",
+    "source": "ui_translations!728"
+  },
+  "翻訳バンクを確認しています…": {
+    "en": "Checking the translation bank...",
+    "source": "ui_translations!731"
+  },
+  "翻訳バンクを取得できませんでした。": {
+    "en": "The translation bank could not be retrieved.",
+    "source": "ui_translations!733"
+  },
+  "翻訳を待っています…": {
+    "en": "Translating…",
+    "source": "通訳君 画面表記"
+  },
+  "翻訳を値化": {
+    "en": "Converting translation into values",
+    "source": "ui_translations!742"
+  },
+  "翻訳結果は必ず正しいとは限りません。": {
+    "en": "Translation results are not always accurate.",
+    "source": "ui_translations!286"
+  },
+  "翻訳準備中": {
+    "en": "Translation in progress",
+    "source": "ui_translations!580"
+  },
+  "翻訳処理中：AI利用の可能性": {
+    "en": "Translating: AI may be used",
+    "source": "通訳君 画面表記"
+  },
+  "翻訳状態": {
+    "en": "Translation status",
+    "source": "ui_translations!145"
+  },
+  "翻訳前チェック": {
+    "en": "Pre-translation check",
+    "source": "ui_translations!65"
+  },
+  "翻訳待ちが増えたため、この文を送信していません。": {
+    "en": "This sentence was not sent because the queue is full.",
+    "source": "通訳君 画面表記"
+  },
+  "翻訳待ちが多い場合や期限切れの場合は、お知らせします。古い接続の処理は新しい会話へ引き継ぎません。": {
+    "en": "You will be notified of queue limits or expiry. Old work is not sent to a new conversation.",
+    "source": "通訳君 画面表記"
+  },
+  "翻訳待ちを送信できませんでした。": {
+    "en": "Could not send the queued translation.",
+    "source": "通訳君 画面表記"
+  },
+  "翻訳方向": {
+    "en": "Translation direction",
+    "source": "ui_translations!293"
+  },
+  "満点": {
+    "en": "Perfect score",
+    "source": "ruby_dictionary!118"
+  },
+  "未回答": {
+    "en": "Not answered",
+    "source": "ruby_dictionary!541"
+  },
+  "未確定": {
+    "en": "Not final",
+    "source": "通訳君 画面表記"
+  },
+  "未確認": {
+    "en": "Not reviewed",
+    "source": "通訳君 画面表記"
+  },
+  "未記入": {
+    "en": "Not filled",
+    "source": "ruby_dictionary!492"
+  },
+  "未計測": {
+    "en": "Not measured",
+    "source": "通訳君 画面表記"
+  },
+  "未計測回数": {
+    "en": "Unmeasured calls",
+    "source": "通訳君 画面表記"
+  },
+  "未使用なら設定上限がそのまま残ります。残り使える額は、全端末共通とこの認証IDの残額の少ない方です。": {
+    "en": "The available amount is the lower of the shared and user limits.",
+    "source": "通訳君 画面表記"
+  },
+  "未取得": {
+    "en": "Not acquired",
+    "source": "ui_translations!159"
+  },
+  "未成功": {
+    "en": "Not successful",
+    "source": "通訳君 画面表記"
+  },
+  "未対応": {
+    "en": "Not supported",
+    "source": "ui_translations!574"
+  },
+  "未提出": {
+    "en": "Not submitted",
+    "source": "ruby_dictionary!504"
+  },
+  "未入室": {
+    "en": "Not entered",
+    "source": "ui_translations!266"
+  },
+  "未入力なら先生A、先生Bで表示": {
+    "en": "If left blank, it will display as Teacher A or Teacher B.",
+    "source": "ui_translations!318"
+  },
+  "未納": {
+    "en": "Unpaid",
+    "source": "ruby_dictionary!137"
+  },
+  "無理をしない": {
+    "en": "Don't overexert",
+    "source": "ruby_dictionary!475"
+  },
+  "名札": {
+    "en": "Name tag",
+    "source": "ruby_dictionary!447"
+  },
+  "名前を書いてください": {
+    "en": "Please write",
+    "source": "ruby_dictionary!487"
+  },
+  "明後日": {
+    "en": "Day after",
+    "source": "ruby_dictionary!26"
+  },
+  "明日の連絡": {
+    "en": "Contact for tomorrow",
+    "source": "ui_translations!545"
+  },
+  "明日まで": {
+    "en": "Until tomorrow",
+    "source": "ruby_dictionary!289"
+  },
+  "免除": {
+    "en": "Exemption",
+    "source": "ruby_dictionary!139"
+  },
+  "面接": {
+    "en": "Interview",
+    "source": "ruby_dictionary!191"
+  },
+  "面談": {
+    "en": "Interview",
+    "source": "ui_translations!532"
+  },
+  "問題集": {
+    "en": "Problem collection",
+    "source": "ruby_dictionary!67"
+  },
+  "野外学習": {
+    "en": "Outdoor learning",
+    "source": "ruby_dictionary!214"
+  },
+  "役割を変えるときは、先に退室してください。": {
+    "en": "When changing roles, please leave the room first.",
+    "source": "ui_translations!821"
+  },
+  "役割を変えるときは退室してください。": {
+    "en": "Please leave the room when you change roles.",
+    "source": "ui_translations!523"
+  },
+  "役場": {
+    "en": "Town hall",
+    "source": "ruby_dictionary!57"
+  },
+  "約束": {
+    "en": "Promise",
+    "source": "ruby_dictionary!253"
+  },
+  "薬": {
+    "en": "Medicine",
+    "source": "ruby_dictionary!464"
+  },
+  "薬を飲みました": {
+    "en": "I took",
+    "source": "ruby_dictionary!466"
+  },
+  "訳": {
+    "en": "Translation",
+    "source": "通訳君 画面表記"
+  },
+  "訳がありません": {
+    "en": "No translation yet",
+    "source": "通訳君 画面表記"
+  },
+  "訳の確認が必要": {
+    "en": "Review translation",
+    "source": "通訳君 画面表記"
+  },
+  "訳の確認待ち": {
+    "en": "Awaiting review",
+    "source": "通訳君 画面表記"
+  },
+  "訳を確認してください": {
+    "en": "Please check the translation.",
+    "source": "通訳君 画面表記"
+  },
+  "訳を確認して覚える": {
+    "en": "Review and remember",
+    "source": "通訳君 画面表記"
+  },
+  "訳を更新中…": {
+    "en": "Updating translation…",
+    "source": "通訳君 画面表記"
+  },
+  "訳を読むことば": {
+    "en": "Reading language",
+    "source": "通訳君 画面表記"
+  },
+  "友達": {
+    "en": "Friend",
+    "source": "ui_translations!491"
+  },
+  "友達関係": {
+    "en": "Friendship",
+    "source": "ruby_dictionary!471"
+  },
+  "予習": {
+    "en": "Preparation",
+    "source": "ruby_dictionary!168"
+  },
+  "予定": {
+    "en": "Schedule",
+    "source": "ui_translations!456"
+  },
+  "予定の時間": {
+    "en": "Scheduled time",
+    "source": "ruby_dictionary!286"
+  },
+  "予備": {
+    "en": "Spare",
+    "source": "ruby_dictionary!550"
+  },
+  "様子を見る": {
+    "en": "Wait and",
+    "source": "ruby_dictionary!467"
+  },
+  "用語": {
+    "en": "Term",
+    "source": "ruby_dictionary!367"
+  },
+  "用語カテゴリ": {
+    "en": "Terminology Categories",
+    "source": "ui_translations!371"
+  },
+  "用語が見つかりませんでした。": {
+    "en": "The term was not found.",
+    "source": "ui_translations!108"
+  },
+  "用語ランキングCSV": {
+    "en": "Word ranking CSV",
+    "source": "通訳君 画面表記"
+  },
+  "用語を検索": {
+    "en": "Search terms",
+    "source": "ui_translations!117"
+  },
+  "用語集計をリセット": {
+    "en": "Reset word counts",
+    "source": "通訳君 画面表記"
+  },
+  "来られない": {
+    "en": "Unable to",
+    "source": "ruby_dictionary!315"
+  },
+  "来られる": {
+    "en": "Can you",
+    "source": "ruby_dictionary!314"
+  },
+  "来月": {
+    "en": "Next month",
+    "source": "ruby_dictionary!30"
+  },
+  "来校": {
+    "en": "Visiting the",
+    "source": "ruby_dictionary!524"
+  },
+  "来校者": {
+    "en": "Visitors",
+    "source": "ruby_dictionary!525"
+  },
+  "来週": {
+    "en": "Next week",
+    "source": "ruby_dictionary!28"
+  },
+  "落とし物": {
+    "en": "Lost and",
+    "source": "ruby_dictionary!478"
+  },
+  "利用を終了して画面の本文を消す": {
+    "en": "End session and clear screen",
+    "source": "通訳君 画面表記"
+  },
+  "利用可能": {
+    "en": "Available",
+    "source": "ui_translations!498"
+  },
+  "利用数": {
+    "en": "Uses",
+    "source": "通訳君 画面表記"
+  },
+  "利用中の音声認識の中断": {
+    "en": "Speech recognition interrupted",
+    "source": "通訳君 画面表記"
+  },
+  "利用履歴CSV": {
+    "en": "Usage history CSV",
+    "source": "通訳君 画面表記"
+  },
+  "利用履歴はまだありません。次の参加から記録します。": {
+    "en": "No usage history yet.",
+    "source": "通訳君 画面表記"
+  },
+  "履歴": {
+    "en": "History",
+    "source": "通訳君 画面表記"
+  },
+  "履歴は会話開始からモード終了までの1回単位です。マイクOFFや一文ごとには分割しません。確実に0円の記録は保存せず、費用未計測の記録は残します。": {
+    "en": "One record covers a whole session. Zero-cost records are omitted; unmeasured costs are kept.",
+    "source": "通訳君 画面表記"
+  },
+  "理科": {
+    "en": "Science",
+    "source": "ui_translations!538"
+  },
+  "理由": {
+    "en": "Reason",
+    "source": "ruby_dictionary!582"
+  },
+  "裏門": {
+    "en": "Back gate",
+    "source": "ruby_dictionary!522"
+  },
+  "両端末のアプリを最新版に更新し、音声接続の応答・ICE状態・相手の音声再生を確認してください。": {
+    "en": "Update both devices, then check signaling, ICE and audio playback.",
+    "source": "通訳君 画面表記"
+  },
+  "両方表示": {
+    "en": "Show both",
+    "source": "ui_translations!26"
+  },
+  "料金計算と履歴の説明": {
+    "en": "Costs and history",
+    "source": "通訳君 画面表記"
+  },
+  "領収": {
+    "en": "Receipt",
+    "source": "ruby_dictionary!144"
+  },
+  "領収書": {
+    "en": "Receipt",
+    "source": "ruby_dictionary!239"
+  },
+  "領収証": {
+    "en": "Receipt",
+    "source": "ruby_dictionary!145"
+  },
+  "臨時休校": {
+    "en": "Temporary school",
+    "source": "ruby_dictionary!269"
+  },
+  "礼": {
+    "en": "Bow",
+    "source": "ruby_dictionary!579"
+  },
+  "練習": {
+    "en": "Practice",
+    "source": "ruby_dictionary!243"
+  },
+  "連絡": {
+    "en": "Contact",
+    "source": "ui_translations!457"
+  },
+  "連絡・相談": {
+    "en": "Contact & support",
+    "source": "ui_translations!860"
+  },
+  "連絡してください": {
+    "en": "Please contact",
+    "source": "ruby_dictionary!280"
+  },
+  "連絡先": {
+    "en": "Contact address",
+    "source": "ruby_dictionary!41"
+  },
+  "連絡袋": {
+    "en": "Contact bag",
+    "source": "ruby_dictionary!510"
+  },
+  "連絡帳": {
+    "en": "Contact book",
+    "source": "ui_translations!472"
+  },
+  "廊下": {
+    "en": "Corridor",
+    "source": "ruby_dictionary!113"
+  },
+  "録音": {
+    "en": "Recording",
+    "source": "ruby_dictionary!530"
+  },
+  "話": {
+    "en": "Story",
+    "source": "ui_translations!682"
+  },
+  "話したことばが、ここに。": {
+    "en": "Your words appear here.",
+    "source": "通訳君 画面表記"
+  },
+  "話しはじめる": {
+    "en": "Start talking",
+    "source": "通訳君 画面表記"
+  },
+  "話す": {
+    "en": "Speak",
+    "source": "通訳君 画面表記"
+  },
+  "話すことばが変わっています。原文を文字入力から送ってください。": {
+    "en": "The spoken language changed. Send the original by typing.",
+    "source": "通訳君 画面表記"
+  },
+  "話す側の言語": {
+    "en": "Speaking language",
+    "source": "通訳君 画面表記"
+  },
+  "話せます": {
+    "en": "Ready to speak",
+    "source": "通訳君 画面表記"
+  }
+}

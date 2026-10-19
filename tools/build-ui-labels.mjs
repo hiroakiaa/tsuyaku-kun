@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+const source=JSON.parse(fs.readFileSync(new URL('./ui-sheet-source.json',import.meta.url),'utf8'));
+const custom=fs.readFileSync(new URL('./ui-short-overrides.txt',import.meta.url),'utf8').replace(/^\uFEFF/,'').split(/\r?\n/).filter(Boolean).map(line=>{const i=line.indexOf('|');if(i<1)throw Error('Invalid label: '+line);return [line.slice(0,i).trim(),line.slice(i+1).trim()];});
+const entries=Object.fromEntries(Object.entries(source).filter(([ja,v])=>ja.trim()&&v.en.trim()&&v.en.length<240).map(([ja,v])=>[ja.trim(),{en:v.en[0].toUpperCase()+v.en.slice(1),source:v.source}]));
+for(const [ja,en] of custom)entries[ja]={en,source:source[ja]?.source||'通訳君 画面表記'};
+const ordered=Object.fromEntries(Object.entries(entries).sort(([a],[b])=>a.localeCompare(b,'ja')));
+fs.writeFileSync(new URL('../web/ui-labels.js',import.meta.url),'// UI English guides. Source: ui_translations + ruby_dictionary; short UI overrides reviewed in code.\nexport const uiLabels = '+JSON.stringify(Object.fromEntries(Object.entries(ordered).map(([ja,v])=>[ja,v.en])),null,2)+';\n');
+fs.writeFileSync(new URL('./ui-labels-publish.json',import.meta.url),JSON.stringify(ordered,null,2));
+const strings=JSON.parse(fs.readFileSync(new URL('./ui-visible-strings.json',import.meta.url),'utf8'));
+console.log(JSON.stringify({total:Object.keys(ordered).length,unmapped:strings.filter(t=>!ordered[t.trim()]&&t.trim().length>4&&!/^[\s。、・：）(（]|^[ぁ-ん]{1,3}|\.csv|\.json|^\d/.test(t)).filter(t=>!/^の|^を|^が|^回|^秒|^件|^文|^ms|^MB|^bytes|^tokens/.test(t))},null,2));

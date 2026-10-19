@@ -1,0 +1,4422 @@
+{
+  "通訳する": {
+    "en": "to interpret",
+    "source": "ui_translations!2"
+  },
+  "よく使う文": {
+    "en": "Frequently used sentences",
+    "source": "ui_translations!3"
+  },
+  "ことば辞書": {
+    "en": "Word dictionary",
+    "source": "ui_translations!4"
+  },
+  "授業モード": {
+    "en": "Class mode",
+    "source": "ui_translations!5"
+  },
+  "先生": {
+    "en": "teacher",
+    "source": "ui_translations!6"
+  },
+  "保護者": {
+    "en": "guardian",
+    "source": "ui_translations!7"
+  },
+  "生徒": {
+    "en": "student",
+    "source": "ui_translations!9"
+  },
+  "言語を選んでください。": {
+    "en": "Please select a language.",
+    "source": "ui_translations!10"
+  },
+  "開くコーナーを選んでください。": {
+    "en": "Please select a corner to open.",
+    "source": "ui_translations!11"
+  },
+  "先に、使う人を選んでください。": {
+    "en": "Please choose who will be using it first.",
+    "source": "ui_translations!12"
+  },
+  "この言語で進む": {
+    "en": "Proceed in this language",
+    "source": "ui_translations!14"
+  },
+  "先生として使います。": {
+    "en": "I will use it as a teacher.",
+    "source": "ui_translations!15"
+  },
+  "保護者として使います。": {
+    "en": "I will use this as a parent/guardian.",
+    "source": "ui_translations!16"
+  },
+  "生徒として使います。": {
+    "en": "I will use it as a student.",
+    "source": "ui_translations!17"
+  },
+  "翻訳したい言語": {
+    "en": "The language to translate to",
+    "source": "ui_translations!19"
+  },
+  "表示言語": {
+    "en": "Display language",
+    "source": "ui_translations!21"
+  },
+  "母語表示": {
+    "en": "Native language display",
+    "source": "ui_translations!23"
+  },
+  "日本語表示": {
+    "en": "Japanese display",
+    "source": "ui_translations!24"
+  },
+  "両方表示": {
+    "en": "Show both",
+    "source": "ui_translations!26"
+  },
+  "アプリ全体を母語で表示する": {
+    "en": "Display the entire app in your native language.",
+    "source": "ui_translations!27"
+  },
+  "で表示する": {
+    "en": "Display",
+    "source": "ui_translations!29"
+  },
+  "自分の言語": {
+    "en": "My language",
+    "source": "ui_translations!30"
+  },
+  "日本語 → 母語表示": {
+    "en": "Japanese → Native language display",
+    "source": "ui_translations!31"
+  },
+  "入力する言語": {
+    "en": "Input language",
+    "source": "ui_translations!32"
+  },
+  "先生 → 保護者": {
+    "en": "Teacher → Parent",
+    "source": "ui_translations!33"
+  },
+  "日本語モードに戻す": {
+    "en": "Return to Japanese mode",
+    "source": "ui_translations!35"
+  },
+  "保護者から": {
+    "en": "From parents",
+    "source": "ui_translations!37"
+  },
+  "保護者の言語で入力": {
+    "en": "Enter in parent's language",
+    "source": "ui_translations!39"
+  },
+  "先生側の言語で入力": {
+    "en": "Enter in the teacher's language.",
+    "source": "ui_translations!40"
+  },
+  "翻訳する言語": {
+    "en": "Language to translate",
+    "source": "ui_translations!42"
+  },
+  "入力する文章": {
+    "en": "Text to enter",
+    "source": "ui_translations!43"
+  },
+  "保護者 → 先生": {
+    "en": "Parents → Teachers",
+    "source": "ui_translations!45"
+  },
+  "伝えたいことを短く入力": {
+    "en": "Enter what you want to say in a short message.",
+    "source": "ui_translations!46"
+  },
+  "先生側の言語": {
+    "en": "Teacher's language",
+    "source": "ui_translations!48"
+  },
+  "先生側の言語で入力し、保護者側の言語にします。": {
+    "en": "Enter the information in the teacher's language, then convert it to the parent's language.",
+    "source": "ui_translations!49"
+  },
+  "保護者側の言語で入力": {
+    "en": "Enter in the parent's language.",
+    "source": "ui_translations!51"
+  },
+  "先生が伝えたいことを入力": {
+    "en": "Enter what the teacher wants to convey.",
+    "source": "ui_translations!52"
+  },
+  "保護者の言語で入力してください。": {
+    "en": "Please enter the information in your parent's language.",
+    "source": "ui_translations!53"
+  },
+  "短い文に分けて話す（書く）と、翻訳が伝わりやすくなります。": {
+    "en": "Speaking (or writing) in short sentences makes the translation easier to understand.",
+    "source": "ui_translations!54"
+  },
+  "うまく伝わらないときは、1文を短くして、名前や日時を分けて書くと翻訳しやすくなります。": {
+    "en": "If you're having trouble getting your point across, try shortening sentences and separating names and dates; this will make them easier to translate.",
+    "source": "ui_translations!55"
+  },
+  "先生が伝えたいことを短く入力": {
+    "en": "Enter a short message for the teacher.",
+    "source": "ui_translations!56"
+  },
+  "相手に見せる文をコピー": {
+    "en": "Copy the text to show the other person.",
+    "source": "ui_translations!57"
+  },
+  "先生から保護者へ伝える内容を入力します。": {
+    "en": "Enter the message the teacher will send to the parents.",
+    "source": "ui_translations!58"
+  },
+  "確認用": {
+    "en": "For confirmation",
+    "source": "ui_translations!59"
+  },
+  "文を2つか3つに分けると、翻訳が伝わりやすくなります。": {
+    "en": "Dividing a sentence into two or three parts makes the translation easier to understand.",
+    "source": "ui_translations!61"
+  },
+  "コピーしました": {
+    "en": "I copied it.",
+    "source": "ui_translations!62"
+  },
+  "重要な内容です。必要に応じて、先生・保護者・通訳者と確認してください。": {
+    "en": "This is important information. Please confirm with your teacher, parent, or interpreter as needed.",
+    "source": "ui_translations!63"
+  },
+  "長い文章です。名前、日時、持ち物などを分けて入力すると確認しやすくなります。": {
+    "en": "This is a long message. It will be easier to review if you separate the information into sections such as name, date, and items to bring.",
+    "source": "ui_translations!64"
+  },
+  "翻訳前チェック": {
+    "en": "Pre-translation check",
+    "source": "ui_translations!65"
+  },
+  "やさしい日本語にする": {
+    "en": "Use simplified Japanese",
+    "source": "ui_translations!67"
+  },
+  "文が長めです": {
+    "en": "The text is rather long.",
+    "source": "ui_translations!68"
+  },
+  "1文を短く分けると、翻訳が安定します。": {
+    "en": "Breaking down sentences into shorter ones improves the accuracy of the translation.",
+    "source": "ui_translations!69"
+  },
+  "お願いが多めです": {
+    "en": "I have quite a few requests.",
+    "source": "ui_translations!71"
+  },
+  "1つずつ分けると、相手が行動しやすくなります。": {
+    "en": "Dividing it into individual parts makes it easier for the other person to take action.",
+    "source": "ui_translations!72"
+  },
+  "指す言葉があります": {
+    "en": "There is a word that refers to it.",
+    "source": "ui_translations!73"
+  },
+  "「それ」などは、何を指すかを書き足すと誤訳が減ります。": {
+    "en": "Adding a description of what \"it\" refers to will reduce mistranslations.",
+    "source": "ui_translations!75"
+  },
+  "日時があります": {
+    "en": "There is a date and time.",
+    "source": "ui_translations!76"
+  },
+  "学校を休むこと": {
+    "en": "Taking time off from school",
+    "source": "ui_translations!78"
+  },
+  "学校や授業に遅れて来ること": {
+    "en": "Being late to school or classes",
+    "source": "ui_translations!79"
+  },
+  "学校をいつもより早く帰ること": {
+    "en": "Going home from school earlier than usual",
+    "source": "ui_translations!80"
+  },
+  "やさしい日本語にすると、翻訳が伝わりやすくなります。": {
+    "en": "Using simpler Japanese makes the translation easier to understand.",
+    "source": "ui_translations!81"
+  },
+  "学校に来ること": {
+    "en": "Coming to school",
+    "source": "ui_translations!82"
+  },
+  "先生に出すこと": {
+    "en": "Give it to the teacher",
+    "source": "ui_translations!83"
+  },
+  "紙などに書くこと": {
+    "en": "Writing on paper or similar",
+    "source": "ui_translations!84"
+  },
+  "持ってくること": {
+    "en": "Bring it",
+    "source": "ui_translations!85"
+  },
+  "先生と保護者が話す会": {
+    "en": "Meeting for teachers and parents to talk",
+    "source": "ui_translations!88"
+  },
+  "これから進む学校や仕事のこと": {
+    "en": "Things about school and work that you will be doing in the future",
+    "source": "ui_translations!91"
+  },
+  "授業で使う物のお金": {
+    "en": "Money for things used in class",
+    "source": "ui_translations!93"
+  },
+  "日にち・時間・持ち物は、相手に見せて確認すると安心です。": {
+    "en": "It's reassuring to show the date, time, and items to the other person for confirmation.",
+    "source": "ui_translations!94"
+  },
+  "学校の外で勉強する行事": {
+    "en": "School events that involve studying outside of school",
+    "source": "ui_translations!95"
+  },
+  "体育で着る服": {
+    "en": "Clothes to wear for physical education",
+    "source": "ui_translations!97"
+  },
+  "学校の中で履くくつ": {
+    "en": "Shoes worn inside the school",
+    "source": "ui_translations!98"
+  },
+  "体調やけが": {
+    "en": "Health condition or injury",
+    "source": "ui_translations!99"
+  },
+  "アレルギー": {
+    "en": "allergy",
+    "source": "ui_translations!100"
+  },
+  "お金": {
+    "en": "money",
+    "source": "ui_translations!102"
+  },
+  "進路や成績": {
+    "en": "Career path and grades",
+    "source": "ui_translations!104"
+  },
+  "個人情報": {
+    "en": "personal information",
+    "source": "ui_translations!105"
+  },
+  "最近見た文": {
+    "en": "Recently seen sentences",
+    "source": "ui_translations!106"
+  },
+  "最近見たことば": {
+    "en": "Words I've seen recently",
+    "source": "ui_translations!107"
+  },
+  "用語が見つかりませんでした。": {
+    "en": "The term was not found.",
+    "source": "ui_translations!108"
+  },
+  "短い言葉で、ひらがな・漢字・英語でも検索できます。": {
+    "en": "You can search using short words, including hiragana, kanji, and English.",
+    "source": "ui_translations!109"
+  },
+  "次へ": {
+    "en": "to the next",
+    "source": "ui_translations!111"
+  },
+  "翻訳する": {
+    "en": "Translate",
+    "source": "ui_translations!113"
+  },
+  "文例を検索": {
+    "en": "Search for example sentences",
+    "source": "ui_translations!114"
+  },
+  "用語を検索": {
+    "en": "Search terms",
+    "source": "ui_translations!117"
+  },
+  "使い方": {
+    "en": "How to use",
+    "source": "ui_translations!119"
+  },
+  "編集・確認する": {
+    "en": "Edit and review",
+    "source": "ui_translations!120"
+  },
+  "コピーする": {
+    "en": "Copy",
+    "source": "ui_translations!121"
+  },
+  "注意": {
+    "en": "Note",
+    "source": "ui_translations!122"
+  },
+  "学校で使うお金を集めること": {
+    "en": "Collecting money to use at school",
+    "source": "ui_translations!123"
+  },
+  "ふりがな": {
+    "en": "furigana",
+    "source": "ui_translations!124"
+  },
+  "読み上げ": {
+    "en": "Read aloud",
+    "source": "ui_translations!125"
+  },
+  "ルビON": {
+    "en": "Rubion",
+    "source": "ui_translations!127"
+  },
+  "ふりがな準備中": {
+    "en": "Pronunciation guides are being prepared.",
+    "source": "ui_translations!129"
+  },
+  "学校と家が連絡を書くノート": {
+    "en": "A notebook for school and home to write down messages.",
+    "source": "ui_translations!130"
+  },
+  "日本語と母語の両方で表示": {
+    "en": "Display in both Japanese and the native language.",
+    "source": "ui_translations!131"
+  },
+  "読み込み状態": {
+    "en": "Loading status",
+    "source": "ui_translations!134"
+  },
+  "件": {
+    "en": "subject",
+    "source": "ui_translations!135"
+  },
+  "学校で使う物": {
+    "en": "Things used at school",
+    "source": "ui_translations!137"
+  },
+  "データ健康診断": {
+    "en": "Data Health Check",
+    "source": "ui_translations!138"
+  },
+  "低通信モード": {
+    "en": "Low communication mode",
+    "source": "ui_translations!140"
+  },
+  "背景画像と重い表示を控えます": {
+    "en": "We will minimize the use of background images and heavy content.",
+    "source": "ui_translations!141"
+  },
+  "翻訳キャッシュ": {
+    "en": "Translation cache",
+    "source": "ui_translations!142"
+  },
+  "今日の翻訳": {
+    "en": "Today's translation",
+    "source": "ui_translations!144"
+  },
+  "翻訳状態": {
+    "en": "Translation status",
+    "source": "ui_translations!145"
+  },
+  "健康診断を確認しています…": {
+    "en": "We are reviewing your health checkup...",
+    "source": "ui_translations!147"
+  },
+  "低品質ログ": {
+    "en": "Low-quality logs",
+    "source": "ui_translations!151"
+  },
+  "エラー": {
+    "en": "error",
+    "source": "ui_translations!152"
+  },
+  "文例が見つかりませんでした。": {
+    "en": "No example sentences were found.",
+    "source": "ui_translations!155"
+  },
+  "読み込み中": {
+    "en": "Loading...",
+    "source": "ui_translations!156"
+  },
+  "最終更新": {
+    "en": "Last updated",
+    "source": "ui_translations!157"
+  },
+  "未取得": {
+    "en": "Not acquired",
+    "source": "ui_translations!159"
+  },
+  "ルビ辞書": {
+    "en": "Ruby dictionary",
+    "source": "ui_translations!160"
+  },
+  "欠席": {
+    "en": "absence",
+    "source": "ui_translations!163"
+  },
+  "表示が遅いときは、ここで読み込み中か確認できます。": {
+    "en": "If the display is slow, you can check here to see if it's loading.",
+    "source": "ui_translations!164"
+  },
+  "入力例": {
+    "en": "Input example",
+    "source": "ui_translations!165"
+  },
+  "体調": {
+    "en": "physical condition",
+    "source": "ui_translations!167"
+  },
+  "通訳": {
+    "en": "interpretation",
+    "source": "ui_translations!170"
+  },
+  "授業": {
+    "en": "class",
+    "source": "ui_translations!172"
+  },
+  "文例": {
+    "en": "Example sentences",
+    "source": "ui_translations!174"
+  },
+  "辞書": {
+    "en": "dictionary",
+    "source": "ui_translations!176"
+  },
+  "生徒モード": {
+    "en": "Student Mode",
+    "source": "ui_translations!178"
+  },
+  "ルーム未入力": {
+    "en": "Room not entered",
+    "source": "ui_translations!180"
+  },
+  "ルビなし": {
+    "en": "No furigana (pronunciation guides)",
+    "source": "ui_translations!181"
+  },
+  "授業中": {
+    "en": "During class",
+    "source": "ui_translations!182"
+  },
+  "入室中": {
+    "en": "Currently in the room",
+    "source": "ui_translations!183"
+  },
+  "自動取得中": {
+    "en": "Automatically retrieving data.",
+    "source": "ui_translations!184"
+  },
+  "待機中": {
+    "en": "Waiting",
+    "source": "ui_translations!186"
+  },
+  "表示設定": {
+    "en": "Display settings",
+    "source": "ui_translations!189"
+  },
+  "よく使われる文を知る": {
+    "en": "Learn commonly used phrases",
+    "source": "ui_translations!191"
+  },
+  "よく使うことばを知る": {
+    "en": "Learn commonly used words",
+    "source": "ui_translations!192"
+  },
+  "翻訳する：日本語 → 母語": {
+    "en": "Translate: Japanese → Native language",
+    "source": "ui_translations!193"
+  },
+  "ルビ表示をオフにします": {
+    "en": "Turn off ruby ​​text display.",
+    "source": "ui_translations!194"
+  },
+  "短い英単語でルビをふります": {
+    "en": "I will add furigana (pronunciation guides) using short English words.",
+    "source": "ui_translations!198"
+  },
+  "ふりがなを消す": {
+    "en": "Remove the furigana (phonetic readings).",
+    "source": "ui_translations!200"
+  },
+  "英語ルビを使う": {
+    "en": "Use English furigana (pronunciation guides).",
+    "source": "ui_translations!201"
+  },
+  "ふりがな再読込": {
+    "en": "Reload phonetic readings",
+    "source": "ui_translations!202"
+  },
+  "日本語でルビをふります": {
+    "en": "I will add furigana (pronunciation guides) in Japanese.",
+    "source": "ui_translations!204"
+  },
+  "日本語で聞く": {
+    "en": "Listen in Japanese",
+    "source": "ui_translations!206"
+  },
+  "わかりました": {
+    "en": "got it",
+    "source": "ui_translations!207"
+  },
+  "閉じる": {
+    "en": "close",
+    "source": "ui_translations!208"
+  },
+  "ことばの意味": {
+    "en": "Meaning of words",
+    "source": "ui_translations!210"
+  },
+  "やさしい日本語": {
+    "en": "Easy Japanese",
+    "source": "ui_translations!211"
+  },
+  "補正効果ログ": {
+    "en": "Correction effect log",
+    "source": "ui_translations!214"
+  },
+  "文章を入力してから翻訳してください。": {
+    "en": "Please enter your text before translating.",
+    "source": "ui_translations!215"
+  },
+  "翻訳しています…": {
+    "en": "Translating...",
+    "source": "ui_translations!216"
+  },
+  "翻訳に失敗しました。文章を短くして、もう一度試してください。": {
+    "en": "Translation failed. Please shorten the sentence and try again.",
+    "source": "ui_translations!217"
+  },
+  "カテゴリー：": {
+    "en": "Category:",
+    "source": "ui_translations!218"
+  },
+  "先生に伝える": {
+    "en": "Tell the teacher",
+    "source": "ui_translations!219"
+  },
+  "はい、翻訳する": {
+    "en": "Yes, translate",
+    "source": "ui_translations!221"
+  },
+  "使う人を選んでください。": {
+    "en": "Please choose who will use it.",
+    "source": "ui_translations!222"
+  },
+  "元の言語": {
+    "en": "Original language",
+    "source": "ui_translations!223"
+  },
+  "変換": {
+    "en": "conversion",
+    "source": "ui_translations!225"
+  },
+  "相手の言語": {
+    "en": "The other person's language",
+    "source": "ui_translations!227"
+  },
+  "先生から": {
+    "en": "From the teacher",
+    "source": "ui_translations!228"
+  },
+  "保護者の言葉を入力": {
+    "en": "Enter parent's words",
+    "source": "ui_translations!229"
+  },
+  "保護者の言葉を先生向けに日本語へ翻訳します。": {
+    "en": "We will translate the parents' comments into Japanese for teachers.",
+    "source": "ui_translations!230"
+  },
+  "短い文に分けると、翻訳が伝わりやすくなります。": {
+    "en": "Dividing the text into shorter sentences makes the translation easier to understand.",
+    "source": "ui_translations!231"
+  },
+  "相手に見せる文": {
+    "en": "A text to show to the other person",
+    "source": "ui_translations!233"
+  },
+  "もとの文": {
+    "en": "Original text",
+    "source": "ui_translations!234"
+  },
+  "大切な内容です。翻訳結果を人と確認してください。": {
+    "en": "This is important information. Please have someone else review the translation.",
+    "source": "ui_translations!235"
+  },
+  "おうちの人": {
+    "en": "Parents",
+    "source": "ui_translations!237"
+  },
+  "日本語のみで表示": {
+    "en": "Display in Japanese only",
+    "source": "ui_translations!241"
+  },
+  "前へ": {
+    "en": "Previous",
+    "source": "ui_translations!242"
+  },
+  "件数と更新時刻を確認": {
+    "en": "Check the number of items and update time.",
+    "source": "ui_translations!243"
+  },
+  "母語のみで表示": {
+    "en": "Display in native language only.",
+    "source": "ui_translations!244"
+  },
+  "データの状態": {
+    "en": "Data status",
+    "source": "ui_translations!245"
+  },
+  "補正候補・エラー・低品質ログを確認": {
+    "en": "Check for correction candidates, errors, and low-quality logs.",
+    "source": "ui_translations!246"
+  },
+  "上限到達": {
+    "en": "Upper limit reached",
+    "source": "ui_translations!248"
+  },
+  "補正候補": {
+    "en": "Correction candidates",
+    "source": "ui_translations!250"
+  },
+  "次に見るもの": {
+    "en": "Next thing to see",
+    "source": "ui_translations!253"
+  },
+  "健康診断を取得できませんでした。": {
+    "en": "I was unable to obtain a health checkup.",
+    "source": "ui_translations!254"
+  },
+  "持ち物": {
+    "en": "belongings",
+    "source": "ui_translations!255"
+  },
+  "前回データを表示中・最新版を確認中…": {
+    "en": "Displaying previous data / Checking for latest version...",
+    "source": "ui_translations!256"
+  },
+  "準備済み": {
+    "en": "Ready",
+    "source": "ui_translations!257"
+  },
+  "宿題": {
+    "en": "homework",
+    "source": "ui_translations!259"
+  },
+  "自動取得停止中": {
+    "en": "Automatic data acquisition is currently stopped.",
+    "source": "ui_translations!261"
+  },
+  "一時停止中": {
+    "en": "Paused",
+    "source": "ui_translations!263"
+  },
+  "母語": {
+    "en": "mother tongue",
+    "source": "ui_translations!264"
+  },
+  "入力した文章を、相手の言語へ翻訳して読み上げます。": {
+    "en": "The text you enter will be translated into the recipient's language and read aloud.",
+    "source": "ui_translations!265"
+  },
+  "未入室": {
+    "en": "Not entered",
+    "source": "ui_translations!266"
+  },
+  "日本語ルビを使う": {
+    "en": "Use Japanese furigana",
+    "source": "ui_translations!267"
+  },
+  "辞書を読み込んでいます": {
+    "en": "Loading dictionary",
+    "source": "ui_translations!269"
+  },
+  "選択した文を翻訳": {
+    "en": "Translate the selected sentence",
+    "source": "ui_translations!271"
+  },
+  "選択したテキストを母語に翻訳しますか？": {
+    "en": "Do you want to translate the selected text into your native language?",
+    "source": "ui_translations!272"
+  },
+  "選択したテキストを母語に翻訳しています。": {
+    "en": "The selected text is being translated into your native language.",
+    "source": "ui_translations!273"
+  },
+  "もう一度翻訳": {
+    "en": "Translate again",
+    "source": "ui_translations!274"
+  },
+  "母語の説明を取得できませんでした。": {
+    "en": "The explanation in the native language could not be retrieved.",
+    "source": "ui_translations!275"
+  },
+  "ことばでつながる学校生活": {
+    "en": "School life connected through words",
+    "source": "ui_translations!277"
+  },
+  "設定": {
+    "en": "setting",
+    "source": "ui_translations!278"
+  },
+  "ログアウト": {
+    "en": "Log out",
+    "source": "ui_translations!279"
+  },
+  "最初にログイン画面で、使いたいコーナーを選びます。": {
+    "en": "First, on the login screen, select the section you want to use.",
+    "source": "ui_translations!281"
+  },
+  "「通訳する」では、先生から保護者へ、保護者から先生へを切り替えて使います。": {
+    "en": "The phrase \"to interpret\" is used when switching between communication from the teacher to the parent and from the parent to the teacher.",
+    "source": "ui_translations!282"
+  },
+  "文例やことば辞書では、学校生活でよく使う文やことばを確認できます。": {
+    "en": "The example sentences and vocabulary dictionary allow you to check sentences and words commonly used in school life.",
+    "source": "ui_translations!283"
+  },
+  "けが、病気、アレルギー、お金、進路、個人情報に関する内容は、人が確認してください。": {
+    "en": "Information regarding injuries, illnesses, allergies, finances, career paths, and personal information must be verified by a human.",
+    "source": "ui_translations!285"
+  },
+  "翻訳結果は必ず正しいとは限りません。": {
+    "en": "Translation results are not always accurate.",
+    "source": "ui_translations!286"
+  },
+  "よく見られる": {
+    "en": "Commonly seen",
+    "source": "ui_translations!287"
+  },
+  "翻訳方向": {
+    "en": "Translation direction",
+    "source": "ui_translations!293"
+  },
+  "ルームID": {
+    "en": "Room ID",
+    "source": "ui_translations!296"
+  },
+  "先生名": {
+    "en": "Teacher name",
+    "source": "ui_translations!298"
+  },
+  "すべて": {
+    "en": "all",
+    "source": "ui_translations!299"
+  },
+  "授業音声入力": {
+    "en": "Classroom voice input",
+    "source": "ui_translations!300"
+  },
+  "送信待ち": {
+    "en": "Waiting to send",
+    "source": "ui_translations!302"
+  },
+  "タグを選ぶ": {
+    "en": "Select a tag",
+    "source": "ui_translations!303"
+  },
+  "文例カテゴリ": {
+    "en": "Example sentence categories",
+    "source": "ui_translations!305"
+  },
+  "授業開始": {
+    "en": "Classes begin",
+    "source": "ui_translations!306"
+  },
+  "授業再開": {
+    "en": "Classes resume",
+    "source": "ui_translations!307"
+  },
+  "授業内容を自動取得する": {
+    "en": "Automatically retrieve lesson content.",
+    "source": "ui_translations!308"
+  },
+  "自動取得を一時停止する": {
+    "en": "Pause automatic retrieval.",
+    "source": "ui_translations!309"
+  },
+  "ここを選んで、キーボードのマイクで話してください。話すと入力されますが、3秒空白が続くと、それまでの内容を生徒側に送られて、翻訳されます。": {
+    "en": "Select this option and speak into the keyboard microphone. Your speech will be entered, but if there is a 3-second pause, the content up to that point will be sent to the student and translated.",
+    "source": "ui_translations!310"
+  },
+  "入室": {
+    "en": "Entering the room",
+    "source": "ui_translations!311"
+  },
+  "作成・入室": {
+    "en": "Create and enter the room",
+    "source": "ui_translations!313"
+  },
+  "全員": {
+    "en": "All",
+    "source": "ui_translations!316"
+  },
+  "英語": {
+    "en": "English",
+    "source": "ui_translations!317"
+  },
+  "未入力なら先生A、先生Bで表示": {
+    "en": "If left blank, it will display as Teacher A or Teacher B.",
+    "source": "ui_translations!318"
+  },
+  "音声をログにする": {
+    "en": "Log audio",
+    "source": "ui_translations!319"
+  },
+  "見つかりませんでした。": {
+    "en": "It was not found.",
+    "source": "ui_translations!320"
+  },
+  "英語を準備しています…": {
+    "en": "I'm preparing in English...",
+    "source": "ui_translations!321"
+  },
+  "カテゴリ：": {
+    "en": "category:",
+    "source": "ui_translations!322"
+  },
+  "辞書ページ切り替え": {
+    "en": "Switch dictionary page",
+    "source": "ui_translations!324"
+  },
+  "編集する": {
+    "en": "Edit",
+    "source": "ui_translations!325"
+  },
+  "一時停止": {
+    "en": "pause",
+    "source": "ui_translations!326"
+  },
+  "通訳欄へ入れる": {
+    "en": "Enter in the interpreter section.",
+    "source": "ui_translations!327"
+  },
+  "編集した文を翻訳": {
+    "en": "Translate the edited text.",
+    "source": "ui_translations!329"
+  },
+  "新着": {
+    "en": "New Arrivals",
+    "source": "ui_translations!331"
+  },
+  "翻訳できました。": {
+    "en": "Translation complete.",
+    "source": "ui_translations!332"
+  },
+  "読み込んでいます…": {
+    "en": "Loading...",
+    "source": "ui_translations!333"
+  },
+  "処理しています…": {
+    "en": "Processing...",
+    "source": "ui_translations!334"
+  },
+  "翻訳に失敗しました。文章を短くしてください。": {
+    "en": "Translation failed. Please shorten the sentence.",
+    "source": "ui_translations!335"
+  },
+  "文例を読み込んでいます…": {
+    "en": "I'm reading through the example sentences...",
+    "source": "ui_translations!336"
+  },
+  "文章が長すぎます。短く分けて入力してください。": {
+    "en": "The text is too long. Please break it down into shorter sentences.",
+    "source": "ui_translations!337"
+  },
+  "送信済みログはまだありません。": {
+    "en": "There are no sent logs yet.",
+    "source": "ui_translations!338"
+  },
+  "母語訳を取得できませんでした。": {
+    "en": "The native language translation could not be retrieved.",
+    "source": "ui_translations!339"
+  },
+  "日本語を編集できます。編集後に「編集した文を翻訳」を押してください。": {
+    "en": "You can edit the Japanese text. After editing, please press \"Translate edited text\".",
+    "source": "ui_translations!340"
+  },
+  "ルームを作成または入室": {
+    "en": "Create or join a room",
+    "source": "ui_translations!343"
+  },
+  "終了しました。": {
+    "en": "Ended.",
+    "source": "ui_translations!346"
+  },
+  "ルームが閉じられました。": {
+    "en": "The room has been closed.",
+    "source": "ui_translations!348"
+  },
+  "削除": {
+    "en": "delete",
+    "source": "ui_translations!349"
+  },
+  "日本語を入力してください。": {
+    "en": "Please enter Japanese text.",
+    "source": "ui_translations!351"
+  },
+  "ルームに入室しています。": {
+    "en": "You are now in the room.",
+    "source": "ui_translations!352"
+  },
+  "翻訳に失敗しました。": {
+    "en": "Translation failed.",
+    "source": "ui_translations!354"
+  },
+  "保護者側の言語で入力し、先生側の言語にします。": {
+    "en": "Enter the information in the parent's language, then convert it to the teacher's language.",
+    "source": "ui_translations!355"
+  },
+  "学校から帰ること": {
+    "en": "Going home from school",
+    "source": "ui_translations!356"
+  },
+  "先生と話すこと": {
+    "en": "Talking with the teacher",
+    "source": "ui_translations!357"
+  },
+  "給食のお金": {
+    "en": "school lunch money",
+    "source": "ui_translations!358"
+  },
+  "授業ログを保存しました。": {
+    "en": "The lesson log has been saved.",
+    "source": "ui_translations!359"
+  },
+  "入力内容を消す": {
+    "en": "Delete input content",
+    "source": "ui_translations!360"
+  },
+  "行事": {
+    "en": "Events",
+    "source": "ui_translations!362"
+  },
+  "入室を中止しました。": {
+    "en": "Entry to the room has been cancelled.",
+    "source": "ui_translations!363"
+  },
+  "授業ログを開始しました。入力欄を選び、キーボードのマイクで話してください。": {
+    "en": "The lesson log has started. Please select an input field and speak into the microphone on your keyboard.",
+    "source": "ui_translations!364"
+  },
+  "相手に伝える": {
+    "en": "Tell the other person",
+    "source": "ui_translations!365"
+  },
+  "授業内容を翻訳する": {
+    "en": "Translate the lesson content",
+    "source": "ui_translations!366"
+  },
+  "保護者への説明に": {
+    "en": "Explanation to parents",
+    "source": "ui_translations!367"
+  },
+  "削除できませんでした。": {
+    "en": "Could not delete.",
+    "source": "ui_translations!369"
+  },
+  "入力を待っています。": {
+    "en": "Waiting for input.",
+    "source": "ui_translations!370"
+  },
+  "用語カテゴリ": {
+    "en": "Terminology Categories",
+    "source": "ui_translations!371"
+  },
+  "退室する": {
+    "en": "Leave the room",
+    "source": "ui_translations!372"
+  },
+  "授業ログを取得できませんでした。": {
+    "en": "The class log could not be retrieved.",
+    "source": "ui_translations!375"
+  },
+  "閲覧数を保存できませんでした：": {
+    "en": "Could not save view count:",
+    "source": "ui_translations!376"
+  },
+  "授業ログを保存できませんでした：": {
+    "en": "The class log could not be saved:",
+    "source": "ui_translations!377"
+  },
+  "読み上げ位置": {
+    "en": "Reading position",
+    "source": "ui_translations!378"
+  },
+  "準備中": {
+    "en": "Under preparation",
+    "source": "ui_translations!379"
+  },
+  "辞書の一覧を読み込んでいます…": {
+    "en": "Loading dictionary list...",
+    "source": "ui_translations!380"
+  },
+  "母語訳を読み込んでいます…": {
+    "en": "I'm reading the translation in my native language...",
+    "source": "ui_translations!381"
+  },
+  "キーボードのマイクで話してください。": {
+    "en": "Please speak into the microphone on your keyboard.",
+    "source": "ui_translations!385"
+  },
+  "このログを削除": {
+    "en": "Delete this log",
+    "source": "ui_translations!386"
+  },
+  "削除中": {
+    "en": "Deleting",
+    "source": "ui_translations!387"
+  },
+  "退室しました。": {
+    "en": "I have left the room.",
+    "source": "ui_translations!389"
+  },
+  "授業ログを保存しています。": {
+    "en": "The lesson log is being saved.",
+    "source": "ui_translations!390"
+  },
+  "授業ログを保存できませんでした。": {
+    "en": "The lesson log could not be saved.",
+    "source": "ui_translations!391"
+  },
+  "授業ログは保存されませんでした。入室状態を確認してください。": {
+    "en": "The class log was not saved. Please check your class status.",
+    "source": "ui_translations!392"
+  },
+  "同じ授業ログは保存済みです。": {
+    "en": "The same class log has already been saved.",
+    "source": "ui_translations!393"
+  },
+  "ルームIDを入力してください。": {
+    "en": "Please enter the room ID.",
+    "source": "ui_translations!394"
+  },
+  "ルームに入室できませんでした。": {
+    "en": "I was unable to enter the room.",
+    "source": "ui_translations!396"
+  },
+  "一時停止しました。再開するときは「授業再開」を押してください。": {
+    "en": "The lesson has been paused. Please press \"Resume Lesson\" to resume.",
+    "source": "ui_translations!401"
+  },
+  "授業ログを削除しました。": {
+    "en": "The class log has been deleted.",
+    "source": "ui_translations!403"
+  },
+  "まだ開始していません。": {
+    "en": "It hasn't started yet.",
+    "source": "ui_translations!404"
+  },
+  "削除するログを選べませんでした。": {
+    "en": "I was unable to select which logs to delete.",
+    "source": "ui_translations!407"
+  },
+  "削除できませんでした：": {
+    "en": "Could not delete:",
+    "source": "ui_translations!412"
+  },
+  "ルームに入室できませんでした：": {
+    "en": "Could not enter the room:",
+    "source": "ui_translations!413"
+  },
+  "授業ログを取得できませんでした：": {
+    "en": "Could not retrieve class logs:",
+    "source": "ui_translations!416"
+  },
+  "に入室中です。生徒に伝えて、授業開始ボタンを押してください。": {
+    "en": "The classroom is currently occupied. Please inform the students and press the \"Start Class\" button.",
+    "source": "ui_translations!417"
+  },
+  "に入室しました。授業ログを自動取得しています。": {
+    "en": "You have entered the classroom. The class log is being automatically retrieved.",
+    "source": "ui_translations!418"
+  },
+  "に入室中・": {
+    "en": "Currently in the room.",
+    "source": "ui_translations!420"
+  },
+  "・新しい授業ログを表示しました。": {
+    "en": "・A new lesson log has been displayed.",
+    "source": "ui_translations!421"
+  },
+  "原因不明": {
+    "en": "Cause unknown",
+    "source": "ui_translations!423"
+  },
+  "・新しい授業ログはまだありません。": {
+    "en": "There are no new lesson logs yet.",
+    "source": "ui_translations!424"
+  },
+  "先生がルームを閉じました。授業が終わったので退室してください。": {
+    "en": "The teacher has closed the room. The class is over, so please leave.",
+    "source": "ui_translations!427"
+  },
+  "授業ログの自動取得は一時停止中です。": {
+    "en": "Automatic retrieval of class logs is currently suspended.",
+    "source": "ui_translations!428"
+  },
+  "授業ログを自動取得しています。": {
+    "en": "Class logs are being automatically retrieved.",
+    "source": "ui_translations!429"
+  },
+  "先生が入室中です。": {
+    "en": "The teacher is in the room.",
+    "source": "ui_translations!430"
+  },
+  "ポルトガル語": {
+    "en": "Portuguese",
+    "source": "ui_translations!431"
+  },
+  "入室から50分たったため、自動取得を停止しました。続ける場合は「授業内容を自動取得する」を押してください。": {
+    "en": "Automatic data retrieval has stopped because 50 minutes have passed since you entered the room. If you wish to continue, please press \"Automatically retrieve lesson content\".",
+    "source": "ui_translations!432"
+  },
+  "スペイン語": {
+    "en": "Spanish",
+    "source": "ui_translations!434"
+  },
+  "タガログ語": {
+    "en": "Tagalog",
+    "source": "ui_translations!438"
+  },
+  "中国語": {
+    "en": "Chinese",
+    "source": "ui_translations!439"
+  },
+  "フィリピノ語": {
+    "en": "Filipino",
+    "source": "ui_translations!441"
+  },
+  "ベトナム語": {
+    "en": "Vietnamese",
+    "source": "ui_translations!442"
+  },
+  "インドネシア語": {
+    "en": "Indonesian",
+    "source": "ui_translations!443"
+  },
+  "ネパール語": {
+    "en": "Nepali",
+    "source": "ui_translations!445"
+  },
+  "確認": {
+    "en": "confirmation",
+    "source": "ui_translations!447"
+  },
+  "給食": {
+    "en": "school lunch",
+    "source": "ui_translations!448"
+  },
+  "服": {
+    "en": "clothes",
+    "source": "ui_translations!451"
+  },
+  "提出物": {
+    "en": "submission",
+    "source": "ui_translations!452"
+  },
+  "予定": {
+    "en": "schedule",
+    "source": "ui_translations!456"
+  },
+  "連絡": {
+    "en": "contact",
+    "source": "ui_translations!457"
+  },
+  "日程": {
+    "en": "schedule",
+    "source": "ui_translations!460"
+  },
+  "保健室": {
+    "en": "Health room",
+    "source": "ui_translations!461"
+  },
+  "迎え": {
+    "en": "Pick up",
+    "source": "ui_translations!462"
+  },
+  "放課後": {
+    "en": "after school",
+    "source": "ui_translations!463"
+  },
+  "集金": {
+    "en": "Collection",
+    "source": "ui_translations!464"
+  },
+  "参観": {
+    "en": "visit",
+    "source": "ui_translations!466"
+  },
+  "その他": {
+    "en": "others",
+    "source": "ui_translations!467"
+  },
+  "家庭": {
+    "en": "home",
+    "source": "ui_translations!469"
+  },
+  "連絡帳": {
+    "en": "Contact book",
+    "source": "ui_translations!472"
+  },
+  "校外学習": {
+    "en": "Field trip",
+    "source": "ui_translations!473"
+  },
+  "基本": {
+    "en": "basic",
+    "source": "ui_translations!474"
+  },
+  "手続き": {
+    "en": "procedure",
+    "source": "ui_translations!475"
+  },
+  "進路": {
+    "en": "course",
+    "source": "ui_translations!478"
+  },
+  "カテゴリー": {
+    "en": "Category",
+    "source": "ui_translations!479"
+  },
+  "服装": {
+    "en": "clothing",
+    "source": "ui_translations!481"
+  },
+  "図工": {
+    "en": "Art and Craft",
+    "source": "ui_translations!482"
+  },
+  "支払い": {
+    "en": "payment",
+    "source": "ui_translations!485"
+  },
+  "校内": {
+    "en": "Inside the school",
+    "source": "ui_translations!486"
+  },
+  "学校": {
+    "en": "school",
+    "source": "ui_translations!487"
+  },
+  "健康": {
+    "en": "health",
+    "source": "ui_translations!489"
+  },
+  "水泳": {
+    "en": "swimming",
+    "source": "ui_translations!490"
+  },
+  "友達": {
+    "en": "friend",
+    "source": "ui_translations!491"
+  },
+  "相談": {
+    "en": "consultation",
+    "source": "ui_translations!494"
+  },
+  "利用可能": {
+    "en": "available",
+    "source": "ui_translations!498"
+  },
+  "先生モード": {
+    "en": "Teacher mode",
+    "source": "ui_translations!499"
+  },
+  "ルーム": {
+    "en": "room",
+    "source": "ui_translations!500"
+  },
+  "選択文を翻訳": {
+    "en": "Translate the selected sentences",
+    "source": "ui_translations!502"
+  },
+  "教科": {
+    "en": "Subject",
+    "source": "ui_translations!504"
+  },
+  "数学": {
+    "en": "mathematics",
+    "source": "ui_translations!505"
+  },
+  "共通": {
+    "en": "common",
+    "source": "ui_translations!506"
+  },
+  "母語の説明を準備しています…": {
+    "en": "I am preparing an explanation in my native language...",
+    "source": "ui_translations!508"
+  },
+  "社会": {
+    "en": "society",
+    "source": "ui_translations!509"
+  },
+  "授業ログはまだありません。": {
+    "en": "There are no class logs yet.",
+    "source": "ui_translations!511"
+  },
+  "母語訳を準備しています…": {
+    "en": "I am preparing a translation in my native language...",
+    "source": "ui_translations!512"
+  },
+  "日本語": {
+    "en": "Japanese",
+    "source": "ui_translations!513"
+  },
+  "記録を続けています。": {
+    "en": "I'm continuing to record.",
+    "source": "ui_translations!515"
+  },
+  "入室中は役割を切り替えられません。退室してから切り替えてください。": {
+    "en": "You cannot switch roles while inside the room. Please switch roles after leaving the room.",
+    "source": "ui_translations!516"
+  },
+  "ルームの入室状態を確認しています。": {
+    "en": "We are checking the room's occupancy status.",
+    "source": "ui_translations!517"
+  },
+  "に入室しました。授業ログを自動取得しています。役割を変えるときは退室してください。": {
+    "en": "You have entered the room. The class log is being automatically retrieved. Please leave the room if you wish to change roles.",
+    "source": "ui_translations!519"
+  },
+  "新しい授業ログはまだありません。": {
+    "en": "There are no new lesson logs yet.",
+    "source": "ui_translations!522"
+  },
+  "役割を変えるときは退室してください。": {
+    "en": "Please leave the room when you change roles.",
+    "source": "ui_translations!523"
+  },
+  "続ける場合は「授業内容を自動取得する」を押してください。": {
+    "en": "If you wish to continue, please press \"Automatically retrieve lesson content\".",
+    "source": "ui_translations!525"
+  },
+  "韓国語": {
+    "en": "Korean",
+    "source": "ui_translations!526"
+  },
+  "欠席・遅刻": {
+    "en": "Absence/Lateness",
+    "source": "ui_translations!528"
+  },
+  "朝の連絡": {
+    "en": "Morning contact",
+    "source": "ui_translations!529"
+  },
+  "体育": {
+    "en": "physical education",
+    "source": "ui_translations!530"
+  },
+  "面談": {
+    "en": "interview",
+    "source": "ui_translations!532"
+  },
+  "締切": {
+    "en": "deadline",
+    "source": "ui_translations!533"
+  },
+  "部活動": {
+    "en": "Club activities",
+    "source": "ui_translations!534"
+  },
+  "けが": {
+    "en": "Injury",
+    "source": "ui_translations!535"
+  },
+  "他": {
+    "en": "others",
+    "source": "ui_translations!537"
+  },
+  "理科": {
+    "en": "science",
+    "source": "ui_translations!538"
+  },
+  "学校生活": {
+    "en": "school life",
+    "source": "ui_translations!539"
+  },
+  "授業音声入力欄が見つかりません。": {
+    "en": "The audio input field for the lesson cannot be found.",
+    "source": "ui_translations!541"
+  },
+  "交通": {
+    "en": "traffic",
+    "source": "ui_translations!542"
+  },
+  "登下校": {
+    "en": "Going to and from school",
+    "source": "ui_translations!544"
+  },
+  "明日の連絡": {
+    "en": "Contact for tomorrow",
+    "source": "ui_translations!545"
+  },
+  "保護者会": {
+    "en": "Parents meeting",
+    "source": "ui_translations!546"
+  },
+  "学習": {
+    "en": "study",
+    "source": "ui_translations!547"
+  },
+  "生活": {
+    "en": "life",
+    "source": "ui_translations!549"
+  },
+  "成績": {
+    "en": "Grades",
+    "source": "ui_translations!550"
+  },
+  "安全": {
+    "en": "safety",
+    "source": "ui_translations!551"
+  },
+  "に入室中です。生徒に伝えて、授業開始ボタンを押してください。役割を変えるときは退室してください。": {
+    "en": "The room is currently occupied. Please inform the students and press the start lesson button. Please leave the room when changing roles.",
+    "source": "ui_translations!554"
+  },
+  "新しい授業ログを表示しました。": {
+    "en": "The new lesson log has been displayed.",
+    "source": "ui_translations!555"
+  },
+  "生徒に伝えて、授業開始ボタンを押してください。": {
+    "en": "Please inform the students and then press the start button for the lesson.",
+    "source": "ui_translations!556"
+  },
+  "マイクで入力": {
+    "en": "Input via microphone",
+    "source": "ui_translations!559"
+  },
+  "音声入力を停止": {
+    "en": "Stop voice input",
+    "source": "ui_translations!560"
+  },
+  "マイクアイコンが機能しない場合は、キーボードのマイクで話してください。": {
+    "en": "If the microphone icon isn't working, please use the microphone on your keyboard.",
+    "source": "ui_translations!561"
+  },
+  "マイクで音声入力できます。スマホやタブレットなどでマイクアイコンが機能しない場合は、キーボードのマイクで話してください。": {
+    "en": "You can use the microphone for voice input. If the microphone icon doesn't work on your smartphone or tablet, please use the microphone on your keyboard.",
+    "source": "ui_translations!562"
+  },
+  "マイクで音声入力できます。スマホやタブレットなどでマイクアイコンが機能しない場合は、キーボードのマイクで話してください。短い文に分けると、翻訳が伝わりやすくなります。": {
+    "en": "You can use the microphone for voice input. If the microphone icon doesn't work on your smartphone or tablet, please use the microphone on your keyboard. Breaking your sentences into shorter phrases will make the translation easier to understand.",
+    "source": "ui_translations!563"
+  },
+  "端末": {
+    "en": "terminal",
+    "source": "ui_translations!565"
+  },
+  "PC": {
+    "en": "PC",
+    "source": "ui_translations!567"
+  },
+  "iPhone / iPad": {
+    "en": "iPhone / iPad",
+    "source": "ui_translations!569"
+  },
+  "Android": {
+    "en": "Android",
+    "source": "ui_translations!570"
+  },
+  "アプリ内マイク対応": {
+    "en": "In-app microphone support",
+    "source": "ui_translations!571"
+  },
+  "キーボードマイク推奨": {
+    "en": "Keyboard and microphone recommended",
+    "source": "ui_translations!572"
+  },
+  "未対応": {
+    "en": "Not supported",
+    "source": "ui_translations!574"
+  },
+  "マイクボタンで音声入力できます。動かない場合はキーボードのマイクを使ってください。": {
+    "en": "You can use the microphone button for voice input. If it doesn't work, please use the microphone on your keyboard.",
+    "source": "ui_translations!576"
+  },
+  "この端末では入力欄を選び、キーボードのマイクで話してください。": {
+    "en": "On this device, select an input field and speak into the keyboard's microphone.",
+    "source": "ui_translations!577"
+  },
+  "AndroidやPCでは、マイクボタンで入力できます。動かない場合はキーボードのマイクを使ってください。": {
+    "en": "On Android and PC, you can input using the microphone button. If it doesn't work, please use the microphone on your keyboard.",
+    "source": "ui_translations!578"
+  },
+  "翻訳準備中": {
+    "en": "Translation in progress",
+    "source": "ui_translations!580"
+  },
+  "よく使われる文": {
+    "en": "Commonly used sentences",
+    "source": "ui_translations!582"
+  },
+  "音声入力": {
+    "en": "Voice input",
+    "source": "ui_translations!584"
+  },
+  "iPhone/iPadでは入力欄を選び、キーボードのマイクで話してください。": {
+    "en": "On iPhone/iPad, select the input field and speak into the keyboard's microphone.",
+    "source": "ui_translations!586"
+  },
+  "授業のふり返り": {
+    "en": "Lesson review",
+    "source": "ui_translations!587"
+  },
+  "ログ数": {
+    "en": "Number of logs",
+    "source": "ui_translations!588"
+  },
+  "平均品質": {
+    "en": "average quality",
+    "source": "ui_translations!590"
+  },
+  "今日出たことば": {
+    "en": "Words that came up today",
+    "source": "ui_translations!592"
+  },
+  "まだありません": {
+    "en": "Not yet.",
+    "source": "ui_translations!594"
+  },
+  "日本語残り診断": {
+    "en": "Japanese language remaining diagnosis",
+    "source": "ui_translations!595"
+  },
+  "表示言語切替後の残り文言を確認": {
+    "en": "Check the remaining text after switching the display language.",
+    "source": "ui_translations!597"
+  },
+  "検出": {
+    "en": "detection",
+    "source": "ui_translations!598"
+  },
+  "固定UIの日本語残りは見つかりませんでした。": {
+    "en": "No further Japanese language options for the fixed UI were found.",
+    "source": "ui_translations!600"
+  },
+  "持ち物や提出物があります": {
+    "en": "There are items to bring and documents to submit.",
+    "source": "ui_translations!602"
+  },
+  "持ってくる物、出す物は、1つずつ分けると伝わりやすくなります。": {
+    "en": "It's easier to communicate if you separate the items you bring and the items you give away into one item each.",
+    "source": "ui_translations!603"
+  },
+  "日時、場所、持ち物、お願いを行ごとに分けると読みやすくなります。": {
+    "en": "Separating the date, time, location, items to bring, and requests into separate lines makes it easier to read.",
+    "source": "ui_translations!604"
+  },
+  "ていねいな表現が長めです": {
+    "en": "The polite expressions are rather long.",
+    "source": "ui_translations!606"
+  },
+  "短く「お願いします」「できますか」にすると翻訳が安定します。": {
+    "en": "Using shorter phrases like \"Please\" or \"Can you do it?\" will result in more stable translations.",
+    "source": "ui_translations!609"
+  },
+  "ここから新着": {
+    "en": "New arrivals start here",
+    "source": "ui_translations!611"
+  },
+  "表示モード": {
+    "en": "Display mode",
+    "source": "ui_translations!612"
+  },
+  "母語だけ": {
+    "en": "Native language only",
+    "source": "ui_translations!614"
+  },
+  "母語＋英語": {
+    "en": "Native language + English",
+    "source": "ui_translations!615"
+  },
+  "全部": {
+    "en": "All",
+    "source": "ui_translations!616"
+  },
+  "補正済み": {
+    "en": "Corrected",
+    "source": "ui_translations!617"
+  },
+  "確認ポイント": {
+    "en": "Points to check",
+    "source": "ui_translations!618"
+  },
+  "重要": {
+    "en": "important",
+    "source": "ui_translations!620"
+  },
+  "学習内容": {
+    "en": "Learning content",
+    "source": "ui_translations!622"
+  },
+  "マイことばに保存": {
+    "en": "Save to My Words",
+    "source": "ui_translations!623"
+  },
+  "大きな注意点はありません。": {
+    "en": "There are no major points to note.",
+    "source": "ui_translations!624"
+  },
+  "今日のマイことば": {
+    "en": "Today's word",
+    "source": "ui_translations!627"
+  },
+  "保存した文やことばを確認": {
+    "en": "Check saved sentences and words.",
+    "source": "ui_translations!628"
+  },
+  "保存したことばはまだありません。": {
+    "en": "You haven't saved any words yet.",
+    "source": "ui_translations!631"
+  },
+  "60日より前の授業ログを画面に出ない状態にし、処理済みの補正候補を整理します。": {
+    "en": "Class logs older than 60 days will be hidden from the screen, and processed correction candidates will be organized.",
+    "source": "ui_translations!632"
+  },
+  "整理が完了しました": {
+    "en": "The organization is complete.",
+    "source": "ui_translations!633"
+  },
+  "整理しています…": {
+    "en": "I'm organizing things...",
+    "source": "ui_translations!634"
+  },
+  "古い授業ログを整理": {
+    "en": "Organizing old lesson logs",
+    "source": "ui_translations!638"
+  },
+  "整理した補正候補": {
+    "en": "Organized correction candidates",
+    "source": "ui_translations!639"
+  },
+  "大きく見せる": {
+    "en": "Make it look bigger",
+    "source": "ui_translations!640"
+  },
+  "消す": {
+    "en": "erase",
+    "source": "ui_translations!643"
+  },
+  "授業前チェック": {
+    "en": "Pre-class check",
+    "source": "ui_translations!644"
+  },
+  "非表示にした授業ログ": {
+    "en": "Hidden class logs",
+    "source": "ui_translations!646"
+  },
+  "音声入力欄に文字が入る": {
+    "en": "Text is entered into the voice input field.",
+    "source": "ui_translations!647"
+  },
+  "文例カード、辞書カード、授業ログ本文は診断対象外です。": {
+    "en": "Example sentence cards, dictionary cards, and lesson log texts are not included in the diagnosis.",
+    "source": "ui_translations!649"
+  },
+  "箇条書きにできます": {
+    "en": "You can use bullet points.",
+    "source": "ui_translations!650"
+  },
+  "ログが1件送信される": {
+    "en": "One log entry is sent.",
+    "source": "ui_translations!651"
+  },
+  "ルームIDを生徒に伝える": {
+    "en": "Tell the students the room ID.",
+    "source": "ui_translations!654"
+  },
+  "行動": {
+    "en": "action",
+    "source": "ui_translations!658"
+  },
+  "通常": {
+    "en": "usually",
+    "source": "ui_translations!659"
+  },
+  "保存しました": {
+    "en": "Saved",
+    "source": "ui_translations!660"
+  },
+  "60日より前のログを非表示にする": {
+    "en": "Hide logs older than 60 days.",
+    "source": "ui_translations!662"
+  },
+  "整理する": {
+    "en": "sort out",
+    "source": "ui_translations!663"
+  },
+  "整理できませんでした。": {
+    "en": "I was unable to organize it.",
+    "source": "ui_translations!664"
+  },
+  "日": {
+    "en": "day",
+    "source": "ui_translations!665"
+  },
+  "授業開始を押す": {
+    "en": "Press \"Start Class\"",
+    "source": "ui_translations!667"
+  },
+  "授業ログ": {
+    "en": "Class Log",
+    "source": "ui_translations!668"
+  },
+  "最新の授業内容を上に表示します。": {
+    "en": "The latest lesson content will be displayed at the top.",
+    "source": "ui_translations!670"
+  },
+  "最新の授業内容を表示します。": {
+    "en": "The latest lesson content will be displayed.",
+    "source": "ui_translations!671"
+  },
+  "新着を見る": {
+    "en": "View new arrivals",
+    "source": "ui_translations!673"
+  },
+  "見返し": {
+    "en": "View items",
+    "source": "ui_translations!674"
+  },
+  "標準": {
+    "en": "View items",
+    "source": "ui_translations!675"
+  },
+  "大きめ": {
+    "en": "standard",
+    "source": "ui_translations!678"
+  },
+  "復習": {
+    "en": "review",
+    "source": "ui_translations!679"
+  },
+  "かなり大きめ": {
+    "en": "Quite large",
+    "source": "ui_translations!680"
+  },
+  "話": {
+    "en": "story",
+    "source": "ui_translations!682"
+  },
+  "指示": {
+    "en": "instructions",
+    "source": "ui_translations!683"
+  },
+  "説明": {
+    "en": "explanation",
+    "source": "ui_translations!684"
+  },
+  "授業の最初から順番に表示します。": {
+    "en": "The lessons will be displayed in order from the beginning.",
+    "source": "ui_translations!687"
+  },
+  "件を見る": {
+    "en": "View items",
+    "source": "ui_translations!688"
+  },
+  "マイクを確認しています。話し始めてください。": {
+    "en": "Checking the microphone. Please start speaking.",
+    "source": "ui_translations!689"
+  },
+  "マイク入力中です。話してください。": {
+    "en": "Microphone input is in progress. Please speak.",
+    "source": "ui_translations!691"
+  },
+  "マイクが許可されていません。ブラウザと端末のマイク許可を確認してください。": {
+    "en": "Your microphone is not permitted. Please check the microphone permissions for your browser and device.",
+    "source": "ui_translations!694"
+  },
+  "音声を聞き取っています。": {
+    "en": "I am listening to the audio.",
+    "source": "ui_translations!695"
+  },
+  "マイクが見つかりません。Chromebook/PCの入力デバイスでワイヤレスマイク受信機を選んでください。": {
+    "en": "Microphone not found. Please select a wireless microphone receiver in your Chromebook/PC's input devices.",
+    "source": "ui_translations!696"
+  },
+  "マイクを開始できません。別のアプリがマイクを使っていないか、Chromebook/PCの入力デバイスを確認してください。": {
+    "en": "The microphone cannot be started. Please check your Chromebook/PC's input devices to ensure another app is not using the microphone.",
+    "source": "ui_translations!697"
+  },
+  "音声を検出できませんでした。マイク入力デバイスと受信機の電源を確認してください。": {
+    "en": "No sound was detected. Please check the power on your microphone input device and receiver.",
+    "source": "ui_translations!698"
+  },
+  "音声認識サービスに接続できません。ネットワークやChromeの音声入力設定を確認してください。": {
+    "en": "Unable to connect to the speech recognition service. Please check your network and Chrome speech input settings.",
+    "source": "ui_translations!699"
+  },
+  "マイク入力で問題が起きました。キーボードのマイク、または端末の音声入力設定を確認してください。": {
+    "en": "There was a problem with the microphone input. Please check the microphone on your keyboard or the voice input settings on your device.",
+    "source": "ui_translations!701"
+  },
+  "マイク入力中です。話した内容が入力欄に入ります。": {
+    "en": "Microphone input is in progress. What you say will be entered into the input field.",
+    "source": "ui_translations!704"
+  },
+  "入力欄に文字が入りました。": {
+    "en": "Text has been entered into the input field.",
+    "source": "ui_translations!706"
+  },
+  "マイク入力を開始します。話し始めてください。": {
+    "en": "Microphone input will now begin. Please start speaking.",
+    "source": "ui_translations!707"
+  },
+  "マイク入力を開始しました。話し始めてください。": {
+    "en": "Microphone input has started. Please begin speaking.",
+    "source": "ui_translations!709"
+  },
+  "外部マイクを開く": {
+    "en": "Open external microphone",
+    "source": "ui_translations!710"
+  },
+  "外部マイクページを開くには、ルームIDを入力してください。": {
+    "en": "To open the external microphone page, please enter the room ID.",
+    "source": "ui_translations!712"
+  },
+  "外部マイクページを開けませんでした。ポップアップを許可してください。": {
+    "en": "The external microphone page could not be opened. Please allow pop-ups.",
+    "source": "ui_translations!714"
+  },
+  "外部マイクページを開けませんでした。先にルームへ入室してください。": {
+    "en": "The external microphone page could not be opened. Please enter the room first.",
+    "source": "ui_translations!715"
+  },
+  "外部マイクページを開きました。新しいタブでマイク開始を押してください。": {
+    "en": "The external microphone page has opened. Please click \"Start Microphone\" in the new tab.",
+    "source": "ui_translations!716"
+  },
+  "入室する": {
+    "en": "Enter the room",
+    "source": "ui_translations!718"
+  },
+  "ルームIDを作成中": {
+    "en": "Creating Room ID",
+    "source": "ui_translations!719"
+  },
+  "ルームIDを生徒に伝えてください。": {
+    "en": "Please provide the room ID to the students.",
+    "source": "ui_translations!721"
+  },
+  "再試行": {
+    "en": "retry",
+    "source": "ui_translations!723"
+  },
+  "ルームIDの作成を再試行": {
+    "en": "retry",
+    "source": "ui_translations!724"
+  },
+  "作成できませんでした": {
+    "en": "Could not create.",
+    "source": "ui_translations!726"
+  },
+  "翻訳バンク": {
+    "en": "Translation Bank",
+    "source": "ui_translations!728"
+  },
+  "通訳文の育ち方と速度を確認": {
+    "en": "Check the growth and speed of the interpreted text.",
+    "source": "ui_translations!730"
+  },
+  "翻訳バンクを確認しています…": {
+    "en": "Checking the translation bank...",
+    "source": "ui_translations!731"
+  },
+  "翻訳バンクを取得できませんでした。": {
+    "en": "The translation bank could not be retrieved.",
+    "source": "ui_translations!733"
+  },
+  "承認済み候補を文例に追加": {
+    "en": "Added approved candidates to example sentences.",
+    "source": "ui_translations!734"
+  },
+  "候補の状態": {
+    "en": "Candidate status",
+    "source": "ui_translations!736"
+  },
+  "新規": {
+    "en": "New",
+    "source": "ui_translations!737"
+  },
+  "文例化済み": {
+    "en": "Example sentences already provided",
+    "source": "ui_translations!739"
+  },
+  "承認済み": {
+    "en": "approved",
+    "source": "ui_translations!741"
+  },
+  "翻訳を値化": {
+    "en": "Converting translation into values",
+    "source": "ui_translations!742"
+  },
+  "よく使われる通訳文": {
+    "en": "Commonly used translations",
+    "source": "ui_translations!745"
+  },
+  "速度ログ": {
+    "en": "Speed ​​log",
+    "source": "ui_translations!747"
+  },
+  "Firebaseルール案": {
+    "en": "Proposed Firebase rules",
+    "source": "ui_translations!749"
+  },
+  "式の確認待ち": {
+    "en": "Waiting for confirmation of the formula",
+    "source": "ui_translations!752"
+  },
+  "文例候補を作る": {
+    "en": "Create example sentences",
+    "source": "ui_translations!754"
+  },
+  "承認済み候補を文例に追加しています…": {
+    "en": "Approved candidates are being added to the example sentences...",
+    "source": "ui_translations!755"
+  },
+  "承認済み候補を文例に追加できませんでした。": {
+    "en": "The approved candidate could not be added to the example sentences.",
+    "source": "ui_translations!756"
+  },
+  "却下": {
+    "en": "Rejected",
+    "source": "ui_translations!758"
+  },
+  "値化しています…": {
+    "en": "It's being converted into a value...",
+    "source": "ui_translations!759"
+  },
+  "文例候補を作っています…": {
+    "en": "I'm creating sample sentences...",
+    "source": "ui_translations!760"
+  },
+  "テンプレート素材": {
+    "en": "Template materials",
+    "source": "ui_translations!762"
+  },
+  "テンプレート再利用": {
+    "en": "Reuse templates",
+    "source": "ui_translations!764"
+  },
+  "テンプレート素材シートを用意": {
+    "en": "Prepare a template material sheet.",
+    "source": "ui_translations!765"
+  },
+  "テンプレート素材を取り込む": {
+    "en": "Import template materials",
+    "source": "ui_translations!766"
+  },
+  "テンプレート素材シートを用意しています…": {
+    "en": "We have prepared a template material sheet...",
+    "source": "ui_translations!767"
+  },
+  "テンプレート素材シートを用意できませんでした。": {
+    "en": "The template material sheet could not be prepared.",
+    "source": "ui_translations!768"
+  },
+  "テンプレート素材を取り込めませんでした。": {
+    "en": "The template material could not be imported.",
+    "source": "ui_translations!769"
+  },
+  "通訳キャッシュ状態": {
+    "en": "Interpreter cache status",
+    "source": "ui_translations!770"
+  },
+  "よく使われるテンプレート": {
+    "en": "Frequently used templates",
+    "source": "ui_translations!771"
+  },
+  "テンプレートはまだありません。": {
+    "en": "There are no templates yet.",
+    "source": "ui_translations!772"
+  },
+  "種類": {
+    "en": "kinds",
+    "source": "ui_translations!775"
+  },
+  "テンプレート素材を取り込んでいます…": {
+    "en": "Importing template materials...",
+    "source": "ui_translations!776"
+  },
+  "シート上で翻訳が終わった数式を文字として固定します。": {
+    "en": "The translated formulas are fixed as text on the sheet.",
+    "source": "ui_translations!779"
+  },
+  "よく使われた通訳文を文例候補シートへ送ります。": {
+    "en": "Frequently used translations will be sent to the example sentence sheet.",
+    "source": "ui_translations!780"
+  },
+  "現場でよく聞く文を入れる専用シートを作ります。": {
+    "en": "I will create a dedicated sheet for entering phrases that are frequently heard on-site.",
+    "source": "ui_translations!783"
+  },
+  "テンプレート素材シートの文を翻訳バンクに登録します。": {
+    "en": "The text from the template material sheet will be registered in the translation bank.",
+    "source": "ui_translations!785"
+  },
+  "approvedにした候補を、よく使う文カードに追加します。": {
+    "en": "The candidates you've marked as approved will be added to your frequently used phrase cards.",
+    "source": "ui_translations!786"
+  },
+  "現場でよく聞く文を入れる専用シートを作ります。取り込みはスプレッドシート上部の「つたえる君」メニューから行います。": {
+    "en": "We will create a dedicated sheet for frequently heard phrases used on-site. Data can be imported using the \"Communication Tool\" menu at the top of the spreadsheet.",
+    "source": "ui_translations!788"
+  },
+  "速報日本語": {
+    "en": "Breaking News in Japanese",
+    "source": "ui_translations!790"
+  },
+  "授業開始（外部マイク使用）": {
+    "en": "Class begins (using external microphone)",
+    "source": "ui_translations!793"
+  },
+  "に入室中です。生徒に伝えて、「授業開始（外部マイク使用）」を押してください。": {
+    "en": "The classroom is currently open. Please inform the students and press \"Start Lesson (Use External Microphone)\".",
+    "source": "ui_translations!794"
+  },
+  "に入室中です。生徒に伝えて、「授業開始（外部マイク使用）」を押してください。役割を変えるときは退室してください。": {
+    "en": "I am currently in the room. Please inform the students and press \"Start Lesson (Use External Microphone)\". Please leave the room when you change roles.",
+    "source": "ui_translations!796"
+  },
+  "生徒に伝えて、「授業開始（外部マイク使用）」を押してください。": {
+    "en": "Please inform the students and press \"Start Lesson (Use External Microphone)\".",
+    "source": "ui_translations!797"
+  },
+  "授業内容": {
+    "en": "Course content",
+    "source": "ui_translations!799"
+  },
+  "の授業内容": {
+    "en": "Course content",
+    "source": "ui_translations!801"
+  },
+  "外部通訳アプリを開く": {
+    "en": "Open an external translation app.",
+    "source": "ui_translations!803"
+  },
+  "現在のルビ英語": {
+    "en": "Current English with furigana (pronunciation guides)",
+    "source": "ui_translations!805"
+  },
+  "現在のルビ日本語": {
+    "en": "Current Japanese ruby ​​text",
+    "source": "ui_translations!806"
+  },
+  "現在のルビなし": {
+    "en": "No furigana currently available.",
+    "source": "ui_translations!807"
+  },
+  "日本語に戻す": {
+    "en": "Return to Japanese",
+    "source": "ui_translations!809"
+  },
+  "マイクで話せます。短い文に分けると伝わりやすくなります。": {
+    "en": "You can speak into the microphone. Breaking your message into short sentences will make it easier to understand.",
+    "source": "ui_translations!811"
+  },
+  "通訳アプリを開く": {
+    "en": "Open the translation app.",
+    "source": "ui_translations!813"
+  },
+  "先生へ伝える": {
+    "en": "Tell the teacher",
+    "source": "ui_translations!814"
+  },
+  "文例を探す": {
+    "en": "Search for example sentences",
+    "source": "ui_translations!817"
+  },
+  "ことばを調べる": {
+    "en": "Searching for words",
+    "source": "ui_translations!818"
+  },
+  "授業を記録": {
+    "en": "Record the lesson",
+    "source": "ui_translations!819"
+  },
+  "役割を変えるときは、先に退室してください。": {
+    "en": "When changing roles, please leave the room first.",
+    "source": "ui_translations!821"
+  },
+  "授業を開始しました。キーボードのマイクで話してください。": {
+    "en": "The lesson has begun. Please speak into the microphone on your keyboard.",
+    "source": "ui_translations!822"
+  },
+  "新しいタブで「マイク開始」を押してください。": {
+    "en": "Please press \"Start Microphone\" in the new tab.",
+    "source": "ui_translations!824"
+  },
+  "開けませんでした。ポップアップを許可してください。": {
+    "en": "It couldn't be opened. Please allow pop-ups.",
+    "source": "ui_translations!825"
+  },
+  "に入室しました。授業内容を取得しています。": {
+    "en": "I have entered the classroom. I am acquiring the lesson content.",
+    "source": "ui_translations!826"
+  },
+  "に入室中です。ルームIDを生徒に伝えてください。": {
+    "en": "The room is currently occupied. Please inform the student of the room ID.",
+    "source": "ui_translations!827"
+  },
+  "50分経過したため停止しました。「自動取得」で再開できます。": {
+    "en": "The process has stopped because 50 minutes have elapsed. You can resume it by selecting \"Automatic Acquisition\".",
+    "source": "ui_translations!830"
+  },
+  "保護者へ伝える内容を入力します。": {
+    "en": "Enter the information to be conveyed to the parents/guardians.",
+    "source": "ui_translations!834"
+  },
+  "授業を翻訳": {
+    "en": "Translate the lesson",
+    "source": "ui_translations!835"
+  },
+  "保護者へ伝える": {
+    "en": "To inform parents/guardians",
+    "source": "ui_translations!836"
+  },
+  "保存できませんでした。入室状態を確認してください。": {
+    "en": "Saving failed. Please check your room status.",
+    "source": "ui_translations!839"
+  },
+  "休み・健康・安全": {
+    "en": "Rest, health, and safety",
+    "source": "ui_translations!841"
+  },
+  "持ち物・提出": {
+    "en": "Items to bring and submission",
+    "source": "ui_translations!843"
+  },
+  "行事・部活動": {
+    "en": "Events/club activities",
+    "source": "ui_translations!844"
+  },
+  "お金・手続き": {
+    "en": "Money and procedures",
+    "source": "ui_translations!845"
+  },
+  "家族・相談": {
+    "en": "Family/Consultation",
+    "source": "ui_translations!846"
+  },
+  "授業・勉強": {
+    "en": "Classes and studying",
+    "source": "ui_translations!848"
+  },
+  "会話・連絡": {
+    "en": "Conversation/Contact",
+    "source": "ui_translations!849"
+  },
+  "enroll": {
+    "en": "enroll",
+    "source": "ui_translations!851"
+  },
+  "support": {
+    "en": "support",
+    "source": "ui_translations!852"
+  },
+  "aid": {
+    "en": "a",
+    "source": "ui_translations!853"
+  },
+  "transfer": {
+    "en": "Transfer",
+    "source": "ui_translations!854"
+  },
+  "payment": {
+    "en": "payment",
+    "source": "ui_translations!855"
+  },
+  "health": {
+    "en": "health",
+    "source": "ui_translations!856"
+  },
+  "after": {
+    "en": "after",
+    "source": "ui_translations!857"
+  },
+  "健康・安全": {
+    "en": "Health and safety",
+    "source": "ui_translations!859"
+  },
+  "連絡・相談": {
+    "en": "Health and safety",
+    "source": "ui_translations!860"
+  },
+  "学校生活・行事": {
+    "en": "School life/events",
+    "source": "ui_translations!862"
+  },
+  "欠席届": {
+    "en": "absence form",
+    "source": "ruby_dictionary!2"
+  },
+  "出欠": {
+    "en": "attendance",
+    "source": "ruby_dictionary!3"
+  },
+  "出欠確認": {
+    "en": "attendance confirmation",
+    "source": "ruby_dictionary!4"
+  },
+  "欠席理由": {
+    "en": "reason for",
+    "source": "ruby_dictionary!5"
+  },
+  "家庭の都合": {
+    "en": "family reasons",
+    "source": "ruby_dictionary!6"
+  },
+  "体調不良のため": {
+    "en": "due to",
+    "source": "ruby_dictionary!7"
+  },
+  "お迎え": {
+    "en": "pick-up",
+    "source": "ruby_dictionary!9"
+  },
+  "早め": {
+    "en": "early",
+    "source": "ruby_dictionary!10"
+  },
+  "遅れる": {
+    "en": "delayed",
+    "source": "ruby_dictionary!11"
+  },
+  "間に合う": {
+    "en": "i'll make",
+    "source": "ruby_dictionary!12"
+  },
+  "都合が悪い": {
+    "en": "inconvenient",
+    "source": "ruby_dictionary!13"
+  },
+  "都合がよい": {
+    "en": "convenient",
+    "source": "ruby_dictionary!14"
+  },
+  "可能": {
+    "en": "possible",
+    "source": "ruby_dictionary!15"
+  },
+  "不可能": {
+    "en": "impossible",
+    "source": "ruby_dictionary!16"
+  },
+  "必要ありません": {
+    "en": "it's not",
+    "source": "ruby_dictionary!17"
+  },
+  "必要です": {
+    "en": "it is",
+    "source": "ruby_dictionary!18"
+  },
+  "お願いします": {
+    "en": "please",
+    "source": "ruby_dictionary!19"
+  },
+  "ご確認ください": {
+    "en": "please check",
+    "source": "ruby_dictionary!20"
+  },
+  "ご了承ください": {
+    "en": "note that",
+    "source": "ruby_dictionary!21"
+  },
+  "至急": {
+    "en": "urgent",
+    "source": "ruby_dictionary!22"
+  },
+  "早急": {
+    "en": "quickly",
+    "source": "ruby_dictionary!23"
+  },
+  "本日": {
+    "en": "today",
+    "source": "ruby_dictionary!24"
+  },
+  "昨日": {
+    "en": "yesterday",
+    "source": "ruby_dictionary!25"
+  },
+  "明後日": {
+    "en": "day after",
+    "source": "ruby_dictionary!26"
+  },
+  "今週": {
+    "en": "this week",
+    "source": "ruby_dictionary!27"
+  },
+  "来週": {
+    "en": "next week",
+    "source": "ruby_dictionary!28"
+  },
+  "今月": {
+    "en": "this month",
+    "source": "ruby_dictionary!29"
+  },
+  "来月": {
+    "en": "next month",
+    "source": "ruby_dictionary!30"
+  },
+  "午前": {
+    "en": "morning",
+    "source": "ruby_dictionary!31"
+  },
+  "午後": {
+    "en": "afternoon",
+    "source": "ruby_dictionary!32"
+  },
+  "変更があります": {
+    "en": "there are",
+    "source": "ruby_dictionary!34"
+  },
+  "中止": {
+    "en": "cancel",
+    "source": "ruby_dictionary!35"
+  },
+  "延期": {
+    "en": "postponement",
+    "source": "ruby_dictionary!36"
+  },
+  "実施": {
+    "en": "implementation",
+    "source": "ruby_dictionary!37"
+  },
+  "案内": {
+    "en": "guidance",
+    "source": "ruby_dictionary!38"
+  },
+  "お知らせ": {
+    "en": "notice",
+    "source": "ruby_dictionary!39"
+  },
+  "通知": {
+    "en": "notification",
+    "source": "ruby_dictionary!40"
+  },
+  "連絡先": {
+    "en": "contact address",
+    "source": "ruby_dictionary!41"
+  },
+  "勤務先": {
+    "en": "place of",
+    "source": "ruby_dictionary!42"
+  },
+  "勤務先電話番号": {
+    "en": "work phone",
+    "source": "ruby_dictionary!43"
+  },
+  "世帯": {
+    "en": "household",
+    "source": "ruby_dictionary!44"
+  },
+  "世帯主": {
+    "en": "head of",
+    "source": "ruby_dictionary!45"
+  },
+  "本人": {
+    "en": "the person",
+    "source": "ruby_dictionary!46"
+  },
+  "代理人": {
+    "en": "agent",
+    "source": "ruby_dictionary!47"
+  },
+  "本人確認": {
+    "en": "identity verification",
+    "source": "ruby_dictionary!48"
+  },
+  "身分証明書": {
+    "en": "id card",
+    "source": "ruby_dictionary!49"
+  },
+  "健康保険証": {
+    "en": "health insurance",
+    "source": "ruby_dictionary!50"
+  },
+  "母子健康手帳": {
+    "en": "maternal and",
+    "source": "ruby_dictionary!51"
+  },
+  "翻訳": {
+    "en": "translation",
+    "source": "ruby_dictionary!53"
+  },
+  "日本語支援": {
+    "en": "japanese language",
+    "source": "ruby_dictionary!54"
+  },
+  "教育委員会": {
+    "en": "board of",
+    "source": "ruby_dictionary!55"
+  },
+  "市役所": {
+    "en": "city hall",
+    "source": "ruby_dictionary!56"
+  },
+  "役場": {
+    "en": "town hall",
+    "source": "ruby_dictionary!57"
+  },
+  "住民票": {
+    "en": "resident record",
+    "source": "ruby_dictionary!58"
+  },
+  "戸籍": {
+    "en": "family register",
+    "source": "ruby_dictionary!59"
+  },
+  "入学説明会": {
+    "en": "entrance information",
+    "source": "ruby_dictionary!60"
+  },
+  "入学通知書": {
+    "en": "admission notice",
+    "source": "ruby_dictionary!61"
+  },
+  "就学通知書": {
+    "en": "school attendance",
+    "source": "ruby_dictionary!62"
+  },
+  "学用品": {
+    "en": "school supplies",
+    "source": "ruby_dictionary!63"
+  },
+  "教材": {
+    "en": "teaching materials",
+    "source": "ruby_dictionary!64"
+  },
+  "副教材": {
+    "en": "supplementary teaching",
+    "source": "ruby_dictionary!65"
+  },
+  "資料集": {
+    "en": "collection of",
+    "source": "ruby_dictionary!66"
+  },
+  "問題集": {
+    "en": "problem collection",
+    "source": "ruby_dictionary!67"
+  },
+  "ワーク": {
+    "en": "work",
+    "source": "ruby_dictionary!68"
+  },
+  "プリント": {
+    "en": "print",
+    "source": "ruby_dictionary!69"
+  },
+  "配布物": {
+    "en": "handouts",
+    "source": "ruby_dictionary!70"
+  },
+  "持ち帰り": {
+    "en": "takeout",
+    "source": "ruby_dictionary!71"
+  },
+  "持参": {
+    "en": "bring",
+    "source": "ruby_dictionary!72"
+  },
+  "持たせてください": {
+    "en": "please let",
+    "source": "ruby_dictionary!73"
+  },
+  "準備": {
+    "en": "preparation",
+    "source": "ruby_dictionary!74"
+  },
+  "準備物": {
+    "en": "preparations",
+    "source": "ruby_dictionary!75"
+  },
+  "不要": {
+    "en": "unnecessary",
+    "source": "ruby_dictionary!76"
+  },
+  "持ち帰る": {
+    "en": "take home",
+    "source": "ruby_dictionary!77"
+  },
+  "上靴": {
+    "en": "indoor shoes",
+    "source": "ruby_dictionary!78"
+  },
+  "体操服": {
+    "en": "gym clothes",
+    "source": "ruby_dictionary!79"
+  },
+  "ジャージ": {
+    "en": "jersey",
+    "source": "ruby_dictionary!80"
+  },
+  "赤白帽": {
+    "en": "red and",
+    "source": "ruby_dictionary!81"
+  },
+  "水着": {
+    "en": "swimsuit",
+    "source": "ruby_dictionary!82"
+  },
+  "水泳帽": {
+    "en": "swimming cap",
+    "source": "ruby_dictionary!83"
+  },
+  "習字セット": {
+    "en": "calligraphy set",
+    "source": "ruby_dictionary!84"
+  },
+  "鍵盤ハーモニカ": {
+    "en": "keyboard harmonica",
+    "source": "ruby_dictionary!85"
+  },
+  "リコーダー": {
+    "en": "recorder",
+    "source": "ruby_dictionary!86"
+  },
+  "算数セット": {
+    "en": "math set",
+    "source": "ruby_dictionary!87"
+  },
+  "給食セット": {
+    "en": "school lunch",
+    "source": "ruby_dictionary!88"
+  },
+  "ナフキン": {
+    "en": "napkin",
+    "source": "ruby_dictionary!89"
+  },
+  "マスク": {
+    "en": "mask",
+    "source": "ruby_dictionary!90"
+  },
+  "エプロン": {
+    "en": "apron",
+    "source": "ruby_dictionary!91"
+  },
+  "当番": {
+    "en": "duty",
+    "source": "ruby_dictionary!92"
+  },
+  "日直": {
+    "en": "class duty",
+    "source": "ruby_dictionary!93"
+  },
+  "係": {
+    "en": "person in",
+    "source": "ruby_dictionary!94"
+  },
+  "掃除": {
+    "en": "cleaning",
+    "source": "ruby_dictionary!95"
+  },
+  "清掃": {
+    "en": "cleaning",
+    "source": "ruby_dictionary!96"
+  },
+  "朝の会": {
+    "en": "morning meeting",
+    "source": "ruby_dictionary!97"
+  },
+  "帰りの会": {
+    "en": "closing meeting",
+    "source": "ruby_dictionary!98"
+  },
+  "学級活動": {
+    "en": "class activities",
+    "source": "ruby_dictionary!99"
+  },
+  "委員会": {
+    "en": "committee",
+    "source": "ruby_dictionary!100"
+  },
+  "児童会": {
+    "en": "student council",
+    "source": "ruby_dictionary!101"
+  },
+  "生徒会": {
+    "en": "student council",
+    "source": "ruby_dictionary!102"
+  },
+  "校外": {
+    "en": "outside school",
+    "source": "ruby_dictionary!104"
+  },
+  "教室": {
+    "en": "classroom",
+    "source": "ruby_dictionary!105"
+  },
+  "職員室": {
+    "en": "staff room",
+    "source": "ruby_dictionary!106"
+  },
+  "校長室": {
+    "en": "principal's office",
+    "source": "ruby_dictionary!107"
+  },
+  "図書室": {
+    "en": "library",
+    "source": "ruby_dictionary!108"
+  },
+  "体育館": {
+    "en": "gym",
+    "source": "ruby_dictionary!109"
+  },
+  "運動場": {
+    "en": "playground",
+    "source": "ruby_dictionary!110"
+  },
+  "校庭": {
+    "en": "school grounds",
+    "source": "ruby_dictionary!111"
+  },
+  "昇降口": {
+    "en": "entrance/exit",
+    "source": "ruby_dictionary!112"
+  },
+  "廊下": {
+    "en": "corridor",
+    "source": "ruby_dictionary!113"
+  },
+  "階段": {
+    "en": "stairs",
+    "source": "ruby_dictionary!114"
+  },
+  "欠点": {
+    "en": "disadvantage",
+    "source": "ruby_dictionary!115"
+  },
+  "平均点": {
+    "en": "average score",
+    "source": "ruby_dictionary!116"
+  },
+  "点数": {
+    "en": "score",
+    "source": "ruby_dictionary!117"
+  },
+  "満点": {
+    "en": "perfect score",
+    "source": "ruby_dictionary!118"
+  },
+  "再テスト": {
+    "en": "retest",
+    "source": "ruby_dictionary!119"
+  },
+  "補習": {
+    "en": "supplementary lessons",
+    "source": "ruby_dictionary!120"
+  },
+  "個別指導": {
+    "en": "individual tutoring",
+    "source": "ruby_dictionary!121"
+  },
+  "日本語指導": {
+    "en": "japanese language",
+    "source": "ruby_dictionary!122"
+  },
+  "取り出し授業": {
+    "en": "extraction lesson",
+    "source": "ruby_dictionary!123"
+  },
+  "補助": {
+    "en": "auxiliary",
+    "source": "ruby_dictionary!124"
+  },
+  "支援員": {
+    "en": "support staff",
+    "source": "ruby_dictionary!125"
+  },
+  "相談室": {
+    "en": "counseling room",
+    "source": "ruby_dictionary!126"
+  },
+  "スクールカウンセラー": {
+    "en": "school counselor",
+    "source": "ruby_dictionary!127"
+  },
+  "特別支援": {
+    "en": "special support",
+    "source": "ruby_dictionary!128"
+  },
+  "特別支援学級": {
+    "en": "special support",
+    "source": "ruby_dictionary!129"
+  },
+  "通級": {
+    "en": "special needs",
+    "source": "ruby_dictionary!130"
+  },
+  "合理的配慮": {
+    "en": "reasonable accommodation",
+    "source": "ruby_dictionary!131"
+  },
+  "学用品費": {
+    "en": "school supplies",
+    "source": "ruby_dictionary!132"
+  },
+  "通学用品費": {
+    "en": "school supplies",
+    "source": "ruby_dictionary!133"
+  },
+  "修学旅行費": {
+    "en": "school trip",
+    "source": "ruby_dictionary!134"
+  },
+  "校外活動費": {
+    "en": "extracurricular activity",
+    "source": "ruby_dictionary!135"
+  },
+  "納入": {
+    "en": "delivery",
+    "source": "ruby_dictionary!136"
+  },
+  "未納": {
+    "en": "unpaid",
+    "source": "ruby_dictionary!137"
+  },
+  "分割": {
+    "en": "division",
+    "source": "ruby_dictionary!138"
+  },
+  "免除": {
+    "en": "exemption",
+    "source": "ruby_dictionary!139"
+  },
+  "減額": {
+    "en": "reduction",
+    "source": "ruby_dictionary!140"
+  },
+  "口座": {
+    "en": "account",
+    "source": "ruby_dictionary!141"
+  },
+  "引落": {
+    "en": "direct debit",
+    "source": "ruby_dictionary!142"
+  },
+  "残高不足": {
+    "en": "insufficient funds",
+    "source": "ruby_dictionary!143"
+  },
+  "領収": {
+    "en": "receipt",
+    "source": "ruby_dictionary!144"
+  },
+  "領収証": {
+    "en": "receipt",
+    "source": "ruby_dictionary!145"
+  },
+  "災害": {
+    "en": "disaster",
+    "source": "ruby_dictionary!146"
+  },
+  "防災": {
+    "en": "disaster prevention",
+    "source": "ruby_dictionary!147"
+  },
+  "防犯": {
+    "en": "crime prevention",
+    "source": "ruby_dictionary!148"
+  },
+  "不審者": {
+    "en": "suspicious person",
+    "source": "ruby_dictionary!149"
+  },
+  "通学路": {
+    "en": "school route",
+    "source": "ruby_dictionary!150"
+  },
+  "見守り": {
+    "en": "watching over",
+    "source": "ruby_dictionary!151"
+  },
+  "一斉下校": {
+    "en": "all students",
+    "source": "ruby_dictionary!152"
+  },
+  "引き渡し訓練": {
+    "en": "handover training",
+    "source": "ruby_dictionary!153"
+  },
+  "音楽": {
+    "en": "music",
+    "source": "ruby_dictionary!157"
+  },
+  "美術": {
+    "en": "art",
+    "source": "ruby_dictionary!158"
+  },
+  "技術": {
+    "en": "technology",
+    "source": "ruby_dictionary!160"
+  },
+  "家庭科": {
+    "en": "home economics",
+    "source": "ruby_dictionary!161"
+  },
+  "保健体育": {
+    "en": "health and",
+    "source": "ruby_dictionary!163"
+  },
+  "道徳": {
+    "en": "moral",
+    "source": "ruby_dictionary!164"
+  },
+  "総合": {
+    "en": "overall",
+    "source": "ruby_dictionary!165"
+  },
+  "課題": {
+    "en": "assignment",
+    "source": "ruby_dictionary!167"
+  },
+  "予習": {
+    "en": "preparation",
+    "source": "ruby_dictionary!168"
+  },
+  "提出課題": {
+    "en": "submitted assignment",
+    "source": "ruby_dictionary!170"
+  },
+  "小テスト": {
+    "en": "quiz",
+    "source": "ruby_dictionary!171"
+  },
+  "定期テスト": {
+    "en": "regular tests",
+    "source": "ruby_dictionary!172"
+  },
+  "中間テスト": {
+    "en": "midterm exams",
+    "source": "ruby_dictionary!173"
+  },
+  "期末テスト": {
+    "en": "final exams",
+    "source": "ruby_dictionary!174"
+  },
+  "実力テスト": {
+    "en": "aptitude test",
+    "source": "ruby_dictionary!175"
+  },
+  "通知表": {
+    "en": "report card",
+    "source": "ruby_dictionary!176"
+  },
+  "評定": {
+    "en": "rating",
+    "source": "ruby_dictionary!178"
+  },
+  "評価": {
+    "en": "evaluation",
+    "source": "ruby_dictionary!179"
+  },
+  "観点": {
+    "en": "perspective",
+    "source": "ruby_dictionary!180"
+  },
+  "学習状況": {
+    "en": "learning status",
+    "source": "ruby_dictionary!181"
+  },
+  "生活状況": {
+    "en": "living situation",
+    "source": "ruby_dictionary!182"
+  },
+  "所見": {
+    "en": "findings",
+    "source": "ruby_dictionary!183"
+  },
+  "進路希望": {
+    "en": "career aspirations",
+    "source": "ruby_dictionary!185"
+  },
+  "志望校": {
+    "en": "desired school",
+    "source": "ruby_dictionary!186"
+  },
+  "高校": {
+    "en": "high school",
+    "source": "ruby_dictionary!187"
+  },
+  "高等学校": {
+    "en": "high school",
+    "source": "ruby_dictionary!188"
+  },
+  "入試": {
+    "en": "entrance exam",
+    "source": "ruby_dictionary!189"
+  },
+  "受験": {
+    "en": "entrance exam",
+    "source": "ruby_dictionary!190"
+  },
+  "面接": {
+    "en": "interview",
+    "source": "ruby_dictionary!191"
+  },
+  "願書": {
+    "en": "application form",
+    "source": "ruby_dictionary!192"
+  },
+  "調査書": {
+    "en": "investigation report",
+    "source": "ruby_dictionary!193"
+  },
+  "推薦": {
+    "en": "recommendation",
+    "source": "ruby_dictionary!194"
+  },
+  "公立": {
+    "en": "public",
+    "source": "ruby_dictionary!195"
+  },
+  "私立": {
+    "en": "private",
+    "source": "ruby_dictionary!196"
+  },
+  "学校行事": {
+    "en": "school events",
+    "source": "ruby_dictionary!198"
+  },
+  "入学式": {
+    "en": "entrance ceremony",
+    "source": "ruby_dictionary!199"
+  },
+  "始業式": {
+    "en": "opening ceremony",
+    "source": "ruby_dictionary!200"
+  },
+  "終業式": {
+    "en": "closing ceremony",
+    "source": "ruby_dictionary!201"
+  },
+  "修了式": {
+    "en": "graduation ceremony",
+    "source": "ruby_dictionary!202"
+  },
+  "卒業式": {
+    "en": "graduation ceremony",
+    "source": "ruby_dictionary!203"
+  },
+  "運動会": {
+    "en": "sports day",
+    "source": "ruby_dictionary!204"
+  },
+  "体育祭": {
+    "en": "sports festival",
+    "source": "ruby_dictionary!205"
+  },
+  "体育大会": {
+    "en": "athletic meet",
+    "source": "ruby_dictionary!206"
+  },
+  "文化祭": {
+    "en": "cultural festival",
+    "source": "ruby_dictionary!207"
+  },
+  "合唱祭": {
+    "en": "chorus festival",
+    "source": "ruby_dictionary!208"
+  },
+  "社会見学": {
+    "en": "field trip",
+    "source": "ruby_dictionary!210"
+  },
+  "遠足": {
+    "en": "field trip",
+    "source": "ruby_dictionary!211"
+  },
+  "修学旅行": {
+    "en": "school trip",
+    "source": "ruby_dictionary!212"
+  },
+  "自然教室": {
+    "en": "nature classroom",
+    "source": "ruby_dictionary!213"
+  },
+  "野外学習": {
+    "en": "outdoor learning",
+    "source": "ruby_dictionary!214"
+  },
+  "職場体験": {
+    "en": "work experience",
+    "source": "ruby_dictionary!215"
+  },
+  "授業参観": {
+    "en": "class observation",
+    "source": "ruby_dictionary!216"
+  },
+  "学級懇談会": {
+    "en": "class meeting",
+    "source": "ruby_dictionary!218"
+  },
+  "個人懇談": {
+    "en": "personal meeting",
+    "source": "ruby_dictionary!219"
+  },
+  "三者懇談": {
+    "en": "tripartite meeting",
+    "source": "ruby_dictionary!220"
+  },
+  "教育相談": {
+    "en": "educational counseling",
+    "source": "ruby_dictionary!221"
+  },
+  "都合": {
+    "en": "convenience",
+    "source": "ruby_dictionary!225"
+  },
+  "参加": {
+    "en": "participation",
+    "source": "ruby_dictionary!226"
+  },
+  "欠席確認": {
+    "en": "absence confirmation",
+    "source": "ruby_dictionary!227"
+  },
+  "教材費": {
+    "en": "teaching material",
+    "source": "ruby_dictionary!229"
+  },
+  "学年費": {
+    "en": "academic fee",
+    "source": "ruby_dictionary!230"
+  },
+  "給食費": {
+    "en": "school lunch",
+    "source": "ruby_dictionary!231"
+  },
+  "積立金": {
+    "en": "reserve fund",
+    "source": "ruby_dictionary!232"
+  },
+  "振込": {
+    "en": "transfer",
+    "source": "ruby_dictionary!233"
+  },
+  "口座振替": {
+    "en": "bank transfer",
+    "source": "ruby_dictionary!234"
+  },
+  "銀行口座": {
+    "en": "bank account",
+    "source": "ruby_dictionary!235"
+  },
+  "封筒": {
+    "en": "envelope",
+    "source": "ruby_dictionary!236"
+  },
+  "金額": {
+    "en": "amount",
+    "source": "ruby_dictionary!237"
+  },
+  "返金": {
+    "en": "refund",
+    "source": "ruby_dictionary!238"
+  },
+  "領収書": {
+    "en": "receipt",
+    "source": "ruby_dictionary!239"
+  },
+  "部活": {
+    "en": "club activities",
+    "source": "ruby_dictionary!241"
+  },
+  "顧問": {
+    "en": "advisor",
+    "source": "ruby_dictionary!242"
+  },
+  "練習": {
+    "en": "practice",
+    "source": "ruby_dictionary!243"
+  },
+  "大会": {
+    "en": "tournament",
+    "source": "ruby_dictionary!244"
+  },
+  "試合": {
+    "en": "game",
+    "source": "ruby_dictionary!245"
+  },
+  "遠征": {
+    "en": "expedition",
+    "source": "ruby_dictionary!246"
+  },
+  "集合場所": {
+    "en": "meeting place",
+    "source": "ruby_dictionary!247"
+  },
+  "解散場所": {
+    "en": "disbandment location",
+    "source": "ruby_dictionary!248"
+  },
+  "活動予定": {
+    "en": "activity schedule",
+    "source": "ruby_dictionary!249"
+  },
+  "校則": {
+    "en": "school rules",
+    "source": "ruby_dictionary!251"
+  },
+  "規則": {
+    "en": "rules",
+    "source": "ruby_dictionary!252"
+  },
+  "約束": {
+    "en": "promise",
+    "source": "ruby_dictionary!253"
+  },
+  "身だしなみ": {
+    "en": "personal grooming",
+    "source": "ruby_dictionary!254"
+  },
+  "頭髪": {
+    "en": "hair",
+    "source": "ruby_dictionary!255"
+  },
+  "禁止": {
+    "en": "prohibited",
+    "source": "ruby_dictionary!258"
+  },
+  "許可": {
+    "en": "permission",
+    "source": "ruby_dictionary!259"
+  },
+  "危険": {
+    "en": "danger",
+    "source": "ruby_dictionary!261"
+  },
+  "避難": {
+    "en": "evacuation",
+    "source": "ruby_dictionary!262"
+  },
+  "避難訓練": {
+    "en": "evacuation drill",
+    "source": "ruby_dictionary!263"
+  },
+  "地震": {
+    "en": "earthquake",
+    "source": "ruby_dictionary!264"
+  },
+  "火災": {
+    "en": "fire",
+    "source": "ruby_dictionary!265"
+  },
+  "警報": {
+    "en": "alarm",
+    "source": "ruby_dictionary!266"
+  },
+  "暴風警報": {
+    "en": "storm warning",
+    "source": "ruby_dictionary!267"
+  },
+  "大雨警報": {
+    "en": "heavy rain",
+    "source": "ruby_dictionary!268"
+  },
+  "臨時休校": {
+    "en": "temporary school",
+    "source": "ruby_dictionary!269"
+  },
+  "登校見合わせ": {
+    "en": "school attendance",
+    "source": "ruby_dictionary!270"
+  },
+  "引き渡し": {
+    "en": "handover",
+    "source": "ruby_dictionary!271"
+  },
+  "引き取り": {
+    "en": "pickup",
+    "source": "ruby_dictionary!272"
+  },
+  "今日": {
+    "en": "today",
+    "source": "ruby_dictionary!274"
+  },
+  "まだ": {
+    "en": "still",
+    "source": "ruby_dictionary!275"
+  },
+  "場合": {
+    "en": "case",
+    "source": "ruby_dictionary!276"
+  },
+  "とき": {
+    "en": "time",
+    "source": "ruby_dictionary!277"
+  },
+  "休み": {
+    "en": "holiday",
+    "source": "ruby_dictionary!278"
+  },
+  "学校へ": {
+    "en": "to school",
+    "source": "ruby_dictionary!279"
+  },
+  "連絡してください": {
+    "en": "please contact",
+    "source": "ruby_dictionary!280"
+  },
+  "遅れて": {
+    "en": "late",
+    "source": "ruby_dictionary!281"
+  },
+  "遅れて登校": {
+    "en": "arriving late",
+    "source": "ruby_dictionary!282"
+  },
+  "学校に着く": {
+    "en": "arrived at",
+    "source": "ruby_dictionary!283"
+  },
+  "着く": {
+    "en": "arrive",
+    "source": "ruby_dictionary!284"
+  },
+  "到着": {
+    "en": "arrival",
+    "source": "ruby_dictionary!285"
+  },
+  "予定の時間": {
+    "en": "scheduled time",
+    "source": "ruby_dictionary!286"
+  },
+  "あとで": {
+    "en": "later",
+    "source": "ruby_dictionary!287"
+  },
+  "後で": {
+    "en": "later",
+    "source": "ruby_dictionary!288"
+  },
+  "明日まで": {
+    "en": "until tomorrow",
+    "source": "ruby_dictionary!289"
+  },
+  "出す紙": {
+    "en": "paper to",
+    "source": "ruby_dictionary!290"
+  },
+  "出ていません": {
+    "en": "it's not",
+    "source": "ruby_dictionary!291"
+  },
+  "提出されていません": {
+    "en": "not submitted",
+    "source": "ruby_dictionary!292"
+  },
+  "必要な書類": {
+    "en": "required documents",
+    "source": "ruby_dictionary!293"
+  },
+  "必要な物": {
+    "en": "items needed",
+    "source": "ruby_dictionary!294"
+  },
+  "持ってきてください": {
+    "en": "please bring",
+    "source": "ruby_dictionary!296"
+  },
+  "給食がありません": {
+    "en": "there is",
+    "source": "ruby_dictionary!297"
+  },
+  "お弁当が必要": {
+    "en": "i need",
+    "source": "ruby_dictionary!298"
+  },
+  "お弁当を持たせてください": {
+    "en": "please pack",
+    "source": "ruby_dictionary!299"
+  },
+  "えんぴつ": {
+    "en": "pencil",
+    "source": "ruby_dictionary!300"
+  },
+  "えんぴつなど": {
+    "en": "pencils, etc.",
+    "source": "ruby_dictionary!301"
+  },
+  "体育の授業": {
+    "en": "physical education",
+    "source": "ruby_dictionary!302"
+  },
+  "くわしい内容": {
+    "en": "detailed information",
+    "source": "ruby_dictionary!303"
+  },
+  "詳しい内容": {
+    "en": "detailed information",
+    "source": "ruby_dictionary!304"
+  },
+  "くわしいこと": {
+    "en": "details",
+    "source": "ruby_dictionary!305"
+  },
+  "配付したお知らせ": {
+    "en": "distributed notice",
+    "source": "ruby_dictionary!306"
+  },
+  "学校からの紙": {
+    "en": "paper from",
+    "source": "ruby_dictionary!307"
+  },
+  "見てください": {
+    "en": "look",
+    "source": "ruby_dictionary!308"
+  },
+  "確認してください": {
+    "en": "please confirm",
+    "source": "ruby_dictionary!309"
+  },
+  "教えてください": {
+    "en": "please tell",
+    "source": "ruby_dictionary!310"
+  },
+  "お知らせください": {
+    "en": "please let",
+    "source": "ruby_dictionary!311"
+  },
+  "参加できる": {
+    "en": "can participate",
+    "source": "ruby_dictionary!312"
+  },
+  "参加できない": {
+    "en": "unable to",
+    "source": "ruby_dictionary!313"
+  },
+  "来られる": {
+    "en": "can you",
+    "source": "ruby_dictionary!314"
+  },
+  "来られない": {
+    "en": "unable to",
+    "source": "ruby_dictionary!315"
+  },
+  "日程を確認": {
+    "en": "check the",
+    "source": "ruby_dictionary!318"
+  },
+  "個人面談の日程": {
+    "en": "individual interview",
+    "source": "ruby_dictionary!319"
+  },
+  "先生と話す日": {
+    "en": "day to",
+    "source": "ruby_dictionary!320"
+  },
+  "早めに": {
+    "en": "early",
+    "source": "ruby_dictionary!321"
+  },
+  "できるだけ早く": {
+    "en": "as soon",
+    "source": "ruby_dictionary!322"
+  },
+  "体の調子": {
+    "en": "physical condition",
+    "source": "ruby_dictionary!323"
+  },
+  "体の調子がよくありません": {
+    "en": "i'm not",
+    "source": "ruby_dictionary!324"
+  },
+  "電話で": {
+    "en": "by phone",
+    "source": "ruby_dictionary!325"
+  },
+  "電話で話します": {
+    "en": "i'll talk",
+    "source": "ruby_dictionary!326"
+  },
+  "状況": {
+    "en": "situation",
+    "source": "ruby_dictionary!327"
+  },
+  "くわしい状況": {
+    "en": "detailed situation",
+    "source": "ruby_dictionary!328"
+  },
+  "学校でけが": {
+    "en": "injured at",
+    "source": "ruby_dictionary!329"
+  },
+  "学校でけがをしました": {
+    "en": "i got",
+    "source": "ruby_dictionary!330"
+  },
+  "いつもより": {
+    "en": "more than",
+    "source": "ruby_dictionary!331"
+  },
+  "遅くなります": {
+    "en": "it will",
+    "source": "ruby_dictionary!332"
+  },
+  "下校が遅くなります": {
+    "en": "school dismissal",
+    "source": "ruby_dictionary!333"
+  },
+  "家に帰る時間": {
+    "en": "time to",
+    "source": "ruby_dictionary!334"
+  },
+  "学校で使うお金": {
+    "en": "money to",
+    "source": "ruby_dictionary!336"
+  },
+  "封筒に入れて": {
+    "en": "put it",
+    "source": "ruby_dictionary!337"
+  },
+  "入れて": {
+    "en": "put it",
+    "source": "ruby_dictionary!338"
+  },
+  "給食のアレルギー": {
+    "en": "school lunch",
+    "source": "ruby_dictionary!340"
+  },
+  "確認したいこと": {
+    "en": "things i",
+    "source": "ruby_dictionary!341"
+  },
+  "必ず": {
+    "en": "surely",
+    "source": "ruby_dictionary!342"
+  },
+  "人が確認": {
+    "en": "human confirmation",
+    "source": "ruby_dictionary!343"
+  },
+  "授業を見る日": {
+    "en": "day to",
+    "source": "ruby_dictionary!344"
+  },
+  "家庭で": {
+    "en": "at home",
+    "source": "ruby_dictionary!347"
+  },
+  "宿題が終わっている": {
+    "en": "i've finished",
+    "source": "ruby_dictionary!348"
+  },
+  "終わっている": {
+    "en": "it's over",
+    "source": "ruby_dictionary!349"
+  },
+  "大切なお知らせ": {
+    "en": "important announcement",
+    "source": "ruby_dictionary!350"
+  },
+  "大切なこと": {
+    "en": "important things",
+    "source": "ruby_dictionary!351"
+  },
+  "家の用事": {
+    "en": "household chores",
+    "source": "ruby_dictionary!353"
+  },
+  "早く帰ります": {
+    "en": "i'll go",
+    "source": "ruby_dictionary!354"
+  },
+  "迎えに行く": {
+    "en": "go to",
+    "source": "ruby_dictionary!355"
+  },
+  "迎えに行く時間": {
+    "en": "time to",
+    "source": "ruby_dictionary!356"
+  },
+  "学校の外": {
+    "en": "outside of",
+    "source": "ruby_dictionary!357"
+  },
+  "学習に行く": {
+    "en": "going to",
+    "source": "ruby_dictionary!358"
+  },
+  "雨の道具": {
+    "en": "rain gear",
+    "source": "ruby_dictionary!359"
+  },
+  "学校のきまり": {
+    "en": "school rules",
+    "source": "ruby_dictionary!360"
+  },
+  "ルール": {
+    "en": "rule",
+    "source": "ruby_dictionary!361"
+  },
+  "一緒に": {
+    "en": "together",
+    "source": "ruby_dictionary!362"
+  },
+  "お子さんと一緒": {
+    "en": "with your",
+    "source": "ruby_dictionary!363"
+  },
+  "一緒に確認": {
+    "en": "let's check",
+    "source": "ruby_dictionary!364"
+  },
+  "学校のルール": {
+    "en": "school rules",
+    "source": "ruby_dictionary!365"
+  },
+  "上履き": {
+    "en": "indoor shoes",
+    "source": "ruby_dictionary!366"
+  },
+  "用語": {
+    "en": "term",
+    "source": "ruby_dictionary!367"
+  },
+  "ハンカチ": {
+    "en": "handkerchief",
+    "source": "ruby_dictionary!368"
+  },
+  "ティッシュ": {
+    "en": "tissue",
+    "source": "ruby_dictionary!369"
+  },
+  "ランドセル": {
+    "en": "school bag",
+    "source": "ruby_dictionary!370"
+  },
+  "筆箱": {
+    "en": "pencil case",
+    "source": "ruby_dictionary!371"
+  },
+  "鉛筆": {
+    "en": "pencil",
+    "source": "ruby_dictionary!372"
+  },
+  "消しゴム": {
+    "en": "eraser",
+    "source": "ruby_dictionary!373"
+  },
+  "定規": {
+    "en": "ruler",
+    "source": "ruby_dictionary!374"
+  },
+  "分度器": {
+    "en": "protractor",
+    "source": "ruby_dictionary!375"
+  },
+  "コンパス": {
+    "en": "compass",
+    "source": "ruby_dictionary!376"
+  },
+  "三角定規": {
+    "en": "triangular ruler",
+    "source": "ruby_dictionary!377"
+  },
+  "ノート": {
+    "en": "notebook",
+    "source": "ruby_dictionary!378"
+  },
+  "教科書": {
+    "en": "textbook",
+    "source": "ruby_dictionary!379"
+  },
+  "雨合羽": {
+    "en": "raincoat",
+    "source": "ruby_dictionary!380"
+  },
+  "傘": {
+    "en": "umbrella",
+    "source": "ruby_dictionary!381"
+  },
+  "給食着": {
+    "en": "school lunch",
+    "source": "ruby_dictionary!382"
+  },
+  "弁当箱": {
+    "en": "lunch box",
+    "source": "ruby_dictionary!383"
+  },
+  "箸": {
+    "en": "chopsticks",
+    "source": "ruby_dictionary!384"
+  },
+  "スプーン": {
+    "en": "spoon",
+    "source": "ruby_dictionary!385"
+  },
+  "フォーク": {
+    "en": "fork",
+    "source": "ruby_dictionary!386"
+  },
+  "赤白帽子": {
+    "en": "red and",
+    "source": "ruby_dictionary!387"
+  },
+  "体操着": {
+    "en": "gym clothes",
+    "source": "ruby_dictionary!388"
+  },
+  "長袖": {
+    "en": "long sleeves",
+    "source": "ruby_dictionary!389"
+  },
+  "長ズボン": {
+    "en": "long pants",
+    "source": "ruby_dictionary!390"
+  },
+  "半袖": {
+    "en": "short sleeves",
+    "source": "ruby_dictionary!391"
+  },
+  "半ズボン": {
+    "en": "shorts",
+    "source": "ruby_dictionary!392"
+  },
+  "縄跳び": {
+    "en": "jump rope",
+    "source": "ruby_dictionary!393"
+  },
+  "習字道具": {
+    "en": "calligraphy tools",
+    "source": "ruby_dictionary!394"
+  },
+  "絵の具セット": {
+    "en": "paint set",
+    "source": "ruby_dictionary!395"
+  },
+  "リュック": {
+    "en": "backpack",
+    "source": "ruby_dictionary!396"
+  },
+  "敷物": {
+    "en": "rug",
+    "source": "ruby_dictionary!397"
+  },
+  "下駄": {
+    "en": "geta",
+    "source": "ruby_dictionary!400"
+  },
+  "提出": {
+    "en": "submission",
+    "source": "ruby_dictionary!401"
+  },
+  "駐車": {
+    "en": "parking",
+    "source": "ruby_dictionary!404"
+  },
+  "担任": {
+    "en": "homeroom teacher",
+    "source": "ruby_dictionary!406"
+  },
+  "下校": {
+    "en": "going home",
+    "source": "ruby_dictionary!407"
+  },
+  "帰宅": {
+    "en": "going home",
+    "source": "ruby_dictionary!408"
+  },
+  "熱": {
+    "en": "heat",
+    "source": "ruby_dictionary!409"
+  },
+  "発熱": {
+    "en": "fever",
+    "source": "ruby_dictionary!410"
+  },
+  "せき": {
+    "en": "cough",
+    "source": "ruby_dictionary!411"
+  },
+  "鼻水": {
+    "en": "snot",
+    "source": "ruby_dictionary!412"
+  },
+  "腹痛": {
+    "en": "abdominal pain",
+    "source": "ruby_dictionary!413"
+  },
+  "頭痛": {
+    "en": "headache",
+    "source": "ruby_dictionary!414"
+  },
+  "すり傷": {
+    "en": "scratch",
+    "source": "ruby_dictionary!416"
+  },
+  "打撲": {
+    "en": "bruise",
+    "source": "ruby_dictionary!417"
+  },
+  "兄弟": {
+    "en": "brothers",
+    "source": "ruby_dictionary!419"
+  },
+  "姉妹": {
+    "en": "sisters",
+    "source": "ruby_dictionary!420"
+  },
+  "祖父": {
+    "en": "grandfather",
+    "source": "ruby_dictionary!421"
+  },
+  "祖母": {
+    "en": "grandmother",
+    "source": "ruby_dictionary!422"
+  },
+  "家族": {
+    "en": "family",
+    "source": "ruby_dictionary!423"
+  },
+  "家庭連絡": {
+    "en": "family contact",
+    "source": "ruby_dictionary!424"
+  },
+  "欠席連絡": {
+    "en": "absence notification",
+    "source": "ruby_dictionary!426"
+  },
+  "遅刻連絡": {
+    "en": "late arrival",
+    "source": "ruby_dictionary!427"
+  },
+  "早退": {
+    "en": "leaving early",
+    "source": "ruby_dictionary!428"
+  },
+  "早退します": {
+    "en": "i'm leaving",
+    "source": "ruby_dictionary!429"
+  },
+  "登校": {
+    "en": "going to",
+    "source": "ruby_dictionary!430"
+  },
+  "通学": {
+    "en": "commuting to",
+    "source": "ruby_dictionary!431"
+  },
+  "徒歩": {
+    "en": "walking",
+    "source": "ruby_dictionary!432"
+  },
+  "自転車": {
+    "en": "bicycle",
+    "source": "ruby_dictionary!433"
+  },
+  "バス": {
+    "en": "bus",
+    "source": "ruby_dictionary!434"
+  },
+  "電車": {
+    "en": "train",
+    "source": "ruby_dictionary!435"
+  },
+  "集合": {
+    "en": "set",
+    "source": "ruby_dictionary!436"
+  },
+  "解散": {
+    "en": "dissolution",
+    "source": "ruby_dictionary!437"
+  },
+  "集合時間": {
+    "en": "meeting time",
+    "source": "ruby_dictionary!438"
+  },
+  "解散時間": {
+    "en": "dismissal time",
+    "source": "ruby_dictionary!440"
+  },
+  "持ち帰り袋": {
+    "en": "takeaway bag",
+    "source": "ruby_dictionary!442"
+  },
+  "ビニール袋": {
+    "en": "plastic bag",
+    "source": "ruby_dictionary!443"
+  },
+  "水筒": {
+    "en": "water bottle",
+    "source": "ruby_dictionary!444"
+  },
+  "タオル": {
+    "en": "towel",
+    "source": "ruby_dictionary!445"
+  },
+  "着替え": {
+    "en": "change of",
+    "source": "ruby_dictionary!446"
+  },
+  "名札": {
+    "en": "name tag",
+    "source": "ruby_dictionary!447"
+  },
+  "制服": {
+    "en": "uniform",
+    "source": "ruby_dictionary!448"
+  },
+  "靴下": {
+    "en": "socks",
+    "source": "ruby_dictionary!449"
+  },
+  "運動靴": {
+    "en": "athletic shoes",
+    "source": "ruby_dictionary!450"
+  },
+  "外靴": {
+    "en": "outside shoes",
+    "source": "ruby_dictionary!451"
+  },
+  "帽子": {
+    "en": "hat",
+    "source": "ruby_dictionary!452"
+  },
+  "防寒着": {
+    "en": "winter clothes",
+    "source": "ruby_dictionary!453"
+  },
+  "手袋": {
+    "en": "gloves",
+    "source": "ruby_dictionary!454"
+  },
+  "水泳バッグ": {
+    "en": "swimming bag",
+    "source": "ruby_dictionary!455"
+  },
+  "ゴーグル": {
+    "en": "goggles",
+    "source": "ruby_dictionary!456"
+  },
+  "プールカード": {
+    "en": "pool card",
+    "source": "ruby_dictionary!457"
+  },
+  "体温": {
+    "en": "body temperature",
+    "source": "ruby_dictionary!458"
+  },
+  "検温": {
+    "en": "temperature check",
+    "source": "ruby_dictionary!459"
+  },
+  "欠席します": {
+    "en": "i will",
+    "source": "ruby_dictionary!460"
+  },
+  "遅刻します": {
+    "en": "i will",
+    "source": "ruby_dictionary!461"
+  },
+  "迎えが必要": {
+    "en": "need a",
+    "source": "ruby_dictionary!462"
+  },
+  "病院": {
+    "en": "hospital",
+    "source": "ruby_dictionary!463"
+  },
+  "薬": {
+    "en": "medicine",
+    "source": "ruby_dictionary!464"
+  },
+  "服薬": {
+    "en": "medication",
+    "source": "ruby_dictionary!465"
+  },
+  "薬を飲みました": {
+    "en": "i took",
+    "source": "ruby_dictionary!466"
+  },
+  "様子を見る": {
+    "en": "wait and",
+    "source": "ruby_dictionary!467"
+  },
+  "安静": {
+    "en": "rest",
+    "source": "ruby_dictionary!468"
+  },
+  "けんか": {
+    "en": "fight",
+    "source": "ruby_dictionary!469"
+  },
+  "仲直り": {
+    "en": "reconciliation",
+    "source": "ruby_dictionary!470"
+  },
+  "友達関係": {
+    "en": "friendship",
+    "source": "ruby_dictionary!471"
+  },
+  "いやなこと": {
+    "en": "unpleasant things",
+    "source": "ruby_dictionary!472"
+  },
+  "困っている": {
+    "en": "i'm in",
+    "source": "ruby_dictionary!473"
+  },
+  "相談してください": {
+    "en": "please consult",
+    "source": "ruby_dictionary!474"
+  },
+  "無理をしない": {
+    "en": "don't overexert",
+    "source": "ruby_dictionary!475"
+  },
+  "安心してください": {
+    "en": "rest assured",
+    "source": "ruby_dictionary!476"
+  },
+  "忘れ物": {
+    "en": "lost item",
+    "source": "ruby_dictionary!477"
+  },
+  "落とし物": {
+    "en": "lost and",
+    "source": "ruby_dictionary!478"
+  },
+  "なくしました": {
+    "en": "i lost",
+    "source": "ruby_dictionary!479"
+  },
+  "見つかりました": {
+    "en": "found it",
+    "source": "ruby_dictionary!480"
+  },
+  "貸し出し": {
+    "en": "lending",
+    "source": "ruby_dictionary!481"
+  },
+  "返却": {
+    "en": "return",
+    "source": "ruby_dictionary!482"
+  },
+  "破損": {
+    "en": "damage",
+    "source": "ruby_dictionary!483"
+  },
+  "汚れ": {
+    "en": "dirt",
+    "source": "ruby_dictionary!484"
+  },
+  "洗濯": {
+    "en": "laundry",
+    "source": "ruby_dictionary!485"
+  },
+  "記名": {
+    "en": "name",
+    "source": "ruby_dictionary!486"
+  },
+  "名前を書いてください": {
+    "en": "please write",
+    "source": "ruby_dictionary!487"
+  },
+  "保管": {
+    "en": "storage",
+    "source": "ruby_dictionary!488"
+  },
+  "学校保管": {
+    "en": "school storage",
+    "source": "ruby_dictionary!489"
+  },
+  "家庭保管": {
+    "en": "home storage",
+    "source": "ruby_dictionary!490"
+  },
+  "記入": {
+    "en": "fill in",
+    "source": "ruby_dictionary!491"
+  },
+  "未記入": {
+    "en": "not filled",
+    "source": "ruby_dictionary!492"
+  },
+  "署名": {
+    "en": "signature",
+    "source": "ruby_dictionary!493"
+  },
+  "押印": {
+    "en": "seal",
+    "source": "ruby_dictionary!494"
+  },
+  "はんこ": {
+    "en": "hanko",
+    "source": "ruby_dictionary!495"
+  },
+  "同意": {
+    "en": "consent",
+    "source": "ruby_dictionary!496"
+  },
+  "同意書": {
+    "en": "consent form",
+    "source": "ruby_dictionary!497"
+  },
+  "申込": {
+    "en": "application",
+    "source": "ruby_dictionary!498"
+  },
+  "申込書": {
+    "en": "application form",
+    "source": "ruby_dictionary!499"
+  },
+  "期限": {
+    "en": "deadline",
+    "source": "ruby_dictionary!501"
+  },
+  "期限を過ぎています": {
+    "en": "the deadline",
+    "source": "ruby_dictionary!502"
+  },
+  "再提出": {
+    "en": "resubmit",
+    "source": "ruby_dictionary!503"
+  },
+  "未提出": {
+    "en": "not submitted",
+    "source": "ruby_dictionary!504"
+  },
+  "記入例": {
+    "en": "example",
+    "source": "ruby_dictionary!505"
+  },
+  "選択してください": {
+    "en": "please select",
+    "source": "ruby_dictionary!506"
+  },
+  "丸をつけてください": {
+    "en": "please circle",
+    "source": "ruby_dictionary!507"
+  },
+  "チェックしてください": {
+    "en": "please check",
+    "source": "ruby_dictionary!508"
+  },
+  "提出箱": {
+    "en": "submission box",
+    "source": "ruby_dictionary!509"
+  },
+  "連絡袋": {
+    "en": "contact bag",
+    "source": "ruby_dictionary!510"
+  },
+  "欠席扱い": {
+    "en": "absent",
+    "source": "ruby_dictionary!511"
+  },
+  "出席扱い": {
+    "en": "counted as",
+    "source": "ruby_dictionary!512"
+  },
+  "遅刻扱い": {
+    "en": "short-term treatment",
+    "source": "ruby_dictionary!513"
+  },
+  "早退扱い": {
+    "en": "early departure",
+    "source": "ruby_dictionary!514"
+  },
+  "駐車場": {
+    "en": "parking",
+    "source": "ruby_dictionary!515"
+  },
+  "駐輪場": {
+    "en": "bicycle parking",
+    "source": "ruby_dictionary!516"
+  },
+  "送迎": {
+    "en": "pick-up and",
+    "source": "ruby_dictionary!517"
+  },
+  "車で送る": {
+    "en": "give me",
+    "source": "ruby_dictionary!518"
+  },
+  "車で迎える": {
+    "en": "pick up",
+    "source": "ruby_dictionary!519"
+  },
+  "校門": {
+    "en": "school gate",
+    "source": "ruby_dictionary!520"
+  },
+  "正門": {
+    "en": "main gate",
+    "source": "ruby_dictionary!521"
+  },
+  "裏門": {
+    "en": "back gate",
+    "source": "ruby_dictionary!522"
+  },
+  "受付": {
+    "en": "reception",
+    "source": "ruby_dictionary!523"
+  },
+  "来校": {
+    "en": "visiting the",
+    "source": "ruby_dictionary!524"
+  },
+  "来校者": {
+    "en": "visitors",
+    "source": "ruby_dictionary!525"
+  },
+  "保護者席": {
+    "en": "parent seat",
+    "source": "ruby_dictionary!526"
+  },
+  "写真撮影": {
+    "en": "photo shoot",
+    "source": "ruby_dictionary!527"
+  },
+  "撮影禁止": {
+    "en": "photography prohibited",
+    "source": "ruby_dictionary!528"
+  },
+  "動画撮影": {
+    "en": "video recording",
+    "source": "ruby_dictionary!529"
+  },
+  "録音": {
+    "en": "recording",
+    "source": "ruby_dictionary!530"
+  },
+  "公開": {
+    "en": "public",
+    "source": "ruby_dictionary!532"
+  },
+  "非公開": {
+    "en": "private",
+    "source": "ruby_dictionary!533"
+  },
+  "写真掲載": {
+    "en": "photo included",
+    "source": "ruby_dictionary!534"
+  },
+  "承諾": {
+    "en": "consent",
+    "source": "ruby_dictionary!535"
+  },
+  "辞退": {
+    "en": "decline",
+    "source": "ruby_dictionary!536"
+  },
+  "希望": {
+    "en": "hope",
+    "source": "ruby_dictionary!537"
+  },
+  "希望しません": {
+    "en": "i do",
+    "source": "ruby_dictionary!538"
+  },
+  "選択肢": {
+    "en": "options",
+    "source": "ruby_dictionary!539"
+  },
+  "回答": {
+    "en": "answer",
+    "source": "ruby_dictionary!540"
+  },
+  "未回答": {
+    "en": "not answered",
+    "source": "ruby_dictionary!541"
+  },
+  "アンケート": {
+    "en": "questionnaire",
+    "source": "ruby_dictionary!542"
+  },
+  "フォーム": {
+    "en": "form",
+    "source": "ruby_dictionary!543"
+  },
+  "送信": {
+    "en": "send",
+    "source": "ruby_dictionary!544"
+  },
+  "送信してください": {
+    "en": "please send",
+    "source": "ruby_dictionary!545"
+  },
+  "受け取り": {
+    "en": "receipt",
+    "source": "ruby_dictionary!546"
+  },
+  "受け取りました": {
+    "en": "i received",
+    "source": "ruby_dictionary!547"
+  },
+  "紛失": {
+    "en": "lost",
+    "source": "ruby_dictionary!548"
+  },
+  "再配付": {
+    "en": "redistribution",
+    "source": "ruby_dictionary!549"
+  },
+  "予備": {
+    "en": "spare",
+    "source": "ruby_dictionary!550"
+  },
+  "不足": {
+    "en": "shortage",
+    "source": "ruby_dictionary!551"
+  },
+  "追加": {
+    "en": "addition",
+    "source": "ruby_dictionary!552"
+  },
+  "変更なし": {
+    "en": "no changes",
+    "source": "ruby_dictionary!553"
+  },
+  "通常通り": {
+    "en": "as usual",
+    "source": "ruby_dictionary!554"
+  },
+  "いつも通り": {
+    "en": "as usual",
+    "source": "ruby_dictionary!555"
+  },
+  "おはよう": {
+    "en": "good morning",
+    "source": "ruby_dictionary!556"
+  },
+  "片付け": {
+    "en": "clean up",
+    "source": "ruby_dictionary!573"
+  },
+  "整列": {
+    "en": "line up",
+    "source": "ruby_dictionary!575"
+  },
+  "移動": {
+    "en": "move",
+    "source": "ruby_dictionary!576"
+  },
+  "着席": {
+    "en": "sit down",
+    "source": "ruby_dictionary!577"
+  },
+  "起立": {
+    "en": "stand up",
+    "source": "ruby_dictionary!578"
+  },
+  "礼": {
+    "en": "bow",
+    "source": "ruby_dictionary!579"
+  },
+  "発表": {
+    "en": "presentation",
+    "source": "ruby_dictionary!580"
+  },
+  "意見": {
+    "en": "opinion",
+    "source": "ruby_dictionary!581"
+  },
+  "理由": {
+    "en": "reason",
+    "source": "ruby_dictionary!582"
+  },
+  "解答": {
+    "en": "answer",
+    "source": "ruby_dictionary!588"
+  },
+  "答え": {
+    "en": "answer",
+    "source": "ruby_dictionary!589"
+  },
+  "丸付け": {
+    "en": "marking",
+    "source": "ruby_dictionary!590"
+  },
+  "直し": {
+    "en": "correction",
+    "source": "ruby_dictionary!591"
+  },
+  "途中式": {
+    "en": "working",
+    "source": "ruby_dictionary!592"
+  },
+  "計算": {
+    "en": "calculation",
+    "source": "ruby_dictionary!593"
+  },
+  "式": {
+    "en": "expression",
+    "source": "ruby_dictionary!594"
+  },
+  "答案": {
+    "en": "answer sheet",
+    "source": "ruby_dictionary!595"
+  },
+  "テスト": {
+    "en": "test",
+    "source": "ruby_dictionary!596"
+  },
+  "採点": {
+    "en": "grading",
+    "source": "ruby_dictionary!599"
+  },
+  "出席": {
+    "en": "attendance",
+    "source": "ruby_dictionary!603"
+  },
+  "遅刻": {
+    "en": "late",
+    "source": "ruby_dictionary!605"
+  },
+  "出血": {
+    "en": "bleeding",
+    "source": "ruby_dictionary!615"
+  },
+  "弁当": {
+    "en": "lunch box",
+    "source": "ruby_dictionary!619"
+  },
+  "食器": {
+    "en": "tableware",
+    "source": "ruby_dictionary!622"
+  },
+  "懇談": {
+    "en": "conference",
+    "source": "ruby_dictionary!636"
+  },
+  "体育館シューズ": {
+    "en": "gym shoes",
+    "source": "ruby_dictionary!645"
+  },
+  "はさみ": {
+    "en": "scissors",
+    "source": "ruby_dictionary!653"
+  },
+  "のり": {
+    "en": "glue",
+    "source": "ruby_dictionary!654"
+  },
+  "住所": {
+    "en": "address",
+    "source": "ruby_dictionary!657"
+  },
+  "電話番号": {
+    "en": "phone number",
+    "source": "ruby_dictionary!658"
+  },
+  "変更": {
+    "en": "change",
+    "source": "ruby_dictionary!659"
+  },
+  "費用": {
+    "en": "cost",
+    "source": "ruby_dictionary!667"
+  },
+  "遅刻届": {
+    "en": "late form",
+    "source": "ruby_dictionary!671"
+  },
+  "早退届": {
+    "en": "early leave form",
+    "source": "ruby_dictionary!672"
+  }
+}

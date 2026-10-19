@@ -869,3 +869,28 @@ body.phone-home .face-controls #switch-speaker:focus-visible{outline:2px solid w
 @media(min-width:600px){body.phone-home .face-controls{grid-template-columns:minmax(0,1fr)!important;gap:8px!important;}body.phone-home .face-controls #switch-speaker{flex-direction:row;justify-self:center;gap:7px;width:80px!important;min-width:80px!important;max-width:80px!important;height:44px!important;min-height:44px!important;}body.phone-home .face-controls #switch-speaker>i{transform:rotate(90deg);}body.phone-home .face-controls #switch-speaker span{font-size:14px!important;}body.phone-home .face-controls select{height:46px;min-height:46px;font-size:16px!important;}body.phone-home .face-controls #face-language{height:50px!important;min-height:50px!important;font-size:17px!important;}}
 
 body.phone-home .face-controls[hidden]{display:none!important;}
+/* English is a visual guide above the unchanged Japanese text. */
+body.phone-home .ui-copy{display:inline-grid;grid-template-columns:minmax(0,1fr);gap:2px;min-width:0;max-width:100%;vertical-align:middle;line-height:inherit;text-align:inherit;}
+body.phone-home .ui-copy>.ui-en{display:block!important;min-width:0;max-width:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif!important;font-size:12px!important;font-weight:500!important;line-height:1.3!important;letter-spacing:.01em!important;color:#aaaab2!important;white-space:normal;overflow-wrap:anywhere;pointer-events:none;}
+.ui-en::before{content:attr(data-ui-english);}
+body.phone-home .ui-copy>.ui-ja{display:block;font:inherit;line-height:inherit;color:inherit;letter-spacing:inherit;}
+html[data-english-guides="off"] body.phone-home .ui-copy>.ui-en{display:none!important;}
+body.phone-home .header-tools #english-guides-toggle{display:grid;place-items:center;flex:0 0 32px;width:32px;height:40px;min-width:32px;min-height:40px;padding:4px!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;font:600 12px/1 system-ui,sans-serif;color:#8f8f98!important;}
+body.phone-home .header-tools #english-guides-toggle[aria-pressed="true"]{color:#dedee3!important;text-decoration:underline;text-underline-offset:5px;text-decoration-color:#77777e;}
+body.phone-home #english-guides-toggle::after{display:none!important;}
+body.phone-home #english-guides-toggle:focus-visible{outline:2px solid #eee;outline-offset:2px;}
+body.phone-home .header-tools{gap:6px;}
+body.phone-home .bottom-nav .ui-copy{justify-items:center;gap:1px;}
+body.phone-home .bottom-nav .ui-copy>.ui-en{font-size:11px!important;white-space:nowrap;}
+body.phone-home .face-controls #switch-speaker .ui-copy{gap:1px;}
+body.phone-home .face-controls #switch-speaker .ui-copy>.ui-en{font-size:10px!important;line-height:1.1!important;}
+html[data-english-guides="on"] body.phone-home .face-controls #switch-speaker{gap:1px;}
+html[data-english-guides="on"] body.phone-home .face-controls #switch-speaker>i{font-size:15px;}
+html[data-english-guides="on"] body.phone-home .call-controls #microphone{min-height:60px;}
+body.phone-home .reference-card .ui-copy{justify-items:start;}
+body.phone-home .reference-card .ui-copy>.ui-en{font-size:12px!important;}
+body.phone-home .reference-reading .ui-en{display:none!important;}
+body.phone-home #empty-caption .ui-copy{gap:7px;}
+body.phone-home #empty-caption .ui-copy>.ui-en{font-size:13px!important;}
+body.phone-home .admin-tabs .ui-copy,body.phone-home .reference-tabs .ui-copy{justify-items:center;}
+@media(max-width:359px){body.phone-home .header-tools{gap:3px;}body.phone-home .header-tools #language-options{width:46px;padding:10px!important;}body.phone-home .brand{font-size:20px;}}

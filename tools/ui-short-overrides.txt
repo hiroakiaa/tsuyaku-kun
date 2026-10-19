@@ -1,0 +1,439 @@
+つうやく|Translate
+通訳|Translate
+通訳する|Translate
+つうわ|Call
+通話|Call
+じゅぎょう|Class
+授業|Class
+じしょ|Dictionary
+辞書|Dictionary
+辞典|Words
+話す|Speak
+聞く|Listen
+交代|Switch
+先生|Teacher
+生徒|Student
+保護者|Parent
+自分|Me
+相手|Partner
+あなた|You
+参加者|Participants
+あなたの端末|Your device
+あなたのよく使う文|Your phrases
+じぶんが話すことば|My language
+じぶんのことば|My language
+じぶんのことば / Your language|My language
+じぶんが話すことば / Your language|My language
+① じぶんのことば / Your language|1. My language
+② ルームID / Room ID|2. Room ID
+相手（あいて）のことば|Partner's language
+訳を読むことば|Reading language
+言語|Language
+言語を選ぶ|Choose language
+日本語|Japanese
+英語|English
+ドイツ語|German
+ポルトガル語|Portuguese
+スペイン語|Spanish
+ベトナム語|Vietnamese
+フィリピノ語|Filipino
+タガログ語|Tagalog
+中国語（簡体字）|Chinese
+韓国語|Korean
+インドネシア語|Indonesian
+ネパール語|Nepali
+やさしい日本語|Easy Japanese
+マイクをONにする|Turn mic on
+マイクをとめる|Stop mic
+マイクOFF|Mic off
+マイクを準備しています|Preparing mic
+話せます|Ready to speak
+参加できます|Ready to join
+準備中|Getting ready
+準備しています|Getting ready
+接続しています|Connecting
+接続中|Connected
+再接続しています|Reconnecting
+再接続待ち|Waiting to reconnect
+接続を準備しています|Preparing connection
+話したことばが、ここに。|Your words appear here.
+文字で入力|Type instead
+文字を入力する|Type a message
+文字入力を閉じる|Close typing
+ことばを入力して送る|Type and send
+検索ワード…|Search words…
+文を検索|Search phrases
+ことばを検索|Search words
+検索を開く|Open search
+検索を閉じる|Close search
+検索をクリア|Clear search
+閉じる|Close
+もどる|Back
+ホームにもどる|Back to home
+じぶんだけホームにもどる|Leave class
+話しはじめる|Start talking
+相手をよぶ|Invite partner
+相手に送るリンク|Invitation link
+リンクをコピー|Copy link
+コピーしました|Copied
+ルームIDをコピー|Copy room ID
+ルームIDをコピーしました。|Room ID copied.
+ルームID|Room ID
+ルームID：|Room ID:
+授業に入る|Join class
+この言語で参加 / Join|Join in this language
+授業に入っています…|Joining class…
+授業のテーマ（任意）|Class topic (optional)
+授業をおわる|End class
+授業をおわりますか？|End this class?
+授業をおわると、生徒にことばが届かなくなります。|Students will stop receiving captions.
+授業が終了しました。|Class has ended.
+会話をおわる|End conversation
+通話をおわる|End call
+招待が届いています|You are invited
+先生のことばを読む・文字で返事をする言語|Read captions and type replies in this language.
+先生のことばを読む・文字で返事をする言語を選びます。|Choose the language for captions and typed replies.
+先生のことばをこの言語で読み、文字入力もこの言語で送ります。|Read captions and type replies in this language.
+相手の言語ではなく、あなたが話す言語を選んでください。|Choose the language you speak.
+言語を確認して「授業に入る」を押してください。|Check your language, then choose Join class.
+よく使う文|Phrases
+あなたのよく使う文|Your phrases
+すべて|All
+ひらく|Open
+少なく表示|Show less
+追加されたことば|Added words
+お金・手続き|Payments & forms
+学校生活・行事|School life & events
+学校生活|School life
+健康・安全|Health & safety
+持ち物・提出|Items & forms
+授業・勉強|Class & study
+連絡・相談|Contact & support
+数学|Math
+授業一般|General class
+訳|Translation
+訳がありません|No translation yet
+辞書の訳|Dictionary translation
+確認した訳|Reviewed translation
+この訳を覚える|Remember translation
+訳を確認して覚える|Review and remember
+訳の確認が必要|Review translation
+訳の確認待ち|Awaiting review
+訳を確認してください|Please check the translation.
+訳を更新中…|Updating translation…
+翻訳を待っています…|Translating…
+続きのことばを待っています|Waiting for more words…
+文が確定したら再生できます|Playback is available when the sentence is complete.
+日本語の原文|Japanese original
+日本語を直す|Edit Japanese
+聞き取った日本語を直す|Edit recognized Japanese
+直して翻訳する|Edit and translate
+次から同じ聞き間違いを直す|Remember this speech correction
+覚える訳を入力してください。|Enter the translation to remember.
+確認した訳を覚えました。|Translation remembered.
+確認した訳を、この端末の次の通訳で使います。|Use this reviewed translation again on this device.
+この文を再試行|Retry this sentence
+この文をもう一度翻訳します。|Translate this sentence again.
+再試行|Retry
+再生|Play
+一時停止|Pause
+再開|Resume
+停止|Stop
+最新へ ↓|Latest ↓
+新しい字幕 · 最新へ ↓|New captions · Latest ↓
+候補として送る|Suggest
+共有辞書の候補に送る|Suggest for shared dictionary
+ことば・訳の候補|Word suggestion
+内容を確認して送ってください。個人情報は入れないでください。確認後に共有辞書へ反映します。|Check the suggestion. Do not include personal details. Suggestions are reviewed before sharing.
+共有する場合は、人名や連絡先を取り除いてください。候補は確認後に共有辞書へ反映します。|Remove names and contact details before sharing. Suggestions are reviewed first.
+スプレッドシートに候補を追加しました。|Suggestion saved to the spreadsheet.
+文例の候補をスプレッドシートに追加しました。|Phrase suggestion saved.
+この言語の訳はスプレッドシートにまだ登録されていません。|This translation is not in the spreadsheet yet.
+管理者|Admin
+管理者パスワード|Admin password
+管理者表示を閉じて認証解除|Close admin and lock
+パスワード|Password
+パスワードを確認してください。|Check the password.
+表示する|Show
+管理項目|Admin sections
+概要|Overview
+履歴|History
+分析|Analysis
+辞書利用|Dictionary use
+設定・説明|Settings & help
+利用数|Uses
+用語ランキングCSV|Word ranking CSV
+採用候補CSV|Suggestion CSV
+用語集計をリセット|Reset word counts
+この端末の用語集計を削除しますか？|Reset this device's word counts?
+通訳で使われたことば|Words used in translation
+通話で使われたことば|Words used in calls
+よく使う文のクリック|Phrase opens
+辞典のクリック|Word opens
+文のクリック|Phrase opens
+候補|Suggestion
+採用候補|Suggested
+除外|Excluded
+除外した候補も表示|Show excluded suggestions
+確認状態|Review status
+未確認|Not reviewed
+確認済み|Reviewed
+未確定|Not final
+未成功|Not successful
+未計測|Not measured
+終了未記録|End not recorded
+回数|Count
+文数|Captions
+試行|Attempts
+未計測回数|Unmeasured calls
+利用履歴CSV|Usage history CSV
+日付を押すと詳細が開きます。|Choose a date for details.
+この端末で記録した利用の目安です。|Estimated use recorded on this device.
+料金計算と履歴の説明|Costs and history
+本日のAI利用と設定上限|Today's AI use and limits
+残り使える額（アプリ内の設定）|AI budget left (app limit)
+今日のAI予算の残り|Today's AI budget left
+今日あと使えるAI予算|AI budget left today
+この使い方なら、あとどのくらい？|How much more can I use?
+残量を更新|Refresh budget
+残量を確認しています…|Checking budget…
+残量を取得できませんでした。「残量を更新」で再試行してください。未取得を0円として表示しません。|Budget is unavailable. Choose Refresh budget to try again.
+全端末共通の設定|Shared limit for all devices
+AI利用の停止上限|AI safety limits
+AIの無料枠上限|AI free allowance
+本日の利用上限|Daily limit
+未使用なら設定上限がそのまま残ります。残り使える額は、全端末共通とこの認証IDの残額の少ない方です。|The available amount is the lower of the shared and user limits.
+AIサービス側の制限を検知したため、本日のAI処理は停止中です。|AI is stopped today because the provider reported a limit.
+失敗・未計測は予約分を残します。アカウントの無料枠や請求額の保証ではありません。音声中継と他のアプリは対象外です。|Reservations may remain after failures. This is not a bill or a guaranteed provider balance.
+回数はAI翻訳のみの概算です。文章量・言語数・再試行・音声認識で変わります。呼び出し前に多めの予算を確保するため、表示残額があっても開始できない場合があります。辞書だけの利用はこのAI予算を消費しません。|Estimates cover AI translation only. Length, languages and retries affect use. Dictionary lookup does not use this budget.
+換算設定（円 / USD）|Exchange rate (JPY / USD)
+表示用の設定です。請求額や無料枠は変わりません。|Display setting only; billing and allowances do not change.
+全端末の標準辞書利用|Standard dictionary use across devices
+全端末の集計を更新|Refresh shared counts
+全端末の集計を取得できませんでした。端末内の記録は残っています。|Shared counts are unavailable. Local records are kept.
+まだ集計がありません。更新後の利用から数えます。|No counts yet. New activity will be counted.
+まだ記録がありません。更新後の利用から集計します。|No records yet. New activity will be recorded.
+利用履歴はまだありません。次の参加から記録します。|No usage history yet.
+履歴は会話開始からモード終了までの1回単位です。マイクOFFや一文ごとには分割しません。確実に0円の記録は保存せず、費用未計測の記録は残します。|One record covers a whole session. Zero-cost records are omitted; unmeasured costs are kept.
+分析を作る|Create analysis
+分析をコピー|Copy analysis
+JSONを保存|Save JSON
+改善用の分析出力|Analysis export
+改善用の分析結果|Analysis results
+改善の相談に使う計測結果です。|Measurements for troubleshooting.
+計測結果を作成します。本文はチェックした場合だけ含みます。|Create measurements. Conversation text is included only if selected.
+発言・訳の例も含める（現在の字幕と保存済み履歴）|Include speech and translation examples
+共有前に、氏名や連絡先が含まれていないか確認してください。|Remove names and contact details before sharing.
+分析欄を選択しました。コピーして、このチャットへ貼り付けてください。|Analysis selected. Copy it into this chat.
+端末の保存領域に書き込めません。分析を保存してください。|Device storage is unavailable. Save the analysis.
+端末の保存領域に書き込めませんでした。|Could not save to device storage.
+共有端末と保存|Shared devices and storage
+共有端末：確認した訳を次の起動へ保存しない|Shared device: do not keep reviewed translations after restart
+初期設定は共有端末です。過去の個人用保存は削除せず、共有端末では読み込みません。次の人へ渡す前に利用を終了してください。|Shared-device mode is the default. End the session before handing the device to someone else.
+保存方法を変更しました。アプリを再読み込みすると適用されます。|Storage setting changed. Reload to apply it.
+利用を終了して画面の本文を消す|End session and clear screen
+使い方・最近の改善|Help & updates
+辞書の訳と確認した訳を再利用します。登録した言い換えにも対応します。日付・数字・否定が違う文は区別します。|Reuse dictionary and reviewed translations. Dates, numbers and negation are checked separately.
+通話・授業の同じ発話の再送は、保存済みの結果を返します。失敗した訳は再試行ボタンからやり直します。|Repeated captions reuse saved results. Retry failed translations with the retry button.
+翻訳待ちが多い場合や期限切れの場合は、お知らせします。古い接続の処理は新しい会話へ引き継ぎません。|You will be notified of queue limits or expiry. Old work is not sent to a new conversation.
+発話がないと15秒の予告後に停止します。「続ける」で延長できます。辞書の更新後は古い確認済み訳を再確認してください。|The mic stops after an idle warning. Choose Continue to keep talking. Recheck saved translations after dictionary updates.
+接続を確認|Check connection
+接続の確認|Connection check
+接続診断結果|Connection results
+結果をコピー|Copy results
+確認できた事実|Observed facts
+原因の候補|Possible causes
+次の確認|Next steps
+接続できました|Connected
+接続できません|Cannot connect
+接続できませんでした|Connection failed
+接続を停止しました|Connection stopped
+接続を確認してください。|Check the connection.
+接続を準備できませんでした。|Could not prepare the connection.
+接続の準備に時間がかかっています。|Connection is taking longer than expected.
+接続の準備を取り消しました。|Connection setup cancelled.
+接続できませんでした。タブを選び直してください。|Connection failed. Select the mode again.
+接続できませんでした。通信環境を確認して、もう一度お試しください。|Check your connection and try again.
+接続できないため再試行を停止しました。回線を確認してタブを選び直してください。|Retries stopped. Check the network and select the mode again.
+参加の認証を確認してください。タブを選び直すと再開できます。|Check sign-in. Select the mode again to retry.
+ログインの更新に失敗しました。|Could not refresh sign-in.
+ルームの有効期限が切れました。タブを選び直して開始してください。|The room expired. Select the mode to start again.
+保存済みの辞書を使っています。|Using the saved dictionary.
+本日のAI利用上限です。じしょに登録された訳を使えます。|Today's AI limit was reached. Dictionary translations are still available.
+本日の利用上限に達しました。時間をおいてお試しください。|Daily limit reached. Please try later.
+サーバーの本日の利用上限に達しています。日本時間の翌朝9時以降に再度お試しください。|Daily server limit reached. Try after 9 am Japan time tomorrow.
+翻訳できませんでした。原文を残しています。|Translation failed. The original is kept.
+翻訳できませんでした。字幕の原文から、この文だけ再試行できます。|Translation failed. Retry this sentence from its original caption.
+翻訳待ちが増えたため、この文を送信していません。|This sentence was not sent because the queue is full.
+翻訳待ちを送信できませんでした。|Could not send the queued translation.
+字幕が更新されました。もう一度開いてください。|The caption changed. Open it again.
+字幕の接続が途切れました。マイクを押し直すか文字で伝えてください。|Caption connection lost. Restart the mic or type your message.
+再接続後に送信します。|Will send after reconnecting.
+話すことばが変わっています。原文を文字入力から送ってください。|The spoken language changed. Send the original by typing.
+もう一度伝えてください。|Please say it again.
+マイクを許可して、もう一度押してください。|Allow microphone access, then try again.
+この端末では読み上げを使えません。|Speech playback is unavailable on this device.
+この言語の音声が使えません。端末の読み上げ設定で、この言語の音声を追加してください。|Add this language's voice in the device's speech settings.
+音声の再生が端末に制限されています。もう一度再生ボタンを押してください。|Playback was blocked. Press Play again.
+音声を開始できませんでした。もう一度再生するか、端末の読み上げ音声・音量・通信状態を確認してください。|Playback did not start. Try again or check the voice, volume and connection.
+音声を準備しています。押すと取り消し|Preparing audio. Press to cancel.
+音声の中継を利用できません。字幕は利用できますが、音声は直接接続のみになります。|Audio relay is unavailable. Captions still work; audio needs a direct connection.
+音声認識の通信を再試行しています。もう一度話してください。|Retrying speech recognition. Please speak again.
+音声認識をつなぎ直しています。|Reconnecting speech recognition.
+認識待ちが増えています。文字でも伝えられます。|Speech recognition is busy. You can type instead.
+認識待ちが増えました。マイクは継続しています。短く区切ってもう一度話してください。|Recognition is busy. The mic stays on. Speak again in shorter phrases.
+発話がないため、15秒後にマイクを停止します。|No speech detected. The mic will stop in 15 seconds.
+続ける|Continue
+発話がないためマイクを停止しました。再開するときはマイクをONにしてください。|The mic stopped after inactivity. Turn it on to continue.
+画面を離れたためマイクを停止しました。再開するときはマイクをONにしてください。|The mic stopped while away. Turn it on to continue.
+画面を離れたため通話を一時停止しました。マイクをONにすると同じルームへ再接続します。|The call paused while away. Turn the mic on to reconnect.
+通話画面を復元しました。マイクをONにすると同じルームへ再接続します。|Call restored. Turn the mic on to reconnect.
+通話を一時停止しました|Call paused
+退室しました|You left the room
+この端末で利用中|Using this device
+参加中・音声準備中|Joined; preparing audio
+音声接続中|Audio connected
+音声接続中…|Connecting audio…
+音声再接続待ち|Waiting to reconnect audio
+音声停止|Audio stopped
+音声接続を確認|Check audio connection
+音声認識中|Recognizing speech
+音声認識を準備中|Preparing speech recognition
+数字・日付を確認してください|Check numbers and dates.
+否定の意味を確認してください|Check the negative meaning.
+日本語の文字が残っています。訳を確認してください|Japanese remains in the translation. Please check it.
+日本語は字幕から直せます。確認した訳を覚えると、この端末の次の通訳で使います。|Edit Japanese from its caption. Remember reviewed translations for reuse on this device.
+処理待機中|Waiting
+翻訳処理中：AI利用の可能性|Translating: AI may be used
+サーバー音声認識：従量課金対象|Server speech recognition: usage-based cost
+ブラウザー音声認識：アプリの認識API費用なし|Browser speech recognition: no app recognition API fee
+音声接続中：TURN経由の場合は通信費|Audio connected: TURN relay may incur cost
+現在の処理：|Current activity:
+停止後の通信|Activity after stopping
+翻訳の待ち時間の内訳|Translation timing
+端末の順番待ち|Device queue
+端末の訳の検索|Local translation lookup
+認証を含むHTTP往復|HTTP round trip with sign-in
+サーバー認証|Server authentication
+ルームの翻訳待ち|Room translation queue
+サーバーの辞書検索|Server dictionary lookup
+AI予算の確保|Reserve AI budget
+AI応答の待ち時間|AI response wait
+AI予算の精算|Settle AI budget
+AI応答の解析|Parse AI response
+字幕・翻訳サーバー|Caption & translation server
+音声中継サーバー|Audio relay server
+ブラウザー音声認識|Browser speech recognition
+音声認識API|Speech recognition API
+翻訳AI|Translation AI
+参加の認証|Join authentication
+AI料金表|AI pricing
+TURN料金表|TURN pricing
+AI内部エラー|AI internal error
+AIサービスの混雑|AI service busy
+AI処理の時間切れ|AI timeout
+AIモデルの利用不可|AI model unavailable
+AIモデルの有料プラン要件|AI model requires a paid plan
+AIサービスのアクセス拒否|AI access denied
+AIへの入力形式|AI input format
+AIの無料枠上限|AI allowance limit
+アクセスの拒否|Access denied
+認証の拒否|Authentication denied
+HTTPエラー|HTTP error
+時間切れ|Timeout
+応答の遅延・無応答|Slow or missing response
+呼び出し制限|Request limit
+サーバー側のエラー|Server error
+アプリ用の応答ではありません|Unexpected app response
+フィルター画面・プロキシ・想定外の応答|Filter, proxy or unexpected response
+端末内の音声認識待ち行列の増加|Speech recognition queue growth
+利用中の音声認識の中断|Speech recognition interrupted
+音声通話の接続・接続応答の失敗|Audio connection or signaling failed
+分類のみ・未確定|Classification only; unconfirmed
+HTTP状態のみ確定|HTTP status confirmed only
+イベントを観測・原因は未確定|Event observed; cause unknown
+AIエラーコードを観測|AI error code observed
+AI側の報告・残量は未確認|Provider report; balance unverified
+アプリ内で観測|Observed in the app
+DNSの解決結果|DNS results
+TLS証明書・ハンドシェイク|TLS certificate & handshake
+学校フィルター・プロキシの拒否理由|School filter or proxy rejection reason
+CORSの詳細な拒否理由|Detailed CORS rejection reason
+実際のTURN中継経路と学校端末間の音声到達|Actual TURN path and audio delivery
+接続先への通信制限・DNS・TLS・CORS|Network limits, DNS, TLS or CORS
+認証ヘッダーを含む通信・CORSプリフライトの制限|Authentication header or CORS preflight restriction
+APIの通常通信|Normal API request
+APIの認証ヘッダー付き通信|API request with authentication header
+ルーム作成と同じ通信形式|Same request format as room creation
+この確認ではAPIへ接続できました。認証やルーム作成そのものの成功までは保証しません。|The API responded. Sign-in and room creation still need checking.
+この端末からAPIへ正常に接続できない項目があります。結果をコピーして、このチャットへ貼り付けてください。|Some API checks failed. Copy the results into this chat.
+診断欄をコピーして、このチャットへ貼り付けてください。|Copy the diagnostic results into this chat.
+通常通信は成功し、ヘッダー付き通信は失敗しています。|Normal requests passed; authenticated requests failed.
+通常通信とヘッダー付き通信の両方が失敗しています。認証ヘッダーだけの問題とは絞れません。|Both normal and authenticated requests failed. The header alone is not the confirmed cause.
+ルーム作成の失敗記録があります。QR表示前の段階です。|Room creation failed before the QR code was shown.
+QRコードが出る前の失敗は、参加の認証やルーム作成の通信が原因です。音声中継（TURN）より前の段階です。|A failure before the QR code concerns sign-in or room setup, before audio relay.
+TURN情報を取得できないため、音声中継の利用を確認できません。|TURN credentials are unavailable; audio relay cannot be confirmed.
+受信したデータを確認できませんでした。|Could not read the received data.
+端末がオフラインと報告しています。|The device reports it is offline.
+匿名認証の準備は完了しています。|Anonymous sign-in is ready.
+匿名認証の準備完了を確認できていません。|Anonymous sign-in is not confirmed.
+接続診断の判定対象は過去5分の記録です。利用結果とは別の検査です。|Connection diagnosis uses the last five minutes, separately from usage results.
+当日の発話から表示までの時間は未計測です。ブラウザー認識には発話時刻がないため、翻訳時間を体感待ち時間として扱いません。|Speech-to-display time is not measured today. Translation time alone is not total waiting time.
+翻訳・中継の観測値です。通話全体が成功したか、相手に聞こえたか、翻訳品質は自動判定しません。|These are translation and relay observations, not proof of audio delivery or translation quality.
+APIが成功してからルーム作成、相手の参加、WebSocket、最後に音声のTURN経路を順に確認する。|Check API, room creation, joining, WebSocket, then audio relay.
+音声形式・モデルの入力仕様を確認してください。回線の変更だけで直るとは限りません。|Check the audio format and model input. Changing networks may not fix it.
+音声認識の自動復旧回数と復旧後の字幕を確認してください。|Check speech recognition restarts and captions after recovery.
+両端末のアプリを最新版に更新し、音声接続の応答・ICE状態・相手の音声再生を確認してください。|Update both devices, then check signaling, ICE and audio playback.
+古い待機音声を破棄しました。AIサービスの混雑とは区別しています。|Old queued audio was discarded; this is separate from AI service congestion.
+AIなしで訳せた割合：|Share translated without AI:
+未計測回数|Unmeasured calls
+推定USD|Estimated USD
+推定円|Estimated JPY
+翻訳P95ms|Translation P95 (ms)
+確認日|Checked on
+開始|Start
+発話なし|No speech
+画面移動|Away from screen
+AI側は上限を報告しています。管理画面の当日残量・アカウント・時刻と照合してください。この診断だけで実際の残量は断定しません。|The provider reported a limit. Check today's account and budget; this diagnosis does not prove the balance.
+Cloudflareの無料枠残高や請求額ではありません。「本日の利用」は処理中の予約と失敗時の確保分も含む予算消費額です。実際の請求額ではありません。TURN・外部音声認識・サーバー保存等は別です。認証IDが変わると端末側の値も変わります。|This is the app's reserved budget, not a Cloudflare bill or free balance. Relay, external recognition and storage are separate.
+PCの開発者ツールのNetwork/Consoleで失敗したリクエストのHTTP状態・CORS表示・証明書エラーを確認する。共有時はAuthorization・token・招待URL・本文を削除する。|Check HTTP, CORS and certificate errors in developer tools. Remove tokens, invite links and conversation text before sharing.
+TURN接続情報の取得|TURN credentials
+network_or_corsはブラウザーが理由を開示しない通信失敗。学校の制限・DNS・TLS・CORSのどれかは、この値だけでは断定できません。接続キー・token・発言・氏名は含みません。|The browser hid the failure reason. This code does not identify whether filters, DNS, TLS or CORS caused it.
+「接続を確認」で診断できます。|Choose Check connection for diagnostics.
+ネットワーク管理者に下記接続先のDNS解決・HTTPS/TLS・フィルターの拒否ログを確認してもらう。|Ask the network administrator to check DNS, HTTPS/TLS and filter logs for these endpoints.
+ブラウザーのfetchは通信失敗の詳細を公開しません。network_or_corsだけでは原因を確定できません。過去の失敗記録は現在の障害を証明しません。健康確認はルームを作成せず、音声・WebSocketも検査しません。|Browser network details are limited. Past failures do not prove a current fault. A health check does not test rooms or audio.
+ルールによる確認の目印です。誤訳や精度を自動判定したものではありません。|Rule-based warning, not an automatic accuracy score.
+会話のことばは自動分割した候補です。人名や個人情報、分割の誤りが含まれる場合があります。辞書への採用前に内容と訳を確認してください。全文・参加者名・ルームIDは保存せず、未登録の候補は端末内に保存します。採用候補CSVを確認して、訳を追加してから辞書に取り込んでください。除外は元に戻せます。|Automatically extracted words may include mistakes or personal details. Review candidates and translations before adding them to the dictionary.
+修正回数は精度の判定ではありません。古い履歴と未計測は割合に含みません。|Correction counts are not accuracy scores. Old or unmeasured records are excluded from ratios.
+同じ端末で学校Wi-Fiと許可された別回線を比較し、それぞれの診断結果を保存する。別回線だけ成功する場合は回線側の制限が候補になります。|Compare school Wi-Fi with another permitted network on the same device. Save both results.
+固定費、サーバー処理・共有保存、無料枠、他の端末の音声認識費用は含みません。Cloudflare全体の請求額とは異なります。履歴はこの端末に最大200回、発言本文の保存ボタンはありません。過去に保存した本文は同じ24時間の期限で削除します。発話末尾から表示までの時間は送信端末の音量からの推定です。認識・翻訳・配信を含み、翻訳だけの時間とは異なります。相手端末の発話は測定しません。切断理由の自由文や接続キーは分析へ含めません。|Estimates exclude fixed and other-device costs. History is local, up to 200 sessions. Speech timing is an estimate, not translation time alone.
+成功・失敗を含む記録のP95です。区間は重なるため合算しません。未計測とキャッシュのAI時間は除外します。|P95 includes recorded successes and failures. Timings overlap; do not add them. Unmeasured and cached AI times are excluded.
+招待リンクをコピーしてください。|Copy the invitation link.
+本日の利用：|Today's use:
+次のリセット：|Next reset:
+直近90日。アプリに同梱した標準辞書の項目IDと回数だけを送信します。会話は発言元の端末で数え、相手側の受信では加算しません。未登録のことば・会話本文・参加者名は送信しません。端末内ランキングとは範囲が異なります。|Last 90 days. Only standard dictionary IDs and counts are sent. Conversation text and participant names are not sent.
+直近の健康確認は成功しています。認証更新・ルーム作成・WebSocket・音声通信の成功は別途確認が必要です。|The recent health check passed. Sign-in, room setup, WebSocket and audio still need separate checks.
+確認しています…|Checking…
+自分が話す|I speak
+送信回数は端末の試行記録です。完了通知は停止前の送信分も含み、請求額やAI呼出しの成功とは一致しません。|Send counts are device attempts, not bills or confirmed AI successes. Completions may arrive after stopping.
+通信失敗（制限・CORSなど）|Network failure (limits, CORS, etc.)
+通話に参加するQRコード|Scan to join the call
+音声の接続に失敗しました。|Audio connection failed.
+音声接続を確認してください。|Check the audio connection.
+この端末の利用履歴と、無料枠適用前の変動費の目安です。パスワードは画面を開くための端末内の確認です。|Local usage and estimated variable costs before free allowances. This password only locks this device's admin view.
+この端末・直近90日の利用ランキングです。辞書はカードを開いた回数、会話は確定した原文1件につき同じことばを1回数えます。再送・修正は重複計上しません。|Local ranking for the last 90 days. Cards count opens; conversations count each word once per final caption.
+通訳君：管理者画面を開く|Open admin
+話す側の言語|Speaking language
+聞く側の言語|Listening language
+文を送る|Send message
+ルームIDをコピー。作成から24時間有効|Copy room ID. Valid for 24 hours.
+モード|Mode
+よく使うことばの種類|Phrase or word
+文のカテゴリー|Phrase categories
+辞典のカテゴリー|Word categories
+字幕履歴|Caption history
+字幕と通話|Captions and call
+授業での役割|Class role
+管理者画面|Admin
+管理者表示|Admin
+英語ガイド|English guides
