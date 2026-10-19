@@ -821,23 +821,23 @@ body.phone-home #panel-words .reference-categories .category-filter[aria-pressed
 /* Header search uses the text composer's expansion timing. */
 body.phone-home .header-tools #dictionary-search-toggle{width:44px;height:44px;min-width:44px;padding:8px!important;background:transparent!important;border:0!important;box-shadow:none!important;color:#eee;font-size:19px;}
 body.phone-home #dictionary-search-toggle::after{display:none;}
-body.phone-home #panel-words .dictionary-search{display:block;width:0;max-height:0;margin:0;opacity:0;visibility:hidden;overflow:hidden;transition:width .28s ease,opacity .2s ease,visibility .28s,max-height .28s ease,margin .28s ease;}
-body.phone-home #panel-words .dictionary-search.is-open{width:100%;max-height:80px;margin:12px 0;opacity:1;visibility:visible;}
-body.phone-home #panel-words .dictionary-search .search-field{width:100%;box-sizing:border-box;padding-left:0;}
-@media(prefers-reduced-motion:reduce){body.phone-home #panel-words .dictionary-search{transition:none;}}
+body.phone-home :is(#panel-words,#dictionary-search-popover) .dictionary-search{display:block;width:0;max-height:0;margin:0;opacity:0;visibility:hidden;overflow:hidden;transition:width .28s ease,opacity .2s ease,visibility .28s,max-height .28s ease,margin .28s ease;}
+body.phone-home :is(#panel-words,#dictionary-search-popover) .dictionary-search.is-open{width:100%;max-height:80px;margin:12px 0;opacity:1;visibility:visible;}
+body.phone-home :is(#panel-words,#dictionary-search-popover) .dictionary-search .search-field{width:100%;box-sizing:border-box;padding-left:0;}
+@media(prefers-reduced-motion:reduce){body.phone-home :is(#panel-words,#dictionary-search-popover) .dictionary-search{transition:none;}}
 
 /* Keep the search focus outline inside the expanding wrapper. */
-body.phone-home #panel-words .dictionary-search{box-sizing:border-box;}
-body.phone-home #panel-words .dictionary-search.is-open{padding:4px;max-height:96px;}
-body.phone-home #panel-words .dictionary-search .search-field{min-width:0;gap:4px;}
-body.phone-home #panel-words .dictionary-search .search-field input{box-sizing:border-box;min-width:0;padding:12px 10px!important;}
-body.phone-home #panel-words .dictionary-search .search-field button{flex:0 0 44px;width:44px;margin:0;padding:8px!important;color:#ddd;}
-body.phone-home #panel-words .dictionary-search .search-field button:disabled{opacity:.45;}
+body.phone-home :is(#panel-words,#dictionary-search-popover) .dictionary-search{box-sizing:border-box;}
+body.phone-home :is(#panel-words,#dictionary-search-popover) .dictionary-search.is-open{padding:4px;max-height:96px;}
+body.phone-home :is(#panel-words,#dictionary-search-popover) .dictionary-search .search-field{min-width:0;gap:4px;}
+body.phone-home :is(#panel-words,#dictionary-search-popover) .dictionary-search .search-field input{box-sizing:border-box;min-width:0;padding:12px 10px!important;}
+body.phone-home :is(#panel-words,#dictionary-search-popover) .dictionary-search .search-field button{flex:0 0 44px;width:44px;margin:0;padding:8px!important;color:#ddd;}
+body.phone-home :is(#panel-words,#dictionary-search-popover) .dictionary-search .search-field button:disabled{opacity:.45;}
 
 /* Search focus is expressed only by a brighter bottom rule. */
-body.phone-home #panel-words .dictionary-search .search-field{border:0!important;border-bottom:1px solid #55555b!important;border-radius:0!important;outline:none!important;box-shadow:none!important;transition:border-color .2s ease;}
-body.phone-home #panel-words .dictionary-search .search-field:focus-within{border-bottom-color:#fff!important;outline:none!important;}
-body.phone-home #panel-words .dictionary-search input:focus-visible{outline:none!important;}
+body.phone-home :is(#panel-words,#dictionary-search-popover) .dictionary-search .search-field{border:0!important;border-bottom:1px solid #55555b!important;border-radius:0!important;outline:none!important;box-shadow:none!important;transition:border-color .2s ease;}
+body.phone-home :is(#panel-words,#dictionary-search-popover) .dictionary-search .search-field:focus-within{border-bottom-color:#fff!important;outline:none!important;}
+body.phone-home :is(#panel-words,#dictionary-search-popover) .dictionary-search input:focus-visible{outline:none!important;}
 
 /* Keep usage moderation readable without horizontal scrolling. */
 body.phone-home .admin-panel>.admin-tab-panel{min-width:0;overflow-x:hidden!important;overflow-wrap:anywhere}
@@ -852,3 +852,23 @@ body.phone-home #modal-body .admin-budget-remaining{display:block;font-size:clam
 body.phone-home #modal-body .admin-budget progress{display:block;width:100%;height:10px;accent-color:#ddd;margin:16px 0}
 body.phone-home #modal-body .admin-budget p{margin:10px 0}
 body.phone-home #modal-body .admin-budget small{display:block;color:#aaa}
+
+/* Search escapes scrolling containers through the browser top layer. */
+body.phone-home #dictionary-search-popover{position:fixed;inset:auto;margin:0;padding:0 14px;background:#18181b;color:#eee;border:1px solid #343438;border-radius:12px;box-shadow:0 12px 32px #0008;box-sizing:border-box;max-width:calc(100vw - 32px);overflow:visible;}
+#dictionary-search-popover.popover-fallback{display:block;z-index:10000;}
+body.phone-home #dictionary-search-popover .dictionary-search[hidden]{display:none!important;}
+body.phone-home #dictionary-search-popover .search-field{display:flex;align-items:center;background:transparent!important;}
+body.phone-home #dictionary-search-popover input{width:100%;background:transparent!important;color:#eee;border:0!important;border-radius:0!important;box-shadow:none!important;font-size:16px;}
+body.phone-home #dictionary-search-popover .search-field button{background:transparent!important;border:0!important;}
+body.phone-home .header-tools #language-options{box-sizing:border-box;width:52px;height:48px;padding:12px!important;}
+body.phone-home #header-face-speaker{display:none!important;}
+body.phone-home .face-controls{display:grid!important;grid-template-columns:minmax(0,1.12fr) 44px minmax(0,1fr)!important;align-items:center;gap:8px!important;padding:10px 0 16px!important;}
+body.phone-home .face-controls .face-language-field{display:grid;gap:5px;min-width:0;margin:0;}
+body.phone-home .face-controls .face-person{font-size:11px;color:#b9b9bf;line-height:1.3;}
+body.phone-home .face-controls strong,body.phone-home .face-controls #face-speaker{display:block!important;font-size:12px;margin:0;color:#b9b9bf;}
+body.phone-home .face-controls .face-speaking strong{font-size:14px;color:#fff;}
+body.phone-home .face-controls select{box-sizing:border-box;width:100%;min-width:0;max-width:100%;height:44px;min-height:44px;margin:0!important;padding:0 22px 0 8px!important;font-size:14px!important;border:1px solid #44444a;border-radius:8px;background:#191919;color:#ddd;}
+body.phone-home .face-controls .face-speaking select{height:48px;min-height:48px;max-height:none;font-size:16px!important;border-color:#92929a;color:#fff;}
+body.phone-home .face-controls #switch-speaker{width:44px!important;min-width:44px!important;max-width:44px!important;height:44px!important;min-height:44px!important;padding:10px!important;margin:30px 0 0!important;background:transparent!important;color:#eee;font-size:18px;}
+body.phone-home .face-controls #switch-speaker:focus-visible{outline:2px solid white;outline-offset:2px;}
+@media(min-width:600px){body.phone-home .face-controls{grid-template-columns:minmax(0,1fr)!important;gap:10px!important;}body.phone-home .face-controls #switch-speaker{justify-self:center;margin:0!important;transform:rotate(90deg);}body.phone-home .face-controls .face-speaking select{height:52px;min-height:52px;font-size:18px!important;}}
