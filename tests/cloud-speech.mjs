@@ -29,3 +29,19 @@ const p=new CloudSpeechPlayer({engine:{getVoices:()=>[],cancel(){}},Utterance:cl
 p.toggle('old','Kumusta?','fil');assert.equal(p.loading,true);p.stop();resolveLoad({audioContent:'aGVsbG8='});await new Promise(resolve=>setImmediate(resolve));assert.equal(p.key,null);assert.equal(audios[0].onended,null);
 p.toggle('new','Salamat.','fil');resolveLoad({audioContent:'aGVsbG8='});await new Promise(resolve=>setImmediate(resolve));const current=audios.at(-1);current.onplaying();assert.equal(p.loading,false);p.toggle('new','Salamat.','fil');assert.equal(p.paused,true);current.onended();assert.equal(p.key,null);assert.deepEqual(errors,[]);
 console.log('Cloud speech: Filipino-only synthesis, atomic monthly caps, conservative failures, cache and stale playback passed');
+// Safari can leave the user-gesture warm-up promise unresolved forever.
+let safariAudio,safariLoads=0;const safariErrors=[];
+class SafariAudio extends Audio{
+ constructor(){super();safariAudio=this;this.calls=0;}
+ play(){this.calls++;if(this.calls===1)return new Promise(()=>{});return Promise.reject(Object.assign(Error('gesture required'),{name:'NotAllowedError'}));}
+}
+const safari=new CloudSpeechPlayer({engine:{cancel(){}},cloud:{enabled:()=>true,Audio:SafariAudio,load:async()=>{safariLoads++;return {audioContent:'aGVsbG8='};}},onError:e=>safariErrors.push(e)});
+safari.toggle('safari','Kumusta?','fil');await new Promise(resolve=>setImmediate(resolve));
+assert.equal(safariAudio.calls,2,'pending silent playback must not block actual MP3');
+assert.equal(safari.loading,false);assert.equal(safari.paused,true);assert.deepEqual(safariErrors,['speech-tap']);
+safariAudio.play=()=>{safariAudio.onplaying();return Promise.resolve();};
+safari.toggle('safari','Kumusta?','fil');assert.equal(safari.paused,false);assert.equal(safari.started,true);assert.equal(safariLoads,1,'second gesture reuses prepared audio without another paid request');safari.stop();
+let timeoutCallback;const timeoutErrors=[];
+const stalled=new CloudSpeechPlayer({engine:{cancel(){}},delay:fn=>{timeoutCallback=fn;return 1;},clearDelay(){},cloud:{enabled:()=>true,Audio,load:()=>new Promise(()=>{})},onError:e=>timeoutErrors.push(e)});
+stalled.toggle('stalled','Kumusta?','fil');assert.equal(stalled.loading,true);timeoutCallback();assert.equal(stalled.key,null);assert.equal(stalled.loading,false);assert.deepEqual(timeoutErrors,['cloud-speech']);
+console.log('Safari speech: unresolved warm-up, second gesture without new synthesis, and bounded full request wait passed');
