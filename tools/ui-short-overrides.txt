@@ -437,3 +437,75 @@ network_or_corsはブラウザーが理由を開示しない通信失敗。学�
 管理者画面|Admin
 管理者表示|Admin
 英語ガイド|English guides
+欠席の確認|Check absence
+遅刻して登校します|Arriving late
+お弁当が必要です|Packed lunch needed
+持ち物のお知らせ|What to bring
+体操服が必要です|PE clothes needed
+提出物のお願い|Items to submit
+行事のお知らせ|School event
+面談の日程確認|Meeting schedule
+体調不良の連絡|Feeling unwell
+けがの連絡|Injury notice
+部活動の予定|Club schedule
+集金のお願い|Payment request
+アレルギー確認|Allergy check
+授業参観のお知らせ|Class observation
+宿題の確認|Check homework
+連絡帳を見てください|Check the school notebook
+早退します|Leaving early
+校外学習の持ち物|School trip items
+保護者会のお知らせ|Parent meeting
+校則の確認|Check school rules
+入学の相談|School enrollment
+手続きの窓口|Where to apply
+必要な書類の確認|Required documents
+書類の書き方|How to fill in forms
+提出先の確認|Where to submit
+提出期限の確認|Submission deadline
+転校の予定|School transfer plans
+転校の書類|Transfer documents
+住所の変更|Address change
+就学援助の相談|School financial aid
+援助の申請方法|How to apply for aid
+費用の支払い相談|Payment support
+口座振替の確認|Automatic payments
+通訳をお願いしたい|Request an interpreter
+やさしい説明のお願い|Please explain simply
+面談の相談|Request a meeting
+相談の予約|Book a consultation
+食物アレルギーを伝える|Report a food allergy
+健康情報の確認|Check health information
+登校再開の確認|Returning to school
+学童保育の相談|After-school care
+買う物の確認|What to buy
+書類をもう一度ください|Request forms again
+連絡方法の確認|How to contact school
+学級|Class
+学年|Grade
+出席番号|Student number
+お弁当|Packed lunch
+緊急連絡先|Emergency contact
+就学援助|School financial aid
+就学援助申請書|School aid application
+入学準備費|School start-up costs
+転入学|Transferring into a school
+転校|School transfer
+編入学|Joining a course partway
+在学証明書|School enrollment certificate
+教科用図書給与証明書|Textbook provision certificate
+学区|School district
+指定校変更|Change assigned school
+就学時健康診断|Pre-enrollment health check
+健康調査票|Student health form
+食物アレルギー|Food allergy
+出席停止|School-directed absence
+口座振替依頼書|Automatic payment form
+添付書類|Supporting documents
+認定結果|Application decision
+通訳派遣|Interpreter service
+就学相談|Schooling consultation
+学童保育|After-school care
+家庭訪問|Teacher home visit
+PTA|Parent-teacher association
+連絡アプリ|School communication app

@@ -215,6 +215,10 @@
     "en": "Check HTTP, CORS and certificate errors in developer tools. Remove tokens, invite links and conversation text before sharing.",
     "source": "通訳君 画面表記"
   },
+  "PTA": {
+    "en": "Parent-teacher association",
+    "source": "school_terms!608"
+  },
   "QRコードが出る前の失敗は、参加の認証やルーム作成の通信が原因です。音声中継（TURN）より前の段階です。": {
     "en": "A failure before the QR code concerns sign-in or room setup, before audio relay.",
     "source": "通訳君 画面表記"
@@ -282,6 +286,10 @@
   "アレルギー": {
     "en": "Allergy",
     "source": "ui_translations!100"
+  },
+  "アレルギー確認": {
+    "en": "Allergy check",
+    "source": "phrase_cards!14"
   },
   "アンケート": {
     "en": "Questionnaire",
@@ -367,9 +375,17 @@
     "en": "Please let",
     "source": "ruby_dictionary!311"
   },
+  "お弁当": {
+    "en": "Packed lunch",
+    "source": "school_terms!577"
+  },
   "お弁当が必要": {
     "en": "I need",
     "source": "ruby_dictionary!298"
+  },
+  "お弁当が必要です": {
+    "en": "Packed lunch needed",
+    "source": "phrase_cards!4"
   },
   "お弁当を持たせてください": {
     "en": "Please pack",
@@ -418,6 +434,10 @@
   "けが、病気、アレルギー、お金、進路、個人情報に関する内容は、人が確認してください。": {
     "en": "Information regarding injuries, illnesses, allergies, finances, career paths, and personal information must be verified by a human.",
     "source": "ui_translations!285"
+  },
+  "けがの連絡": {
+    "en": "Injury notice",
+    "source": "phrase_cards!11"
   },
   "けんか": {
     "en": "Fight",
@@ -1035,6 +1055,10 @@
     "en": "Back",
     "source": "通訳君 画面表記"
   },
+  "やさしい説明のお願い": {
+    "en": "Please explain simply",
+    "source": "phrase_cards!36"
+  },
   "やさしい日本語": {
     "en": "Easy Japanese",
     "source": "ui_translations!211"
@@ -1351,6 +1375,10 @@
     "en": "Postponement",
     "source": "ruby_dictionary!36"
   },
+  "援助の申請方法": {
+    "en": "How to apply for aid",
+    "source": "phrase_cards!32"
+  },
   "遠征": {
     "en": "Expedition",
     "source": "ruby_dictionary!246"
@@ -1543,6 +1571,10 @@
     "en": "Home storage",
     "source": "ruby_dictionary!490"
   },
+  "家庭訪問": {
+    "en": "Teacher home visit",
+    "source": "school_terms!607"
+  },
   "家庭連絡": {
     "en": "Family contact",
     "source": "ruby_dictionary!424"
@@ -1731,6 +1763,10 @@
     "en": "Enter the translation to remember.",
     "source": "通訳君 画面表記"
   },
+  "学級": {
+    "en": "Class",
+    "source": "school_terms!570"
+  },
   "学級活動": {
     "en": "Class activities",
     "source": "ruby_dictionary!99"
@@ -1738,6 +1774,10 @@
   "学級懇談会": {
     "en": "Class meeting",
     "source": "ruby_dictionary!218"
+  },
+  "学区": {
+    "en": "School district",
+    "source": "school_terms!594"
   },
   "学校": {
     "en": "School",
@@ -1854,6 +1894,18 @@
   "学習内容": {
     "en": "Learning content",
     "source": "ui_translations!622"
+  },
+  "学童保育": {
+    "en": "After-school care",
+    "source": "school_terms!606"
+  },
+  "学童保育の相談": {
+    "en": "After-school care",
+    "source": "phrase_cards!42"
+  },
+  "学年": {
+    "en": "Grade",
+    "source": "school_terms!571"
   },
   "学年費": {
     "en": "Academic fee",
@@ -2075,6 +2127,10 @@
     "en": "Textbook",
     "source": "ruby_dictionary!379"
   },
+  "教科用図書給与証明書": {
+    "en": "Textbook provision certificate",
+    "source": "school_terms!593"
+  },
   "教材": {
     "en": "Teaching materials",
     "source": "ruby_dictionary!64"
@@ -2098,6 +2154,10 @@
   "禁止": {
     "en": "Prohibited",
     "source": "ruby_dictionary!258"
+  },
+  "緊急連絡先": {
+    "en": "Emergency contact",
+    "source": "school_terms!579"
   },
   "金額": {
     "en": "Amount",
@@ -2159,6 +2219,10 @@
     "en": "I will",
     "source": "ruby_dictionary!460"
   },
+  "欠席の確認": {
+    "en": "Check absence",
+    "source": "phrase_cards!2"
+  },
   "欠席扱い": {
     "en": "Absent",
     "source": "ruby_dictionary!511"
@@ -2207,6 +2271,10 @@
     "en": "Health & safety",
     "source": "ui_translations!859"
   },
+  "健康情報の確認": {
+    "en": "Check health information",
+    "source": "phrase_cards!40"
+  },
   "健康診断を確認しています…": {
     "en": "We are reviewing your health checkup...",
     "source": "ui_translations!147"
@@ -2214,6 +2282,10 @@
   "健康診断を取得できませんでした。": {
     "en": "I was unable to obtain a health checkup.",
     "source": "ui_translations!254"
+  },
+  "健康調査票": {
+    "en": "Student health form",
+    "source": "school_terms!597"
   },
   "健康保険証": {
     "en": "Health insurance",
@@ -2415,6 +2487,14 @@
     "en": "Bank transfer",
     "source": "ruby_dictionary!234"
   },
+  "口座振替の確認": {
+    "en": "Automatic payments",
+    "source": "phrase_cards!34"
+  },
+  "口座振替依頼書": {
+    "en": "Automatic payment form",
+    "source": "school_terms!600"
+  },
   "校外": {
     "en": "Outside school",
     "source": "ruby_dictionary!104"
@@ -2423,6 +2503,10 @@
     "en": "Field trip",
     "source": "ui_translations!473"
   },
+  "校外学習の持ち物": {
+    "en": "School trip items",
+    "source": "phrase_cards!19"
+  },
   "校外活動費": {
     "en": "Extracurricular activity",
     "source": "ruby_dictionary!135"
@@ -2430,6 +2514,10 @@
   "校則": {
     "en": "School rules",
     "source": "ruby_dictionary!251"
+  },
+  "校則の確認": {
+    "en": "Check school rules",
+    "source": "phrase_cards!21"
   },
   "校長室": {
     "en": "Principal's office",
@@ -2454,6 +2542,10 @@
   "行事・部活動": {
     "en": "Events/club activities",
     "source": "ui_translations!844"
+  },
+  "行事のお知らせ": {
+    "en": "School event",
+    "source": "phrase_cards!8"
   },
   "行動": {
     "en": "Action",
@@ -2594,6 +2686,10 @@
   "災害": {
     "en": "Disaster",
     "source": "ruby_dictionary!146"
+  },
+  "在学証明書": {
+    "en": "School enrollment certificate",
+    "source": "school_terms!592"
   },
   "作成・入室": {
     "en": "Create and enter the room",
@@ -2739,6 +2835,10 @@
     "en": "Instructions",
     "source": "ui_translations!683"
   },
+  "指定校変更": {
+    "en": "Change assigned school",
+    "source": "school_terms!595"
+  },
   "支援員": {
     "en": "Support staff",
     "source": "ruby_dictionary!125"
@@ -2818,6 +2918,10 @@
   "持ち物・提出": {
     "en": "Items & forms",
     "source": "ui_translations!843"
+  },
+  "持ち物のお知らせ": {
+    "en": "What to bring",
+    "source": "phrase_cards!5"
   },
   "持ち物や提出物があります": {
     "en": "There are items to bring and documents to submit.",
@@ -2994,6 +3098,10 @@
   "手続き": {
     "en": "Procedure",
     "source": "ui_translations!475"
+  },
+  "手続きの窓口": {
+    "en": "Where to apply",
+    "source": "phrase_cards!23"
   },
   "手袋": {
     "en": "Gloves",
@@ -3179,6 +3287,10 @@
     "en": "Class observation",
     "source": "ruby_dictionary!216"
   },
+  "授業参観のお知らせ": {
+    "en": "Class observation",
+    "source": "phrase_cards!15"
+  },
   "授業前チェック": {
     "en": "Pre-class check",
     "source": "ui_translations!644"
@@ -3198,6 +3310,26 @@
   "授業内容を翻訳する": {
     "en": "Translate the lesson content",
     "source": "ui_translations!366"
+  },
+  "就学援助": {
+    "en": "School financial aid",
+    "source": "school_terms!586"
+  },
+  "就学援助の相談": {
+    "en": "School financial aid",
+    "source": "phrase_cards!31"
+  },
+  "就学援助申請書": {
+    "en": "School aid application",
+    "source": "school_terms!587"
+  },
+  "就学時健康診断": {
+    "en": "Pre-enrollment health check",
+    "source": "school_terms!596"
+  },
+  "就学相談": {
+    "en": "Schooling consultation",
+    "source": "school_terms!605"
   },
   "就学通知書": {
     "en": "School attendance",
@@ -3247,6 +3379,10 @@
     "en": "Collection",
     "source": "ui_translations!464"
   },
+  "集金のお願い": {
+    "en": "Payment request",
+    "source": "phrase_cards!13"
+  },
   "集合": {
     "en": "Set",
     "source": "ruby_dictionary!436"
@@ -3262,6 +3398,10 @@
   "住所": {
     "en": "Address",
     "source": "ruby_dictionary!657"
+  },
+  "住所の変更": {
+    "en": "Address change",
+    "source": "phrase_cards!30"
   },
   "住民票": {
     "en": "Resident record",
@@ -3282,6 +3422,10 @@
   "宿題が終わっている": {
     "en": "I've finished",
     "source": "ruby_dictionary!348"
+  },
+  "宿題の確認": {
+    "en": "Check homework",
+    "source": "phrase_cards!16"
   },
   "出す紙": {
     "en": "Paper to",
@@ -3310,6 +3454,14 @@
   "出席扱い": {
     "en": "Counted as",
     "source": "ruby_dictionary!512"
+  },
+  "出席停止": {
+    "en": "School-directed absence",
+    "source": "school_terms!599"
+  },
+  "出席番号": {
+    "en": "Student number",
+    "source": "school_terms!572"
   },
   "準備": {
     "en": "Preparation",
@@ -3350,6 +3502,14 @@
   "署名": {
     "en": "Signature",
     "source": "ruby_dictionary!493"
+  },
+  "書類の書き方": {
+    "en": "How to fill in forms",
+    "source": "phrase_cards!25"
+  },
+  "書類をもう一度ください": {
+    "en": "Request forms again",
+    "source": "phrase_cards!44"
   },
   "除外": {
     "en": "Excluded",
@@ -3442,6 +3602,14 @@
   "食器": {
     "en": "Tableware",
     "source": "ruby_dictionary!622"
+  },
+  "食物アレルギー": {
+    "en": "Food allergy",
+    "source": "school_terms!598"
+  },
+  "食物アレルギーを伝える": {
+    "en": "Report a food allergy",
+    "source": "phrase_cards!39"
   },
   "振込": {
     "en": "Transfer",
@@ -3932,7 +4100,7 @@
     "source": "ruby_dictionary!428"
   },
   "早退します": {
-    "en": "I'm leaving",
+    "en": "Leaving early",
     "source": "ruby_dictionary!429"
   },
   "早退扱い": {
@@ -3986,6 +4154,10 @@
   "相談してください": {
     "en": "Please consult",
     "source": "ruby_dictionary!474"
+  },
+  "相談の予約": {
+    "en": "Book a consultation",
+    "source": "phrase_cards!38"
   },
   "相談室": {
     "en": "Counseling room",
@@ -4099,6 +4271,10 @@
     "en": "Gym clothes",
     "source": "ruby_dictionary!79"
   },
+  "体操服が必要です": {
+    "en": "PE clothes needed",
+    "source": "phrase_cards!6"
+  },
   "体調": {
     "en": "Physical condition",
     "source": "ui_translations!167"
@@ -4110,6 +4286,10 @@
   "体調不良のため": {
     "en": "Due to",
     "source": "ruby_dictionary!7"
+  },
+  "体調不良の連絡": {
+    "en": "Feeling unwell",
+    "source": "phrase_cards!10"
   },
   "待機中": {
     "en": "Waiting",
@@ -4246,6 +4426,10 @@
   "遅刻": {
     "en": "Late",
     "source": "ruby_dictionary!605"
+  },
+  "遅刻して登校します": {
+    "en": "Arriving late",
+    "source": "phrase_cards!3"
   },
   "遅刻します": {
     "en": "I will",
@@ -4423,9 +4607,17 @@
     "en": "Words used in translation",
     "source": "通訳君 画面表記"
   },
+  "通訳をお願いしたい": {
+    "en": "Request an interpreter",
+    "source": "phrase_cards!35"
+  },
   "通訳君：管理者画面を開く": {
     "en": "Open admin",
     "source": "通訳君 画面表記"
+  },
+  "通訳派遣": {
+    "en": "Interpreter service",
+    "source": "school_terms!604"
   },
   "通訳文の育ち方と速度を確認": {
     "en": "Check the growth and speed of the interpreted text.",
@@ -4499,6 +4691,14 @@
     "en": "Submitted assignment",
     "source": "ruby_dictionary!170"
   },
+  "提出期限の確認": {
+    "en": "Submission deadline",
+    "source": "phrase_cards!27"
+  },
+  "提出先の確認": {
+    "en": "Where to submit",
+    "source": "phrase_cards!26"
+  },
   "提出箱": {
     "en": "Submission box",
     "source": "ruby_dictionary!509"
@@ -4507,9 +4707,33 @@
     "en": "Submission",
     "source": "ui_translations!452"
   },
+  "提出物のお願い": {
+    "en": "Items to submit",
+    "source": "phrase_cards!7"
+  },
   "締切": {
     "en": "Deadline",
     "source": "ui_translations!533"
+  },
+  "添付書類": {
+    "en": "Supporting documents",
+    "source": "school_terms!601"
+  },
+  "転校": {
+    "en": "School transfer",
+    "source": "school_terms!590"
+  },
+  "転校の書類": {
+    "en": "Transfer documents",
+    "source": "phrase_cards!29"
+  },
+  "転校の予定": {
+    "en": "School transfer plans",
+    "source": "phrase_cards!28"
+  },
+  "転入学": {
+    "en": "Transferring into a school",
+    "source": "school_terms!589"
   },
   "点数": {
     "en": "Score",
@@ -4550,6 +4774,10 @@
   "登校見合わせ": {
     "en": "School attendance",
     "source": "ruby_dictionary!270"
+  },
+  "登校再開の確認": {
+    "en": "Returning to school",
+    "source": "phrase_cards!41"
   },
   "途中式": {
     "en": "Working",
@@ -4775,9 +5003,17 @@
     "en": "Put it",
     "source": "ruby_dictionary!338"
   },
+  "入学の相談": {
+    "en": "School enrollment",
+    "source": "phrase_cards!22"
+  },
   "入学式": {
     "en": "Entrance ceremony",
     "source": "ruby_dictionary!199"
+  },
+  "入学準備費": {
+    "en": "School start-up costs",
+    "source": "school_terms!588"
   },
   "入学説明会": {
     "en": "Entrance information",
@@ -4863,6 +5099,10 @@
     "en": "HTTP round trip with sign-in",
     "source": "通訳君 画面表記"
   },
+  "認定結果": {
+    "en": "Application decision",
+    "source": "school_terms!602"
+  },
   "熱": {
     "en": "Heat",
     "source": "ruby_dictionary!409"
@@ -4886,6 +5126,10 @@
   "配布物": {
     "en": "Handouts",
     "source": "ruby_dictionary!70"
+  },
+  "買う物の確認": {
+    "en": "What to buy",
+    "source": "phrase_cards!43"
   },
   "箸": {
     "en": "Chopsticks",
@@ -4935,6 +5179,10 @@
     "en": "Cost",
     "source": "ruby_dictionary!667"
   },
+  "費用の支払い相談": {
+    "en": "Payment support",
+    "source": "phrase_cards!33"
+  },
   "避難": {
     "en": "Evacuation",
     "source": "ruby_dictionary!262"
@@ -4974,6 +5222,10 @@
   "必要な書類": {
     "en": "Required documents",
     "source": "ruby_dictionary!293"
+  },
+  "必要な書類の確認": {
+    "en": "Required documents",
+    "source": "phrase_cards!24"
   },
   "必要な物": {
     "en": "Items needed",
@@ -5054,6 +5306,10 @@
   "部活動": {
     "en": "Club activities",
     "source": "ui_translations!534"
+  },
+  "部活動の予定": {
+    "en": "Club schedule",
+    "source": "phrase_cards!12"
   },
   "封筒": {
     "en": "Envelope",
@@ -5279,6 +5535,10 @@
     "en": "Edit",
     "source": "ui_translations!325"
   },
+  "編入学": {
+    "en": "Joining a course partway",
+    "source": "school_terms!591"
+  },
   "返却": {
     "en": "Return",
     "source": "ruby_dictionary!482"
@@ -5354,6 +5614,10 @@
   "保護者会": {
     "en": "Parents meeting",
     "source": "ui_translations!546"
+  },
+  "保護者会のお知らせ": {
+    "en": "Parent meeting",
+    "source": "phrase_cards!20"
   },
   "保護者席": {
     "en": "Parent seat",
@@ -5739,6 +6003,14 @@
     "en": "Interview",
     "source": "ui_translations!532"
   },
+  "面談の相談": {
+    "en": "Request a meeting",
+    "source": "phrase_cards!37"
+  },
+  "面談の日程確認": {
+    "en": "Meeting schedule",
+    "source": "phrase_cards!9"
+  },
   "問題集": {
     "en": "Problem collection",
     "source": "ruby_dictionary!67"
@@ -5971,6 +6243,10 @@
     "en": "Contact & support",
     "source": "ui_translations!860"
   },
+  "連絡アプリ": {
+    "en": "School communication app",
+    "source": "school_terms!609"
+  },
   "連絡してください": {
     "en": "Please contact",
     "source": "ruby_dictionary!280"
@@ -5986,6 +6262,14 @@
   "連絡帳": {
     "en": "Contact book",
     "source": "ui_translations!472"
+  },
+  "連絡帳を見てください": {
+    "en": "Check the school notebook",
+    "source": "phrase_cards!17"
+  },
+  "連絡方法の確認": {
+    "en": "How to contact school",
+    "source": "phrase_cards!45"
   },
   "廊下": {
     "en": "Corridor",

@@ -1,4 +1,4 @@
-import {uiLabels} from './ui-labels.js?v=20261020-english-guides-2';
+import {uiLabels} from './ui-labels.js?v=20261020-english-guides-3';
 
 export const ENGLISH_GUIDES_KEY='tsuyaku-english-guides-v1';
 export function guidesEnabled(storage){try{return storage.getItem(ENGLISH_GUIDES_KEY)!=='off';}catch{return true;}}
@@ -36,7 +36,10 @@ export function englishFor(value){
  return '';
 }
 
-const skip='script,style,noscript,textarea,input,select,option,svg,canvas,code,pre,[contenteditable],[data-ui-ignore],.ui-copy,.ui-en,.caption-line>p,.caption-meta>span:first-child,.participant-name,.reference-language-text,[data-speech-text],.speech-word-active,.speech-words-spoken';
+let activeGuides=null;
+export function refreshEnglishGuides(scope){activeGuides?.refresh(scope);}
+
+const skip='script,style,noscript,textarea,input,select,option,svg,canvas,code,pre,[contenteditable],[data-ui-ignore],.ui-copy,.ui-en,.caption-line>p,.caption-meta>span:first-child,.participant-name,.reference-language-text,.reference-reading,[data-speech-text],.speech-word-active,.speech-words-spoken';
 export function englishPrompt(value,enabled=true){const en=enabled?englishFor(value):'';return en?en+'\n\n'+value:value;}
 
 export function installEnglishGuides({doc=document,storage=localStorage,Observer=MutationObserver}={}){
@@ -61,6 +64,7 @@ export function installEnglishGuides({doc=document,storage=localStorage,Observer
   for(const control of controls){
    if(control.closest('[data-ui-ignore]'))continue;
    // Native options already contain the language's own name. Only translate UI instructions.
+   if(control.tagName==='SELECT')for(const option of control.options){const base=option.dataset.uiOption||option.getAttribute('label')||option.textContent;if(base.includes('/'))continue;const en=englishFor(base);if(en){option.dataset.uiOption=base;option.label=enabled?en+' / '+base:base;}}
    const label=control.getAttribute('aria-label'),title=control.getAttribute('title');
    for(const [attribute,value] of [['aria-label',label],['title',title]]){
     if(!value)continue;
@@ -87,6 +91,6 @@ export function installEnglishGuides({doc=document,storage=localStorage,Observer
  button.onclick=()=>{oldSet(!enabled);try{storage.setItem(ENGLISH_GUIDES_KEY,enabled?'on':'off');}catch{}pending.add(doc.body);schedule();};
  visit(doc.body);observe();
  // No network, polling, AI calls or server-side preference changes are needed.
- return {refresh(){pending.add(doc.body);schedule();},disconnect(){observer.disconnect();button.remove();}};
+ return {refresh(scope=doc.body){pending.add(scope);schedule();},disconnect(){observer.disconnect();button.remove();}};
 }
-if(typeof document!=='undefined'&&document.querySelector('.header-tools'))installEnglishGuides();
+if(typeof document!=='undefined'&&document.querySelector('.header-tools'))activeGuides=installEnglishGuides();

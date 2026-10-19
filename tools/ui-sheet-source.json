@@ -4418,5 +4418,289 @@
   "早退届": {
     "en": "early leave form",
     "source": "ruby_dictionary!672"
+  },
+  "学級": {
+    "en": "class",
+    "source": "school_terms!570"
+  },
+  "学年": {
+    "en": "grade level",
+    "source": "school_terms!571"
+  },
+  "出席番号": {
+    "en": "student attendance number",
+    "source": "school_terms!572"
+  },
+  "お弁当": {
+    "en": "lunch box",
+    "source": "school_terms!577"
+  },
+  "緊急連絡先": {
+    "en": "emergency contact",
+    "source": "school_terms!579"
+  },
+  "就学援助": {
+    "en": "Financial help for families who have difficulty paying school expenses.",
+    "source": "school_terms!586"
+  },
+  "就学援助申請書": {
+    "en": "A form used to apply for financial help with school expenses.",
+    "source": "school_terms!587"
+  },
+  "入学準備費": {
+    "en": "Money needed to prepare school supplies before starting school.",
+    "source": "school_terms!588"
+  },
+  "転入学": {
+    "en": "Moving from another school to this school.",
+    "source": "school_terms!589"
+  },
+  "転校": {
+    "en": "Moving from the current school to another school.",
+    "source": "school_terms!590"
+  },
+  "編入学": {
+    "en": "Joining a school at a later grade or partway through a course.",
+    "source": "school_terms!591"
+  },
+  "在学証明書": {
+    "en": "A document showing that a child is enrolled at a school.",
+    "source": "school_terms!592"
+  },
+  "教科用図書給与証明書": {
+    "en": "A document listing textbooks provided by the school, used when transferring schools.",
+    "source": "school_terms!593"
+  },
+  "学区": {
+    "en": "An area used to determine a child's school based on where the child lives.",
+    "source": "school_terms!594"
+  },
+  "指定校変更": {
+    "en": "A procedure to change the assigned school to another school with permission.",
+    "source": "school_terms!595"
+  },
+  "就学時健康診断": {
+    "en": "A health check before a child starts elementary school.",
+    "source": "school_terms!596"
+  },
+  "健康調査票": {
+    "en": "A form informing the school about a child's health, including illnesses and allergies.",
+    "source": "school_terms!597"
+  },
+  "食物アレルギー": {
+    "en": "A reaction to certain foods. Please inform the school.",
+    "source": "school_terms!598"
+  },
+  "出席停止": {
+    "en": "Staying away from school as instructed, for example because of an infectious illness. It is recorded separately from ordinary absence.",
+    "source": "school_terms!599"
+  },
+  "口座振替依頼書": {
+    "en": "A form authorizing automatic payment of school fees from a bank account.",
+    "source": "school_terms!600"
+  },
+  "添付書類": {
+    "en": "Required documents submitted together with an application form.",
+    "source": "school_terms!601"
+  },
+  "認定結果": {
+    "en": "A decision stating whether an application for assistance has been approved.",
+    "source": "school_terms!602"
+  },
+  "通訳派遣": {
+    "en": "Arranging for an interpreter to come and help people communicate.",
+    "source": "school_terms!604"
+  },
+  "就学相談": {
+    "en": "Consultation about a child's schooling and the support the child needs.",
+    "source": "school_terms!605"
+  },
+  "学童保育": {
+    "en": "Care for elementary school children after school or at other times when their parents are away.",
+    "source": "school_terms!606"
+  },
+  "家庭訪問": {
+    "en": "A teacher visits a child's home to talk with the parents about the child.",
+    "source": "school_terms!607"
+  },
+  "PTA": {
+    "en": "A parent-teacher association that works together to support children and the school.",
+    "source": "school_terms!608"
+  },
+  "連絡アプリ": {
+    "en": "An app used to read school notices and contact the school.",
+    "source": "school_terms!609"
+  },
+  "欠席の確認": {
+    "en": "Your child has not arrived at school today. If your child will be absent or late, please contact the school.",
+    "source": "phrase_cards!2"
+  },
+  "遅刻して登校します": {
+    "en": "My child will arrive late today. I will tell you the expected arrival time later.",
+    "source": "phrase_cards!3"
+  },
+  "お弁当が必要です": {
+    "en": "There will be no school lunch tomorrow. Please have your child bring a lunch box.",
+    "source": "phrase_cards!4"
+  },
+  "持ち物のお知らせ": {
+    "en": "Please have your child bring a water bottle, towel, and writing tools tomorrow.",
+    "source": "phrase_cards!5"
+  },
+  "体操服が必要です": {
+    "en": "There will be physical education class tomorrow. Please have your child bring PE clothes.",
+    "source": "phrase_cards!6"
+  },
+  "提出物のお願い": {
+    "en": "The required document has not been submitted yet. Please have your child bring it to school by tomorrow.",
+    "source": "phrase_cards!7"
+  },
+  "行事のお知らせ": {
+    "en": "There will be a school event next week. Please check the handout for details.",
+    "source": "phrase_cards!8"
+  },
+  "面談の日程確認": {
+    "en": "Please confirm the schedule for the individual meeting. If the date is not convenient, please contact the school.",
+    "source": "phrase_cards!9"
+  },
+  "体調不良の連絡": {
+    "en": "Your child is not feeling well. Please contact the school as soon as possible.",
+    "source": "phrase_cards!10"
+  },
+  "けがの連絡": {
+    "en": "Your child was injured at school. We will explain the details by phone.",
+    "source": "phrase_cards!11"
+  },
+  "部活動の予定": {
+    "en": "There will be club activity today. Your child will leave school later than usual.",
+    "source": "phrase_cards!12"
+  },
+  "集金のお願い": {
+    "en": "We will collect money for learning materials. Please put it in the envelope and have your child bring it tomorrow.",
+    "source": "phrase_cards!13"
+  },
+  "アレルギー確認": {
+    "en": "We need to confirm something about school lunch allergies. Please contact the school.",
+    "source": "phrase_cards!14"
+  },
+  "授業参観のお知らせ": {
+    "en": "There will be a class observation this week. Please let the school know if you can attend.",
+    "source": "phrase_cards!15"
+  },
+  "宿題の確認": {
+    "en": "Please check at home whether your child has finished the homework.",
+    "source": "phrase_cards!16"
+  },
+  "連絡帳を見てください": {
+    "en": "I wrote an important message in the contact notebook. Please check it.",
+    "source": "phrase_cards!17"
+  },
+  "校外学習の持ち物": {
+    "en": "There will be a school trip for learning. Please have your child bring lunch, a water bottle, and rain gear.",
+    "source": "phrase_cards!19"
+  },
+  "保護者会のお知らせ": {
+    "en": "There will be a parents meeting next month. Please tell the school whether you can attend.",
+    "source": "phrase_cards!20"
+  },
+  "校則の確認": {
+    "en": "There is something we would like to confirm about school rules. Please check it together with your child.",
+    "source": "phrase_cards!21"
+  },
+  "入学の相談": {
+    "en": "I would like my child to enroll at this school.",
+    "source": "phrase_cards!22"
+  },
+  "手続きの窓口": {
+    "en": "Where can I complete the school enrollment procedures?",
+    "source": "phrase_cards!23"
+  },
+  "必要な書類の確認": {
+    "en": "Please tell me which documents are needed for the procedure.",
+    "source": "phrase_cards!24"
+  },
+  "書類の書き方": {
+    "en": "I do not know how to fill out the form. Could you go through it with me?",
+    "source": "phrase_cards!25"
+  },
+  "提出先の確認": {
+    "en": "Where should I submit this document?",
+    "source": "phrase_cards!26"
+  },
+  "提出期限の確認": {
+    "en": "What is the deadline for submitting this document?",
+    "source": "phrase_cards!27"
+  },
+  "転校の予定": {
+    "en": "My child will change schools because we are moving. Please tell me what procedures are needed.",
+    "source": "phrase_cards!28"
+  },
+  "転校の書類": {
+    "en": "Could you prepare the documents to give to my child's new school?",
+    "source": "phrase_cards!29"
+  },
+  "住所の変更": {
+    "en": "Our address has changed. Please tell me how to notify the school.",
+    "source": "phrase_cards!30"
+  },
+  "就学援助の相談": {
+    "en": "I would like to discuss school expenses. Can I apply for financial assistance?",
+    "source": "phrase_cards!31"
+  },
+  "援助の申請方法": {
+    "en": "Please explain how to apply for school financial assistance and which documents are needed.",
+    "source": "phrase_cards!32"
+  },
+  "費用の支払い相談": {
+    "en": "I am having difficulty paying the school expenses by the deadline and would like to discuss this.",
+    "source": "phrase_cards!33"
+  },
+  "口座振替の確認": {
+    "en": "Please explain how to set up automatic bank payments and when the money will be withdrawn.",
+    "source": "phrase_cards!34"
+  },
+  "通訳をお願いしたい": {
+    "en": "I find it difficult to understand explanations in Japanese. Could you arrange an interpreter?",
+    "source": "phrase_cards!35"
+  },
+  "やさしい説明のお願い": {
+    "en": "Please explain a little more slowly, using simple words.",
+    "source": "phrase_cards!36"
+  },
+  "面談の相談": {
+    "en": "I would like to meet with the teacher to discuss how my child is doing at school.",
+    "source": "phrase_cards!37"
+  },
+  "相談の予約": {
+    "en": "I would like to make an appointment for a consultation. Please tell me a convenient date and time.",
+    "source": "phrase_cards!38"
+  },
+  "食物アレルギーを伝える": {
+    "en": "My child has a food allergy. I would like to discuss school meals.",
+    "source": "phrase_cards!39"
+  },
+  "健康情報の確認": {
+    "en": "Please tell us about any ongoing illnesses, allergies, or other matters the school should be aware of.",
+    "source": "phrase_cards!40"
+  },
+  "登校再開の確認": {
+    "en": "When can my child return to school? Are any documents required?",
+    "source": "phrase_cards!41"
+  },
+  "学童保育の相談": {
+    "en": "I would like after-school care for my child. Please tell me how to apply.",
+    "source": "phrase_cards!42"
+  },
+  "買う物の確認": {
+    "en": "What should I buy for my child to use at school?",
+    "source": "phrase_cards!43"
+  },
+  "書類をもう一度ください": {
+    "en": "I lost the document from school. Could I have another copy?",
+    "source": "phrase_cards!44"
+  },
+  "連絡方法の確認": {
+    "en": "Should I contact the school by phone or through the app?",
+    "source": "phrase_cards!45"
   }
 }
