@@ -1,4 +1,4 @@
-import {uiLabels} from './ui-labels.js?v=20261020-english-guides-3';
+import {uiLabels} from './ui-labels.js?v=20261020-english-guides-4';
 
 export const ENGLISH_GUIDES_KEY='tsuyaku-english-guides-v1';
 export function guidesEnabled(storage){try{return storage.getItem(ENGLISH_GUIDES_KEY)!=='off';}catch{return true;}}
@@ -64,7 +64,7 @@ export function installEnglishGuides({doc=document,storage=localStorage,Observer
   for(const control of controls){
    if(control.closest('[data-ui-ignore]'))continue;
    // Native options already contain the language's own name. Only translate UI instructions.
-   if(control.tagName==='SELECT')for(const option of control.options){const base=option.dataset.uiOption||option.getAttribute('label')||option.textContent;if(base.includes('/'))continue;const en=englishFor(base);if(en){option.dataset.uiOption=base;option.label=enabled?en+' / '+base:base;}}
+   if(control.tagName==='SELECT'&&![...control.options].some(o=>o.value==='ja'&&o.textContent.includes('日本語')))for(const option of control.options){const base=option.dataset.uiOption||option.getAttribute('label')||option.textContent;if(base.includes('/'))continue;const en=englishFor(base);if(en){option.dataset.uiOption=base;option.label=enabled?en+' / '+base:base;}}
    const label=control.getAttribute('aria-label'),title=control.getAttribute('title');
    for(const [attribute,value] of [['aria-label',label],['title',title]]){
     if(!value)continue;
