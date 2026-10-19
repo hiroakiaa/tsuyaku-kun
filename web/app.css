@@ -867,3 +867,5 @@ body.phone-home .face-controls #switch-speaker{display:flex;flex-direction:colum
 body.phone-home .face-controls #switch-speaker span{font-size:12px!important;line-height:1.2;color:inherit;white-space:nowrap;}
 body.phone-home .face-controls #switch-speaker:focus-visible{outline:2px solid white;outline-offset:2px;}
 @media(min-width:600px){body.phone-home .face-controls{grid-template-columns:minmax(0,1fr)!important;gap:8px!important;}body.phone-home .face-controls #switch-speaker{flex-direction:row;justify-self:center;gap:7px;width:80px!important;min-width:80px!important;max-width:80px!important;height:44px!important;min-height:44px!important;}body.phone-home .face-controls #switch-speaker>i{transform:rotate(90deg);}body.phone-home .face-controls #switch-speaker span{font-size:14px!important;}body.phone-home .face-controls select{height:46px;min-height:46px;font-size:16px!important;}body.phone-home .face-controls #face-language{height:50px!important;min-height:50px!important;font-size:17px!important;}}
+
+body.phone-home .face-controls[hidden]{display:none!important;}
