@@ -862,16 +862,14 @@ body.phone-home #dictionary-search-popover input{width:100%;background:transpare
 body.phone-home #dictionary-search-popover .search-field button{background:transparent!important;border:0!important;}
 body.phone-home .header-tools #language-options{box-sizing:border-box;width:52px;height:48px;padding:12px!important;}
 body.phone-home #header-face-speaker{display:none!important;}
-body.phone-home .face-controls{display:grid!important;grid-template-columns:minmax(0,1.12fr) 44px minmax(0,1fr)!important;align-items:center;gap:8px!important;padding:10px 0 16px!important;}
-body.phone-home .face-controls .face-language-field{display:grid;gap:5px;min-width:0;margin:0;}
-body.phone-home .face-controls .face-person{font-size:11px;color:#b9b9bf;line-height:1.3;}
-body.phone-home .face-controls strong,body.phone-home .face-controls #face-speaker{display:block!important;font-size:12px;margin:0;color:#b9b9bf;}
-body.phone-home .face-controls .face-speaking strong{font-size:14px;color:#fff;}
+/* Compact speaker controls: one label per field and a named swap action. */
+body.phone-home .face-controls{display:grid!important;grid-template-columns:minmax(0,1.08fr) 48px minmax(0,1fr)!important;align-items:end;gap:8px!important;padding:8px 0 12px!important;}
+body.phone-home .face-controls .face-language-field{display:grid;gap:6px;min-width:0;margin:0;}
+body.phone-home .face-controls strong,body.phone-home .face-controls #face-speaker{display:block!important;font-size:15px!important;line-height:1.35;margin:0;color:#c8c8ce;}
+body.phone-home .face-controls .face-speaking #face-speaker{font-size:16px!important;color:#fff;}
 body.phone-home .face-controls select{box-sizing:border-box;width:100%;min-width:0;max-width:100%;height:44px;min-height:44px;margin:0!important;padding:0 22px 0 8px!important;font-size:14px!important;border:1px solid #44444a;border-radius:8px;background:#191919;color:#ddd;}
-body.phone-home .face-controls .face-speaking select{height:48px;min-height:48px;max-height:none;font-size:16px!important;border-color:#92929a;color:#fff;}
-body.phone-home .face-controls #switch-speaker{width:44px!important;min-width:44px!important;max-width:44px!important;height:44px!important;min-height:44px!important;padding:10px!important;margin:30px 0 0!important;background:transparent!important;color:#eee;font-size:18px;}
+body.phone-home .face-controls #face-language{height:48px!important;min-height:48px!important;max-height:none!important;font-size:16px!important;border-color:#92929a;color:#fff;}
+body.phone-home .face-controls #switch-speaker{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;width:48px!important;min-width:48px!important;max-width:48px!important;height:48px!important;min-height:48px!important;padding:4px!important;margin:0!important;background:transparent!important;color:#eee;font-size:18px;transform:none;}
+body.phone-home .face-controls #switch-speaker span{font-size:12px!important;line-height:1.2;color:inherit;white-space:nowrap;}
 body.phone-home .face-controls #switch-speaker:focus-visible{outline:2px solid white;outline-offset:2px;}
-@media(min-width:600px){body.phone-home .face-controls{grid-template-columns:minmax(0,1fr)!important;gap:10px!important;}body.phone-home .face-controls #switch-speaker{justify-self:center;margin:0!important;transform:rotate(90deg);}body.phone-home .face-controls .face-speaking select{height:52px;min-height:52px;font-size:18px!important;}}
-
-body.phone-home .face-controls #face-language{height:48px!important;min-height:48px!important;max-height:none!important;}
-@media(min-width:600px){body.phone-home .face-controls #face-language{height:52px!important;min-height:52px!important;}}
+@media(min-width:600px){body.phone-home .face-controls{grid-template-columns:minmax(0,1fr)!important;gap:8px!important;}body.phone-home .face-controls #switch-speaker{flex-direction:row;justify-self:center;gap:7px;width:80px!important;min-width:80px!important;max-width:80px!important;height:44px!important;min-height:44px!important;}body.phone-home .face-controls #switch-speaker>i{transform:rotate(90deg);}body.phone-home .face-controls #switch-speaker span{font-size:14px!important;}body.phone-home .face-controls select{height:46px;min-height:46px;font-size:16px!important;}body.phone-home .face-controls #face-language{height:50px!important;min-height:50px!important;font-size:17px!important;}}
