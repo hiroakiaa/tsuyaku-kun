@@ -1,5 +1,5 @@
 import {SharedWordUsage} from './shared-word-usage.js?v=20261011-continuity-words-1';
-import {installConversationUI} from './conversation-ui.js?v=20261009-status-clean-1';
+import {installConversationUI} from './conversation-ui.js?v=20261019-mic-empty-1';
 import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261009-mobile-speaker-1';
 import {IdleWatch} from './idle-watch.js?v=20261008-safety-1';
 import {recordResource,recordPause,recordResume} from './resource-usage.js?v=20261009-mobile-speaker-1';
@@ -333,7 +333,7 @@ window.addEventListener('pagehide',suspendBackgroundInterpretation);
 
 // Presentation observes state changes without polling or starting network work.
 function conversationState(){return {mode:room?.mode,role:room?.mode==='lesson'?(role||lessonRole):(tab==='lesson'?lessonRole:null),mic,preparing:$('#microphone').getAttribute('aria-busy')==='true',recognitionKind,paused:backgroundCallPaused,connection:$('#connection').textContent,local:room?.local===true,translating:[...records.values()].some(r=>r.status==='translating'||r.updating),relay:[...peers.values()].some(p=>p.pc.connectionState==='connected')};}
-conversationUI=installConversationUI({getState:conversationState,stop:()=>{if(room)pauseConversation('manual');}});
+conversationUI=installConversationUI({getState:conversationState});
 
 // Flush bounded batches only while visible. Failures stay queued for a later foreground run.
 setInterval(()=>{if(document.visibilityState==='visible'&&user)void sharedWords.flush().catch(()=>{});},60000);

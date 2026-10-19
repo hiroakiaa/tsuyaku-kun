@@ -9,17 +9,15 @@ export function conversationPresentation(s){
  return {microphone,connection:s.local?'この端末で利用中':s.connection||'準備中',cost:costs.join(' ／ ')||'処理待機中',role:s.role==='teacher'?'先生':s.role==='student'?'生徒':'',canStop:!!(s.mode&&(s.mic||s.preparing||s.translating||s.relay))};
 }
 
-export function installConversationUI({getState,stop}){
- const $=s=>document.querySelector(s),live=$('#live'),captions=$('#captions');
+export function installConversationUI({getState}){
+ const $=s=>document.querySelector(s),captions=$('#captions');
  const make=(tag,text,cls)=>{const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n;};
- const bar=make('div',null,'conversation-status'),stopButton=make('button','一時停止');
- bar.setAttribute('aria-label','会話の状態');stopButton.type='button';stopButton.onclick=stop;bar.append(stopButton);live.querySelector('.live-tools').prepend(bar);
  const badge=make('span',null,'header-role');badge.hidden=true;$('.app-shell>header').insertBefore(badge,$('.header-tools'));
  const latest=make('button','最新へ ↓','captions-latest');latest.type='button';latest.hidden=true;captions.parentElement.append(latest);
  let unread=false,scheduled=false;
  const nearBottom=()=>captions.scrollHeight-captions.scrollTop-captions.clientHeight<100;
  const text=(n,v)=>{if(n.textContent!==v)n.textContent=v;};
- const refresh=()=>{scheduled=false;const p=conversationPresentation(getState());badge.hidden=!p.role;text(badge,p.role);stopButton.hidden=!p.canStop;bar.hidden=!p.canStop;const cards=[...captions.querySelectorAll('.caption')];cards.forEach((n,i)=>n.classList.toggle('caption-latest',i===cards.length-1));if(nearBottom())unread=false;latest.hidden=!cards.length||nearBottom();text(latest,unread?'新しい字幕 · 最新へ ↓':'最新へ ↓');};
+ const refresh=()=>{scheduled=false;const p=conversationPresentation(getState());badge.hidden=!p.role;text(badge,p.role);const cards=[...captions.querySelectorAll('.caption')];cards.forEach((n,i)=>n.classList.toggle('caption-latest',i===cards.length-1));if(nearBottom())unread=false;latest.hidden=!cards.length||nearBottom();text(latest,unread?'新しい字幕 · 最新へ ↓':'最新へ ↓');};
  const schedule=()=>{if(!scheduled){scheduled=true;queueMicrotask(refresh);}};
  latest.onclick=()=>{unread=false;captions.scrollTo({top:captions.scrollHeight,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});schedule();};
  captions.addEventListener('scroll',schedule,{passive:true});
