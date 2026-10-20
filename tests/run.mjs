@@ -1,3 +1,4 @@
+import './async-ui.mjs';
 import {lessonCode} from '../web/entry-feedback.js';
 import './entry-feedback.mjs';
 import './device-check.mjs';

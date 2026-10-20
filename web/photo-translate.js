@@ -1,5 +1,9 @@
 import {translatePhotoProgressively} from './photo-progress.js?v=20261020-photo-fast-1';
 import {matchingPhotoBlocks,drawPhotoOverlay} from './photo-overlay.js?v=20261020-photo-overlay-2';
+export function photoReadResult(value){
+ if(!value||typeof value.text!=='string')throw Error('写真の読み取り結果を確認できませんでした。もう一度お試しください。');
+ return {...value,blocks:Array.isArray(value.blocks)?value.blocks.filter(b=>b&&typeof b.id==='string'&&typeof b.text==='string'):[],truncated:value.truncated===true};
+}
 export function photoTranslationText(text,start=0,end=0){const selected=end>start?text.slice(start,end):text;const value=selected.trim();if(!value||value.length>1200)throw Error('訳す部分を選択するか、原文を1200文字以内に直してください。');return value;}
 export function cropRect(width,height,crop){
  const [left,top,right,bottom]=crop.map(Number);if(![width,height,...crop].every(n=>Number.isFinite(Number(n)))||width<1||height<1||left<0||top<0||right>100||bottom>100||right-left<5||bottom-top<5)throw Error('読取範囲を広げてください。');
@@ -10,7 +14,7 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
  const remember=(map,key,value)=>{map.delete(key);map.set(key,value);while(map.size>24)map.delete(map.keys().next().value);};
  button.onclick=()=>{
   const root=el('div',undefined,'photo-translate photo-simple'),file=el('input'),pick=el('button','画像を選ぶ');
-  file.type='file';file.accept='image/*';file.hidden=true;file.setAttribute('aria-label','撮影した写真・画像を選ぶ');pick.type='button';pick.className='photo-pick';pick.onclick=()=>file.click();
+  file.type='file';file.accept='image/*';file.hidden=true;file.setAttribute('aria-label','撮影した写真・画像を選ぶ');pick.type='button';pick.className='photo-pick';pick.onclick=()=>{file.value='';file.click();};
   const preview=el('canvas');preview.hidden=true;preview.className='photo-preview';preview.setAttribute('aria-label','選択した写真');
   const source=el('select'),target=el('select');for(const language of languages().filter(l=>l.code!=='ja-easy'))for(const select of [source,target]){const o=el('option',language.labelJa+(language.labelNative&&language.labelNative!==language.labelJa?' / '+language.labelNative:''));o.value=language.code;select.append(o);}source.value='ja';target.value=viewLanguage()==='ja-easy'?'ja':viewLanguage();
   const sourceLabel=el('label','原文の言語'),targetLabel=el('label','訳す言語');sourceLabel.append(source);targetLabel.append(target);const languageRow=el('div',undefined,'photo-languages');languageRow.append(sourceLabel,targetLabel);
@@ -31,7 +35,7 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
   file.onchange=async()=>{
    const selected=file.files?.[0];if(!selected)return;const version=++epoch;busy=true;image=null;buttons();text.value='';ocrText='';ocrBlocks=[];details.hidden=true;details.open=false;clearTranslation();requestId=currentHash=null;say('写真を準備しています…');
    try{if(selected.size>15000000)throw Error('15MB以内の写真を選んでください。');if(objectURL)URL.revokeObjectURL(objectURL);objectURL=URL.createObjectURL(selected);const next=new Image();next.src=objectURL;await next.decode();if(closed||version!==epoch)return;if(next.naturalWidth*next.naturalHeight>50000000)throw Error('画像が大きすぎます。小さくして選び直してください。');image=next;const scale=Math.min(1,1800/Math.max(next.naturalWidth,next.naturalHeight));preview.width=Math.round(next.naturalWidth*scale);preview.height=Math.round(next.naturalHeight*scale);const ctx=preview.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,preview.width,preview.height);ctx.drawImage(image,0,0,preview.width,preview.height);preview.hidden=false;pick.textContent='画像を変更';pick.title=selected.name;say();}
-   catch(e){if(!closed&&version===epoch)say('写真を開けませんでした。'+(e.message||'JPEG・PNGの写真をお試しください。'));}
+   catch(e){if(!closed&&version===epoch)say('写真を開けませんでした。'+(e.message&&/[ぁ-んァ-ヶ一-龠]/.test(e.message)?e.message:'JPEG・PNG形式の画像を選び直してください。'));}
    finally{if(!closed&&version===epoch){busy=false;buttons();}}
   };
   const controllers=new Set();
@@ -39,7 +43,7 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
   async function readPhoto(){
    const base64=preview.toDataURL('image/jpeg',.9).split(',')[1];if(base64.length>2800000)throw Error('画像が大きすぎます。小さい画像を選んでください。');
    const bytes=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(base64)));currentHash=[...bytes].map(b=>b.toString(16).padStart(2,'0')).join('');let data=images.get(currentHash);
-   if(!data){requestId||=crypto.randomUUID();data=await bounded(signal=>api('/photo/recognize',{image:base64,id:requestId},{signal}));remember(images,currentHash,data);}
+   if(!data){requestId||=crypto.randomUUID();data=photoReadResult(await bounded(signal=>api('/photo/recognize',{image:base64,id:requestId},{signal})));remember(images,currentHash,data);}
    if(closed)return;text.value=data.text;ocrText=data.text;ocrBlocks=data.blocks||[];details.hidden=!data.text;
    if(!data.text)throw Error('文字が見つかりませんでした。写真を選び直してください。');if(data.truncated){details.open=true;throw Error('文字が多いため一部だけ読み取りました。原文を確認し、訳す部分を選択してください。');}
   }
@@ -53,10 +57,11 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
      result.replaceChildren();const incomplete=data.blocks.length<inputBlocks.length||data.blocks.some(b=>b.partial);if(incomplete)result.append(el('p','翻訳途中です。まだ訳されていない部分があります。','photo-help'));
      if(blocks&&data.blocks.length){overlayData={blocks,translated:data.blocks,to};overlay.hidden=false;preview.hidden=true;paintOverlay();details.open=false;}else details.open=true;
      const translated=data.blocks.map(b=>b.translations[to]).join('\n\n');
-     for(const [code,value] of from===to?[[from,original]]:[[from,original],[to,translated]]){if(!value)continue;const section=el('section',undefined,'reference-language'),name=languages().find(l=>l.code===code)?.labelJa||code;section.setAttribute('aria-label',name);section.append(el('h3',name),el('p',value,'reference-language-text'),speechControls(value,code,'photo:'+crypto.randomUUID()+':'+code));if(incomplete&&code===to)for(const button of section.querySelectorAll('[data-play]'))button.disabled=true;result.append(section);}
+     for(const [code,value] of from===to?[[from,original]]:[[from,original],[to,translated]]){if(!value)continue;const section=el('section',undefined,'reference-language'),name=languages().find(l=>l.code===code)?.labelJa||code;section.setAttribute('aria-label',name);const paragraph=el('p',value,'reference-language-text');paragraph.lang=code==='ja-easy'?'ja':code;section.append(el('h3',name),paragraph,speechControls(value,code,'photo:'+crypto.randomUUID()+':'+code));if(incomplete&&code===to)for(const button of section.querySelectorAll('[data-play]'))button.disabled=true;result.append(section);}
      details.hidden=false;updateSpeechControls();
     }
     say('翻訳しています…');let data=translations.get(key);
+    if(!data&&from===to){data={blocks:inputBlocks.map(b=>({id:b.id,translations:{[from]:b.text},quality:{warnings:[]}}))};remember(translations,key,data);}
     if(!data){data=await translatePhotoProgressively({blocks:inputBlocks,source:from,target:to,cache:segments,valid:()=>!closed&&version===epoch,request:body=>bounded(signal=>api('/photo/translate',body,{signal})),onProgress:(partial,done,total)=>{show(partial);say('翻訳しています… '+done+' / '+total);}});remember(translations,key,data);}
     if(closed||version!==epoch)return;show(data);say(data.blocks.some(b=>b.quality?.warnings?.length)?'数字・日付など、訳の確認が必要な箇所があります。':'');
    }catch(e){if(!closed&&version===epoch)say((e.message||'翻訳できませんでした。')+(result.childElementCount?' 完成した部分は残しています。もう一度押すと未完了の部分を再試行します。':''));}

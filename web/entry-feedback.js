@@ -21,10 +21,16 @@ export function searchBounds(anchor,viewport){
  return {width,left:Math.max(leftEdge,Math.min(anchor.right-width,leftEdge+viewport.width-margin*2-width)),top,maxHeight:Math.max(0,bottom-top)};
 }
 
-// Keep the same live-region node in the dialog's top layer so feedback remains visible.
-export function installModalFeedback({dialog,message,close}){
- const parent=message.parentNode,next=message.nextSibling;
+// Keep feedback in the modal top layer and restore a replaced opener after closing.
+export function installModalFeedback({dialog,message,close,resolveFocus=target=>target?.isConnected?target:null}){
+ const parent=message.parentNode,next=message.nextSibling;let returnTo,epoch=0;
  close.setAttribute('autofocus','');
- dialog.addEventListener('close',()=>{if(dialog.open)return;if(next?.parentNode===parent)parent.insertBefore(message,next);else parent.append(message);});
- return ()=>{dialog.append(message);close.focus({preventScroll:true});};
+ dialog.addEventListener('close',()=>{
+  if(dialog.open)return;
+  if(next?.parentNode===parent)parent.insertBefore(message,next);else parent.append(message);
+  const doc=dialog.ownerDocument,target=returnTo,closedEpoch=epoch;returnTo=null;
+  const restore=()=>{if(!dialog.open&&epoch===closedEpoch&&doc&&(doc.activeElement===doc.body||dialog.contains(doc.activeElement)))resolveFocus(target)?.focus({preventScroll:true});};
+  if(doc?.defaultView?.requestAnimationFrame)doc.defaultView.requestAnimationFrame(restore);else restore();
+ });
+ return trigger=>{epoch++;returnTo=trigger;dialog.append(message);close.focus({preventScroll:true});};
 }

@@ -80,3 +80,28 @@ Review queue (related changes are tested together; do not equate scenario count 
 20. Ignore UI-only mutations when marking unread captions — old code reproduced the playback-label defect cleanly at all three sizes; fixed code compares actual paragraph content, and still marks genuinely new captions.
 
 Drafts introduced here are memory-only and cleared by the existing conversation reset. No conversation text, credential or new preference is persisted. The validated build is `20261021-interactions-1`; deployment and public-file verification use the existing main-branch release workflow. Screens with only 80px of visible height keep the search input inside the bounded popover. These reduced-viewport checks are emulated; no physical iOS keyboard or pinch-zoom claim is made.
+
+## Round 3 — loading and recovery, release 20261021-loading-1
+
+This is an interim release within the next 20-item review, not a claim that a third group of 20 is complete. Existing functions only; no new provider, privilege, quota or user-data storage.
+
+Verified fixes:
+
+- Retry initial anonymous authentication from a subsequent user operation after a transient failure, reusing the Firebase app/auth instance and one observer.
+- Share concurrent authentication attempts; a failed attempt can be retried without a permanent rejected promise.
+- Refresh the dictionary after authentication recovers and share concurrent catalog requests.
+- Skip a full dictionary rerender when the fetched catalog is unchanged.
+- Preserve category/card focus when a changed catalog arrives during use.
+- Restore focus to the corresponding replacement dictionary card after closing its modal; guard against delayed close events and reopened dialogs.
+- Display jaText-only catalog rows rather than an empty card/title.
+- Reject malformed OCR responses before inserting a draft or writing the in-memory image cache, so retry performs recognition again.
+- Normalize invalid OCR block entries before overlay processing.
+- Explain image decode failures in Japanese with JPEG/PNG recovery guidance.
+- Permit selecting the same image file again.
+- Skip an unnecessary translation API request when source and target languages match.
+- Mark photo-result text with its language for accessibility.
+- Suppress confirmation sound after its dialog closes, disable duplicate tone starts during resume/playback, release the audio context, and recover if audio construction fails.
+
+Evidence: `tools/check-loading.mjs` reproduced the original loading defects in 27 baseline cases and then passed 30 recovery cases across 390×844, 568×320 and 1024×600. Unit tests cover single-flight retry, OCR validation and delayed confirmation audio with a fake AudioContext. The loading browser suite uses synthetic auth, catalog and photo responses, and generated test pixels: no paid OCR/translation calls and no personal photographs. Same-file selection and language attributes were reviewed in source; they are not physical-device claims. Existing interaction and full viewport regressions are also run before publication. Physical iOS/Android microphone, speech output and peer-audio delivery remain outside this headless browser proof.
+
+Release regression outcome: 63 interaction scenarios and 198 geometry checks passed with zero browser exceptions. The 568×320 English-guide call screen was visually inspected; invitation controls, full QR and microphone action remain above navigation. Unit suite passed after confirmation-tone cleanup. Publication verification will compare the delivered changed modules with these sources.

@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {singleFlight} from '../web/async-ui.js';
+import {photoReadResult} from '../web/photo-translate.js';
+let calls=0,release;
+const run=singleFlight(async()=>{calls++;await new Promise(resolve=>release=resolve);return calls;});
+const first=run(),second=run();assert.equal(first,second);await Promise.resolve();assert.equal(calls,1);release();assert.equal(await first,1);
+const third=run();await Promise.resolve();assert.equal(calls,2);release();assert.equal(await third,2);
+let retries=0;const retry=singleFlight(async()=>{if(++retries===1)throw Error('temporary');return 'ready';});await assert.rejects(retry(),/temporary/);assert.equal(await retry(),'ready');
+for(const bad of [null,{}, {text:undefined},{text:5}])assert.throws(()=>photoReadResult(bad),/読み取り結果/);
+const value=photoReadResult({text:'原文',blocks:[null,{id:'bad',text:3},{id:'b0',text:'原文'}],truncated:'false'});assert.equal(value.text,'原文');assert.deepEqual(value.blocks,[{id:'b0',text:'原文'}]);assert.equal(value.truncated,false);assert.deepEqual(photoReadResult({text:'原文',blocks:null}).blocks,[]);
+console.log('Async UI: shared attempts, explicit retries and validated photo results passed');

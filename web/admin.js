@@ -1,8 +1,8 @@
-import {photoUsageSection} from './photo-translate.js?v=20261020-delivery-1';
-import {englishPrompt} from './ui-english.js?v=20261021-interactions-1';
+import {photoUsageSection} from './photo-translate.js?v=20261021-loading-1';
+import {englishPrompt} from './ui-english.js?v=20261021-loading-1';
 import {createBudgetView} from './budget-view.js?v=20261020-delivery-1';
-import {conversationPresentation} from './conversation-ui.js?v=20261021-interactions-1';
-import {PRICES,costOf,percentile,analysisReport,translationTimingSummary} from './usage.js?v=20261021-interactions-1';
+import {conversationPresentation} from './conversation-ui.js?v=20261021-loading-1';
+import {PRICES,costOf,percentile,analysisReport,translationTimingSummary} from './usage.js?v=20261021-loading-1';
 import {listHistory as storedHistory} from './history.js?v=20261006-school-1';
 import {resourceSnapshot} from './resource-usage.js?v=20261008-safety-2';
 const listHistory=()=>localStorage.getItem('tsuyaku-device-mode')==='personal'?storedHistory():Promise.resolve([]);
