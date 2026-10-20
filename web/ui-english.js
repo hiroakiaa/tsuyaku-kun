@@ -1,4 +1,4 @@
-import {uiLabels} from './ui-labels.js?v=20261020-live-guides-2';
+import {uiLabels} from './ui-labels.js?v=20261020-delivery-2';
 
 export const ENGLISH_GUIDES_KEY='tsuyaku-english-guides-v1';
 export function guidesEnabled(storage){try{return storage.getItem(ENGLISH_GUIDES_KEY)!=='off';}catch{return true;}}
@@ -6,6 +6,7 @@ let sheetLabels=Object.create(null);
 export function applyEnglishLabels(labels){if(!labels||Array.isArray(labels)||typeof labels!=='object')return false;const next=Object.create(null);for(const [ja,en] of Object.entries(labels)){if(ja.length<=3000&&typeof en==='string'&&en.length<=300&&!/[<>\x00-\x08]/.test(en))next[ja]=en.trim();}if(!Object.keys(next).length)return false;sheetLabels=next;activeGuides?.refresh();return true;}
 const trim=value=>String(value??'').replace(/\s+/g,' ').trim();
 const dynamicLabels=[
+ ['相手端末に表示済み','Displayed on partners'],['取得日時：','Retrieved'],
  ['この認証IDの本日の利用：',"This user's use today"],['この認証IDの1日の設定上限：',"This user's daily limit"],['この認証IDの残り：',"This user's remaining budget"],
  ['本日の利用：',"Today's use"],['1日の設定上限：','Daily limit'],['次のリセット：','Next reset'],['翻訳 P95：','Translation P95'],
  ['最新の利用：翻訳成功 ','Latest translation results'],['最新の利用で5秒以上の翻訳 ','Translations taking over 5 seconds'],['最新の利用でTURN中継通信 ','Observed TURN traffic'],

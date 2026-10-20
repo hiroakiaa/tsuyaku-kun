@@ -2,7 +2,7 @@ import {deviceCheckPanel,microphoneUnavailable} from './device-check.js?v=202610
 import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261020-delivery-1';
 import {remotePlayback} from './remote-playback.js?v=20261020-delivery-1';
 import {installPhotoTranslate} from './photo-translate.js?v=20261020-delivery-1';
-import {refreshEnglishGuides,applyEnglishLabels} from './ui-english.js?v=20261020-live-guides-2';
+import {refreshEnglishGuides,applyEnglishLabels} from './ui-english.js?v=20261020-delivery-2';
 import {SharedWordUsage} from './shared-word-usage.js?v=20261011-continuity-words-1';
 import {installConversationUI} from './conversation-ui.js?v=20261019-mic-empty-1';
 import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261009-mobile-speaker-1';
@@ -14,10 +14,10 @@ import {ReviewedStore} from './reviewed-store.js';
 import {PersonalPhrases} from './personal-phrases.js?v=20261007-learning-1';
 import {recognitionHints} from './recognition-hints.js?v=20261007-progressive-1';
 import {acquireMicrophone} from './microphone.js?v=20261006-mic-1';
-import {UsageLedger,WordUsage} from './usage.js?v=20261020-delivery-1';
+import {UsageLedger,WordUsage} from './usage.js?v=20261020-delivery-2';
 import {CloudSpeechPlayer,createSpeechCache} from './cloud-speech-player.js?v=20261020-safari-speech-2';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-progressive-1';
-import {installAdmin} from './admin.js?v=20261020-delivery-1';
+import {installAdmin} from './admin.js?v=20261020-delivery-2';
 import {config} from './config.js';
 import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection as explainRecentConnection} from './network.js?v=20261009-mobile-speaker-1';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
@@ -59,7 +59,7 @@ function options(select,selected){select.replaceChildren(...catalog.languages.ma
 const sharedLanguageIds=['face-other-language','lesson-language'];
 function sharedLanguage(){const value=localStorage.getItem('tsuyaku-display-language')||localStorage.getItem('view-language')||localStorage.getItem('face-other-language')||'pt';return catalog.languages.some(l=>l.code===value)?value:'pt';}
 function speakingLanguage(){const value=localStorage.getItem('tsuyaku-speaking-language')||localStorage.getItem('face-self-language')||'ja';return catalog.languages.some(l=>l.code===value)?value:'ja';}
-function setSpeakingLanguage(value){if(!catalog.languages.some(l=>l.code===value))return;localStorage.setItem('tsuyaku-speaking-language',value);for(const id of ['face-self-language','source-language']){$('#'+id).value=value;localStorage.setItem(id,value);}if(room?.mode==='interpreter'){send({type:'language',language:value});if(mic)startRecognition();}}
+function setSpeakingLanguage(value){if(!catalog.languages.some(l=>l.code===value))return;localStorage.setItem('tsuyaku-speaking-language',value);for(const id of ['face-self-language','source-language']){$('#'+id).value=value;localStorage.setItem(id,value);}if(room?.mode==='interpreter'){send({type:'language',language:value});for(const record of [...records.values()])renderCaption(record);if(mic)startRecognition();}}
 function setSharedLanguage(value,notify=true){if(!catalog.languages.some(l=>l.code===value))return;localStorage.setItem('tsuyaku-display-language',value);for(const id of sharedLanguageIds){$('#'+id).value=value;localStorage.setItem(id,value);}renderReferences();if(room?.mode==='lesson'&&role!=='teacher'){if(notify&&selfId)send({type:'participant_language',to:selfId,language:value});for(const record of [...records.values()])renderCaption(record);}}
 function renderParticipants(){const list=$('#participants');list.classList.toggle('lesson-participants',room?.mode==='lesson');list.replaceChildren(...participants.map(p=>{const name=(p.id===selfId?'あなた':p.name)+(p.role==='teacher'&&room.mode==='lesson'?'・先生':'');if(room?.mode!=='lesson'){const item=el('span',name,'participant');const state=p.id===selfId?'字幕サーバーに接続':({connected:'字幕参加中・音声接続中',connecting:'字幕参加中・音声接続中…',failed:'字幕参加中・音声は再接続中',disconnected:'字幕参加中・音声は再接続待ち'}[peers.get(p.id)?.pc.connectionState]||'字幕参加中・音声準備中');item.append(el('small',state,'participant-connection'));const action=peers.get(p.id)?.audioAction;if(action)item.append(action);return item;}const row=el('div',undefined,'participant'),select=el('select');row.dataset.participantId=p.id;options(select,p.role==='teacher'?'ja':p.viewLanguage||p.language);select.setAttribute('aria-label',name+'の言語');select.disabled=p.role==='teacher'||(role!=='teacher'&&p.id!==selfId);select.onchange=()=>{if(room?.mode!=='lesson')return;send({type:'participant_language',to:p.id,language:select.value});};const identity=el('div',undefined,'participant-identity'),connection=el('small',p.id===selfId?'あなたの端末':({connected:'音声接続中',connecting:'音声接続中…',disconnected:'音声再接続待ち',failed:'音声接続を確認',closed:'音声停止'}[peers.get(p.id)?.pc.connectionState]||'参加中・音声準備中'),'participant-connection');identity.append(el('span',name,'participant-name'),connection);row.append(identity,select);const action=peers.get(p.id)?.audioAction;if(action)row.append(action);return row;}));}
 function nativeLanguageOptions(select,selected){options(select,selected);for(const option of select.options){const language=catalog.languages.find(l=>l.code===option.value);option.textContent=language?.labelNative||language?.labelJa||option.value;}}
