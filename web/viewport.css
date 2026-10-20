@@ -13,6 +13,7 @@ body.phone-home .reference-categories{scroll-padding-inline:8px;overscroll-behav
 body.phone-home .category-filter{scroll-margin-inline:8px;}
 body.phone-home .admin-tabs{scroll-padding-inline:8px;overscroll-behavior-x:contain;}
 body.phone-home #dictionary-search-popover{overflow-y:auto;overscroll-behavior:contain;}
+body.phone-home #dictionary-search-popover.short-viewport .dictionary-search.is-open{margin-block:0;padding-block:0;max-height:none;}
 body.phone-home dialog>#message:not([hidden]){position:sticky;inset:auto;bottom:0;transform:none;width:auto;max-width:100%;margin-top:12px;box-shadow:none;border-color:#777;flex-shrink:0;}
 body.phone-home input[aria-invalid="true"]{border-color:#e3aaa4!important;}
 

@@ -1,0 +1,20 @@
+{
+  "build": "20261021-interactions-1",
+  "improvementBatch": 2,
+  "reviewItems": 20,
+  "interactionCases": 63,
+  "interactionViewports": [
+    "390x844",
+    "568x320",
+    "1024x600"
+  ],
+  "interactionFailures": 0,
+  "layoutCases": 198,
+  "layoutFailures": 0,
+  "browserExceptions": 0,
+  "method": "Headless Chrome, actual DOM/CSS and synthetic auth/room responses; no paid AI or microphone calls. A separate old-component probe reproduced the unread-caption defect at all three interaction sizes.",
+  "limitations": [
+    "No physical iPhone/Android audio proof",
+    "Visible viewport pan/keyboard/zoom checks are emulated"
+  ]
+}

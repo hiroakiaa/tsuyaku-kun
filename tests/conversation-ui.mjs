@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {conversationPresentation as present} from '../web/conversation-ui.js';
+import {conversationPresentation as present,captionContentChanged} from '../web/conversation-ui.js';
 assert.equal(present({preparing:true}).microphone,'準備中');
 assert.equal(present({mic:false,translating:true}).microphone,'マイクOFF');
 assert.match(present({mic:false,translating:true}).cost,/翻訳処理中/);
@@ -10,4 +10,10 @@ assert.match(present({mic:false,relay:true}).cost,/TURN/);
 assert.equal(present({mode:'lesson',role:'student'}).role,'生徒');
 assert.equal(present({mode:'lesson',mic:false}).canStop,false);
 assert.equal(present({mode:'interpreter',relay:true}).canStop,true);
+const paragraphs=[{textContent:'Original caption'}],card={isConnected:true,matches:s=>s==='.caption',querySelectorAll:s=>s==='.caption-line>p'?paragraphs:[],closest:()=>card},seen=new WeakMap();
+assert.equal(captionContentChanged([{target:{},addedNodes:[card]}],seen),true);
+assert.equal(captionContentChanged([{target:{closest:()=>card},addedNodes:[]}],seen),false,'control-label updates are not new caption content');
+paragraphs[0].textContent='Updated translation';assert.equal(captionContentChanged([{target:{closest:()=>card},addedNodes:[]}],seen),true);
+assert.equal(captionContentChanged([{target:{closest:()=>card},addedNodes:[]}],seen),false);
+card.isConnected=false;paragraphs[0].textContent='Removed content';assert.equal(captionContentChanged([{target:{closest:()=>card},addedNodes:[]}],seen),false);
 console.log('Conversation UI: microphone, ongoing processing, role and pause states passed');

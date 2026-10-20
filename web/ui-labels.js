@@ -1597,5 +1597,6 @@ export const uiLabels = {
   "話す側の言語": "Speaking language",
   "話せます": "Ready to speak",
   "ルームIDを数字4桁で入力してください。": "Enter a 4-digit room ID.",
-  "先生から教わったルームIDを入力してください。": "Enter your teacher's room ID."
+  "先生から教わったルームIDを入力してください。": "Enter your teacher's room ID.",
+  "見つかりませんでした。短いことばで検索するか、「すべて」を選んでください。": "Try a shorter word or select All."
 };

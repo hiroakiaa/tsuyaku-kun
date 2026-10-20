@@ -52,9 +52,9 @@ The earlier visual-verification gate was resolved using the dedicated Playwright
 - New source/build identifier: `20261020-usability-1`. Publish through the existing main-branch workflow and run `tools/verify-release.mjs`; this now compares actual script/module/style contents as well as entry version.
 - Limits: headless Chrome validates layout and DOM operations, not actual iPhone Safari, Android capture, Bluetooth, physical keyboards or real peer audio. No new product feature, provider, quota or permission was added.
 
-## Round 2 — interaction review in progress, not published
+## Round 2 — verified for release 20261021-interactions-1
 
-The browser fixture was extracted into `tools/browser-fixture.mjs` so the layout and interaction suites use the same synthetic network setup. `tools/check-interactions.mjs` initially reproduced six defects at all three target sizes (390×844, 568×320, 1024×600). Further probes reproduced inside-to-outside modal drag dismissal, category scroll restoration after English annotation, and stale clipboard errors after changing mode. Current interaction suite: 39 cases, no failures. Unit suite passes. Full layout regression suite also passed: 198 cases, no geometry failures or browser exceptions.
+The browser fixture was extracted into `tools/browser-fixture.mjs` so the layout and interaction suites use the same synthetic network setup. `tools/check-interactions.mjs` initially reproduced six defects at all three target sizes (390×844, 568×320, 1024×600). Further probes reproduced inside-to-outside modal drag dismissal, category scroll restoration after English annotation, and stale clipboard errors after changing mode. Final interaction suite: 63 cases across three viewport sizes, no failures or browser exceptions. Unit suite passes. Full layout regression suite also passed: 198 cases, no geometry failures or browser exceptions.
 
 Review queue (related changes are tested together; do not equate scenario count with improvement count):
 
@@ -66,17 +66,17 @@ Review queue (related changes are tested together; do not equate scenario count 
 6. Move focus to newly expanded dictionary results — fixed and reproduced.
 7. Return focus to Show more after collapsing results — fixed and tested.
 8. Preserve the category strip's scroll position while searching — fixed after testing English annotation timing.
-9. Clamp selected-category centering at both scroll edges — implemented; include edge cases before publishing.
-10. Honor reduced motion when centering categories — implemented; additional preference check pending.
+9. Clamp selected-category centering at both scroll edges — verified at both scroll edges.
+10. Honor reduced motion when centering categories — verified with the browser reduced-motion preference.
 11. Bound search to the visible viewport width — implemented, unit and browser geometry tested.
 12. Keep search within reduced visible height during keyboard/zoom changes — implemented with bounds and scrollable content; emulated, not a physical mobile-keyboard test.
-13. Reposition an open search on visual viewport pan/resize — implemented; listener-specific check pending.
+13. Reposition an open search on visual viewport pan/resize — verified by visible viewport resize and pan events.
 14. Restore the selected mode after an idle application update; invalid saved values fall back safely — fixed and tested, key consumed once.
 15. Explain how to recover from an empty dictionary search — implemented as a polite status notice.
 16. Suppress clipboard failure feedback from a room that has already been left — fixed and reproduced; fallback link is selectable.
-17. Audit delayed lesson-room-ID copy completion after leaving — pending.
-18. Audit language metadata on multilingual reading content — pending.
-19. Audit validation state after returning to the lesson role picker — pending.
-20. Audit false new-caption indicators caused by UI-only mutations — pending.
+17. Ignore delayed lesson-room-ID copy completion after leaving — reproduced and fixed for the active room, with a snapshot of the copied ID.
+18. Assign the correct language to multilingual caption/reference paragraphs — fixed and browser-tested, with Japanese retained on missing-translation guidance.
+19. Clear stale invalid-input state when returning to student entry — reproduced and fixed; the entered ID itself remains available for correction.
+20. Ignore UI-only mutations when marking unread captions — old code reproduced the playback-label defect cleanly at all three sizes; fixed code compares actual paragraph content, and still marks genuinely new captions.
 
-Drafts introduced here are memory-only and cleared by the existing conversation reset. No conversation text, credential or new preference is persisted. These changes remain local until all remaining checks and the full viewport regression suite pass; the public app remains `20261020-usability-1`.
+Drafts introduced here are memory-only and cleared by the existing conversation reset. No conversation text, credential or new preference is persisted. The validated build is `20261021-interactions-1`; deployment and public-file verification use the existing main-branch release workflow. Screens with only 80px of visible height keep the search input inside the bounded popover. These reduced-viewport checks are emulated; no physical iOS keyboard or pinch-zoom claim is made.
