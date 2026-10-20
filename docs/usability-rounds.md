@@ -51,3 +51,32 @@ The earlier visual-verification gate was resolved using the dedicated Playwright
 - Reproduction uses Playwright available as `playwright` or via the `PLAYWRIGHT_PACKAGE` environment variable, installed Chrome, and synthetic in-memory auth/room responses. Optional `VIEWPORTS` accepts an array of width/height pairs. Generated screenshots and detailed measurements live under ignored/untracked `checks/viewports/`; they are not user conversation logs.
 - New source/build identifier: `20261020-usability-1`. Publish through the existing main-branch workflow and run `tools/verify-release.mjs`; this now compares actual script/module/style contents as well as entry version.
 - Limits: headless Chrome validates layout and DOM operations, not actual iPhone Safari, Android capture, Bluetooth, physical keyboards or real peer audio. No new product feature, provider, quota or permission was added.
+
+## Round 2 — interaction review in progress, not published
+
+The browser fixture was extracted into `tools/browser-fixture.mjs` so the layout and interaction suites use the same synthetic network setup. `tools/check-interactions.mjs` initially reproduced six defects at all three target sizes (390×844, 568×320, 1024×600). Further probes reproduced inside-to-outside modal drag dismissal, category scroll restoration after English annotation, and stale clipboard errors after changing mode. Current interaction suite: 39 cases, no failures. Unit suite passes. Full layout regression suite also passed: 198 cases, no geometry failures or browser exceptions.
+
+Review queue (related changes are tested together; do not equate scenario count with improvement count):
+
+1. Keep a dialog open when its internal padding is clicked — fixed and reproduced.
+2. Do not dismiss a dialog after dragging from inside to outside — fixed and reproduced.
+3. Preserve each speaker's unsent draft when switching speakers — fixed; browser test restores the original draft.
+4. Synchronize invitation language after changing the header language setting — fixed and reproduced.
+5. Keep keyboard focus on the selected dictionary category after rerender — fixed and reproduced.
+6. Move focus to newly expanded dictionary results — fixed and reproduced.
+7. Return focus to Show more after collapsing results — fixed and tested.
+8. Preserve the category strip's scroll position while searching — fixed after testing English annotation timing.
+9. Clamp selected-category centering at both scroll edges — implemented; include edge cases before publishing.
+10. Honor reduced motion when centering categories — implemented; additional preference check pending.
+11. Bound search to the visible viewport width — implemented, unit and browser geometry tested.
+12. Keep search within reduced visible height during keyboard/zoom changes — implemented with bounds and scrollable content; emulated, not a physical mobile-keyboard test.
+13. Reposition an open search on visual viewport pan/resize — implemented; listener-specific check pending.
+14. Restore the selected mode after an idle application update; invalid saved values fall back safely — fixed and tested, key consumed once.
+15. Explain how to recover from an empty dictionary search — implemented as a polite status notice.
+16. Suppress clipboard failure feedback from a room that has already been left — fixed and reproduced; fallback link is selectable.
+17. Audit delayed lesson-room-ID copy completion after leaving — pending.
+18. Audit language metadata on multilingual reading content — pending.
+19. Audit validation state after returning to the lesson role picker — pending.
+20. Audit false new-caption indicators caused by UI-only mutations — pending.
+
+Drafts introduced here are memory-only and cleared by the existing conversation reset. No conversation text, credential or new preference is persisted. These changes remain local until all remaining checks and the full viewport regression suite pass; the public app remains `20261020-usability-1`.
