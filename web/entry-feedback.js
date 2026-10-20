@@ -7,6 +7,6 @@ export function lessonCode(value){
 export function installModalFeedback({dialog,message,close}){
  const parent=message.parentNode,next=message.nextSibling;
  close.setAttribute('autofocus','');
- dialog.addEventListener('close',()=>{if(next?.parentNode===parent)parent.insertBefore(message,next);else parent.append(message);});
+ dialog.addEventListener('close',()=>{if(dialog.open)return;if(next?.parentNode===parent)parent.insertBefore(message,next);else parent.append(message);});
  return ()=>{dialog.append(message);close.focus({preventScroll:true});};
 }

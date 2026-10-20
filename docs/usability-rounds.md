@@ -38,3 +38,7 @@ Status: first CSS pass in `web/viewport.css`; existing automated test suite pass
 - The 568×320 landscape target needs side-by-side layout too: the short-height breakpoint now begins at 480px width rather than 600px. The actual rendering still requires browser verification.
 
 Browser reconnection attempted on the next goal turn: inventory works, but a fresh app tab still times out at the browser's focus-emulation command. No visual verification or deployment claimed.
+
+Further review: reconnecting text submissions previously remained in the input after being queued. Pressing Send again allocated a new caption ID and could replay the same sentence twice. Once the existing queue owns the caption, the draft is now cleared; the caption itself stays visible. A regression test verifies two consecutive submits create only one queued caption and a late submission after leaving does not throw or erase the draft. A delayed close event from a preceding modal no longer moves feedback out of a newly opened modal.
+
+Verification gate remains blocked after three consecutive goal turns: fresh Chrome tabs fail at focus emulation; selecting the current extension connection does not repair it; the in-app-browser attempt also times out and resets its controller. The app has not been republished. Resume with local preview at the viewport matrix above, verify Round 1 first, then update tested release identifiers and publish through the existing workflow. Do not keep adding unverified UI changes while this gate is unavailable.

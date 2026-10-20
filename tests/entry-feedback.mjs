@@ -9,4 +9,6 @@ const events={},moves=[],parent={append:n=>moves.push(['home',n])},message={pare
 const opened=installModalFeedback({dialog,message,close});opened();events.close();opened();events.close();
 assert.deepEqual(moves.map(x=>x[0]),['dialog','focus','home','dialog','focus','home']);
 assert.equal(moves[1][1],true);
+dialog.open=true;const before=moves.length;events.close();assert.equal(moves.length,before,'late close from previous modal must not remove feedback from reopened modal');
+dialog.open=false;events.close();assert.equal(moves.at(-1)[0],'home');
 console.log('Entry feedback: full-width room IDs, invalid input explanations and modal live-region restoration passed');
