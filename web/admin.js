@@ -1,4 +1,4 @@
-import {photoUsageSection} from './photo-translate.js?v=20261020-photo-simple-1';
+import {photoUsageSection} from './photo-translate.js?v=20261020-photo-fast-1';
 import {englishPrompt} from './ui-english.js?v=20261020-live-guides-2';
 import {createBudgetView} from './budget-view.js?v=20261012-budget-labels-2';
 import {conversationPresentation} from './conversation-ui.js?v=20261009-status-clean-1';

@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {photoTranslationPlan,translatePhotoProgressively} from '../web/photo-progress.js';
+const blocks=[{id:'b0',text:'提出日は10月20日です。'.repeat(45)},{id:'b1',text:'教科書を持ってきてください。'}];
+const plan=photoTranslationPlan(blocks);assert.ok(plan.length>2);assert.ok(plan.every(b=>b.reduce((n,p)=>n+p.text.length,0)<=260&&b.length<=6));assert.equal(plan.flat().filter(p=>p.originalId==='b0').map(p=>p.text).join(''),blocks[0].text);
+const cache=new Map();let active=0,max=0,calls=0;const progress=[];
+const request=async body=>{calls++;active++;max=Math.max(max,active);assert.deepEqual(body.targets,['es']);await new Promise(r=>setTimeout(r,2));active--;return {blocks:body.blocks.map(b=>({id:b.id,translations:{es:'ES:'+b.text}}))};};
+const result=await translatePhotoProgressively({blocks,source:'ja',target:'es',request,cache,onProgress:(data,n)=>progress.push(n)});assert.equal(result.blocks.length,2);assert.equal(result.blocks[0].translations.ja,blocks[0].text);assert.ok(max<=2);assert.equal(progress.length,plan.length);
+const before=calls;await translatePhotoProgressively({blocks,source:'ja',target:'es',request,cache});assert.equal(calls,before,'repeat translation must not spend AI again');
+let count=0;const partialCache=new Map();await assert.rejects(()=>translatePhotoProgressively({blocks,source:'ja',target:'es',cache:partialCache,request:async body=>{if(++count===2)throw Error('network');return request(body);}}));assert.ok(partialCache.size>0,'successful batches survive another batch failing');
+await assert.rejects(()=>translatePhotoProgressively({blocks,source:'ja',target:'es',cache:new Map(),request:async()=>({blocks:[]})}));
+console.log('Photo progress: bounded batches, no text loss, two requests maximum, selected language only, cache and failure recovery passed');
