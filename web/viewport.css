@@ -1,0 +1,66 @@
+/* Height is a layout constraint too. Keep actions reachable without shrinking text. */
+body.phone-home :is(.live-tools,.live-actions,.caption-stage,.entry-card,.reference-copy){min-width:0;}
+body.phone-home button:disabled{cursor:default;}
+body.phone-home :is(input,select,textarea){scroll-margin-block:72px;}
+body.phone-home .caption-stage>.captions{scroll-padding-block:16px 90px;}
+body.phone-home dialog{max-height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));overflow-y:auto;overscroll-behavior:contain;}
+body.phone-home .modal-heading{gap:12px;}
+body.phone-home .modal-heading h2{min-width:0;overflow-wrap:anywhere;}
+body.phone-home .modal-heading>button{flex-shrink:0;min-width:44px;min-height:44px;}
+body.phone-home #message:not([hidden]){bottom:calc(var(--nav-space,80px) + env(safe-area-inset-bottom) + 8px);max-height:min(160px,30dvh);overflow:auto;}
+body.phone-home .reference-title{overflow-wrap:anywhere;}
+body.phone-home .reference-categories{scroll-padding-inline:8px;overscroll-behavior-x:contain;}
+body.phone-home .category-filter{scroll-margin-inline:8px;}
+body.phone-home .admin-tabs{scroll-padding-inline:8px;overscroll-behavior-x:contain;}
+body.phone-home dialog>#message:not([hidden]){position:sticky;inset:auto;bottom:0;transform:none;width:auto;max-width:100%;margin-top:12px;box-shadow:none;border-color:#777;flex-shrink:0;}
+body.phone-home input[aria-invalid="true"]{border-color:#e3aaa4!important;}
+
+@media(max-height:620px){
+ body.phone-home{--shell-gap:8px;--nav-space:76px;}
+ html[data-english-guides="on"] body.phone-home{--nav-space:84px;}
+ body.phone-home .app-shell>header{min-height:44px;margin-bottom:4px;padding-block:2px;row-gap:4px;}
+ body.phone-home main.phone-home-card>.bottom-nav{padding-block:4px calc(4px + env(safe-area-inset-bottom));}
+ body.phone-home main.phone-home-card>.bottom-nav button{min-height:48px!important;gap:2px;}
+ body.phone-home .live-actions{gap:6px;padding-bottom:4px;}
+ body.phone-home .call-controls{gap:6px;padding-block:2px;}
+ body.phone-home .call-controls #microphone{min-height:48px;}
+ html[data-english-guides="on"] body.phone-home .call-controls #microphone{min-height:52px;}
+ body.phone-home .live-tools{min-height:0;overflow:auto;overscroll-behavior:contain;}
+ body.phone-home .participants{max-height:64px;overflow:auto;}
+ body.phone-home .empty{padding-block:8px;}
+ body.phone-home #empty-caption h2{margin-block:8px;}
+ body.phone-home .caption-stage{min-height:0;}
+ body.phone-home .caption-stage>.captions{min-height:0;}
+ body.phone-home .entry-card{gap:12px;padding:16px;}
+ body.phone-home #lesson-role-picker{gap:12px;}
+ body.phone-home dialog{padding:16px;}
+ body.phone-home .modal-heading{margin-bottom:10px;}
+}
+
+/* A landscape phone has less usable height than a portrait tablet of the same width. */
+@media(min-width:480px) and (max-height:620px){
+ body.phone-home #live:not([hidden]),body.phone-home.mode-active #live:not([hidden]),body.phone-home.mode-active[data-active-mode="interpreter"] #live:not([hidden]){display:grid;grid-template-columns:minmax(180px,34%) minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;gap:10px;overflow:hidden;}
+ body.phone-home #live>.live-tools{grid-column:1;grid-row:1;max-height:none;}
+ body.phone-home #live>.live-actions{grid-column:1;grid-row:2;}
+ body.phone-home #live>.caption-stage{grid-column:2;grid-row:1 / span 2;padding:0;}
+ body.phone-home .caption-stage>.captions{height:100%;border-radius:0!important;border-left:1px solid var(--line)!important;padding:12px 12px 84px!important;}
+ body.phone-home .face-controls{grid-template-columns:minmax(0,1fr)!important;padding:4px 0 8px!important;gap:6px!important;}
+ body.phone-home .face-controls .face-language-field{gap:3px;}
+ body.phone-home .face-controls #switch-speaker{flex-direction:row;justify-self:center;width:80px!important;min-width:80px!important;max-width:80px!important;height:44px!important;min-height:44px!important;gap:6px;}
+ body.phone-home .face-controls #switch-speaker>i{transform:rotate(90deg);}
+ body.phone-home .call-invite:not([hidden]){padding:10px;gap:8px;}
+ body.phone-home .call-invite>.qr{max-width:96px;height:auto;}
+ body.phone-home .caption{padding:12px;margin-bottom:10px;}
+}
+
+/* Preserve usable controls at 280–359px, without forcing a wider document. */
+@media(max-width:359px){
+ body.phone-home .app-shell>header{column-gap:4px;}
+ body.phone-home .header-tools{flex-wrap:nowrap;gap:2px;}
+ body.phone-home .brand{flex-shrink:1;min-width:0;}
+ body.phone-home .face-controls{gap:5px!important;grid-template-columns:minmax(0,1fr) 44px minmax(0,1fr)!important;}
+ body.phone-home .face-controls #switch-speaker{width:44px!important;min-width:44px!important;max-width:44px!important;}
+ body.phone-home .face-controls select{padding-inline:6px 20px!important;}
+ body.phone-home .reference-list button.reference-card{grid-template-columns:minmax(0,1fr) minmax(48px,28%);gap:8px;}
+}
+@media(prefers-reduced-motion:reduce){body.phone-home .reference-categories,body.phone-home .admin-tabs{scroll-behavior:auto;}}

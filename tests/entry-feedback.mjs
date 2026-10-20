@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {lessonCode,installModalFeedback} from '../web/entry-feedback.js';
+assert.deepEqual(lessonCode(' １２３４ ').value,'1234');
+assert.equal(lessonCode('１２３４').valid,true);
+for(const value of ['', '123', '12345', '12a4', '12 4'])assert.equal(lessonCode(value).valid,false);
+assert.match(lessonCode('').message,/先生/);
+assert.match(lessonCode('123').message,/4桁/);
+const events={},moves=[],parent={append:n=>moves.push(['home',n])},message={parentNode:parent,nextSibling:null},close={setAttribute:()=>{},focus:o=>moves.push(['focus',o.preventScroll])},dialog={addEventListener:(t,f)=>events[t]=f,append:n=>moves.push(['dialog',n])};
+const opened=installModalFeedback({dialog,message,close});opened();events.close();opened();events.close();
+assert.deepEqual(moves.map(x=>x[0]),['dialog','focus','home','dialog','focus','home']);
+assert.equal(moves[1][1],true);
+console.log('Entry feedback: full-width room IDs, invalid input explanations and modal live-region restoration passed');
