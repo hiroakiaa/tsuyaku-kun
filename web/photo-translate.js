@@ -50,10 +50,10 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
     let original;try{original=photoTranslationText(text.value,text.selectionStart,text.selectionEnd);}catch(e){details.hidden=false;details.open=true;throw e;}
     const from=source.value,to=target.value,blocks=matchingPhotoBlocks(original,ocrText,ocrBlocks),inputBlocks=blocks||[{id:'b0',text:original}],key=JSON.stringify([original,from,to,inputBlocks.map(b=>b.text)]);
     function show(data){
-     result.replaceChildren();
+     result.replaceChildren();const incomplete=data.blocks.length<inputBlocks.length||data.blocks.some(b=>b.partial);if(incomplete)result.append(el('p','翻訳途中です。まだ訳されていない部分があります。','photo-help'));
      if(blocks&&data.blocks.length){overlayData={blocks,translated:data.blocks,to};overlay.hidden=false;preview.hidden=true;paintOverlay();details.open=false;}else details.open=true;
      const translated=data.blocks.map(b=>b.translations[to]).join('\n\n');
-     for(const [code,value] of from===to?[[from,original]]:[[from,original],[to,translated]]){if(!value)continue;const section=el('section',undefined,'reference-language'),name=languages().find(l=>l.code===code)?.labelJa||code;section.setAttribute('aria-label',name);section.append(el('h3',name),el('p',value,'reference-language-text'),speechControls(value,code,'photo:'+crypto.randomUUID()+':'+code));result.append(section);}
+     for(const [code,value] of from===to?[[from,original]]:[[from,original],[to,translated]]){if(!value)continue;const section=el('section',undefined,'reference-language'),name=languages().find(l=>l.code===code)?.labelJa||code;section.setAttribute('aria-label',name);section.append(el('h3',name),el('p',value,'reference-language-text'),speechControls(value,code,'photo:'+crypto.randomUUID()+':'+code));if(incomplete&&code===to)for(const button of section.querySelectorAll('[data-play]'))button.disabled=true;result.append(section);}
      details.hidden=false;updateSpeechControls();
     }
     say('翻訳しています…');let data=translations.get(key);

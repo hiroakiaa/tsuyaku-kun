@@ -36,3 +36,10 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify published release
+        run: |
+          for attempt in 1 2 3 4 5; do
+            node tools/verify-release.mjs && exit 0
+            sleep 10
+          done
+          exit 1

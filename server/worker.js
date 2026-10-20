@@ -8,7 +8,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261020-photo-overlay-1';
+const BUILD_ID='20261020-delivery-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -207,6 +207,17 @@ export class TranslationRoom {
         this.send(target.ws,{type:'language_changed',language});this.roster();return;
       }
       if(data.type==='language'&&room.mode==='interpreter'){const language=String(data.language||'');if(!catalog.languages.some(l=>l.code===language))throw Error('言語を確認してください。');ws.serializeAttachment({...a,language,viewLanguage:language,name:(catalog.languages.find(l=>l.code===language)?.labelJa||'ことば')+'の参加者'});this.roster();return;}
+      if(data.type==='caption_received'){
+        if(!/^[a-f0-9]{32}_[A-Za-z0-9_-]{1,100}$/.test(String(data.id||''))||!Number.isInteger(data.revision)||data.revision<0)return;
+        const saved=await this.ctx.storage.get('caption:'+data.id);if(!saved||saved.id.startsWith(a.id+'_')||!['ready','failed'].includes(saved.status)||(saved.revision||0)!==data.revision)return;
+        const receipts=saved.receipts||{};if(receipts[a.id]!==data.revision){receipts[a.id]=data.revision;await this.ctx.storage.put('caption:'+data.id,{...saved,receipts});}
+        const others=this.participants().filter(p=>!saved.id.startsWith(p.a.id+'_')),count=others.filter(p=>receipts[p.a.id]===data.revision).length,owner=this.participants().find(p=>saved.id.startsWith(p.a.id+'_'));
+        if(owner)this.send(owner.ws,{type:'caption_delivered',id:saved.id,revision:data.revision,count,total:others.length});return;
+      }
+      if(data.type==='caption_sync'){
+        if(!Array.isArray(data.ids)||data.ids.length>12)return;
+        for(const id of new Set(data.ids)){if(typeof id!=='string'||!id.startsWith(a.id+'_')||id.length>140)continue;const saved=await this.ctx.storage.get('caption:'+id);if(!saved)continue;this.send(ws,{type:'caption_accepted',id,revision:saved.revision||0});if(['ready','failed'].includes(saved.status))this.broadcast({type:'translation',...saved});else this.send(ws,{type:'caption_pending',...saved});}return;
+      }
       if(data.type==='signal'){if(room.mode==='face')return;
         const other=this.participants().find(p=>p.a.id===data.to);if(!other)return;
         if(room.mode==='lesson'&&a.role!=='teacher'&&data.signal?.description?.type==='offer')throw Error('先生から接続します。');
@@ -227,7 +238,8 @@ export class TranslationRoom {
       if(!await this.captionIsLive(ws,room))return;
       if(!cap.final){this.broadcast({type:'caption',id,speaker:captionParticipant(room,a,data).name,source:captionParticipant(room,a,data).language,text:cap.text,final:false,revision:cap.revision,continuing:cap.continuing,at:Date.now()});return;}
       const existing=await this.ctx.storage.get('caption:'+id);if(existing?.text===cap.text&&cap.revision<=(existing.revision||0)&&cap.continuing===!!existing.continuing){
-        if(['ready','failed'].includes(existing.status))this.send(ws,{type:'translation',...existing});
+        this.send(ws,{type:'caption_accepted',id,revision:existing.revision||0});
+        if(['ready','failed'].includes(existing.status))this.broadcast({type:'translation',...existing});
         else if(this.jobs.has(id))this.ctx.waitUntil(this.jobs.get(id).then(async()=>{const saved=await this.ctx.storage.get('caption:'+id);if(['ready','failed'].includes(saved?.status)&&await this.captionIsLive(ws,room))this.send(ws,{type:'translation',...saved});}));
         else if(!this.queuedCaptions.has(id)){const interrupted={...existing,status:'failed',error:'前の翻訳処理の完了を確認できません。必要なら再試行してください。',aiFailure:{reason:'service',evidence:'unclassified'}};await this.ctx.storage.put('caption:'+id,interrupted);this.send(ws,{type:'translation',...interrupted});}
         return;
@@ -240,10 +252,12 @@ export class TranslationRoom {
       if(!existing&&(await this.ctx.storage.get('captionCount')||0)>=3000)throw Error('この授業は3000文に達しました。新しいルームを作ってください。');
       if(!existing){await this.ctx.storage.put('captionCount',(await this.ctx.storage.get('captionCount')||0)+1);await this.ctx.storage.put('caption:'+id,{id,source:captionParticipant(room,a,data).language,speaker:captionParticipant(room,a,data).name,text:cap.text,revision:cap.revision,continuing:cap.continuing,final:true,at:Date.now(),status:'queued'});}
       this.queuedCaptions.set(id,{ws,a:captionParticipant(room,a,data),room,cap,queuedAt:Date.now()});
+      this.send(ws,{type:'caption_accepted',id,revision:cap.revision||0});
+      this.broadcast({type:'caption_pending',id,source:captionParticipant(room,a,data).language,speaker:captionParticipant(room,a,data).name,text:cap.text,final:true,revision:cap.revision||0,status:'translating',at:Date.now()});
       if(this.jobs.has(id))return;
       this.startCaptionJob(id);
   }
-  async rejectCaption(ws,id,cap,error){const saved=await this.ctx.storage.get('caption:'+id);if(saved?.status==='queued'&&(saved.revision||0)<=(cap.revision||0))await this.ctx.storage.put('caption:'+id,{...saved,status:'failed',error,usage:{inputTokens:0,outputTokens:0,cacheHit:true},usageId:'rejected-'+id});if(!ws.deserializeAttachment()?.left)this.send(ws,{type:'caption_rejected',id,revision:cap.revision||0,error});}
+  async rejectCaption(ws,id,cap,error){const saved=await this.ctx.storage.get('caption:'+id);if(saved?.status==='queued'&&(saved.revision||0)<=(cap.revision||0)){const failed={...saved,status:'failed',error,usage:{inputTokens:0,outputTokens:0,cacheHit:true},usageId:'rejected-'+id};await this.ctx.storage.put('caption:'+id,failed);const room=await this.info();if(room&&!room.ended&&room.expires>Date.now())this.broadcast({type:'translation',...failed});}if(!ws.deserializeAttachment()?.left)this.send(ws,{type:'caption_rejected',id,revision:cap.revision||0,error});}
   startCaptionJob(id){
     // Keep waiting work in the bounded queue; never create a timer per waiting caption.
     if(this.jobs.has(id)||this.jobs.size>=2||!this.queuedCaptions.has(id))return;
@@ -274,10 +288,10 @@ export class TranslationRoom {
     const all=this.cachedCatalog;
       const past=(await this.ctx.storage.get('recent')||[]).map(r=>r.text);
       if(!await this.captionIsLive(ws,room,queuedAt))return;if(Date.now()<this.aiBlockedUntil)throw Object.assign(Error('quota'),{code:3036});const translations=await translateText({...this.env,budgetUid:a.uid,executionValid:()=>this.captionIsLive(ws,room,queuedAt)},text,a.language,targets,past,room.unit,all,u=>{usage=u;if(u.translationTiming)u.translationTiming.queueMs=Math.max(0,start-queuedAt);});
-      if(!(await this.info())||room.expires<=Date.now())return;const publish=await this.captionIsLive(ws,room);const quality=inspectTranslations(text,record.source,targets,translations);const done={...record,translations,quality,usage,status:'ready',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,done);const recent=await this.ctx.storage.get('recent')||[];await this.ctx.storage.put('recent',[...recent.filter(r=>r.id!==id),{id,at:start,text}].sort((a,b)=>a.at-b.at).slice(-3));if(publish)this.broadcast({type:'translation',...done});if(publish&&!quality.warnings.length&&!quality.unmeasuredLanguages.length&&a.language==='ja'&&!usage?.cacheHit&&((all.learnableTexts||[]).includes(text)||(all.phrases||[]).some(p=>p.jaText===text)))this.ctx.waitUntil(bridge(this.env,a.token,'tsuyakuLearn',{text,translations}).catch(()=>{}));
-    }catch(e){if(['quota','billing','auth'].includes(aiFailure(e).reason))this.aiBlockedUntil=Math.floor(Date.now()/86400000)*86400000+86400000;if(!(await this.info())||room.expires<=Date.now())return;const publish=await this.captionIsLive(ws,room),failure=aiFailure(e),failed={...record,usage,status:'failed',latencyMs:Date.now()-start,error:failure.message,aiFailure:failure};await this.ctx.storage.put('caption:'+id,failed);if(publish)this.broadcast({type:'translation',...failed});}
+      if(!(await this.info())||room.expires<=Date.now())return;const currentRoom=await this.info(),publish=!!currentRoom&&!currentRoom.ended&&currentRoom.expires>Date.now();const quality=inspectTranslations(text,record.source,targets,translations);const done={...record,translations,quality,usage,status:'ready',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,done);const recent=await this.ctx.storage.get('recent')||[];await this.ctx.storage.put('recent',[...recent.filter(r=>r.id!==id),{id,at:start,text}].sort((a,b)=>a.at-b.at).slice(-3));if(publish)this.broadcast({type:'translation',...done});if(publish&&!quality.warnings.length&&!quality.unmeasuredLanguages.length&&a.language==='ja'&&!usage?.cacheHit&&((all.learnableTexts||[]).includes(text)||(all.phrases||[]).some(p=>p.jaText===text)))this.ctx.waitUntil(bridge(this.env,a.token,'tsuyakuLearn',{text,translations}).catch(()=>{}));
+    }catch(e){if(['quota','billing','auth'].includes(aiFailure(e).reason))this.aiBlockedUntil=Math.floor(Date.now()/86400000)*86400000+86400000;if(!(await this.info())||room.expires<=Date.now())return;const currentRoom=await this.info(),publish=!!currentRoom&&!currentRoom.ended&&currentRoom.expires>Date.now(),failure=aiFailure(e),failed={...record,usage,status:'failed',latencyMs:Date.now()-start,error:failure.message,aiFailure:failure};await this.ctx.storage.put('caption:'+id,failed);if(publish)this.broadcast({type:'translation',...failed});}
   }
-  async webSocketClose(ws){for(const [id,job]of this.queuedCaptions)if(job.ws===ws)this.queuedCaptions.delete(id);const a=ws.deserializeAttachment();if(a?.left)return;ws.serializeAttachment({...a,left:true});try{ws.close(1000,'left');}catch{}if(a?.uid)this.broadcast({type:'notice',text:a.name+'さんが退室しました。'});this.roster();await this.scheduleAlarm();}
+  async webSocketClose(ws){for(const [id,job]of this.queuedCaptions)if(job.ws===ws){this.queuedCaptions.delete(id);await this.rejectCaption(ws,id,job.cap,'発言側の接続が切れたため、この文の翻訳は開始していません。');}const a=ws.deserializeAttachment();if(a?.left)return;ws.serializeAttachment({...a,left:true});try{ws.close(1000,'left');}catch{}if(a?.uid)this.broadcast({type:'notice',text:a.name+'さんが退室しました。'});this.roster();await this.scheduleAlarm();}
   async webSocketError(ws){await this.webSocketClose(ws);}
   async alarm(){
     if(await this.ctx.storage.get('codesDirectory')){await new LessonCodes(this.ctx.storage).cleanup();return;}

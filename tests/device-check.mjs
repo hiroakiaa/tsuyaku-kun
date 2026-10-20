@@ -1,0 +1,5 @@
+import assert from 'node:assert/strict';import {microphoneUnavailable} from '../web/device-check.js';
+assert.equal(microphoneUnavailable(null),true);assert.equal(microphoneUnavailable({getAudioTracks:()=>[{readyState:'ended'}]}),true);assert.equal(microphoneUnavailable({getAudioTracks:()=>[{readyState:'live'}]}),false);
+console.log('Device check: ended and missing microphones distinguished from live inputs');
+
+const {deviceCheckPanel}=await import('../web/device-check.js');let close,release,stopped=0;const nodes=[],el=(tag,text)=>{const node={tag,text,append(){},setAttribute(){},closest:()=>({addEventListener:(name,fn)=>close=fn})};nodes.push(node);return node;};deviceCheckPanel({el,modal(){},Context:null,getMedia:()=>new Promise(r=>release=r)});const start=nodes.find(n=>n.text==='マイク入力を確認'),pending=start.onclick();await Promise.resolve();close();release({getTracks:()=>[{stop:()=>stopped++}]});await pending;assert.equal(stopped,1,'closing a microphone check must stop a late permission result');console.log('Device check: closing dialog releases late microphone permission without recording');
