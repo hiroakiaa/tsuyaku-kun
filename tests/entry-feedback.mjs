@@ -1,5 +1,10 @@
 import assert from 'node:assert/strict';
 import {lessonCode,installModalFeedback} from '../web/entry-feedback.js';
+import {readFile} from 'node:fs/promises';
+const index=await readFile(new URL('../index.html',import.meta.url),'utf8');
+assert.equal((index.match(/src="web\/ui-english\.js/g)||[]).length,0,'English guides must initialize through the shared app import, not a second script version');
+const app=await readFile(new URL('../web/app.js',import.meta.url),'utf8'),admin=await readFile(new URL('../web/admin.js',import.meta.url),'utf8');
+assert.equal(app.match(/from '(\.\/ui-english\.js[^']*)'/)?.[1],admin.match(/from '(\.\/ui-english\.js[^']*)'/)?.[1],'app and admin must share one guide module');
 assert.deepEqual(lessonCode(' １２３４ ').value,'1234');
 assert.equal(lessonCode('１２３４').valid,true);
 for(const value of ['', '123', '12345', '12a4', '12 4'])assert.equal(lessonCode(value).valid,false);

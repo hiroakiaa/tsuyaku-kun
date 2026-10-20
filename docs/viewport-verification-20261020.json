@@ -1,0 +1,39 @@
+{
+  "build": "20261020-usability-1",
+  "method": "Synthetic authentication and room transport; real DOM/CSS/browser. No microphone, AI calls or physical devices tested.",
+  "viewports": [
+    "280x653",
+    "320x568",
+    "360x640",
+    "390x844",
+    "568x320",
+    "667x375",
+    "844x390",
+    "900x600",
+    "1024x600",
+    "1280x720",
+    "1440x900"
+  ],
+  "guides": [
+    "on",
+    "off"
+  ],
+  "screens": [
+    "face",
+    "language-dialog",
+    "call",
+    "lesson-roles",
+    "lesson-student",
+    "lesson-teacher",
+    "dictionary-search",
+    "photo-dialog",
+    "admin-overview"
+  ],
+  "checks": 198,
+  "failures": 0,
+  "browserExceptions": 0,
+  "limitations": [
+    "Synthetic auth and rooms",
+    "No physical phone, real microphone or live peer audio proof"
+  ]
+}

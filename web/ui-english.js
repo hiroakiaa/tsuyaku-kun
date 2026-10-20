@@ -1,4 +1,4 @@
-import {uiLabels} from './ui-labels.js?v=20261020-delivery-2';
+import {uiLabels} from './ui-labels.js?v=20261020-usability-1';
 
 export const ENGLISH_GUIDES_KEY='tsuyaku-english-guides-v1';
 export function guidesEnabled(storage){try{return storage.getItem(ENGLISH_GUIDES_KEY)!=='off';}catch{return true;}}
@@ -47,6 +47,7 @@ const skip='script,style,noscript,textarea,input,select,option,svg,canvas,code,p
 export function englishPrompt(value,enabled=true){const en=enabled?englishFor(value):'';return en?en+'\n\n'+value:value;}
 
 export function installEnglishGuides({doc=document,storage=localStorage,Observer=MutationObserver}={}){
+ const controllerKey=Symbol.for('tsuyaku.ui-english.controller');if(doc[controllerKey])return doc[controllerKey];
  let enabled=guidesEnabled(storage),scheduled=false;
  const pending=new Set(),root=doc.documentElement;
  const button=doc.createElement('button');button.id='english-guides-toggle';button.type='button';button.textContent='EN';button.setAttribute('data-ui-ignore','');
@@ -76,7 +77,7 @@ export function installEnglishGuides({doc=document,storage=localStorage,Observer
     const ja=previous&&value===previous.split('\u001f')[1]?previous.split('\u001f')[0]:value;
     const en=englishFor(ja);if(!en){if(previous)control.setAttribute(attribute,ja);continue;}
     const bilingual=en+' / '+ja;control.dataset[attribute==='title'?'uiTitle':'uiAria']=ja+'\u001f'+bilingual;
-    control.setAttribute(attribute,enabled?bilingual:ja);
+    const displayed=enabled?bilingual:ja;if(control.getAttribute(attribute)!==displayed)control.setAttribute(attribute,displayed);
    }
   }
  }
@@ -95,6 +96,6 @@ export function installEnglishGuides({doc=document,storage=localStorage,Observer
  button.onclick=()=>{oldSet(!enabled);try{storage.setItem(ENGLISH_GUIDES_KEY,enabled?'on':'off');}catch{}pending.add(doc.body);schedule();};
  visit(doc.body);observe();
  // No network, polling, AI calls or server-side preference changes are needed.
- return {refresh(scope=doc.body){pending.add(scope);schedule();},disconnect(){observer.disconnect();button.remove();}};
+ const controller={refresh(scope=doc.body){pending.add(scope);schedule();},disconnect(){observer.disconnect();button.remove();if(doc[controllerKey]===controller)delete doc[controllerKey];}};doc[controllerKey]=controller;return controller;
 }
 if(typeof document!=='undefined'&&document.querySelector('.header-tools'))activeGuides=installEnglishGuides();

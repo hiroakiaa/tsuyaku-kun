@@ -1,0 +1,53 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {createRequire} from 'node:module';
+import {catalog} from '../server/catalog.js';
+const require=createRequire(import.meta.url);
+const {chromium}=require(process.env.PLAYWRIGHT_PACKAGE||'playwright');
+const root=path.resolve(fileURLToPath(new URL('../',import.meta.url))),out=path.join(root,'checks','viewports');await fs.mkdir(out,{recursive:true});
+const origin='https://tsuyaku-preview.test',rooms=new Map(),errors=[],results=[];
+const browser=await chromium.launch({channel:'chrome',headless:true});
+const types={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.png':'image/png','.ttf':'font/ttf','.woff2':'font/woff2','.webmanifest':'application/manifest+json'};
+let roomCounter=0;const externalAssets=new Map();
+async function setup(context){
+ await context.route('**/*',async route=>{
+  const u=new URL(route.request().url());if(process.env.TRACE)console.log('ASSET',u.pathname);
+  if(u.origin===origin){try{const name=u.pathname==='/'?'index.html':decodeURIComponent(u.pathname.slice(1));const f=path.resolve(root,name);if(!f.startsWith(root+path.sep))return route.abort();return route.fulfill({body:await fs.readFile(f),contentType:types[path.extname(f)]||'application/octet-stream'});}catch{return route.fulfill({status:404,body:'Missing test asset'});}}
+  if(u.hostname==='www.gstatic.com')return route.fulfill({contentType:'text/javascript',body:u.pathname.includes('firebase-app')?'export function initializeApp(){return {}}':`const user={getIdToken:async()=>"synthetic-test-token"};export function getAuth(){return {authStateReady:async()=>{},currentUser:user}}export async function signInAnonymously(){}export function onAuthStateChanged(a,f){f(user)}`});
+  if(u.hostname==='cdnjs.cloudflare.com'){try{if(!externalAssets.has(u.href))externalAssets.set(u.href,fetch(u,{signal:AbortSignal.timeout(10000)}).then(async r=>({body:Buffer.from(await r.arrayBuffer()),contentType:r.headers.get('content-type')||'application/octet-stream'})));return route.fulfill(await externalAssets.get(u.href));}catch{return route.abort();}}
+  if(u.hostname==='tsuyaku-kun-api.allinone-hiroakiaa.workers.dev'){
+   let data={};if(u.pathname==='/catalog')data=catalog;
+   if(u.pathname==='/rooms'){const payload=route.request().postDataJSON();const id=String(++roomCounter).padStart(32,'0');data={id,key:'a'.repeat(32),mode:payload.mode,code:'1234',unit:'数学',expires:Date.now()+86400000};rooms.set(id,data);}
+   if(u.pathname==='/lessons/join'){const id=String(++roomCounter).padStart(32,'0');data={id,key:'a'.repeat(32),mode:'lesson',code:'1234',unit:'数学',expires:Date.now()+86400000};rooms.set(id,{...data,student:true});}
+   return route.fulfill({json:data});
+  }
+  // Display/interaction test only: no live Google, AI, audio or participant requests.
+  return route.fulfill({body:'',contentType:u.pathname.endsWith('.css')?'text/css':'application/octet-stream'});
+ });
+ await context.routeWebSocket('**/rooms/*/socket',socket=>{const id=new URL(socket.url()).pathname.split('/')[2],r=rooms.get(id);socket.onMessage(raw=>{const msg=JSON.parse(String(raw));if(msg.type==='auth')socket.send(JSON.stringify({type:'ready',id:'b'.repeat(32),role:r?.student?'student':'teacher',mode:r?.mode||'interpreter',code:'1234',unit:'数学',history:[],expires:Date.now()+86400000}));if(msg.type==='ping')socket.send(JSON.stringify({type:'pong'}));});});
+}
+async function geometry(page,name,size,guides){
+ const value=await page.evaluate(()=>{const rect=s=>{const n=document.querySelector(s);if(!n||n.hidden||!n.getClientRects().length)return null;const r=n.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,right:r.right,bottom:r.bottom};};return {width:innerWidth,height:innerHeight,documentWidth:document.documentElement.scrollWidth,header:rect('.app-shell>header'),nav:rect('.bottom-nav'),mic:rect('#microphone'),captions:rect('.caption-stage'),tools:rect('.live-tools'),dialog:rect('dialog[open]'),role:rect('#lesson-role-picker'),panel:rect('[role=tabpanel]:not([hidden])'),close:rect('#modal-close'),qr:rect('#call-invite canvas'),speaking:rect('#face-language'),listening:rect('#face-listening-language'),roleButton:rect('#lesson-role-teacher'),search:rect('#dictionary-search-popover .dictionary-search.is-open'),title:document.querySelector('#empty-caption h2')?.getBoundingClientRect().height};});
+ const problems=[];if(value.documentWidth>size[0]+1)problems.push('horizontal-overflow');
+ if(name==='face'||name==='call'){if(value.mic&&value.nav&&value.mic.bottom>value.nav.y+1)problems.push('mic-over-navigation');if(value.mic&&(value.mic.y<0||value.mic.right>size[0]+1))problems.push('mic-outside-screen');if(value.captions?.height<70)problems.push('caption-area-too-short');}
+ if(name==='face'&&value.tools){for(const field of [value.speaking,value.listening])if(field&&(field.y<value.tools.y-1||field.bottom>value.tools.bottom+1))problems.push('language-field-clipped');}
+ if(name==='call'&&value.qr&&value.tools&&(value.qr.y<value.tools.y-1||value.qr.bottom>value.tools.bottom+1))problems.push('qr-needs-scroll');
+ if(name==='lesson-roles'&&value.roleButton&&value.nav&&value.roleButton.bottom>value.nav.y+1)problems.push('role-button-over-navigation');
+ if(value.search&&(value.search.x<0||value.search.right>size[0]+1||value.search.bottom>size[1]+1))problems.push('search-outside-screen');
+ if(value.dialog&&(value.dialog.y<0||value.dialog.bottom>size[1]+1))problems.push('dialog-outside-screen');
+ results.push({name,size,guides,...value,problems});if([280,568,1024].includes(size[0]))await page.screenshot({path:path.join(out,`${size.join('x')}-${guides}-${name}.png`)});
+}
+try{
+ const sizes=process.env.VIEWPORTS?JSON.parse(process.env.VIEWPORTS):process.env.QUICK?[[844,390]]:[[280,653],[320,568],[360,640],[390,844],[568,320],[667,375],[844,390],[900,600],[1024,600],[1280,720],[1440,900]];
+ for(const size of sizes){for(const guides of ['on','off']){
+  const context=await browser.newContext({viewport:{width:size[0],height:size[1]}});await setup(context);await context.addInitScript(value=>localStorage.setItem('tsuyaku-english-guides-v1',value),guides);
+  const page=await context.newPage();page.on('pageerror',e=>errors.push({size,guides,message:e.message}));page.setDefaultTimeout(8000);await page.goto(origin,{waitUntil:'commit',timeout:8000});await page.locator('#microphone:not([disabled])').waitFor();await page.evaluate(()=>document.fonts.ready);
+  if(await page.locator('#english-guides-toggle').count()!==1)throw Error('Duplicate English toggle');await page.evaluate(async()=>{const a=await import('/web/ui-english.js?v=duplicate-initialization-check');a.refreshEnglishGuides();await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});if(await page.locator('#english-guides-toggle').count()!==1)throw Error('Repeated guide initialization');await geometry(page,'face',size,guides);await page.screenshot({path:path.join(out,`${size.join('x')}-${guides}-face.png`)});
+  await page.locator('#language-options').click();await page.locator('dialog[open]').waitFor();if(!await page.locator('#modal-close').evaluate(n=>n===document.activeElement))throw Error('Modal focus missing');await geometry(page,'language-dialog',size,guides);await page.locator('#modal-close').click();
+  await page.locator('#tab-interpreter').click();await page.locator('#call-invite-link').waitFor();await page.locator('#call-invite canvas[role=img]').waitFor();await geometry(page,'call',size,guides);await page.screenshot({path:path.join(out,`${size.join('x')}-${guides}-call.png`)});
+  await page.locator('#tab-lesson').click();await page.locator('#lesson-role-picker:not([hidden])').waitFor();await geometry(page,'lesson-roles',size,guides);await page.locator('#lesson-role-student').click();await page.locator('#join-lesson').click();await geometry(page,'lesson-student',size,guides);if(!await page.locator('#join-status').textContent())throw Error('No room-ID guidance');
+  await page.locator('#lesson-role-back').click();await page.locator('#lesson-role-teacher').click();await page.locator('#leave:not([hidden])').waitFor();await geometry(page,'lesson-teacher',size,guides);await page.locator('#tab-words').click();await page.locator('#dictionary-search-toggle').click();await page.locator('#phrase-search').fill('持ち物');await page.locator('#phrase-search').press('Escape');await page.locator('#dictionary-search-toggle').click();await page.locator('#phrase-search').waitFor();await page.waitForTimeout(300);await geometry(page,'dictionary-search',size,guides);await page.screenshot({path:path.join(out,`${size.join('x')}-${guides}-dictionary.png`)});
+  await page.locator('#phrase-search').press('Escape');await page.locator('#photo-translate-open').click();await geometry(page,'photo-dialog',size,guides);await page.locator('#modal-close').click();await page.locator('#admin').click();await page.locator('input[type=password]').fill('1111');await page.locator('#modal-body button[type=submit]').click();await page.locator('.admin-panel').waitFor();await geometry(page,'admin-overview',size,guides);await page.locator('.admin-tabs button').filter({hasText:'分析'}).click();await page.locator('#modal-body button').filter({hasText:'分析を作る'}).click();const exported=await page.locator('.admin-tab-panel:not([hidden]) textarea').inputValue();const report=JSON.parse(exported);if(!report.captionDelivery||JSON.stringify(report).includes('synthetic-test-token'))throw Error('Invalid or sensitive delivery export');await page.locator('.admin-panel>button').filter({hasText:'管理者表示を閉じて認証解除'}).click();await context.close();
+ }}
+}finally{await browser.close();await fs.writeFile(path.join(out,'results.json'),JSON.stringify({note:'Synthetic authentication and room transport; real DOM/CSS/browser. No microphone, AI calls or physical devices tested.',results,errors},null,2));if(errors.length||results.some(r=>r.problems.length))process.exitCode=1;console.log(JSON.stringify({checks:results.length,problems:results.filter(r=>r.problems.length).map(r=>({name:r.name,size:r.size,guides:r.guides,problems:r.problems})),errors}));}

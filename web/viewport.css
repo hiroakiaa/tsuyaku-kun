@@ -53,6 +53,26 @@ body.phone-home input[aria-invalid="true"]{border-color:#e3aaa4!important;}
  body.phone-home .caption{padding:12px;margin-bottom:10px;}
 }
 
+/* On very short landscape screens, both language fields must fit without scrolling. */
+@media(min-width:480px) and (max-height:420px){
+ html[data-english-guides="on"] body.phone-home{--nav-space:76px;}
+ body.phone-home .app-shell>header{padding-block:0;}
+ body.phone-home #live:not([hidden]),body.phone-home.mode-active #live:not([hidden]),body.phone-home.mode-active[data-active-mode="interpreter"] #live:not([hidden]){grid-template-columns:minmax(240px,40%) minmax(0,1fr);gap:8px;}
+ body.phone-home .face-controls{grid-template-columns:minmax(0,1fr) 44px minmax(0,1fr)!important;gap:5px!important;align-items:end;}
+ body.phone-home .face-controls #switch-speaker{flex-direction:column;width:44px!important;min-width:44px!important;max-width:44px!important;height:48px!important;min-height:48px!important;gap:1px;}
+ body.phone-home .face-controls #switch-speaker>i{transform:none;}
+ body.phone-home .face-controls :is(#face-language,#face-listening-language){height:44px!important;min-height:44px!important;padding-inline:6px 20px!important;}
+ body.phone-home[data-active-mode="interpreter"] #live:has(#call-invite:not([hidden])):has(#empty-caption){grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;}
+ body.phone-home[data-active-mode="interpreter"] #live:has(#call-invite:not([hidden])):has(#empty-caption)>.caption-stage{display:none;}
+ body.phone-home[data-active-mode="interpreter"] #live:has(#call-invite:not([hidden])):has(#empty-caption)>.live-tools{grid-column:1;grid-row:1;}
+ body.phone-home[data-active-mode="interpreter"] #live:has(#call-invite:not([hidden])):has(#empty-caption)>.live-actions{grid-column:1;grid-row:2;}
+ body.phone-home #call-invite:not([hidden]){grid-template-columns:minmax(0,1fr) minmax(0,.85fr) minmax(0,1fr) 96px;grid-template-rows:auto;align-items:center;padding:8px;}
+ body.phone-home #call-invite>label{grid-column:1;grid-row:1;}
+ body.phone-home #call-invite>.secondary{grid-column:2;grid-row:1;min-width:0;}
+ body.phone-home #call-invite>.invite-link-area{grid-column:3;grid-row:1;}
+ body.phone-home #call-invite>.qr{grid-column:4;grid-row:1;width:96px;height:96px;}
+}
+
 /* Preserve usable controls at 280–359px, without forcing a wider document. */
 @media(max-width:359px){
  body.phone-home .app-shell>header{column-gap:4px;}
