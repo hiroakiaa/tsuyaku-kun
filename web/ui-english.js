@@ -50,9 +50,9 @@ export function installEnglishGuides({doc=document,storage=localStorage,Observer
  const controllerKey=Symbol.for('tsuyaku.ui-english.controller');if(doc[controllerKey])return doc[controllerKey];
  let enabled=guidesEnabled(storage),scheduled=false;
  const pending=new Set(),root=doc.documentElement;
- const button=doc.createElement('button');button.id='english-guides-toggle';button.type='button';button.textContent='EN';button.setAttribute('data-ui-ignore','');
- button.setAttribute('aria-label','英語ガイド / English guides');
- const setEnabled=value=>{enabled=!!value;root.dataset.englishGuides=enabled?'on':'off';button.setAttribute('aria-pressed',String(enabled));button.title=enabled?'英語ガイドを隠す / Hide English guides':'英語ガイドを表示 / Show English guides';};
+ const button=doc.createElement('button');button.id='english-guides-toggle';button.type='button';button.textContent='英語\nルビ';button.setAttribute('data-ui-ignore','');
+ button.setAttribute('aria-label','英語ルビ / English guides');
+ const setEnabled=value=>{enabled=!!value;root.dataset.englishGuides=enabled?'on':'off';button.setAttribute('aria-pressed',String(enabled));button.title=enabled?'英語ルビを隠す / Hide English guides':'英語ルビを表示 / Show English guides';};
  doc.querySelector('.header-tools').insertBefore(button,doc.querySelector('#language-options'));setEnabled(enabled);
  function annotateText(node){
   const parent=node.parentElement;if(!parent||parent.closest(skip)||!/[ぁ-んァ-ヶ一-龠]/.test(node.data))return;
