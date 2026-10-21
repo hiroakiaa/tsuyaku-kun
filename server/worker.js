@@ -8,7 +8,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261021-text-chat-1';
+const BUILD_ID='20261021-lesson-text-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -218,11 +218,8 @@ export class TranslationRoom {
         if(!Array.isArray(data.ids)||data.ids.length>12)return;
         for(const id of new Set(data.ids)){if(typeof id!=='string'||!id.startsWith(a.id+'_')||id.length>140)continue;const saved=await this.ctx.storage.get('caption:'+id);if(!saved)continue;this.send(ws,{type:'caption_accepted',id,revision:saved.revision||0});if(['ready','failed'].includes(saved.status))this.broadcast({type:'translation',...saved});else this.send(ws,{type:'caption_pending',...saved});}return;
       }
-      if(data.type==='signal'){if(room.mode!=='lesson')return;
-        const other=this.participants().find(p=>p.a.id===data.to);if(!other)return;
-        if(room.mode==='lesson'&&a.role!=='teacher'&&data.signal?.description?.type==='offer')throw Error('先生から接続します。');
-        this.send(other.ws,{type:'signal',from:a.id,signal:data.signal});return;
-      }
+      // Ignore audio signaling from older clients: every room delivers text only.
+      if(data.type==='signal')return;
       if(data.type==='end'){
         if(a.role!=='teacher')throw Error('先生だけが終了できます。');await this.ctx.storage.put('room',{...room,ended:true});await this.scheduleAlarm(room);this.broadcast({type:'ended'});return;
       }
