@@ -1,7 +1,7 @@
 import {costOf,PRICES} from './usage.js?v=20261011-continuity-words-1';
 export function budgetEstimates(rows,status){
  const out=[];
- for(const [mode,label] of [['face','通訳'],['interpreter','通話'],['lesson','授業']]){
+ for(const [mode,label] of [['face','通訳'],['interpreter','チャット'],['lesson','授業']]){
   const samples=rows.filter(s=>s.mode===mode&&s.attemptCount>0&&!s.unmeasuredCalls&&!s.estimatedTokenCalls&&s.inputTokens>0&&!(s.whisperSeconds>0)).sort((a,b)=>b.startedAt-a.startedAt).slice(0,20);
   const attempts=samples.reduce((n,s)=>n+s.attemptCount,0),cost=samples.reduce((n,s)=>n+costOf(s,s.priceSnapshot||PRICES).translation,0);
   if(!attempts||!(cost>0)){out.push({mode,label,samples:0});continue;}
