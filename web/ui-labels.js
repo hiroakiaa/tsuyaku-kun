@@ -1,5 +1,6 @@
 // UI English guides. Source: ui_translations + ruby_dictionary; short UI overrides reviewed in code.
 export const uiLabels = {
+  "参加を待っています": "Waiting to join",
   "参加中": "Joined",
   "話した内容を翻訳テキストで送ります": "Send translated messages from your speech",
   "チャットは話した内容を翻訳テキストで送ります。元の音声は配信せず、訳文の再生ボタンで聞けます。ここでは入力音量だけをこの端末で確認します。認識・翻訳・録音保存はしません。30秒で停止します。": "Chat sends translated text from your speech, not a live audio call. Press Play to hear a translation. This check only measures your microphone level, without transcription, translation or recording. It stops after 30 seconds.",
