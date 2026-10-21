@@ -25,13 +25,18 @@ export function installConversationUI({getState}){
  const make=(tag,text,cls)=>{const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n;};
  const badge=make('span',null,'header-role');badge.hidden=true;$('.app-shell>header').insertBefore(badge,$('.header-tools'));
  const latest=make('button','最新へ ↓','captions-latest');latest.type='button';latest.hidden=true;captions.parentElement.append(latest);
- let unread=false,scheduled=false,scrollFrame;const seenCaptions=new WeakMap();for(const card of captions.querySelectorAll('.caption'))seenCaptions.set(card,JSON.stringify([...card.querySelectorAll('.caption-line>p')].map(n=>n.textContent)));
+ let unread=false,scheduled=false,scrollFrame,following=true;const seenCaptions=new WeakMap();for(const card of captions.querySelectorAll('.caption'))seenCaptions.set(card,JSON.stringify([...card.querySelectorAll('.caption-line>p')].map(n=>n.textContent)));
  const nearBottom=()=>captions.scrollHeight-captions.scrollTop-captions.clientHeight<100;
  const text=(n,v)=>{if(n.textContent!==v)n.textContent=v;};
- const refresh=()=>{scheduled=false;const p=conversationPresentation(getState());badge.hidden=!p.role;text(badge,p.role);const cards=[...captions.querySelectorAll('.caption')];cards.forEach((n,i)=>n.classList.toggle('caption-latest',i===cards.length-1));if(nearBottom())unread=false;latest.hidden=!cards.length||nearBottom();text(latest,unread?'新しい字幕 · 最新へ ↓':'最新へ ↓');};
+ const refresh=()=>{scheduled=false;const p=conversationPresentation(getState());badge.hidden=!p.role;text(badge,p.role);const cards=[...captions.querySelectorAll('.caption')];cards.forEach((n,i)=>n.classList.toggle('caption-latest',i===cards.length-1));if(!cards.length)following=true;if(nearBottom())unread=false;latest.hidden=!cards.length||nearBottom()||getState().mode==='lesson'&&getState().role!=='teacher'&&following;text(latest,unread?'新しい字幕 · 最新へ ↓':'最新へ ↓');};
  const schedule=()=>{if(!scheduled){scheduled=true;queueMicrotask(refresh);}};
- latest.onclick=()=>{unread=false;captions.scrollTo({top:captions.scrollHeight,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});schedule();};
- captions.addEventListener('scroll',schedule,{passive:true});
+ const followLatest=({primary=false}={})=>{following=true;unread=false;cancelAnimationFrame(scrollFrame);scrollFrame=requestAnimationFrame(()=>{scrollFrame=requestAnimationFrame(()=>{const state=getState();if(state.mode!=='interpreter'&&!(primary&&state.mode==='lesson'&&state.role!=='teacher'))return;unread=false;const card=captions.querySelector('.caption:last-child'),line=card?.querySelector('.caption-line-primary');let top=captions.scrollHeight;if(primary&&card){const containerRect=captions.getBoundingClientRect(),anchor=card.getBoundingClientRect().height<=captions.clientHeight-24?card:line||card;top=Math.max(0,captions.scrollTop+anchor.getBoundingClientRect().top-containerRect.top-12);}captions.scrollTo({top,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});schedule();});});};
+ latest.onclick=()=>{following=true;const state=getState();if(state.mode==='lesson'&&state.role!=='teacher'){followLatest({primary:true});return;}unread=false;captions.scrollTo({top:captions.scrollHeight,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});schedule();};
+ captions.addEventListener('scroll',()=>{if(nearBottom())following=true;schedule();},{passive:true});
+ const readingEarlier=()=>{following=false;cancelAnimationFrame(scrollFrame);schedule();};
+ captions.addEventListener('wheel',readingEarlier,{passive:true});captions.addEventListener('touchmove',readingEarlier,{passive:true});
+ captions.addEventListener('pointerdown',event=>{if(event.target===captions)readingEarlier();},{passive:true});
+ captions.addEventListener('keydown',event=>{if(['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(event.key)&&!event.target.closest('button,input,select,textarea'))readingEarlier();});
  new ResizeObserver(schedule).observe(captions);
  new MutationObserver(records=>{if(captionContentChanged(records,seenCaptions)&&!nearBottom())unread=true;schedule();}).observe(captions,{childList:true,characterData:true,subtree:true});
  new MutationObserver(schedule).observe($('#connection'),{childList:true,subtree:true});
@@ -40,5 +45,5 @@ export function installConversationUI({getState}){
  new MutationObserver(schedule).observe($('#lesson-role-student'),{attributes:true,attributeFilter:['aria-pressed']});
  new MutationObserver(schedule).observe($('#participants'),{childList:true,subtree:true});
  document.addEventListener('visibilitychange',schedule);schedule();
- return {refresh:schedule,followLatest(){unread=false;cancelAnimationFrame(scrollFrame);scrollFrame=requestAnimationFrame(()=>{scrollFrame=requestAnimationFrame(()=>{if(getState().mode!=='interpreter')return;unread=false;captions.scrollTo({top:captions.scrollHeight,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});schedule();});});},syncDisplay(){for(const card of captions.querySelectorAll('.caption'))seenCaptions.set(card,JSON.stringify([...card.querySelectorAll('.caption-line>p')].map(n=>n.textContent)));schedule();}};
+ return {refresh:schedule,followLatest,shouldFollow:()=>following,syncDisplay(){for(const card of captions.querySelectorAll('.caption'))seenCaptions.set(card,JSON.stringify([...card.querySelectorAll('.caption-line>p')].map(n=>n.textContent)));schedule();}};
 }
