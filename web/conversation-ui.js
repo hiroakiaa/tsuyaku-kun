@@ -5,8 +5,7 @@ export function conversationPresentation(s){
  if(s.translating)costs.push('翻訳処理中：AI利用の可能性');
  if(s.mic&&s.recognitionKind==='server')costs.push('サーバー音声認識：従量課金対象');
  if(s.mic&&s.recognitionKind==='browser')costs.push('ブラウザー音声認識：アプリの認識API費用なし');
- if(s.relay)costs.push('音声接続中：TURN経由の場合は通信費');
- return {microphone,connection:s.local?'この端末で利用中':s.connection||'準備中',cost:costs.join(' ／ ')||'処理待機中',role:s.role==='teacher'?'先生':s.role==='student'?'生徒':'',canStop:!!(s.mode&&(s.mic||s.preparing||s.translating||s.relay))};
+ return {microphone,connection:s.local?'この端末で利用中':s.connection||'準備中',cost:costs.join(' ／ ')||'処理待機中',role:s.role==='teacher'?'先生':s.role==='student'?'生徒':'',canStop:!!(s.mode&&(s.mic||s.preparing||s.translating))};
 }
 
 export function captionContentChanged(records,seen){
