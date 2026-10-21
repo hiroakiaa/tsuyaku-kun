@@ -1,5 +1,5 @@
 import {singleFlight} from './async-ui.js?v=20261021-loading-1';
-import {lessonCode,installModalFeedback,backdropClick,updateMode,searchBounds} from './entry-feedback.js?v=20261021-loading-1';
+import {lessonCode,installModalFeedback,backdropClick,updateMode,searchBounds,resilientPreferences} from './entry-feedback.js?v=20261022-language-storage-1';
 import {deviceCheckPanel,microphoneUnavailable} from './device-check.js?v=20261021-text-chat-1';
 import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261020-delivery-1';
 import {installPhotoTranslate} from './photo-translate.js?v=20261021-loading-1';
@@ -15,7 +15,7 @@ import {ReviewedStore} from './reviewed-store.js';
 import {PersonalPhrases} from './personal-phrases.js?v=20261007-learning-1';
 import {recognitionHints} from './recognition-hints.js?v=20261007-progressive-1';
 import {acquireMicrophone} from './microphone.js?v=20261006-mic-1';
-import {UsageLedger,WordUsage} from './usage.js?v=20261021-lesson-reading-1';
+import {UsageLedger,WordUsage} from './usage.js?v=20261022-language-storage-1';
 import {CloudSpeechPlayer,createSpeechCache} from './cloud-speech-player.js?v=20261020-safari-speech-2';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-progressive-1';
 import {installAdmin} from './admin.js?v=20261021-invite-compact-1';
@@ -58,11 +58,12 @@ function updateLiveActions(){
 let modalPointerOutside=false;$('#modal').onpointerdown=e=>{modalPointerOutside=backdropClick(e,$('#modal'));};$('#modal-close').onclick=()=>$('#modal').close();$('#modal').onclick=e=>{if(modalPointerOutside&&backdropClick(e,$('#modal')))$('#modal').close();modalPointerOutside=false;};
 function label(text,input){const n=el('label',text);n.append(input);return n;}
 function options(select,selected){select.replaceChildren(...catalog.languages.map(l=>{const o=el('option',l.labelNative&&l.labelNative!==l.labelJa?l.labelJa+' / '+l.labelNative:l.labelJa);o.value=l.code;return o;}));select.value=selected;}
+const languagePreferences=resilientPreferences(()=>localStorage);
 const sharedLanguageIds=['face-other-language','lesson-language'];
-function sharedLanguage(){const value=localStorage.getItem('tsuyaku-display-language')||localStorage.getItem('view-language')||localStorage.getItem('face-other-language')||'pt';return catalog.languages.some(l=>l.code===value)?value:'pt';}
-function speakingLanguage(){const value=localStorage.getItem('tsuyaku-speaking-language')||localStorage.getItem('face-self-language')||'ja';return catalog.languages.some(l=>l.code===value)?value:'ja';}
-function setSpeakingLanguage(value){if(!catalog.languages.some(l=>l.code===value))return;localStorage.setItem('tsuyaku-speaking-language',value);for(const id of ['face-self-language','source-language']){$('#'+id).value=value;localStorage.setItem(id,value);}if(room?.mode==='interpreter'){renderParticipants();send({type:'language',language:value});for(const record of [...records.values()])renderCaption(record);if(mic)startRecognition();}}
-function setSharedLanguage(value,notify=true){if(!catalog.languages.some(l=>l.code===value))return;localStorage.setItem('tsuyaku-display-language',value);for(const id of sharedLanguageIds){$('#'+id).value=value;localStorage.setItem(id,value);}renderReferences();if(room?.mode==='lesson'&&role!=='teacher'){if(notify&&selfId)send({type:'participant_language',to:selfId,language:value});for(const record of [...records.values()])renderCaption(record);}}
+function sharedLanguage(){const value=languagePreferences.getItem('tsuyaku-display-language')||languagePreferences.getItem('view-language')||languagePreferences.getItem('face-other-language')||'pt';return catalog.languages.some(l=>l.code===value)?value:'pt';}
+function speakingLanguage(){const value=languagePreferences.getItem('tsuyaku-speaking-language')||languagePreferences.getItem('face-self-language')||'ja';return catalog.languages.some(l=>l.code===value)?value:'ja';}
+function setSpeakingLanguage(value){if(!catalog.languages.some(l=>l.code===value))return;languagePreferences.setItem('tsuyaku-speaking-language',value);for(const id of ['face-self-language','source-language']){$('#'+id).value=value;languagePreferences.setItem(id,value);}if(room?.mode==='interpreter'){renderParticipants();send({type:'language',language:value});for(const record of [...records.values()])renderCaption(record);if(mic)startRecognition();}}
+function setSharedLanguage(value,notify=true){if(!catalog.languages.some(l=>l.code===value))return;languagePreferences.setItem('tsuyaku-display-language',value);for(const id of sharedLanguageIds){$('#'+id).value=value;languagePreferences.setItem(id,value);}renderReferences();if(room?.mode==='lesson'&&role!=='teacher'){if(notify&&selfId)send({type:'participant_language',to:selfId,language:value});for(const record of [...records.values()])renderCaption(record);}}
 let chatEnglishOverride;
 function chatEnglishVisible(){if(chatEnglishOverride!==undefined)return chatEnglishOverride;try{return localStorage.getItem('tsuyaku-chat-english-v1')!=='off';}catch{return true;}}
 function setChatEnglish(visible,id){chatEnglishOverride=visible;try{localStorage.setItem('tsuyaku-chat-english-v1',visible?'on':'off');}catch{}const captions=$('#captions'),scroll=captions.scrollTop;speechPlayer.stop();for(const r of [...records.values()])renderCaption(r);conversationUI?.syncDisplay();captions.scrollTop=scroll;elements.get(id)?.querySelector('.chat-english-option input')?.focus({preventScroll:true});}
