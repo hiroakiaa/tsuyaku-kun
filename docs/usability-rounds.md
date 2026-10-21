@@ -135,3 +135,15 @@ Each received non-English-language bubble has a small 英語訳 checkbox. It con
 Paired browser tests verify both viewer-relative message positions, one incoming bubble containing both languages, local-only visibility changes, focus retention, English-only deduplication, and no false unread marker after changing display. The existing synthetic recognition, sending, optional playback and zero-RTC/TURN checks remain in place. These checks do not claim physical-device speech accuracy. No backend translation model, quota or API provider is changed.
 
 Final validation passed: full unit suite, paired-viewer chat checks at three sizes (including read-state setup before testing display-only mutations), 63 existing interaction checks, and 198 viewport checks. Portrait and landscape screenshots were inspected. The English preference is display-only and does not alter server translation targets or quotas.
+
+## Chat playback labels, direct language choice and following messages — 20261021-chat-controls-1
+
+The chat language name now sits beneath its own playback button, while message text uses the remaining column. Existing native/cloud playback, stop controls and paragraph language metadata remain attached to the same message. Other modes keep their existing label layout.
+
+The self identity card contains a native select covering the card, with a visible chevron and keyboard-focus outline. Changing it uses the same speaking-language setter as the header and invitation controls; it updates persistence, room language signaling, recognition when active and existing caption display. The partner card stays read-only. Focus returns to the replacement self-language select after rerender.
+
+New chat text, message status transitions and revised speech schedule a coalesced scroll after two animation frames so the translated layout can settle. Chat uses smooth scrolling (automatic movement when reduced motion is requested), and a mode guard prevents a queued callback from affecting a different mode. Delivery acknowledgements, playback labels, language-choice rerenders and English visibility changes do not trigger a new follow action. Other modes retain their previous near-bottom behavior.
+
+Paired-page tests at 390×844, 568×320 and 1024×600 verify native-card language changes and focus, label geometry beneath Play, and sender/receiver scroll completion after building a scrollable history and deliberately returning to old messages. A scrollTo spy verifies smooth behavior. Synthetic recognition, translation transport and playback are fixtures; this is not physical Safari/Android confirmation. No server, model, quota or API provider change.
+
+Final release validation: full unit suite, three paired-page chat scenarios with scroll spies, 63 existing interaction checks and all 198 viewport checks passed. The 390×844 and 568×320 screenshots were visually inspected. Public verification compares the changed app, CSS, conversation UI and guide-label files with tested sources.

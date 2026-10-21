@@ -26,7 +26,7 @@ export function installConversationUI({getState}){
  const make=(tag,text,cls)=>{const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n;};
  const badge=make('span',null,'header-role');badge.hidden=true;$('.app-shell>header').insertBefore(badge,$('.header-tools'));
  const latest=make('button','最新へ ↓','captions-latest');latest.type='button';latest.hidden=true;captions.parentElement.append(latest);
- let unread=false,scheduled=false;const seenCaptions=new WeakMap();for(const card of captions.querySelectorAll('.caption'))seenCaptions.set(card,JSON.stringify([...card.querySelectorAll('.caption-line>p')].map(n=>n.textContent)));
+ let unread=false,scheduled=false,scrollFrame;const seenCaptions=new WeakMap();for(const card of captions.querySelectorAll('.caption'))seenCaptions.set(card,JSON.stringify([...card.querySelectorAll('.caption-line>p')].map(n=>n.textContent)));
  const nearBottom=()=>captions.scrollHeight-captions.scrollTop-captions.clientHeight<100;
  const text=(n,v)=>{if(n.textContent!==v)n.textContent=v;};
  const refresh=()=>{scheduled=false;const p=conversationPresentation(getState());badge.hidden=!p.role;text(badge,p.role);const cards=[...captions.querySelectorAll('.caption')];cards.forEach((n,i)=>n.classList.toggle('caption-latest',i===cards.length-1));if(nearBottom())unread=false;latest.hidden=!cards.length||nearBottom();text(latest,unread?'新しい字幕 · 最新へ ↓':'最新へ ↓');};
@@ -41,5 +41,5 @@ export function installConversationUI({getState}){
  new MutationObserver(schedule).observe($('#lesson-role-student'),{attributes:true,attributeFilter:['aria-pressed']});
  new MutationObserver(schedule).observe($('#participants'),{childList:true,subtree:true});
  document.addEventListener('visibilitychange',schedule);schedule();
- return {refresh:schedule,syncDisplay(){for(const card of captions.querySelectorAll('.caption'))seenCaptions.set(card,JSON.stringify([...card.querySelectorAll('.caption-line>p')].map(n=>n.textContent)));schedule();}};
+ return {refresh:schedule,followLatest(){unread=false;cancelAnimationFrame(scrollFrame);scrollFrame=requestAnimationFrame(()=>{scrollFrame=requestAnimationFrame(()=>{if(getState().mode!=='interpreter')return;unread=false;captions.scrollTo({top:captions.scrollHeight,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});schedule();});});},syncDisplay(){for(const card of captions.querySelectorAll('.caption'))seenCaptions.set(card,JSON.stringify([...card.querySelectorAll('.caption-line>p')].map(n=>n.textContent)));schedule();}};
 }
