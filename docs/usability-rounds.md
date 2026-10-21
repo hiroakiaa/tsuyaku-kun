@@ -147,3 +147,11 @@ New chat text, message status transitions and revised speech schedule a coalesce
 Paired-page tests at 390×844, 568×320 and 1024×600 verify native-card language changes and focus, label geometry beneath Play, and sender/receiver scroll completion after building a scrollable history and deliberately returning to old messages. A scrollTo spy verifies smooth behavior. Synthetic recognition, translation transport and playback are fixtures; this is not physical Safari/Android confirmation. No server, model, quota or API provider change.
 
 Final release validation: full unit suite, three paired-page chat scenarios with scroll spies, 63 existing interaction checks and all 198 viewport checks passed. The 390×844 and 568×320 screenshots were visually inspected. Public verification compares the changed app, CSS, conversation UI and guide-label files with tested sources.
+
+## Compact invitation — 20261021-invite-compact-1
+
+Removed the duplicate speaking-language select from both the chat invitation and its preparing state. The self-language card remains the direct native language chooser; the shared header settings stay synchronized with it. The invitation now contains the link/copy action, QR and a compact supplemental microphone-check button. Normal phone layouts put the small check button below the link; very short landscape layouts use link/check/QR columns so the full 96px QR stays visible. The check button remains readable with English guides enabled.
+
+A targeted rendering check reproduced QR clipping at 568×320 when the compact button was placed on a second row. Moving the check button into its own landscape column fixed it; the 390×844 and 568×320 screens were visually inspected. Existing language-control regression now checks the self card and explicitly rejects a duplicate invitation select. No microphone permission, speech recognition, room transport or quota behavior is changed.
+
+Final validation: full unit suite, 63 interaction scenarios and 198 viewport checks passed without browser exceptions or geometry failures. Targeted follow-up also passed at 390×844 and 568×320 after the landscape QR correction.

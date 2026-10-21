@@ -954,3 +954,11 @@ body.phone-home #chat-self-language{position:absolute;inset:0;width:100%;height:
 body.phone-home .chat-person[data-chat-side="self"]>.fa-chevron-down{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:10px;color:#aaaab5;}
 body.phone-home .chat-person[data-chat-side="self"]:focus-within{outline:2px solid #d2d2dc;outline-offset:2px;}
 body.phone-home .chat-person[data-chat-side="self"]:hover{border-color:#81818e;}
+/* Invitation: one language selector lives on the self card, leaving just the link and QR here. */
+body.phone-home #call-invite:not([hidden]){display:grid;grid-template-columns:minmax(0,1fr) 96px;grid-template-rows:auto auto;align-items:center;gap:6px 12px;padding:12px;}
+body.phone-home #call-invite>.invite-link-area{grid-column:1;grid-row:1;}
+body.phone-home #call-invite>.qr{grid-column:2;grid-row:1 / span 2;width:96px;height:96px;margin:0;justify-self:end;}
+body.phone-home #call-invite>.invite-check{grid-column:1;grid-row:2;justify-self:start;width:auto!important;max-width:100%;min-height:36px;height:auto;margin:0;padding:6px 10px!important;font-size:12px;line-height:1.25;border-radius:10px;}
+body.phone-home #call-invite>.invite-check .ui-en{font-size:10px;}
+body.phone-home #call-invite>.invite-preparing{grid-column:1 / -1;grid-row:1 / span 2;min-height:88px;}
+@media(max-width:359px){body.phone-home #call-invite:not([hidden]){grid-template-columns:minmax(0,1fr) 84px;gap:6px 8px;padding:10px;}body.phone-home #call-invite>.qr{width:84px;height:84px;}}

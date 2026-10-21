@@ -68,11 +68,11 @@ body.phone-home input[aria-invalid="true"]{border-color:#e3aaa4!important;}
  body.phone-home[data-active-mode="interpreter"] #live:has(#call-invite:not([hidden])):has(#empty-caption)>.caption-stage{display:none;}
  body.phone-home[data-active-mode="interpreter"] #live:has(#call-invite:not([hidden])):has(#empty-caption)>.live-tools{grid-column:1;grid-row:1;}
  body.phone-home[data-active-mode="interpreter"] #live:has(#call-invite:not([hidden])):has(#empty-caption)>.live-actions{grid-column:1;grid-row:2;}
- body.phone-home #call-invite:not([hidden]){grid-template-columns:minmax(0,1fr) minmax(0,.85fr) minmax(0,1fr) 96px;grid-template-rows:auto;align-items:center;padding:8px;}
- body.phone-home #call-invite>label{grid-column:1;grid-row:1;}
- body.phone-home #call-invite>.secondary{grid-column:2;grid-row:1;min-width:0;}
- body.phone-home #call-invite>.invite-link-area{grid-column:3;grid-row:1;}
- body.phone-home #call-invite>.qr{grid-column:4;grid-row:1;width:96px;height:96px;}
+ body.phone-home #call-invite:not([hidden]){grid-template-columns:minmax(0,1fr) auto 96px;grid-template-rows:auto;align-items:center;padding:8px;}
+ body.phone-home #call-invite>.invite-preparing{grid-column:1 / -1;grid-row:1 / span 2;}
+ body.phone-home #call-invite>.invite-check{grid-column:2;grid-row:1;min-width:0;}
+ body.phone-home #call-invite>.invite-link-area{grid-column:1;grid-row:1;}
+ body.phone-home #call-invite>.qr{grid-column:3;grid-row:1;width:96px;height:96px;}
 }
 
 /* Preserve usable controls at 280–359px, without forcing a wider document. */
