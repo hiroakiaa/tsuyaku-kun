@@ -34,3 +34,9 @@ export function installModalFeedback({dialog,message,close,resolveFocus=target=>
  });
  return trigger=>{epoch++;returnTo=trigger;dialog.append(message);close.focus({preventScroll:true});};
 }
+
+// A full or unavailable preference store must not interrupt language selection.
+export function resilientPreferences(readStorage){
+ const fallback=new Map();
+ return {getItem(key){if(fallback.has(key))return fallback.get(key);try{return readStorage()?.getItem(key)??null;}catch{return null;}},setItem(key,value){value=String(value);try{const storage=readStorage();if(!storage)throw Error('Unavailable storage');storage.setItem(key,value);fallback.delete(key);}catch{fallback.set(key,value);}}};
+}
