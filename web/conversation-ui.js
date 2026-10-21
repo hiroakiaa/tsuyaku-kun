@@ -41,5 +41,5 @@ export function installConversationUI({getState}){
  new MutationObserver(schedule).observe($('#lesson-role-student'),{attributes:true,attributeFilter:['aria-pressed']});
  new MutationObserver(schedule).observe($('#participants'),{childList:true,subtree:true});
  document.addEventListener('visibilitychange',schedule);schedule();
- return {refresh:schedule};
+ return {refresh:schedule,syncDisplay(){for(const card of captions.querySelectorAll('.caption'))seenCaptions.set(card,JSON.stringify([...card.querySelectorAll('.caption-line>p')].map(n=>n.textContent)));schedule();}};
 }
