@@ -86,3 +86,13 @@ body.phone-home input[aria-invalid="true"]{border-color:#e3aaa4!important;}
  body.phone-home .reference-list button.reference-card{grid-template-columns:minmax(0,1fr) minmax(48px,28%);gap:8px;}
 }
 @media(prefers-reduced-motion:reduce){body.phone-home .reference-categories,body.phone-home .admin-tabs{scroll-behavior:auto;}}
+
+/* Students need their language and captions, not the teacher's full class roster. */
+body.phone-home[data-active-mode="lesson"] #live:has(#microphone[hidden]):has(#leave[hidden])>.live-actions{display:none!important;}
+body.phone-home[data-active-mode="lesson"] #live:has(#microphone[hidden]) #lesson-language-entry small{display:none;}
+body.phone-home[data-active-mode="lesson"] #live:has(#microphone[hidden]) #lesson-language-entry{margin-block:0;}
+body.phone-home[data-active-mode="lesson"] #live:has(#microphone[hidden]) #lesson-toolbar{gap:8px;margin-bottom:0;}
+body.phone-home[data-active-mode="lesson"] #live:has(#microphone[hidden]) #lesson-language-entry select{min-height:44px;padding-block:8px;}
+@media(max-height:620px){body.phone-home #participants.lesson-participants{max-height:120px;}}
+
+body.phone-home .lesson-waiting{display:block;color:var(--muted,#aaaab5);font-size:13px;line-height:1.5;padding:4px 0;}
