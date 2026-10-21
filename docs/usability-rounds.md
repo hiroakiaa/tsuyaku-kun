@@ -155,3 +155,11 @@ Removed the duplicate speaking-language select from both the chat invitation and
 A targeted rendering check reproduced QR clipping at 568×320 when the compact button was placed on a second row. Moving the check button into its own landscape column fixed it; the 390×844 and 568×320 screens were visually inspected. Existing language-control regression now checks the self card and explicitly rejects a duplicate invitation select. No microphone permission, speech recognition, room transport or quota behavior is changed.
 
 Final validation: full unit suite, 63 interaction scenarios and 198 viewport checks passed without browser exceptions or geometry failures. Targeted follow-up also passed at 390×844 and 568×320 after the landscape QR correction.
+
+## Text-only lessons — 20261021-lesson-text-1
+
+Removed browser peer connections, STUN/TURN credential requests, remote audio elements/playback, signaling, ICE restarts and periodic RTC sampling from conversation startup, microphone activation and cleanup. The teacher microphone remains an input to speech recognition; per-caption TTS remains available. The room server ignores obsolete audio signaling in every mode. Historical cost/RTC fields are retained for older analysis records. Lesson roster now describes text distribution and display language, without audio readiness messages.
+
+Fixed the prepared-auth helper to use the student's selected display language, while teachers use Japanese. Live lesson targets already collect every participant's language/view language and are deduplicated. New regression tests cover Spanish, German and Filipino recipients, a mid-lesson switch to Portuguese, legacy signaling rejection and prepared-auth language selection.
+
+The browser lesson check uses four isolated contexts at 390×844, 568×320 and 1024×600. It runs the real frontend plus TranslationRoom logic with synthetic authentication, recognition, AI output and WebSocket bridging; verifies teacher speech captions, each selected translation, student microphone absence, language changes, no peer creation, no TURN requests and no outgoing signaling. This does not claim physical iOS/Android microphone verification or translation-quality evaluation. Existing unit, 63 interaction and 198 viewport checks, plus three paired-page chat regressions, pass.
