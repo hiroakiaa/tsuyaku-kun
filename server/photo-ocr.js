@@ -1,10 +1,11 @@
+import {PHOTO_POLICY} from '../web/cost-policy.js';
 // Counts only: images and extracted text are never persisted here.
-export const PHOTO_MONTH_LIMIT=900,PHOTO_USER_LIMIT=100;
+export const PHOTO_MONTH_LIMIT=PHOTO_POLICY.monthRequests,PHOTO_USER_LIMIT=PHOTO_POLICY.userRequests;
 const problem=(message,status=400)=>Object.assign(Error(message),{status});
 export async function photoBudget(storage,data,now=Date.now()){
  return storage.transaction(async tx=>{
   const month=new Date(now).toISOString().slice(0,7),reset=new Date(month+'-01T00:00:00Z');reset.setUTCMonth(reset.getUTCMonth()+1);
-  let state=await tx.get('photo-budget');const recent=(state?.recent||[]).filter(at=>at>now-32*86400000);
+  let state=await tx.get('photo-budget');const recent=(state?.recent||[]).filter(at=>at>now-PHOTO_POLICY.rollingDays*86400000);
   if(state?.month!==month)state={month,used:0,users:{},leases:{},receipts:{},blocked:false};state.recent=recent;
   const uid=String(data.uid||'').slice(0,64),status=()=>({month,resetsAt:reset.getTime(),limit:PHOTO_MONTH_LIMIT,used:state.used,rollingUsed:recent.length,remaining:Math.max(0,Math.min(PHOTO_MONTH_LIMIT-state.used,PHOTO_MONTH_LIMIT-recent.length)),userLimit:PHOTO_USER_LIMIT,userUsed:state.users[uid]||0,userRemaining:Math.max(0,PHOTO_USER_LIMIT-(state.users[uid]||0)),blocked:state.blocked});
   if(data.action==='status')return status();
