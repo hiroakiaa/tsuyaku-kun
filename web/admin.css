@@ -1,0 +1,39 @@
+/* Admin: a small overview; explanations remain keyboard/touch-accessible. */
+body.phone-home #modal-body .admin-panel{font-size:14px;line-height:1.6;}
+body.phone-home #modal-body .admin-tab-panel{padding:4px 0 12px!important;}
+body.phone-home #modal-body .admin-card-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;}
+body.phone-home #modal-body .admin-card-heading h3{font-size:15px;line-height:1.4;margin:0;min-width:0;}
+body.phone-home #modal-body .admin-refresh{flex:none;margin:0!important;min-height:44px;padding:6px 10px!important;background:transparent!important;border:0!important;font-size:13px;box-shadow:none!important;color:#ccc!important;}
+body.phone-home #modal-body .admin-budget{padding:4px 0 12px;margin:0;border-bottom:1px solid #343438;}
+body.phone-home #modal-body .admin-budget-remaining{font-size:clamp(28px,5vw,36px);line-height:1.3;font-variant-numeric:tabular-nums;}
+body.phone-home #modal-body .admin-caption{font-size:12px;line-height:1.5;color:#aaa;margin:5px 0 8px;}
+body.phone-home #modal-body .admin-budget progress{height:5px;margin:10px 0;}
+body.phone-home #modal-body .admin-estimates{display:grid;gap:4px;}
+body.phone-home #modal-body .admin-metric{display:flex;justify-content:space-between;align-items:baseline;gap:8px;min-width:0;line-height:1.5;padding:3px 0;}
+body.phone-home #modal-body .admin-metric>span{color:#bbb;}
+body.phone-home #modal-body .admin-metric>strong{font-size:14px;font-weight:600;color:#eee;text-align:right;}
+body.phone-home #modal-body .admin-metric.is-current>span{color:#fff;}
+body.phone-home #modal-body .admin-alert{font-size:13px;line-height:1.5;border-left:2px solid #ddd;padding:6px 10px;margin:8px 0;color:#fff;}
+body.phone-home #modal-body .admin-monthly-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding-top:12px;}
+body.phone-home #modal-body .admin-service-budget{min-width:0;}
+body.phone-home #modal-body .admin-service-remaining{display:block;font-size:18px;line-height:1.4;font-variant-numeric:tabular-nums;}
+body.phone-home #modal-body .admin-panel .admin-detail{margin:4px 0;padding:0!important;border:0!important;border-bottom:1px solid #343438!important;background:transparent!important;}
+body.phone-home #modal-body .admin-detail>summary{min-height:44px;box-sizing:border-box;padding:10px 0;cursor:pointer;color:#bbb;font-size:13px;line-height:1.7;}
+body.phone-home #modal-body .admin-detail[open]>summary{color:#fff;}
+body.phone-home #modal-body .admin-detail>summary:focus-visible{outline:2px solid #ddd;outline-offset:-2px;}
+body.phone-home #modal-body .admin-detail>p,body.phone-home #modal-body .admin-detail>small{font-size:13px;line-height:1.7;margin:8px 0;color:#bbb;}
+body.phone-home #modal-body .admin-detail>button{margin-bottom:8px;}
+body.phone-home #modal-body .admin-panel>button:last-child{min-height:44px;margin:6px 0 0!important;padding:8px!important;background:transparent!important;border:0!important;box-shadow:none!important;font-size:13px!important;color:#aaa!important;}
+body.phone-home #modal-body .admin-summary{background:transparent!important;border:0;border-bottom:1px solid #343438;padding:8px 0;margin:0 0 10px;}
+body.phone-home #modal-body .admin-summary strong{display:block;font-size:16px;}
+body.phone-home #modal-body .admin-summary p{margin:4px 0;font-size:13px;color:#bbb;}
+@media(max-width:540px){body.phone-home #modal-body .admin-monthly-grid{grid-template-columns:minmax(0,1fr);gap:10px;}body.phone-home #modal-body .admin-metric>strong{font-size:13px;}}
+@media(max-height:420px) and (min-width:541px){body.phone-home #modal-body .admin-panel>button:last-child{margin-top:0!important;min-height:44px;}body.phone-home #modal-body .admin-monthly-grid{gap:12px;}}
+body.phone-home #modal-body .admin-panel>.admin-tabs{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px!important;overflow:visible;padding:3px!important;}
+body.phone-home #modal-body .admin-panel>.admin-tabs>button{padding:7px 2px!important;font-size:12px!important;white-space:normal!important;min-height:44px!important;line-height:1.4;}
+body.phone-home #modal-body .admin-tabs .ui-copy{min-width:0;max-width:100%;}
+body.phone-home #modal-body .admin-tabs .ui-en{overflow-wrap:anywhere;white-space:normal;}
+body.phone-home #modal-body .admin-tabs .admin-tab-en{display:block;font-size:11px;line-height:1.4;white-space:nowrap;color:#b5b5bd;font-weight:400;}
+html[data-english-guides=off] body.phone-home #modal-body .admin-tabs .admin-tab-en{display:none;}
+body.phone-home #modal-body .admin-panel>.admin-tabs>button{display:flex!important;flex-direction:column!important;align-items:center;justify-content:center;gap:2px!important;}
+body.phone-home #modal-body .admin-panel>.admin-tabs>button>span{display:block;white-space:nowrap;}
