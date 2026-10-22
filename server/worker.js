@@ -8,7 +8,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261022-group-chat-1';
+const BUILD_ID='20261022-group-chat-2';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -211,7 +211,7 @@ export class TranslationRoom {
       if(data.type==='ping'){this.send(ws,{type:'pong'});return;}
       if(a.pending){if(a.requestUntil<=Date.now()){this.send(ws,{type:'join_declined',text:'参加の確認が時間切れになりました。招待リンクから入り直してください。'});await this.webSocketClose(ws);}else this.send(ws,{type:'join_waiting',expires:a.requestUntil});return;}
       if(data.type==='chat_admit'){await this.admission(()=>this.admitChat(ws,data));return;}
-      if(data.type==='chat_name'&&room.groupChat){const name=String(data.name||'').replace(/[\p{Cc}\p{Cf}]/gu,'').trim().slice(0,20);if(!name)throw Error('表示名を入力してください。');const member=await this.ctx.storage.get('member:'+a.uid);if(!member)return;await this.ctx.storage.put('member:'+a.uid,{...member,name});ws.serializeAttachment({...a,name});this.roster();return;}
+      if(data.type==='chat_name'&&room.groupChat){const name=String(data.name||'').replace(/[\p{Cc}\p{Cf}]/gu,'').trim().slice(0,20);if(!name)throw Error('表示名を入力してください。');const member=await this.ctx.storage.get('member:'+a.uid);if(!member)return;await this.ctx.storage.put('member:'+a.uid,{...member,name});ws.serializeAttachment({...ws.deserializeAttachment(),name});this.roster();return;}
       if(data.type==='lesson_unit'&&room.mode==='lesson'){
         if(room.ended)throw Error('この授業は終了しました。');
         if(a.role!=='teacher')throw Error('授業のテーマは先生だけが変更できます。');
