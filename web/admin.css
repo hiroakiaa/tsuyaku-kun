@@ -43,3 +43,4 @@ body.phone-home #modal-body .admin-cost-table{border-collapse:collapse;width:100
 body.phone-home #modal-body .admin-cost-table th,body.phone-home #modal-body .admin-cost-table td{padding:10px 6px;text-align:left;vertical-align:top;border-bottom:1px solid #343438;overflow-wrap:anywhere;}
 body.phone-home #modal-body .admin-cost-table th{width:42%;font-weight:500;}
 body.phone-home #modal-body .admin-cost-table td small{display:block;color:#aaa;line-height:1.6;margin-top:4px;}
+body.phone-home #modal-body .admin-billing{padding:4px 0 12px;margin-bottom:10px;border-bottom:1px solid #343438;}body.phone-home #modal-body .admin-billing>button{font-size:13px;min-height:44px;margin-top:8px;}body.phone-home #modal-body .admin-billing h4{font-size:14px;margin:14px 0 6px;}
