@@ -1,8 +1,8 @@
-import {safeSocketSend,microphoneHelp,participantLabel} from './session-reliability.js?v=20261022-group-usability-1';
+import {safeSocketSend,microphoneHelp,participantLabel} from './session-reliability.js?v=20261022-cost-accounting-1';
 import {singleFlight} from './async-ui.js?v=20261021-loading-1';
 import {lessonCode,installModalFeedback,backdropClick,updateMode,searchBounds,resilientPreferences} from './entry-feedback.js?v=20261022-language-storage-1';
 import {deviceCheckPanel,microphoneUnavailable} from './device-check.js?v=20261021-text-chat-1';
-import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261022-group-usability-1';
+import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261022-cost-accounting-1';
 import {installPhotoTranslate} from './photo-translate.js?v=20261021-loading-1';
 import {refreshEnglishGuides,applyEnglishLabels} from './ui-english.js?v=20261021-chat-controls-1';
 import {SharedWordUsage} from './shared-word-usage.js?v=20261011-continuity-words-1';
@@ -16,10 +16,10 @@ import {ReviewedStore} from './reviewed-store.js';
 import {PersonalPhrases} from './personal-phrases.js?v=20261007-learning-1';
 import {recognitionHints} from './recognition-hints.js?v=20261007-progressive-1';
 import {acquireMicrophone} from './microphone.js?v=20261006-mic-1';
-import {UsageLedger,WordUsage} from './usage.js?v=20261022-group-usability-1';
+import {UsageLedger,WordUsage} from './usage.js?v=20261022-cost-accounting-1';
 import {CloudSpeechPlayer,createSpeechCache} from './cloud-speech-player.js?v=20261020-safari-speech-2';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-progressive-1';
-import {installAdmin} from './admin.js?v=20261021-invite-compact-1';
+import {installAdmin} from './admin.js?v=20261022-cost-accounting-1';
 import {config} from './config.js';
 import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection as explainRecentConnection} from './network.js?v=20261009-mobile-speaker-1';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
@@ -29,7 +29,7 @@ import {callCaptionLanguages,chatCaptionLanguages,isDisplayableCaption} from './
 import {listHistory as storedHistory} from './history.js?v=20261006-school-1';
 const listHistory=()=>localStorage.getItem('tsuyaku-device-mode')==='personal'?storedHistory():Promise.resolve([]);
 import {createServerRecognition} from './caption-server.js?v=20261007-free-1';
-import {createBrowserRecognition} from './caption-browser.js?v=20261022-group-usability-1';
+import {createBrowserRecognition} from './caption-browser.js?v=20261022-cost-accounting-1';
 const browserSpeechUnavailable=new Set();let recognitionKind=null,conversationUI;
 const idleWatch=new IdleWatch({onWarn:()=>{ledger.event('idle_warning');message('発話がないため、15秒後にマイクを停止します。');const keep=el('button','続ける');keep.onclick=()=>{idleWatch.continue();message('');ledger.event('idle_continue');};$('#message').append(keep);clearTimeout(messageTimer);},onStop:()=>pauseConversation('idle'),onDiagnostic:code=>ledger.event(code)});
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -42,7 +42,7 @@ const sharedWords=new SharedWordUsage(localStorage,{api,catalog:()=>seed});
 const wordUsage=new WordUsage(localStorage);const ledger=new UsageLedger(localStorage,()=>Date.now(),sessionStorage),connections=new ConnectionDiary(localStorage);
 const showModalFeedback=installModalFeedback({dialog:$('#modal'),message:$('#message'),close:$('#modal-close'),resolveFocus:referenceReturnFocus});
 let messageTimer;const message=text=>{clearTimeout(messageTimer);const n=$('#message');n.textContent=text;n.hidden=!text;if(text)messageTimer=setTimeout(()=>{n.replaceChildren();n.hidden=true;},6000);};
-installAdmin({wordUsage,sharedWords,api,getConversationState:()=>conversationState(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});
+installAdmin({wordUsage,sharedWords,api,getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});
 const status=text=>{$('#connection').textContent=text;connectionHint(text);};
 function connectionHint(text){let box=$('#connection-hint');const show=room&&!room.local&&/再接続|切れ|停止|接続でき|別のタブ/.test(text);if(!box&&show){box=el('div',undefined,'connection-hint');box.id='connection-hint';box.setAttribute('role','status');const note=el('span'),retry=el('button','再接続','secondary');retry.onclick=()=>{if(!room||room.joinBlocked)return;intentionalClose=false;reconnectAttempts=0;clearTimeout(reconnectTimer);if(socket?.readyState===1)socket.close(4000,'manual reconnect');else void connect().then(startConnectionTimers).catch(showConnectionError);};box.append(note,retry);$('#live .live-tools').prepend(box);}if(box){box.hidden=!show;box.firstChild.textContent=text;box.querySelector('button').disabled=!navigator.onLine||room?.joinBlocked===true;}}
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;if(tag==='button'&&text){const icons={'接続を確認':'network-wired','再試行':'rotate-right','リンクをコピー':'copy','ひらく':'book-open','候補として送る':'plus','授業をおわる':'stop','じぶんだけホームにもどる':'door-open'};if(icons[text])n.prepend(icon(icons[text]));}return n;}
@@ -194,7 +194,7 @@ async function handle(data){
  if(data.type==='caption_delivered'){captionDelivery.delivered(data.id,data.revision||0,data.count,data.total);refreshDelivery(data.id);return;}
  if(data.type==='caption_pending'){if(!data.final)return;captionDelivery.received(data.id,data.revision||0);const previous=records.get(data.id);if(previous&&(previous.revision||0)>=(data.revision||0)&&previous.status==='ready')return;renderCaption({...data,translations:{[data.source]:data.text},status:'translating'});return;}
  if(data.type==='caption')return;
- if(data.type==='translation'){captionDelivery.received(data.id,data.revision||0);if(data.id.startsWith(selfId+'_'))captionDelivery.result(data.id,data.revision||0,data.status);if(data.status==='ready'&&!data.quality)data.quality=inspectTranslations(data.text,data.source,Object.keys(data.translations||{}),data.translations);data.updating=false;data.memorySource=data.memorySource||null;const rawId=[...localTimings.keys()].find(key=>{const t=localTimings.get(key);return data.id===selfId+'_'+(t.id||key)&&(t.revision??0)===(data.revision??0);});if(rawId){if(data.status==='ready'){const metrics=latencyFromTiming(localTimings.get(rawId),Date.now());ledger.timing(data.id+':'+(data.revision??0),metrics);}localTimings.delete(rawId);}ledger.caption(data);wordUsage.caption(data,room?.mode);sharedWords.caption(data,room?.mode,selfId);if(data.id.startsWith(selfId+'_')&&!data.quality?.warnings.length&&!data.quality?.unmeasuredLanguages.length&&personalPhrases.observe(data))renderReferences();if(data.status==='ready')for(const id of data.usage?.bankKeys||[])void api('/dictionary/usage',{kind:'bank',id}).catch(()=>{});if(data.status==='failed'){const previous=records.get(data.id);if(previous?.status==='ready')renderCaption({...previous,updating:false});}renderCaption(data);acknowledgeCaption(data);if((data.revision??0)>=(records.get(data.id)?.revision??0))records.set(data.id,data);if(data.status==='failed')showTranslationFailure(data);for(const [id,p] of pending){if(data.id.endsWith('_'+id)&&(data.revision??0)>=(p.revision??0))pending.delete(id);}return;}
+ if(data.type==='translation'){captionDelivery.received(data.id,data.revision||0);if(data.id.startsWith(selfId+'_'))captionDelivery.result(data.id,data.revision||0,data.status);if(data.status==='ready'&&!data.quality)data.quality=inspectTranslations(data.text,data.source,Object.keys(data.translations||{}),data.translations);data.updating=false;data.memorySource=data.memorySource||null;const rawId=[...localTimings.keys()].find(key=>{const t=localTimings.get(key);return data.id===selfId+'_'+(t.id||key)&&(t.revision??0)===(data.revision??0);});if(rawId){if(data.status==='ready'){const metrics=latencyFromTiming(localTimings.get(rawId),Date.now());ledger.timing(data.id+':'+(data.revision??0),metrics);}localTimings.delete(rawId);}ledger.caption(data,{selfId});wordUsage.caption(data,room?.mode);sharedWords.caption(data,room?.mode,selfId);if(data.id.startsWith(selfId+'_')&&!data.quality?.warnings.length&&!data.quality?.unmeasuredLanguages.length&&personalPhrases.observe(data))renderReferences();if(data.status==='ready')for(const id of data.usage?.bankKeys||[])void api('/dictionary/usage',{kind:'bank',id}).catch(()=>{});if(data.status==='failed'){const previous=records.get(data.id);if(previous?.status==='ready')renderCaption({...previous,updating:false});}renderCaption(data);acknowledgeCaption(data);if((data.revision??0)>=(records.get(data.id)?.revision??0))records.set(data.id,data);if(data.status==='failed')showTranslationFailure(data);for(const [id,p] of pending){if(data.id.endsWith('_'+id)&&(data.revision??0)>=(p.revision??0))pending.delete(id);}return;}
  if(data.type==='notice'){message(data.text);return;}
  if(data.type==='ended'){ledger.event('lesson_ended');await leave(true);message('授業が終了しました。');return;}
 }
@@ -310,7 +310,7 @@ async function translateLocally(cap,source){
     localRequest=new AbortController();const requestStarted=Date.now();try{result=await api('/translate',{text:cap.text,source,targets:missing,unit:room.unit,context},{signal:localRequest.signal});}finally{clientRequestMs=Date.now()-requestStarted;}
     sessionTranslations.set(cacheKey,result);if(sessionTranslations.size>100)sessionTranslations.delete(sessionTranslations.keys().next().value);
    }
-   result=stampTiming(result);if(room===job.activeRoom&&sessionEpoch===job.epoch&&!valid())ledger.caption({...base,...result,status:'ready'});if(valid()){const completion=localCompletions.get(cap.id);await handle({...base,...result,translations:{...result.translations,...known.translations},status:'ready',...(completion?.text===cap.text?{revision:completion.revision,continuing:false}:{})});}
+   result=stampTiming(result);if(room===job.activeRoom&&sessionEpoch===job.epoch&&!valid())ledger.caption({...base,...result,status:'ready'},{selfId});if(valid()){const completion=localCompletions.get(cap.id);await handle({...base,...result,translations:{...result.translations,...known.translations},status:'ready',...(completion?.text===cap.text?{revision:completion.revision,continuing:false}:{})});}
   }catch(error){if(error.aiFailure?.reason==='quota')aiBlockedUntil=Math.floor(Date.now()/86400000)*86400000+86400000;
    if(valid())await handle({...base,translations:known.translations,status:'failed',error:error.message,aiFailure:error.aiFailure,httpStatus:error.httpStatus,usage:{...stampTiming({usage:error.usage}).usage,...(!error.usage?{unknown:true}:{})}});
   }finally{localRequest=null;}
@@ -381,6 +381,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 window.addEventListener('pagehide',suspendBackgroundInterpretation);
 
 // Presentation observes state changes without polling or starting network work.
+function currentBudgetScenario(){if(!room)return null;const source=currentSource();let targets;if(room.mode==='interpreter'){const langs=participants.map(p=>p.language);targets=[...langs,...(langs.some(c=>c!=='en')?['en']:[])];}else if(room.mode==='lesson')targets=['ja','en',...participants.flatMap(p=>[p.language,p.viewLanguage]).filter(Boolean)];else targets=['ja',$('#face-self-language').value,$('#face-other-language').value,'en'];return {mode:room.mode,source,targets};}
 function conversationState(){return {mode:room?.mode,role:room?.mode==='lesson'?(role||lessonRole):(tab==='lesson'?lessonRole:null),mic,preparing:$('#microphone').getAttribute('aria-busy')==='true',recognitionKind,paused:backgroundCallPaused,connection:$('#connection').textContent,local:room?.local===true,translating:[...records.values()].some(r=>r.status==='translating'||r.updating)};}
 conversationUI=installConversationUI({getState:conversationState});
 
