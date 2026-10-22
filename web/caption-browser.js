@@ -1,3 +1,4 @@
+import {splitRecognizedText} from './session-reliability.js?v=20261022-reliability-20-1';
 import {createServerRecognition} from './caption-server.js?v=20261007-free-1';
 import {nonSpeechReason} from './speech-filter.js?v=20261007-learning-1';
 
@@ -9,7 +10,7 @@ export function createBrowserRecognition({language, Native, onDiagnostic = () =>
   return class BrowserRecognition extends Base {
     start() {
       this.abort();this.active=true;
-      let native;
+      let native;const finals=new Map();
       try{native=this.native=new Native();}catch{this.fail('service');return;}
       native.lang=language; native.continuous=true; native.interimResults=false; native.maxAlternatives=1;
       const started=()=>{if(!this.active||this.native!==native)return;cancel(this.startWatch);this.startWatch=null;};
@@ -18,11 +19,11 @@ export function createBrowserRecognition({language, Native, onDiagnostic = () =>
         if(!this.active||this.native!==native)return;
         for(let i=event.resultIndex;i<event.results.length;i++){
           const result=event.results[i],text=result?.[0]?.transcript?.trim();
-          if(!result?.isFinal||!text)continue;
+          if(!result?.isFinal||!text||finals.get(i)===text)continue;finals.set(i,text);if(finals.size>1000)finals.delete(finals.keys().next().value);
           const rejected=nonSpeechReason({text},language);
           if(rejected){this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:rejected});continue;}
           // Native speech events do not expose PCM timings: leave these unmeasured.
-          this.acceptText(text,{recognitionReadyAt:Date.now(),boundary:'pause'});
+          const chunks=splitRecognizedText(text);if(chunks.length>1)this.finishFragment();for(const chunk of chunks){if(chunks.length>1)this.breakContinuity=true;this.acceptText(chunk,{recognitionReadyAt:Date.now(),boundary:'pause'});if(chunks.length>1)this.finishFragment();}
         }
       };
       native.onerror=event=>{started();

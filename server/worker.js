@@ -8,7 +8,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261022-group-chat-2';
+const BUILD_ID='20261022-reliability-20-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -191,7 +191,7 @@ export class TranslationRoom {
         const lang=String(data.language||'ja');if(!catalog.languages.some(l=>l.code===lang))throw Error('言語を確認してください。');
         if(room.mode==='face'&&auth.uid!==room.owner)throw Error('対面は作成した端末で使います。');const role=auth.uid===room.owner?'teacher':'guest';
         return await this.admission(async()=>{
-        if(this.ctx.getWebSockets().some(p=>{const value=p.deserializeAttachment();return value?.uid===auth.uid&&!value.left&&(p.readyState===undefined||p.readyState===1);}))throw Error('別のタブで参加中です。');
+        if(this.ctx.getWebSockets().some(p=>{const value=p.deserializeAttachment();return value?.uid===auth.uid&&!value.left&&(p.readyState===undefined||p.readyState===1);}))throw Object.assign(Error('別のタブで参加中です。先に開いた通訳君のタブを使うか、そちらを閉じてから再接続してください。'),{code:'duplicate_tab'});
         if(room.mode==='interpreter'&&this.participants().length>=(room.groupChat?5:2))throw Error(room.groupChat?'チャットは5人まで参加できます。':'チャットは2人まで参加できます。');
         if(room.groupChat&&data.chatProtocol!==1)throw Error('ページを更新してから参加してください。');
         const stableId=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(auth.uid)))].slice(0,16).map(x=>x.toString(16).padStart(2,'0')).join('');
@@ -249,7 +249,7 @@ export class TranslationRoom {
       if(room.mode==='lesson'&&a.role!=='teacher'&&(data.kind!=='text'||data.final!==true||data.continuing||data.metadataOnly))throw Error('生徒は文字入力で伝えてください。');
       const admission=(this.admissionTail||Promise.resolve()).then(()=>this.acceptCaption(ws,a,room,data));
       this.admissionTail=admission.catch(()=>{});await admission;
-    }catch(e){this.send(ws,{type:'error',error:e.message||'接続を確認してください。'});if(!ws.deserializeAttachment()?.uid)ws.close(1008,'auth');}
+    }catch(e){this.send(ws,{type:'error',error:e.message||'接続を確認してください。',...(e.code==='duplicate_tab'?{errorCode:e.code}:{})});if(!ws.deserializeAttachment()?.uid)ws.close(1008,'auth');}
   }
   async acceptCaption(ws,a,room,data){
       const cap=validateCaption(data),id=a.id+'_'+cap.id;
