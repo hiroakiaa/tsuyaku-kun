@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {billingWindow,billingNumber,billingTotals,googlePreviewRows,readGoogleBillingPreview} from '../web/billing-data.js';
-import {isBillingAdministrator,cloudflareBillingReport} from '../server/billing-report.js';
+import {isBillingAdministrator,cloudflareBillingReport,googleBillingReport} from '../server/billing-report.js';
 const project='sample-project',month='2026-10',dataset='gcp_billing_immutable_test_us',table='gcp_billing_export_focus_test';
 const fields=['BilledCost','BillingCurrency','ChargePeriodStart','ServiceName','SubAccountId','x_ExportTime'],schema={fields:fields.map(name=>({name}))};
 const row=(amount='0',date='2026-10-22T10:00:00Z',p=project)=>({f:[amount,'JPY',date,'Firestore',p,'2026-10-22T11:00:00Z'].map(v=>({v}))});
@@ -23,3 +23,12 @@ const at=Date.parse('2026-10-22T12:00:00Z');const cf=await cloudflareBillingRepo
 const bad=await cloudflareBillingReport({...env,CF_BILLING_ACCOUNT:'b'.repeat(32)},at,async()=>Response.json({success:true,result:[{ServiceName:'Workers',BillingCurrency:'USD',ChargePeriodStart:'2026-10-21',ChargePeriodEnd:'2026-10-22'}]}));assert.equal(bad.status,'error');assert.equal((await cloudflareBillingReport({},at)).status,'pending');
 for(const file of ['../web/billing-data.js','../web/billing-view.js','../server/billing-report.js']){const source=await fs.readFile(new URL(file,import.meta.url),'utf8');assert.ok(!/jobs\.query|maximumBytesBilled|storage\.googleapis\.com|\/queries\b|SELECT\s+.*FROM/i.test(source),'No paid query implementation is retained');}
 console.log('Free billing: preview-only GETs, schema/month/project validation, zero vs missing, credits, currencies, hard stop, owner-only authorization, cache and secret isolation passed');
+
+const pair=await crypto.subtle.generateKey({name:'RSASSA-PKCS1-v1_5',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['sign','verify']);
+const privatePem='-----BEGIN PRIVATE KEY-----'+Buffer.from(await crypto.subtle.exportKey('pkcs8',pair.privateKey)).toString('base64')+'-----END PRIVATE KEY-----';
+const reader={type:'service_account',project_id:project,client_email:'tsuyaku-billing-reader@'+project+'.iam.gserviceaccount.com',private_key:privatePem};
+const googleEnv={FIREBASE_PROJECT:project,GOOGLE_BILLING_DATASET:dataset,GOOGLE_BILLING_TABLE:table,GOOGLE_BILLING_READER_KEY:JSON.stringify(reader)};let googleCalls=0;
+const readerFetch=async(url,options)=>{googleCalls++;if(url==='https://oauth2.googleapis.com/token'){assert.equal(options.method,'POST');const jwt=options.body.get('assertion'),[header,payload,signature]=jwt.split('.'),claims=JSON.parse(Buffer.from(payload,'base64url'));assert.equal(claims.scope,'https://www.googleapis.com/auth/bigquery.readonly');assert.equal(claims.aud,url);assert.equal(claims.exp-claims.iat,600);assert.equal(await crypto.subtle.verify('RSASSA-PKCS1-v1_5',pair.publicKey,Buffer.from(signature,'base64url'),new TextEncoder().encode(header+'.'+payload)),true);return Response.json({access_token:'ephemeral-test-token'});}assert.equal(options.method,'GET');return mock()(url,options);};
+const google=await googleBillingReport(googleEnv,at,readerFetch);assert.equal(google.status,'ready');assert.equal(google.rows[0].amount,0);assert.ok(!JSON.stringify(google).includes('PRIVATE KEY'));await googleBillingReport(googleEnv,at+1,readerFetch);assert.equal(googleCalls,4);assert.equal((await googleBillingReport({},at)).status,'pending');
+assert.equal((await googleBillingReport({...googleEnv,GOOGLE_BILLING_DATASET:dataset+'_pending'},at,async url=>url.includes('oauth2')?Response.json({access_token:'test'}):new Response('',{status:404}))).status,'pending');
+console.log('Dataset-only server reader: signed readonly JWT, fixed auth endpoint, no browser token, free GETs, cache and pending export passed');
