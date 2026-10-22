@@ -1,6 +1,7 @@
+import {SPEECH_POLICY} from '../web/cost-policy.js';
 // Only counts are persisted. Speech text and generated audio stay out of storage/logs.
-export const SPEECH_MONTH_LIMIT=500000;
-export const SPEECH_USER_LIMIT=50000;
+export const SPEECH_MONTH_LIMIT=SPEECH_POLICY.monthCharacters;
+export const SPEECH_USER_LIMIT=SPEECH_POLICY.userCharacters;
 export function speechInput(data){
  const language=String(data.language||'').toLowerCase();
  if(!['fil','tl','fil-ph','tl-ph'].includes(language))throw Object.assign(Error('この読み上げはフィリピノ語専用です。'),{status:400});
@@ -13,7 +14,7 @@ export async function speechBudget(storage,data,now=Date.now()){
  return storage.transaction(async tx=>{
   const month=new Date(now).toISOString().slice(0,7),next=new Date(now);next.setUTCDate(1);next.setUTCMonth(next.getUTCMonth()+1);next.setUTCHours(0,0,0,0);
   let state=await tx.get('speech-budget');if(state?.month!==month)state={month,used:0,requests:0,users:{},leases:{}};
-  const status=()=>({month,resetsAt:next.getTime(),usedCharacters:state.used,limitCharacters:SPEECH_MONTH_LIMIT,remainingCharacters:Math.max(0,SPEECH_MONTH_LIMIT-state.used),requests:state.requests,estimatedBeforeFreeUSD:state.used*.000004});
+  const uid=String(data.uid||'').slice(0,128);const status=()=>({userLimitCharacters:SPEECH_USER_LIMIT,userUsedCharacters:state.users[uid]||0,userRemainingCharacters:Math.max(0,SPEECH_USER_LIMIT-(state.users[uid]||0)),month,resetsAt:next.getTime(),usedCharacters:state.used,limitCharacters:SPEECH_MONTH_LIMIT,remainingCharacters:Math.max(0,SPEECH_MONTH_LIMIT-state.used),requests:state.requests,estimatedBeforeFreeUSD:state.used*SPEECH_POLICY.perMillionCharacters/1e6});
   if(data.action==='status')return status();
   for(const [id,lease]of Object.entries(state.leases))if(lease.expires<=now)delete state.leases[id];
   if(data.action==='reserve'){
