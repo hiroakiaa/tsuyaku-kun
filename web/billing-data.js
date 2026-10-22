@@ -1,5 +1,6 @@
 // Free table preview only. No BigQuery SQL, jobs, Storage Read API or paid fallback.
-export const BILLING_READ_LIMITS=Object.freeze({rows:5000,pages:5,pageRows:1000,bytes:2000000,intervalMs:86400000});
+export const BILLING_READ_LIMITS=Object.freeze({rows:5000,pages:5,pageRows:1000,bytes:2000000,intervalMs:86400000,pendingIntervalMs:900000});
+export function billingRefreshInterval(report){return report?.status==='pending'&&report.retryable===true?BILLING_READ_LIMITS.pendingIntervalMs:BILLING_READ_LIMITS.intervalMs;}
 export function billingWindow(month){
  if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(month))throw Error('集計月を確認してください。');
  const start=Date.parse(month+'-01T00:00:00Z'),next=new Date(start);next.setUTCMonth(next.getUTCMonth()+1);
@@ -24,7 +25,7 @@ export async function readGoogleBillingPreview({accessToken,project,dataset,tabl
  async function get(url){const r=await fetcher(url,{method:'GET',headers:{Authorization:'Bearer '+accessToken},signal:AbortSignal.timeout(10000),cache:'no-store'});if(!r.ok)throw Error(r.status===404?'請求データの準備中です。':r.status===403?'無料閲覧で取得できません。有料照会は実行しません。':'請求データを取得できませんでした。');const reader=r.body.getReader(),chunks=[];try{for(;;){const part=await reader.read();if(part.done)break;bytes+=part.value.length;if(bytes>BILLING_READ_LIMITS.bytes){await reader.cancel();throw Error('無料取得の処理上限で停止しました。');}chunks.push(part.value);}}finally{reader.releaseLock();}const result=new Uint8Array(chunks.reduce((n,c)=>n+c.length,0));let at=0;for(const c of chunks){result.set(c,at);at+=c.length;}return JSON.parse(new TextDecoder().decode(result));}
  const meta=await get(base+'?fields=schema,numRows,lastModifiedTime,type');
  if(meta.type!=='TABLE'||!/^\d+$/.test(String(meta.numRows))||Number(meta.numRows)>BILLING_READ_LIMITS.rows)throw Error('無料閲覧の上限内で全件取得できません。有料照会は実行しません。');
- const expected=Number(meta.numRows);if(!expected)return {provider:'google',month,status:'pending',message:'請求データの準備中です。まだ0円とは判定しません。'};
+ const expected=Number(meta.numRows);if(!expected)return {provider:'google',month,status:'pending',retryable:true,message:'請求データの準備中です。まだ0円とは判定しません。'};
  let token='',rows=[];const tokens=new Set();
  for(let page=0;page<BILLING_READ_LIMITS.pages;page++){
   const params=new URLSearchParams({maxResults:String(BILLING_READ_LIMITS.pageRows),selectedFields:required.join(',')});if(token)params.set('pageToken',token);const data=await get(base+'/data?'+params);
@@ -32,6 +33,6 @@ export async function readGoogleBillingPreview({accessToken,project,dataset,tabl
  }
  if(token||rows.length!==expected)throw Error('請求データの一部を取得できませんでした。合計は表示しません。');
  const after=await get(base+'?fields=numRows,lastModifiedTime');if(after.numRows!==meta.numRows||after.lastModifiedTime!==meta.lastModifiedTime)throw Error('請求データが更新中です。時間を置いて確認してください。');
- const parsed=googlePreviewRows(meta.schema,rows,{project,month});return {provider:'google',month,status:parsed.rows.length?'ready':'pending',...parsed,fetchedAt:now,scope:'Google Cloud対象プロジェクト・クレジット反映後',message:'提供元の月途中データです。反映遅延・修正があり、確定請求ではありません。'};
+ const parsed=googlePreviewRows(meta.schema,rows,{project,month});return {provider:'google',month,status:parsed.rows.length?'ready':'pending',retryable:!parsed.rows.length,...parsed,fetchedAt:now,scope:'Google Cloud対象プロジェクト・クレジット反映後',message:'提供元の月途中データです。反映遅延・修正があり、確定請求ではありません。'};
 }
 export function billingTotals(reports,month){const totals={};let known=0;for(const report of reports){if(report?.month!==month||report.status!=='ready')continue;for(const row of amountRows(report.rows)){totals[row.currency]=(totals[row.currency]||0)+row.amount;known++;}}return {month,totals,known,complete:false,finalInvoice:false};}
