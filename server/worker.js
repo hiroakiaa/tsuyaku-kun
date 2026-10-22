@@ -8,7 +8,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261022-group-usability-1';
+const BUILD_ID='20261022-cost-accounting-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -46,13 +46,13 @@ const rid=/^[a-f0-9]{32}$/;
 async function body(request,max=32768){const reader=request.body?.getReader();if(!reader)throw Error('データがありません。');let s='',size=0;const decoder=new TextDecoder();try{for(;;){const r=await reader.read();if(r.done)break;size+=r.value.length;if(size>max){await reader.cancel();throw Error('データが大きすぎます。');}s+=decoder.decode(r.value,{stream:true});}s+=decoder.decode();return JSON.parse(s);}finally{reader.releaseLock();}}
 async function bridge(env,token,action,extra={}){if(!env.SHEETS_BRIDGE)return null;const r=await fetch(env.SHEETS_BRIDGE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,idToken:token,...extra}),signal:AbortSignal.timeout(20000)});if(!r.ok)throw Error('辞書との接続を確認してください。');const result=await r.json();if(result.error)throw Error(result.error);return result;}
 export async function translateText(env,text,source,targets,context=[],unit='',data=catalog,onUsage=()=>{}){
-  const timing={serverBuild:BUILD_ID,dictionaryMs:null,aiTotalMs:null,providerMs:null,budgetWaitMs:null,budgetSettleMs:null,parseMs:null,authMs:env.authMs??null};const reportUsage=onUsage;onUsage=u=>reportUsage({...u,translationTiming:timing});env={...env,translationTiming:timing};
+  const timing={serverBuild:BUILD_ID,dictionaryMs:null,aiTotalMs:null,providerMs:null,budgetWaitMs:null,budgetSettleMs:null,parseMs:null,authMs:env.authMs??null};let scenario;const reportUsage=onUsage;onUsage=u=>reportUsage({...u,translationTiming:timing,...(scenario?{translationScenario:scenario}:{})});env={...env,translationTiming:timing};
   source=spokenLanguage(source);
-  const unique=[...new Set(targets)].filter(c=>c!==source);
+  const unique=[...new Set(targets)].filter(c=>c!==source);scenario={version:1,source,targets:[...unique].sort(),aiTargets:[],characters:[...text].length};
   const out={[source]:text};if(!unique.length){onUsage({inputTokens:0,outputTokens:0,cacheHit:true});return out;}
   const dictionaryStarted=Date.now();const stored=storedTranslations(text,source,unique,data,unit==='数学'||unit.includes('方程式')?'math':unit);
   timing.dictionaryMs=Date.now()-dictionaryStarted;Object.assign(out,stored.translations);
-  const missing=unique.filter(c=>!out[c]);
+  const missing=unique.filter(c=>!out[c]);scenario.aiTargets=[...missing].sort();
   if(!missing.length){onUsage({inputTokens:0,outputTokens:0,cacheHit:true,cacheSource:'spreadsheet',bankKeys:stored.keys});return out;}
   const terms=glossaryFor(text,data.glossary||[]);
   const protectedSpeech=protectUncertainSpeech(text);
@@ -83,7 +83,7 @@ export default {async fetch(request,env){
       }
       return cors(error('写真の操作を確認してください。',404));
     }catch(e){return cors(error(e.message||'写真を読み取れませんでした。',e.status||502));}}
-    if(url.pathname==='/speech/status'&&request.method==='GET')return cors(json({enabled:!!env.GOOGLE_TTS_API_KEY,voice:'fil-PH-Wavenet-A',...await speechOperation(env,{action:'status'})}));
+    if(url.pathname==='/speech/status'&&request.method==='GET')return cors(json({enabled:!!env.GOOGLE_TTS_API_KEY,voice:'fil-PH-Wavenet-A',...await speechOperation(env,{action:'status',uid:await photoUid(auth.uid)})}));
     if(url.pathname==='/speech/synthesize'&&request.method==='POST'){try{return cors(new Response(JSON.stringify(await synthesizeFilipino(env,await body(request,16000))),{headers:{'Content-Type':'application/json;charset=utf-8','Cache-Control':'no-store'}}));}catch(e){return cors(error(e.message||'音声を準備できませんでした。',e.status||502));}}
     if(url.pathname==='/usage/budget'&&request.method==='GET'){
       const budget=env.ROOMS.get(env.ROOMS.idFromName('__ai_budget_v1__'));
