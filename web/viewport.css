@@ -109,6 +109,16 @@ body.phone-home .chat-qr-large{display:block;width:min(420px,calc(100vw - 88px),
 @media(max-width:359px){body.phone-home #call-invite:not([hidden]){grid-template-columns:minmax(0,1fr) 144px;}body.phone-home #call-invite>.invite-qr-open{width:144px;}}
 @media(min-width:480px) and (max-height:620px){body.phone-home #call-invite:not([hidden]){grid-template-columns:minmax(0,1fr) auto 96px;}body.phone-home #call-invite>.invite-qr-open{grid-column:3;grid-row:1;width:96px;}}
 /* Group chat keeps the familiar other-left / self-right arrangement. */
+body.phone-home .connection-hint{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px;border-bottom:1px solid #666;font-size:14px;}
+body.phone-home .connection-hint[hidden]{display:none;}
+body.phone-home .connection-hint button{padding:8px;min-height:44px;font-size:14px;flex-shrink:0;}
+body.phone-home.mode-active{height:var(--visible-app-height,100dvh);}
+body.phone-home .app-shell{height:var(--visible-app-height,100dvh)!important;}
+html[data-keyboard-open=true] body.phone-home .bottom-nav{bottom:var(--keyboard-inset,0px)!important;}
+html[data-keyboard-open=true] body.phone-home dialog{top:0;bottom:var(--keyboard-inset);max-height:calc(var(--visible-app-height) - 16px);margin-block:auto;}
+html[data-keyboard-open=true] body.phone-home .live-tools{max-height:72px;overflow:auto;}
+html[data-keyboard-open=true] body.phone-home .app-shell>header{min-height:36px;margin-bottom:4px;padding-block:0;}
+html[data-keyboard-open=true] body.phone-home .live-actions{padding-block:0;}
 body.phone-home .chat-person[role=button]{cursor:pointer;position:relative;flex-wrap:wrap;}
 body.phone-home .chat-person[role=button]:focus-visible{outline:2px solid #eee;outline-offset:2px;}
 body.phone-home .chat-person[role=button]>.fa-chevron-down{font-size:12px;margin-left:auto;}
