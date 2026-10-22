@@ -67,3 +67,5 @@
 管理者本人のGoogle認証でのみ請求データを表示。無料枠前の推定値とは合算しない。Googleは保存料がGoogle負担のFOCUSを無料のtabledata.listで読むだけ。有料SQL・ジョブ実行・Storage Read API・有料フォールバックは実装しない。Cloudflareは既存Workers FreeとBilling Readだけ。費用確認のための有料リソースは追加しない。
 提供元の0円、空の未準備データ、取得失敗を区別する。GoogleプロジェクトとCloudflareアカウントの範囲差、UTC月と請求サイクル、複数通貨、クレジットの二重減算、固定費・税・他サービスの未取得を点検する。詳細はbilling-integration.md。
 
+
+2026-10-22 free-billing-2: Googleは専用IDのデータセット限定閲覧へ変更。管理者Googleログインは本人確認のみ。有料照会権限なし、無料tabledata.listのみ。JSON鍵は暗号化シークレットに保存し公開しない。FOCUSデータ待ち・取得失敗は0円にしない。上限・単価・プランの変更なし。
