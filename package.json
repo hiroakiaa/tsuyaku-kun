@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --experimental-vm-modules tests/run.mjs && node tests/group-chat.mjs",
+    "test": "node --experimental-vm-modules tests/run.mjs && node tests/group-chat.mjs && node tests/chat-recovery.mjs",
     "serve": "node tools/serve.mjs",
     "deploy": "wrangler deploy"
   },
