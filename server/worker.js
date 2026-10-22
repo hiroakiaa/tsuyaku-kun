@@ -8,7 +8,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261022-reliability-20-1';
+const BUILD_ID='20261022-group-usability-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -161,7 +161,7 @@ export class TranslationRoom {
   visibleTo(a,data){return !['caption','caption_pending','translation'].includes(data.type)||a.chatAfter===undefined||data.id?.startsWith(a.id+'_')||Number.isInteger(data.sequence)&&data.sequence>a.chatAfter;}
   admission(fn){const work=(this.admissionTail||Promise.resolve()).then(fn);this.admissionTail=work.catch(()=>{});return work;}
   waiting(){return this.ctx.getWebSockets().map(ws=>({ws,a:ws.deserializeAttachment()})).filter(p=>p.a?.pending&&!p.a.left&&p.a.requestUntil>Date.now()&&(p.ws.readyState===undefined||p.ws.readyState===1));}
-  requests(){const requests=this.waiting().map(({a})=>({id:a.id,name:a.name,language:a.language}));for(const {ws,a}of this.participants())if(a.role==='teacher'&&a.chatAfter!==undefined)this.send(ws,{type:'chat_requests',requests});}
+  requests(){const ownerPresent=this.participants().some(({a})=>a.role==='teacher');for(const {ws,a}of this.waiting())this.send(ws,{type:'join_waiting',expires:a.requestUntil,ownerPresent});const requests=this.waiting().map(({a})=>({id:a.id,name:a.name,language:a.language}));for(const {ws,a}of this.participants())if(a.role==='teacher'&&a.chatAfter!==undefined)this.send(ws,{type:'chat_requests',requests});}
   async readyParticipant(ws,room){const a=ws.deserializeAttachment();const history=[...(await this.ctx.storage.list({prefix:'caption:',limit:3000})).values()].filter(r=>this.visibleTo(a,{type:'translation',...r})).sort((x,y)=>(x.sequence??x.at)-(y.sequence??y.at));this.send(ws,{type:'ready',id:a.id,role:a.role,mode:room.mode,groupChat:room.groupChat===true,unit:room.unit,code:room.code,expires:room.expires,ended:!!room.ended,history});this.roster();}
   async admitChat(ws,data){const room=await this.info(),a=ws.deserializeAttachment();if(!room?.groupChat||room.ended||a.left||a.pending||a.uid!==room.owner)throw Error('参加の承認は作成者だけができます。');const target=this.waiting().find(p=>p.a.id===data.to);if(!target)throw Error('この参加リクエストは終了しました。');if(data.allow!==true){this.send(target.ws,{type:'join_declined',text:'作成者が参加を見送りました。'});await this.webSocketClose(target.ws);return;}if(this.participants().length>=5)throw Error('チャットは5人までです。退室後に承認してください。');const count=await this.ctx.storage.get('memberCount')||0;if(count>=30)throw Error('この部屋の参加履歴が上限に達しました。新しい部屋を作ってください。');const member={after:await this.ctx.storage.get('captionCount')||0,name:target.a.customName?target.a.name:'参加者'+(count+1)};await this.ctx.storage.put('member:'+target.a.uid,member);await this.ctx.storage.put('memberCount',count+1);target.ws.serializeAttachment({...target.a,pending:false,chatAfter:member.after,name:member.name});await this.readyParticipant(target.ws,room);await this.scheduleAlarm(room);}
 
@@ -200,7 +200,7 @@ export class TranslationRoom {
         if(room.groupChat&&role==='teacher'&&!member){member={after:0,name:'参加者1'};await this.ctx.storage.put('member:'+auth.uid,member);await this.ctx.storage.put('memberCount',Math.max(1,await this.ctx.storage.get('memberCount')||0));}
         if(room.groupChat&&!member&&this.waiting().length>=5)throw Error('参加の確認が混み合っています。しばらくしてから参加してください。');
         ws.serializeAttachment({...a,...auth,...(room.groupChat?{pending:!member,customName:!!String(data.displayName||'').trim(),requestUntil:Date.now()+120000,chatAfter:member?.after}:{}),id:stableId,token:data.token,name:room.groupChat?(member?.name||String(data.displayName||'').replace(/[\p{Cc}\p{Cf}]/gu,'').trim().slice(0,20)||'参加希望者'):String(data.name||'参加者').slice(0,40),language:role==='teacher'&&room.mode==='lesson'?'ja':lang,viewLanguage,role});
-        await this.scheduleAlarm(room);if(ws.deserializeAttachment().pending){this.send(ws,{type:'join_waiting',expires:Date.now()+120000});this.requests();return;}await this.readyParticipant(ws,room);
+        await this.scheduleAlarm(room);if(ws.deserializeAttachment().pending){this.send(ws,{type:'join_waiting',ownerPresent:this.participants().some(({a})=>a.role==='teacher'),expires:Date.now()+120000});this.requests();return;}await this.readyParticipant(ws,room);
         if(this.env.SHEETS_BRIDGE&&Date.now()>this.catalogUntil){this.catalogUntil=Date.now()+300000;this.ctx.waitUntil(bridge(this.env,data.token,'tsuyakuCatalog').then(r=>{if(r)this.cachedCatalog=r;}).catch(()=>{}));}return;});
       }
       if(a.left)return;
@@ -209,7 +209,7 @@ export class TranslationRoom {
       if(data.type==='reauth'){const auth=await verifyToken(data.token,this.env.FIREBASE_PROJECT);if(auth.uid!==a.uid)throw Error('ログインし直してください。');ws.serializeAttachment({...ws.deserializeAttachment(),...auth,token:data.token});await this.scheduleAlarm(room);return;}
       if(Date.now()-a.window>60000){a.window=Date.now();a.count=0;}if(++a.count>400)throw Error('操作が多すぎます。');ws.serializeAttachment(a);
       if(data.type==='ping'){this.send(ws,{type:'pong'});return;}
-      if(a.pending){if(a.requestUntil<=Date.now()){this.send(ws,{type:'join_declined',text:'参加の確認が時間切れになりました。招待リンクから入り直してください。'});await this.webSocketClose(ws);}else this.send(ws,{type:'join_waiting',expires:a.requestUntil});return;}
+      if(a.pending){if(a.requestUntil<=Date.now()){this.send(ws,{type:'join_declined',text:'参加の確認が時間切れになりました。招待リンクから入り直してください。'});await this.webSocketClose(ws);}else this.send(ws,{type:'join_waiting',ownerPresent:this.participants().some(({a})=>a.role==='teacher'),expires:a.requestUntil});return;}
       if(data.type==='chat_admit'){await this.admission(()=>this.admitChat(ws,data));return;}
       if(data.type==='chat_name'&&room.groupChat){const name=String(data.name||'').replace(/[\p{Cc}\p{Cf}]/gu,'').trim().slice(0,20);if(!name)throw Error('表示名を入力してください。');const member=await this.ctx.storage.get('member:'+a.uid);if(!member)return;await this.ctx.storage.put('member:'+a.uid,{...member,name});ws.serializeAttachment({...ws.deserializeAttachment(),name});this.roster();return;}
       if(data.type==='lesson_unit'&&room.mode==='lesson'){
