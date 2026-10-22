@@ -19,7 +19,7 @@ import {acquireMicrophone} from './microphone.js?v=20261006-mic-1';
 import {UsageLedger,WordUsage} from './usage.js?v=20261022-admin-simple-1';
 import {CloudSpeechPlayer,createSpeechCache} from './cloud-speech-player.js?v=20261020-safari-speech-2';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-progressive-1';
-import {installAdmin} from './admin.js?v=20261022-admin-simple-1';
+import {installAdmin} from './admin.js?v=20261022-admin-password-width-1';
 import {config} from './config.js';
 import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,explainConnection as explainRecentConnection} from './network.js?v=20261009-mobile-speaker-1';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
