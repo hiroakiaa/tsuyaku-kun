@@ -37,3 +37,9 @@ body.phone-home #modal-body .admin-tabs .admin-tab-en{display:block;font-size:11
 html[data-english-guides=off] body.phone-home #modal-body .admin-tabs .admin-tab-en{display:none;}
 body.phone-home #modal-body .admin-panel>.admin-tabs>button{display:flex!important;flex-direction:column!important;align-items:center;justify-content:center;gap:2px!important;}
 body.phone-home #modal-body .admin-panel>.admin-tabs>button>span{display:block;white-space:nowrap;}
+body.phone-home #modal-body .admin-month-costs{padding:4px 0 10px;margin:0 0 10px;border-bottom:1px solid #343438;}
+body.phone-home #modal-body .admin-month-subtotal{font-size:13px;line-height:1.6;margin:6px 0;}
+body.phone-home #modal-body .admin-cost-table{border-collapse:collapse;width:100%;font-size:12px;table-layout:fixed;}
+body.phone-home #modal-body .admin-cost-table th,body.phone-home #modal-body .admin-cost-table td{padding:10px 6px;text-align:left;vertical-align:top;border-bottom:1px solid #343438;overflow-wrap:anywhere;}
+body.phone-home #modal-body .admin-cost-table th{width:42%;font-weight:500;}
+body.phone-home #modal-body .admin-cost-table td small{display:block;color:#aaa;line-height:1.6;margin-top:4px;}

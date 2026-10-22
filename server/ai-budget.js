@@ -1,3 +1,4 @@
+import {monthlyAiState,monthlyReserve,monthlySettle,monthlyAiReport} from './monthly-ai-cost.js';
 import {AI_LIMITS,TRANSLATION_PRICE} from '../web/cost-policy.js';
 // Conservative app-local variable-cost budget, not Cloudflare account billing.
 const DAY=86400000;
@@ -13,9 +14,10 @@ export function reserveCost(model,input){
 }
 export async function budgetOperation(storage,data,now=Date.now()){
  return storage.transaction(async tx=>{
-  const day=Math.floor(now/DAY);let state=await tx.get('budget');
-  if(!state||state.day!==day)state={day,total:0,users:{},leases:{},blockedUntil:0};
+  const day=Math.floor(now/DAY),previous=await tx.get('budget');let state=previous;
+  if(!state||state.day!==day)state={day,total:0,users:{},leases:{},blockedUntil:0,...(previous?.monthly?{monthly:previous.monthly}:{})};
   for(const [id,l]of Object.entries(state.leases))if(l.expires<=now)delete state.leases[id];
+  if(data.action!=='status'){state.monthly=monthlyAiState(previous,now);for(const [id,l]of Object.entries(state.monthly.leases))if(l.expires<=now)delete state.monthly.leases[id];}if(data.action==='monthly'){await tx.put('budget',state);return monthlyAiReport(state.monthly,now);}
   if(data.action==='status'){
    const user=state.users[String(data.uid||'unknown').slice(0,128)]||{cost:0,calls:0};
    const globalRemaining=Math.max(0,Math.round(AI_LIMITS.globalUSD*1e6)-state.total),userRemaining=Math.max(0,Math.round(AI_LIMITS.userUSD*1e6)-user.cost);
@@ -28,9 +30,10 @@ export async function budgetOperation(storage,data,now=Date.now()){
    if(state.blockedUntil>now||state.total+cost>Math.round(AI_LIMITS.globalUSD*1e6)||user.cost+cost>Math.round(AI_LIMITS.userUSD*1e6)||user.calls>=AI_LIMITS.userCalls)throw budgetError();
    const leases=Object.values(state.leases);if(leases.length>=8||leases.filter(l=>l.uid===uid).length>=2)throw budgetError('busy');
    const id=crypto.randomUUID();state.total+=cost;user.cost+=cost;user.calls++;state.users[uid]=user;state.leases[id]={uid,cost,expires:now+120000};
-   await tx.put('budget',state);return {id,day,reserved:cost};
+   monthlyReserve(state.monthly,id,day,cost,data.model,now);await tx.put('budget',state);return {id,day,reserved:cost};
   }
   if(data.action==='settle'&&data.day===day){const lease=state.leases[data.id];if(lease){const actual=Number.isSafeInteger(data.actual)&&data.actual>=0?data.actual:lease.cost;const delta=actual-lease.cost;state.total=Math.max(0,state.total+delta);state.users[lease.uid].cost=Math.max(0,state.users[lease.uid].cost+delta);delete state.leases[data.id];}}
+  if(data.action==='settle')monthlySettle(state.monthly,data);
   if(data.action==='block')state.blockedUntil=(day+1)*DAY;
   await tx.put('budget',state);return {ok:true};
  });
@@ -39,7 +42,7 @@ export async function guardedAi(env,model,input,run){
  if(!env.ROOMS)return run(); // Unit fixtures do not provide Cloudflare bindings.
  const budget=env.ROOMS.get(env.ROOMS.idFromName('__ai_budget_v1__'));
  const call=async data=>{const r=await budget.fetch(new Request('https://budget/budget',{method:'POST',body:JSON.stringify(data)}));const result=await r.json();if(!r.ok)throw budgetError(result.reason);return result;};
- const reserveStarted=Date.now();let reservation;try{reservation=await call({action:'reserve',uid:env.budgetUid||'unknown',cost:reserveCost(model,input)});}finally{if(env.translationTiming)env.translationTiming.budgetWaitMs=Date.now()-reserveStarted;}
+ const reserveStarted=Date.now();let reservation;try{reservation=await call({action:'reserve',uid:env.budgetUid||'unknown',model,cost:reserveCost(model,input)});}finally{if(env.translationTiming)env.translationTiming.budgetWaitMs=Date.now()-reserveStarted;}
  let actual;
  try{const result=await run();const u=result?.usage;if(model.includes('gemma')&&Number.isFinite(u?.prompt_tokens)&&Number.isFinite(u?.completion_tokens))actual=Math.ceil(u.prompt_tokens*TRANSLATION_PRICE.inputPerMillion+u.completion_tokens*TRANSLATION_PRICE.outputPerMillion);return result;}
  catch(e){if([e,...(e?.errors||[]),e?.cause].some(v=>[3036,5035,3023,3041,5016,5018].includes(Number(v?.code))))await call({action:'block'}).catch(()=>{});throw e;}

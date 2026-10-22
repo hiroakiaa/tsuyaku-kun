@@ -1,3 +1,4 @@
+import './monthly-costs.mjs';
 import './cost-accounting.mjs';
 import './async-ui.mjs';
 import {lessonCode} from '../web/entry-feedback.js';
