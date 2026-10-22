@@ -1,12 +1,11 @@
 import {config} from './config.js';
-import {readGoogleBillingPreview,billingTotals,BILLING_READ_LIMITS} from './billing-data.js?v=20261022-free-billing-1';
+import {billingTotals,BILLING_READ_LIMITS} from './billing-data.js?v=20261022-free-billing-2';
 async function connectOwner(){
  const [appSdk,authSdk]=await Promise.all([import('https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js')]);
  const app=appSdk.getApps().find(a=>a.name==='billing-admin')||appSdk.initializeApp(config.firebase,'billing-admin'),auth=authSdk.getAuth(app);await authSdk.setPersistence(auth,authSdk.inMemoryPersistence);
- const provider=new authSdk.GoogleAuthProvider();provider.addScope('https://www.googleapis.com/auth/bigquery.readonly');provider.setCustomParameters({prompt:'select_account'});
- const result=await authSdk.signInWithPopup(auth,provider),accessToken=authSdk.GoogleAuthProvider.credentialFromResult(result)?.accessToken;
- if(!accessToken){await authSdk.signOut(auth);throw Error('請求データの閲覧が許可されませんでした。');}
- return {accessToken,token:()=>result.user.getIdToken(),close:()=>authSdk.signOut(auth)};
+ const provider=new authSdk.GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});
+ const result=await authSdk.signInWithPopup(auth,provider);
+ return {token:()=>result.user.getIdToken(),close:()=>authSdk.signOut(auth)};
 }
 export function createBillingView({el,connect=connectOwner,fetcher=fetch,now=()=>Date.now()}){
  const box=el('section',undefined,'admin-billing'),head=el('div',undefined,'admin-card-heading'),content=el('div'),login=el('button','Googleで請求額を確認'),refresh=el('button','更新','admin-refresh'),logout=el('button','確認を終了');
@@ -37,7 +36,7 @@ export function createBillingView({el,connect=connectOwner,fetcher=fetch,now=()=
   const month=new Date(now()).toISOString().slice(0,7);if(lastRead!==null&&lastMonth===month&&now()-lastRead<BILLING_READ_LIMITS.intervalMs){render('表示済みの取得結果を使用しています。');return;}
   lastRead=now();lastMonth=month;const serial=epoch;render('無料の読取APIで確認しています…');
   const access=await api('/billing/access');if(serial!==epoch)return;if(access.paidQueries!==false||access.readMethod!=='tabledata.list')throw Error('無料閲覧の設定を確認できないため停止しました。');
-  const settled=await Promise.allSettled([readGoogleBillingPreview({...access,month,accessToken:owner.accessToken,fetcher,now:now()}),api('/billing/cloudflare')]);if(serial!==epoch)return;
+  const settled=await Promise.allSettled([api('/billing/google'),api('/billing/cloudflare')]);if(serial!==epoch)return;
   reports=settled.map((r,i)=>r.status==='fulfilled'?r.value:{provider:i?'cloudflare':'google',month,status:'error',message:r.reason?.message||'未取得'});render();
  }
  login.onclick=async()=>{if(busy)return;busy=true;login.disabled=true;const serial=++epoch;render('管理者本人を確認しています…');try{const connection=await connect();if(serial!==epoch){await connection.close();return;}owner=connection;await load();}catch(e){render(e?.code==='auth/popup-closed-by-user'?'確認を取り消しました。':e?.message||'確認できませんでした。');}finally{busy=false;login.disabled=false;}};
