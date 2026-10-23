@@ -173,3 +173,17 @@ body.phone-home .chat-person[data-chat-side=other].chat-approval-needed{backgrou
 #modal.guest-invitation .guest-hint{margin:-8px 0 0;text-align:left;font-size:13px}
 #modal.guest-invitation .chat-join-button{margin:4px auto 0}
 @media(max-width:359px){#modal.guest-invitation .modal-heading{gap:6px}#modal.guest-invitation #modal-title{font-size:19px}#modal .guest-japanese-toggle{min-width:48px;padding:6px!important}}
+
+/* Existing actions remain reachable on short displays and with a keyboard. */
+#modal.guest-invitation{width:min(560px,calc(100% - 24px));scroll-padding-block:16px 64px}
+#modal.guest-invitation .modal-heading{position:sticky;top:0;z-index:2;background:#1c1c1f;padding-right:0}
+#modal.guest-invitation .guest-join-form{display:grid;gap:16px;min-width:0}
+#modal.guest-invitation :is(input,select){font-size:16px;min-height:48px;min-width:0;width:100%}
+#modal.guest-invitation :is(button,input,select):focus-visible{outline:2px solid #eee;outline-offset:3px}
+#modal.guest-invitation .guest-feedback{margin:0;line-height:1.5;font-size:14px;color:#e5c1b8;overflow-wrap:anywhere}
+#modal.guest-invitation .guest-display-announcement{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+#modal-body .chat-action-feedback{grid-column:1/-1;overflow-wrap:anywhere;margin:0;text-align:left}
+#modal-body .chat-action-feedback[hidden]{display:none!important}
+#modal-body .chat-group-person>span{min-width:0;overflow-wrap:anywhere}
+@media(min-width:540px) and (max-height:480px){#modal.guest-invitation .guest-join-form{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px 16px}#modal.guest-invitation .guest-join-form>label:first-child{grid-column:1;grid-row:1}#modal.guest-invitation .guest-join-form>label:nth-of-type(2){grid-column:2;grid-row:1}#modal.guest-invitation .guest-hint,#modal.guest-invitation .guest-feedback,#modal.guest-invitation .chat-join-button{grid-column:1/-1}#modal.guest-invitation .modal-heading{margin-bottom:12px;padding-bottom:8px}}
+@media(prefers-reduced-motion:reduce){body.phone-home .captions{scroll-behavior:auto!important}}
