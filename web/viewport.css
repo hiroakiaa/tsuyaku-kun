@@ -146,3 +146,15 @@ body.phone-home .chat-request-row>button{font-size:14px;min-height:44px;padding:
 #modal-body .chat-join-button:disabled{opacity:.6}
 
 #modal-body .chat-join-button .ui-copy,#modal-body .chat-join-button .ui-ja,#modal-body .chat-join-button .ui-en{color:#171719!important}
+
+/* Keep approval primary, invitation compact, and name controls on one row. */
+#modal-body .chat-name-form{display:grid!important;gap:8px;min-width:0}
+#modal-body .chat-name-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:stretch;min-width:0}
+#modal-body .chat-name-controls input{min-width:0;width:100%;height:100%;min-height:48px;box-sizing:border-box}
+#modal-body .chat-name-controls button{display:flex;align-items:center;justify-content:center;min-height:48px;height:100%;margin:0;white-space:nowrap}
+#modal-body .chat-invite-action{width:calc(50% - 4px);min-width:0;justify-self:start;min-height:44px;font-size:13px;padding:8px!important;white-space:normal}
+#modal-body .chat-request-row>button[data-allow=true]{grid-column:1/-1;width:100%;min-height:52px;background:#f4f4f5!important;color:#171719!important;border-color:#f4f4f5!important;font-size:17px;font-weight:700}
+#modal-body .chat-request-row>button[data-allow=true] .ui-copy,#modal-body .chat-request-row>button[data-allow=true] .ui-ja,#modal-body .chat-request-row>button[data-allow=true] .ui-en{color:#171719!important}
+#modal-body .chat-request-row>button[data-allow=false]{grid-column:2;min-width:0}
+body.phone-home .chat-person[data-chat-side=other].chat-approval-needed{background:#303034!important;border-color:#85858e!important;box-shadow:0 0 12px #ffffff16;transition:background-color .2s,border-color .2s,box-shadow .2s}
+@media(prefers-reduced-motion:reduce){body.phone-home .chat-person.chat-approval-needed{transition:none}}
