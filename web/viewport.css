@@ -158,3 +158,18 @@ body.phone-home .chat-request-row>button{font-size:14px;min-height:44px;padding:
 #modal-body .chat-request-row>button[data-allow=false]{grid-column:2;min-width:0}
 body.phone-home .chat-person[data-chat-side=other].chat-approval-needed{background:#303034!important;border-color:#85858e!important;box-shadow:0 0 12px #ffffff16;transition:background-color .2s,border-color .2s,box-shadow .2s}
 @media(prefers-reduced-motion:reduce){body.phone-home .chat-person.chat-approval-needed{transition:none}}
+
+/* Guest invitation uses English first; Japanese is an optional local display. */
+#modal.guest-invitation .modal-heading{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center}
+#modal.guest-invitation #modal-title{min-width:0;font-size:21px;line-height:1.35}
+#modal .guest-copy{display:inline-flex;flex-direction:column;gap:4px;line-height:1.4}
+#modal .guest-japanese{font-size:.78em;font-weight:400;color:#bdbdc4}
+#modal .guest-japanese[hidden]{display:none!important}
+#modal .guest-japanese-toggle{width:auto;min-width:56px;min-height:44px;height:auto;padding:8px!important;font-size:13px;border:0;background:transparent;box-shadow:none;border-radius:10px}
+#modal .guest-japanese-toggle[aria-pressed=true]{background:#303034;border:1px solid #777}
+#modal.guest-invitation #modal-close{position:static;top:auto;right:auto;align-self:center;margin:0;border-radius:12px!important;width:44px;min-width:44px;height:44px;min-height:44px;padding:8px!important;font-size:20px}
+#modal.guest-invitation .chat-join-panel{display:grid;gap:18px;min-width:0}
+#modal.guest-invitation .chat-join-panel label{gap:8px;font-size:16px}
+#modal.guest-invitation .guest-hint{margin:-8px 0 0;text-align:left;font-size:13px}
+#modal.guest-invitation .chat-join-button{margin:4px auto 0}
+@media(max-width:359px){#modal.guest-invitation .modal-heading{gap:6px}#modal.guest-invitation #modal-title{font-size:19px}#modal .guest-japanese-toggle{min-width:48px;padding:6px!important}}
