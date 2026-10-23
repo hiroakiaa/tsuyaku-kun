@@ -1,3 +1,5 @@
+import {guardedStorage} from './storage-access.js?v=20261024-usability20-4';
+const localStorage=guardedStorage(()=>globalThis.localStorage);
 import {uiLabels} from './ui-labels.js?v=20261021-chat-controls-1';
 
 export const ENGLISH_GUIDES_KEY='tsuyaku-english-guides-v1';

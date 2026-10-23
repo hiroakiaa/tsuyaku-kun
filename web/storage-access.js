@@ -1,0 +1,2 @@
+// Reads may fall back to defaults; failed writes must remain observable by callers.
+export function guardedStorage(read){return {getItem(key){try{return read()?.getItem(key)??null;}catch{return null;}},setItem(key,value){const storage=read();if(!storage)throw Error('Storage unavailable');storage.setItem(key,String(value));},removeItem(key){const storage=read();if(!storage)throw Error('Storage unavailable');storage.removeItem(key);}};}
