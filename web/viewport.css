@@ -187,3 +187,29 @@ body.phone-home .chat-person[data-chat-side=other].chat-approval-needed{backgrou
 #modal-body .chat-group-person>span{min-width:0;overflow-wrap:anywhere}
 @media(min-width:540px) and (max-height:480px){#modal.guest-invitation .guest-join-form{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px 16px}#modal.guest-invitation .guest-join-form>label:first-child{grid-column:1;grid-row:1}#modal.guest-invitation .guest-join-form>label:nth-of-type(2){grid-column:2;grid-row:1}#modal.guest-invitation .guest-hint,#modal.guest-invitation .guest-feedback,#modal.guest-invitation .chat-join-button{grid-column:1/-1}#modal.guest-invitation .modal-heading{margin-bottom:12px;padding-bottom:8px}}
 @media(prefers-reduced-motion:reduce){body.phone-home .captions{scroll-behavior:auto!important}}
+/* Same three columns on both chat cards, including approval and waiting states. */
+body.phone-home .chat-participants .chat-person{display:grid;grid-template-columns:auto minmax(0,1fr) 12px;align-items:center;align-content:center;gap:8px;min-height:68px;box-sizing:border-box;padding:10px!important;position:relative;}
+body.phone-home .chat-participants .chat-person>.chat-person-icon{grid-column:1;grid-row:1;width:28px;height:28px;}
+body.phone-home .chat-participants .chat-person>.chat-person-copy{grid-column:2;grid-row:1;min-width:0;}
+body.phone-home .chat-participants .chat-person-label{font-size:12px;line-height:1.35;overflow-wrap:anywhere;}
+body.phone-home .chat-participants .chat-person-language{font-size:15px;line-height:1.4;overflow-wrap:anywhere;}
+body.phone-home .chat-participants .chat-person>.fa-chevron-down{position:static;grid-column:3;grid-row:1;transform:none;margin:0;justify-self:center;font-size:11px;}
+body.phone-home .chat-participants .chat-request-badge{grid-column:2/4;grid-row:2;max-width:100%;overflow-wrap:anywhere;}
+body.phone-home .chat-participants .chat-person select{border-radius:inherit;}
+/* Existing content remains usable with long labels and keyboard navigation. */
+body.phone-home :is(button,summary,select,input,textarea,[role=button]):focus-visible{outline:2px solid #eee;outline-offset:3px;}
+body.phone-home :is(.photo-text-details,.photo-display-settings,.admin-panel details)>summary{min-height:44px;box-sizing:border-box;padding-block:12px;line-height:1.5;}
+body.phone-home #lesson-room-code{font-variant-numeric:tabular-nums;letter-spacing:.12em;}
+body.phone-home #join-status{overflow-wrap:anywhere;line-height:1.5;}
+body.phone-home :is(#message,.connection-hint,.caption-progress,.caption-delivery){overflow-wrap:anywhere;}
+body.phone-home #modal:has(.photo-simple) .modal-heading{position:sticky;top:0;z-index:3;}
+body.phone-home #modal .photo-translate textarea{max-height:40dvh;min-height:100px;overflow:auto;}
+body.phone-home #modal .photo-overlay-viewport:focus-visible{outline:2px solid #eee;outline-offset:2px;}
+body.phone-home #modal-body .admin-metric{flex-wrap:wrap;column-gap:12px;}
+body.phone-home #modal-body .admin-metric>*{min-width:0;overflow-wrap:anywhere;max-width:100%;}
+body.phone-home #modal-body .admin-metric>strong{margin-left:auto;text-align:right;font-variant-numeric:tabular-nums;}
+body.phone-home #modal-body .admin-tabs>button:focus-visible{outline-offset:-2px;}
+body.phone-home #modal-body .admin-panel :is(input,textarea,select){max-width:100%;min-width:0;box-sizing:border-box;}
+@media(max-width:359px){body.phone-home .chat-participants .chat-person{grid-template-columns:22px minmax(0,1fr) 10px;gap:5px;padding:8px!important;}body.phone-home .chat-participants .chat-person>.chat-person-icon{width:22px;height:22px;font-size:11px;}body.phone-home .chat-participants .chat-person-language{font-size:13px;}body.phone-home #modal .photo-languages{grid-template-columns:minmax(0,1fr);gap:10px;}}
+@media(max-height:420px){body.phone-home .chat-participants .chat-person{min-height:58px;padding:6px!important;}body.phone-home #modal .photo-translate>canvas{max-height:20dvh;}}
+@media(prefers-reduced-motion:reduce){body.phone-home :is(.chat-person,.photo-translate button,.caption-composer,.text-form,.reference-card){transition:none!important;animation:none!important;}}
