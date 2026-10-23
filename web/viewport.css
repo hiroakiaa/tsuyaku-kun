@@ -213,3 +213,10 @@ body.phone-home #modal-body .admin-panel :is(input,textarea,select){max-width:10
 @media(max-width:359px){body.phone-home .chat-participants .chat-person{grid-template-columns:22px minmax(0,1fr) 10px;gap:5px;padding:8px!important;}body.phone-home .chat-participants .chat-person>.chat-person-icon{width:22px;height:22px;font-size:11px;}body.phone-home .chat-participants .chat-person-language{font-size:13px;}body.phone-home #modal .photo-languages{grid-template-columns:minmax(0,1fr);gap:10px;}}
 @media(max-height:420px){body.phone-home .chat-participants .chat-person{min-height:58px;padding:6px!important;}body.phone-home #modal .photo-translate>canvas{max-height:20dvh;}}
 @media(prefers-reduced-motion:reduce){body.phone-home :is(.chat-person,.photo-translate button,.caption-composer,.text-form,.reference-card){transition:none!important;animation:none!important;}}
+/* Explicit submission feedback stays with the editable content. */
+body.phone-home #modal-body .form-feedback{margin:8px 0;line-height:1.6;font-size:14px;overflow-wrap:anywhere;color:#e5c1b8;}
+body.phone-home #modal-body .form-feedback[hidden]{display:none!important;}
+body.phone-home #modal-body form[aria-busy=true]{cursor:progress;}
+body.phone-home #modal-body form textarea{font-size:16px;min-height:96px;line-height:1.6;resize:vertical;max-width:100%;box-sizing:border-box;}
+body.phone-home #modal-body .reference-language-text{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7;}
+body.phone-home #modal-body .reference-language-heading>.speech-controls{flex-wrap:wrap;row-gap:6px;max-width:100%;}
