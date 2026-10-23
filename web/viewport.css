@@ -138,3 +138,11 @@ body.phone-home .chat-request-row{display:grid;grid-template-columns:1fr 1fr;gap
 body.phone-home .chat-request-row>span{grid-column:1/-1;overflow-wrap:anywhere;}
 body.phone-home .chat-request-row>button{font-size:14px;min-height:44px;padding:8px;}
 @media(max-width:359px){body.phone-home .chat-waiting{flex-direction:column;align-items:stretch;}body.phone-home .chat-group-person{grid-template-columns:20px minmax(0,1fr);}body.phone-home .chat-group-person small{grid-column:2;}}
+
+/* A single clear join action, centered within the invitation. */
+#modal-body .chat-join-button{display:flex;align-items:center;justify-content:center;gap:10px;width:min(100%,320px);min-height:52px;margin:20px auto 4px;padding:12px 18px!important;border:1px solid #f4f4f5!important;background:#f4f4f5!important;color:#171719!important;border-radius:16px;font-size:17px;font-weight:700;line-height:1.4;text-align:center}
+#modal-body .chat-join-button:hover{background:#dedee2!important;border-color:#dedee2!important}
+#modal-body .chat-join-button:focus-visible{outline:2px solid white;outline-offset:4px}
+#modal-body .chat-join-button:disabled{opacity:.6}
+
+#modal-body .chat-join-button .ui-copy,#modal-body .chat-join-button .ui-ja,#modal-body .chat-join-button .ui-en{color:#171719!important}
