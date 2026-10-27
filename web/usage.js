@@ -1,6 +1,6 @@
 import {TRANSLATION_PRICE,translationScenario} from './cost-policy.js?v=20261022-cost-accounting-1';
 import {resourceSnapshot} from './resource-usage.js?v=20261024-usability20-4';
-export const BUILD_ID='20261027-school-connection-2';
+export const BUILD_ID='20261027-speech-resume-1';
 // Device-local operational history. No names, room keys, tokens or speech are stored here.
 export const PRICES={checkedAt:TRANSLATION_PRICE.checkedAt,inputPerMillion:TRANSLATION_PRICE.inputPerMillion,outputPerMillion:TRANSLATION_PRICE.outputPerMillion,streamPerMinute:.0092,whisperPerMinute:.000513,turnPerGB:.05};
 export function percentile(values,p){const a=values.filter(Number.isFinite).sort((a,b)=>a-b);return a.length?a[Math.max(0,Math.ceil(a.length*p)-1)]:null;}
