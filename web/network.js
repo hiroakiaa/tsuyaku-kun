@@ -16,14 +16,17 @@ export class ConnectionDiary{
  list(){try{const rows=JSON.parse(this.storage.getItem(this.key)||'[]');return Array.isArray(rows)?rows.slice(-50).map(safeConnectionRecord):[];}catch{return [];}}
  add(value){const record=safeConnectionRecord(value);try{this.storage.setItem(this.key,JSON.stringify([...this.list(),record].slice(-50)));}catch{}return record;}
 }
-export async function requestJson(url,options={}, {fetcher=fetch,stage='api',operation='other',onFailure=()=>{}}={}){
- let response;
- try{response=await fetcher(url,options);}catch(error){const failure=connectionFailure(error,{stage,endpoint:url,operation});onFailure(failure.connection);throw failure;}
+export function isTransportFailure(data){return ['network_or_cors','timeout','invalid_response','auth_unavailable'].includes(data?.connectionFailure?.code);}
+export function translationFailureSummary(data){return isTransportFailure(data)?'翻訳サーバーとの通信を確認できませんでした。原文は残しています。':['quota','billing','auth'].includes(data?.aiFailure?.reason)?'翻訳の利用制限です。接続状態とは別です。原文を残しています。':'翻訳処理を完了できませんでした。原文を残しています。';}
+export async function requestJson(url,options={}, {fetcher=fetch,stage='api',operation='other',onFailure=()=>{},now=()=>Date.now()}={}){
+ const started=now();const record=value=>safeConnectionRecord({...value,elapsedMs:Math.max(0,now()-started)});let response;
+ try{response=await fetcher(url,options);}catch(error){const failure=connectionFailure(error,{stage,endpoint:url,operation});failure.connection=record(failure.connection);failure.failureRecorded=true;onFailure(failure.connection);throw failure;}
  let result;
- try{result=await response.json();}catch{const failure=connectionFailure({code:'invalid_response'},{stage,endpoint:url,operation,status:response.status});onFailure(failure.connection);throw failure;}
- if(!response.ok||result.error){onFailure(safeConnectionRecord({stage,operation,endpoint:url,code:'http_error',status:response.status,errorCode:result.errorCode,aiReason:result.aiFailure?.reason,aiCode:result.aiFailure?.code,aiEvidence:result.aiFailure?.evidence,aiModel:result.aiFailure?.model}));throw Object.assign(Error(result.error||'接続先が応答しました（HTTP '+response.status+'）。'),{errorCode:result.errorCode,usage:result.usage,latencyMs:result.latencyMs,httpStatus:response.status,resourceFailure:result.resourceFailure,aiFailure:result.aiFailure});}
+ try{result=await response.json();if(!result||typeof result!=='object'||Array.isArray(result))throw Error('Invalid JSON envelope');}catch{const failure=connectionFailure({code:'invalid_response'},{stage,endpoint:url,operation,status:response.status});failure.connection=record(failure.connection);failure.failureRecorded=true;onFailure(failure.connection);throw failure;}
+ if(!response.ok||result.error){const connection=record({stage,operation,endpoint:url,code:'http_error',status:response.status,errorCode:result.errorCode,aiReason:result.aiFailure?.reason,aiCode:result.aiFailure?.code,aiEvidence:result.aiFailure?.evidence,aiModel:result.aiFailure?.model});onFailure(connection);throw Object.assign(Error(result.error||'接続先が応答しました（HTTP '+response.status+'）。'),{errorCode:result.errorCode,usage:result.usage,latencyMs:result.latencyMs,httpStatus:response.status,resourceFailure:result.resourceFailure,aiFailure:result.aiFailure,connection,failureRecorded:true});}
  return result;
 }
+
 export async function probeNetwork(api,{fetcher=fetch,now=()=>Date.now()}={}){
  return Promise.all(['api_simple','api_headers'].map(async stage=>{
  const started=now(),url=api+'/health',options={method:stage==='api_simple'?'GET':'POST',signal:AbortSignal.timeout(8000),referrerPolicy:'no-referrer',...(stage==='api_headers'?{headers:{Authorization:'Bearer connectivity-check','Content-Type':'application/json'},body:'{}'}:{})};
@@ -39,7 +42,7 @@ export function explainConnection(checks,{authentication='unavailable',online=tr
  const facts=[],candidates=[],nextSteps=[];const recentSessions=summarizeSessions(sessions);facts.push('接続診断の判定対象は過去5分の記録です。利用結果とは別の検査です。');if(history.length>records.length)facts.push('5分より古い通信記録 '+(history.length-records.length)+'件は現在の原因判定から除外しています。');if(recentSessions.length){const s=recentSessions[0];facts.push('最新の利用：翻訳成功 '+s.translatedCaptions+'文、翻訳失敗 '+s.failedCaptions+'文、再接続 '+s.reconnectCount+'回。');if(s.slowTranslationCount>0)facts.push('最新の利用で5秒以上の翻訳 '+s.slowTranslationCount+'文、最初の翻訳 '+s.firstTranslationMs+'ms。処理内訳は未計測で、原因は断定できません。');if(s.relayBytes>0)facts.push('最新の利用でTURN中継通信 '+s.relayBytes+' bytesを観測しました。相手の音声再生成功までは判定しません。');}
  facts.push(authentication==='ready'?'匿名認証の準備は完了しています。':'匿名認証の準備完了を確認できていません。');
  if(!online)facts.push('端末がオフラインと報告しています。');
- for(const r of [simple,headers,turn,transcribe,translation].filter(Boolean))facts.push((r.stage==='browser_speech'?'ブラウザー音声認識':r.operation==='translation'?'翻訳AI':r.operation==='transcribe'?'音声認識API':({api_simple:'APIの通常通信',api_headers:'APIの認証ヘッダー付き通信',turn:'TURN接続情報の取得'})[r.stage])+'：'+r.code+(r.status?'（HTTP '+r.status+'）':'')+'。');
+ for(const r of [simple,headers,turn,transcribe,translation].filter(Boolean))facts.push((r.stage==='browser_speech'?'ブラウザー音声認識':r.operation==='translation'?'翻訳要求の通信':r.operation==='transcribe'?'音声認識API':({api_simple:'APIの通常通信',api_headers:'APIの認証ヘッダー付き通信',turn:'TURN接続情報の取得'})[r.stage])+'：'+r.code+(r.status?'（HTTP '+r.status+'）':'')+'。');
  const failed=records.filter(r=>!['ok','filtered','browser_speech_started','browser_speech_ended'].includes(r.code));
  const recent=sessions.filter(s=>Number.isFinite(s.updatedAt)&&s.updatedAt<=now&&now-s.updatedAt<=300000),errors=recent.flatMap(s=>s.events||[]).filter(e=>e.type==='recognition_error'),drops=recent.flatMap(s=>s.events||[]).filter(e=>e.type==='asr_queue_drop');
  const rtcFailures=recent.flatMap(s=>s.events||[]).filter(e=>['rtc_failed','rtc_signal_error'].includes(e.type));
@@ -61,8 +64,8 @@ export function explainConnection(checks,{authentication='unavailable',online=tr
  if(records.some(r=>r.aiReason==='quota'))nextSteps.push('AI側は上限を報告しています。管理画面の当日残量・アカウント・時刻と照合してください。この診断だけで実際の残量は断定しません。');
  if(records.some(r=>r.aiReason==='input'))nextSteps.push('音声形式・モデルの入力仕様を確認してください。回線の変更だけで直るとは限りません。');
  if(failed.some(r=>['network_or_cors','timeout','invalid_response'].includes(r.code))){nextSteps.push('同じ端末で学校Wi-Fiと許可された別回線を比較し、それぞれの診断結果を保存する。別回線だけ成功する場合は回線側の制限が候補になります。');nextSteps.push('ネットワーク管理者に下記接続先のDNS解決・HTTPS/TLS・フィルターの拒否ログを確認してもらう。');nextSteps.push('PCの開発者ツールのNetwork/Consoleで失敗したリクエストのHTTP状態・CORS表示・証明書エラーを確認する。共有時はAuthorization・token・招待URL・本文を削除する。');}
- nextSteps.push('APIが成功してからルーム作成、相手の参加、WebSocket、最後に音声のTURN経路を順に確認する。');
- return {generatedAt:new Date(now).toISOString(),observationWindowSeconds:300,pastRecordCount:history.length-records.length,sessionResults:recentSessions,facts,candidates,nextSteps,requiredEndpoints:[...new Set(records.map(r=>r.endpoint).filter(Boolean))],notMeasured:['DNSの解決結果','TLS証明書・ハンドシェイク','学校フィルター・プロキシの拒否理由','CORSの詳細な拒否理由','実際のTURN中継経路と学校端末間の音声到達'],limitations:'ブラウザーのfetchは通信失敗の詳細を公開しません。network_or_corsだけでは原因を確定できません。過去の失敗記録は現在の障害を証明しません。健康確認はルームを作成せず、音声・WebSocketも検査しません。'};
+ nextSteps.push('つうやくはAPIへの接続後、短い文の翻訳を確認する。チャット・授業はルーム参加とWebSocketによる字幕の受信を順に確認する。');
+ return {generatedAt:new Date(now).toISOString(),observationWindowSeconds:300,pastRecordCount:history.length-records.length,sessionResults:recentSessions,facts,candidates,nextSteps,requiredEndpoints:[...new Set(records.map(r=>r.endpoint).filter(Boolean))],notMeasured:['DNSの解決結果','TLS証明書・ハンドシェイク','学校フィルター・プロキシの拒否理由','CORSの詳細な拒否理由','学校端末からの実際の翻訳要求・WebSocket到達・相手端末への字幕表示'],limitations:'ブラウザーのfetchは通信失敗の詳細を公開しません。network_or_corsだけでは原因を確定できません。過去の失敗記録は現在の障害を証明しません。健康確認はルームを作成せず、音声・WebSocketも検査しません。'};
 }
 
 export function summarizeSessions(sessions=[]){
