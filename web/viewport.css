@@ -225,3 +225,6 @@ body.phone-home #modal-body .reference-language-heading>.speech-controls{flex-wr
 body.phone-home button[aria-busy=true]>.fa-spinner{animation:tsuyaku-wait 1.2s linear infinite;}
 body.phone-home .speech-controls[data-speech-state=loading] [data-play]{outline:1px solid #888;outline-offset:2px;}
 @media(prefers-reduced-motion:reduce){body.phone-home button[aria-busy=true]>.fa-spinner{animation:none;}}
+/* Error actions contain real text; the old 40px icon width must not apply. */
+body.phone-home .caption-meta .caption-action{width:auto!important;min-width:120px;max-width:100%;height:auto;min-height:44px;white-space:normal;line-height:1.5;flex:0 1 auto;}
+body.phone-home .caption-meta .caption-progress{flex:1 0 100%;min-width:0;line-height:1.5;}
