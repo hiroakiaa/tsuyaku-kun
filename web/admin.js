@@ -6,7 +6,7 @@ function adminDisclosure(el,title,nodes){const d=el('details',undefined,'admin-d
 import {englishPrompt} from './ui-english.js?v=20261024-usability20-4';
 import {createBudgetView,createMonthlyBudgetView,budgetLimitNote,COST_SOURCES} from './budget-view.js?v=20261022-billing-auto-1';
 import {conversationPresentation} from './conversation-ui.js?v=20261021-chat-controls-1';
-import {PRICES,costOf,percentile,analysisReport,translationTimingSummary} from './usage.js?v=20261024-usability20-4';
+import {PRICES,costOf,percentile,analysisReport,translationTimingSummary} from './usage.js?v=20261027-school-connection-1';
 import {listHistory as storedHistory} from './history.js?v=20261006-school-1';
 import {resourceSnapshot} from './resource-usage.js?v=20261024-usability20-4';
 const listHistory=()=>localStorage.getItem('tsuyaku-device-mode')==='personal'?storedHistory():Promise.resolve([]);
