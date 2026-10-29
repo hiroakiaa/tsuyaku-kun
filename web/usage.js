@@ -1,6 +1,6 @@
 import {TRANSLATION_PRICE,translationScenario} from './cost-policy.js?v=20261022-cost-accounting-1';
 import {resourceSnapshot} from './resource-usage.js?v=20261024-usability20-4';
-export const BUILD_ID='20261029-review100-1';
+export const BUILD_ID='20261029-recognition-queue-1';
 // Device-local operational history. No names, room keys, tokens or speech are stored here.
 export const PRICES={checkedAt:TRANSLATION_PRICE.checkedAt,inputPerMillion:TRANSLATION_PRICE.inputPerMillion,outputPerMillion:TRANSLATION_PRICE.outputPerMillion,streamPerMinute:.0092,whisperPerMinute:.000513,turnPerGB:.05};
 export function percentile(values,p){const a=values.filter(Number.isFinite).sort((a,b)=>a-b);return a.length?a[Math.max(0,Math.ceil(a.length*p)-1)]:null;}
@@ -49,5 +49,5 @@ export function wordCandidate(word){const w=normalizeWord(word);return [...w].le
 
 export function currentBuildSummary(sessions){
  const rows=sessions.filter(s=>s.build===BUILD_ID),values=field=>rows.flatMap(s=>s[field]||[]).filter(v=>Number.isFinite(v)&&v>=0),sum=field=>rows.reduce((n,s)=>n+(Number.isFinite(s[field])?s[field]:0),0);
- return {build:BUILD_ID,sessions:rows.length,successfulCaptions:Math.max(0,sum('captionCount')-sum('failedCaptions')),failedCaptions:sum('failedCaptions'),p50TranslationMs:percentile(values('latencies'),.5),p95TranslationMs:percentile(values('latencies'),.95),p50RecognitionMs:percentile(values('recognitionLatencies'),.5),p95RecognitionMs:percentile(values('recognitionLatencies'),.95),p50SpeechToDisplayMs:percentile(values('speechLatencies'),.5),p95SpeechToDisplayMs:percentile(values('speechLatencies'),.95),speechTimingSamples:values('speechLatencies').length,note:'このビルドの端末内記録だけです。旧版・他端末は含みません。検出できなかった発話や誤認識率はこの件数から判断できません。'};
+ return {build:BUILD_ID,sessions:rows.length,successfulCaptions:Math.max(0,sum('captionCount')-sum('failedCaptions')),failedCaptions:sum('failedCaptions'),failedAttempts:sum('failedAttempts'),retryCount:rows.flatMap(s=>s.events||[]).filter(e=>e.type==='translation_retry').length,unmeasuredCalls:sum('unmeasuredCalls'),p50TranslationMs:percentile(values('latencies'),.5),p95TranslationMs:percentile(values('latencies'),.95),p50RecognitionMs:percentile(values('recognitionLatencies'),.5),p95RecognitionMs:percentile(values('recognitionLatencies'),.95),p50SpeechToDisplayMs:percentile(values('speechLatencies'),.5),p95SpeechToDisplayMs:percentile(values('speechLatencies'),.95),speechTimingSamples:values('speechLatencies').length,note:'このビルドの端末内記録だけです。旧版・他端末は含みません。検出できなかった発話や誤認識率はこの件数から判断できません。'};
 }
