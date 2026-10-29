@@ -18,7 +18,8 @@ export class PcmSegmenter {
   acceptFrame(){
     let sum=0,squares=0;for(const x of this.frame){sum+=x/32768;squares+=(x/32768)**2;}
     const rms=Math.sqrt(Math.max(0,squares/320-(sum/320)**2));
-    const threshold=Math.max(.004,Math.min(.018,this.noise*2.5));
+    // Bound adaptation so quiet speech remains audible after a long pause.
+    const threshold=Math.max(.004,Math.min(.006,this.noise*1.5));
     const voiced=rms>=threshold;
     if(!this.started){
       if(!voiced){this.onset=0;this.noise=this.noise*.98+Math.min(rms,.006)*.02;this.preroll.set(this.frame,this.preIndex);this.preIndex=(this.preIndex+320)%this.preroll.length;return;}
