@@ -111,3 +111,8 @@ Compared with browser-native recognition, this adds server ASR usage; it is not 
 ## 2026-10-29 compact face captions
 
 Presentation-only changes: original and target remain visible, auxiliary English is collapsible, and playback retains accessible language labels. Edit/save are grouped in a dialog. This does not reduce generated target languages, trigger synthesis on expansion, or change AI/ASR budgets, calls, prices, reuse or accounting. Chat and lesson rendering remain unchanged.
+
+
+## 2026-10-29 short JA/EN recognition
+
+Use script and ordinary English-word evidence to accept a selected JA/EN language when acoustic confidence is weak. Unknown names, digits and unselected languages do not choose a side. Automatic ASR omits vocabulary prompts to avoid imposing Japanese vocabulary on English. No extra ASR, language-classifier or translation requests, new provider, model, price or budget increase. Other language pairs keep the existing confidence threshold. Physical-user reproduction is unconfirmed; live synthesized short English samples and deterministic weak-confidence cases are distinct tests.
