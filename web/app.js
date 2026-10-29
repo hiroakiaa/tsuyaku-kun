@@ -33,7 +33,7 @@ import {CloudSpeechPlayer,createSpeechCache} from './cloud-speech-player.js?v=20
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-progressive-1';
 import {installAdmin} from './admin.js?v=20261030-realtime-1';
 import {config} from './config.js';
-import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261030-common-phrases-1';
+import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261030-realtime-1';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
 import {translationOf,spokenLanguage,withEasyJapanese,supplementCatalog} from './core.js?v=20261029-communication50-1';
 import {speakerCaption,speakerInfo} from './face-mode.js?v=20261006-school-1';
