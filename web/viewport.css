@@ -252,3 +252,4 @@ body.phone-home .face-caption-english>summary{cursor:pointer;color:#a8a8b6;font-
 body.phone-home .face-caption-english>.caption-line>p{font-size:14px!important;}
 body.phone-home #modal-body .face-caption-actions{display:grid;gap:8px;}
 body.phone-home #modal-body .face-caption-actions>button{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;margin:0;text-align:left;}
+body.phone-home #captions .caption.caption-face{opacity:1;}body.phone-home #captions .caption-face .speech-controls>button,body.phone-home #captions .caption-face .face-caption-more{background:transparent!important;border:0!important;box-shadow:none!important;}body.phone-home #captions .caption-face .speech-controls>button:hover{background:#ffffff0b!important;}
