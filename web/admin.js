@@ -6,9 +6,9 @@ function adminDisclosure(el,title,nodes){const d=el('details',undefined,'admin-d
 import {englishPrompt} from './ui-english.js?v=20261029-two-language-1';
 import {createBudgetView,createMonthlyBudgetView,budgetLimitNote,COST_SOURCES} from './budget-view.js?v=20261029-two-language-1';
 import {conversationPresentation} from './conversation-ui.js?v=20261029-communication50-1';
-import {PRICES,costOf,percentile,analysisReport,translationTimingSummary} from './usage.js?v=20261029-catalog-pipeline-1';
+import {PRICES,costOf,percentile,analysisReport,translationTimingSummary} from './usage.js?v=20261030-common-phrases-1';
 import {listHistory as storedHistory} from './history.js?v=20261006-school-1';
-import {resourceSnapshot} from './resource-usage.js?v=20261029-catalog-pipeline-1';
+import {resourceSnapshot} from './resource-usage.js?v=20261030-common-phrases-1';
 const listHistory=()=>localStorage.getItem('tsuyaku-device-mode')==='personal'?storedHistory():Promise.resolve([]);
 import {csv} from './core.js';
 export function installAdmin({wordUsage,sharedWords,api,button,modal,el,ledger,download,currentRecords,connectionHistory=()=>[],deliveryDiagnostics=()=>({events:[]}),connectionAnalysis=()=>null,checkConnection,message,getConversationState=()=>({}),getBudgetScenario=()=>null}){

@@ -567,3 +567,5 @@ await import('./faithful-pipeline.mjs');
 await import('./ios-mic-recovery.mjs');
 
 await import('./catalog-pipeline.mjs');
+
+await import('./common-phrases.mjs');
