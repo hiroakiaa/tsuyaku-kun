@@ -4,7 +4,10 @@ export function compactFaceCaption(article,record,{el,icon,modal,englishOpen=fal
  const other=record.speaker==='相手';article.dataset.faceSide=other?'other':'self';
  const meta=article.querySelector('.caption-meta'),oldSpeaker=meta.firstElementChild;
  const speaker=el('span',undefined,'face-caption-speaker'),circle=el('span',undefined,'face-caption-avatar');
- circle.setAttribute('aria-hidden','true');circle.append(icon('user'));
+ circle.setAttribute('aria-hidden','true');
+ const person=article.ownerDocument.createElementNS('http://www.w3.org/2000/svg','svg');
+ person.setAttribute('viewBox','0 0 24 24');person.setAttribute('width','16');person.setAttribute('height','16');person.setAttribute('fill','currentColor');person.setAttribute('focusable','false');
+ const shape=article.ownerDocument.createElementNS('http://www.w3.org/2000/svg','path');shape.setAttribute('d','M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21v-2a8 8 0 0 1 16 0v2Z');person.append(shape);circle.append(person);
  speaker.append(circle,el('span',other?'相手':'自分'));oldSpeaker?.replaceWith(speaker);
  const actions=[...meta.querySelectorAll('button[aria-label="日本語を直す"],button[aria-label="訳を確認して覚える"]')];
  const header=el('div',undefined,'face-caption-header');
