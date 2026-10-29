@@ -15,24 +15,24 @@ import {deviceCheckPanel,microphoneUnavailable} from './device-check.js?v=202610
 import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261022-billing-auto-1';
 import {installPhotoTranslate} from './photo-translate.js?v=20261024-usability20-3';
 import {refreshEnglishGuides,applyEnglishLabels} from './ui-english.js?v=20261029-two-language-1';
-import {SharedWordUsage} from './shared-word-usage.js?v=20261029-waiting-bubble-1';
+import {SharedWordUsage} from './shared-word-usage.js?v=20261029-catalog-pipeline-1';
 import {installConversationUI,createWaitingBubble} from './conversation-ui.js?v=20261029-waiting-bubble-1';
 import {guardCaptionTranslation,hasInternalMarker,needsTranslationReview} from './translation-safety.js?v=20261029-faithful-pipeline-1';
 import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261029-faithful-pipeline-1';
 import {IdleWatch} from './idle-watch.js?v=20261008-safety-1';
-import {recordResource,recordPause,recordResume} from './resource-usage.js?v=20261029-waiting-bubble-1';
+import {recordResource,recordPause,recordResume} from './resource-usage.js?v=20261029-catalog-pipeline-1';
 import {mayReconnect} from './resource-policy.js';
 import {TranslationMemory} from './translation-memory.js?v=20261029-communication50-1';
 import {ReviewedStore} from './reviewed-store.js';
 import {PersonalPhrases} from './personal-phrases.js?v=20261007-learning-1';
 import {recognitionHints} from './recognition-hints.js?v=20261007-progressive-1';
 import {acquireMicrophone,needsMicrophoneRefresh} from './microphone.js?v=20261029-ios-mic-recovery-1';
-import {UsageLedger,WordUsage} from './usage.js?v=20261029-waiting-bubble-1';
+import {UsageLedger,WordUsage} from './usage.js?v=20261029-catalog-pipeline-1';
 import {CloudSpeechPlayer,createSpeechCache} from './cloud-speech-player.js?v=20261020-safari-speech-2';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-progressive-1';
 import {installAdmin} from './admin.js?v=20261029-communication50-1';
 import {config} from './config.js';
-import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261029-ios-mic-recovery-1';
+import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261029-catalog-pipeline-1';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
 import {translationOf,spokenLanguage,withEasyJapanese,supplementCatalog} from './core.js?v=20261029-communication50-1';
 import {speakerCaption,speakerInfo} from './face-mode.js?v=20261006-school-1';
@@ -161,7 +161,7 @@ function activateTab(next){if(next==='student')next='lesson';requestedMode=next;
 $$('[data-tab]').forEach(b=>{b.onclick=()=>void activateTab(b.dataset.tab);b.onkeydown=e=>{const tabs=$$('[data-tab]'),i=tabs.indexOf(b);let n;if(e.key==='ArrowRight')n=(i+1)%tabs.length;else if(e.key==='ArrowLeft')n=(i+tabs.length-1)%tabs.length;else if(e.key==='Home')n=0;else if(e.key==='End')n=tabs.length-1;else return;e.preventDefault();tabs[n].focus();void activateTab(tabs[n].dataset.tab);};});
 const initAuth=singleFlight(async()=>{try{const [a,b]=await Promise.all([import('https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js')]);authApi=b;firebaseApp??=a.initializeApp(config.firebase);const auth=authInstance??=b.getAuth(firebaseApp);await auth.authStateReady();if(!auth.currentUser)await b.signInAnonymously(auth);user=auth.currentUser;if(!authObserving){b.onAuthStateChanged(auth,u=>{user=u;});authObserving=true;}status('参加できます');queueMicrotask(()=>void refreshCatalog());}catch(e){status('接続できません');const failure=connectionFailure({code:'auth_unavailable'},{stage:'auth',endpoint:'https://identitytoolkit.googleapis.com',operation:'initial_auth'});connections.add({...failure.connection,online:navigator.onLine,sessions:ledger.list()});showConnectionError(failure);}});
 void listHistory().catch(()=>{});const ready=initAuth();
-const refreshCatalog=singleFlight(async()=>{if(!user)return;try{const nextCatalog=withEasyJapanese(await api('/catalog')),changed=JSON.stringify(catalog)!==JSON.stringify(nextCatalog);catalog=nextCatalog;try{localStorage.setItem('tsuyaku-catalog-v1',JSON.stringify(catalog));}catch{}if(changed){fillLanguages();renderReferences();}}catch{message('保存済みの辞書を使っています。');}});
+const refreshCatalog=singleFlight(async()=>{if(!user)return;const started=Date.now();try{const nextCatalog=withEasyJapanese(await api('/catalog')),changed=JSON.stringify(catalog)!==JSON.stringify(nextCatalog);const fetchedAt=Date.now();catalog=nextCatalog;try{localStorage.setItem('tsuyaku-catalog-v1',JSON.stringify(catalog));}catch{}if(changed){fillLanguages();renderReferences();}connections.add({stage:'api',operation:'catalog',code:'ok',endpoint:config.api,clientRequestMs:fetchedAt-started,catalogApplyMs:Date.now()-fetchedAt,catalogRevision:catalog._catalog?.revision,catalogSource:catalog._catalog?.source});}catch{message('保存済みの辞書を使っています。');}});
 void ready.then(()=>refreshCatalog());
 async function token(){await ready;if(!user)await initAuth();if(!user)throw Error('接続を確認してください。');return user.getIdToken();}
 let lastSocketReceive=0;
@@ -331,14 +331,14 @@ async function translateLocally(cap,source){
   const targets=[...new Set(['ja',$('#face-self-language').value,$('#face-other-language').value,'en'])].filter(c=>c!==source);
   const contextIndependent=source==='ja'&&/^(こんにちは|おはようございます|こんばんは)[。？?！!]?$/u.test(cap.text.trim());
   const preceding=[];for(const r of records.values()){if(r.id===id)break;if(r.text)preceding.push(r.text);}const context=contextIndependent?[]:preceding.slice(-3).map(text=>text.slice(0,480));
-  const queueMs=Math.max(0,Date.now()-job.queuedAt),lookupStarted=Date.now();const known=translationMemory.lookupAsync?await translationMemory.lookupAsync(source,cap.text,targets,job.activeRoom.unit,catalog,true):translationMemory.lookup(source,cap.text,targets,job.activeRoom.unit,catalog,true);if(room!==job.activeRoom||sessionEpoch!==job.epoch||controller.signal.aborted||localRevisions.get(cap.id)!==revision)continue;const clientLookupMs=Date.now()-lookupStarted;ledger.reuseLookup(known.diagnostic);const missing=known.missing;const cacheKey=JSON.stringify([source,cap.text,missing,room.unit,context]);
+  const jobCatalog=catalog,clientCatalogRevision=jobCatalog._catalog?.revision;const queueMs=Math.max(0,Date.now()-job.queuedAt),lookupStarted=Date.now();const known=translationMemory.lookupAsync?await translationMemory.lookupAsync(source,cap.text,targets,job.activeRoom.unit,jobCatalog,true):translationMemory.lookup(source,cap.text,targets,job.activeRoom.unit,jobCatalog,true);if(room!==job.activeRoom||sessionEpoch!==job.epoch||controller.signal.aborted||localRevisions.get(cap.id)!==revision)continue;const clientLookupMs=Date.now()-lookupStarted;ledger.reuseLookup(known.diagnostic);const missing=known.missing;const cacheKey=JSON.stringify([source,cap.text,missing,room.unit,context,clientCatalogRevision]);
   const base={type:'translation',id,source,text:cap.text,speaker:cap.speaker||'自分',final:true,revision,continuing:!!cap.continuing,at:Date.now(),usageId:'local-'+cap.id+'-'+revision};
   let clientRequestMs=null,clientSlotWaitMs=null;const stampTiming=result=>({...result,usage:{...result.usage,translationTiming:{...result.usage?.translationTiming,clientQueueMs:queueMs,clientLookupMs,clientRequestMs,clientSlotWaitMs}}});const valid=()=>room===job.activeRoom&&sessionEpoch===job.epoch&&localRevisions.get(cap.id)===revision&&!controller.signal.aborted;
   try{
    let result=missing.length?sessionTranslations.get(cacheKey):{translations:known.translations,usage:{inputTokens:0,outputTokens:0,cacheHit:true},latencyMs:0,memorySource:known.source};
    if(result)result={...result,usage:{inputTokens:0,outputTokens:0,cacheHit:true},latencyMs:0};
    else{if(Date.now()<aiBlockedUntil)throw Object.assign(Error('本日のAI利用上限です。じしょに登録された訳を使えます。'),{aiFailure:{reason:'quota'}});
-    const waitStarted=Date.now();const release=await faceAiGate.acquire(controller.signal);clientSlotWaitMs=Date.now()-waitStarted;try{if(!valid()||controller.signal.aborted)continue;const requestStarted=Date.now();try{result=await api('/translate',{text:cap.text,source,targets:missing,unit:job.activeRoom.unit,context},{signal:controller.signal});}finally{clientRequestMs=Date.now()-requestStarted;}}finally{release();}
+    const waitStarted=Date.now();const release=await faceAiGate.acquire(controller.signal);clientSlotWaitMs=Date.now()-waitStarted;try{if(!valid()||controller.signal.aborted)continue;const requestStarted=Date.now();try{result=await api('/translate',{text:cap.text,source,targets:missing,unit:job.activeRoom.unit,context,catalogRevision:clientCatalogRevision},{signal:controller.signal});}finally{clientRequestMs=Date.now()-requestStarted;}}finally{release();}
     if(valid()&&guardCaptionTranslation({source,text:cap.text,status:'ready',translations:result.translations}).status==='ready')sessionTranslations.set(cacheKey,result);if(sessionTranslations.size>100)sessionTranslations.delete(sessionTranslations.keys().next().value);
    }
    result=stampTiming(result);if(room===job.activeRoom&&sessionEpoch===job.epoch&&!valid())ledger.caption({...base,...result,status:'ready'},{selfId});if(valid()){const completion=localCompletions.get(cap.id);await handle({...base,...result,translations:{...result.translations,...known.translations},status:'ready',...(completion?.text===cap.text?{revision:completion.revision,continuing:false}:{})});}
