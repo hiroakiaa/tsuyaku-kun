@@ -1,3 +1,4 @@
+import {realtimeUpgrade} from './realtime-recognition.js';
 import {recognitionDecoding} from './recognition-policy.js';
 import {createCatalogCache,exposeCatalog} from './catalog-cache.js';
 import {translationInstructions} from './translation-instructions.js';
@@ -13,8 +14,8 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261030-asr-probe-1';
-const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper']);
+const BUILD_ID='20261030-realtime-1';
+const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
  const local=chain.find(e=>e.appBudget);if(local)return {reason:local.aiReason==='busy'?'overloaded':'quota',code:null,message:local.message,evidence:'unclassified',...(AI_MODELS.has(error?.model)?{model:error.model}:{})};
@@ -81,6 +82,7 @@ export default {async fetch(request,env,ctx){
 
     const match=url.pathname.match(/^\/rooms\/([a-f0-9]{32})(\/socket)?$/);
     if(match){if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'socket:'+(request.headers.get('CF-Connecting-IP')||'local')})).success))return cors(error('少し待ってから再試行してください。',429));const room=env.ROOMS.get(env.ROOMS.idFromName(match[1]));const r=await room.fetch(request);return r.status===101?r:cors(r);}
+    if(url.pathname==='/transcribe-stream')return realtimeUpgrade(request,env,{verifyToken,aiFailure,ctx});
     const token=(request.headers.get('Authorization')||'').replace(/^Bearer /,'');const authStarted=Date.now(),auth=await verifyToken(token,env.FIREBASE_PROJECT,url.pathname.startsWith('/billing/'));env={...env,authMs:Date.now()-authStarted,budgetUid:auth.uid,executionValid:()=>requestExecutionValid(request,requestStarted)};if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'user:'+auth.uid})).success))return cors(error('少し待ってから再試行してください。',429));
     if(url.pathname.startsWith('/billing/')){
       if(!await isBillingAdministrator(auth,env.BILLING_ADMIN_EMAIL_HASH))return cors(error('請求データは管理者本人のGoogle認証が必要です。',403));
