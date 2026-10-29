@@ -1,5 +1,5 @@
-import {monthlyAiState,monthlyReserve,monthlySettle,monthlyAiReport} from './monthly-ai-cost.js';
-import {AI_LIMITS,TRANSLATION_PRICE} from '../web/cost-policy.js';
+import {monthlyAiState,monthlyReserve,monthlySettle,monthlyAiReport,monthlyExtend} from './monthly-ai-cost.js';
+import {AI_LIMITS,TRANSLATION_PRICE,RECOGNITION_PRICE} from '../web/cost-policy.js';
 // Conservative app-local variable-cost budget, not Cloudflare account billing.
 const DAY=86400000;
 export function budgetError(reason='budget'){
@@ -8,6 +8,7 @@ export function budgetError(reason='budget'){
 }
 export function reserveCost(model,input){
  if(model==='@cf/google/gemma-4-26b-a4b-it')return Math.ceil((new TextEncoder().encode(JSON.stringify(input.messages||[])).length*TRANSLATION_PRICE.inputPerMillion+Math.min(4096,input.max_completion_tokens||4096)*TRANSLATION_PRICE.outputPerMillion)*1.1);
+ if(model===RECOGNITION_PRICE.streamModel){if(!Number.isFinite(input.seconds)||input.seconds<=0||input.seconds>30)throw budgetError();return Math.ceil(input.seconds/60*RECOGNITION_PRICE.streamPerMinute*1e6*1.1);}
  if(model==='@cf/openai/whisper-large-v3-turbo')return Math.ceil((input.audio?.length||0)*.75/32000/60*.000513*1e6*1.1);
  if(model==='@cf/openai/whisper')return Math.ceil((input.audio?.length||0)/32000/60*.0006*1e6*1.1);
  throw budgetError();
@@ -23,7 +24,15 @@ export async function budgetOperation(storage,data,now=Date.now()){
    const globalRemaining=Math.max(0,Math.round(AI_LIMITS.globalUSD*1e6)-state.total),userRemaining=Math.max(0,Math.round(AI_LIMITS.userUSD*1e6)-user.cost);
    return {day:new Date(day*DAY).toISOString().slice(0,10),asOf:now,resetsAt:(day+1)*DAY,currency:'USD',global:{limitUSD:AI_LIMITS.globalUSD,usedUSD:state.total/1e6,remainingUSD:globalRemaining/1e6},user:{limitUSD:AI_LIMITS.userUSD,usedUSD:user.cost/1e6,remainingUSD:userRemaining/1e6,calls:user.calls,callLimit:AI_LIMITS.userCalls,callsRemaining:Math.max(0,AI_LIMITS.userCalls-user.calls)},availableUSD:state.blockedUntil>now?0:Math.min(globalRemaining,userRemaining)/1e6,blocked:state.blockedUntil>now,inFlight:Object.values(state.leases).length};
   }
+  if(data.action==='extend'){
+   const lease=state.leases[data.id],cost=data.cost;
+   if(!lease||data.day!==day||lease.uid!==data.uid||!Number.isSafeInteger(cost)||cost<1||cost>10000||!state.monthly.leases[data.id])throw budgetError();
+   const user=state.users[lease.uid];
+   if(state.blockedUntil>now||state.total+cost>Math.round(AI_LIMITS.globalUSD*1e6)||user.cost+cost>Math.round(AI_LIMITS.userUSD*1e6))throw budgetError();
+   const expires=now+120000;monthlyExtend(state.monthly,data.id,day,cost,expires);lease.cost+=cost;lease.expires=expires;state.total+=cost;user.cost+=cost;await tx.put('budget',state);return {ok:true};
+  }
   if(data.action==='reserve'){
+
    const uid=String(data.uid||'unknown').slice(0,128),cost=data.cost;
    if(!Number.isSafeInteger(cost)||cost<1||cost>10000)throw budgetError();
    const user=state.users[uid]||{cost:0,calls:0};

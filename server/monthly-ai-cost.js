@@ -1,5 +1,5 @@
 // Counts and conservative app budget consumption only. No identity or text is stored.
-const MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper']);
+const MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 const bucket=model=>MODELS.has(model)?model:'legacy-unclassified';
 export function monthlyAiState(previous,now){
  const month=new Date(now).toISOString().slice(0,7),existing=previous?.monthly;
@@ -14,3 +14,5 @@ export function monthlyAiState(previous,now){
 export function monthlyReserve(state,id,day,cost,model,now){const key=bucket(model);state.cost+=cost;state.calls++;state.models[key]??={cost:0,calls:0};state.models[key].cost+=cost;state.models[key].calls++;state.leases[id]={cost,model:key,day,expires:now+120000};}
 export function monthlySettle(state,data){const lease=state.leases[data.id];if(!lease||lease.day!==data.day)return;const actual=Number.isSafeInteger(data.actual)&&data.actual>=0?data.actual:lease.cost,delta=actual-lease.cost;state.cost=Math.max(0,state.cost+delta);state.models[lease.model].cost=Math.max(0,state.models[lease.model].cost+delta);delete state.leases[data.id];}
 export function monthlyAiReport(state,now){return {month:state.month,asOf:now,coverageStart:state.coverageStart,partial:state.partial,estimatedBeforeFreeUSD:state.cost/1e6,calls:state.calls,inFlight:Object.keys(state.leases).length,models:Object.entries(state.models).map(([model,v])=>({model,estimatedBeforeFreeUSD:v.cost/1e6,calls:v.calls})),basis:'app_budget_consumption',includesReservations:true};}
+
+export function monthlyExtend(state,id,day,cost,expires){const lease=state.leases[id];if(!lease||lease.day!==day)throw Error("Missing monthly reservation");lease.cost+=cost;lease.expires=expires;state.cost+=cost;state.models[lease.model].cost+=cost;}
