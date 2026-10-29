@@ -42,9 +42,9 @@ export async function guardedAi(env,model,input,run){
  if(!env.ROOMS)return run(); // Unit fixtures do not provide Cloudflare bindings.
  const budget=env.ROOMS.get(env.ROOMS.idFromName('__ai_budget_v1__'));
  const call=async data=>{const r=await budget.fetch(new Request('https://budget/budget',{method:'POST',body:JSON.stringify(data)}));const result=await r.json();if(!r.ok)throw budgetError(result.reason);return result;};
- const reserveStarted=Date.now();let reservation;try{reservation=await call({action:'reserve',uid:env.budgetUid||'unknown',model,cost:reserveCost(model,input)});}finally{if(env.translationTiming)env.translationTiming.budgetWaitMs=Date.now()-reserveStarted;}
+ const reserveStarted=Date.now();let reservation;try{reservation=await call({action:'reserve',uid:env.budgetUid||'unknown',model,cost:reserveCost(model,input)});}finally{if(env.translationTiming)env.translationTiming.budgetWaitMs=(env.translationTiming.budgetWaitMs||0)+Date.now()-reserveStarted;}
  let actual;
  try{const result=await run();const u=result?.usage;if(model.includes('gemma')&&Number.isFinite(u?.prompt_tokens)&&Number.isFinite(u?.completion_tokens))actual=Math.ceil(u.prompt_tokens*TRANSLATION_PRICE.inputPerMillion+u.completion_tokens*TRANSLATION_PRICE.outputPerMillion);return result;}
  catch(e){if([e,...(e?.errors||[]),e?.cause].some(v=>[3036,5035,3023,3041,5016,5018].includes(Number(v?.code))))await call({action:'block'}).catch(()=>{});throw e;}
- finally{const settleStarted=Date.now();try{await call({action:'settle',...reservation,...(actual!==undefined?{actual}:{})}).catch(()=>{});}finally{if(env.translationTiming)env.translationTiming.budgetSettleMs=Date.now()-settleStarted;}}
+ finally{const settleStarted=Date.now();try{await call({action:'settle',...reservation,...(actual!==undefined?{actual}:{})}).catch(()=>{});}finally{if(env.translationTiming)env.translationTiming.budgetSettleMs=(env.translationTiming.budgetSettleMs||0)+Date.now()-settleStarted;}}
 }
