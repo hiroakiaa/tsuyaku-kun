@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {createServerRecognition} from '../web/caption-server.js';
 import {recentSessionEvents,explainConnection,safeConnectionRecord} from '../web/network.js';
 const tick=()=>new Promise(r=>setTimeout(r,0));
-const audio=()=>({samples:new Int16Array(16000).fill(123),at:Date.now(),boundary:'pause'});
+const audio=()=>({samples:Int16Array.from({length:16000},(_,i)=>i%2?123:-123),at:Date.now(),boundary:'pause'});
 function fixture(options={}){
  const requests=[],out=[],diagnostics=[];let usage=0;
  const R=createServerRecognition({endpoint:'https://test/transcribe?language=en',getStream:()=>null,getToken:async()=>'',onUsage:n=>usage+=n,onDiagnostic:d=>diagnostics.push(d),fetcher:(_,o)=>new Promise((resolve,reject)=>{requests.push({signal:o.signal,body:o.body,resolve:text=>resolve({ok:true,status:200,json:async()=>({text})}),reject});o.signal.addEventListener('abort',()=>reject(new DOMException('cancelled','AbortError')));}),...options});
@@ -21,7 +21,7 @@ function fixture(options={}){
  const f=fixture();f.r.queue.push(audio(),audio());const pending=f.r.drain();await tick();f.requests[1].resolve('Later.');await tick();f.r.abort();await pending;assert.deepEqual(f.out,[]);assert.ok(f.requests.every(x=>x.signal.aborted));assert.equal(f.r.jobs.size,0);
 }
 {
- const f=fixture();f.r.queue.push(audio(),audio());const pending=f.r.drain();await tick();f.requests[1].resolve('Recovered.');f.requests[0].reject(Error('network'));await pending;assert.deepEqual(f.out,['Recovered.']);assert.equal(f.r.failures,0);assert.equal(f.diagnostics[0].code,'network_or_cors');f.r.abort();
+ const f=fixture();f.r.queue.push(audio(),audio());const pending=f.r.drain();await tick();f.requests[1].resolve('Recovered.');f.requests[0].reject(Error('network'));await pending;assert.deepEqual(f.out,['Recovered.']);assert.equal(f.r.failures,0);assert.ok(f.diagnostics.some(d=>d.code==='network_or_cors'));f.r.abort();
 }
 {
  const now=Date.now(),s={startedAt:now-600000,updatedAt:now,events:[{type:'recognition_error',seconds:100},{type:'recognition_error',seconds:500},{type:'asr_queue_drop',seconds:601},{type:'recognition_error'},{type:'recognition_error',seconds:-1}]};

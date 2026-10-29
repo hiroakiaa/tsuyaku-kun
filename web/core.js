@@ -17,11 +17,13 @@ export function protectMath(text) {
   return String(text).normalize('NFC').replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-65248));
 }
 export function parseTranslation(text, targets) {
-  const cleaned = String(text).replace(/<think>[\s\S]*?<\/think>/g,'').replace(/^```(?:json)?\s*|\s*```$/g,'').trim();
+  const cleaned = String(text).replace(/^\uFEFF/,'').replace(/<think>[\s\S]*?<\/think>/g,'').replace(/^```(?:json)?\s*|\s*```$/g,'').trim();
+  if(cleaned.startsWith('['))throw Error('翻訳の応答形式を確認してください。');
   const start=cleaned.indexOf('{'),end=cleaned.lastIndexOf('}');
   if(start<0||end<start)throw Error('翻訳の応答を確認できませんでした。');
   const data=JSON.parse(cleaned.slice(start,end+1));
-  const out={};for(const code of targets){if(typeof data[code]!=='string'||!data[code].trim()||data[code].length>4000)throw Error('翻訳が完了しませんでした。');out[code]=data[code].trim();}
+  if(!data||typeof data!=='object'||Array.isArray(data))throw Error('翻訳の応答形式を確認してください。');
+  const out={};for(const code of targets){if(typeof data[code]!=='string'||!data[code].trim()||data[code].length>4000||/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(data[code]))throw Error('翻訳が完了しませんでした。');out[code]=data[code].trim();}
   return out;
 }
 export function validateCaption(data) {

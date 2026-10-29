@@ -1,7 +1,8 @@
 import {translationField} from '../web/core.js';
 import {equivalentPhrase} from '../web/phrase-equivalence.js';
+import {usableTranslation} from '../web/translation-safety.js';
 
-const usable=value=>typeof value==='string'&&value.trim()&&!value.startsWith('#')&&!value.startsWith('=');
+const usable=usableTranslation;
 export function storedTranslations(text,source,targets,data,subject='') {
   // Exact means exact: different numbers, punctuation and context-dependent variants never share a bank entry.
   const rows=(data.bank||[]).filter(r=>r.status==='approved'&&r.sourceLang===source&&r.sourceText===text&&(!r.subject||r.subject==='common'||r.subject===subject));
