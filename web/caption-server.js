@@ -1,4 +1,4 @@
-import {recognitionLanguage,speechTextAllowed} from './two-language.js?v=20261029-speech-guard-1';
+import {recognitionLanguage,speechTextAllowed} from './two-language.js?v=20261029-speech-evidence-1';
 import {nonSpeechReason} from './speech-filter.js?v=20261007-learning-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261007-progressive-1';
 // Browser-independent recognition using the call's existing microphone stream.
@@ -34,7 +34,7 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
       try {
         await resumed;
         if (!this.active) return;
-        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261007-learning-1', import.meta.url));
+        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261029-speech-evidence-1', import.meta.url));
         if (!this.active) return;
         this.source = this.context.createMediaStreamSource(stream);
         this.node = new Worklet(this.context, 'caption-pcm');
