@@ -1,4 +1,4 @@
-import {recognitionLanguage,speechTextAllowed} from './two-language.js?v=20261029-review100-1';
+import {recognitionLanguage,speechTextAllowed} from './two-language.js?v=20261029-recognition-queue-1';
 import {nonSpeechReason} from './speech-filter.js?v=20261007-learning-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261007-progressive-1';
 // Browser-independent recognition using the call's existing microphone stream.
@@ -21,11 +21,11 @@ export function tokenWithAbort(getToken,signal){
   Promise.resolve().then(getToken).then(value=>{signal.removeEventListener('abort',aborted);resolve(value);},error=>{signal.removeEventListener('abort',aborted);reject(error);});
  });
 }
-export function createServerRecognition({ endpoint, getStream, getToken, fetcher = fetch, onUsage = () => {}, onDiagnostic = () => {},
+export function createServerRecognition({ endpoint, getStream, getToken, fetcher = fetch, onUsage = () => {}, onDiagnostic = () => {}, canParallel = () => true,
   Context = globalThis.AudioContext || globalThis.webkitAudioContext, Worklet = globalThis.AudioWorkletNode }) {
   return class ServerRecognition {
     constructor() { this.active = false; this.queue = []; this.sending = false; this.index = 0; this.failures = 0; this.getHints = () => [];const query=new URL(endpoint||'https://invalid.local').searchParams;this.automatic=query.get('language')==='auto';this.candidates=(query.get('languages')||'').split(','); }
-    progress(){this.onprogress?.({phase:this.capturing?'capturing':this.sending||this.queue.length?'recognizing':'waiting',pending:this.queue.length+(this.sending?1:0)});}
+    progress(){this.onprogress?.({phase:this.capturing?'capturing':this.sending||this.queue.length?'recognizing':'waiting',pending:this.queue.length+(this.jobs?.size||0)});}
     setHints(getHints) { this.getHints = typeof getHints === 'function' ? getHints : () => []; }
     start() {
       this.active = true;
@@ -43,7 +43,7 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
       try {
         await resumed;
         if (!this.active) return;
-        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261029-review100-1', import.meta.url));
+        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261029-recognition-queue-1', import.meta.url));
         if (!this.active) return;
         this.source = this.context.createMediaStreamSource(stream);
         this.node = new Worklet(this.context, 'caption-pcm');
@@ -54,7 +54,7 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
           const samples=event.data?.samples||event.data,boundary=event.data?.boundary==='limit'?'limit':'pause';
           if(!(samples instanceof Int16Array)||samples.length<1||samples.length>48000){onDiagnostic({stage:'asr',operation:'capture',code:'invalid_audio'});return;}
           if (this.queue.length >= 2) { this.queue.shift().samples.fill(0);this.breakContinuity=true; onDiagnostic({stage:'asr',operation:'capture',code:'queue_overflow'}); this.onrecovering?.({reason:'queue_overflow',attempt:1}); }
-          const at=Date.now();this.queue.push({samples,boundary,at,speechStartedAt:firstVoicedAt(samples,at),speechEndedAt:lastVoicedAt(samples,at)});this.progress();
+          const at=Date.now(),sequence=this.captureSequence=(this.captureSequence||0)+1;this.queue.push({samples,boundary,at,sequence,speechStartedAt:firstVoicedAt(samples,at),speechEndedAt:lastVoicedAt(samples,at)});this.progress();
           void this.drain();
         };
         this.node.onprocessorerror=()=>{if(this.active)this.fail('interrupted');};
@@ -67,19 +67,28 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
       } catch (_) { if (this.active) this.fail('audio-capture'); }
     }
     async drain() {
-      if (this.sending || !this.active || !this.queue.length) return;
-      this.sending = true;this.progress();
-      const chunk = this.queue.shift();
+      this.jobs??=new Set();this.commitTail??=Promise.resolve();
+      const started=[];
+      // Keep completed, out-of-order responses in their slots too. Never create an unbounded result buffer.
+      while(this.active&&this.queue.length&&this.jobs.size<2&&(!this.jobs.size||canParallel())){
+        const chunk=this.queue.shift(),job={controller:new AbortController(),previous:this.commitTail};
+        this.commitTail=new Promise(resolve=>job.release=resolve);this.jobs.add(job);this.sending=true;this.progress();
+        started.push(this.recognizeChunk(chunk,job));
+      }
+      await Promise.all(started);
+    }
+    async recognizeChunk(chunk,job) {
       const requestAt=Date.now(), queueMs=Math.max(0,requestAt-chunk.at);
-      const controller = new AbortController(); this.request = controller;let phase='auth',body,clientAuthMs=null,httpStarted=null;
+      const controller = job.controller;let phase='auth',body,clientAuthMs=null,httpStarted=null;
+      const ordered=async()=>{await job.previous;if(!this.active||!this.jobs.has(job)||controller.signal.aborted)return false;if(Number.isFinite(chunk.sequence)){if(Number.isFinite(this.lastSequence)&&chunk.sequence!==this.lastSequence+1)this.breakContinuity=true;this.lastSequence=chunk.sequence;}return true;};
       const stale=()=>Date.now()-chunk.at>15000;
       const timeout = setTimeout(() => controller.abort(), 12000);
       try {
-        if(stale()){this.breakContinuity=true;onDiagnostic({code:'stale_audio',queueMs});this.onrecovering?.({reason:'stale_audio',attempt:1});return;}
+        if(stale()){if(await ordered()){this.breakContinuity=true;onDiagnostic({code:'stale_audio',queueMs});this.onrecovering?.({reason:'stale_audio',attempt:1});}return;}
         const token = await tokenWithAbort(getToken,controller.signal);clientAuthMs=Date.now()-requestAt;
         if (!this.active) return;
-        if (controller.signal.aborted) { this.fail('network'); return; }
-        if(stale()){this.breakContinuity=true;onDiagnostic({code:'stale_audio',queueMs,clientAuthMs});this.onrecovering?.({reason:'stale_audio',attempt:1});return;}
+        if (controller.signal.aborted) throw new DOMException('Recognition cancelled','AbortError');
+        if(stale()){if(await ordered()){this.breakContinuity=true;onDiagnostic({code:'stale_audio',queueMs,clientAuthMs});this.onrecovering?.({reason:'stale_audio',attempt:1});}return;}
         body = encodeWav(chunk.samples); chunk.samples.fill(0);
         onUsage(chunk.samples.length / 16000);
         const hints = [...new Set((this.automatic?[]:(this.getHints() || [])).filter(x => typeof x === 'string')
@@ -90,10 +99,15 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
             ...(encodedHints ? { 'X-Term-Hints': encodedHints } : {}) },
           body, signal: controller.signal, cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer'
         });
-        let failure; if(!response.ok){try{failure=(await response.json()).aiFailure;}catch{}} const requestMetrics={status:response.status,elapsedMs:Date.now()-requestAt,queueMs,clientAuthMs,clientRequestMs:Date.now()-httpStarted,captureTailMs:Number.isFinite(chunk.speechEndedAt)?Math.max(0,chunk.at-chunk.speechEndedAt):null,audioSeconds:chunk.samples.length/16000,segmentBoundary:chunk.boundary,...(failure?{aiReason:failure.reason,aiCode:failure.code,aiEvidence:failure.evidence,aiModel:failure.model}:{})};if(!response.ok)onDiagnostic({code:'http_error',...requestMetrics});
+        phase='parse';let data,failure;if(response.ok){data=await response.json();if(!data||typeof data!=='object'||typeof data.text!=='string')throw Error('invalid response');}else{try{failure=(await response.json()).aiFailure;}catch{}}
+        const responseReadyAt=Date.now();clearTimeout(timeout);
+        const requestMetrics={status:response.status,elapsedMs:responseReadyAt-requestAt,queueMs,clientAuthMs,clientRequestMs:responseReadyAt-httpStarted,captureTailMs:Number.isFinite(chunk.speechEndedAt)?Math.max(0,chunk.at-chunk.speechEndedAt):null,audioSeconds:chunk.samples.length/16000,segmentBoundary:chunk.boundary,...(failure?{aiReason:failure.reason,aiCode:failure.code,aiEvidence:failure.evidence,aiModel:failure.model}:{})};
+        if(!await ordered())return;
+        requestMetrics.orderWaitMs=Math.max(0,Date.now()-responseReadyAt);if(!response.ok)onDiagnostic({code:'http_error',...requestMetrics});
         if (!response.ok) { const error=failure?.reason|| (response.status === 429 ? 'quota' : [401,403].includes(response.status) ? 'auth' : 'network'); if (['network','service','timeout','overloaded'].includes(error) && (response.status>=500||error==='overloaded')) { this.transientFailure(); return; } this.fail(error,failure?.message); return; }
-        phase='parse';const data = await response.json();if(!data||typeof data!=='object'||typeof data.text!=='string')throw Error('invalid response');this.failures=0;onDiagnostic({code:'ok',...requestMetrics,elapsedMs:Date.now()-requestAt});
-        if (!this.active || controller.signal.aborted || Date.now() - chunk.at > 15000) return;
+        this.failures=0;onDiagnostic({code:'ok',...requestMetrics});
+        if (!this.active || controller.signal.aborted) return;
+        if(stale()){this.breakContinuity=true;onDiagnostic({code:'stale_audio',queueMs,orderWaitMs:requestMetrics.orderWaitMs});this.onrecovering?.({reason:'stale_audio',attempt:1});return;}
         const automatic=this.automatic,candidates=this.candidates;
         if(automatic&&typeof data.text==='string'&&data.text.trim()&&(data.languageUncertain||!data.language||!candidates.includes(data.language)||!speechTextAllowed(data.text,candidates))){this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:'language_uncertain'});this.onlanguageuncertain?.({reason:speechTextAllowed(data.text,candidates)?'uncertain':'outside_pair'});return;}
         const rejected=nonSpeechReason(data,data.language||new URL(endpoint).searchParams.get('language'));
@@ -103,9 +117,9 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
           // No cumulative transcript list is retained by the recognizer.
           this.acceptText(text,{speechStartedAt:chunk.speechStartedAt,speechEndedAt:chunk.speechEndedAt,recognitionReadyAt:Date.now(),boundary:chunk.boundary,...(data.language?{language:data.language}:{})});
         }
-      } catch (_) { if(this.active){const code=controller.signal.aborted?'timeout':phase==='parse'?'invalid_response':phase==='auth'?'auth_unavailable':'network_or_cors';onDiagnostic({code,queueMs,clientAuthMs,...(httpStarted?{clientRequestMs:Date.now()-httpStarted}:{})});if(phase==='auth'&&!controller.signal.aborted)this.fail('auth');else this.transientFailure();} }
+      } catch (_) {clearTimeout(timeout);await job.previous; if(this.active&&this.jobs.has(job)){const code=controller.signal.aborted?'timeout':phase==='parse'?'invalid_response':phase==='auth'?'auth_unavailable':'network_or_cors';onDiagnostic({code,queueMs,clientAuthMs,...(httpStarted?{clientRequestMs:Date.now()-httpStarted}:{})});if(phase==='auth'&&!controller.signal.aborted)this.fail('auth');else this.transientFailure();} }
       finally {
-        chunk.samples.fill(0);if(body)new Uint8Array(body).fill(0);clearTimeout(timeout); this.request = null; this.sending = false;this.progress();
+        chunk.samples.fill(0);if(body)new Uint8Array(body).fill(0);clearTimeout(timeout);this.jobs.delete(job);job.release();this.sending=this.jobs.size>0;this.progress();
         if (this.active) void this.drain();
       }
     }
@@ -154,7 +168,7 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
     fail(error,message) { const notify = this.onerror; this.abort(); notify?.({ error, message }); }
     abort() {
       clearTimeout(this.startTimer);clearTimeout(this.fragmentTimer);clearInterval(this.watchdog);this.watchdog=null;this.fragment=null;
-      this.active = false;this.capturing=false; this.request?.abort();
+      this.active = false;this.capturing=false;for(const job of this.jobs||[]){job.controller.abort();job.release();}this.jobs?.clear();this.sending=false;
       for (const chunk of this.queue) chunk.samples.fill(0); this.queue=[];
       if (this.node) { this.node.onprocessorerror=null;this.node.port.onmessage = null; this.node.port.postMessage('stop'); this.node.disconnect(); }
       this.source?.disconnect();
