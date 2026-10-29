@@ -11,15 +11,15 @@ export function validWav(bytes) {
 
 export function hasSpeechEnergy(wav) {
   const view = new DataView(wav.buffer, wav.byteOffset, wav.byteLength);
-  const levels = []; let active = 0;
+  const levels = []; let active = 0,run=0,longest=0;
   // 20ms frames, removing DC: clicks, a steady fan or mic offset are not speech.
   for (let at = 44; at + 640 <= wav.length; at += 640) {
     let sum = 0, squares = 0;
     for (let i = 0; i < 320; i++) { const x = view.getInt16(at + i * 2, true) / 32768; sum += x; squares += x * x; }
     const rms = Math.sqrt(Math.max(0, squares / 320 - (sum / 320) ** 2));
-    levels.push(rms); if (rms >= 0.004) active++;
+    levels.push(rms); if (rms >= 0.004){active++;run++;longest=Math.max(longest,run);}else run=0;
   }
-  if (active < 6) return false;
+  if (active < 6||longest<3) return false;
   levels.sort((a,b) => a-b);
   const low = levels[Math.floor(levels.length * .2)], high = levels[Math.floor(levels.length * .9)];
   return high >= 0.004 && high > low * 1.5;
@@ -38,18 +38,21 @@ export function cleanRecognition(result, language) {
   // A standalone stock outro is a known silence hallucination. Preserve quotes
   // and ordinary sentences containing these words rather than rewriting speech.
   if (/^(?:ご視聴(?:どうも)?ありがとうございました|ご視聴ありがとうございます)+$/.test(normalized)) return '';
+  const vadDuration=result.transcription_info?.duration_after_vad;
+  if(Number.isFinite(vadDuration)&&vadDuration<=0)return '';
   const segments = result.segments || result.transcription_info?.segments;
   if (Array.isArray(segments) && segments.length) {
     // Never remove words solely because they repeat: confidence evidence is required.
     const unreliable = segment =>
       (Number.isFinite(segment.no_speech_prob) && segment.no_speech_prob >= .35) ||
-      (Number.isFinite(segment.avg_logprob) && segment.avg_logprob < -1 &&
-        Number.isFinite(segment.compression_ratio) && segment.compression_ratio > 2.4);
+      (Number.isFinite(segment.avg_logprob) && segment.avg_logprob < -1);
     const kept = segments.filter(segment => !unreliable(segment));
     if (!kept.length) return '';
     // Preserve reliable speech around rejected noise, only when complete segment text is available.
-    if (kept.length !== segments.length && segments.every(segment => typeof segment.text === 'string'))
+    if (kept.length !== segments.length) {
+      if(!segments.every(segment => typeof segment.text === 'string'))return '';
       return finish(kept.map(segment => segment.text.trim()).filter(Boolean).join(' '));
+    }
   }
   return finish(text);
 }
