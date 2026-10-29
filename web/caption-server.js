@@ -1,3 +1,4 @@
+import {recognitionLanguage} from './two-language.js?v=20261029-two-language-1';
 import {nonSpeechReason} from './speech-filter.js?v=20261007-learning-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261007-progressive-1';
 // Browser-independent recognition using the call's existing microphone stream.
@@ -78,12 +79,14 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
         if (!response.ok) { const error=failure?.reason|| (response.status === 429 ? 'quota' : [401,403].includes(response.status) ? 'auth' : 'network'); if (['network','service','timeout','overloaded'].includes(error) && (response.status>=500||error==='overloaded')) { this.transientFailure(); return; } this.fail(error,failure?.message); return; }
         const data = await response.json(); this.failures=0;
         if (!this.active || controller.signal.aborted || Date.now() - chunk.at > 15000) return;
-        const rejected=nonSpeechReason(data,new URL(endpoint).searchParams.get('language'));
+        const query=new URL(endpoint).searchParams,automatic=query.get('language')==='auto',candidates=(query.get('languages')||'').split(',');
+        if(automatic&&typeof data.text==='string'&&data.text.trim()&&(data.languageUncertain||!data.language||!candidates.includes(data.language))){this.breakContinuity=true;this.finishFragment();this.onlanguageuncertain?.({text:data.text.trim().slice(0,600)});return;}
+        const rejected=nonSpeechReason(data,data.language||query.get('language'));
         if(rejected){this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:rejected});return;}
         const text = typeof data.text === 'string' ? data.text.trim().slice(0, 600) : '';
         if (text) {
           // No cumulative transcript list is retained by the recognizer.
-          this.acceptText(text,{speechStartedAt:chunk.speechStartedAt,speechEndedAt:chunk.speechEndedAt,recognitionReadyAt:Date.now(),boundary:chunk.boundary});
+          this.acceptText(text,{speechStartedAt:chunk.speechStartedAt,speechEndedAt:chunk.speechEndedAt,recognitionReadyAt:Date.now(),boundary:chunk.boundary,...(data.language?{language:data.language}:{})});
         }
       } catch (_) { if (this.active) { onDiagnostic({code:controller.signal.aborted?'timeout':'network_or_cors'}); this.transientFailure(); } }
       finally {
@@ -105,7 +108,7 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
       const now=Date.now();let joined=false,index,revision=0,chunks=1;
       if(this.fragment){
         const previous=this.fragment;
-        if(!this.breakContinuity&&now-previous.at<=previous.waitMs){
+        if(!this.breakContinuity&&recognitionLanguage(previous.timing.language)===recognitionLanguage(timing.language)&&now-previous.at<=previous.waitMs){
           this.fragment=null;clearTimeout(this.fragmentTimer);
           text=previous.text.replace(/[。．.]$/u,'')+' '+text;joined=true;
           index=previous.index;revision=previous.revision+1;chunks=(previous.chunks||1)+1;
