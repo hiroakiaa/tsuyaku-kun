@@ -1,3 +1,4 @@
+import {recognitionDecoding} from './recognition-policy.js';
 import {createCatalogCache,exposeCatalog} from './catalog-cache.js';
 import {translationInstructions} from './translation-instructions.js';
 import {resolveSpeechLanguage,recognitionLanguage} from '../web/two-language.js';
@@ -12,7 +13,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261029-catalog-pipeline-1';
+const BUILD_ID='20261030-asr-probe-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -34,7 +35,7 @@ export async function recognizeAudio(env,bytes,language,termHints=[],candidates=
  language=spokenLanguage(language);
         let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
         const hints=[...new Set([...termHints,...(candidates.length?[]:recognitionHints(catalog,language))])].slice(0,30).join('、').slice(0,400);
-        let result;try{result=await runAi(env,'@cf/openai/whisper-large-v3-turbo',{audio:btoa(binary),...(candidates.length?{}:{language:recognitionLanguage(language)}),task:'transcribe',...(candidates.length?{}:{initial_prompt:hints}),vad_filter:true,beam_size:5,condition_on_previous_text:false,no_speech_threshold:.35,compression_ratio_threshold:2.4,log_prob_threshold:-1,hallucination_silence_threshold:.6});}catch(firstError){if(candidates.length||!['input','model'].includes(aiFailure(firstError).reason))throw firstError;try{result=await runAi(env,'@cf/openai/whisper',{audio:Array.from(bytes)});}catch(secondError){throw secondError;}}
+        let result;try{result=await runAi(env,'@cf/openai/whisper-large-v3-turbo',{audio:btoa(binary),...(candidates.length?{}:{language:recognitionLanguage(language)}),task:'transcribe',...(candidates.length?{}:{initial_prompt:hints}),vad_filter:true,beam_size:recognitionDecoding(env.recognitionProfile).beamSize,condition_on_previous_text:false,no_speech_threshold:.35,compression_ratio_threshold:2.4,log_prob_threshold:-1,hallucination_silence_threshold:.6});}catch(firstError){if(candidates.length||!['input','model'].includes(aiFailure(firstError).reason))throw firstError;try{result=await runAi(env,'@cf/openai/whisper',{audio:Array.from(bytes)});}catch(secondError){throw secondError;}}
 
  return result;
 }
@@ -107,15 +108,16 @@ export default {async fetch(request,env,ctx){
     }
     if(url.pathname==='/transcribe'&&request.method==='POST'){
       const language=url.searchParams.get('language')||'ja',automatic=language==='auto',candidates=automatic?[...new Set((url.searchParams.get('languages')||'').split(','))]:[];if(automatic?(!candidates.length||candidates.length>2||candidates.some(code=>!catalog.languages.some(l=>l.code===code))):!catalog.languages.some(l=>l.code===language))return cors(error('言語を確認してください。'));
+      const recognitionProfile=url.searchParams.get('profile')||'baseline';try{recognitionDecoding(recognitionProfile);}catch{return cors(error('認識方式を確認してください。'));}
       if(request.headers.get('Content-Type')!=='audio/wav')return cors(error('音声形式を確認してください。',415));
-      const recognitionTiming={serverBuild:BUILD_ID,authMs:env.authMs??null,uploadMs:null,preprocessMs:null,providerMs:null,budgetWaitMs:null,budgetSettleMs:null,totalMs:null,aiCalled:false},uploadStarted=Date.now();
+      const recognitionTiming={profile:recognitionProfile,serverBuild:BUILD_ID,authMs:env.authMs??null,uploadMs:null,preprocessMs:null,providerMs:null,budgetWaitMs:null,budgetSettleMs:null,totalMs:null,aiCalled:false},uploadStarted=Date.now();
       const timed=data=>{recognitionTiming.totalMs=Date.now()-requestStarted;return {...data,recognitionTiming};};
       const reader=request.body.getReader(),chunks=[];let size=0;try{for(;;){const r=await reader.read();if(r.done)break;size+=r.value.length;if(size>512044){await reader.cancel();return cors(error('音声が長すぎます。',413));}chunks.push(r.value);}}finally{reader.releaseLock();}
       recognitionTiming.uploadMs=Date.now()-uploadStarted;const preprocessStarted=Date.now();
       const bytes=new Uint8Array(size);let offset=0;for(const c of chunks){bytes.set(c,offset);offset+=c.length;c.fill(0);}
       try{if(!validWav(bytes))return cors(error('音声形式を確認してください。',415));if(!hasSpeechEnergy(bytes)){recognitionTiming.preprocessMs=Date.now()-preprocessStarted;return cors(json(timed({text:''})));}
         recognitionTiming.preprocessMs=Date.now()-preprocessStarted;recognitionTiming.aiCalled=true;
-        const result=await recognizeAudio({...env,translationTiming:recognitionTiming},bytes,automatic?candidates[0]:language,safeRecognitionHints(request.headers.get('X-Term-Hints')),candidates);
+        const result=await recognizeAudio({...env,recognitionProfile,translationTiming:recognitionTiming},bytes,automatic?candidates[0]:language,safeRecognitionHints(request.headers.get('X-Term-Hints')),candidates);
         const detected=automatic?resolveSpeechLanguage(result,candidates):language;const text=cleanRecognition(result,detected||'');if(text===null)return cors(error('音声を認識できませんでした。',502));return cors(json(timed({text,...(automatic?{language:detected,languageUncertain:!!text&&!detected}:{})})));
       }catch(e){const failure=aiFailure(e);return cors(json(timed({error:failure.message,aiFailure:failure,recognitionCode:failure.reason}),failure.reason==='quota'?429:['billing','auth'].includes(failure.reason)?403:502));}finally{bytes.fill(0);}
     }

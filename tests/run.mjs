@@ -571,3 +571,5 @@ await import('./catalog-pipeline.mjs');
 await import('./common-phrases.mjs');
 
 await import('./dots-capture.mjs');
+
+await import('./recognition-profiles.mjs');
