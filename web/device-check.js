@@ -1,4 +1,4 @@
-import {acquireMicrophone} from './microphone.js?v=20261006-mic-1';
+import {acquireMicrophone} from './microphone.js?v=20261029-ios-mic-recovery-1';
 export function microphoneUnavailable(stream){return !stream?.getAudioTracks().some(t=>t.readyState==='live');}
 export function deviceCheckPanel({el,modal,participants=()=>[],isRecording=()=>false,getMedia=()=>navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true},video:false}),Context=globalThis.AudioContext||globalThis.webkitAudioContext}){
  const root=el('div',undefined,'device-check'),note=el('p','チャットは話した内容を翻訳テキストで送ります。元の音声は配信せず、訳文の再生ボタンで聞けます。ここでは入力音量だけをこの端末で確認します。認識・翻訳・録音保存はしません。30秒で停止します。'),level=el('meter'),state=el('p','マイクは停止中です。'),start=el('button','マイク入力を確認'),stop=el('button','確認を停止'),tone=el('button','確認音を鳴らす');level.min=0;level.max=1;level.value=0;level.setAttribute('aria-label','マイク入力音量');stop.disabled=true;let stream,context,timer,expiry,closed=false,generation=0;const tones=new Set();
