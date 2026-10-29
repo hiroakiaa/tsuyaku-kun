@@ -4,6 +4,7 @@ import {RECOGNITION_PRICE} from '../web/cost-policy.js';
 const SLICE=15;
 async function budgetCall(env,data){if(!env.ROOMS)throw budgetError();const stub=env.ROOMS.get(env.ROOMS.idFromName('__ai_budget_v1__')),r=await stub.fetch(new Request('https://budget/budget',{method:'POST',body:JSON.stringify(data)})),value=await r.json();if(!r.ok)throw budgetError(value.reason);return value;}
 export function startRealtimeSession(socket,env,{candidates,verifyToken,aiFailure,now=Date.now,setTimer=setTimeout,clearTimer=clearTimeout,callBudget=data=>budgetCall(env,data),waitUntil=()=>{}}={}){
+ socket.binaryType='arraybuffer';
  let state='auth',upstream,lease,uid,startedAt,providerCalled=false,sentBytes=0,reservedSeconds=0,renewTimer,deadlineTimer,lifetimeTimer,openingTimer;const pair=realtimePair(candidates);let resolveDone;const done=new Promise(r=>resolveDone=r);
  const send=value=>{if(state!=='closed')try{socket.send(JSON.stringify(value));}catch{}};
  const close=(reason=null)=>{
