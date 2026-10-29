@@ -284,3 +284,11 @@ body.phone-home .local-icon{display:inline-flex;align-items:center;justify-conte
 
 /* Notices stay above the microphone and leave controls. */
 body.phone-home.mode-active main>#message:not([hidden]){bottom:calc(var(--nav-space,80px) + env(safe-area-inset-bottom) + 92px);max-height:min(120px,25dvh);}
+
+/* Waiting feedback stays in the caption flow; animation never makes a network request. */
+body.phone-home .caption-stage .conversation-progress{position:static;transform:none;max-width:calc(100% - 24px);width:fit-content;margin:10px 12px 14px auto;padding:10px 14px;border:1px solid #45454b;border-radius:18px 18px 4px 18px;background:#25252c;box-shadow:none;white-space:normal;overflow:visible;display:flex;align-items:center;gap:8px;}
+body.phone-home .caption-waiting{display:flex;align-items:center;gap:8px;width:fit-content;max-width:100%;margin:10px 0 2px;padding:8px 12px;border-radius:14px 14px 14px 4px;background:#303037;color:#ededf1;font-size:13px;line-height:1.5;}
+.waiting-label{min-width:0;overflow-wrap:anywhere;}.waiting-dots{display:inline-flex;flex-shrink:0;gap:1px;line-height:1;}.waiting-dots>span{display:inline-block;animation:caption-wait-dot 1.2s ease-in-out infinite;}.waiting-dots>span:nth-child(2){animation-delay:.16s;}.waiting-dots>span:nth-child(3){animation-delay:.32s;}
+@keyframes caption-wait-dot{0%,70%,100%{opacity:.3;transform:translateY(0);}35%{opacity:1;transform:translateY(-3px);}}
+@media(prefers-reduced-motion:reduce){.waiting-dots>span{animation:none;opacity:1;}}
+@media(forced-colors:active){body.phone-home .caption-waiting{border:1px solid CanvasText;}}
