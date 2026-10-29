@@ -24,7 +24,7 @@ export function tokenWithAbort(getToken,signal){
   Promise.resolve().then(getToken).then(value=>{signal.removeEventListener('abort',aborted);resolve(value);},error=>{signal.removeEventListener('abort',aborted);reject(error);});
  });
 }
-export function createServerRecognition({ endpoint, getStream, getToken, fetcher = fetch, onUsage = () => {}, onDiagnostic = () => {}, canParallel = () => true,
+export function createServerRecognition({ endpoint, getStream, getToken, fetcher = fetch, onUsage = () => {}, onDiagnostic = () => {}, canParallel = () => true, acquireSlot = async () => () => {},
   Context = globalThis.AudioContext || globalThis.webkitAudioContext, Worklet = globalThis.AudioWorkletNode }) {
   return class ServerRecognition {
     constructor() { this.active = false; this.queue = []; this.sending = false; this.index = 0; this.failures = 0; this.getHints = () => [];const query=new URL(endpoint||'https://invalid.local').searchParams;this.automatic=query.get('language')==='auto';this.candidates=(query.get('languages')||'').split(','); }
@@ -82,13 +82,14 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
     }
     async recognizeChunk(chunk,job) {
       const requestAt=Date.now(), queueMs=Math.max(0,requestAt-chunk.at);
-      const controller = job.controller;let phase='auth',body,clientAuthMs=null,httpStarted=null,sentSamples=chunk.samples.length;
+      const controller = job.controller;let phase='auth',body,releaseSlot,clientSlotWaitMs=null,clientAuthMs=null,httpStarted=null,sentSamples=chunk.samples.length;
       const ordered=async()=>{await job.previous;if(!this.active||!this.jobs.has(job)||controller.signal.aborted)return false;if(Number.isFinite(chunk.sequence)){if(Number.isFinite(this.lastSequence)&&chunk.sequence!==this.lastSequence+1)this.breakContinuity=true;this.lastSequence=chunk.sequence;}return true;};
       const stale=()=>Date.now()-chunk.at>15000;
       const timeout = setTimeout(() => controller.abort(), 12000);
       try {
         if(stale()){if(await ordered()){this.breakContinuity=true;onDiagnostic({code:'stale_audio',queueMs});this.onrecovering?.({reason:'stale_audio',attempt:1});}return;}
         const token = await tokenWithAbort(getToken,controller.signal);clientAuthMs=Date.now()-requestAt;
+        phase='slot';const slotStarted=Date.now();releaseSlot=await acquireSlot(controller.signal);clientSlotWaitMs=Date.now()-slotStarted;
         if (!this.active) return;
         if (controller.signal.aborted) throw new DOMException('Recognition cancelled','AbortError');
         if(stale()){if(await ordered()){this.breakContinuity=true;onDiagnostic({code:'stale_audio',queueMs,clientAuthMs});this.onrecovering?.({reason:'stale_audio',attempt:1});}return;}
@@ -103,8 +104,8 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
           body, signal: controller.signal, cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer'
         });
         phase='parse';let data,failure,failureData;if(response.ok){data=await response.json();if(!data||typeof data!=='object'||typeof data.text!=='string')throw Error('invalid response');}else{try{failureData=await response.json();failure=failureData.aiFailure;}catch{}}
-        const responseReadyAt=Date.now();clearTimeout(timeout);
-        const requestMetrics={status:response.status,elapsedMs:responseReadyAt-requestAt,queueMs,clientAuthMs,clientRequestMs:responseReadyAt-httpStarted,captureTailMs:Number.isFinite(chunk.speechEndedAt)?Math.max(0,chunk.at-chunk.speechEndedAt):null,audioSeconds:sentSamples/16000,trimmedTailMs:(chunk.samples.length-sentSamples)/16,segmentBoundary:chunk.boundary,...recognitionMetrics((data||failureData)?.recognitionTiming),...(failure?{aiReason:failure.reason,aiCode:failure.code,aiEvidence:failure.evidence,aiModel:failure.model}:{})};
+        const responseReadyAt=Date.now();clearTimeout(timeout);releaseSlot?.();releaseSlot=null;
+        const requestMetrics={status:response.status,elapsedMs:responseReadyAt-requestAt,queueMs,clientAuthMs,clientSlotWaitMs,clientRequestMs:responseReadyAt-httpStarted,captureTailMs:Number.isFinite(chunk.speechEndedAt)?Math.max(0,chunk.at-chunk.speechEndedAt):null,audioSeconds:sentSamples/16000,trimmedTailMs:(chunk.samples.length-sentSamples)/16,segmentBoundary:chunk.boundary,...recognitionMetrics((data||failureData)?.recognitionTiming),...(failure?{aiReason:failure.reason,aiCode:failure.code,aiEvidence:failure.evidence,aiModel:failure.model}:{})};
         // Record actual HTTP completion before waiting for an earlier segment. No transcript is retained.
         if(!this.active||!this.jobs.has(job)||controller.signal.aborted)return;
         chunk.samples.fill(0);if(body)new Uint8Array(body).fill(0);
@@ -124,9 +125,9 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
           // No cumulative transcript list is retained by the recognizer.
           this.acceptText(text,{speechStartedAt:chunk.speechStartedAt,speechEndedAt:chunk.speechEndedAt,recognitionReadyAt:Date.now(),boundary:chunk.boundary,...(data.language?{language:data.language}:{})});
         }
-      } catch (_) {clearTimeout(timeout);await job.previous; if(this.active&&this.jobs.has(job)){const code=controller.signal.aborted?'timeout':phase==='parse'?'invalid_response':phase==='auth'?'auth_unavailable':'network_or_cors';onDiagnostic({code,queueMs,clientAuthMs,...(httpStarted?{clientRequestMs:Date.now()-httpStarted}:{})});if(phase==='auth'&&!controller.signal.aborted)this.fail('auth');else this.transientFailure();} }
+      } catch (_) {releaseSlot?.();releaseSlot=null;clearTimeout(timeout);await job.previous; if(this.active&&this.jobs.has(job)){const code=controller.signal.aborted?'timeout':phase==='parse'?'invalid_response':phase==='auth'?'auth_unavailable':'network_or_cors';onDiagnostic({code,queueMs,clientAuthMs,...(httpStarted?{clientRequestMs:Date.now()-httpStarted}:{})});if(phase==='auth'&&!controller.signal.aborted)this.fail('auth');else this.transientFailure();} }
       finally {
-        chunk.samples.fill(0);if(body)new Uint8Array(body).fill(0);clearTimeout(timeout);this.jobs.delete(job);job.release();this.sending=this.jobs.size>0;this.progress();
+        releaseSlot?.();chunk.samples.fill(0);if(body)new Uint8Array(body).fill(0);clearTimeout(timeout);this.jobs.delete(job);job.release();this.sending=this.jobs.size>0;this.progress();
         if (this.active) void this.drain();
       }
     }
