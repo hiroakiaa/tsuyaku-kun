@@ -116,3 +116,8 @@ Presentation-only changes: original and target remain visible, auxiliary English
 ## 2026-10-29 short JA/EN recognition
 
 Use script and ordinary English-word evidence to accept a selected JA/EN language when acoustic confidence is weak. Unknown names, digits and unselected languages do not choose a side. Automatic ASR omits vocabulary prompts to avoid imposing Japanese vocabulary on English. No extra ASR, language-classifier or translation requests, new provider, model, price or budget increase. Other language pairs keep the existing confidence threshold. Physical-user reproduction is unconfirmed; live synthesized short English samples and deterministic weak-confidence cases are distinct tests.
+
+## 20261029-speech-guard-1
+- 自動判定で選択外文字の混在を拒否。不確実な文章を入力欄へ転記せずマイクを継続。
+- 同じ録音の自動再送・追加AI判定なし。単価・予算上限は変更なし。
+- 継続中の新しい発話には従来どおり認識費用が発生。誤字幕からの翻訳呼出を抑制。
