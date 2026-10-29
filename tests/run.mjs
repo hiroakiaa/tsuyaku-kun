@@ -563,3 +563,5 @@ await test('認証が応答しなくても認識の取消と時間制限を妨�
 });
 
 await import('./faithful-pipeline.mjs');
+
+await import('./ios-mic-recovery.mjs');

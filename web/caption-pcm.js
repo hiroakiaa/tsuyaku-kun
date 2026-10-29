@@ -45,8 +45,8 @@ export class PcmSegmenter {
 }
 if(typeof AudioWorkletProcessor!=='undefined'){
   class CaptionPcmProcessor extends AudioWorkletProcessor{
-    constructor(){super();this.active=true;this.frames=0;this.port.postMessage({alive:true});this.segmenter=new PcmSegmenter(sampleRate,(samples,detail)=>this.port.postMessage({samples,...detail},[samples.buffer]),activity=>this.port.postMessage({activity}));this.port.onmessage=()=>{this.active=false;this.segmenter.clear();};}
-    process(inputs){if(!this.active)return false;if((this.frames+=(inputs[0]?.[0]?.length||128))>=sampleRate*2){this.frames=0;this.port.postMessage({alive:true});}if(inputs[0]?.[0])this.segmenter.push(inputs[0][0]);return true;}
+    constructor(){super();this.active=true;this.frames=0;this.inputFrames=0;this.signalFrames=0;this.port.postMessage({alive:true});this.segmenter=new PcmSegmenter(sampleRate,(samples,detail)=>this.port.postMessage({samples,...detail},[samples.buffer]),activity=>this.port.postMessage({activity}));this.port.onmessage=()=>{this.active=false;this.segmenter.clear();};}
+    process(inputs){if(!this.active)return false;const input=inputs[0]?.[0];if(input){this.inputFrames+=input.length;if(input.some(value=>Math.abs(value)>.0001))this.signalFrames+=input.length;this.segmenter.push(input);}if((this.frames+=(input?.length||128))>=sampleRate*2){this.frames=0;this.port.postMessage({alive:true,inputFrames:this.inputFrames,signalFrames:this.signalFrames});this.inputFrames=this.signalFrames=0;}return true;}
   }
   registerProcessor('caption-pcm',CaptionPcmProcessor);
 }
