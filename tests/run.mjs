@@ -1,3 +1,4 @@
+import {createAiGate} from '../web/ai-gate.js';
 import {guardCaptionTranslation} from '../web/translation-safety.js';
 import './communication50.mjs';
 const speechPayload=({recognitionTiming,...data})=>data;
@@ -255,10 +256,10 @@ await test('登録済みの逆方向訳と不足言語を区別し曖昧な辞�
 });
 await test('対面の完了通知は処理中の訳を再課金せず同じ字幕へ反映する',async()=>{
  const app=await readFile(new URL('../web/app.js',import.meta.url),'utf8'),code=app.slice(app.indexOf('const localJobs='),app.indexOf('const invite=new URLSearchParams'));
- let resolve,calls=0;const replies=[],records=new Map(),activeRoom={local:true,unit:''};const scope={guardCaptionTranslation,Map,Set,Date,JSON,Error,AbortController,room:activeRoom,selfId:'local',sessionEpoch:1,records,catalog:{},pending:new Map(),$:selector=>({value:selector==='#face-other-language'?'es':'ja'}),translationMemory:{lookup:(source,text,targets)=>({translations:{[source]:text},missing:targets,source:'spreadsheet'})},api:()=>{calls++;return new Promise(r=>resolve=r);},message(){},ledger:{event(){},reuseLookup(){}},handle:async r=>{records.set(r.id,r);replies.push(r);}};
+ let resolve,calls=0;const replies=[],records=new Map(),activeRoom={local:true,unit:''};const scope={createAiGate,guardCaptionTranslation,Map,Set,Date,JSON,Error,AbortController,room:activeRoom,selfId:'local',sessionEpoch:1,records,catalog:{},pending:new Map(),$:selector=>({value:selector==='#face-other-language'?'es':'ja'}),translationMemory:{lookup:(source,text,targets)=>({translations:{[source]:text},missing:targets,source:'spreadsheet'})},api:()=>{calls++;return new Promise(r=>resolve=r);},message(){},ledger:{event(){},reuseLookup(){}},handle:async r=>{records.set(r.id,r);replies.push(r);}};
  runInNewContext(code+';this.translateLocally=translateLocally;this.cancelLocalTranslations=cancelLocalTranslations;',scope);
- const work=scope.translateLocally({id:'one',text:'10月9日',revision:0,continuing:true},'ja');await scope.translateLocally({id:'one',text:'10月9日',revision:1,metadataOnly:true},'ja');assert.equal(typeof resolve,'function',JSON.stringify(replies));resolve({translations:{ja:'10月9日',es:'9 de octubre'},usage:{inputTokens:10,outputTokens:3},latencyMs:100});await work;assert.equal(calls,1);assert.equal(replies.length,1);assert.equal(replies[0].continuing,false);assert.equal(replies[0].revision,1);
- const late=scope.translateLocally({id:'two',text:'火曜日',revision:0},'ja');scope.cancelLocalTranslations();scope.room=null;scope.sessionEpoch++;resolve({translations:{es:'martes'}});await late;assert.equal(replies.length,1);
+ const work=scope.translateLocally({id:'one',text:'10月9日',revision:0,continuing:true},'ja');await scope.translateLocally({id:'one',text:'10月9日',revision:1,metadataOnly:true},'ja');await new Promise(r=>setTimeout(r,0));assert.equal(typeof resolve,'function',JSON.stringify(replies));resolve({translations:{ja:'10月9日',es:'9 de octubre'},usage:{inputTokens:10,outputTokens:3},latencyMs:100});await work;assert.equal(calls,1);assert.equal(replies.length,1);assert.equal(replies[0].continuing,false);assert.equal(replies[0].revision,1);
+ const late=scope.translateLocally({id:'two',text:'火曜日',revision:0},'ja');await new Promise(r=>setTimeout(r,0));scope.cancelLocalTranslations();scope.room=null;scope.sessionEpoch++;resolve({translations:{es:'martes'}});await late;assert.equal(replies.length,1);
 });
 await test('確認済み訳はホット150件から外れても端末DBの完全一致で取り出す',async()=>{
  const {TranslationMemory}=await import('../web/translation-memory.js');const {memoryKey}=await import('../web/reviewed-store.js');const db=new Map(),store={get:async k=>db.get(k)||null,put:async r=>{db.set(memoryKey(r.source,r.text,r.unit),structuredClone(r));return true;}};
@@ -285,7 +286,7 @@ await test('背景停止は録音と待機処理を止め字幕と再利用を�
  runInNewContext(code+';this.pause=pauseConversation;',scope);scope.pause();assert.equal(scope.mic,false);assert.equal(scope.microphoneActivation,1);assert.equal(stopped,1);assert.equal(aborted,1);assert.equal(preserve,true);assert.equal(scope.pending.size,0);assert.equal(scope.localStream,null);assert.equal(button['aria-pressed'],'false');scope.room={mode:'lesson'};scope.mic=true;scope.pause();assert.equal(scope.mic,false);assert.equal(aborted,2);
 });
 await test('背景停止中の辞書検索完了はAIを送らず保存済みキャッシュを残す',async()=>{
- const app=await readFile(new URL('../web/app.js',import.meta.url),'utf8'),code=app.slice(app.indexOf('const localJobs='),app.indexOf('const invite=new URLSearchParams'));let resolve,calls=0;const scope={guardCaptionTranslation,Map,Set,Date,JSON,Error,AbortController,room:{local:true,unit:''},selfId:'local',sessionEpoch:1,records:new Map(),catalog:{},pending:new Map(),$:()=>({value:'en'}),translationMemory:{lookupAsync:()=>new Promise(r=>resolve=r)},api:()=>{calls++;},message(){},ledger:{event(){},reuseLookup(){}},handle:async()=>{throw Error('late display');}};
+ const app=await readFile(new URL('../web/app.js',import.meta.url),'utf8'),code=app.slice(app.indexOf('const localJobs='),app.indexOf('const invite=new URLSearchParams'));let resolve,calls=0;const scope={createAiGate,guardCaptionTranslation,Map,Set,Date,JSON,Error,AbortController,room:{local:true,unit:''},selfId:'local',sessionEpoch:1,records:new Map(),catalog:{},pending:new Map(),$:()=>({value:'en'}),translationMemory:{lookupAsync:()=>new Promise(r=>resolve=r)},api:()=>{calls++;},message(){},ledger:{event(){},reuseLookup(){}},handle:async()=>{throw Error('late display');}};
  runInNewContext(code+';this.translate=translateLocally;this.cancel=cancelLocalTranslations;this.cache=sessionTranslations;',scope);scope.cache.set('saved',{});const work=scope.translate({id:'one',text:'火曜日'},'ja');scope.cancel(true);resolve({translations:{ja:'火曜日'},missing:['en']});await work;assert.equal(calls,0);assert.equal(scope.cache.size,1);scope.cancel();assert.equal(scope.cache.size,0);
 });
 await test('通話の背景停止は中継・定期通信・再接続を閉じ同じルームを残す',async()=>{
@@ -560,3 +561,5 @@ await test('認証が応答しなくても認識の取消と時間制限を妨�
  const controller=new AbortController();let finish;const pending=tokenWithAbort(()=>new Promise(r=>finish=r),controller.signal);await Promise.resolve();controller.abort();await assert.rejects(pending,e=>e.name==='AbortError');finish('late-token');
  const cancelled=new AbortController();cancelled.abort();let calls=0;await assert.rejects(tokenWithAbort(()=>{calls++;},cancelled.signal));assert.equal(calls,0);
 });
+
+await import('./faithful-pipeline.mjs');
