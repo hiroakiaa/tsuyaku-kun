@@ -46,16 +46,17 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
       try {
         await resumed;
         if (!this.active) return;
-        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261029-communication50-1', import.meta.url));
+        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261029-ios-mic-recovery-1', import.meta.url));
         if (!this.active) return;
         this.source = this.context.createMediaStreamSource(stream);
         this.node = new Worklet(this.context, 'caption-pcm');
         this.node.port.onmessage = event => {
           if (!this.active) return;
-          if(event.data?.alive){this.lastAlive=Date.now();if(!this.watchdog)this.watchdog=setInterval(()=>{if(this.active&&Date.now()-this.lastAlive>12000)this.fail('interrupted');},3000);return;}
-          if(event.data?.activity){this.capturing=event.data.activity==='start';this.progress();return;}
+          if(event.data?.alive){this.lastAlive=Date.now();clearTimeout(this.startTimer);const {inputFrames,signalFrames}=event.data;if(Number.isFinite(inputFrames)&&Number.isFinite(signalFrames)){this.missingInputs=inputFrames===0?(this.missingInputs||0)+1:0;if(this.missingInputs>=3){onDiagnostic({stage:'asr',operation:'capture',code:'capture_missing',inputFrames,signalFrames});this.fail('audio-capture','マイクから音声データが届いていません。マイクをONにし直してください。');return;}const code=inputFrames===0?'capture_missing':signalFrames===0?'capture_silent':'capture_active';if(code!==this.captureState||Date.now()-(this.captureStateAt||0)>=15000){this.captureState=code;this.captureStateAt=Date.now();onDiagnostic({stage:'asr',operation:'capture',code,inputFrames,signalFrames,trackMuted:(stream.getAudioTracks?.()||[]).some(t=>t.muted===true)});}}return;}
+          if(event.data?.activity){clearTimeout(this.startTimer);this.lastAlive=Date.now();this.capturing=event.data.activity==='start';this.progress();return;}
           const samples=event.data?.samples||event.data,boundary=event.data?.boundary==='limit'?'limit':'pause';
           if(!(samples instanceof Int16Array)||samples.length<1||samples.length>48000){onDiagnostic({stage:'asr',operation:'capture',code:'invalid_audio'});return;}
+          clearTimeout(this.startTimer);this.lastAlive=Date.now();
           if (this.queue.length >= 2) { this.queue.shift().samples.fill(0);this.breakContinuity=true; onDiagnostic({stage:'asr',operation:'capture',code:'queue_overflow'}); this.onrecovering?.({reason:'queue_overflow',attempt:1}); }
           const at=Date.now(),sequence=this.captureSequence=(this.captureSequence||0)+1;this.queue.push({samples,boundary,at,sequence,speechStartedAt:firstVoicedAt(samples,at),speechEndedAt:lastVoicedAt(samples,at)});this.progress();
           void this.drain();
@@ -66,7 +67,7 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
           if (this.active && this.context.state !== 'running') this.fail('interrupted');
         };
         if (this.context.state !== 'running') { this.fail('interrupted'); return; }
-        clearTimeout(this.startTimer);this.onstart?.();this.progress();
+        this.lastAlive=Date.now();this.watchdog=setInterval(()=>{if(this.active&&Date.now()-this.lastAlive>12000){onDiagnostic({stage:'asr',operation:'capture',code:'capture_stalled'});this.fail('interrupted');}},3000);onDiagnostic({stage:'asr',operation:'capture',code:'capture_ready',trackMuted:(stream.getAudioTracks?.()||[]).some(t=>t.muted===true)});this.onstart?.();this.progress();
       } catch (_) { if (this.active) this.fail('audio-capture'); }
     }
     async drain() {
