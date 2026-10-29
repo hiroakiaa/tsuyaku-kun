@@ -497,3 +497,7 @@ await test('短い日英の発話は原文の根拠を使い、未知語と選�
  assert.equal(resolveSpeechLanguage(sample('Hello','en',.3),['ja','pt']),null);
  assert.equal(resolveSpeechLanguage({text:'Hello',language:'English',language_probability:.3,transcription_info:{text:'Hello'}},['ja','en']),'en');
 });
+
+await test('選択外の文字が混ざる日英認識は高信頼でも拒否',()=>{
+ for(const text of ['こんにちは 안녕하세요','귀엽게 해드립니다.','Hello привет','こんにちは مرحبا'])for(const language of ['ja','en'])assert.equal(resolveSpeechLanguage({text,language,language_probability:.99},['ja','en']),null);
+});
