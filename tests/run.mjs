@@ -569,3 +569,5 @@ await import('./ios-mic-recovery.mjs');
 await import('./catalog-pipeline.mjs');
 
 await import('./common-phrases.mjs');
+
+await import('./dots-capture.mjs');
