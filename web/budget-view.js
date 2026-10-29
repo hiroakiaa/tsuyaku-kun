@@ -1,4 +1,4 @@
-import {costOf,PRICES} from './usage.js?v=20261022-cost-accounting-1';
+import {costOf,PRICES} from './usage.js?v=20261029-review100-1';
 import {AI_LIMITS,SPEECH_POLICY,PHOTO_POLICY,COST_SOURCES,scenarioKey} from './cost-policy.js?v=20261022-cost-accounting-1';
 // Forecast only measured, self-originated AI calls with the same source/targets.
 // Cached captions, received room costs, partial dictionary reuse and legacy rows

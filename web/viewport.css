@@ -253,3 +253,34 @@ body.phone-home .face-caption-english>.caption-line>p{font-size:14px!important;}
 body.phone-home #modal-body .face-caption-actions{display:grid;gap:8px;}
 body.phone-home #modal-body .face-caption-actions>button{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;margin:0;text-align:left;}
 body.phone-home #captions .caption.caption-face{opacity:1;}body.phone-home #captions .caption-face .speech-controls>button,body.phone-home #captions .caption-face .face-caption-more{background:transparent!important;border:0!important;box-shadow:none!important;}body.phone-home #captions .caption-face .speech-controls>button:hover{background:#ffffff0b!important;}
+
+/* Focused feedback: no persistent microphone-state panel. */
+body.phone-home .caption-stage{position:relative;min-width:0;}
+body.phone-home .conversation-progress{position:absolute;top:4px;left:50%;transform:translateX(-50%);z-index:3;max-width:calc(100% - 24px);padding:5px 12px;border-radius:20px;background:#25252ceF;color:#eeeeF4;box-shadow:0 2px 8px #0003;font-size:13px;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none;}
+body.phone-home #captions{overscroll-behavior:contain;scroll-padding-block:44px 20px;overflow-anchor:none;}
+body.phone-home #captions:focus-visible{outline-offset:-3px;}
+body.phone-home .caption-line>p{white-space:pre-wrap;word-break:normal;hyphens:auto;}
+body.phone-home .caption :is(button,summary){touch-action:manipulation;}
+body.phone-home .caption-face .face-caption-more:focus-visible{outline:2px solid #d2e9ff!important;outline-offset:-2px;}
+body.phone-home .caption-face .speech-controls>button:focus-visible{outline:2px solid #d2e9ff!important;outline-offset:-2px;}
+body.phone-home .caption-face .speech-controls>button:disabled{cursor:not-allowed;opacity:.4;}
+body.phone-home .caption-face .face-caption-english>summary{min-height:40px;padding-block:5px;}
+body.phone-home .caption :is(.caption-progress,.caption-delivery,.caption-memory){overflow-wrap:anywhere;max-width:100%;}
+body.phone-home #text-input{font-size:max(16px,1em);line-height:1.5;scroll-margin-bottom:100px;}
+body.phone-home #modal-body :is(input,textarea,select){scroll-margin-block:20px;}
+body.phone-home #modal-body :is(button,summary){touch-action:manipulation;}
+body.phone-home .reference-title{overflow-wrap:anywhere;word-break:normal;}
+body.phone-home .reference-reading{line-height:1.5;}
+body.phone-home .category-filter{scroll-margin-inline:16px;}
+@media(max-width:359px){body.phone-home .caption.caption-face{padding:10px!important;}body.phone-home .caption-face .caption-line-primary>p{font-size:18px!important;}body.phone-home .conversation-progress{font-size:12px;}}
+@media(max-height:420px){body.phone-home .caption.caption-face{padding:8px 10px!important;margin-bottom:7px!important;}body.phone-home .face-caption-header{min-height:28px;}body.phone-home .caption-face .caption-line{margin-top:3px!important;}body.phone-home .conversation-progress{top:0;font-size:12px;padding:3px 10px;}}
+@media(prefers-contrast:more){body.phone-home .caption-face .caption-line-source>p{color:#e0e0e7!important;}body.phone-home .caption{border-color:#85858d!important;}body.phone-home .conversation-progress{background:#000;color:#fff;}}
+@media(forced-colors:active){body.phone-home .face-caption-avatar{forced-color-adjust:none;}body.phone-home .conversation-progress{border:1px solid CanvasText;}}
+
+:root{color-scheme:dark;}
+body.phone-home .caption-stage .conversation-progress[hidden]{display:none!important;}
+
+body.phone-home .local-icon{display:inline-flex;align-items:center;justify-content:center;font-style:normal;line-height:1;flex-shrink:0;}body.phone-home .local-icon::before{content:none!important;}body.phone-home .local-icon>svg{display:block;min-width:1em;overflow:visible;}
+
+/* Notices stay above the microphone and leave controls. */
+body.phone-home.mode-active main>#message:not([hidden]){bottom:calc(var(--nav-space,80px) + env(safe-area-inset-bottom) + 92px);max-height:min(120px,25dvh);}

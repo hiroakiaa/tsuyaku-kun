@@ -1,3 +1,4 @@
+import {tokenWithAbort} from '../web/caption-server.js';
 import {resolveSpeechLanguage,speechSide,recognitionLanguage} from '../web/two-language.js';
 import {createSpeechInputGate} from '../web/speech-input-gate.js';
 import './billing-report.mjs';
@@ -33,11 +34,11 @@ import {fileURLToPath} from 'node:url';
 import {protectMath,parseTranslation,glossaryFor,csv,validateCaption} from '../web/core.js';
 import {catalog} from '../server/catalog.js';
 import workerApi,{TranslationRoom,translateText,recognizeAudio,aiFailure,runAi,translationBudget,requestExecutionValid} from '../server/worker.js';
-import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection,summarizeSessions} from '../web/network.js';
+import {safeConnectionRecord,ConnectionDiary,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection,summarizeSessions} from '../web/network.js';
 import {verifyToken} from '../server/auth.js';
 import {validWav,hasSpeechEnergy,cleanRecognition} from '../server/audio.js';
 import {createServerRecognition,encodeWav,isIncompleteJapanese} from '../web/caption-server.js';
-import {BUILD_ID,UsageLedger,WordUsage,keepUsage,costOf,analysisReport,percentile} from '../web/usage.js';
+import {currentBuildSummary,BUILD_ID,UsageLedger,WordUsage,keepUsage,costOf,analysisReport,percentile} from '../web/usage.js';
 import {SpeechPlayer} from '../web/speech-player.js';
 import {firstVoicedAt,lastVoicedAt,latencyFromTiming,retryDelay} from '../web/diagnostics.js';
 import {speakerInfo,speakerCaption} from '../web/face-mode.js';
@@ -87,7 +88,7 @@ await test('24時間後のIDは再利用でき、古い履歴へ接続しない'
 await test('4桁がすべて使用中なら既存授業を上書きしない',async()=>{const f=codeStorage();for(let i=0;i<10000;i++)f.db.set('code:'+String(i).padStart(4,'0'),{id:'live'+i,expires:ROOM_TTL});await assert.rejects(()=>new LessonCodes(f.storage,()=>1,()=>0).allocate({id:'extra',key:'extra'}));assert.equal(f.db.get('code:0000').id,'live0');});
 await test('4桁以外と期限切れの履歴を区別する',()=>{assert.equal(normalizeRoomCode(' ０００７ '),'0007');assert.equal(historyExpired({at:1000},1000+ROOM_TTL),true);assert.equal(historyExpired({at:1000,expires:9000},8999),false);assert.equal(historyExpired({at:1000,expires:9000},9000),true);});
 await test('先生の終了操作で履歴の24時間期限を延長しない',async()=>{const f=fixture('lesson','teacher'),expires=f.db.get('room').expires;await f.room.webSocketMessage(f.ws,JSON.stringify({type:'end'}));assert.equal(f.db.get('room').expires,expires);});
-await test('全画面の見出しとログイン入口を除き、アイコンはFont Awesomeを使う',async()=>{const h=await readFile(new URL('../index.html',import.meta.url),'utf8');assert.ok(!h.includes('section-heading'));assert.ok(!h.includes('teacher-login'));assert.ok(!h.includes('id="help"'));assert.ok(!h.includes('id="settings"'));assert.ok(h.includes('font-awesome/6.5.2'));assert.ok(!h.includes('tab-student'));assert.ok(h.includes('lesson-role-student'));assert.ok(h.includes('teacher-entry'));for(const id of ['name','view-language','listen','export'])assert.ok(!h.includes('id="'+id+'"'));assert.ok(!h.includes('live-heading'));assert.ok(!h.includes('live-title'));assert.ok(!/[▶Ⅱ■⇄◇◎☎▤▣▧→×]/.test(h));});
+await test('全画面の見出しとログイン入口を除き、アイコンはFont Awesomeを使う',async()=>{const h=await readFile(new URL('../index.html',import.meta.url),'utf8');assert.ok(!h.includes('section-heading'));assert.ok(!h.includes('teacher-login'));assert.ok(!h.includes('id="help"'));assert.ok(!h.includes('id="settings"'));assert.ok(!h.includes('cdnjs.cloudflare.com'));assert.ok((await readFile(new URL('../web/app.js',import.meta.url),'utf8')).includes('installLocalIcons'));assert.ok(!h.includes('tab-student'));assert.ok(h.includes('lesson-role-student'));assert.ok(h.includes('teacher-entry'));for(const id of ['name','view-language','listen','export'])assert.ok(!h.includes('id="'+id+'"'));assert.ok(!h.includes('live-heading'));assert.ok(!h.includes('live-title'));assert.ok(!/[▶Ⅱ■⇄◇◎☎▤▣▧→×]/.test(h));});
 await test('削除後に遅れて始まった翻訳は字幕履歴を作り直さない',async()=>{const f=fixture('lesson','teacher'),room=f.db.get('room');f.db.clear();await f.room.translate(f.ws,f.ws.deserializeAttachment(),room,'late','遅れた字幕');assert.equal(f.db.size,0);});
 await test('未登録の数学用語は原語と定義から指定言語へ訳し、使用量を返す',async()=>{let input,usage;const env={AI:{async run(model,data){input=JSON.parse(data.messages[1].content);return {response:'{"pt":"Coeficiente: o número que multiplica uma variável."}',usage:{prompt_tokens:123,completion_tokens:17}};}}};const result=await translateText(env,'係数\n文字にかけられている数。','ja',['pt'],[],'数学',catalog,u=>usage=u);assert.equal(input.speech,'係数\n文字にかけられている数。');assert.deepEqual(input.targets,['pt']);assert.equal(input.unit,'数学');assert.match(result.pt,/Coeficiente/);assert.equal(usage.inputTokens,123);assert.equal(usage.outputTokens,17);assert.equal(usage.unknown,false);});
 await test('通話の表示は自分の言語と英語、英語を選んだときは1行',()=>{assert.deepEqual(callCaptionLanguages('pt'),['pt','en']);assert.deepEqual(callCaptionLanguages('ja'),['ja','en']);assert.deepEqual(callCaptionLanguages('en'),['en']);});
@@ -528,4 +529,30 @@ await test('30秒と60秒の環境音待機後も小さな発話を拾う',()=>{
   segmenter.push(wave(6400,.01));segmenter.push(new Float32Array(16000));
   assert.equal(out.length,1,seconds+' seconds');assert.equal(hasSpeechEnergy(new Uint8Array(encodeWav(out[0]))),true);
  }
+});
+
+await test('古い音声は認証前に破棄してAIへ送らない',async()=>{
+ let calls=0,auth=0,seconds=0;const notices=[];const R=createServerRecognition({endpoint:'https://test/transcribe',getStream:()=>null,getToken:async()=>{auth++;return '';},onUsage:n=>seconds+=n,onDiagnostic:r=>notices.push(r),fetcher:async()=>{calls++;throw Error('must not send');}}),r=new R();r.active=true;const samples=new Int16Array(16000).fill(12);r.queue.push({samples,at:Date.now()-16000});await r.drain();assert.equal(calls,0);assert.equal(auth,0);assert.equal(seconds,0);assert.ok(samples.every(x=>x===0));assert.ok(notices.some(n=>n.code==='stale_audio'));r.abort();
+});
+await test('認証エラーを通信エラーやAI再試行に分類しない',async()=>{
+ let calls=0,failure;const R=createServerRecognition({endpoint:'https://test/transcribe',getStream:()=>null,getToken:async()=>{throw Error('auth');},fetcher:async()=>{calls++;}}),r=new R();r.active=true;r.onerror=e=>failure=e;r.queue.push({samples:new Int16Array(16000),at:Date.now()});await r.drain();assert.equal(calls,0);assert.equal(failure.error,'auth');assert.equal(r.active,false);
+});
+await test('自動言語判定では辞書ヒントを送らずJSON不正を成功扱いしない',async()=>{
+ const notices=[];let headers;const R=createServerRecognition({endpoint:'https://test/transcribe?language=auto&languages=ja,en',getStream:()=>null,getToken:async()=>'',onDiagnostic:r=>notices.push(r),fetcher:async(_,o)=>{headers=o.headers;return {ok:true,status:200,json:async()=>({text:undefined})};}}),r=new R();r.active=true;r.setHints(()=>['日本語ヒント']);r.queue.push({samples:new Int16Array(16000),at:Date.now()});await r.drain();assert.equal(headers['X-Term-Hints'],undefined);assert.ok(notices.some(n=>n.code==='invalid_response'));assert.ok(!notices.some(n=>n.code==='ok'));r.abort();
+});
+await test('認識の段階を本文なしで通知し数値の計測を制限する',async()=>{
+ const phases=[],records=[];const R=createServerRecognition({endpoint:'https://test/transcribe',getStream:()=>null,getToken:async()=>'',onDiagnostic:r=>records.push(r),fetcher:async()=>({ok:true,status:200,json:async()=>({text:'こんにちは'})})}),r=new R();r.active=true;r.onprogress=e=>phases.push(e.phase);r.queue.push({samples:new Int16Array(16000),at:Date.now(),speechEndedAt:Date.now()-500});await r.drain();assert.ok(phases.includes('recognizing'));assert.equal(phases.at(-1),'waiting');const ok=records.find(r=>r.code==='ok');assert.ok(ok.captureTailMs>=500);assert.ok(Number.isFinite(ok.clientAuthMs));assert.ok(Number.isFinite(ok.clientRequestMs));r.abort();
+});
+await test('音声診断は許可した数値だけを残し本文や秘密を保存しない',()=>{
+ const r=safeConnectionRecord({code:'stale_audio',clientAuthMs:5,clientRequestMs:20,captureTailMs:500,text:'private',token:'secret',audio:'secret'});assert.equal(r.code,'stale_audio');assert.equal(r.clientAuthMs,5);assert.equal(r.captureTailMs,500);assert.equal(r.text,undefined);assert.equal(r.token,undefined);assert.equal(safeConnectionRecord({clientAuthMs:-1,clientRequestMs:Infinity}).clientAuthMs,undefined);
+});
+
+await test('現行ビルドの速度を旧履歴と混ぜず未計測はnullで返す',()=>{
+ const empty=currentBuildSummary([{build:'older',captionCount:99,latencies:[9999]}]);assert.equal(empty.sessions,0);assert.equal(empty.p50TranslationMs,null);
+ const result=currentBuildSummary([{build:BUILD_ID,captionCount:2,failedCaptions:0,latencies:[200,400],recognitionLatencies:[800,1000],speechLatencies:[1000,1400]}]);assert.equal(result.successfulCaptions,2);assert.equal(result.p95RecognitionMs,1000);assert.equal(result.speechTimingSamples,2);
+});
+
+await test('認証が応答しなくても認識の取消と時間制限を妨げない',async()=>{
+ const controller=new AbortController();let finish;const pending=tokenWithAbort(()=>new Promise(r=>finish=r),controller.signal);await Promise.resolve();controller.abort();await assert.rejects(pending,e=>e.name==='AbortError');finish('late-token');
+ const cancelled=new AbortController();cancelled.abort();let calls=0;await assert.rejects(tokenWithAbort(()=>{calls++;},cancelled.signal));assert.equal(calls,0);
 });

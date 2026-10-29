@@ -1,4 +1,4 @@
-import {recognitionLanguage,speechTextAllowed} from './two-language.js?v=20261029-speech-wait-1';
+import {recognitionLanguage,speechTextAllowed} from './two-language.js?v=20261029-review100-1';
 import {nonSpeechReason} from './speech-filter.js?v=20261007-learning-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261007-progressive-1';
 // Browser-independent recognition using the call's existing microphone stream.
@@ -13,10 +13,19 @@ export function encodeWav(samples) {
   return bytes;
 }
 
+export function tokenWithAbort(getToken,signal){
+ return new Promise((resolve,reject)=>{
+  const aborted=()=>reject(new DOMException('Recognition cancelled','AbortError'));
+  if(signal.aborted){aborted();return;}
+  signal.addEventListener('abort',aborted,{once:true});
+  Promise.resolve().then(getToken).then(value=>{signal.removeEventListener('abort',aborted);resolve(value);},error=>{signal.removeEventListener('abort',aborted);reject(error);});
+ });
+}
 export function createServerRecognition({ endpoint, getStream, getToken, fetcher = fetch, onUsage = () => {}, onDiagnostic = () => {},
-  Context = window.AudioContext || window.webkitAudioContext, Worklet = window.AudioWorkletNode }) {
+  Context = globalThis.AudioContext || globalThis.webkitAudioContext, Worklet = globalThis.AudioWorkletNode }) {
   return class ServerRecognition {
-    constructor() { this.active = false; this.queue = []; this.sending = false; this.index = 0; this.failures = 0; this.getHints = () => []; }
+    constructor() { this.active = false; this.queue = []; this.sending = false; this.index = 0; this.failures = 0; this.getHints = () => [];const query=new URL(endpoint||'https://invalid.local').searchParams;this.automatic=query.get('language')==='auto';this.candidates=(query.get('languages')||'').split(','); }
+    progress(){this.onprogress?.({phase:this.capturing?'capturing':this.sending||this.queue.length?'recognizing':'waiting',pending:this.queue.length+(this.sending?1:0)});}
     setHints(getHints) { this.getHints = typeof getHints === 'function' ? getHints : () => []; }
     start() {
       this.active = true;
@@ -34,63 +43,69 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
       try {
         await resumed;
         if (!this.active) return;
-        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261029-speech-wait-1', import.meta.url));
+        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261029-review100-1', import.meta.url));
         if (!this.active) return;
         this.source = this.context.createMediaStreamSource(stream);
         this.node = new Worklet(this.context, 'caption-pcm');
         this.node.port.onmessage = event => {
           if (!this.active) return;
-          if(event.data?.activity){this.capturing=event.data.activity==='start';return;}
+          if(event.data?.alive){this.lastAlive=Date.now();if(!this.watchdog)this.watchdog=setInterval(()=>{if(this.active&&Date.now()-this.lastAlive>12000)this.fail('interrupted');},3000);return;}
+          if(event.data?.activity){this.capturing=event.data.activity==='start';this.progress();return;}
           const samples=event.data?.samples||event.data,boundary=event.data?.boundary==='limit'?'limit':'pause';
+          if(!(samples instanceof Int16Array)||samples.length<1||samples.length>48000){onDiagnostic({stage:'asr',operation:'capture',code:'invalid_audio'});return;}
           if (this.queue.length >= 2) { this.queue.shift().samples.fill(0);this.breakContinuity=true; onDiagnostic({stage:'asr',operation:'capture',code:'queue_overflow'}); this.onrecovering?.({reason:'queue_overflow',attempt:1}); }
-          const at=Date.now();this.queue.push({samples,boundary,at,speechStartedAt:firstVoicedAt(samples,at),speechEndedAt:lastVoicedAt(samples,at)});
+          const at=Date.now();this.queue.push({samples,boundary,at,speechStartedAt:firstVoicedAt(samples,at),speechEndedAt:lastVoicedAt(samples,at)});this.progress();
           void this.drain();
         };
+        this.node.onprocessorerror=()=>{if(this.active)this.fail('interrupted');};
         this.source.connect(this.node); this.node.connect(this.context.destination);
         this.context.onstatechange = () => {
           if (this.active && this.context.state !== 'running') this.fail('interrupted');
         };
         if (this.context.state !== 'running') { this.fail('interrupted'); return; }
-        clearTimeout(this.startTimer);this.onstart?.();
+        clearTimeout(this.startTimer);this.onstart?.();this.progress();
       } catch (_) { if (this.active) this.fail('audio-capture'); }
     }
     async drain() {
       if (this.sending || !this.active || !this.queue.length) return;
-      this.sending = true;
+      this.sending = true;this.progress();
       const chunk = this.queue.shift();
       const requestAt=Date.now(), queueMs=Math.max(0,requestAt-chunk.at);
-      const controller = new AbortController(); this.request = controller;
+      const controller = new AbortController(); this.request = controller;let phase='auth',body,clientAuthMs=null,httpStarted=null;
+      const stale=()=>Date.now()-chunk.at>15000;
       const timeout = setTimeout(() => controller.abort(), 12000);
       try {
-        const token = await getToken();
+        if(stale()){this.breakContinuity=true;onDiagnostic({code:'stale_audio',queueMs});this.onrecovering?.({reason:'stale_audio',attempt:1});return;}
+        const token = await tokenWithAbort(getToken,controller.signal);clientAuthMs=Date.now()-requestAt;
         if (!this.active) return;
         if (controller.signal.aborted) { this.fail('network'); return; }
-        const body = encodeWav(chunk.samples); chunk.samples.fill(0);
+        if(stale()){this.breakContinuity=true;onDiagnostic({code:'stale_audio',queueMs,clientAuthMs});this.onrecovering?.({reason:'stale_audio',attempt:1});return;}
+        body = encodeWav(chunk.samples); chunk.samples.fill(0);
         onUsage(chunk.samples.length / 16000);
-        const hints = [...new Set((this.getHints() || []).filter(x => typeof x === 'string')
+        const hints = [...new Set((this.automatic?[]:(this.getHints() || [])).filter(x => typeof x === 'string')
           .map(x => x.normalize('NFKC').trim()).filter(x => x && x.length <= 40))].slice(0, 30).join(',').slice(0, 300);
         const encodedHints=hints?encodeURIComponent(hints):'';
-        const response = await fetcher(endpoint, {
+        phase='request';httpStarted=Date.now();const response = await fetcher(endpoint, {
           method: 'POST', headers: { 'Content-Type': 'audio/wav', Authorization: 'Bearer ' + token,
             ...(encodedHints ? { 'X-Term-Hints': encodedHints } : {}) },
           body, signal: controller.signal, cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer'
         });
-        let failure; if(!response.ok){try{failure=(await response.json()).aiFailure;}catch{}} onDiagnostic({code:response.ok?'ok':'http_error',status:response.status,elapsedMs:Date.now()-requestAt,queueMs,audioSeconds:chunk.samples.length/16000,segmentBoundary:chunk.boundary,...(failure?{aiReason:failure.reason,aiCode:failure.code,aiEvidence:failure.evidence,aiModel:failure.model}:{})});
+        let failure; if(!response.ok){try{failure=(await response.json()).aiFailure;}catch{}} const requestMetrics={status:response.status,elapsedMs:Date.now()-requestAt,queueMs,clientAuthMs,clientRequestMs:Date.now()-httpStarted,captureTailMs:Number.isFinite(chunk.speechEndedAt)?Math.max(0,chunk.at-chunk.speechEndedAt):null,audioSeconds:chunk.samples.length/16000,segmentBoundary:chunk.boundary,...(failure?{aiReason:failure.reason,aiCode:failure.code,aiEvidence:failure.evidence,aiModel:failure.model}:{})};if(!response.ok)onDiagnostic({code:'http_error',...requestMetrics});
         if (!response.ok) { const error=failure?.reason|| (response.status === 429 ? 'quota' : [401,403].includes(response.status) ? 'auth' : 'network'); if (['network','service','timeout','overloaded'].includes(error) && (response.status>=500||error==='overloaded')) { this.transientFailure(); return; } this.fail(error,failure?.message); return; }
-        const data = await response.json(); this.failures=0;
+        phase='parse';const data = await response.json();if(!data||typeof data!=='object'||typeof data.text!=='string')throw Error('invalid response');this.failures=0;onDiagnostic({code:'ok',...requestMetrics,elapsedMs:Date.now()-requestAt});
         if (!this.active || controller.signal.aborted || Date.now() - chunk.at > 15000) return;
-        const query=new URL(endpoint).searchParams,automatic=query.get('language')==='auto',candidates=(query.get('languages')||'').split(',');
-        if(automatic&&typeof data.text==='string'&&data.text.trim()&&(data.languageUncertain||!data.language||!candidates.includes(data.language)||!speechTextAllowed(data.text,candidates))){this.breakContinuity=true;this.finishFragment();this.onlanguageuncertain?.({reason:speechTextAllowed(data.text,candidates)?'uncertain':'outside_pair'});return;}
-        const rejected=nonSpeechReason(data,data.language||query.get('language'));
+        const automatic=this.automatic,candidates=this.candidates;
+        if(automatic&&typeof data.text==='string'&&data.text.trim()&&(data.languageUncertain||!data.language||!candidates.includes(data.language)||!speechTextAllowed(data.text,candidates))){this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:'language_uncertain'});this.onlanguageuncertain?.({reason:speechTextAllowed(data.text,candidates)?'uncertain':'outside_pair'});return;}
+        const rejected=nonSpeechReason(data,data.language||new URL(endpoint).searchParams.get('language'));
         if(rejected){this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:rejected});return;}
         const text = typeof data.text === 'string' ? data.text.trim().slice(0, 600) : '';
         if (text) {
           // No cumulative transcript list is retained by the recognizer.
           this.acceptText(text,{speechStartedAt:chunk.speechStartedAt,speechEndedAt:chunk.speechEndedAt,recognitionReadyAt:Date.now(),boundary:chunk.boundary,...(data.language?{language:data.language}:{})});
         }
-      } catch (_) { if (this.active) { onDiagnostic({code:controller.signal.aborted?'timeout':'network_or_cors'}); this.transientFailure(); } }
+      } catch (_) { if(this.active){const code=controller.signal.aborted?'timeout':phase==='parse'?'invalid_response':phase==='auth'?'auth_unavailable':'network_or_cors';onDiagnostic({code,queueMs,clientAuthMs,...(httpStarted?{clientRequestMs:Date.now()-httpStarted}:{})});if(phase==='auth'&&!controller.signal.aborted)this.fail('auth');else this.transientFailure();} }
       finally {
-        chunk.samples.fill(0); clearTimeout(timeout); this.request = null; this.sending = false;
+        chunk.samples.fill(0);if(body)new Uint8Array(body).fill(0);clearTimeout(timeout); this.request = null; this.sending = false;this.progress();
         if (this.active) void this.drain();
       }
     }
@@ -138,10 +153,10 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
     }
     fail(error,message) { const notify = this.onerror; this.abort(); notify?.({ error, message }); }
     abort() {
-      clearTimeout(this.startTimer);clearTimeout(this.fragmentTimer);this.fragment=null;
+      clearTimeout(this.startTimer);clearTimeout(this.fragmentTimer);clearInterval(this.watchdog);this.watchdog=null;this.fragment=null;
       this.active = false;this.capturing=false; this.request?.abort();
       for (const chunk of this.queue) chunk.samples.fill(0); this.queue=[];
-      if (this.node) { this.node.port.onmessage = null; this.node.port.postMessage('stop'); this.node.disconnect(); }
+      if (this.node) { this.node.onprocessorerror=null;this.node.port.onmessage = null; this.node.port.postMessage('stop'); this.node.disconnect(); }
       this.source?.disconnect();
       if (this.context) { this.context.onstatechange = null; void this.context.close().catch(() => {}); }
       // Never call stop() on the shared call microphone tracks.
