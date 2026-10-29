@@ -15,7 +15,10 @@ export class RealtimeUtterances{
     const tags=Array.isArray(alt.languages)?alt.languages:[],words=Array.isArray(alt.words)?alt.words:[],language=recognitionLanguage(tags[0]||words.find(w=>w.language)?.language|| (this.candidates.length===1?this.candidates[0]:''));
     if(text.length>600){this.parts=[];this.onUncertain();return;}
     if(this.parts.length>=12||this.parts.reduce((n,p)=>n+p.text.length,0)+text.length>600)this.flush();
-    this.parts.push({text,language:this.candidates.includes(language)?language:null,confidence:alt.confidence});
+    // The provider inserts word separators into Japanese. Preserve Latin word
+    // spacing and repetitions; only join adjacent Japanese script characters.
+    const normalized=language==='ja'?text.replace(/(?<=[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}、。！？])\s+(?=[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}、。！？])/gu,''):text;
+    this.parts.push({text:normalized,language:this.candidates.includes(language)?language:null,confidence:alt.confidence});
    }
   }
   if(data.speech_final===true)this.flush();
