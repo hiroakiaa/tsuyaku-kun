@@ -21,6 +21,7 @@ const flush=async()=>{for(let i=0;i<16;i++)await Promise.resolve();};
 for(const scenario of ['valid','bad-auth','cancel-opening','renew-failure','burst','missing-language']){
  const client=new Socket(),provider=new Socket(),calls=[];let time=now,ai=0,options;const timers=new Map();let next=0,resolveProvider;
  const session=startRealtimeSession(client,{FIREBASE_PROJECT:'test',AI:{run:async(model,input,opts)=>{ai++;options={model,input,opts};if(scenario==='cancel-opening')await new Promise(r=>resolveProvider=r);return {webSocket:provider};}}},{candidates:['ja','en'],now:()=>time,setTimer:(fn,delay)=>{const id=++next;timers.set(id,{fn,delay});return id;},clearTimer:id=>timers.delete(id),verifyToken:async token=>{if(scenario==='bad-auth')throw Error('bad');assert.equal(token,'synthetic');return {uid:'test',exp:(now+3600000)/1000};},aiFailure:e=>({reason:e.appBudget?'quota':'auth'}),callBudget:async data=>{calls.push(data);if(data.action==='extend'&&scenario==='renew-failure')throw Error('quota');return data.action==='reserve'?{id:'lease',day:1}:{ok:true};}});
+ assert.equal(client.binaryType,'arraybuffer');
  client.message(JSON.stringify({type:'auth',token:'synthetic'}));await flush();
  if(scenario==='bad-auth'){assert.equal(ai,0);await session.done;continue;}
  if(scenario==='cancel-opening'){session.close();resolveProvider();await flush();assert(provider.closed);assert.equal(calls.filter(c=>c.action==='settle').length,1);continue;}
