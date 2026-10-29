@@ -1,4 +1,4 @@
-import {recognitionLanguage} from './two-language.js?v=20261029-short-language-1';
+import {recognitionLanguage,speechTextAllowed} from './two-language.js?v=20261029-speech-guard-1';
 import {nonSpeechReason} from './speech-filter.js?v=20261007-learning-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261007-progressive-1';
 // Browser-independent recognition using the call's existing microphone stream.
@@ -80,7 +80,7 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
         const data = await response.json(); this.failures=0;
         if (!this.active || controller.signal.aborted || Date.now() - chunk.at > 15000) return;
         const query=new URL(endpoint).searchParams,automatic=query.get('language')==='auto',candidates=(query.get('languages')||'').split(',');
-        if(automatic&&typeof data.text==='string'&&data.text.trim()&&(data.languageUncertain||!data.language||!candidates.includes(data.language))){this.breakContinuity=true;this.finishFragment();this.onlanguageuncertain?.({text:data.text.trim().slice(0,600)});return;}
+        if(automatic&&typeof data.text==='string'&&data.text.trim()&&(data.languageUncertain||!data.language||!candidates.includes(data.language)||!speechTextAllowed(data.text,candidates))){this.breakContinuity=true;this.finishFragment();this.onlanguageuncertain?.({reason:speechTextAllowed(data.text,candidates)?'uncertain':'outside_pair'});return;}
         const rejected=nonSpeechReason(data,data.language||query.get('language'));
         if(rejected){this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:rejected});return;}
         const text = typeof data.text === 'string' ? data.text.trim().slice(0, 600) : '';
