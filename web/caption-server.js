@@ -1,4 +1,4 @@
-import {recognitionLanguage} from './two-language.js?v=20261029-two-language-1';
+import {recognitionLanguage} from './two-language.js?v=20261029-short-language-1';
 import {nonSpeechReason} from './speech-filter.js?v=20261007-learning-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261007-progressive-1';
 // Browser-independent recognition using the call's existing microphone stream.
