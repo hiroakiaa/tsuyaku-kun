@@ -21,7 +21,11 @@ export class PcmSegmenter {
     const threshold=Math.max(.004,Math.min(.018,this.noise*2.5));
     const voiced=rms>=threshold;
     if(!this.started){
-      if(!voiced){this.noise=this.noise*.98+Math.min(rms,.006)*.02;this.preroll.set(this.frame,this.preIndex);this.preIndex=(this.preIndex+320)%this.preroll.length;return;}
+      if(!voiced){this.onset=0;this.noise=this.noise*.98+Math.min(rms,.006)*.02;this.preroll.set(this.frame,this.preIndex);this.preIndex=(this.preIndex+320)%this.preroll.length;return;}
+      // Require 60ms of sustained activity, not six scattered handling clicks.
+      this.onset++;
+      if(this.onset<3){this.preroll.set(this.frame,this.preIndex);this.preIndex=(this.preIndex+320)%this.preroll.length;return;}
+      this.voiced=640;
       this.samples.set(this.preroll.subarray(this.preIndex));this.samples.set(this.preroll.subarray(0,this.preIndex),this.preroll.length-this.preIndex);
       this.length=this.preroll.length;this.started=true;this.activity('start');this.preroll.fill(0);this.preIndex=0;
     }
@@ -32,11 +36,11 @@ export class PcmSegmenter {
       if(this.voiced>=1920)this.emit(this.samples.slice(0,this.length),{boundary:forced?'limit':'pause'});
       if(!forced)this.activity('end');
       const overlap=forced?this.samples.slice(this.length-this.preroll.length,this.length):null;
-      this.samples.fill(0);this.length=0;this.voiced=0;this.silence=0;this.started=false;
+      this.samples.fill(0);this.length=0;this.voiced=0;this.silence=0;this.onset=0;this.started=false;
       if(overlap)this.preroll.set(overlap);
     }
   }
-  clear(){this.samples.fill(0);this.preroll.fill(0);this.frame.fill(0);this.preIndex=0;this.frameLength=0;this.started=false;this.length=0;this.sum=0;this.count=0;this.phase=0;this.voiced=0;this.silence=0;this.noise=.001;}
+  clear(){this.samples.fill(0);this.preroll.fill(0);this.frame.fill(0);this.preIndex=0;this.frameLength=0;this.started=false;this.length=0;this.sum=0;this.count=0;this.phase=0;this.onset=0;this.voiced=0;this.silence=0;this.noise=.001;}
 }
 if(typeof AudioWorkletProcessor!=='undefined'){
   class CaptionPcmProcessor extends AudioWorkletProcessor{
