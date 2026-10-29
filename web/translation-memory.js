@@ -2,6 +2,7 @@ import {catalogVersion} from './catalog-version.js?v=20261008-safety-1';
 import {ReviewedStore,memoryKey,retentionScore} from './reviewed-store.js?v=20261008-report-2';
 import {translationField,translationOf} from './core.js?v=20261007-progressive-1';
 import {phraseIdentity} from './phrase-equivalence.js?v=20261008-report-2';
+import {hasInternalMarker,needsTranslationReview,usableTranslation} from './translation-safety.js?v=20261029-communication50-1';
 const key='tsuyaku-reviewed-memory-v1';
 const exact=text=>String(text||'').normalize('NFC').trim();
 // Catalog objects are replaced when refreshed; weak keys release old indexes.
@@ -18,16 +19,16 @@ function indexedCatalog(catalog,source){
 export class TranslationMemory {
  constructor(storage,store=new ReviewedStore()){this.storage=storage;this.store=store;this.hot=new Map();try{const data=JSON.parse(storage.getItem(key));this.rows=Array.isArray(data?.rows)?data.rows.slice(-150):[];this.corrections=Array.isArray(data?.corrections)?data.corrections.slice(-100):[];}catch{this.rows=[];this.corrections=[];}this.rows=this.rows.filter(r=>r&&typeof r.text==='string'&&r.translations&&typeof r.translations==='object');for(const r of this.rows){r.unit=r.unit||'';this.hot.set(memoryKey(r.source,r.text,r.unit),r);void this.store.put(r);}}
  persist(){this.rows=[...this.hot.values()].sort((a,b)=>retentionScore(b)-retentionScore(a)).slice(0,150);this.hot=new Map(this.rows.map(r=>[memoryKey(r.source,r.text,r.unit),r]));this.corrections=this.corrections.slice(-100);try{this.storage.setItem(key,JSON.stringify({rows:this.rows.slice(-150),corrections:this.corrections.slice(-100)}));}catch{}}
- remember(source,text,translations,unit=''){text=exact(text);if(!text||text.length>600)return false;const clean={};for(const [code,value] of Object.entries(translations||{}))if(code!==source&&typeof value==='string'&&value.trim()&&value.length<=1500)clean[code]=value.trim();if(!Object.keys(clean).length)return false;
+ remember(source,text,translations,unit=''){text=exact(text);if(!text||text.length>600)return false;const clean={};for(const [code,value] of Object.entries(translations||{}))if(code!==source&&typeof value==='string'&&value.trim()&&value.length<=1500&&!hasInternalMarker(value)&&!needsTranslationReview(value))clean[code]=value.trim();if(!Object.keys(clean).length)return false;
  const version=catalogVersion(this.catalog||{}),id=memoryKey(source,text,unit),candidate=this.hot.get(id),row=candidate?.catalogVersion===version?candidate:null,next={...row,source,text,unit,catalogVersion:version,translations:{...row?.translations,...clean},at:Date.now(),lastUsed:Date.now(),hits:row?.hits||0};this.hot.set(id,next);this.persist();void this.store.get(id).then(old=>this.store.put({...old,...next,translations:{...(old?.catalogVersion===version?old.translations:{}),...next.translations}}));return true;}
- lookup(source,text,targets,unit='',catalog=this.catalog||{},partial=false){this.catalog=catalog;text=exact(text);const version=catalogVersion(catalog),candidate=this.hot.get(memoryKey(source,text,unit)),row=candidate&&candidate.catalogVersion===version?candidate:null;if(row){row.hits=(row.hits||0)+1;row.lastUsed=Date.now();if(row.hits===1||row.hits%10===0)void this.store.put(row);}const out={[source]:text};if(row)Object.assign(out,row.translations);
+ lookup(source,text,targets,unit='',catalog=this.catalog||{},partial=false){this.catalog=catalog;text=exact(text);const version=catalogVersion(catalog),candidate=this.hot.get(memoryKey(source,text,unit)),row=candidate&&candidate.catalogVersion===version?candidate:null;if(row){row.hits=(row.hits||0)+1;row.lastUsed=Date.now();if(row.hits===1||row.hits%10===0)void this.store.put(row);}const out={[source]:text};if(row)for(const [code,value]of Object.entries(row.translations||{}))if(code!==source&&usableTranslation(value))out[code]=value;
  const bucket=indexedCatalog(catalog,source).get(phraseIdentity(text,source));
  const bank=(bucket?.bank||[]).filter(r=>!r.subject||r.subject==='common'||r.subject===unit);
  const phraseRows=bucket?.phrases||[];
  const glossary=bucket?.glossary[0];
- for(const code of targets)if(!out[code]){const candidates=[...bank,...phraseRows,...(glossary?[glossary]:[])];const values=[...new Set(candidates.map(r=>r[translationField(code)]||(r===glossary&&code==='en'?r.en:'')).filter(v=>typeof v==='string'&&v.trim()&&!/^[#=]/.test(v)))];if(values.length===1)out[code]=values[0];}
+ for(const code of targets)if(!out[code]){const candidates=[...bank,...phraseRows,...(glossary?[glossary]:[])];const values=[...new Set(candidates.map(r=>r[translationField(code)]||(r===glossary&&code==='en'?r.en:'')).filter(usableTranslation))];if(values.length===1)out[code]=values[0];}
  const matches=bucket?.materials||[];
- for(const code of targets)if(!out[code]){const values=[...new Set(matches.map(r=>translationOf(r,code)).filter(v=>typeof v==='string'&&v.trim()&&!/^[#=]/.test(v)))];if(values.length===1)out[code]=values[0];}
+ for(const code of targets)if(!out[code]){const values=[...new Set(matches.map(r=>translationOf(r,code)).filter(usableTranslation))];if(values.length===1)out[code]=values[0];}
  if(partial)return {translations:out,missing:targets.filter(c=>!out[c]),source:row?'reviewed':'spreadsheet',diagnostic:{reason:targets.every(c=>out[c])?'complete':row||bucket?'missing_languages':'no_match',missing:targets.filter(c=>!out[c])}};
  return targets.every(c=>typeof out[c]==='string'&&out[c].trim())?{translations:out,source:row?'reviewed':'spreadsheet'}:null;}
  async lookupAsync(source,text,targets,unit='',catalog=this.catalog||{},partial=false){
