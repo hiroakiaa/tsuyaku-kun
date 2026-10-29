@@ -3,3 +3,9 @@ export function acquireMicrophone(getMedia,isCurrent,{timeoutMs=15000}={}){
  Promise.resolve().then(getMedia).then(stream=>{if(settled||!isCurrent()){stream.getTracks().forEach(t=>t.stop());if(!settled)finish(Object.assign(Error('マイクの開始を取り消しました。'),{name:'AbortError'}));return;}finish(null,stream);},error=>finish(error));
  });
 }
+
+// Mobile WebKit can keep a live track muted after native speech playback.
+export function needsMicrophoneRefresh(stream,environment={}){
+ const tracks=stream?.getAudioTracks?.()||[];
+ return tracks.some(t=>t.muted===true)||/iPhone|iPad|iPod/i.test(environment.userAgent||'')||(environment.platform==='MacIntel'&&environment.maxTouchPoints>1);
+}
