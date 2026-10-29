@@ -8,8 +8,15 @@ export function recognitionLanguage(code){
  if(value==='zh'||value.startsWith('zh-'))return 'zh';
  return value.split('-')[0];
 }
+export function speechTextAllowed(text,candidates){
+ const codes=new Set(candidates.map(recognitionLanguage));
+ const scripts=[['ko',/\p{Script=Hangul}/u],['ja',/[\p{Script=Hiragana}\p{Script=Katakana}]/u],['zh',/\p{Script=Han}/u],['ne',/\p{Script=Devanagari}/u]];
+ for(const [code,pattern] of scripts)if(pattern.test(text)&&!codes.has(code)&&!(code==='zh'&&codes.has('ja')))return false;
+ return !/[\p{Script=Cyrillic}\p{Script=Arabic}\p{Script=Thai}]/u.test(text);
+}
 export function resolveSpeechLanguage(result,candidates){
  const info=result?.transcription_info||result||{},language=recognitionLanguage(info.language??result?.language),confidence=info.language_probability??result?.language_probability;
+ if(!speechTextAllowed(String(result?.text??info.text??''),candidates))return null;
  const matches=candidates.filter(code=>recognitionLanguage(code)===language);
  if(!language||!matches.length||(confidence!=null&&(!Number.isFinite(confidence)||confidence<0||confidence>1)))return null;
  // Short replies often have weak acoustic language confidence. For JA/EN only,
