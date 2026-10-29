@@ -1,5 +1,5 @@
 import {splitRecognizedText} from './session-reliability.js?v=20261022-reliability-20-1';
-import {createServerRecognition} from './caption-server.js?v=20261029-ios-mic-recovery-1';
+import {createServerRecognition} from './caption-server.js?v=20261030-dots-capture-1';
 import {nonSpeechReason} from './speech-filter.js?v=20261007-learning-1';
 
 // The browser may use its vendor's speech service. This is not an offline guarantee.
