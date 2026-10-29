@@ -35,7 +35,9 @@ export class PcmSegmenter {
     const forced=this.length===this.samples.length;
     if(forced||this.silence>=8000){
       if(this.voiced>=1920)this.emit(this.samples.slice(0,this.length),{boundary:forced?'limit':'pause'});
-      if(!forced)this.activity('end');
+      // Every emitted segment ends its capture state, including a forced limit.
+      // A new onset starts capture again only when fresh voiced frames arrive.
+      this.activity('end');
       const overlap=forced?this.samples.slice(this.length-this.preroll.length,this.length):null;
       this.samples.fill(0);this.length=0;this.voiced=0;this.silence=0;this.onset=0;this.started=false;
       if(overlap)this.preroll.set(overlap);
