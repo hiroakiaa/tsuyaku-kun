@@ -1,5 +1,8 @@
 // UI English guides. Source: ui_translations + ruby_dictionary; short UI overrides reviewed in code.
 export const uiLabels = {
+  "自分の言語": "My language",
+  "相手の言語": "Their language",
+  "話す言語を自動判定": "Detect spoken language",
   "自分の言語を変更": "Change my language",
   "英語訳": "English",
   "英語訳を表示": "Show English translation",

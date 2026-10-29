@@ -1,6 +1,6 @@
 import {guardedStorage} from './storage-access.js?v=20261024-usability20-4';
 const localStorage=guardedStorage(()=>globalThis.localStorage);
-import {uiLabels} from './ui-labels.js?v=20261021-chat-controls-1';
+import {uiLabels} from './ui-labels.js?v=20261029-two-language-1';
 
 export const ENGLISH_GUIDES_KEY='tsuyaku-english-guides-v1';
 export function guidesEnabled(storage){try{return storage.getItem(ENGLISH_GUIDES_KEY)!=='off';}catch{return true;}}

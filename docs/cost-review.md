@@ -99,3 +99,10 @@
 ## 2026-10-27 読み上げ後の音声認識復帰
 
 読み上げ前にONだったマイクの意図を維持し、読み上げ中は認識を中断・音声トラックを無効化。終了・取消・一時停止後は残響待ちを挟んで、同じ会話・同じマイク操作世代で画面が表示中の場合だけ復帰する。手動OFF・退室・背景・入力機器切断・承認待ちでは復帰しない。待機中は認識の課金秒数を積算せず、再開後の実稼働のみ計測する。自動復帰により手動OFFのままだった旧動作より認識時間が増える可能性があるが、既存の音声認識・AI予算上限と単価は変更しない。読み上げの音声生成回数・翻訳先・再試行は追加しない。
+
+
+## 2026-10-29: two-language automatic recognition
+
+Face mode defaults to automatic language detection using one existing Whisper Turbo request per captured speech segment, without a forced language. Only a detected configured language with provider probability >=0.6 is accepted. Unsupported/uncertain detection retains text for manual correction and does not call translation. No parallel recognizers, extra language-classifier calls or automatic expensive fallback are used. Manual recognition remains available in language settings. Speech audio is sent to the existing Cloudflare recognition endpoint and is not persisted by this change. Silence energy gating, bounded queue and stale-result cancellation remain in place.
+
+Compared with browser-native recognition, this adds server ASR usage; it is not free or a translation-only cost. Existing duration-based ledger and shared daily AI budget reservations apply; limits and model prices are unchanged. The admin translation-count estimate explicitly excludes ASR. Reading speech still suspends capture and only restores a previously ON valid microphone. Chat and lesson recognition paths are unchanged. Real bilingual audio/provider response and physical-device validation must be recorded separately from synthetic integration tests.

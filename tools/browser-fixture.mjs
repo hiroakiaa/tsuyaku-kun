@@ -6,12 +6,14 @@ import {catalog} from '../server/catalog.js';
 const require=createRequire(import.meta.url);
 const {chromium}=require(process.env.PLAYWRIGHT_PACKAGE||'playwright');
 const root=path.resolve(fileURLToPath(new URL('../',import.meta.url)));
-export async function createUiFixture(){
+export async function createUiFixture({automaticLanguage=false}={}){
 const origin='https://tsuyaku-preview.test',rooms=new Map(),errors=[],results=[];
 const browser=await chromium.launch({channel:'chrome',headless:true});
 const types={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.png':'image/png','.ttf':'font/ttf','.woff2':'font/woff2','.webmanifest':'application/manifest+json'};
 let roomCounter=0,readyHistory=[],authFailures=0,catalogGate=null,apiHandler=null;const externalAssets=new Map();
 async function setup(context){
+ // Existing microphone regressions exercise manual/native recognition; auto has its own integration suite.
+ if(!automaticLanguage)await context.addInitScript(()=>localStorage.setItem('tsuyaku-face-auto-language','off'));
  await context.route('**/*',async route=>{
   const u=new URL(route.request().url());if(process.env.TRACE)console.log('ASSET',u.pathname);
   if(u.origin===origin){try{const name=u.pathname==='/'?'index.html':decodeURIComponent(u.pathname.slice(1));const f=path.resolve(root,name);if(!f.startsWith(root+path.sep))return route.abort();return route.fulfill({body:await fs.readFile(process.env.BASELINE_CONVERSATION_UI&&name==='web/conversation-ui.js'?process.env.BASELINE_CONVERSATION_UI:f),contentType:types[path.extname(f)]||'application/octet-stream'});}catch{return route.fulfill({status:404,body:'Missing test asset'});}}
