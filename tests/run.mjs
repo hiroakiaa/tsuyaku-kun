@@ -519,3 +519,13 @@ await test('サーバーも散発音をAIへ渡さない',()=>{
  for(let i=0;i<10;i++)for(let j=0;j<320;j++)samples[i*1280+j]=Math.sin(j*.15)*3000;
  assert.equal(hasSpeechEnergy(new Uint8Array(encodeWav(samples))),false);
 });
+
+await test('30秒と60秒の環境音待機後も小さな発話を拾う',()=>{
+ const wave=(n,a)=>Float32Array.from({length:n},(_,i)=>Math.sin(i*.15)*a);
+ for(const seconds of [0,30,60]){
+  const out=[],segmenter=new PcmSegmenter(16000,s=>out.push(s));
+  segmenter.push(wave(seconds*16000,.0045));assert.equal(out.length,0);
+  segmenter.push(wave(6400,.01));segmenter.push(new Float32Array(16000));
+  assert.equal(out.length,1,seconds+' seconds');assert.equal(hasSpeechEnergy(new Uint8Array(encodeWav(out[0]))),true);
+ }
+});
