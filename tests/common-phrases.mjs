@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import {TranslationMemory,builtInTranslation} from '../web/translation-memory.js';
+import {UsageLedger,reuseSummary,costOf} from '../web/usage.js';
+import {catalogVersion} from '../web/catalog-version.js';
+const storage={getItem:()=>null,setItem(){}},empty={get:async()=>null,put:async()=>true};
+const memory=new TranslationMemory(storage,empty);
+for(const [ja,en] of [['こんにちは。','Hello.'],['おはようございます。','Good morning.'],['ありがとうございます。','Thank you.'],['どういたしまして。',"You're welcome."],['もう一度言ってください。','Please say that again.'],['どういう意味ですか？','What does that mean?'],['何歳ですか？','How old are you?']]){
+ assert.equal((await memory.lookupAsync('ja',ja,['en'],'',{},true)).translations.en,en);
+ assert.equal((await memory.lookupAsync('en',en,['ja'],'',{},true)).translations.ja,ja);
+}
+const hit=await memory.lookupAsync('en','How old are you?',['ja'],'',{},true);
+assert.equal(hit.source,'builtin');assert.equal(hit.translations.ja,'何歳ですか？');assert.deepEqual(hit.missing,[]);
+assert.equal(builtInTranslation('ja','ありがとうございます。',['en']).translations.en,'Thank you.');
+for(const text of ['How old are you','How old are you? Today?','How old is Jasmine?','How old are you? 15','How young are you?','Do not say How old are you?'])assert.equal(builtInTranslation('en',text,['ja']),null,text);
+assert.equal(builtInTranslation('en','How old are you?',['ja-easy']),null);
+assert.equal(builtInTranslation('en','How old are you?',['ja','es']),null);
+assert.equal(builtInTranslation('es','How old are you?',['ja']),null);
+const catalog={phrases:[{jaText:'何歳ですか？',enText:'How old are you?'}]};
+assert.equal((await memory.lookupAsync('en','How old are you?',['ja'],'',catalog,true)).source,'spreadsheet');
+const conflict={phrases:[...catalog.phrases,{jaText:'年齢は？',enText:'How old are you?'}]};
+assert.equal((await memory.lookupAsync('en','How old are you?',['ja'],'',conflict,true)).missing.length,1);
+const reviewed=new TranslationMemory(storage,empty);reviewed.catalog={};reviewed.remember('en','How old are you?',{ja:'おいくつですか？'});
+assert.equal((await reviewed.lookupAsync('en','How old are you?',['ja'],'',{},true)).translations.ja,'おいくつですか？');
+const disk=new TranslationMemory(storage,{get:async()=>({source:'en',text:'How old are you?',unit:'',catalogVersion:catalogVersion({}),translations:{ja:'おいくつですか？'}}),put:async()=>true});
+assert.equal((await disk.lookupAsync('en','How old are you?',['ja'],'',{},true)).source,'reviewed');
+const slow=new TranslationMemory(storage,{get:()=>new Promise(()=>{}),put:async()=>true});
+assert.equal((await slow.lookupAsync('en','How old are you?',['ja'],'',{},true)).diagnostic.reason,'no_match');
+const ledger=new UsageLedger(storage);ledger.begin('face',['ja','en']);ledger.caption({id:'one',at:1,final:true,status:'ready',memorySource:'builtin',usage:{inputTokens:0,outputTokens:0,cacheHit:true}});
+ledger.current.whisperSeconds=2;assert.equal(ledger.current.reuseCounts.builtin,1);assert.equal(ledger.current.reuseCounts.reviewed,0);assert.equal(reuseSummary([ledger.current]).withoutAI,1);assert.equal(costOf(ledger.current).translation,0);assert.ok(costOf(ledger.current).recognition>0);
+console.log('PASS common phrases: whole text, language limits, conflicts, hot/disk precedence, timeout and distinct accounting');
