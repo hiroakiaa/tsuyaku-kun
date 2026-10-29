@@ -228,3 +228,27 @@ body.phone-home .speech-controls[data-speech-state=loading] [data-play]{outline:
 /* Error actions contain real text; the old 40px icon width must not apply. */
 body.phone-home .caption-meta .caption-action{width:auto!important;min-width:120px;max-width:100%;height:auto;min-height:44px;white-space:normal;line-height:1.5;flex:0 1 auto;}
 body.phone-home .caption-meta .caption-progress{flex:1 0 100%;min-width:0;line-height:1.5;}
+
+/* Compact face captions keep readable text and 44px playback targets. */
+body.phone-home .caption.caption-face{padding:12px 14px!important;border-radius:20px!important;margin-bottom:10px!important;}
+body.phone-home .caption-face .caption-meta{gap:5px;margin:0!important;}
+body.phone-home .face-caption-header{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:32px;}
+body.phone-home .face-caption-speaker{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#d8d8df;white-space:nowrap;}
+body.phone-home .caption-face[data-face-side=self] .face-caption-speaker{margin-left:auto;}
+body.phone-home .caption-face[data-face-side=other] .face-caption-speaker{order:-1;margin-right:auto;}
+body.phone-home .face-caption-avatar{display:grid;place-items:center;box-sizing:border-box;width:28px!important;height:28px!important;min-width:28px;min-height:28px;flex:0 0 28px;aspect-ratio:1;border-radius:50%!important;padding:0!important;background:#cce8f8;color:#244a67;line-height:1;}
+body.phone-home .caption-face[data-face-side=other] .face-caption-avatar{background:#d1eddf;color:#245340;}
+body.phone-home .face-caption-avatar>.fa-user{font-size:14px;line-height:1;}
+body.phone-home .caption-face .face-caption-more{width:44px!important;height:36px;min-height:36px;padding:0!important;background:transparent!important;color:#babac5;font-size:24px;line-height:1;border:0!important;}
+body.phone-home .caption-face .caption-line{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important;gap:8px!important;margin:6px 0 0!important;padding:0!important;}
+body.phone-home .caption-face .caption-line>p{grid-column:1!important;grid-row:1!important;font-size:15px!important;line-height:1.55!important;margin:0!important;color:#bdbdc7!important;}
+body.phone-home .caption-face .caption-line-primary>p{font-size:20px!important;line-height:1.55!important;font-weight:600;color:#f5f5f7!important;}
+body.phone-home .caption-face .caption-line>.speech-controls{grid-column:2!important;grid-row:1!important;display:flex!important;flex-wrap:wrap;gap:2px!important;justify-content:flex-end;max-width:90px;align-self:start;}
+body.phone-home .caption-face .speech-controls>button{width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important;padding:8px!important;border:0!important;border-radius:12px!important;background:transparent!important;font-size:17px!important;}
+body.phone-home .caption-face .speech-controls>button:hover{background:#ffffff0b!important;}
+body.phone-home .caption-face .caption-line>.caption-progress{grid-column:1/-1!important;}
+body.phone-home .face-caption-english{margin-top:5px;border-top:1px solid #ffffff12;padding-top:3px;}
+body.phone-home .face-caption-english>summary{cursor:pointer;color:#a8a8b6;font-size:12px;min-height:32px;display:list-item;align-content:center;width:fit-content;}
+body.phone-home .face-caption-english>.caption-line>p{font-size:14px!important;}
+body.phone-home #modal-body .face-caption-actions{display:grid;gap:8px;}
+body.phone-home #modal-body .face-caption-actions>button{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;margin:0;text-align:left;}
