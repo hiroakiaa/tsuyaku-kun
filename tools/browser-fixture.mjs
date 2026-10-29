@@ -6,12 +6,13 @@ import {catalog} from '../server/catalog.js';
 const require=createRequire(import.meta.url);
 const {chromium}=require(process.env.PLAYWRIGHT_PACKAGE||'playwright');
 const root=path.resolve(fileURLToPath(new URL('../',import.meta.url)));
-export async function createUiFixture({automaticLanguage=false}={}){
+export async function createUiFixture({automaticLanguage=false,realtime=false}={}){
 const origin='https://tsuyaku-preview.test',rooms=new Map(),errors=[],results=[];
 const browser=await chromium.launch({channel:'chrome',headless:true});
 const types={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.png':'image/png','.ttf':'font/ttf','.woff2':'font/woff2','.webmanifest':'application/manifest+json'};
 let roomCounter=0,readyHistory=[],authFailures=0,catalogGate=null,apiHandler=null;const externalAssets=new Map();
 async function setup(context){
+ if(!realtime)await context.addInitScript(()=>localStorage.setItem('tsuyaku-recognition-speed-v1','economy'));
  // Existing microphone regressions exercise manual/native recognition; auto has its own integration suite.
  if(!automaticLanguage)await context.addInitScript(()=>localStorage.setItem('tsuyaku-face-auto-language','off'));
  await context.route('**/*',async route=>{
