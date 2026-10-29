@@ -174,8 +174,8 @@ await test('環境音の誤認識を確信度で除外し正常な前後の声�
  assert.equal(cleanRecognition(result),'授業を始めます お願いします');
  assert.equal(cleanRecognition({text:'エアガーフ',segments:[{text:'エアガーフ',avg_logprob:-1.5,compression_ratio:3}]}),'');
  assert.equal(cleanRecognition({text:'はい はい はい',segments:[{text:'はい はい はい',no_speech_prob:.01,avg_logprob:-.2,compression_ratio:3}]}),'はい はい はい');
- assert.equal(cleanRecognition({text:'はい',segments:[{avg_logprob:-1.5,compression_ratio:1}]}),'はい');
- assert.equal(cleanRecognition({text:'こんにちは エアガーフ',segments:[{no_speech_prob:.01},{no_speech_prob:.8}]}),'こんにちは エアガーフ');
+ assert.equal(cleanRecognition({text:'はい',segments:[{avg_logprob:-1.5,compression_ratio:1}]}),'');
+ assert.equal(cleanRecognition({text:'こんにちは エアガーフ',segments:[{no_speech_prob:.01},{no_speech_prob:.8}]}),'');
  assert.equal(cleanRecognition({text:'エアガーフ',transcription_info:{segments:[{no_speech_prob:.9}]}}),'');
 });
 await test('無言区間の幻覚対策と音声検出を認識モデルに明示する',async()=>{
@@ -500,4 +500,22 @@ await test('短い日英の発話は原文の根拠を使い、未知語と選�
 
 await test('選択外の文字が混ざる日英認識は高信頼でも拒否',()=>{
  for(const text of ['こんにちは 안녕하세요','귀엽게 해드립니다.','Hello привет','こんにちは مرحبا'])for(const language of ['ja','en'])assert.equal(resolveSpeechLanguage({text,language,language_probability:.99},['ja','en']),null);
+});
+
+await test('非反復の低確信英語とVAD無発話は字幕に採用しない',()=>{
+ const text="First, I'm going to...";
+ assert.equal(cleanRecognition({text,segments:[{text,avg_logprob:-1.4,no_speech_prob:.1,compression_ratio:1}]}),'');
+ assert.equal(cleanRecognition({text,segments:[{text,avg_logprob:-.2,no_speech_prob:.01,compression_ratio:1}]}),text);
+ assert.equal(cleanRecognition({text,transcription_info:{duration_after_vad:0}}),'');
+});
+await test('散発する操作音を認識送信しない',()=>{
+ const out=[],s=new PcmSegmenter(16000,x=>out.push(x));
+ for(let i=0;i<10;i++){s.push(Float32Array.from({length:320},(_,j)=>Math.sin(j*.15)*.08));s.push(new Float32Array(1280));}
+ s.push(new Float32Array(16000));assert.equal(out.length,0);
+});
+
+await test('サーバーも散発音をAIへ渡さない',()=>{
+ const samples=new Int16Array(16000);
+ for(let i=0;i<10;i++)for(let j=0;j<320;j++)samples[i*1280+j]=Math.sin(j*.15)*3000;
+ assert.equal(hasSpeechEnergy(new Uint8Array(encodeWav(samples))),false);
 });
