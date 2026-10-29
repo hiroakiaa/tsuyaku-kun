@@ -1,0 +1,52 @@
+import assert from 'node:assert/strict';
+import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from '../server/quality.js';
+import {hasInternalMarker,guardCaptionTranslation,needsTranslationReview} from '../web/translation-safety.js';
+import {parseTranslation} from '../web/core.js';
+import {inspectTranslations} from '../web/translation-quality.js';
+import {recognitionMetrics} from '../web/recognition-metrics.js';
+import {safeConnectionRecord,explainConnection} from '../web/network.js';
+import {joinSpeechText,speechGapAllowsJoin,incompleteEnglish} from '../web/speech-continuity.js';
+import {processingPresentation} from '../web/conversation-ui.js';
+import {trimmedAudioLength} from '../web/audio-trim.js';
+import {translateText} from '../server/worker.js';
+import {TranslationMemory} from '../web/translation-memory.js';
+import {storedTranslations} from '../server/dictionary.js';
+for(const token of ['__UNCLEAR_1__','__unclear_1__','＿UNCLEAR＿１＿','__UNCLEAR_99__']){
+ const result=restoreUncertainSpeech({en:'Hello '+token},'こんにちは',[]).en;
+ assert.ok(needsTranslationReview(result));assert.ok(!hasInternalMarker(result));assert.ok(result.includes('こんにちは'));
+}
+const protectedText=protectUncertainSpeech('二次つ目');
+for(const token of ['__UNCLEAR_1__','__unclear_1__','＿UNCLEAR＿１＿']){
+ const r=restoreUncertainSpeech({de:token+' und '+token},'二次つ目',protectedText.spans).de;assert.ok(!hasInternalMarker(r));assert.equal(r.match(/二次つ目/g).length,2);assert.match(r,/unklare Formulierung/);
+}
+assert.ok(needsTranslationReview(restoreUncertainSpeech({en:'Invented'},'二次つ目',protectedText.spans).en));
+const bad={type:'translation',id:'test',source:'ja',text:'こんにちは',status:'ready',translations:{ja:'こんにちは',en:'Hello __UNCLEAR_1__'},usage:{inputTokens:10}};
+assert.equal(guardCaptionTranslation(bad).status,'failed');assert.deepEqual(guardCaptionTranslation(bad).translations,{ja:'こんにちは'});assert.equal(bad.status,'ready');assert.equal(guardCaptionTranslation(bad).usage.inputTokens,10);
+assert.equal(guardCaptionTranslation({...bad,translations:{en:'Hello'}}).status,'ready');
+const memory=new TranslationMemory({getItem:()=>null,setItem(){}},{put:async()=>{},get:async()=>null});
+assert.equal(memory.remember('ja','確認',{en:'__UNCLEAR_1__'}),false);
+assert.equal(memory.remember('ja','確認',{en:'Check'}),true);
+for(const row of memory.hot.values())row.translations.en='__UNCLEAR_1__';
+assert.deepEqual(memory.lookup('ja','確認',['en'],'',{},true).missing,['en']);
+assert.deepEqual(storedTranslations('確認','ja',['en'],{phrases:[{id:'safe',jaText:'確認',enText:'__UNCLEAR_1__'}]}).translations,{});
+assert.deepEqual(parseTranslation('\uFEFF```json\n{"en":"Hello"}\n```',['en']),{en:'Hello'});
+for(const raw of ['[{"en":"Hello"}]','{"en":"\\u0000"}','{"en":""}','{"en":4}','{"en":"Hello"'])assert.throws(()=>parseTranslation(raw,['en']));
+assert.ok(inspectTranslations('不要','ja',['de'],{de:'Es ist nötig.'}).warnings.some(w=>w.code==='negation_check'));
+assert.equal(inspectTranslations('不要','ja',['de'],{de:'Es ist nicht nötig.'}).warnings.length,0);
+assert.ok(inspectTranslations('問3','ja',['de'],{de:'Frage drei'}).unmeasuredLanguages.includes('de'));
+assert.ok(inspectTranslations('こんにちは','ja',['de'],{de:'こんにちは'}).warnings.some(w=>w.code==='source_script_remaining'));
+assert.ok(inspectTranslations('こんにちは','ja',['en'],{en:'__UNCLEAR_1__'}).warnings.some(w=>w.code==='internal_marker'));
+assert.ok(schoolContextHints('今マイクは何をしていますか','ja').some(x=>x.term==='マイク'));assert.equal(schoolContextHints('マイクさんの誕生日です','ja').length,0);
+let payload;const env={AI:{run:async(_,input)=>{payload=input;return {response:'{"en":"Hello __UNCLEAR_1__"}',usage:{prompt_tokens:10,completion_tokens:4}};}}};
+const out=await translateText(env,'お話しします','ja',['en'],[],'',{});assert.ok(!hasInternalMarker(out.en));assert.ok(!payload.messages[0].content.includes('__UNCLEAR_'));assert.match(payload.messages[0].content,/unfinished/);assert.match(payload.messages[0].content,/Quoted foreign words/);
+await translateText(env,'二次つ目','ja',['en'],[],'',{});assert.ok(payload.messages[0].content.includes('__UNCLEAR_1__'));
+const measured=recognitionMetrics({providerMs:1200,budgetWaitMs:25,budgetSettleMs:20,authMs:1,uploadMs:5,preprocessMs:3,totalMs:1300,serverBuild:'20261029-communication50-1',aiCalled:false,text:'SECRET',token:'SECRET',audio:'SECRET'});
+assert.equal(measured.serverProviderMs,1200);assert.equal(measured.aiCalled,false);assert.ok(!JSON.stringify(measured).includes('SECRET'));assert.equal(recognitionMetrics({providerMs:-1,totalMs:Infinity,authMs:'0'}).serverProviderMs,undefined);
+const stored=safeConnectionRecord({...measured,code:'recognition_order',orderWaitMs:2300});assert.equal(stored.serverProviderMs,1200);assert.equal(stored.orderWaitMs,2300);assert.equal(stored.aiCalled,false);assert.equal(explainConnection([stored]).candidates.length,0);
+assert.equal(speechGapAllowsJoin({speechEndedAt:1000},{speechStartedAt:3000}),false);assert.equal(speechGapAllowsJoin({speechEndedAt:1000},{speechStartedAt:1100}),true);assert.equal(speechGapAllowsJoin({},{}),true);
+assert.equal(joinSpeechText('明日は','お休みです','ja','pause'),'明日はお休みです');assert.equal(joinSpeechText('We need a book','a book tomorrow','en','limit'),'We need a book tomorrow');assert.equal(joinSpeechText('Go','Go now','en','pause'),'Go Go now');assert.equal(incompleteEnglish('It means'),true);assert.equal(incompleteEnglish('It means hello.'),false);
+const state={mode:'face',mic:true,speechPhase:'recognizing',recognitionRequestAt:1000};assert.match(processingPresentation(state,6000).text,/ON/);assert.equal(processingPresentation({...state,mic:false},6000).text,'');assert.equal(processingPresentation({...state,paused:true},6000).text,'');assert.equal(processingPresentation({...state,speechPhase:'capturing',translating:true},6000).phase,'capturing');assert.equal(processingPresentation(state,2000).busy,true);assert.equal(processingPresentation({...state,mode:null},2000).busy,false);
+const signal=new Int16Array(16000);for(let i=0;i<8000;i++)signal[i]=i%2?300:-300;
+assert.equal(trimmedAudioLength(signal,'pause'),11200);assert.equal(trimmedAudioLength(signal,'limit'),16000);assert.equal(trimmedAudioLength(new Int16Array(8000),'pause'),8000);
+const quietVoice=new Int16Array(16000);for(let i=0;i<quietVoice.length;i++)quietVoice[i]=i%2?50:-50;assert.equal(trimmedAudioLength(quietVoice,'pause'),16000,'quiet .0015 RMS speech is retained');
+console.log('Communication50: marker leakage regression, language checks, prompt safety, strict parsing, server timing privacy, temporal continuity, quiet-tail preservation and processing states passed');
