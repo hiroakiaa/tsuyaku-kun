@@ -5,7 +5,7 @@ const response=await fetch(new URL('index.html?verify='+Date.now(),base),{signal
 const assets=[expected,...[...html.matchAll(/href="(web\/[^"#]+\.css[^"#]*)"/g)].map(m=>m[1])];
 for(const match of local.matchAll(/href="(web\/[^"#]+\.css[^"#]*)"/g))if(!html.includes(match[1]))throw Error('Published style version differs: '+match[1]);
 const app=await fs.readFile(new URL('../web/app.js',import.meta.url),'utf8');
-for(const match of app.matchAll(/from '(\.\/(?:two-language|caption-server|cost-policy|session-reliability|caption-browser|call-mode|caption-delivery|async-ui|entry-feedback|device-check|photo-translate|entry-feedback|ui-english|conversation-ui|admin|usage)\.js[^']*)'/g))assets.push('web/'+match[1].slice(2));
+for(const match of app.matchAll(/from '(\.\/(?:face-caption|two-language|caption-server|cost-policy|session-reliability|caption-browser|call-mode|caption-delivery|async-ui|entry-feedback|device-check|photo-translate|entry-feedback|ui-english|conversation-ui|admin|usage)\.js[^']*)'/g))assets.push('web/'+match[1].slice(2));
 for(const match of app.matchAll(/import\('(\.\/qr\.js[^']*)'\)/g))assets.push('web/'+match[1].slice(2));
 const admin=await fs.readFile(new URL('../web/admin.js',import.meta.url),'utf8');for(const match of admin.matchAll(/from '(\.\/(?:budget-view|service-month-view|billing-view)\.js[^']*)'/g))assets.push('web/'+match[1].slice(2));
 assets.push('web/cost-policy.js?v=20261022-cost-accounting-1','web/billing-data.js?v=20261022-billing-auto-1');
