@@ -106,3 +106,8 @@
 Face mode defaults to automatic language detection using one existing Whisper Turbo request per captured speech segment, without a forced language. Only a detected configured language with provider probability >=0.6 is accepted. Unsupported/uncertain detection retains text for manual correction and does not call translation. No parallel recognizers, extra language-classifier calls or automatic expensive fallback are used. Manual recognition remains available in language settings. Speech audio is sent to the existing Cloudflare recognition endpoint and is not persisted by this change. Silence energy gating, bounded queue and stale-result cancellation remain in place.
 
 Compared with browser-native recognition, this adds server ASR usage; it is not free or a translation-only cost. Existing duration-based ledger and shared daily AI budget reservations apply; limits and model prices are unchanged. The admin translation-count estimate explicitly excludes ASR. Reading speech still suspends capture and only restores a previously ON valid microphone. Chat and lesson recognition paths are unchanged. Real bilingual audio/provider response and physical-device validation must be recorded separately from synthetic integration tests.
+
+
+## 2026-10-29 compact face captions
+
+Presentation-only changes: original and target remain visible, auxiliary English is collapsible, and playback retains accessible language labels. Edit/save are grouped in a dialog. This does not reduce generated target languages, trigger synthesis on expansion, or change AI/ASR budgets, calls, prices, reuse or accounting. Chat and lesson rendering remain unchanged.
