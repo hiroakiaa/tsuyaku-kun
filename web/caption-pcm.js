@@ -33,7 +33,7 @@ export class PcmSegmenter {
     this.samples.set(this.frame,this.length);this.length+=320;
     if(voiced){this.voiced+=320;this.silence=0;}else this.silence+=320;
     const forced=this.length===this.samples.length;
-    if(forced||this.silence>=9600){
+    if(forced||this.silence>=8000){
       if(this.voiced>=1920)this.emit(this.samples.slice(0,this.length),{boundary:forced?'limit':'pause'});
       if(!forced)this.activity('end');
       const overlap=forced?this.samples.slice(this.length-this.preroll.length,this.length):null;
@@ -45,8 +45,8 @@ export class PcmSegmenter {
 }
 if(typeof AudioWorkletProcessor!=='undefined'){
   class CaptionPcmProcessor extends AudioWorkletProcessor{
-    constructor(){super();this.active=true;this.segmenter=new PcmSegmenter(sampleRate,(samples,detail)=>this.port.postMessage({samples,...detail},[samples.buffer]),activity=>this.port.postMessage({activity}));this.port.onmessage=()=>{this.active=false;this.segmenter.clear();};}
-    process(inputs){if(!this.active)return false;if(inputs[0]?.[0])this.segmenter.push(inputs[0][0]);return true;}
+    constructor(){super();this.active=true;this.frames=0;this.port.postMessage({alive:true});this.segmenter=new PcmSegmenter(sampleRate,(samples,detail)=>this.port.postMessage({samples,...detail},[samples.buffer]),activity=>this.port.postMessage({activity}));this.port.onmessage=()=>{this.active=false;this.segmenter.clear();};}
+    process(inputs){if(!this.active)return false;if((this.frames+=(inputs[0]?.[0]?.length||128))>=sampleRate*2){this.frames=0;this.port.postMessage({alive:true});}if(inputs[0]?.[0])this.segmenter.push(inputs[0][0]);return true;}
   }
   registerProcessor('caption-pcm',CaptionPcmProcessor);
 }
