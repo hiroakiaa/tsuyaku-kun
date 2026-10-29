@@ -1,6 +1,6 @@
 // Conservative checks: warnings are review prompts, never accuracy scores.
-import {hasInternalMarker,needsTranslationReview} from './translation-safety.js?v=20261029-communication50-1';
-export const QUALITY_VERSION=2;
+import {QUALITY_VERSION,hasInternalMarker,needsTranslationReview} from './translation-safety.js?v=20261029-faithful-pipeline-1';
+export {QUALITY_VERSION};
 export function inspectTranslations(text,source,targets,translations={}){
  const normalize=s=>String(s||'').normalize('NFKC');
  const numbers=s=>(normalize(s).replaceAll('−','-').replace(/(?<=\d)[,\s](?=\d{3}(?:\D|$))/g,'').match(/-?\d+(?:[.,]\d+)?/g)||[]).map(n=>String(Number(n.replace(',','.')))).sort();
@@ -14,6 +14,11 @@ export function inspectTranslations(text,source,targets,translations={}){
   checkedLanguages.push(language);
   if(hasInternalMarker(value))warnings.push({language,code:'internal_marker'});
   if(needsTranslationReview(value))warnings.push({language,code:'translation_needs_review'});
+  if(source==='en'&&['ja','ja-easy'].includes(language)){
+   const same=s=>normalize(s).toLowerCase().replace(/[\s\p{P}]/gu,'');
+   if((text.match(/[A-Za-z]+/g)||[]).length>=2&&/\b(?:to|the|a|an|is|are|let|we|you|i|what|how|please|can|this|that|and|for|of)\b/i.test(text)&&same(text)===same(value))warnings.push({language,code:'untranslated_target'});
+   if(/小学生|しょうがくせい|小学校|しょうがっこう|皆さん|みなさん/.test(value)&&!(/\b(?:elementary|primary|pupils|children|everyone|students|class)\b|all of you/i.test(text)))warnings.push({language,code:'added_audience'});
+  }
   if(source==='ja'&&['en','es','pt','de'].includes(language)&&/[\u3040-\u30ff\u3400-\u9fff]/u.test(value))warnings.push({language,code:'source_script_remaining'});
   // Word-form numbers and dates require semantic interpretation: do not guess.
   const wordNumbers=/\b(?:one|two|three|four|five|six|seven|eight|nine|ten|hundred|thousand|january|february|march|april|may|june|july|august|september|october|november|december|uno|dos|tres|cuatro|cinco|um|dois|três|quatro|janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro|eins|zwei|drei|vier|fünf|sechs|sieben|acht|neun|zehn|hundert|tausend|januar|februar|märz|april|mai|juni|juli|august|september|oktober|november|dezember|enero|febrero|marzo|mayo|junio|julio|septiembre|octubre|diciembre)\b/i;
@@ -22,4 +27,4 @@ export function inspectTranslations(text,source,targets,translations={}){
  }
  return {version:QUALITY_VERSION,checkedLanguages,unmeasuredLanguages,warnings};
 }
-export function qualityMessage(code){return {internal_marker:'訳を確認できませんでした。原文を確認してください',translation_needs_review:'不明な言葉があります。原文を確認してください',source_script_remaining:'日本語の文字が残っています。訳を確認してください',number_mismatch:'数字・日付を確認してください',negation_check:'否定の意味を確認してください',missing_translation:'訳がありません'}[code]||'訳を確認してください';}
+export function qualityMessage(code){return {untranslated_target:'原文の英語が残っています。訳を確認してください',added_audience:'原文にない相手・学年の説明が加わっていないか確認してください',internal_marker:'訳を確認できませんでした。原文を確認してください',translation_needs_review:'不明な言葉があります。原文を確認してください',source_script_remaining:'日本語の文字が残っています。訳を確認してください',number_mismatch:'数字・日付を確認してください',negation_check:'否定の意味を確認してください',missing_translation:'訳がありません'}[code]||'訳を確認してください';}
