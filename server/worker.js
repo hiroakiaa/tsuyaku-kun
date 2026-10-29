@@ -1,3 +1,4 @@
+import {createCatalogCache,exposeCatalog} from './catalog-cache.js';
 import {translationInstructions} from './translation-instructions.js';
 import {resolveSpeechLanguage,recognitionLanguage} from '../web/two-language.js';
 import {isBillingAdministrator,cloudflareBillingReport,googleBillingReport} from './billing-report.js';
@@ -11,7 +12,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261029-faithful-pipeline-1';
+const BUILD_ID='20261029-catalog-pipeline-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -48,8 +49,11 @@ const error=(text,status=400)=>json({error:text},status);
 const rid=/^[a-f0-9]{32}$/;
 async function body(request,max=32768){const reader=request.body?.getReader();if(!reader)throw Error('データがありません。');let s='',size=0;const decoder=new TextDecoder();try{for(;;){const r=await reader.read();if(r.done)break;size+=r.value.length;if(size>max){await reader.cancel();throw Error('データが大きすぎます。');}s+=decoder.decode(r.value,{stream:true});}s+=decoder.decode();return JSON.parse(s);}finally{reader.releaseLock();}}
 async function bridge(env,token,action,extra={}){if(!env.SHEETS_BRIDGE)return null;const r=await fetch(env.SHEETS_BRIDGE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,idToken:token,...extra}),signal:AbortSignal.timeout(20000)});if(!r.ok)throw Error('辞書との接続を確認してください。');const result=await r.json();if(result.error)throw Error(result.error);return result;}
+const sharedCatalogCache=createCatalogCache(catalog);
+async function loadSharedCatalog(env,token){return sharedCatalogCache.refresh(env.SHEETS_BRIDGE,()=>bridge(env,token,'tsuyakuCatalog'));}
+export function catalogForTranslation(env,token,ctx){const snapshot=sharedCatalogCache.peek(env.SHEETS_BRIDGE);if(env.SHEETS_BRIDGE&&ctx?.waitUntil&&!snapshot.fresh)ctx.waitUntil(loadSharedCatalog(env,token));return snapshot;}
 export async function translateText(env,text,source,targets,context=[],unit='',data=catalog,onUsage=()=>{}){
-  const timing={serverBuild:BUILD_ID,dictionaryMs:null,aiTotalMs:null,providerMs:null,budgetWaitMs:null,budgetSettleMs:null,parseMs:null,authMs:env.authMs??null};let scenario;const reportUsage=onUsage;onUsage=u=>reportUsage({...u,translationTiming:timing,...(scenario?{translationScenario:scenario}:{})});env={...env,translationTiming:timing};
+  const knownCatalog=data._catalog,metadata=env.catalogMetadata||{catalogSource:data===catalog?'bundled':['spreadsheet','bundled'].includes(knownCatalog?.source)?knownCatalog.source:'unmeasured',...(/^c1-[a-f0-9]{8}$/.test(knownCatalog?.revision||'')?{catalogRevision:knownCatalog.revision}:{})};const timing={...metadata,serverBuild:BUILD_ID,dictionaryMs:null,aiTotalMs:null,providerMs:null,budgetWaitMs:null,budgetSettleMs:null,parseMs:null,authMs:env.authMs??null};let scenario;const reportUsage=onUsage;onUsage=u=>reportUsage({...u,translationTiming:timing,...(scenario?{translationScenario:scenario}:{})});env={...env,translationTiming:timing};
   source=spokenLanguage(source);
   const unique=[...new Set(targets)].filter(c=>c!==source);scenario={version:1,source,targets:[...unique].sort(),aiTargets:[],characters:[...text].length};
   const out={[source]:text};if(!unique.length){onUsage({inputTokens:0,outputTokens:0,cacheHit:true});return out;}
@@ -65,7 +69,7 @@ export async function translateText(env,text,source,targets,context=[],unit='',d
   const raw=result.response||result.choices?.[0]?.message?.content||'';const u=result.usage;const measured=Number.isFinite(u?.prompt_tokens)&&Number.isFinite(u?.completion_tokens);onUsage({inputTokens:measured?u.prompt_tokens:Math.ceil(messages.map(m=>m.content).join('').length/2),outputTokens:measured?u.completion_tokens:Math.ceil(raw.length/2),estimated:!measured,unknown:false});
   const parseStarted=Date.now();try{return {...out,...restoreUncertainSpeech(parseTranslation(result.response||result.choices?.[0]?.message?.content||'',missing),text,protectedSpeech.spans)};}finally{timing.parseMs=Date.now()-parseStarted;}
 }
-export default {async fetch(request,env){
+export default {async fetch(request,env,ctx){
   const requestStarted=Date.now(),origin=request.headers.get('Origin'),url=new URL(request.url);
   const allowed=origin===env.ALLOWED_ORIGIN||origin==='http://localhost:8787';
   const cors=response=>{const h=new Headers(response.headers);if(allowed){h.set('Access-Control-Allow-Origin',origin);h.set('Access-Control-Allow-Headers','Content-Type, Authorization, X-Term-Hints');h.set('Access-Control-Allow-Methods','GET, POST, OPTIONS');h.set('Vary','Origin');}return new Response(response.body,{status:response.status,headers:h});};
@@ -121,15 +125,16 @@ export default {async fetch(request,env){
       if(!text||text.length>1200||!catalog.languages.some(l=>l.code===source)||!targets.length||targets.length>4||targets.some(c=>!catalog.languages.some(l=>l.code===c)))return cors(error('ことばと言語を確認してください。'));
       const context=(Array.isArray(data.context)?data.context:[]).slice(-3).filter(x=>typeof x==='string').map(x=>x.slice(0,480));
       let usage={},started=Date.now();
-      try{const translations=await translateText(env,text,source,targets,context,String(data.unit||'').slice(0,160),catalog,u=>{usage=u;});return cors(json({translations,quality:inspectTranslations(text,source,targets,translations),usage,latencyMs:Date.now()-started}));}
+      const dictionary=catalogForTranslation(env,token,ctx),clientRevision=/^c1-[a-f0-9]{8}$/.test(data.catalogRevision||'')?data.catalogRevision:null;const catalogMetadata={catalogSource:dictionary.source,catalogRevision:dictionary.revision,catalogAgeMs:dictionary.ageMs,catalogFresh:dictionary.fresh,catalogMatch:clientRevision?clientRevision===dictionary.revision:null};
+      try{const translations=await translateText({...env,catalogMetadata},text,source,targets,context,String(data.unit||'').slice(0,160),dictionary.data,u=>{usage=u;});return cors(json({translations,quality:inspectTranslations(text,source,targets,translations),usage,latencyMs:Date.now()-started}));}
       catch(e){const failure=aiFailure(e);return cors(json({error:failure.message,aiFailure:failure,usage},failure.reason==='quota'?429:['billing','auth'].includes(failure.reason)?403:502));}
     }
     if(url.pathname==='/ui-labels'&&request.method==='GET'){const result=await bridge(env,token,'tsuyakuUiLabels');if(!result?.labels)return cors(error('画面表記を取得できませんでした。',503));return cors(json({labels:result.labels,updatedAt:result.updatedAt}));}
-    if(url.pathname==='/catalog'&&request.method==='GET'){try{return cors(json(await bridge(env,token,'tsuyakuCatalog')||catalog));}catch{return cors(json(catalog));}}
+    if(url.pathname==='/catalog'&&request.method==='GET')return cors(json(exposeCatalog(await loadSharedCatalog(env,token))));
     if(url.pathname==='/dictionary/translate'&&request.method==='POST'){
       const data=await body(request,4096),text=String(data.text||'').trim(),language=String(data.language||'');
       if(!text||text.length>1500||!catalog.languages.some(l=>l.code===language))return cors(error('ことばと言語を確認してください。'));
-      let dataCatalog=catalog;try{dataCatalog=await bridge(env,token,'tsuyakuCatalog')||catalog;}catch{}
+      const dictionary=await loadSharedCatalog(env,token),dataCatalog=dictionary.data;
       const stored=storedTranslations(text,'ja',[language],dataCatalog,String(data.subject||''));const term=(dataCatalog.terms||[]).find(row=>row.ja===text);
       const translation=stored.translations[language]||term?.[translationField(language)]||(language==='en'?term?.en:language==='ja'?text:null);
       if(typeof translation!=='string'||!translation.trim()||/^[#=]/.test(translation))return cors(error('この言語の訳はまだ辞書にありません。スプレッドシートの訳を追加してください。',404));
@@ -216,7 +221,7 @@ export class TranslationRoom {
         if(room.groupChat&&!member&&this.waiting().length>=5)throw Error('参加の確認が混み合っています。しばらくしてから参加してください。');
         ws.serializeAttachment({...a,...auth,...(room.groupChat?{pending:!member,customName:!!String(data.displayName||'').trim(),requestUntil:Date.now()+120000,chatAfter:member?.after}:{}),id:stableId,token:data.token,name:room.groupChat?(member?.name||String(data.displayName||'').replace(/[\p{Cc}\p{Cf}]/gu,'').trim().slice(0,20)||'参加希望者'):String(data.name||'参加者').slice(0,40),language:role==='teacher'&&room.mode==='lesson'?'ja':lang,viewLanguage,role});
         await this.scheduleAlarm(room);if(ws.deserializeAttachment().pending){this.send(ws,{type:'join_waiting',ownerPresent:this.participants().some(({a})=>a.role==='teacher'),expires:Date.now()+120000});this.requests();return;}await this.readyParticipant(ws,room);
-        if(this.env.SHEETS_BRIDGE&&Date.now()>this.catalogUntil){this.catalogUntil=Date.now()+300000;this.ctx.waitUntil(bridge(this.env,data.token,'tsuyakuCatalog').then(r=>{if(r)this.cachedCatalog=r;}).catch(()=>{}));}return;});
+        if(this.env.SHEETS_BRIDGE&&Date.now()>this.catalogUntil){this.catalogUntil=Date.now()+300000;this.ctx.waitUntil(loadSharedCatalog(this.env,data.token).then(snapshot=>{this.cachedCatalog=exposeCatalog(snapshot);}).catch(()=>{}));}return;});
       }
       if(a.left)return;
       if(data.type==='leave'){await this.webSocketClose(ws);return;}
@@ -318,7 +323,7 @@ export class TranslationRoom {
     await this.ctx.storage.put('caption:'+id,record);
     try{
       const languages=this.participants().map(p=>p.a.language);const targets=room.mode==='interpreter'?[...new Set([...languages,...(languages.some(code=>code!=='en')?['en']:[])])]:[...new Set(['ja','en',...this.participants().flatMap(p=>[p.a.language,p.a.viewLanguage])])];
-      if(this.env.SHEETS_BRIDGE&&Date.now()>this.catalogUntil){this.catalogUntil=Date.now()+300000;this.ctx.waitUntil(bridge(this.env,a.token,'tsuyakuCatalog').then(r=>{if(r)this.cachedCatalog=r;}).catch(()=>{}));}
+      if(this.env.SHEETS_BRIDGE&&Date.now()>this.catalogUntil){this.catalogUntil=Date.now()+300000;this.ctx.waitUntil(loadSharedCatalog(this.env,a.token).then(snapshot=>{this.cachedCatalog=exposeCatalog(snapshot);}).catch(()=>{}));}
     const all=this.cachedCatalog;
       const floor=room.groupChat?Math.max(0,...this.participants().map(p=>p.a.chatAfter||0)):null;const past=(await this.ctx.storage.get('recent')||[]).filter(r=>floor===null||Number.isInteger(r.sequence)&&r.sequence>floor).map(r=>r.text);
       if(!await this.captionIsLive(ws,room,queuedAt))return;if(Date.now()<this.aiBlockedUntil)throw Object.assign(Error('quota'),{code:3036});const translations=await translateText({...this.env,budgetUid:a.uid,executionValid:()=>this.captionIsLive(ws,room,queuedAt)},text,a.language,targets,past,room.unit,all,u=>{usage=u;if(u.translationTiming)u.translationTiming.queueMs=Math.max(0,start-queuedAt);});
