@@ -575,3 +575,5 @@ await import('./dots-capture.mjs');
 await import('./recognition-profiles.mjs');
 
 await import('./realtime-recognition.mjs');
+
+await import('./hybrid-recovery.mjs');
