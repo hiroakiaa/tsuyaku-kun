@@ -10,11 +10,10 @@ export function startRealtimeSession(socket,env,{candidates,verifyToken,aiFailur
  const close=(reason=null)=>{
   if(state==='closed')return;const previous=state;if(reason)send({type:'error',code:reason});state='closed';for(const timer of [renewTimer,deadlineTimer,lifetimeTimer,openingTimer,inputTimer,authTimer])clearTimer(timer);
   try{if(upstream){upstream.send(JSON.stringify({type:'CloseStream'}));upstream.close(1000,'finished');}}catch{}
-  try{socket.close(reason?1011:1000,'finished');}catch{}
   // Unknown connection failures retain their reservation, never claim a free call.
   const seconds=providerCalled&&previous==='ready'?Math.min(reservedSeconds,Math.max(sentBytes/32000,(now()-startedAt)/1000)):null;
   const actual=!providerCalled?0:reason?undefined:Number.isFinite(seconds)?Math.ceil(seconds/60*RECOGNITION_PRICE.streamPerMinute*1e6):undefined;
-  const settlement=Promise.resolve(lease?callBudget({action:'settle',...lease,...(actual!==undefined?{actual}:{})}):null).catch(()=>{}).finally(resolveDone);waitUntil(settlement);
+  let settlementFailed=false;const settlement=Promise.resolve(lease?callBudget({action:'settle',...lease,...(actual!==undefined?{actual}:{})}):null).catch(()=>{settlementFailed=true;}).finally(()=>{try{socket.close(reason||settlementFailed?1011:1000,'finished');}catch{}resolveDone();});waitUntil(settlement);
  };
  let resultId=0;const meter=new RealtimeUtterances(pair||[],r=>send({type:'result',...r,id:resultId++}),(reason,range)=>send({type:'uncertain',reason,id:resultId++,...range}));
  const inputDeadline=()=>{clearTimer(inputTimer);inputTimer=setTimer(()=>close('timeout'),5000);};

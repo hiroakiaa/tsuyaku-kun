@@ -19,7 +19,7 @@ export class ConnectionDiary{
  add(value){const record=safeConnectionRecord(value);try{this.storage.setItem(this.key,JSON.stringify([...this.list(),record].slice(-50)));}catch{}return record;}
 }
 export function isTransportFailure(data){return ['network_or_cors','timeout','invalid_response','auth_unavailable'].includes(data?.connectionFailure?.code);}
-export function translationFailureSummary(data){return isTransportFailure(data)?'翻訳サーバーとの通信を確認できませんでした。原文は残しています。':['quota','billing','auth'].includes(data?.aiFailure?.reason)?'翻訳の利用制限です。接続状態とは別です。原文を残しています。':'翻訳処理を完了できませんでした。原文を残しています。';}
+export function translationFailureSummary(data){return isTransportFailure(data)?'翻訳サーバーとの通信を確認できませんでした。原文は残しています。':data?.aiFailure?.scope==='app'&&data.aiFailure.limit==='concurrent'?'前の処理の終了待ちです。原文は残しています。':data?.aiFailure?.scope==='app'&&data.aiFailure.limit==='daily'?'本日のアプリ内予算の上限です。節約へ切り替えても本日の残量は戻りません。原文は残しています。':['quota','billing','auth'].includes(data?.aiFailure?.reason)?'翻訳の利用制限です。接続状態とは別です。原文を残しています。':'翻訳処理を完了できませんでした。原文を残しています。';}
 export async function requestJson(url,options={}, {fetcher=fetch,stage='api',operation='other',onFailure=()=>{},now=()=>Date.now()}={}){
  const started=now();const record=value=>safeConnectionRecord({...value,elapsedMs:Math.max(0,now()-started)});let response;
  try{response=await fetcher(url,options);}catch(error){const failure=connectionFailure(error,{stage,endpoint:url,operation});failure.connection=record(failure.connection);failure.failureRecorded=true;onFailure(failure.connection);throw failure;}

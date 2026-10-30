@@ -3,7 +3,7 @@ import {percentile} from './statistics.js?v=20261029-faithful-pipeline-1';
 export {percentile};
 import {TRANSLATION_PRICE,translationScenario,RECOGNITION_PRICE} from './cost-policy.js?v=20261030-realtime-1';
 import {resourceSnapshot} from './resource-usage.js?v=20261029-ios-mic-recovery-1';
-export const BUILD_ID='20261030-speed-toggle-1';
+export const BUILD_ID='20261030-slot-release-1';
 // Device-local operational history. No names, room keys, tokens or speech are stored here.
 export const PRICES={checkedAt:TRANSLATION_PRICE.checkedAt,inputPerMillion:TRANSLATION_PRICE.inputPerMillion,outputPerMillion:TRANSLATION_PRICE.outputPerMillion,streamPerMinute:RECOGNITION_PRICE.streamPerMinute,whisperPerMinute:RECOGNITION_PRICE.whisperPerMinute,turnPerGB:.05};
 export function costOf(s,p=PRICES){const translation=(s.inputTokens||0)/1e6*p.inputPerMillion+(s.outputTokens||0)/1e6*p.outputPerMillion,recognition=(s.streamSeconds||0)/60*p.streamPerMinute+(s.whisperSeconds||0)/60*p.whisperPerMinute,turn=(s.relayBytes||0)/1e9*p.turnPerGB;return {translation,recognition,turn,total:translation+recognition+turn};}

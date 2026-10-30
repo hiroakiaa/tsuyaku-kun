@@ -11,7 +11,7 @@ export function compactFaceCaption(article,record,{el,icon,modal,englishOpen=fal
  speaker.append(circle,el('span',other?'相手':'自分'));oldSpeaker?.replaceWith(speaker);
  const actions=[...meta.querySelectorAll('button[aria-label="日本語を直す"],button[aria-label="訳を確認して覚える"]')];
  const header=el('div',undefined,'face-caption-header');
- if(actions.length){const more=el('button','…','face-caption-more');more.type='button';more.setAttribute('aria-label','この発言の操作');more.setAttribute('aria-haspopup','dialog');
+ if(actions.length){const more=el('button',undefined,'face-caption-more');more.append(icon('pen'));more.title='原文・訳の操作';more.type='button';more.setAttribute('aria-label','この発言の操作');more.setAttribute('aria-haspopup','dialog');
   for(const action of actions){action.remove();action.append(el('span',action.getAttribute('aria-label')));}
   more.onclick=()=>{const content=el('div',undefined,'face-caption-actions');content.append(...actions);modal('この発言の操作',content);};header.append(more);
  }
