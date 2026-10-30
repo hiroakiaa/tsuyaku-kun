@@ -10,5 +10,8 @@ for(let i=0;i<10;i++)pcm.push(frame);assert.equal(activities.at(-1),'start');pcm
 for(const phase of ['capturing','recognizing']){const state={mode:'face',mic:true,speechPhase:phase};assert.equal(processingPresentation(state).show,true);assert.equal(processingPresentation(state).text,'');assert.equal(processingPresentation({...state,mic:false}).show,false);assert.equal(processingPresentation({...state,paused:true}).show,false);}
 assert.equal(processingPresentation({mode:'face',mic:true,speechPhase:'waiting'}).show,false);
 assert.equal(processingPresentation({mode:'face',mic:true,speechPhase:'waiting',translating:true}).show,true);
+for(const phase of ['capturing','recognizing','waiting']){const state={mode:'face',mic:true,recognitionKind:'realtime',speechPhase:phase};assert.equal(processingPresentation(state).show,false,'continuous input cannot restore completed-caption dots');assert.equal(processingPresentation({...state,translating:true}).show,true);}
+assert.equal(processingPresentation({mode:'face',mic:true,recognitionKind:'realtime',speechPhase:'recovering'}).show,true);
+assert.equal(processingPresentation({mode:'face',mic:false,recognitionKind:'realtime',speechPhase:'recovering'}).show,false);
 console.log('PASS dots and capture: forced segment ends capture, silence leaves it idle, fresh speech resumes and pending states have no visible copy');
 

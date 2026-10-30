@@ -22,7 +22,7 @@ for(const scenario of ['order','cancel','cap']){
  const F=createRealtimeRecognition({endpoint:'wss://test',candidates:['ja','en'],getStream:()=>({getAudioTracks:()=>[{enabled:true,readyState:'live'}]}),getToken:async()=>'synthetic',recoverAudio:async data=>{calls++;recoverySamples=data.samples;if(scenario==='cap')return {text:'Hello.',language:'en'};return new Promise(resolve=>finish=resolve);},Context:C,Worklet:W,Socket:S});const r=new F();r.onresult=e=>delivered.push(e.resultIndex);r.onlanguageuncertain=()=>uncertain++;r.start();await flush();ws.readyState=1;ws.onopen();ws.message({type:'ready'});for(let i=0;i<10;i++)node.port.onmessage({data:voice()});
  const unsure=id=>ws.message({type:'uncertain',id,audioStart:.1,audioEnd:.8,reason:'language_outside'});unsure(0);await flush();
  if(scenario==='cap'){for(let i=1;i<4;i++){unsure(i);await flush();}assert.equal(calls,3);assert.equal(uncertain,1);r.abort();continue;}
- ws.message({type:'result',id:1,text:'Later.',language:'en',final:true});assert.deepEqual(delivered,[]);
+ ws.message({type:'activity',phase:'capturing'});assert.equal(r.phase,'recovering');ws.message({type:'result',id:1,text:'Later.',language:'en',final:true});assert.deepEqual(delivered,[]);
  if(scenario==='cancel'){r.abort();assert(recoverySamples.every(v=>v===0));finish({text:'Hello.',language:'en'});await flush();assert.deepEqual(delivered,[]);assert.equal(r.audio.frames.length,0);continue;}
  finish({text:'Hello.',language:'en'});await flush();assert.deepEqual(delivered,[0,1]);assert(recoverySamples.every(v=>v===0));r.abort();
 }

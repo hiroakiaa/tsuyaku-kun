@@ -1,8 +1,10 @@
 export function createWaitingBubble(el){const bubble=el('div',undefined,'caption-waiting'),dots=el('span',undefined,'waiting-dots');dots.setAttribute('aria-hidden','true');for(let i=0;i<3;i++)dots.append(el('span','・'));bubble.setAttribute('role','status');bubble.setAttribute('aria-label','処理中');bubble.append(dots);return bubble;}
 export function processingPresentation(s,now=Date.now()){
- const active=!!s.mode,recognizing=s.mic&&!s.paused&&s.speechPhase==='recognizing';
- const phase=s.mic&&!s.paused&&s.speechPhase==='capturing'?'capturing':s.translating?'translating':recognizing?'recognizing':'waiting';
- return {phase,text:'',show:active&&phase!=='waiting',busy:active&&['recognizing','translating'].includes(phase),watch:false};
+ const active=!!s.mode,input=s.mic&&!s.paused,realtime=s.recognitionKind==='realtime';
+ // A continuous audio stream is not an unfinished caption. Ambient input must
+ // not restore processing dots after the previous translation is complete.
+ const phase=input&&s.speechPhase==='recovering'?'recovering':input&&!realtime&&s.speechPhase==='capturing'?'capturing':s.translating?'translating':input&&!realtime&&s.speechPhase==='recognizing'?'recognizing':'waiting';
+ return {phase,text:'',show:active&&phase!=='waiting',busy:active&&['recognizing','recovering','translating'].includes(phase),watch:false};
 }
 export function conversationPresentation(s){
  const reconnecting=/再接続|つなぎ直|停止しました|接続できません/.test(s.connection||'')||s.paused;
