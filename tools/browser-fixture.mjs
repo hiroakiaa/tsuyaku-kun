@@ -12,7 +12,7 @@ const browser=await chromium.launch({channel:'chrome',headless:true});
 const types={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.png':'image/png','.ttf':'font/ttf','.woff2':'font/woff2','.webmanifest':'application/manifest+json'};
 let roomCounter=0,readyHistory=[],authFailures=0,catalogGate=null,apiHandler=null;const externalAssets=new Map();
 async function setup(context){
- if(!realtime)await context.addInitScript(()=>localStorage.setItem('tsuyaku-recognition-speed-v1','economy'));
+ await context.addInitScript(value=>localStorage.setItem('tsuyaku-recognition-speed-v1',value),realtime?'fast':'economy');
  // Existing microphone regressions exercise manual/native recognition; auto has its own integration suite.
  if(!automaticLanguage)await context.addInitScript(()=>localStorage.setItem('tsuyaku-face-auto-language','off'));
  await context.route('**/*',async route=>{
