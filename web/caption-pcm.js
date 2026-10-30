@@ -1,8 +1,8 @@
 // 20 ms RMS frames avoid treating every waveform zero crossing as silence.
 // Audio stays in bounded memory only; natural pauses do not duplicate billing.
 export class PcmSegmenter {
-  constructor(rate, emit, activity=()=>{}) {
-    this.rate=rate;this.emit=emit;this.activity=activity;this.samples=new Int16Array(48000);
+  constructor(rate, emit, activity=()=>{}, {pauseMs=500}={}) {
+    this.pauseSamples=pauseMs===300?4800:8000;this.rate=rate;this.emit=emit;this.activity=activity;this.samples=new Int16Array(48000);
     this.preroll=new Int16Array(3200);this.frame=new Int16Array(320);
     this.clear();
   }
@@ -33,7 +33,7 @@ export class PcmSegmenter {
     this.samples.set(this.frame,this.length);this.length+=320;
     if(voiced){this.voiced+=320;this.silence=0;}else this.silence+=320;
     const forced=this.length===this.samples.length;
-    if(forced||this.silence>=8000){
+    if(forced||this.silence>=this.pauseSamples){
       if(this.voiced>=1920)this.emit(this.samples.slice(0,this.length),{boundary:forced?'limit':'pause'});
       // Every emitted segment ends its capture state, including a forced limit.
       // A new onset starts capture again only when fresh voiced frames arrive.
@@ -47,7 +47,7 @@ export class PcmSegmenter {
 }
 if(typeof AudioWorkletProcessor!=='undefined'){
   class CaptionPcmProcessor extends AudioWorkletProcessor{
-    constructor(){super();this.active=true;this.frames=0;this.inputFrames=0;this.signalFrames=0;this.port.postMessage({alive:true});this.segmenter=new PcmSegmenter(sampleRate,(samples,detail)=>this.port.postMessage({samples,...detail},[samples.buffer]),activity=>this.port.postMessage({activity}));this.port.onmessage=()=>{this.active=false;this.segmenter.clear();};}
+    constructor(options){super();this.active=true;this.frames=0;this.inputFrames=0;this.signalFrames=0;this.port.postMessage({alive:true});this.segmenter=new PcmSegmenter(sampleRate,(samples,detail)=>this.port.postMessage({samples,...detail},[samples.buffer]),activity=>this.port.postMessage({activity}),options?.processorOptions);this.port.onmessage=()=>{this.active=false;this.segmenter.clear();};}
     process(inputs){if(!this.active)return false;const input=inputs[0]?.[0];if(input){this.inputFrames+=input.length;if(input.some(value=>Math.abs(value)>.0001))this.signalFrames+=input.length;this.segmenter.push(input);}if((this.frames+=(input?.length||128))>=sampleRate*2){this.frames=0;this.port.postMessage({alive:true,inputFrames:this.inputFrames,signalFrames:this.signalFrames});this.inputFrames=this.signalFrames=0;}return true;}
   }
   registerProcessor('caption-pcm',CaptionPcmProcessor);
