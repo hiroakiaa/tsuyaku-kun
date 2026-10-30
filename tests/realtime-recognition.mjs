@@ -55,7 +55,7 @@ for(const scenario of ['valid','bad-auth','cancel-opening','renew-failure','rene
  if(scenario==='idle-input'){const timer=[...timers.values()].find(t=>t.delay===5000);time+=5000;await timer.fn();await session.done;assert(client.closed);assert(provider.closed);assert.equal(calls.filter(c=>c.action==='extend').length,0);assert(client.sent.some(x=>typeof x==='string'&&JSON.parse(x).code==='timeout'));assert.equal(timers.size,0);continue;}
  if(scenario==='renew-failure'){const timer=[...timers.values()].find(t=>t.delay===9000);time=now+9000;await timer.fn();await flush();assert(client.closed);assert.equal(calls.at(-1).actual,undefined);continue;}
  if(scenario==='renew-success'){const timer=[...timers.values()].find(t=>t.delay===9000);time=now+9000;await timer.fn();await flush();assert.equal(calls.filter(c=>c.action==='reserve').length,1);assert.equal(calls.filter(c=>c.action==='extend').length,1);assert(!client.closed);assert([...timers.values()].some(t=>t.delay===21000));}
- if(scenario==='burst'){for(let i=0;i<34;i++)client.message(new ArrayBuffer(3200));assert(client.closed);assert(client.sent.some(x=>typeof x==='string'&&JSON.parse(x).code==='overloaded'));continue;}
+ if(scenario==='burst'){for(let i=0;i<34;i++)client.message(new ArrayBuffer(3200));await flush();assert(client.closed);assert(client.sent.some(x=>typeof x==='string'&&JSON.parse(x).code==='overloaded'));continue;}
  provider.message(JSON.stringify(result('Hello.',scenario==='missing-language'?'':'en')));assert(client.sent.some(x=>JSON.parse(x).type===(scenario==='missing-language'?'uncertain':'result')));
  client.message(JSON.stringify({type:'stop'}));await session.done;assert(provider.closed);assert(calls.at(-1).actual>0);
 }
@@ -72,6 +72,10 @@ for(const scenario of ['complete','provider-error','queue-bound']){
  if(scenario==='queue-bound'){for(let i=0;i<30;i++)voice();assert.equal(errors,1);assert.equal(released,1);assert.equal(unknown,1);continue;}
  ws.message({type:'ready'});assert.equal(usage,.1);assert.equal(released,0);assert.equal(rec.pending.length,0);assert(ws.sent.some(v=>v instanceof ArrayBuffer));
  if(scenario==='provider-error'){ws.message({type:'error',code:'quota'});assert.equal(errors,1);assert.equal(unknown,1);assert.equal(released,1);continue;}
- const final={type:'result',id:0,language:'en',text:'Hello.',final:true};ws.message(final);ws.message(final);assert.equal(results,1);rec.abort();assert.equal(released,1);assert.equal(unknown,0);assert.equal(rec.node.port.onmessage,null);
+ const final={type:'result',id:0,language:'en',text:'Hello.',final:true};ws.message(final);ws.message(final);assert.equal(results,1);rec.abort();assert.equal(released,0,'keep local slot until server settlement closes socket');assert.equal(rec.node.port.onmessage,null);ws.message(final);assert.equal(results,1);ws.readyState=3;ws.onclose();assert.equal(released,1);rec.abort();assert.equal(released,1);assert.equal(unknown,0);assert.equal(rec.node.port.onmessage,null);
 }
-console.log('PASS realtime client: bounded startup audio, one held AI slot, final-only deduplication, observed stream usage, unknown failure cost and synchronous abort');
+console.log('PASS realtime client: bounded startup audio, one held AI slot, final-only deduplication, observed stream usage, unknown failure cost, immediate audio cancellation and settled slot release');
+
+// A clean stop cannot signal socket completion while the budget still owns the lease.
+{const client=new Socket(),provider=new Socket();let settle,finished=false;const session=startRealtimeSession(client,{AI:{run:async()=>({webSocket:provider})}},{candidates:['ja','en'],verifyToken:async()=>({uid:'switch-test',exp:(Date.now()+60000)/1000}),callBudget:async d=>{if(d.action==='reserve')return {id:'switch',day:1};if(d.action==='settle'){await new Promise(r=>settle=r);finished=true;}return {ok:true};}});client.message(JSON.stringify({type:'auth',token:'synthetic'}));await flush();client.message(JSON.stringify({type:'stop'}));assert(provider.closed);assert(!client.closed);assert(!finished);client.message(new ArrayBuffer(3200));assert.equal(provider.sent.filter(x=>x instanceof ArrayBuffer).length,0);settle();await session.done;assert(finished);assert(client.closed);}
+console.log('PASS stream switch: stop input immediately, ignore late audio, close only after budget settlement');
