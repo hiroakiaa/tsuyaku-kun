@@ -18,7 +18,7 @@ for(const scenario of ['order','cancel','cap']){
  let node,ws,finish,calls=0,uncertain=0,recoverySamples;const delivered=[];
  class C{constructor(){this.state='running';this.audioWorklet={addModule:async()=>{}};}resume(){return Promise.resolve();}createMediaStreamSource(){return {connect(){},disconnect(){}};}close(){return Promise.resolve();}}
  class W{constructor(){node=this;this.port={postMessage(){}};}connect(){}disconnect(){}}
- class S{constructor(){ws=this;this.readyState=0;this.bufferedAmount=0;}send(){}close(){this.readyState=3;}message(data){this.onmessage?.({data:JSON.stringify(data)});}}
+ class S{constructor(){ws=this;this.readyState=0;this.bufferedAmount=0;}send(v){if(typeof v==='string'&&JSON.parse(v).type==='stop')queueMicrotask(()=>{this.readyState=3;this.onclose?.();});}close(){this.readyState=3;}message(data){this.onmessage?.({data:JSON.stringify(data)});}}
  const F=createRealtimeRecognition({endpoint:'wss://test',candidates:['ja','en'],getStream:()=>({getAudioTracks:()=>[{enabled:true,readyState:'live'}]}),getToken:async()=>'synthetic',recoverAudio:async data=>{calls++;recoverySamples=data.samples;if(scenario==='cap')return {text:'Hello.',language:'en'};return new Promise(resolve=>finish=resolve);},Context:C,Worklet:W,Socket:S});const r=new F();r.onresult=e=>delivered.push(e.resultIndex);r.onlanguageuncertain=()=>uncertain++;r.start();await flush();ws.readyState=1;ws.onopen();ws.message({type:'ready'});for(let i=0;i<10;i++)node.port.onmessage({data:voice()});
  const unsure=id=>ws.message({type:'uncertain',id,audioStart:.1,audioEnd:.8,reason:'language_outside'});unsure(0);await flush();
  if(scenario==='cap'){for(let i=1;i<4;i++){unsure(i);await flush();}assert.equal(calls,3);assert.equal(uncertain,1);r.abort();continue;}
