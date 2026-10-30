@@ -24,6 +24,12 @@ ordered.accept(result('Wait','en',5,{speech_final:false}));ordered.accept({...re
 ordered.accept(result('a moment.','en',6));assert.equal(turns[4].text,'Wait a moment.');
 ordered.accept(result('overlap','en',6.5,{duration:1}));assert.equal(rejections.length,1,'partly overlapping committed audio is not guessed');
 ordered.accept(result('no timestamp','en',NaN));assert.equal(rejections.length,2);
+const paddingTurns=[],paddingErrors=[],padding=new RealtimeUtterances(['ja','en'],r=>paddingTurns.push(r),r=>paddingErrors.push(r));
+const wordsResult=(text,windowStart,duration,wordStart,wordEnd,final=true)=>result(text,'en',windowStart,{duration,speech_final:final,channel:{alternatives:[{transcript:text,confidence:.99,languages:['en'],words:[{word:text,start:wordStart,end:wordEnd}]}]}});
+padding.accept(wordsResult('Hello.',0,3,.5,1));padding.accept(wordsResult('Hello.',0,3,.5,1));assert.equal(paddingTurns.length,1);
+padding.accept(wordsResult('Again.',2,3,3.5,4,false));assert.equal(paddingErrors.length,0,'overlapping silent padding is not repeated speech');
+padding.accept({type:'UtteranceEnd',last_word_end:2.5});assert.equal(paddingTurns.length,1);
+padding.accept({type:'UtteranceEnd',last_word_end:4});assert.equal(paddingTurns[1].text,'Again.');
 const db=new Map(),storage={get:async k=>structuredClone(db.get(k)),put:async(k,v)=>db.set(k,structuredClone(v)),transaction:async fn=>fn(storage)};
 const now=Date.UTC(2026,9,30),cost=reserveCost(RECOGNITION_PRICE.streamModel,{seconds:15});let lease=await budgetOperation(storage,{action:'reserve',uid:'a',model:RECOGNITION_PRICE.streamModel,cost},now);
 await budgetOperation(storage,{action:'extend',...lease,uid:'a',cost},now+1000);let status=await budgetOperation(storage,{action:'status',uid:'a'},now+1000);assert.equal(status.user.calls,1);assert.equal(status.inFlight,1);assert.equal(status.user.usedUSD,cost*2/1e6);assert.equal(status.user.limitUSD,AI_LIMITS.userUSD);
