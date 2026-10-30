@@ -1,0 +1,33 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import {createRequire} from 'node:module';
+import {lastVoicedAt} from '../web/diagnostics.js';
+import {config} from '../web/config.js';
+import {RECOGNITION_PRICE} from '../web/cost-policy.js';
+if(!process.argv.includes('--live'))throw Error('Explicit --live required: one synthetic conversation uses the existing recognition budget.');
+const {ws:Socket}=createRequire(import.meta.url)(process.env.PLAYWRIGHT_UTILS||'playwright-core/lib/utilsBundle.js');
+const root=path.resolve('checks/recognition-probe'),fixtures=JSON.parse((await fs.readFile(path.join(root,'cases.json'),'utf8')).replace(/^\uFEFF/,''));
+const auth=await(await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key='+config.firebase.apiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({returnSecureToken:true}),signal:AbortSignal.timeout(10000)})).json();if(!auth.idToken)throw Error('Anonymous authentication unavailable');
+const readBudget=async()=>{const response=await fetch(config.api+'/usage/budget',{headers:{Origin:'https://hiroakiaa.github.io',Authorization:'Bearer '+auth.idToken},signal:AbortSignal.timeout(10000)});if(!response.ok)throw Error('Budget unavailable');return response.json();};
+const beforeBudget=await readBudget();if(beforeBudget.availableUSD<45/60*RECOGNITION_PRICE.streamPerMinute*1.1)throw Error('Existing budget insufficient for bounded probe');
+const socket=new Socket(config.api.replace(/^http/,'ws')+'/transcribe-stream?languages=ja,en',{headers:{Origin:'https://hiroakiaa.github.io'}}),results=[],failures=[];let readyAt,closedAt,pump,cursor=null,lastSpeechAt=null,expectIdle=false,started=Date.now(),sentSeconds=0;
+const delay=ms=>new Promise(r=>setTimeout(r,ms));
+const until=async(predicate,ms)=>{const end=Date.now()+ms;while(!predicate()){if(failures.length&&!expectIdle)throw Error(failures.at(-1));if(Date.now()>=end)throw Error('Probe timed out');await delay(20);}};
+socket.on('open',()=>socket.send(JSON.stringify({type:'auth',token:auth.idToken})));
+socket.on('message',raw=>{const data=JSON.parse(String(raw));if(data.type==='ready')readyAt=Date.now();if(data.type==='error')failures.push(data.code);if(data.type==='uncertain')failures.push('uncertain');if(data.type==='result')results.push({...data,receivedAt:Date.now(),speechEndedAt:lastSpeechAt});});
+socket.on('error',()=>failures.push('network'));socket.on('close',()=>closedAt=Date.now());
+const deadline=setTimeout(()=>socket.close(1000,'probe deadline'),45000),rows=[];
+try{
+ await until(()=>readyAt||closedAt,10000);if(!readyAt)throw Error('Connection closed');
+ pump=setInterval(()=>{if(socket.readyState!==1)return;const packet=Buffer.alloc(3200);if(cursor){const end=Math.min(cursor.at+3200,cursor.bytes.length);cursor.bytes.copy(packet,0,cursor.at,end);cursor.at=end;if(end===cursor.bytes.length)cursor=null;}const voice=lastVoicedAt(new Int16Array(packet.buffer,packet.byteOffset,1600),Date.now());if(voice!==null)lastSpeechAt=voice;socket.send(packet);sentSeconds+=.1;},100);
+ for(const id of ['ja-negative','en-negative','ja-math','en-question','en-question']){
+  const fixture=fixtures.find(c=>c.id===id),raw=await fs.readFile(path.join(root,id+'.wav'));let pcm,format;
+  for(let at=12;at+8<=raw.length;){const size=raw.readUInt32LE(at+4),tag=raw.toString('ascii',at,at+4);if(at+8+size>raw.length)throw Error('Truncated fixture');if(tag==='fmt ')format=raw.subarray(at+8,at+8+size);if(tag==='data')pcm=raw.subarray(at+8,at+8+size);at+=8+size+(size%2);}
+  if(!pcm||pcm.length>160000||!format||format.length<16||format.readUInt16LE(0)!==1||format.readUInt16LE(2)!==1||format.readUInt32LE(4)!==16000||format.readUInt16LE(14)!==16)throw Error('Expected bounded mono PCM16 fixture');
+  const before=results.length;cursor={bytes:pcm,at:0};await until(()=>!cursor||closedAt,6000);if(closedAt)throw Error('Connection closed');await until(()=>results.length>before||closedAt,10000);if(closedAt)throw Error('Connection closed');await delay(1500);
+  const batch=results.slice(before),result=batch[0],row={fixture:id,resultCount:batch.length,text:result?.text,language:result?.language,segmentCount:result?.segmentCount,afterSpeechMs:result?.receivedAt-result?.speechEndedAt,sessionMs:Date.now()-readyAt,keyFactsRetained:batch.length===1&&result.language===fixture.language&&fixture.patterns.every(p=>new RegExp(p,'iu').test(result.text))};rows.push(row);console.log(JSON.stringify(row));if(!row.keyFactsRetained)throw Error('Synthetic semantic check failed');
+ }
+ expectIdle=true;clearInterval(pump);const stopped=Date.now();await until(()=>closedAt,7500);const idleStopMs=closedAt-stopped;if(!failures.includes('timeout')||idleStopMs<4000||idleStopMs>6500)throw Error('Idle input guard did not stop on time');if(Date.now()-readyAt<15000)throw Error('Budget renewal not exercised');
+ await delay(300);const afterBudget=await readBudget(),budgetCalls=afterBudget.user.calls-beforeBudget.user.calls;if(budgetCalls!==1)throw Error('Renewal created extra recognition calls');
+ console.log(JSON.stringify({singleConnection:true,results:results.length,sentSeconds:Math.round(sentSeconds*10)/10,sessionMs:closedAt-readyAt,idleStopMs,budgetCalls,estimatedBudgetUSD:afterBudget.user.usedUSD-beforeBudget.user.usedUSD,continuedBeyondFirst15Seconds:true,realUserAccuracyNotMeasured:true}));
+}finally{clearInterval(pump);clearTimeout(deadline);if(socket.readyState===1){socket.send(JSON.stringify({type:'stop'}));socket.close(1000,'probe finished');}else if(socket.readyState===0)socket.close();await fs.writeFile(path.join(root,'realtime-session.json'),JSON.stringify({synthetic:true,rows,failures,sentSeconds,elapsedMs:Date.now()-started},null,2));}
