@@ -5,7 +5,7 @@ const response=await fetch(new URL('index.html?verify='+Date.now(),base),{signal
 const assets=[expected,...[...html.matchAll(/href="(web\/[^"#]+\.css[^"#]*)"/g)].map(m=>m[1])];
 for(const match of local.matchAll(/href="(web\/[^"#]+\.css[^"#]*)"/g))if(!html.includes(match[1]))throw Error('Published style version differs: '+match[1]);
 const app=await fs.readFile(new URL('../web/app.js',import.meta.url),'utf8');
-for(const match of app.matchAll(/from '(\.\/(?:realtime-recognition|microphone|ai-gate|statistics|network|translation-safety|core|translation-quality|translation-memory|icons|face-caption|two-language|caption-server|cost-policy|session-reliability|caption-browser|call-mode|caption-delivery|async-ui|entry-feedback|device-check|photo-translate|entry-feedback|ui-english|conversation-ui|admin|usage)\.js[^']*)'/g))assets.push('web/'+match[1].slice(2));
+for(const match of app.matchAll(/from '(\.\/(?:realtime-recovery|realtime-recognition|microphone|ai-gate|statistics|network|translation-safety|core|translation-quality|translation-memory|icons|face-caption|two-language|caption-server|cost-policy|session-reliability|caption-browser|call-mode|caption-delivery|async-ui|entry-feedback|device-check|photo-translate|entry-feedback|ui-english|conversation-ui|admin|usage)\.js[^']*)'/g))assets.push('web/'+match[1].slice(2));
 for(const match of app.matchAll(/import\('(\.\/qr\.js[^']*)'\)/g))assets.push('web/'+match[1].slice(2));
 assets.push('web/realtime-protocol.js?v=20261030-realtime-1','web/caption-stream-pcm.js?v=20261030-realtime-1','web/cost-policy.js?v=20261030-realtime-1');
 assets.push('web/statistics.js?v=20261029-faithful-pipeline-1');
