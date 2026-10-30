@@ -16,7 +16,7 @@ export function startRealtimeSession(socket,env,{candidates,verifyToken,aiFailur
   const actual=!providerCalled?0:reason?undefined:Number.isFinite(seconds)?Math.ceil(seconds/60*RECOGNITION_PRICE.streamPerMinute*1e6):undefined;
   const settlement=Promise.resolve(lease?callBudget({action:'settle',...lease,...(actual!==undefined?{actual}:{})}):null).catch(()=>{}).finally(resolveDone);waitUntil(settlement);
  };
- const meter=new RealtimeUtterances(pair||[],r=>send({type:'result',...r}),reason=>send({type:'uncertain',reason}));
+ let resultId=0;const meter=new RealtimeUtterances(pair||[],r=>send({type:'result',...r,id:resultId++}),(reason,range)=>send({type:'uncertain',reason,id:resultId++,...range}));
  const inputDeadline=()=>{clearTimer(inputTimer);inputTimer=setTimer(()=>close('timeout'),5000);};
  const arm=()=>{
   clearTimer(deadlineTimer);deadlineTimer=setTimer(()=>close('quota'),Math.max(0,startedAt+reservedSeconds*1000-now()));
