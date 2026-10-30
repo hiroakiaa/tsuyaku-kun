@@ -1,4 +1,4 @@
-import {FreshAudioWindow} from './realtime-recovery.js?v=20261030-hybrid-1';
+import {FreshAudioWindow} from './realtime-recovery.js?v=20261030-hybrid-2';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261007-progressive-1';
 import {realtimePair} from './realtime-protocol.js?v=20261030-realtime-1';
 import {tokenWithAbort} from './caption-server.js?v=20261030-dots-capture-1';
@@ -25,7 +25,7 @@ export function createRealtimeRecognition({endpoint,candidates,getStream,getToke
   takeTiming(){const timing={speechStartedAt:this.firstSpeechAt,speechEndedAt:this.lastSpeechAt,recognitionReadyAt:Date.now()};this.firstSpeechAt=this.lastSpeechAt=null;this.speechPending=false;this.progress(this.recovering?'recognizing':'waiting');return timing;}
   emit(data,timing){if(!this.active)return;const result=[{transcript:data.text}];result.isFinal=true;onDiagnostic({code:'realtime_result'});this.onresult?.({resultIndex:data.id,results:{length:data.id+1,[data.id]:result},language:data.language,...timing});}
   async recover(data,timing){
-   const clip=recoverAudio&&!this.recovering&&this.recoveryCount<3?this.audio.take(data.audioStart,data.audioEnd):null;
+   const clip=recoverAudio&&!this.recovering&&this.recoveryCount<3?this.audio.take(data.audioStart,data.audioEnd,Date.now(),timing.speechStartedAt):null;
    if(!clip){this.onlanguageuncertain?.({reason:'uncertain'});return;}
    this.recovering=true;this.recoveryCount++;this.recoverySamples=clip.samples;this.progress('recognizing');
    try{const recovered=await recoverAudio({...clip,candidates:pair,signal:this.controller.signal});if(!this.active)return;if(recovered&&pair.includes(recovered.language)&&typeof recovered.text==='string'&&recovered.text.trim()&&recovered.text.length<=600)this.emit({...recovered,id:data.id},{speechStartedAt:clip.speechStartedAt,speechEndedAt:clip.speechEndedAt,recognitionReadyAt:Date.now()});else this.onlanguageuncertain?.({reason:'uncertain'});}
