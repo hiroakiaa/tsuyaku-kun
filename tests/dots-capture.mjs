@@ -15,3 +15,6 @@ assert.equal(processingPresentation({mode:'face',mic:true,recognitionKind:'realt
 assert.equal(processingPresentation({mode:'face',mic:false,recognitionKind:'realtime',speechPhase:'recovering'}).show,false);
 console.log('PASS dots and capture: forced segment ends capture, silence leaves it idle, fresh speech resumes and pending states have no visible copy');
 
+
+{const fast=[],economy=[];const a=new PcmSegmenter(16000,x=>fast.push(x),()=>{},{pauseMs:300}),b=new PcmSegmenter(16000,x=>economy.push(x));for(let i=0;i<20;i++){a.push(frame);b.push(frame);}a.push(new Float32Array(4800));b.push(new Float32Array(4800));assert.equal(fast.length,1);assert.equal(economy.length,0);b.push(new Float32Array(3200));assert.equal(economy.length,1);assert(fast[0].length<economy[0].length);assert.equal(new PcmSegmenter(16000,()=>{},()=>{},{pauseMs:0}).pauseSamples,8000);}
+console.log('PASS all-language speed capture: 300 ms pause, unchanged 500 ms economy and bounded default');
