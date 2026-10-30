@@ -11,7 +11,7 @@ parser.accept(result('Do you like','en',0,{speech_final:false}));parser.accept(r
 parser.accept(result('math?','en',1));assert.equal(out.length,1);parser.accept(result('math?','en',3));assert.equal(out.length,2);
 parser.accept(result('未確認','ru',4));parser.accept(result('Not guessed','',5));assert.equal(out.length,2);assert.equal(uncertain.length,2);
 parser.accept(result('三 掛 ける 四 は 十 二 です。','ja',6));assert.equal(out.at(-1).text,'三掛ける四は十二です。');
-parser.accept(result('Tom Smith は 来ます。 来ます。','ja',7));assert.equal(out.at(-1).text,'Tom Smith は来ます。来ます。');
+parser.accept(result('Tom Smith は 来ます。 来ます。','ja',7));assert.equal(out.at(-1).text,'Tom Smith は来ます。来ます。');parser.accept(result('答えは十五ではありません。ではありません。','ja',8));assert.equal(uncertain.length,3,'repeated clause is checked from audio, not deleted');
 const turns=[],rejections=[],ordered=new RealtimeUtterances(['ja','en'],r=>turns.push(r),()=>rejections.push(true));
 ordered.accept(result('Do you','en',0,{speech_final:false}));
 ordered.accept(result('Do you like math?','en',0,{duration:2}));assert.equal(turns[0].text,'Do you like math?');assert.equal(turns[0].segmentCount,1);
