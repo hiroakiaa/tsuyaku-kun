@@ -14,7 +14,7 @@ const socket=new Socket(config.api.replace(/^http/,'ws')+'/transcribe-stream?lan
 const delay=ms=>new Promise(r=>setTimeout(r,ms));
 const until=async(predicate,ms)=>{const end=Date.now()+ms;while(!predicate()){if(failures.length&&!expectIdle)throw Error(failures.at(-1));if(Date.now()>=end)throw Error('Probe timed out');await delay(20);}};
 socket.on('open',()=>socket.send(JSON.stringify({type:'auth',token:auth.idToken})));
-socket.on('message',raw=>{const data=JSON.parse(String(raw));if(data.type==='ready')readyAt=Date.now();if(data.type==='error')failures.push(data.code);if(data.type==='uncertain')failures.push('uncertain');if(data.type==='result')results.push({...data,receivedAt:Date.now(),speechEndedAt:lastSpeechAt});});
+socket.on('message',raw=>{const data=JSON.parse(String(raw));if(data.type==='ready')readyAt=Date.now();if(data.type==='error')failures.push(data.code);if(data.type==='uncertain')failures.push('uncertain:'+String(data.reason||'unmeasured'));if(data.type==='result')results.push({...data,receivedAt:Date.now(),speechEndedAt:lastSpeechAt});});
 socket.on('error',()=>failures.push('network'));socket.on('close',()=>closedAt=Date.now());
 const deadline=setTimeout(()=>socket.close(1000,'probe deadline'),45000),rows=[];
 try{
