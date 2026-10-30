@@ -14,7 +14,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261030-slot-release-1';
+const BUILD_ID='20261030-school-economy-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -62,7 +62,7 @@ export async function translateText(env,text,source,targets,context=[],unit='',d
   const dictionaryStarted=Date.now();const stored=storedTranslations(text,source,unique,data,unit==='数学'||unit.includes('方程式')?'math':unit);
   timing.dictionaryMs=Date.now()-dictionaryStarted;Object.assign(out,stored.translations);
   const missing=unique.filter(c=>!out[c]);scenario.aiTargets=[...missing].sort();
-  if(!missing.length){onUsage({inputTokens:0,outputTokens:0,cacheHit:true,cacheSource:'spreadsheet',bankKeys:stored.keys});return out;}
+  if(!missing.length){onUsage({inputTokens:0,outputTokens:0,cacheHit:true,cacheSource:stored.builtin?'builtin':'spreadsheet',bankKeys:stored.keys});return out;}
   const terms=glossaryFor(text,data.glossary||[]);
   const protectedSpeech=protectUncertainSpeech(text);
   const messages=[{role:'system',content:translationInstructions(missing,protectedSpeech.spans.length>0)},{role:'user',content:JSON.stringify({source,targets:missing,...(schoolContextHints(text,source).length?{schoolMeanings:schoolContextHints(text,source)}:{}),correctionHints:correctionHints(text,data.corrections,unit==='数学'||unit.includes('方程式')?'math':unit),unit:unit.slice(0,160),glossary:terms,context:context.slice(-3),speech:protectedSpeech.speech})}];
