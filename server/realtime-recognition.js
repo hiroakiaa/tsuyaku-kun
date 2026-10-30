@@ -5,10 +5,10 @@ const SLICE=15;
 async function budgetCall(env,data){if(!env.ROOMS)throw budgetError();const stub=env.ROOMS.get(env.ROOMS.idFromName('__ai_budget_v1__')),r=await stub.fetch(new Request('https://budget/budget',{method:'POST',body:JSON.stringify(data)})),value=await r.json();if(!r.ok)throw budgetError(value.reason);return value;}
 export function startRealtimeSession(socket,env,{candidates,verifyToken,aiFailure,now=Date.now,setTimer=setTimeout,clearTimer=clearTimeout,callBudget=data=>budgetCall(env,data),waitUntil=()=>{}}={}){
  socket.binaryType='arraybuffer';
- let state='auth',upstream,lease,uid,startedAt,providerCalled=false,sentBytes=0,reservedSeconds=0,renewTimer,deadlineTimer,lifetimeTimer,openingTimer;const pair=realtimePair(candidates);let resolveDone;const done=new Promise(r=>resolveDone=r);
+ let state='auth',upstream,lease,uid,startedAt,providerCalled=false,sentBytes=0,reservedSeconds=0,renewTimer,deadlineTimer,lifetimeTimer,openingTimer,inputTimer;const pair=realtimePair(candidates);let resolveDone;const done=new Promise(r=>resolveDone=r);
  const send=value=>{if(state!=='closed')try{socket.send(JSON.stringify(value));}catch{}};
  const close=(reason=null)=>{
-  if(state==='closed')return;const previous=state;if(reason)send({type:'error',code:reason});state='closed';for(const timer of [renewTimer,deadlineTimer,lifetimeTimer,openingTimer,authTimer])clearTimer(timer);
+  if(state==='closed')return;const previous=state;if(reason)send({type:'error',code:reason});state='closed';for(const timer of [renewTimer,deadlineTimer,lifetimeTimer,openingTimer,inputTimer,authTimer])clearTimer(timer);
   try{if(upstream){upstream.send(JSON.stringify({type:'CloseStream'}));upstream.close(1000,'finished');}}catch{}
   try{socket.close(reason?1011:1000,'finished');}catch{}
   // Unknown connection failures retain their reservation, never claim a free call.
@@ -17,6 +17,7 @@ export function startRealtimeSession(socket,env,{candidates,verifyToken,aiFailur
   const settlement=Promise.resolve(lease?callBudget({action:'settle',...lease,...(actual!==undefined?{actual}:{})}):null).catch(()=>{}).finally(resolveDone);waitUntil(settlement);
  };
  const meter=new RealtimeUtterances(pair||[],r=>send({type:'result',...r}),()=>send({type:'uncertain'}));
+ const inputDeadline=()=>{clearTimer(inputTimer);inputTimer=setTimer(()=>close('timeout'),5000);};
  const arm=()=>{
   clearTimer(deadlineTimer);deadlineTimer=setTimer(()=>close('quota'),Math.max(0,startedAt+reservedSeconds*1000-now()));
   clearTimer(renewTimer);renewTimer=setTimer(async()=>{
@@ -41,7 +42,7 @@ export function startRealtimeSession(socket,env,{candidates,verifyToken,aiFailur
     if(state==='closed'){ws.close(1000,'cancelled');return;}upstream=ws;state='ready';clearTimer(openingTimer);
     upstream.addEventListener('message',event=>{if(state!=='ready'||typeof event.data!=='string'||event.data.length>64000)return;let data;try{data=JSON.parse(event.data);}catch{return;}if(data.type==='Error'){close('service');return;}if(data.type==='SpeechStarted')send({type:'activity',phase:'capturing'});meter.accept(data);});
     upstream.addEventListener('close',event=>{if(state==='ready')meter.flush();close([1000,1001].includes(event.code)?null:'service');});upstream.addEventListener('error',()=>close('service'));
-    lifetimeTimer=setTimer(()=>close('session_limit'),Math.min(120000,Number.isFinite(auth.exp)?Math.max(0,auth.exp*1000-now()):120000));arm();send({type:'ready',model:'nova-3',languages:pair});
+    lifetimeTimer=setTimer(()=>close('session_limit'),Math.min(120000,Number.isFinite(auth.exp)?Math.max(0,auth.exp*1000-now()):120000));arm();inputDeadline();send({type:'ready',model:'nova-3',languages:pair});
    }catch(error){close(aiFailure?.(error)?.reason||'service');}})());return;
   }
   if(state!=='ready'){close('input');return;}
@@ -52,7 +53,7 @@ export function startRealtimeSession(socket,env,{candidates,verifyToken,aiFailur
   const nextBytes=sentBytes+event.data.byteLength;
   if(now()>=startedAt+reservedSeconds*1000||nextBytes>reservedSeconds*32000){close('quota');return;}
   if(nextBytes>Math.max(0,now()-startedAt)/1000*32000+96000||upstream.bufferedAmount>64000){close('overloaded');return;}
-  sentBytes=nextBytes;try{upstream.send(event.data);}catch{close('service');}
+  sentBytes=nextBytes;inputDeadline();try{upstream.send(event.data);}catch{close('service');}
  });
  socket.addEventListener('close',event=>close([1000,1001].includes(event.code)?null:'service'));socket.addEventListener('error',()=>close('service'));
  return {done,close};
