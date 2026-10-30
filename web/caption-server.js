@@ -1,7 +1,7 @@
 import {recognitionLanguage,speechTextAllowed} from './two-language.js?v=20261029-communication50-1';
 import {nonSpeechReason} from './speech-filter.js?v=20261007-learning-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261007-progressive-1';
-import {recognitionMetrics} from './recognition-metrics.js?v=20261029-communication50-1';
+import {recognitionMetrics} from './recognition-metrics.js?v=20261030-all-language-speed-1';
 import {trimmedAudioLength} from './audio-trim.js?v=20261029-communication50-1';
 import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish} from './speech-continuity.js?v=20261029-communication50-1';
 // Browser-independent recognition using the call's existing microphone stream.
@@ -24,7 +24,7 @@ export function tokenWithAbort(getToken,signal){
   Promise.resolve().then(getToken).then(value=>{signal.removeEventListener('abort',aborted);resolve(value);},error=>{signal.removeEventListener('abort',aborted);reject(error);});
  });
 }
-export function createServerRecognition({ endpoint, getStream, getToken, fetcher = fetch, onUsage = () => {}, onDiagnostic = () => {}, canParallel = () => true, acquireSlot = async () => () => {},
+export function createServerRecognition({ endpoint, captureProfile='baseline', getStream, getToken, fetcher = fetch, onUsage = () => {}, onDiagnostic = () => {}, canParallel = () => true, acquireSlot = async () => () => {},
   Context = globalThis.AudioContext || globalThis.webkitAudioContext, Worklet = globalThis.AudioWorkletNode }) {
   return class ServerRecognition {
     constructor() { this.active = false; this.queue = []; this.sending = false; this.index = 0; this.failures = 0; this.getHints = () => [];const query=new URL(endpoint||'https://invalid.local').searchParams;this.automatic=query.get('language')==='auto';this.candidates=(query.get('languages')||'').split(','); }
@@ -46,10 +46,10 @@ export function createServerRecognition({ endpoint, getStream, getToken, fetcher
       try {
         await resumed;
         if (!this.active) return;
-        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261030-dots-capture-1', import.meta.url));
+        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261030-all-language-speed-1', import.meta.url));
         if (!this.active) return;
         this.source = this.context.createMediaStreamSource(stream);
-        this.node = new Worklet(this.context, 'caption-pcm');
+        this.node = new Worklet(this.context, 'caption-pcm',{processorOptions:{pauseMs:captureProfile==='fast'?300:500}});
         this.node.port.onmessage = event => {
           if (!this.active) return;
           if(event.data?.alive){this.lastAlive=Date.now();clearTimeout(this.startTimer);const {inputFrames,signalFrames}=event.data;if(Number.isFinite(inputFrames)&&Number.isFinite(signalFrames)){this.missingInputs=inputFrames===0?(this.missingInputs||0)+1:0;if(this.missingInputs>=3){onDiagnostic({stage:'asr',operation:'capture',code:'capture_missing',inputFrames,signalFrames});this.fail('audio-capture','マイクから音声データが届いていません。マイクをONにし直してください。');return;}const code=inputFrames===0?'capture_missing':signalFrames===0?'capture_silent':'capture_active';if(code!==this.captureState||Date.now()-(this.captureStateAt||0)>=15000){this.captureState=code;this.captureStateAt=Date.now();onDiagnostic({stage:'asr',operation:'capture',code,inputFrames,signalFrames,trackMuted:(stream.getAudioTracks?.()||[]).some(t=>t.muted===true)});}}return;}
