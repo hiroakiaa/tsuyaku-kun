@@ -1,0 +1,25 @@
+import assert from 'node:assert/strict';
+import {schoolTranslation} from '../web/school-phrases.js';
+import {faceTranslationTargets,speedPreferred} from '../web/economy-policy.js';
+import {storedTranslations} from '../server/dictionary.js';
+import {translateText} from '../server/worker.js';
+import {TranslationMemory} from '../web/translation-memory.js';
+for(const value of [null,'economy','unknown'])assert.equal(speedPreferred({getItem:()=>value}),false);
+assert.equal(speedPreferred({getItem:()=> 'fast'}),true);
+assert.deepEqual(faceTranslationTargets('ko','ko','zh-CN',{economy:true}),['zh-CN']);
+assert.deepEqual(faceTranslationTargets('ko','ko','zh-CN'),['ja','zh-CN','en']);
+const languages=['ja','en','pt','es','tl','fil','vi','zh-CN','ko','id','ne','de'];
+for(const source of languages){const all=schoolTranslation('ja','こんにちは。',[source]);assert.equal(all.missing.length,0);assert.equal(schoolTranslation(source,all.translations[source],['ja']).translations.ja,'こんにちは。');}
+const combined='こんにちは。数学の授業を始めます。';
+assert.equal(schoolTranslation('ja',combined,['en']).translations.en,'Hello. We will begin the mathematics class.');
+for(const text of ['こんにちは。田中さんは3日欠席です。','分かりませんでした。','こんにちは？','こんにちは。授業を始めません。','数学の授業を始めます。明日は休みです。'])assert.equal(schoolTranslation('ja',text,['en']),null);
+assert.equal(schoolTranslation('ja-easy','こんにちは。',['en']),null);
+assert.equal(schoolTranslation('ja','こんにちは。',['ja-easy']),null);
+assert.deepEqual(schoolTranslation('ja',combined,['en','ko'],{partial:true}).missing,['ko']);
+const empty={phrases:[],bank:[],terms:[]};let usage;
+const output=await translateText({AI:{run(){throw Error('Fixed text must not invoke AI');}}},combined,'ja',['en'],[],'',empty,u=>usage=u);
+assert.equal(output.en,'Hello. We will begin the mathematics class.');assert.equal(usage.cacheSource,'builtin');assert.equal(usage.inputTokens,0);
+const conflict={...empty,phrases:[{jaText:'こんにちは。',enText:'A'},{jaText:'こんにちは。',enText:'B'}]};assert.deepEqual(storedTranslations('こんにちは。','ja',['en'],conflict).translations,{});
+const approved={...empty,bank:[{status:'approved',sourceLang:'ja',sourceText:'こんにちは。',enText:'Reviewed greeting'}]};assert.equal(storedTranslations('こんにちは。','ja',['en'],approved).translations.en,'Reviewed greeting');
+const memory=new TranslationMemory({getItem:()=>null,setItem(){}});assert.equal((await memory.lookupAsync('ja',combined,['en'],'',empty,true)).source,'builtin');assert.deepEqual((await memory.lookupAsync('ja','こんにちは。田中さんは3日欠席です。',['en'],'',empty,true)).missing,['en']);
+console.log('PASS school economy: explicit preferences, selected targets, all fixed languages, exact sentences, unknown/negated facts, zero AI and catalog priority');
