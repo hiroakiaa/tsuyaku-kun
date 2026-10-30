@@ -1,5 +1,5 @@
 import {createRealtimeRecovery} from './realtime-recovery.js?v=20261030-hybrid-2';
-import {createRealtimeRecognition} from './realtime-recognition.js?v=20261030-processing-dots-1';
+import {createRealtimeRecognition} from './realtime-recognition.js?v=20261030-cost-compare-1';
 import {createAiGate} from './ai-gate.js?v=20261029-faithful-pipeline-1';
 import {localIcon,installLocalIcons} from './icons.js?v=20261029-communication50-1';
 installLocalIcons(document);
@@ -18,7 +18,7 @@ import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261022-bi
 import {installPhotoTranslate} from './photo-translate.js?v=20261024-usability20-3';
 import {refreshEnglishGuides,applyEnglishLabels} from './ui-english.js?v=20261029-two-language-1';
 import {SharedWordUsage} from './shared-word-usage.js?v=20261030-common-phrases-1';
-import {installConversationUI,createWaitingBubble} from './conversation-ui.js?v=20261030-processing-dots-1';
+import {installConversationUI,createWaitingBubble} from './conversation-ui.js?v=20261030-cost-compare-1';
 import {guardCaptionTranslation,hasInternalMarker,needsTranslationReview} from './translation-safety.js?v=20261029-faithful-pipeline-1';
 import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261029-faithful-pipeline-1';
 import {IdleWatch} from './idle-watch.js?v=20261008-safety-1';
@@ -29,10 +29,10 @@ import {ReviewedStore} from './reviewed-store.js';
 import {PersonalPhrases} from './personal-phrases.js?v=20261007-learning-1';
 import {recognitionHints} from './recognition-hints.js?v=20261007-progressive-1';
 import {acquireMicrophone,needsMicrophoneRefresh} from './microphone.js?v=20261029-ios-mic-recovery-1';
-import {UsageLedger,WordUsage} from './usage.js?v=20261030-processing-dots-1';
+import {UsageLedger,WordUsage} from './usage.js?v=20261030-cost-compare-1';
 import {CloudSpeechPlayer,createSpeechCache} from './cloud-speech-player.js?v=20261020-safari-speech-2';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-progressive-1';
-import {installAdmin} from './admin.js?v=20261030-processing-dots-1';
+import {installAdmin} from './admin.js?v=20261030-cost-compare-1';
 import {config} from './config.js';
 import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261030-realtime-1';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
