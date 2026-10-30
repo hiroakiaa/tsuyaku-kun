@@ -11,7 +11,15 @@ function missingLanguageEvidence(text,candidates,confidence){
 }
 export class RealtimeUtterances{
  constructor(candidates,onResult,onUncertain=()=>{}){this.candidates=candidates;this.onResult=onResult;this.onUncertain=onUncertain;this.parts=[];this.seen=new Set();this.index=0;this.committedEnd=-1;}
- flush(){if(!this.parts.length)return;const parts=this.parts;this.parts=[];this.committedEnd=Math.max(this.committedEnd,...parts.map(p=>p.end));if(parts.some(p=>!p.language)){this.onUncertain(parts.find(p=>!p.language).languageReason);return;}if(parts.some(p=>!Number.isFinite(p.confidence)||p.confidence<.6)){this.onUncertain('confidence');return;}const language=parts[0].language,text=parts.map(p=>p.text).join(language==='ja'?'':' ').trim();if(text&&parts.every(p=>p.language===language)&&speechTextAllowed(text,this.candidates))this.onResult({id:this.index++,text,language,final:true,segmentCount:parts.length,languageBasis:parts.some(p=>p.languageBasis==='transcript_evidence')?'transcript_evidence':'provider'});else this.onUncertain('text');}
+ flush(){
+  if(!this.parts.length)return;const parts=this.parts;this.parts=[];const audioStart=Math.min(...parts.map(p=>p.start)),audioEnd=Math.max(...parts.map(p=>p.end));this.committedEnd=Math.max(this.committedEnd,audioEnd);
+  const uncertain=reason=>this.onUncertain(reason,{audioStart,audioEnd});
+  if(parts.some(p=>!p.language)){uncertain(parts.find(p=>!p.language).languageReason);return;}
+  if(parts.some(p=>!Number.isFinite(p.confidence)||p.confidence<.6)){uncertain('confidence');return;}
+  const language=parts[0].language,text=parts.map(p=>p.text).join(language==='ja'?'':' ').trim(),clauses=text.toLowerCase().split(/[。！？.!?]/u).map(t=>t.trim()).filter(Boolean),last=clauses.at(-1);
+  if(clauses.length>1&&last.length>=4&&clauses.at(-2).endsWith(last)){uncertain('repeated_clause');return;}
+  if(text&&parts.every(p=>p.language===language)&&speechTextAllowed(text,this.candidates))this.onResult({id:this.index++,text,language,final:true,segmentCount:parts.length,languageBasis:parts.some(p=>p.languageBasis==='transcript_evidence')?'transcript_evidence':'provider'});else uncertain('text');
+ }
  accept(data){
   // A delayed end event for the previous utterance must not finalize new speech.
   if(data?.type==='UtteranceEnd'){if(Number.isFinite(data.last_word_end)&&this.parts.length&&data.last_word_end>=this.parts.at(-1).speechEnd-.01)this.flush();return;}
