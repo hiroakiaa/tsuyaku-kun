@@ -3,21 +3,8 @@ import {ReviewedStore,memoryKey,retentionScore} from './reviewed-store.js?v=2026
 import {translationField,translationOf} from './core.js?v=20261007-progressive-1';
 import {phraseIdentity} from './phrase-equivalence.js?v=20261008-report-2';
 import {hasInternalMarker,needsTranslationReview,usableTranslation} from './translation-safety.js?v=20261029-faithful-pipeline-1';
-// Deliberately exact whole utterances; no punctuation stripping, templates or fuzzy matching.
-const commonPhrases=[
- ['こんにちは。','Hello.'],['おはようございます。','Good morning.'],
- ['ありがとうございます。','Thank you.'],['どういたしまして。',"You're welcome."],
- ['もう一度言ってください。','Please say that again.'],
- ['どういう意味ですか？','What does that mean?'],
- ['何歳ですか？','How old are you?']
-];
-export function builtInTranslation(source,text,targets){
- if(!['ja','en'].includes(source)||!targets.length||targets.some(code=>!['ja','en'].includes(code)))return null;
- const value=String(text||'').normalize('NFC').trim(),from=source==='ja'?0:1;
- const row=commonPhrases.find(row=>row[from]===value);if(!row)return null;
- const translations={ja:row[0],en:row[1],[source]:value};
- return {translations,missing:[],source:'builtin',diagnostic:{reason:'complete',missing:[]}};
-}
+import {schoolTranslation} from './school-phrases.js?v=20261030-school-economy-1';
+export const builtInTranslation=schoolTranslation;
 const key='tsuyaku-reviewed-memory-v1';
 const exact=text=>String(text||'').normalize('NFC').trim();
 // Catalog objects are replaced when refreshed; weak keys release old indexes.
@@ -49,7 +36,7 @@ export class TranslationMemory {
  async lookupAsync(source,text,targets,unit='',catalog=this.catalog||{},partial=false){
  text=exact(text);const hotResult=this.lookup(source,text,targets,unit,catalog,partial);if(hotResult&&(!partial||!hotResult.missing.length))return hotResult;
  let timer,timedOut=false;const id=memoryKey(source,text,unit),legacy=JSON.stringify([source,text,unit]);const read=async()=>await this.store.get(id)||(id!==legacy?await this.store.get(legacy):null);const row=await Promise.race([read(),new Promise(resolve=>timer=setTimeout(()=>{timedOut=true;resolve(null);},120))]);clearTimeout(timer);
- if(row&&row.catalogVersion===catalogVersion(catalog)&&row.source===source&&phraseIdentity(row.text,source)===phraseIdentity(text,source)&&row.unit===unit&&row.translations){row.lastUsed=Date.now();row.hits=(row.hits||0)+1;this.hot.set(id,row);this.persist();void this.store.put(row);return this.lookup(source,text,targets,unit,catalog,partial);}return !timedOut&&hotResult?.diagnostic?.reason==='no_match'?(builtInTranslation(source,text,targets)||hotResult):hotResult;
+ if(row&&row.catalogVersion===catalogVersion(catalog)&&row.source===source&&phraseIdentity(row.text,source)===phraseIdentity(text,source)&&row.unit===unit&&row.translations){row.lastUsed=Date.now();row.hits=(row.hits||0)+1;this.hot.set(id,row);this.persist();void this.store.put(row);return this.lookup(source,text,targets,unit,catalog,partial);}return !timedOut&&hotResult?.diagnostic?.reason==='no_match'?(builtInTranslation(source,text,targets,{partial})||hotResult):hotResult;
  }
  correct(heard,corrected,unit=''){heard=exact(heard);corrected=exact(corrected);if(!heard||!corrected||heard===corrected||heard.length>600||corrected.length>600)return;const existing=this.corrections.find(r=>r.heard===heard&&r.unit===unit);if(existing)existing.corrected=corrected;else this.corrections.push({heard,corrected,unit});this.persist();}
  corrected(heard,unit=''){const text=exact(heard);return this.corrections.find(r=>r.heard===text&&r.unit===unit)?.corrected||text;}
