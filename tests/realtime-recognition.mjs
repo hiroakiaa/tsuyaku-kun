@@ -30,6 +30,11 @@ padding.accept(wordsResult('Hello.',0,3,.5,1));padding.accept(wordsResult('Hello
 padding.accept(wordsResult('Again.',2,3,3.5,4,false));assert.equal(paddingErrors.length,0,'overlapping silent padding is not repeated speech');
 padding.accept({type:'UtteranceEnd',last_word_end:2.5});assert.equal(paddingTurns.length,1);
 padding.accept({type:'UtteranceEnd',last_word_end:4});assert.equal(paddingTurns[1].text,'Again.');
+const evidenceTurns=[],evidenceErrors=[],evidence=new RealtimeUtterances(['ja','en'],r=>evidenceTurns.push(r),r=>evidenceErrors.push(r));
+evidence.accept(result('Do you like mathematics?','',0));assert.equal(evidenceTurns[0].language,'en');assert.equal(evidenceTurns[0].languageBasis,'transcript_evidence');
+evidence.accept(result('こんにちは。','und',1));assert.equal(evidenceTurns[1].language,'ja');
+for(const [text,language,confidence] of [['Tom Smith','',.99],['15','',.99],['yes','',.99],['no no no','',.99],['Do you like mathematics?','',.7],['Do you like mathematics?','fr',.99],['こんにちは 안녕하세요','',.99]]){const before=evidenceTurns.length;evidence.accept({...result(text,language,2+evidenceErrors.length),channel:{alternatives:[{transcript:text,languages:language?[language]:[],confidence}]}});assert.equal(evidenceTurns.length,before,'ambiguous or unselected language is not inferred');}
+assert(evidenceErrors.includes('language_missing'));assert(evidenceErrors.includes('language_outside'));
 const db=new Map(),storage={get:async k=>structuredClone(db.get(k)),put:async(k,v)=>db.set(k,structuredClone(v)),transaction:async fn=>fn(storage)};
 const now=Date.UTC(2026,9,30),cost=reserveCost(RECOGNITION_PRICE.streamModel,{seconds:15});let lease=await budgetOperation(storage,{action:'reserve',uid:'a',model:RECOGNITION_PRICE.streamModel,cost},now);
 await budgetOperation(storage,{action:'extend',...lease,uid:'a',cost},now+1000);let status=await budgetOperation(storage,{action:'status',uid:'a'},now+1000);assert.equal(status.user.calls,1);assert.equal(status.inFlight,1);assert.equal(status.user.usedUSD,cost*2/1e6);assert.equal(status.user.limitUSD,AI_LIMITS.userUSD);
