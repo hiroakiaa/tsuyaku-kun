@@ -3,7 +3,7 @@ import {AI_LIMITS,TRANSLATION_PRICE,RECOGNITION_PRICE} from '../web/cost-policy.
 // Conservative app-local variable-cost budget, not Cloudflare account billing.
 const DAY=86400000;
 export function budgetError(reason='budget'){
- const e=Error(reason==='busy'?'処理が混み合っています。少し待ってください。':'本日のアプリ内AI利用上限に達しました。辞書の訳は引き続き使えます。');
+ const e=Error(reason==='busy'?'同時処理の上限です。前の処理が終わってから、この文を再試行してください。':'本日のアプリ内AI利用上限に達しました。辞書の訳は引き続き使えます。');
  e.appBudget=true;e.aiReason=reason;e.code=reason==='busy'?3040:3036;return e;
 }
 export function reserveCost(model,input){
