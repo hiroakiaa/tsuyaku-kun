@@ -1,10 +1,10 @@
-import {faceTranslationTargets,speedPreferred} from './economy-policy.js?v=20261031-comparison-1';
+import {faceTranslationTargets,speedPreferred,speedPasswordMatches} from './economy-policy.js?v=20261031-speed-password-1';
 import {createRealtimeRecovery} from './realtime-recovery.js?v=20261030-hybrid-2';
-import {createRealtimeRecognition} from './realtime-recognition.js?v=20261031-comparison-1';
+import {createRealtimeRecognition} from './realtime-recognition.js?v=20261031-speed-password-1';
 import {createAiGate} from './ai-gate.js?v=20261029-faithful-pipeline-1';
 import {localIcon,installLocalIcons} from './icons.js?v=20261029-communication50-1';
 installLocalIcons(document);
-import {compactFaceCaption} from './face-caption.js?v=20261031-comparison-1';
+import {compactFaceCaption} from './face-caption.js?v=20261031-speed-password-1';
 import {speechSide} from './two-language.js?v=20261029-communication50-1';
 import {createSpeechInputGate} from './speech-input-gate.js?v=20261029-two-language-1';
 import {guardedStorage} from './storage-access.js?v=20261024-usability20-4';
@@ -19,33 +19,34 @@ import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261022-bi
 import {installPhotoTranslate} from './photo-translate.js?v=20261024-usability20-3';
 import {refreshEnglishGuides,applyEnglishLabels} from './ui-english.js?v=20261029-two-language-1';
 import {SharedWordUsage} from './shared-word-usage.js?v=20261030-common-phrases-1';
-import {installConversationUI,createWaitingBubble} from './conversation-ui.js?v=20261031-comparison-1';
+import {installConversationUI,createWaitingBubble} from './conversation-ui.js?v=20261031-speed-password-1';
 import {guardCaptionTranslation,hasInternalMarker,needsTranslationReview} from './translation-safety.js?v=20261029-faithful-pipeline-1';
 import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261029-faithful-pipeline-1';
 import {IdleWatch} from './idle-watch.js?v=20261008-safety-1';
 import {recordResource,recordPause,recordResume} from './resource-usage.js?v=20261030-common-phrases-1';
 import {mayReconnect} from './resource-policy.js';
-import {TranslationMemory} from './translation-memory.js?v=20261031-comparison-1';
+import {TranslationMemory} from './translation-memory.js?v=20261031-speed-password-1';
 import {ReviewedStore} from './reviewed-store.js';
 import {PersonalPhrases} from './personal-phrases.js?v=20261007-learning-1';
 import {recognitionHints} from './recognition-hints.js?v=20261007-progressive-1';
 import {acquireMicrophone,needsMicrophoneRefresh} from './microphone.js?v=20261029-ios-mic-recovery-1';
-import {UsageLedger,WordUsage} from './usage.js?v=20261031-comparison-1';
+import {UsageLedger,WordUsage} from './usage.js?v=20261031-speed-password-1';
 import {CloudSpeechPlayer,createSpeechCache} from './cloud-speech-player.js?v=20261020-safari-speech-2';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-progressive-1';
-import {installAdmin} from './admin.js?v=20261031-comparison-1';
+import {installAdmin} from './admin.js?v=20261031-speed-password-1';
 import {config} from './config.js';
-import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261031-comparison-1';
+import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261031-speed-password-1';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
 import {translationOf,spokenLanguage,withEasyJapanese,supplementCatalog} from './core.js?v=20261029-communication50-1';
 import {speakerCaption,speakerInfo} from './face-mode.js?v=20261006-school-1';
 import {callCaptionLanguages,chatCaptionLanguages,isDisplayableCaption} from './call-mode.js?v=20261021-chat-bubbles-1';
 import {listHistory as storedHistory} from './history.js?v=20261006-school-1';
 const listHistory=()=>localStorage.getItem('tsuyaku-device-mode')==='personal'?storedHistory():Promise.resolve([]);
-import {createServerRecognition} from './caption-server.js?v=20261031-comparison-1';
+import {createServerRecognition} from './caption-server.js?v=20261031-speed-password-1';
 import {createBrowserRecognition} from './caption-browser.js?v=20261030-dots-capture-1';
 const browserSpeechUnavailable=new Set();let recognitionKind=null,conversationUI,realtimeUnavailable=false;
-const preferRealtime=()=>speedPreferred(localStorage);
+let speedAuthorized=false;localStorage.setItem('tsuyaku-recognition-speed-v1','economy');
+const preferRealtime=()=>speedAuthorized&&speedPreferred(localStorage);
 const idleWatch=new IdleWatch({onWarn:()=>{ledger.event('idle_warning');message('発話がないため、15秒後にマイクを停止します。');const keep=el('button','続ける');keep.onclick=()=>{idleWatch.continue();message('');ledger.event('idle_continue');};$('#message').append(keep);clearTimeout(messageTimer);},onStop:()=>pauseConversation('idle'),onDiagnostic:code=>ledger.event(code)});
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 function readCatalogCache(){try{const saved=JSON.parse(localStorage.getItem('tsuyaku-catalog-v1'));if(saved&&Array.isArray(saved.languages)&&Array.isArray(saved.phrases)&&Array.isArray(saved.terms)&&Array.isArray(saved.glossary))return supplementCatalog(saved,seed);}catch{}return seed;}
@@ -98,9 +99,11 @@ function nativeLanguageOptions(select,selected){options(select,selected);for(con
 function fillLanguages(){for(const id of ['face-self-language','source-language'])options($('#'+id),speakingLanguage());const value=sharedLanguage();for(const id of sharedLanguageIds)options($('#'+id),value);nativeLanguageOptions($('#lesson-language'),value);}
 fillLanguages();options($('#face-language'),speakingLanguage());for(const id of sharedLanguageIds)$('#'+id).onchange=()=>setSharedLanguage($('#'+id).value);for(const id of ['face-self-language','source-language'])$('#'+id).onchange=()=>setSpeakingLanguage($('#'+id).value);
 function faceAutomatic(){return localStorage.getItem('tsuyaku-face-auto-language')!=='off';}
-function showLanguageOptions(){const content=el('div',undefined,'language-panel'),spoken=el('select'),display=el('select');options(spoken,speakingLanguage());options(display,sharedLanguage());spoken.onchange=()=>{if(room?.mode==='face'){speechPlayer.stop();stopRecognition(true);}setSpeakingLanguage(spoken.value);if(room?.mode==='face'){updateFace();if(mic)startRecognition();}};display.onchange=()=>{if(room?.mode==='face'){speechPlayer.stop();stopRecognition(true);}setSharedLanguage(display.value);if(room?.mode==='face'){updateFace();if(mic)startRecognition();}for(const record of [...records.values()])renderCaption(record);};if(room?.mode==='interpreter'){nativeLanguageOptions(spoken,speakingLanguage());content.append(label('じぶんが話すことば / Your language',spoken),el('p','相手の言語ではなく、あなたが話す言語を選んでください。','small'));}else if(room?.mode==='lesson'&&role!=='teacher'){nativeLanguageOptions(display,sharedLanguage());content.append(label('じぶんのことば / Your language',display),el('p','先生のことばをこの言語で読み、文字入力もこの言語で送ります。','small'));}else if(room?.mode==='face'||tab==='face'){content.append(label('自分の言語',spoken),label('相手の言語',display));const auto=el('input');auto.type='checkbox';auto.id='face-auto-language';auto.checked=faceAutomatic();const fast=el('input');fast.type='checkbox';fast.id='face-realtime';fast.checked=preferRealtime();fast.disabled=!auto.checked;fast.onchange=()=>{localStorage.setItem('tsuyaku-recognition-speed-v1',fast.checked?'fast':'economy');paintRecognitionSpeed();realtimeUnavailable=false;speechPlayer.stop();stopRecognition(true);if(mic)startRecognition();};auto.onchange=()=>{localStorage.setItem('tsuyaku-face-auto-language',auto.checked?'on':'off');fast.disabled=!auto.checked;updateFace();speechPlayer.stop();stopRecognition(true);if(mic)startRecognition();};const choice=label('話す言語を自動判定',auto);content.append(choice,label('速度優先の自動認識（試験）',fast),el('p','速度優先は全言語で使えます。言語に応じてリアルタイム認識か、短い区間の高速認識を使います。速さ・認識精度は言語や環境で異なります。リアルタイム方式は無音中も費用がかかります。OFFにすると節約方式です。節約は選んだ2言語だけを翻訳し、補助の英語訳は追加しません。','small'));}else content.append(label('自分の言語',spoken),label('相手の言語',display));modal('言語を選ぶ',content);}
+function showLanguageOptions(){const content=el('div',undefined,'language-panel'),spoken=el('select'),display=el('select');options(spoken,speakingLanguage());options(display,sharedLanguage());spoken.onchange=()=>{if(room?.mode==='face'){speechPlayer.stop();stopRecognition(true);}setSpeakingLanguage(spoken.value);if(room?.mode==='face'){updateFace();if(mic)startRecognition();}};display.onchange=()=>{if(room?.mode==='face'){speechPlayer.stop();stopRecognition(true);}setSharedLanguage(display.value);if(room?.mode==='face'){updateFace();if(mic)startRecognition();}for(const record of [...records.values()])renderCaption(record);};if(room?.mode==='interpreter'){nativeLanguageOptions(spoken,speakingLanguage());content.append(label('じぶんが話すことば / Your language',spoken),el('p','相手の言語ではなく、あなたが話す言語を選んでください。','small'));}else if(room?.mode==='lesson'&&role!=='teacher'){nativeLanguageOptions(display,sharedLanguage());content.append(label('じぶんのことば / Your language',display),el('p','先生のことばをこの言語で読み、文字入力もこの言語で送ります。','small'));}else if(room?.mode==='face'||tab==='face'){content.append(label('自分の言語',spoken),label('相手の言語',display));const auto=el('input');auto.type='checkbox';auto.id='face-auto-language';auto.checked=faceAutomatic();const fast=el('input');fast.type='checkbox';fast.id='face-realtime';fast.checked=preferRealtime();fast.disabled=!auto.checked;fast.onchange=()=>{const wanted=fast.checked;fast.checked=preferRealtime();requestSpeedMode(wanted);};auto.onchange=()=>{localStorage.setItem('tsuyaku-face-auto-language',auto.checked?'on':'off');fast.disabled=!auto.checked;updateFace();speechPlayer.stop();stopRecognition(true);if(mic)startRecognition();};const choice=label('話す言語を自動判定',auto);content.append(choice,label('速度優先の自動認識（試験）',fast),el('p','速度優先は全言語で使えます。言語に応じてリアルタイム認識か、短い区間の高速認識を使います。速さ・認識精度は言語や環境で異なります。リアルタイム方式は無音中も費用がかかります。OFFにすると節約方式です。節約は選んだ2言語だけを翻訳し、補助の英語訳は追加しません。','small'));}else content.append(label('自分の言語',spoken),label('相手の言語',display));modal('言語を選ぶ',content);}
 function paintRecognitionSpeed(){const b=$('#recognition-speed');b.hidden=tab!=='face';const fast=preferRealtime();b.setAttribute('aria-checked',String(fast));b.setAttribute('aria-label','速度重視');b.title=fast?'速度重視：全言語に対応。言語に合わせてリアルタイム認識・短区間の高速認識を使います。':'節約：発話を区切って認識し、選んだ2言語だけを翻訳します';}
-$('#recognition-speed').onclick=()=>{const fast=!preferRealtime();localStorage.setItem('tsuyaku-recognition-speed-v1',fast?'fast':'economy');localStorage.setItem('tsuyaku-face-auto-language','on');realtimeUnavailable=false;paintRecognitionSpeed();if(room?.mode==='face'){speechPlayer.stop();stopRecognition(true);updateFace();if(mic)startRecognition();}};
+function applySpeedMode(fast){speedAuthorized=fast;localStorage.setItem('tsuyaku-recognition-speed-v1',fast?'fast':'economy');localStorage.setItem('tsuyaku-face-auto-language','on');realtimeUnavailable=false;paintRecognitionSpeed();if(room?.mode==='face'){speechPlayer.stop();stopRecognition(true);updateFace();if(mic)startRecognition();}}
+function requestSpeedMode(fast){if(!fast){applySpeedMode(false);return;}const form=el('form'),input=el('input'),error=el('p'),submit=el('button','速度モードにする'),cancel=el('button','キャンセル');input.type='password';input.id='speed-password';input.autocomplete='off';input.inputMode='numeric';input.required=true;error.setAttribute('role','alert');submit.type='submit';cancel.type='button';form.append(label('パスワード',input),submit,cancel,error);cancel.onclick=()=>$('#modal').close();form.onsubmit=e=>{e.preventDefault();if(!speedPasswordMatches(input.value)){input.value='';input.setAttribute('aria-invalid','true');error.textContent='パスワードを確認してください。';input.focus();return;}input.value='';applySpeedMode(true);$('#modal').close();};modal('速度モード',form);$('#modal').dataset.kind='speed-password';$('#modal').addEventListener('close',()=>{input.value='';$('#recognition-speed').focus({preventScroll:true});},{once:true});input.focus({preventScroll:true});}
+$('#recognition-speed').onclick=()=>requestSpeedMode(!preferRealtime());
 paintRecognitionSpeed();
 $('#language-options').onclick=showLanguageOptions;
 const photoButton=el('button');photoButton.id='photo-translate-open';photoButton.type='button';photoButton.setAttribute('aria-label','写真を翻訳');photoButton.title='写真を翻訳';photoButton.append(icon('camera'));$('#language-options').before(photoButton);

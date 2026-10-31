@@ -23,3 +23,5 @@ const conflict={...empty,phrases:[{jaText:'こんにちは。',enText:'A'},{jaTe
 const approved={...empty,bank:[{status:'approved',sourceLang:'ja',sourceText:'こんにちは。',enText:'Reviewed greeting'}]};assert.equal(storedTranslations('こんにちは。','ja',['en'],approved).translations.en,'Reviewed greeting');
 const memory=new TranslationMemory({getItem:()=>null,setItem(){}});assert.equal((await memory.lookupAsync('ja',combined,['en'],'',empty,true)).source,'builtin');assert.deepEqual((await memory.lookupAsync('ja','こんにちは。田中さんは3日欠席です。',['en'],'',empty,true)).missing,['en']);
 console.log('PASS school economy: explicit preferences, selected targets, all fixed languages, exact sentences, unknown/negated facts, zero AI and catalog priority');
+
+{const {speedPasswordMatches}=await import('../web/economy-policy.js');for(const s of ['1111','１１１１','1１1１',' １１11 '])assert.equal(speedPasswordMatches(s),true);for(const s of ['1112','１１１','①①①①','1 111','',null,1111])assert.equal(speedPasswordMatches(s),false);}
