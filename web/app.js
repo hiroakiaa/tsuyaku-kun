@@ -1,10 +1,10 @@
-import {faceTranslationTargets,speedPreferred} from './economy-policy.js?v=20261030-school-economy-1';
+import {faceTranslationTargets,speedPreferred} from './economy-policy.js?v=20261031-azure-free-1';
 import {createRealtimeRecovery} from './realtime-recovery.js?v=20261030-hybrid-2';
-import {createRealtimeRecognition} from './realtime-recognition.js?v=20261030-school-economy-1';
+import {createRealtimeRecognition} from './realtime-recognition.js?v=20261031-azure-free-1';
 import {createAiGate} from './ai-gate.js?v=20261029-faithful-pipeline-1';
 import {localIcon,installLocalIcons} from './icons.js?v=20261029-communication50-1';
 installLocalIcons(document);
-import {compactFaceCaption} from './face-caption.js?v=20261030-school-economy-1';
+import {compactFaceCaption} from './face-caption.js?v=20261031-azure-free-1';
 import {speechSide} from './two-language.js?v=20261029-communication50-1';
 import {createSpeechInputGate} from './speech-input-gate.js?v=20261029-two-language-1';
 import {guardedStorage} from './storage-access.js?v=20261024-usability20-4';
@@ -19,30 +19,30 @@ import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261022-bi
 import {installPhotoTranslate} from './photo-translate.js?v=20261024-usability20-3';
 import {refreshEnglishGuides,applyEnglishLabels} from './ui-english.js?v=20261029-two-language-1';
 import {SharedWordUsage} from './shared-word-usage.js?v=20261030-common-phrases-1';
-import {installConversationUI,createWaitingBubble} from './conversation-ui.js?v=20261030-school-economy-1';
+import {installConversationUI,createWaitingBubble} from './conversation-ui.js?v=20261031-azure-free-1';
 import {guardCaptionTranslation,hasInternalMarker,needsTranslationReview} from './translation-safety.js?v=20261029-faithful-pipeline-1';
 import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261029-faithful-pipeline-1';
 import {IdleWatch} from './idle-watch.js?v=20261008-safety-1';
 import {recordResource,recordPause,recordResume} from './resource-usage.js?v=20261030-common-phrases-1';
 import {mayReconnect} from './resource-policy.js';
-import {TranslationMemory} from './translation-memory.js?v=20261030-school-economy-1';
+import {TranslationMemory} from './translation-memory.js?v=20261031-azure-free-1';
 import {ReviewedStore} from './reviewed-store.js';
 import {PersonalPhrases} from './personal-phrases.js?v=20261007-learning-1';
 import {recognitionHints} from './recognition-hints.js?v=20261007-progressive-1';
 import {acquireMicrophone,needsMicrophoneRefresh} from './microphone.js?v=20261029-ios-mic-recovery-1';
-import {UsageLedger,WordUsage} from './usage.js?v=20261030-school-economy-1';
+import {UsageLedger,WordUsage} from './usage.js?v=20261031-azure-free-1';
 import {CloudSpeechPlayer,createSpeechCache} from './cloud-speech-player.js?v=20261020-safari-speech-2';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261007-progressive-1';
-import {installAdmin} from './admin.js?v=20261030-school-economy-1';
+import {installAdmin} from './admin.js?v=20261031-azure-free-1';
 import {config} from './config.js';
-import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261030-school-economy-1';
+import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261031-azure-free-1';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
 import {translationOf,spokenLanguage,withEasyJapanese,supplementCatalog} from './core.js?v=20261029-communication50-1';
 import {speakerCaption,speakerInfo} from './face-mode.js?v=20261006-school-1';
 import {callCaptionLanguages,chatCaptionLanguages,isDisplayableCaption} from './call-mode.js?v=20261021-chat-bubbles-1';
 import {listHistory as storedHistory} from './history.js?v=20261006-school-1';
 const listHistory=()=>localStorage.getItem('tsuyaku-device-mode')==='personal'?storedHistory():Promise.resolve([]);
-import {createServerRecognition} from './caption-server.js?v=20261030-school-economy-1';
+import {createServerRecognition} from './caption-server.js?v=20261031-azure-free-1';
 import {createBrowserRecognition} from './caption-browser.js?v=20261030-dots-capture-1';
 const browserSpeechUnavailable=new Set();let recognitionKind=null,conversationUI,realtimeUnavailable=false;
 const preferRealtime=()=>speedPreferred(localStorage);
@@ -320,7 +320,7 @@ function editJapanese(record){record={...record,revision:Math.max(record.revisio
 function submitCaption(cap,speech=false){if(!room||chatWaiting)return false;if(room.mode==='face'&&!cap.speaker)cap={...cap,speaker:cap.speakerSide==='other'?'相手':'自分'};const source=cap.source||currentSource(),unit=room?.unit||'';if(speech&&source==='ja')cap.text=translationMemory.corrected(cap.text,unit);const previous=records.get(selfId+'_'+cap.id);if(room?.mode==='face'&&cap.final){const targets=faceTranslationTargets(source,$('#face-self-language').value,$('#face-other-language').value,{economy:!preferRealtime()});const cached=translationMemory.lookup(source,cap.text,targets,unit,catalog);if(cached){const same=cap.metadataOnly&&previous?.memorySource&&previous.text===cap.text;void handle({type:'translation',id:selfId+'_'+cap.id,source,text:cap.text,speaker:cap.speaker||(cap.speakerSide==='other'?'相手':previous?.speaker||'自分'),translations:cached.translations,status:'ready',final:true,revision:cap.revision??0,continuing:cap.continuing===true,at:Date.now(),latencyMs:0,memorySource:cached.source,usageId:same?previous.usageId:'local-'+cap.id+'-'+(cap.revision??0),usage:{inputTokens:0,outputTokens:0,cacheHit:true}});return true;}}if(cap.final){pending.set(cap.id,cap);if(!cap.metadataOnly)renderCaption({id:selfId+'_'+cap.id,text:cap.text,source,speaker:cap.speaker||(cap.speakerSide==='other'?'相手':previous?.speaker||'自分'),translations:{[source]:cap.text},final:true,revision:cap.revision??0,status:'translating',continuing:!!cap.continuing,updating:false,quality:undefined,memorySource:null});}if(room?.local){void translateLocally(cap,source);return true;}return trackCaptionSend(cap);}
 
 
-const localJobs=new Map(),localRevisions=new Map(),localCompletions=new Map(),sessionTranslations=new Map();const faceAiGate=createAiGate(2),localActive=new Map();let localRequest,aiBlockedUntil=0;
+const localJobs=new Map(),localRevisions=new Map(),localCompletions=new Map(),sessionTranslations=new Map();const faceAiGate=createAiGate(2),localActive=new Map();let localRequest,aiBlockedUntil=0,azureBlockedUntil=0;
 const localJobAvailable=(key,job)=>!localActive.has(key)&&![...localActive.values()].some(controller=>controller.source===job.source&&controller.text===job.cap.text);
 function cancelLocalTranslations(preserveCache=false){localJobs.clear();localRevisions.clear();localCompletions.clear();if(!preserveCache)sessionTranslations.clear();for(const controller of localActive.values())controller.abort();localActive.clear();localRequest=null;}
 async function translateLocally(cap,source){
@@ -344,12 +344,12 @@ async function translateLocally(cap,source){
   try{
    let result=missing.length?sessionTranslations.get(cacheKey):{translations:known.translations,usage:{inputTokens:0,outputTokens:0,cacheHit:true},latencyMs:0,memorySource:known.source};
    if(result)result={...result,usage:{inputTokens:0,outputTokens:0,cacheHit:true},latencyMs:0};
-   else{if(Date.now()<aiBlockedUntil)throw Object.assign(Error('本日のAI利用上限です。じしょに登録された訳を使えます。'),{aiFailure:{reason:'quota'}});
-    const waitStarted=Date.now();const release=await faceAiGate.acquire(controller.signal);clientSlotWaitMs=Date.now()-waitStarted;try{if(!valid()||controller.signal.aborted)continue;const requestStarted=Date.now();try{result=await api('/translate',{text:cap.text,source,targets:missing,unit:job.activeRoom.unit,context,catalogRevision:clientCatalogRevision},{signal:controller.signal});}finally{clientRequestMs=Date.now()-requestStarted;}}finally{release();}
+   else{if(!preferRealtime()&&Date.now()<azureBlockedUntil)throw Object.assign(Error('Azure無料翻訳の上限です。有料翻訳へは切り替えません。'),{aiFailure:{reason:'quota',scope:'azure'}});if(Date.now()<aiBlockedUntil){const free=!preferRealtime()&&!missing.includes('ja-easy')?await api('/translation/free-status'):null;if(!free?.enabled)throw Object.assign(Error('本日のAI利用上限です。じしょに登録された訳を使えます。'),{aiFailure:{reason:'quota'}});}
+    const waitStarted=Date.now();const release=await faceAiGate.acquire(controller.signal);clientSlotWaitMs=Date.now()-waitStarted;try{if(!valid()||controller.signal.aborted)continue;const requestStarted=Date.now();try{result=await api('/translate',{text:cap.text,source,targets:missing,translationMode:preferRealtime()?'fast':'economy',unit:job.activeRoom.unit,context,catalogRevision:clientCatalogRevision},{signal:controller.signal});}finally{clientRequestMs=Date.now()-requestStarted;}}finally{release();}
     if(valid()&&guardCaptionTranslation({source,text:cap.text,status:'ready',translations:result.translations}).status==='ready')sessionTranslations.set(cacheKey,result);if(sessionTranslations.size>100)sessionTranslations.delete(sessionTranslations.keys().next().value);
    }
    result=stampTiming(result);if(room===job.activeRoom&&sessionEpoch===job.epoch&&!valid())ledger.caption({...base,...result,status:'ready'},{selfId});if(valid()){const completion=localCompletions.get(cap.id);await handle({...base,...result,translations:{...result.translations,...known.translations},status:'ready',...(completion?.text===cap.text?{revision:completion.revision,continuing:false}:{})});}
-  }catch(error){if(error.aiFailure?.reason==='quota')aiBlockedUntil=Math.floor(Date.now()/86400000)*86400000+86400000;
+  }catch(error){if(error.aiFailure?.reason==='quota'){const until=Math.floor(Date.now()/86400000)*86400000+86400000;if(error.aiFailure.scope==='azure')azureBlockedUntil=until;else aiBlockedUntil=until;}
    if(valid()){if(error.connectionIssue)stopMicrophoneForConnection();await handle({...base,translations:known.translations,status:'failed',connectionFailure:error.connection,failureRecorded:error.failureRecorded===true,error:error.message,aiFailure:error.aiFailure,httpStatus:error.httpStatus,usage:{...stampTiming({usage:error.usage}).usage,...(!error.usage?{unknown:true}:{})}});}
   }
   }finally{if(localActive.get(key)===controller)localActive.delete(key);localRequest=[...localActive.values()][0];}

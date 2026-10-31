@@ -582,3 +582,5 @@ await import('./hybrid-recovery.mjs');
 await test('アプリ内の同時上限と日次予算は提供元の障害と区別する',async()=>{const {budgetError}=await import('../server/ai-budget.js');const busy=aiFailure(budgetError('busy')),quota=aiFailure(budgetError());assert.equal(busy.scope,'app');assert.equal(busy.limit,'concurrent');assert.equal(quota.limit,'daily');assert.match(translationFailureSummary({aiFailure:busy}),/終了待ち/);assert.match(translationFailureSummary({aiFailure:quota}),/残量は戻りません/);});
 
 await import('./school-economy.mjs');
+
+await import('./azure-translator.mjs');

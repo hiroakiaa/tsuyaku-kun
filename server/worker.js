@@ -1,3 +1,4 @@
+import {azureConfig,azureLanguages,azureTranslate,azureBudget,azureOperation} from './azure-translator.js';
 import {realtimeUpgrade} from './realtime-recognition.js';
 import {recognitionDecoding} from './recognition-policy.js';
 import {createCatalogCache,exposeCatalog} from './catalog-cache.js';
@@ -14,7 +15,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261030-school-economy-1';
+const BUILD_ID='20261031-azure-free-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -63,6 +64,7 @@ export async function translateText(env,text,source,targets,context=[],unit='',d
   timing.dictionaryMs=Date.now()-dictionaryStarted;Object.assign(out,stored.translations);
   const missing=unique.filter(c=>!out[c]);scenario.aiTargets=[...missing].sort();
   if(!missing.length){onUsage({inputTokens:0,outputTokens:0,cacheHit:true,cacheSource:stored.builtin?'builtin':'spreadsheet',bankKeys:stored.keys});return out;}
+  if(env.translationEconomy&&env.AZURE_TRANSLATOR_F0&&azureLanguages(source,missing)){const start=Date.now();try{return {...out,...await azureTranslate(env,text,source,missing,onUsage)};}finally{timing.providerMs=Date.now()-start;timing.aiTotalMs=timing.providerMs;}}
   const terms=glossaryFor(text,data.glossary||[]);
   const protectedSpeech=protectUncertainSpeech(text);
   const messages=[{role:'system',content:translationInstructions(missing,protectedSpeech.spans.length>0)},{role:'user',content:JSON.stringify({source,targets:missing,...(schoolContextHints(text,source).length?{schoolMeanings:schoolContextHints(text,source)}:{}),correctionHints:correctionHints(text,data.corrections,unit==='数学'||unit.includes('方程式')?'math':unit),unit:unit.slice(0,160),glossary:terms,context:context.slice(-3),speech:protectedSpeech.speech})}];
@@ -101,6 +103,7 @@ export default {async fetch(request,env,ctx){
       }
       return cors(error('写真の操作を確認してください。',404));
     }catch(e){return cors(error(e.message||'写真を読み取れませんでした。',e.status||502));}}
+    if(url.pathname==='/translation/free-status'&&request.method==='GET'){let config;try{config=azureConfig(env);}catch{return cors(json({enabled:false,expired:true}));}return cors(json(config?{enabled:true,expiresAt:config.expiresAt,...await azureOperation(env,{action:'status',uid:await photoUid(auth.uid)})}:{enabled:false}));}
     if(url.pathname==='/speech/status'&&request.method==='GET')return cors(json({enabled:!!env.GOOGLE_TTS_API_KEY,voice:'fil-PH-Wavenet-A',...await speechOperation(env,{action:'status',uid:await photoUid(auth.uid)})}));
     if(url.pathname==='/speech/synthesize'&&request.method==='POST'){try{return cors(new Response(JSON.stringify(await synthesizeFilipino(env,await body(request,16000))),{headers:{'Content-Type':'application/json;charset=utf-8','Cache-Control':'no-store'}}));}catch(e){return cors(error(e.message||'音声を準備できませんでした。',e.status||502));}}
     if(['/usage/budget','/usage/monthly'].includes(url.pathname)&&request.method==='GET'){
@@ -130,8 +133,8 @@ export default {async fetch(request,env,ctx){
       const context=(Array.isArray(data.context)?data.context:[]).slice(-3).filter(x=>typeof x==='string').map(x=>x.slice(0,480));
       let usage={},started=Date.now();
       const dictionary=catalogForTranslation(env,token,ctx),clientRevision=/^c1-[a-f0-9]{8}$/.test(data.catalogRevision||'')?data.catalogRevision:null;const catalogMetadata={catalogSource:dictionary.source,catalogRevision:dictionary.revision,catalogAgeMs:dictionary.ageMs,catalogFresh:dictionary.fresh,catalogMatch:clientRevision?clientRevision===dictionary.revision:null};
-      try{const translations=await translateText({...env,catalogMetadata},text,source,targets,context,String(data.unit||'').slice(0,160),dictionary.data,u=>{usage=u;});return cors(json({translations,quality:inspectTranslations(text,source,targets,translations),usage,latencyMs:Date.now()-started}));}
-      catch(e){const failure=aiFailure(e);return cors(json({error:failure.message,aiFailure:failure,usage},failure.reason==='quota'?429:['billing','auth'].includes(failure.reason)?403:502));}
+      try{const translations=await translateText({...env,catalogMetadata,translationEconomy:data.translationMode==='economy'},text,source,targets,context,String(data.unit||'').slice(0,160),dictionary.data,u=>{usage=u;});return cors(json({translations,quality:inspectTranslations(text,source,targets,translations),usage,latencyMs:Date.now()-started}));}
+      catch(e){const failure=e.azureFailure||aiFailure(e);return cors(json({error:failure.message,aiFailure:failure,usage},failure.reason==='quota'?429:['billing','auth'].includes(failure.reason)?403:502));}
     }
     if(url.pathname==='/ui-labels'&&request.method==='GET'){const result=await bridge(env,token,'tsuyakuUiLabels');if(!result?.labels)return cors(error('画面表記を取得できませんでした。',503));return cors(json({labels:result.labels,updatedAt:result.updatedAt}));}
     if(url.pathname==='/catalog'&&request.method==='GET')return cors(json(exposeCatalog(await loadSharedCatalog(env,token))));
@@ -191,7 +194,7 @@ export class TranslationRoom {
 
   roster(){this.broadcast({type:'participants',participants:this.participants().map(({a})=>({id:a.id,name:a.name,language:a.language,viewLanguage:a.viewLanguage,role:a.role}))});this.requests();}
   async fetch(request){
-    const path=new URL(request.url).pathname;if(path==='/photo-budget'){try{return json(await photoBudget(this.ctx.storage,await body(request,4096)));}catch(e){return error(e.message,e.status||400);}}if(path==='/speech-budget'){try{return json(await speechBudget(this.ctx.storage,await body(request,2048)));}catch(e){return error(e.message,e.status||400);}}if(path==='/word-stats'){try{return json(await wordStats(this.ctx.storage,request.method==='POST'?(await body(request,12000)).events:null));}catch(e){return error(e.message,400);}}if(path==='/budget'){try{return json(await budgetOperation(this.ctx.storage,await body(request,2048)));}catch(e){return json({reason:e.aiReason||'budget'},429);}}
+    const path=new URL(request.url).pathname;if(path==='/azure-budget'){try{return json(await azureBudget(this.ctx.storage,await body(request,2048)));}catch(e){return json({error:e.message,reason:e.azureFailure?.reason||'service'},e.status||503);}}if(path==='/photo-budget'){try{return json(await photoBudget(this.ctx.storage,await body(request,4096)));}catch(e){return error(e.message,e.status||400);}}if(path==='/speech-budget'){try{return json(await speechBudget(this.ctx.storage,await body(request,2048)));}catch(e){return error(e.message,e.status||400);}}if(path==='/word-stats'){try{return json(await wordStats(this.ctx.storage,request.method==='POST'?(await body(request,12000)).events:null));}catch(e){return error(e.message,400);}}if(path==='/budget'){try{return json(await budgetOperation(this.ctx.storage,await body(request,2048)));}catch(e){return json({reason:e.aiReason||'budget'},429);}}
     if(path.startsWith('/codes/')){try{const codes=new LessonCodes(this.ctx.storage),data=await body(request);if(path==='/codes/allocate')return json(await codes.allocate(data));if(path==='/codes/find')return json(await codes.lookup(data.code));if(path==='/codes/release'){await codes.release(data.code,data.id);return json({ok:true});}return error('操作を確認してください。');}catch(e){return json({error:e.message,...(e.errorCode?{errorCode:e.errorCode}:{})},400);}}
     if(path==='/init'){if(await this.info())return error('ルームは作成済みです。',409);const data=await body(request);await this.ctx.storage.put('room',data);await this.ctx.storage.setAlarm(data.expires);return json({ok:true});}
     const room=await this.info();if(!room||room.expires<=Date.now())return error('このルームは終了しました。',410);
