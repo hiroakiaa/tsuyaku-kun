@@ -15,3 +15,6 @@ export function joinSpeechText(previous,next,language,boundary){
  return previous+separator+next;
 }
 export function incompleteEnglish(text){return /^(?:it means|this means|because|if|when|i(?:'m| am) going to|we(?:'re| are) going to|could you|can you|i would like to)[,:]?$/i.test(text.trim());}
+
+// Only grammatical endings; meaningful short replies and questions stay intact.
+export function japaneseSpeechTail(text){return /^(?:です|でした|ます|ました|ません)[。．.!！]?$/u.test(String(text||'').trim());}
