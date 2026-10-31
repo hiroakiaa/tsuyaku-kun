@@ -15,7 +15,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261031-azure-free-1';
+const BUILD_ID='20261031-azure-monthly-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -103,7 +103,7 @@ export default {async fetch(request,env,ctx){
       }
       return cors(error('写真の操作を確認してください。',404));
     }catch(e){return cors(error(e.message||'写真を読み取れませんでした。',e.status||502));}}
-    if(url.pathname==='/translation/free-status'&&request.method==='GET'){let config;try{config=azureConfig(env);}catch{return cors(json({enabled:false,expired:true}));}return cors(json(config?{enabled:true,expiresAt:config.expiresAt,...await azureOperation(env,{action:'status',uid:await photoUid(auth.uid)})}:{enabled:false}));}
+    if(url.pathname==='/translation/free-status'&&request.method==='GET'){let config;try{config=azureConfig(env);}catch{return cors(json({enabled:false,expired:true}));}return cors(json(config?{enabled:true,monthlyF0:config.monthlyF0===true,expiresAt:config.monthlyF0===true?null:config.expiresAt,...await azureOperation(env,{action:'status',uid:await photoUid(auth.uid)})}:{enabled:false}));}
     if(url.pathname==='/speech/status'&&request.method==='GET')return cors(json({enabled:!!env.GOOGLE_TTS_API_KEY,voice:'fil-PH-Wavenet-A',...await speechOperation(env,{action:'status',uid:await photoUid(auth.uid)})}));
     if(url.pathname==='/speech/synthesize'&&request.method==='POST'){try{return cors(new Response(JSON.stringify(await synthesizeFilipino(env,await body(request,16000))),{headers:{'Content-Type':'application/json;charset=utf-8','Cache-Control':'no-store'}}));}catch(e){return cors(error(e.message||'音声を準備できませんでした。',e.status||502));}}
     if(['/usage/budget','/usage/monthly'].includes(url.pathname)&&request.method==='GET'){
