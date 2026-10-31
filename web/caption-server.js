@@ -3,7 +3,7 @@ import {nonSpeechReason} from './speech-filter.js?v=20261007-learning-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261007-progressive-1';
 import {recognitionMetrics} from './recognition-metrics.js?v=20261030-all-language-speed-1';
 import {trimmedAudioLength} from './audio-trim.js?v=20261029-communication50-1';
-import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish} from './speech-continuity.js?v=20261029-communication50-1';
+import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish,japaneseSpeechTail} from './speech-continuity.js?v=20261031-analysis-focus-1';
 // Browser-independent recognition using the call's existing microphone stream.
 export function encodeWav(samples) {
   const bytes = new ArrayBuffer(44 + samples.length * 2), view = new DataView(bytes);
@@ -144,6 +144,13 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
     }
     acceptText(text,timing) {
       const now=Date.now();let joined=false,index,revision=0,chunks=1;
+      const anchor=this.tailAnchor;this.tailAnchor=null;clearTimeout(this.tailAnchorTimer);
+      if(anchor&&!this.fragment&&!this.breakContinuity&&recognitionLanguage(timing.language)==='ja'&&recognitionLanguage(anchor.timing.language)==='ja'&&japaneseSpeechTail(text)&&Number.isFinite(anchor.timing.speechEndedAt)&&Number.isFinite(timing.speechStartedAt)&&speechGapAllowsJoin(anchor.timing,timing)&&timing.speechStartedAt-anchor.timing.speechEndedAt<=300&&now-anchor.at<=8000){
+        const ending=text.trim().replace(/[。．.!！]$/u,''),base=anchor.text.replace(/[。．.!！]$/u,'');
+        if(base.endsWith(ending)){onDiagnostic({code:'filtered',filterReason:'boundary_echo'});return;}
+        text=base+text;index=anchor.index;revision=anchor.revision+1;chunks=anchor.chunks+1;joined=true;timing={...timing,speechStartedAt:anchor.timing.speechStartedAt};
+        onDiagnostic({code:'recognition_repair'});
+      }
       if(this.fragment){
         const previous=this.fragment;
         if(!this.breakContinuity&&recognitionLanguage(previous.timing.language)===recognitionLanguage(timing.language)&&speechGapAllowsJoin(previous.timing,timing)&&now-previous.at<=previous.waitMs){
@@ -153,11 +160,13 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
           timing={...timing,speechStartedAt:previous.timing.speechStartedAt};
         }else this.finishFragment();
       }
+      if(!joined&&recognitionLanguage(timing.language)==='ja'&&japaneseSpeechTail(text)){this.breakContinuity=true;onDiagnostic({code:'filtered',filterReason:'isolated_fragment'});this.onlanguageuncertain?.({reason:'fragment'});return;}
       this.breakContinuity=false;
       index??=this.index++;
       // Bound cumulative updates to four chunks and 480 characters.
       const continuing=chunks<4&&(timing.boundary==='limit'&&!/[。.!?！？]\s*$/.test(text)||isIncompleteJapanese(text)||recognitionLanguage(timing.language)==='en'&&incompleteEnglish(text))&&text.length<480;
       this.emitText(text,timing,index,revision,continuing);
+      if(!continuing&&timing.boundary==='limit'){this.tailAnchor={text,timing,index,revision,chunks,at:now};this.tailAnchorTimer=setTimeout(()=>{this.tailAnchor=null;},8000);}
       if(continuing){
         this.fragment={text,timing,chunks,index,revision,at:now,waitMs:8000};
         const flush=()=>{
@@ -176,7 +185,7 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
     }
     fail(error,message) { const notify = this.onerror; this.abort(); notify?.({ error, message }); }
     abort() {
-      clearTimeout(this.startTimer);clearTimeout(this.fragmentTimer);clearInterval(this.watchdog);this.watchdog=null;this.fragment=null;
+      clearTimeout(this.startTimer);clearTimeout(this.fragmentTimer);clearTimeout(this.tailAnchorTimer);this.tailAnchor=null;clearInterval(this.watchdog);this.watchdog=null;this.fragment=null;
       this.active = false;this.capturing=false;for(const job of this.jobs||[]){job.controller.abort();job.release();}this.jobs?.clear();this.sending=false;
       for (const chunk of this.queue) chunk.samples.fill(0); this.queue=[];
       if (this.node) { this.node.onprocessorerror=null;this.node.port.onmessage = null; this.node.port.postMessage('stop'); this.node.disconnect(); }

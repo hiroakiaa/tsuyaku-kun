@@ -584,3 +584,5 @@ await test('アプリ内の同時上限と日次予算は提供元の障害と�
 await import('./school-economy.mjs');
 
 await import('./azure-translator.mjs');
+
+await import('./analysis-focus.mjs');
