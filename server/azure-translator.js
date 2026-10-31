@@ -5,8 +5,8 @@ const fail=(message,status=503,reason='service')=>Object.assign(Error(message),{
 export function azureConfig(env,now=Date.now()){
  if(!env.AZURE_TRANSLATOR_F0)return null;
  let c;try{c=JSON.parse(env.AZURE_TRANSLATOR_F0);}catch{throw fail('Azure無料翻訳の設定を確認してください。');}
- if(c.sku!=='F0'||typeof c.key!=='string'||!c.key||c.region!=='japaneast'||!Number.isFinite(Date.parse(c.expiresAt)))throw fail('Azure無料翻訳の設定を確認してください。');
- if(now>=Date.parse(c.expiresAt))throw fail('Azure無料試用の接続期限です。有料プランには切り替えていません。',429,'quota');return c;
+ if(c.sku!=='F0'||typeof c.key!=='string'||!c.key||c.region!=='japaneast'||(c.monthlyF0!==true&&!Number.isFinite(Date.parse(c.expiresAt))))throw fail('Azure無料翻訳の設定を確認してください。');
+ if(c.monthlyF0!==true&&now>=Date.parse(c.expiresAt))throw fail('Azure無料試用の接続期限です。有料プランには切り替えていません。',429,'quota');return c;
 }
 export function azureLanguages(source,targets){const map=c=>({fil:'fil',tl:'fil','zh-CN':'zh-Hans'})[c]||c;const allowed=new Set(['ja','en','pt','es','tl','fil','vi','zh-CN','ko','id','ne','de']);return allowed.has(source)&&targets.every(c=>allowed.has(c))?{source:map(source),targets:[...new Set(targets.map(map))],map}:null;}
 export async function azureBudget(storage,data,now=Date.now()){
