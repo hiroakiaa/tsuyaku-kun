@@ -3,7 +3,7 @@ import {ReviewedStore,memoryKey,retentionScore} from './reviewed-store.js?v=2026
 import {translationField,translationOf} from './core.js?v=20261007-progressive-1';
 import {phraseIdentity} from './phrase-equivalence.js?v=20261008-report-2';
 import {hasInternalMarker,needsTranslationReview,usableTranslation} from './translation-safety.js?v=20261029-faithful-pipeline-1';
-import {schoolTranslation} from './school-phrases.js?v=20261030-school-economy-1';
+import {schoolTranslation} from './school-phrases.js?v=20261102-recognition-coverage-1';
 export const builtInTranslation=schoolTranslation;
 const key='tsuyaku-reviewed-memory-v1';
 const exact=text=>String(text||'').normalize('NFC').trim();
