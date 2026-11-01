@@ -28,7 +28,9 @@ const bilingual=[
 const rows=[...multilingual.map(row=>Object.fromEntries(columns.map((code,i)=>[code,row[i]]))),...bilingual.map(([ja,en])=>({ja,en}))];
 const canonical=code=>code==='fil'?'tl':code;
 const exact=text=>String(text||'').normalize('NFC').trim();
-function one(source,text,targets){const matches=rows.filter(row=>row[canonical(source)]===text);if(!matches.length)return null;const translations={[source]:text};for(const code of targets){const values=[...new Set(matches.map(row=>row[canonical(code)]).filter(Boolean))];if(values.length===1)translations[code]=values[0];}return translations;}
+// Only a final full stop is optional. Questions, exclamations, names and words remain distinct.
+const statementKey=text=>exact(text).replace(/[。．.]$/u,'');
+function one(source,text,targets){const matches=rows.filter(row=>typeof row[canonical(source)]==='string'&&statementKey(row[canonical(source)])===statementKey(text));if(!matches.length)return null;const translations={[source]:text};for(const code of targets){const values=[...new Set(matches.map(row=>row[canonical(code)]).filter(Boolean))];if(values.length===1)translations[code]=values[0];}return translations;}
 export function schoolTranslation(source,text,targets,{partial=false}={}){
  if(!Array.isArray(targets)||!targets.length||targets.length>4)return null;text=exact(text);if(!text||text.length>600||source==='ja-easy')return null;
  let translations=one(source,text,targets);
