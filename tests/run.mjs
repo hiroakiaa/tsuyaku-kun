@@ -2,6 +2,7 @@ import {faceTranslationTargets} from '../web/economy-policy.js';
 import {createAiGate} from '../web/ai-gate.js';
 import {guardCaptionTranslation} from '../web/translation-safety.js';
 import './communication50.mjs';
+import './recognition-coverage.mjs';
 const speechPayload=({recognitionTiming,...data})=>data;
 import {tokenWithAbort} from '../web/caption-server.js';
 import './recognition-order.mjs';
