@@ -1,7 +1,7 @@
 import {recognitionLanguage,speechTextAllowed} from './two-language.js?v=20261029-communication50-1';
 import {nonSpeechReason} from './speech-filter.js?v=20261007-learning-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261007-progressive-1';
-import {recognitionMetrics} from './recognition-metrics.js?v=20261102-school-asr-1';
+import {recognitionMetrics} from './recognition-metrics.js?v=20261102-school-guard-2';
 import {trimmedAudioLength} from './audio-trim.js?v=20261029-communication50-1';
 import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish,japaneseSpeechTail} from './speech-continuity.js?v=20261031-analysis-focus-1';
 // Browser-independent recognition using the call's existing microphone stream.
@@ -117,7 +117,7 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
         this.failures=0;
         if (!this.active || controller.signal.aborted) return;
         if(stale()){this.breakContinuity=true;onDiagnostic({code:'stale_audio',queueMs,orderWaitMs:requestMetrics.orderWaitMs});this.onrecovering?.({reason:'stale_audio',attempt:1});return;}
-        const automatic=this.automatic,candidates=this.candidates;
+        const automatic=this.automatic,candidates=this.candidates;if(data.recognitionRejected==='stock_outro'){this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:'empty'});this.onlanguageuncertain?.({reason:'stock_outro'});return;}
         if(automatic&&typeof data.text==='string'&&data.text.trim()&&(data.languageUncertain||!data.language||!candidates.includes(data.language)||!speechTextAllowed(data.text,candidates))){this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:'language_uncertain'});this.onlanguageuncertain?.({reason:speechTextAllowed(data.text,candidates)?'uncertain':'outside_pair'});return;}
         const rejected=nonSpeechReason(data,data.language||new URL(endpoint).searchParams.get('language'));
         if(rejected){this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:rejected});return;}

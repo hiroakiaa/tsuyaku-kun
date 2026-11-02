@@ -1,8 +1,5 @@
 // Only vocabulary is sent as recognition context, never past personal speech.
 const school=['教科書','ページ','問い','問題','答え','丸付け','正解','整列','体育館','集合','出席番号','縦二列'];
-// Balanced, fixed vocabulary only. Never supply a target sentence to copy.
-const schoolVocabulary={ja:['数学','授業','問い','問題','答え','教科書','分数','ページ'],en:['mathematics','class','question','problem','answer','textbook','fraction','page'],de:['Mathematik','Unterricht','Frage','Aufgabe','Antwort','Lehrbuch','Bruch','Seite'],pt:['matemática','aula','pergunta','problema','resposta','livro','fração','página'],es:['matemáticas','clase','pregunta','problema','respuesta','libro','fracción','página'],tl:['matematika','klase','tanong','suliranin','sagot','aklat','praksyon','pahina'],vi:['toán học','tiết học','câu hỏi','bài toán','đáp án','sách giáo khoa','phân số','trang'],ko:['수학','수업','질문','문제','답','교과서','분수','쪽'],id:['matematika','kelas','pertanyaan','soal','jawaban','buku','pecahan','halaman'],ne:['गणित','कक्षा','प्रश्न','समस्या','उत्तर','पाठ्यपुस्तक','भिन्न','पृष्ठ'],'zh-CN':['数学','课堂','提问','题目','答案','教科书','分数','页']};
-export function schoolRecognitionHints(candidates){return [...new Set(candidates.flatMap(code=>schoolVocabulary[code==='ja-easy'?'ja':code==='fil'?'tl':code]||[]))].slice(0,16);}
 export function recognitionHints(data,language='ja',unit=''){
   const japanese=language==='ja'||language==='ja-easy';
   const field=({en:'enText',es:'esText',pt:'ptText',vi:'viText','zh-CN':'zhText',ko:'koText',tl:'tlText',fil:'tlText',id:'idText',ne:'neText'})[language];
