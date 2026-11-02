@@ -18,3 +18,11 @@ export function incompleteEnglish(text){return /^(?:it means|this means|because|
 
 // Only grammatical endings; meaningful short replies and questions stay intact.
 export function japaneseSpeechTail(text){return /^(?:です|でした|ます|ました|ません)[。．.!！]?$/u.test(String(text||'').trim());}
+
+// Repair only an exact repeated integer plus a grammatical ending in overlapping audio.
+export function japaneseNumericCompletion(previous,next){
+ const base=String(previous||'').trim().replace(/[。．.!！]$/u,''),tail=String(next||'').trim();
+ const before=/(?:^|[^0-9０-９.,．，])([0-9０-９]{1,8})$/u.exec(base),after=/^([0-9０-９]{1,8})(です|でした|ではありません|じゃありません)[。．.!！]?$/u.exec(tail);
+ if(!before||!after||before[1]!==after[1])return null;
+ return base+tail.slice(after[1].length);
+}
