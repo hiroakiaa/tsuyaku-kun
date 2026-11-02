@@ -24,10 +24,11 @@ export function tokenWithAbort(getToken,signal){
   Promise.resolve().then(getToken).then(value=>{signal.removeEventListener('abort',aborted);resolve(value);},error=>{signal.removeEventListener('abort',aborted);reject(error);});
  });
 }
+let recognitionRunCounter=0;
 export function createServerRecognition({ endpoint, captureProfile='baseline', getStream, getToken, fetcher = fetch, onUsage = () => {}, onDiagnostic = () => {}, canParallel = () => true, acquireSlot = async () => () => {},
   Context = globalThis.AudioContext || globalThis.webkitAudioContext, Worklet = globalThis.AudioWorkletNode }) {
   return class ServerRecognition {
-    constructor() { this.active = false; this.queue = []; this.sending = false; this.index = 0; this.failures = 0; this.getHints = () => [];const query=new URL(endpoint||'https://invalid.local').searchParams;this.automatic=query.get('language')==='auto';this.candidates=(query.get('languages')||'').split(','); }
+    constructor() { this.recognitionRun=++recognitionRunCounter;this.active = false; this.queue = []; this.sending = false; this.index = 0; this.failures = 0; this.getHints = () => [];const query=new URL(endpoint||'https://invalid.local').searchParams;this.automatic=query.get('language')==='auto';this.candidates=(query.get('languages')||'').split(','); }
     progress(){this.onprogress?.({phase:this.capturing?'capturing':this.sending||this.queue.length?'recognizing':'waiting',pending:this.queue.length+(this.jobs?.size||0),requestStartedAt:this.jobs?.size?Math.min(...[...this.jobs].map(j=>j.startedAt||Date.now())):null});}
     setHints(getHints) { this.getHints = typeof getHints === 'function' ? getHints : () => []; }
     start() {
@@ -73,8 +74,9 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
     async drain() {
       this.jobs??=new Set();this.commitTail??=Promise.resolve();
       const started=[];
-      // Keep completed, out-of-order responses in their slots too. Never create an unbounded result buffer.
-      while(this.active&&this.queue.length&&this.jobs.size<2&&(!this.jobs.size||canParallel())){
+      // Bound the whole pipeline to three jobs and actual network work to two.
+      // A completed response waiting for order must not block the second network lane.
+      while(this.active&&this.queue.length&&this.jobs.size<3&&[...this.jobs].filter(j=>!j.networkDone).length<2&&(![...this.jobs].some(j=>!j.networkDone)||canParallel())){
         const chunk=this.queue.shift(),job={controller:new AbortController(),previous:this.commitTail,startedAt:Date.now()};
         this.commitTail=new Promise(resolve=>job.release=resolve);this.jobs.add(job);this.sending=true;this.progress();
         started.push(this.recognizeChunk(chunk,job));
@@ -82,18 +84,19 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
       await Promise.all(started);
     }
     async recognizeChunk(chunk,job) {
+      const segmentDiagnostic=record=>onDiagnostic({...record,recognitionRun:this.recognitionRun,...(Number.isSafeInteger(chunk.sequence)?{segmentSequence:chunk.sequence}:{})});
       const requestAt=Date.now(), queueMs=Math.max(0,requestAt-chunk.at);
       const controller = job.controller;let phase='auth',body,releaseSlot,clientSlotWaitMs=null,clientAuthMs=null,httpStarted=null,sentSamples=chunk.samples.length;
       const ordered=async()=>{await job.previous;if(!this.active||!this.jobs.has(job)||controller.signal.aborted)return false;if(Number.isFinite(chunk.sequence)){if(Number.isFinite(this.lastSequence)&&chunk.sequence!==this.lastSequence+1)this.breakContinuity=true;this.lastSequence=chunk.sequence;}return true;};
       const stale=()=>Date.now()-chunk.at>15000;
       const timeout = setTimeout(() => controller.abort(), 12000);
       try {
-        if(stale()){if(await ordered()){this.breakContinuity=true;onDiagnostic({code:'stale_audio',queueMs});this.onrecovering?.({reason:'stale_audio',attempt:1});}return;}
+        if(stale()){if(await ordered()){this.breakContinuity=true;segmentDiagnostic({code:'stale_audio',queueMs});this.onrecovering?.({reason:'stale_audio',attempt:1});}return;}
         const token = await tokenWithAbort(getToken,controller.signal);clientAuthMs=Date.now()-requestAt;
         phase='slot';const slotStarted=Date.now();releaseSlot=await acquireSlot(controller.signal);clientSlotWaitMs=Date.now()-slotStarted;
         if (!this.active) return;
         if (controller.signal.aborted) throw new DOMException('Recognition cancelled','AbortError');
-        if(stale()){if(await ordered()){this.breakContinuity=true;onDiagnostic({code:'stale_audio',queueMs,clientAuthMs});this.onrecovering?.({reason:'stale_audio',attempt:1});}return;}
+        if(stale()){if(await ordered()){this.breakContinuity=true;segmentDiagnostic({code:'stale_audio',queueMs,clientAuthMs});this.onrecovering?.({reason:'stale_audio',attempt:1});}return;}
         sentSamples=trimmedAudioLength(chunk.samples,chunk.boundary);body = encodeWav(chunk.samples.subarray(0,sentSamples)); chunk.samples.fill(0);
         onUsage(sentSamples / 16000);
         const hints = [...new Set((this.automatic?[]:(this.getHints() || [])).filter(x => typeof x === 'string')
@@ -110,23 +113,24 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
         // Record actual HTTP completion before waiting for an earlier segment. No transcript is retained.
         if(!this.active||!this.jobs.has(job)||controller.signal.aborted)return;
         chunk.samples.fill(0);if(body)new Uint8Array(body).fill(0);
-        onDiagnostic({code:response.ok?'ok':'http_error',...requestMetrics,at:responseReadyAt});
+        segmentDiagnostic({code:response.ok?'ok':'http_error',...requestMetrics,at:responseReadyAt});
+        if(response.ok){job.networkDone=true;void this.drain();}
         if(!await ordered())return;
-        requestMetrics.orderWaitMs=Math.max(0,Date.now()-responseReadyAt);if(requestMetrics.orderWaitMs>0)onDiagnostic({code:'recognition_order',orderWaitMs:requestMetrics.orderWaitMs});
+        requestMetrics.orderWaitMs=Math.max(0,Date.now()-responseReadyAt);if(requestMetrics.orderWaitMs>0)segmentDiagnostic({code:'recognition_order',orderWaitMs:requestMetrics.orderWaitMs});
         if (!response.ok) { const error=failure?.reason|| (response.status === 429 ? 'quota' : [401,403].includes(response.status) ? 'auth' : 'network'); if (['network','service','timeout','overloaded'].includes(error) && (response.status>=500||error==='overloaded')) { this.transientFailure(); return; } this.fail(error,failure?.message); return; }
         this.failures=0;
         if (!this.active || controller.signal.aborted) return;
-        if(stale()){this.breakContinuity=true;onDiagnostic({code:'stale_audio',queueMs,orderWaitMs:requestMetrics.orderWaitMs});this.onrecovering?.({reason:'stale_audio',attempt:1});return;}
-        const automatic=this.automatic,candidates=this.candidates;if(data.recognitionRejected==='stock_outro'){this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:'empty'});this.onlanguageuncertain?.({reason:'stock_outro'});return;}
-        if(automatic&&typeof data.text==='string'&&data.text.trim()&&(data.languageUncertain||!data.language||!candidates.includes(data.language)||!speechTextAllowed(data.text,candidates))){this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:'language_uncertain'});this.onlanguageuncertain?.({reason:speechTextAllowed(data.text,candidates)?'uncertain':'outside_pair'});return;}
+        if(stale()){this.breakContinuity=true;segmentDiagnostic({code:'stale_audio',queueMs,orderWaitMs:requestMetrics.orderWaitMs});this.onrecovering?.({reason:'stale_audio',attempt:1});return;}
+        const automatic=this.automatic,candidates=this.candidates;if(data.recognitionRejected==='stock_outro'){this.breakContinuity=true;this.finishFragment();segmentDiagnostic({code:'filtered',filterReason:'empty'});this.onlanguageuncertain?.({reason:'stock_outro'});return;}
+        if(automatic&&typeof data.text==='string'&&data.text.trim()&&(data.languageUncertain||!data.language||!candidates.includes(data.language)||!speechTextAllowed(data.text,candidates))){this.breakContinuity=true;this.finishFragment();segmentDiagnostic({code:'filtered',filterReason:'language_uncertain'});this.onlanguageuncertain?.({reason:speechTextAllowed(data.text,candidates)?'uncertain':'outside_pair'});return;}
         const rejected=nonSpeechReason(data,data.language||new URL(endpoint).searchParams.get('language'));
-        if(rejected){this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:rejected});return;}
+        if(rejected){this.breakContinuity=true;this.finishFragment();segmentDiagnostic({code:'filtered',filterReason:rejected});return;}
         const text = typeof data.text === 'string' ? data.text.trim().slice(0, 600) : '';
         if (text) {
           // No cumulative transcript list is retained by the recognizer.
-          this.acceptText(text,{speechStartedAt:chunk.speechStartedAt,speechEndedAt:chunk.speechEndedAt,recognitionReadyAt:Date.now(),boundary:chunk.boundary,...(data.language?{language:data.language}:{})});
+          this.acceptText(text,{recognitionRun:this.recognitionRun,segmentSequence:chunk.sequence,speechStartedAt:chunk.speechStartedAt,speechEndedAt:chunk.speechEndedAt,recognitionReadyAt:Date.now(),boundary:chunk.boundary,...(data.language?{language:data.language}:{})});
         }
-      } catch (_) {releaseSlot?.();releaseSlot=null;clearTimeout(timeout);await job.previous; if(this.active&&this.jobs.has(job)){const code=controller.signal.aborted?'timeout':phase==='parse'?'invalid_response':phase==='auth'?'auth_unavailable':'network_or_cors';onDiagnostic({code,queueMs,clientAuthMs,...(httpStarted?{clientRequestMs:Date.now()-httpStarted}:{})});if(phase==='auth'&&!controller.signal.aborted)this.fail('auth');else this.transientFailure();} }
+      } catch (_) {releaseSlot?.();releaseSlot=null;clearTimeout(timeout);await job.previous; if(this.active&&this.jobs.has(job)){const code=controller.signal.aborted?'timeout':phase==='parse'?'invalid_response':phase==='auth'?'auth_unavailable':'network_or_cors';segmentDiagnostic({code,queueMs,clientAuthMs,...(httpStarted?{clientRequestMs:Date.now()-httpStarted}:{})});if(phase==='auth'&&!controller.signal.aborted)this.fail('auth');else this.transientFailure();} }
       finally {
         releaseSlot?.();chunk.samples.fill(0);if(body)new Uint8Array(body).fill(0);clearTimeout(timeout);this.jobs.delete(job);job.release();this.sending=this.jobs.size>0;this.progress();
         if (this.active) void this.drain();
