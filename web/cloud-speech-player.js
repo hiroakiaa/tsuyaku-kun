@@ -1,16 +1,17 @@
-import {SpeechPlayer,speechWords} from './speech-player.js?v=20261020-dictionary-voice-1';
+import {SpeechPlayer,speechWords,selectSpeechVoice} from './speech-player.js?v=20261102-playback-start-1';
 
 // The same controls drive native speech and WaveNet playback.
 export class CloudSpeechPlayer extends SpeechPlayer{
  constructor({cloud,...options}){super(options);this.cloud=cloud;this.cloudAudio=null;this.cloudAbort=null;}
  toggle(key,text,lang,options){
-  if(/^(?:fil|tl)(?:-|$)/i.test(lang)&&this.cloud?.enabled())return this.toggleCloud(key,text,lang);
+  if(this.cloudAudio&&this.key===key)return this.toggleCloud(key,text,lang);
+  if(/^(?:fil|tl)(?:-|$)/i.test(lang)&&this.cloud?.enabled()&&!selectSpeechVoice(this.readVoices(),lang,{localOnly:true}))return this.toggleCloud(key,text,lang);
   return super.toggle(key,text,lang,options);
  }
  toggleCloud(key,text,lang){
   if(this.key===key){if(this.loading){this.stop();return;}if(this.paused){this.paused=false;const generation=this.generation;this.watchStart?.();try{void Promise.resolve(this.cloudAudio.play()).catch(()=>{if(generation!==this.generation)return;this.clearPending();this.paused=true;this.onChange();this.onError('speech-tap');});}catch{this.clearPending();this.paused=true;this.onChange();this.onError('speech-tap');}}else{this.paused=true;this.cloudAudio.pause();}this.onChange();return;}
   if(!String(text||'').trim())return;
-  this.stop();const generation=++this.generation;this.key=key;this.loading=true;this.paused=false;this.started=false;
+  this.stop();const generation=++this.generation,requestedAt=this.now();this.key=key;this.loading=true;this.paused=false;this.started=false;
   const audio=new this.cloud.Audio();this.cloudAudio=audio;this.cloudAbort=new AbortController();
   // Unlock this element during the user's click, before the HTTP round-trip (iOS).
   audio.src='data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQIAAAAAAA==';
@@ -27,7 +28,7 @@ export class CloudSpeechPlayer extends SpeechPlayer{
    try{
     const result=await this.cloud.load(text,lang,{signal:this.cloudAbort.signal});
     if(generation!==this.generation)return;
-    audio.pause();audio.onplaying=()=>{if(generation!==this.generation)return;this.loading=false;this.started=true;this.paused=false;this.clearPending();this.watchStart=watch;this.onChange();};
+    audio.pause();audio.onplaying=()=>{if(generation!==this.generation)return;const firstStart=!this.started;this.loading=false;this.started=true;this.paused=false;this.clearPending();if(firstStart)this.onStartMetric({language:lang,source:'cloud',startDelayMs:Math.max(0,this.now()-requestedAt)});this.watchStart=watch;this.onChange();};
     audio.ontimeupdate=()=>{if(generation!==this.generation||this.paused||!Number.isFinite(audio.duration)||audio.duration<=0)return;const at=audio.currentTime/audio.duration*total,word=words.filter(w=>w.at<=at).at(-1);if(word&&word.start!==this.range?.start){this.range={start:word.start,end:word.end};this.onChange();}};
     audio.onended=()=>this.started?finish():fail('cloud-speech');audio.onerror=()=>fail('cloud-speech');
     audio.src='data:audio/mpeg;base64,'+result.audioContent;
