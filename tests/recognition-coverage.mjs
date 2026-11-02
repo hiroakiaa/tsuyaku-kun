@@ -12,3 +12,6 @@ for(const text of ['おはようございます？','おはようございます
 assert.equal(schoolTranslation('de','Guten Morgen',['ja']).translations.ja,'おはようございます。');
 assert.equal(schoolTranslation('en','Good morning?',['ja']),null);
 console.log('PASS pair coverage survives log truncation; private text rejected; only final statement stops reuse school phrases');
+
+ledger.recognitionObservation(['ja','de'],{code:'request_cancelled'});assert.equal(ledger.current.recognitionByPair[0].cancelled,1);delete ledger.current.recognitionByPair[0].cancelled;ledger.recognitionObservation(['ja','de'],{code:'request_cancelled'});assert.equal(ledger.current.recognitionByPair[0].cancelled,1);
+const cancelledReport=improvementReport([ledger.current],{diagnostics:[{at:1000,operation:'transcribe',code:'request_cancelled',recognitionRun:1,segmentSequence:6,clientRequestMs:9000}]});assert.equal(cancelledReport.recognitionCoverage.cancelledRequests,1);assert.equal(cancelledReport.recognitionCoverage.retainedCancellations[0].segment,6);assert.equal(cancelledReport.recognitionDiagnostics.requestFailures,0);assert.equal(cancelledReport.recognitionDiagnostics.request.samples,0);

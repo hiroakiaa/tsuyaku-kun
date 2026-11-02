@@ -2,8 +2,8 @@ import {QUALITY_VERSION} from './translation-safety.js?v=20261029-faithful-pipel
 import {percentile} from './statistics.js?v=20261029-faithful-pipeline-1';
 export {percentile};
 import {TRANSLATION_PRICE,translationScenario,RECOGNITION_PRICE} from './cost-policy.js?v=20261030-realtime-1';
-import {resourceSnapshot} from './resource-usage.js?v=20261103-pipeline-latency-1';
-export const BUILD_ID='20261103-speech-activity-1';
+import {resourceSnapshot} from './resource-usage.js?v=20261103-request-lifecycle-1';
+export const BUILD_ID='20261103-request-lifecycle-1';
 // Device-local operational history. No names, room keys, tokens or speech are stored here.
 export const PRICES={checkedAt:TRANSLATION_PRICE.checkedAt,inputPerMillion:TRANSLATION_PRICE.inputPerMillion,outputPerMillion:TRANSLATION_PRICE.outputPerMillion,streamPerMinute:RECOGNITION_PRICE.streamPerMinute,whisperPerMinute:RECOGNITION_PRICE.whisperPerMinute,turnPerGB:.05};
 export function costOf(s,p=PRICES){const translation=(s.inputTokens||0)/1e6*p.inputPerMillion+(s.outputTokens||0)/1e6*p.outputPerMillion,recognition=(s.streamSeconds||0)/60*p.streamPerMinute+(s.whisperSeconds||0)/60*p.whisperPerMinute,turn=(s.relayBytes||0)/1e9*p.turnPerGB;return {translation,recognition,turn,total:translation+recognition+turn};}
@@ -20,9 +20,9 @@ export class UsageLedger{
  recognitionFiltered(reason){if(!this.current||!['empty','model_no_speech','nonverbal','language_uncertain','boundary_echo','isolated_fragment'].includes(reason))return;this.current.recognitionFilters??={empty:0,model_no_speech:0,nonverbal:0,language_uncertain:0,boundary_echo:0,isolated_fragment:0};this.current.recognitionFilters[reason]=(Number.isFinite(this.current.recognitionFilters[reason])?this.current.recognitionFilters[reason]:0)+1;this.save();}
  recognitionObservation(languages,result){
   if(!this.current||!Array.isArray(languages)||!languages.length||languages.length>2||!languages.every(c=>/^[a-z]{2,3}(?:-[A-Za-z]+)?$/.test(c)))return;
-  const fields={sent:'requests',ok:'responses',http_error:'requestErrors',timeout:'requestErrors',network_or_cors:'requestErrors',invalid_response:'requestErrors',auth_unavailable:'requestErrors',queue_overflow:'queueDrops',stale_audio:'staleDrops',retry:'retries'};
+  const fields={sent:'requests',request_cancelled:'cancelled',ok:'responses',http_error:'requestErrors',timeout:'requestErrors',network_or_cors:'requestErrors',invalid_response:'requestErrors',auth_unavailable:'requestErrors',queue_overflow:'queueDrops',stale_audio:'staleDrops',retry:'retries'};
   let field=fields[result?.code];if(result?.code==='filtered')field=({empty:'empty',model_no_speech:'noSpeech',nonverbal:'nonverbal',language_uncertain:'languageUncertain',boundary_echo:'boundaryEcho',isolated_fragment:'isolatedTail'})[result.filterReason];if(!field)return;
-  const key=[...new Set(languages)].sort().join(',');const s=this.current;s.recognitionByPair??=[];let row=s.recognitionByPair.find(r=>r.pair===key);if(!row){if(s.recognitionByPair.length>=20)return;row={pair:key,requests:0,responses:0,requestErrors:0,queueDrops:0,staleDrops:0,retries:0,empty:0,noSpeech:0,nonverbal:0,languageUncertain:0,boundaryEcho:0,isolatedTail:0};s.recognitionByPair.push(row);}row[field]++;this.save();
+  const key=[...new Set(languages)].sort().join(',');const s=this.current;s.recognitionByPair??=[];let row=s.recognitionByPair.find(r=>r.pair===key);if(!row){if(s.recognitionByPair.length>=20)return;row={pair:key,requests:0,responses:0,cancelled:0,requestErrors:0,queueDrops:0,staleDrops:0,retries:0,empty:0,noSpeech:0,nonverbal:0,languageUncertain:0,boundaryEcho:0,isolatedTail:0};s.recognitionByPair.push(row);}row[field]=(row[field]||0)+1;this.save();
  }
  unmeasuredRecognition(){if(!this.current)return;this.current.unmeasuredCalls++;this.event('recognition_cost_unmeasured');this.save();}
  playbackStarted({language,source,startDelayMs}={}){if(!this.current||!['device','browser_service','browser_default','cloud'].includes(source)||typeof language!=='string'||!/^[a-z]{2,3}(?:-[A-Za-z]+)?$/.test(language)||!Number.isFinite(startDelayMs)||startDelayMs<0||startDelayMs>120000)return;this.current.playbackStarts??=[];this.current.playbackStarts.push({language,source,startDelayMs:Math.round(startDelayMs)});this.current.playbackStarts=this.current.playbackStarts.slice(-50);this.save();}
