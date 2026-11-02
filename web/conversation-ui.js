@@ -1,9 +1,10 @@
 export function createWaitingBubble(el){const bubble=el('div',undefined,'caption-waiting'),dots=el('span',undefined,'waiting-dots');dots.setAttribute('aria-hidden','true');for(let i=0;i<3;i++)dots.append(el('span','・'));bubble.setAttribute('role','status');bubble.setAttribute('aria-label','処理中');bubble.append(dots);return bubble;}
 export function processingPresentation(s,now=Date.now()){
- // Capture, recognition and recovery can be triggered by ambient sound or a live
- // microphone. Only an actual unfinished translation warrants a waiting bubble.
- const active=!!s.mode,translating=active&&!!s.translating;
- return {phase:translating?'translating':'waiting',text:'',show:translating,busy:translating,watch:false};
+ // Only fresh speech arms recognition waiting. Background ASR alone cannot
+ // reopen dots after a completed translation.
+ const active=!!s.mode,translating=active&&!!s.translating,speech=active&&s.mic&&!s.paused&&s.speechPending===true&&s.speechPhase!=='recovering';
+ const phase=translating?'translating':speech?(s.speechPhase==='capturing'?'capturing':'recognizing'):'waiting';
+ return {phase,text:'',show:translating||speech,busy:translating||speech,watch:false};
 }
 export function conversationPresentation(s){
  const reconnecting=/再接続|つなぎ直|停止しました|接続できません/.test(s.connection||'')||s.paused;
