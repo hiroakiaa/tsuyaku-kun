@@ -46,10 +46,10 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
       try {
         await resumed;
         if (!this.active) return;
-        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261030-all-language-speed-1', import.meta.url));
+        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261102-economy-pause-1', import.meta.url));
         if (!this.active) return;
         this.source = this.context.createMediaStreamSource(stream);
-        this.node = new Worklet(this.context, 'caption-pcm',{processorOptions:{pauseMs:captureProfile==='fast'?300:500}});
+        this.node = new Worklet(this.context, 'caption-pcm',{processorOptions:{pauseMs:captureProfile==='fast'?300:captureProfile==='balanced'?400:500}});
         this.node.port.onmessage = event => {
           if (!this.active) return;
           if(event.data?.alive){this.lastAlive=Date.now();clearTimeout(this.startTimer);const {inputFrames,signalFrames}=event.data;if(Number.isFinite(inputFrames)&&Number.isFinite(signalFrames)){this.missingInputs=inputFrames===0?(this.missingInputs||0)+1:0;if(this.missingInputs>=3){onDiagnostic({stage:'asr',operation:'capture',code:'capture_missing',inputFrames,signalFrames});this.fail('audio-capture','マイクから音声データが届いていません。マイクをONにし直してください。');return;}const code=inputFrames===0?'capture_missing':signalFrames===0?'capture_silent':'capture_active';if(code!==this.captureState||Date.now()-(this.captureStateAt||0)>=15000){this.captureState=code;this.captureStateAt=Date.now();onDiagnostic({stage:'asr',operation:'capture',code,inputFrames,signalFrames,trackMuted:(stream.getAudioTracks?.()||[]).some(t=>t.muted===true)});}}return;}

@@ -2,7 +2,7 @@
 // Audio stays in bounded memory only; natural pauses do not duplicate billing.
 export class PcmSegmenter {
   constructor(rate, emit, activity=()=>{}, {pauseMs=500}={}) {
-    this.pauseSamples=pauseMs===300?4800:8000;this.rate=rate;this.emit=emit;this.activity=activity;this.samples=new Int16Array(48000);
+    this.pauseSamples=pauseMs===300?4800:pauseMs===400?6400:8000;this.rate=rate;this.emit=emit;this.activity=activity;this.samples=new Int16Array(48000);
     this.preroll=new Int16Array(3200);this.frame=new Int16Array(320);
     this.clear();
   }
