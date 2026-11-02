@@ -1,7 +1,7 @@
 import {recognitionLanguage,speechTextAllowed} from './two-language.js?v=20261029-communication50-1';
 import {nonSpeechReason} from './speech-filter.js?v=20261007-learning-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261007-progressive-1';
-import {recognitionMetrics} from './recognition-metrics.js?v=20261030-all-language-speed-1';
+import {recognitionMetrics} from './recognition-metrics.js?v=20261102-school-asr-1';
 import {trimmedAudioLength} from './audio-trim.js?v=20261029-communication50-1';
 import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish,japaneseSpeechTail} from './speech-continuity.js?v=20261031-analysis-focus-1';
 // Browser-independent recognition using the call's existing microphone stream.
