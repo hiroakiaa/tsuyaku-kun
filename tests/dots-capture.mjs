@@ -7,14 +7,16 @@ while(!chunks.length)pcm.push(frame);
 assert.equal(chunks[0].samples.length,48000);assert.equal(chunks[0].detail.boundary,'limit');assert.equal(activities.at(-1),'end');
 const before=chunks.length;pcm.push(new Float32Array(32000));assert.equal(chunks.length,before);assert.equal(activities.at(-1),'end');
 for(let i=0;i<10;i++)pcm.push(frame);assert.equal(activities.at(-1),'start');pcm.push(new Float32Array(9600));assert.equal(activities.at(-1),'end');assert.equal(chunks.at(-1).detail.boundary,'pause');
-for(const phase of ['capturing','recognizing']){const state={mode:'face',mic:true,speechPhase:phase};assert.equal(processingPresentation(state).show,true);assert.equal(processingPresentation(state).text,'');assert.equal(processingPresentation({...state,mic:false}).show,false);assert.equal(processingPresentation({...state,paused:true}).show,false);}
+for(const phase of ['capturing','recognizing']){const state={mode:'face',mic:true,speechPhase:phase};assert.equal(processingPresentation(state).show,false);assert.equal(processingPresentation(state).text,'');assert.equal(processingPresentation({...state,mic:false}).show,false);assert.equal(processingPresentation({...state,paused:true}).show,false);}
 assert.equal(processingPresentation({mode:'face',mic:true,speechPhase:'waiting'}).show,false);
 assert.equal(processingPresentation({mode:'face',mic:true,speechPhase:'waiting',translating:true}).show,true);
 for(const phase of ['capturing','recognizing','waiting']){const state={mode:'face',mic:true,recognitionKind:'realtime',speechPhase:phase};assert.equal(processingPresentation(state).show,false,'continuous input cannot restore completed-caption dots');assert.equal(processingPresentation({...state,translating:true}).show,true);}
-assert.equal(processingPresentation({mode:'face',mic:true,recognitionKind:'realtime',speechPhase:'recovering'}).show,true);
+assert.equal(processingPresentation({mode:'face',mic:true,recognitionKind:'realtime',speechPhase:'recovering'}).show,false);
 assert.equal(processingPresentation({mode:'face',mic:false,recognitionKind:'realtime',speechPhase:'recovering'}).show,false);
 console.log('PASS dots and capture: forced segment ends capture, silence leaves it idle, fresh speech resumes and pending states have no visible copy');
 
 
 {const fast=[],economy=[];const a=new PcmSegmenter(16000,x=>fast.push(x),()=>{},{pauseMs:300}),b=new PcmSegmenter(16000,x=>economy.push(x));for(let i=0;i<20;i++){a.push(frame);b.push(frame);}a.push(new Float32Array(4800));b.push(new Float32Array(4800));assert.equal(fast.length,1);assert.equal(economy.length,0);b.push(new Float32Array(3200));assert.equal(economy.length,1);assert(fast[0].length<economy[0].length);assert.equal(new PcmSegmenter(16000,()=>{},()=>{},{pauseMs:0}).pauseSamples,8000);}
 console.log('PASS all-language speed capture: 300 ms pause, unchanged 500 ms economy and bounded default');
+
+for(const mode of ['face','interpreter','lesson'])for(const recognitionKind of ['server','browser','realtime'])for(const speechPhase of ['capturing','recognizing','recovering','waiting']){const state={mode,recognitionKind,speechPhase,mic:true};assert.equal(processingPresentation(state).show,false,'idle or ambient recognition must not promise a new caption');assert.equal(processingPresentation({...state,translating:true}).show,true);assert.equal(processingPresentation({...state,translating:true}).busy,true);assert.equal(processingPresentation({...state,translating:false}).show,false,'translation completion clears dots even if recognition is still busy');}assert.equal(processingPresentation({mode:null,translating:true}).show,false);console.log('PASS waiting bubbles only for unfinished translations across all conversation and recognition modes');
