@@ -192,6 +192,7 @@ await test('無言区間の幻覚対策と音声検出を認識モデルに明�
  let params;await recognizeAudio({AI:{run:async(_,input)=>{params=input;return {text:''};}}},new Uint8Array(encodeWav(new Int16Array(16000))),'ja');
  assert.equal(params.vad_filter,true);assert.equal(params.condition_on_previous_text,false);assert.equal(params.hallucination_silence_threshold,.6);assert.equal(params.compression_ratio_threshold,2.4);assert.equal(params.log_prob_threshold,-1);
 });
+await test('明示した比較経路だけ重複VADを省き探索数と幻覚対策を維持する',async()=>{let params;await recognizeAudio({recognitionProfile:'client_vad',AI:{run:async(_,input)=>{params=input;return {text:''};}}},new Uint8Array(encodeWav(new Int16Array(16000))),'ja');assert.equal(params.vad_filter,false);assert.equal(params.beam_size,5);assert.equal(params.condition_on_previous_text,false);assert.equal(params.no_speech_threshold,.35);assert.equal(params.hallucination_silence_threshold,.6);});
 await test('最初の認識結果を即送信し続きは同じIDの新しい版にする',()=>{
  const R=createServerRecognition({endpoint:'https://example.test',getStream:()=>null,getToken:async()=>'',Context:class{},Worklet:class{}}),r=new R(),events=[];r.active=true;r.onresult=e=>events.push(e);
  r.acceptText('10月9日',{boundary:'limit',speechStartedAt:100,speechEndedAt:1000});assert.equal(events.length,1);assert.equal(events[0].revision,0);assert.equal(events[0].continuing,true);
