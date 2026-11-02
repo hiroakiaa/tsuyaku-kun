@@ -3,7 +3,7 @@ import {nonSpeechReason} from './speech-filter.js?v=20261007-learning-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261103-audio-offset-1';
 import {recognitionMetrics} from './recognition-metrics.js?v=20261102-school-guard-2';
 import {trimmedAudioLength} from './audio-trim.js?v=20261029-communication50-1';
-import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish,japaneseSpeechTail} from './speech-continuity.js?v=20261031-analysis-focus-1';
+import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish,japaneseSpeechTail,japaneseNumericCompletion} from './speech-continuity.js?v=20261103-boundary-numbers-1';
 // Browser-independent recognition using the call's existing microphone stream.
 export function encodeWav(samples) {
   const bytes = new ArrayBuffer(44 + samples.length * 2), view = new DataView(bytes);
@@ -149,17 +149,20 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
     acceptText(text,timing) {
       const now=Date.now();let joined=false,index,revision=0,chunks=1;
       const anchor=this.tailAnchor;this.tailAnchor=null;clearTimeout(this.tailAnchorTimer);
-      if(anchor&&!this.fragment&&!this.breakContinuity&&recognitionLanguage(timing.language)==='ja'&&recognitionLanguage(anchor.timing.language)==='ja'&&japaneseSpeechTail(text)&&Number.isFinite(anchor.timing.speechEndedAt)&&Number.isFinite(timing.speechStartedAt)&&speechGapAllowsJoin(anchor.timing,timing)&&timing.speechStartedAt-anchor.timing.speechEndedAt<=300&&now-anchor.at<=8000){
+      const overlaps=previous=>Number.isFinite(previous?.speechEndedAt)&&Number.isFinite(timing.speechStartedAt)&&timing.speechStartedAt<previous.speechEndedAt&&timing.speechStartedAt>=previous.speechEndedAt-1500;
+      const numericCompletion=anchor&&overlaps(anchor.timing)?japaneseNumericCompletion(anchor.text,text):null;
+      if(anchor&&!this.fragment&&!this.breakContinuity&&recognitionLanguage(timing.language)==='ja'&&recognitionLanguage(anchor.timing.language)==='ja'&&(japaneseSpeechTail(text)||numericCompletion!==null)&&Number.isFinite(anchor.timing.speechEndedAt)&&Number.isFinite(timing.speechStartedAt)&&speechGapAllowsJoin(anchor.timing,timing)&&timing.speechStartedAt-anchor.timing.speechEndedAt<=300&&now-anchor.at<=8000){
         const ending=text.trim().replace(/[。．.!！]$/u,''),base=anchor.text.replace(/[。．.!！]$/u,'');
         if(base.endsWith(ending)){onDiagnostic({code:'filtered',filterReason:'boundary_echo'});return;}
-        text=base+text;index=anchor.index;revision=anchor.revision+1;chunks=anchor.chunks+1;joined=true;timing={...timing,speechStartedAt:anchor.timing.speechStartedAt};
+        text=numericCompletion??base+text;index=anchor.index;revision=anchor.revision+1;chunks=anchor.chunks+1;joined=true;timing={...timing,speechStartedAt:anchor.timing.speechStartedAt};
         onDiagnostic({code:'recognition_repair'});
       }
       if(this.fragment){
         const previous=this.fragment;
         if(!this.breakContinuity&&recognitionLanguage(previous.timing.language)===recognitionLanguage(timing.language)&&speechGapAllowsJoin(previous.timing,timing)&&now-previous.at<=previous.waitMs){
           this.fragment=null;clearTimeout(this.fragmentTimer);
-          text=joinSpeechText(previous.text.replace(/[。．.]$/u,''),text,recognitionLanguage(timing.language),previous.timing.boundary);joined=true;
+          const completion=previous.timing.boundary==='limit'&&recognitionLanguage(timing.language)==='ja'&&overlaps(previous.timing)?japaneseNumericCompletion(previous.text,text):null;
+          text=completion??joinSpeechText(previous.text.replace(/[。．.]$/u,''),text,recognitionLanguage(timing.language),previous.timing.boundary);if(completion!==null)onDiagnostic({code:'recognition_repair'});joined=true;
           index=previous.index;revision=previous.revision+1;chunks=(previous.chunks||1)+1;
           timing={...timing,speechStartedAt:previous.timing.speechStartedAt};
         }else this.finishFragment();
