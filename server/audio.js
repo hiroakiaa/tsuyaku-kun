@@ -25,9 +25,14 @@ export function hasSpeechEnergy(wav) {
   return high >= 0.004 && high > low * 1.5;
 }
 
-export function cleanRecognition(result, language) {
+export function suspectedSchoolOutro(result){
+ const text=String(result?.text??result?.transcription_info?.text??'').normalize('NFKC').trim().replace(/[\s、。,.!！?？]/gu,'');
+ return /^(?:これから(?:も)?(?:数多くの|たくさんの)?動画で(?:また)?お会いしましょう|(?:それでは)?(?:また)?次の動画でお会いしましょう)$/.test(text);
+}
+export function cleanRecognition(result, language, {schoolContext=false}={}) {
   const text = result?.text ?? result?.transcription_info?.text;
   if (typeof text !== 'string') return null;
+  if(schoolContext&&suspectedSchoolOutro(result))return '';
   // Ignore the confirmed sneeze-like standalone Japanese ASR result only.
   // Keep questions, meaningful short replies, and text in every other language.
   const finish = value => {
