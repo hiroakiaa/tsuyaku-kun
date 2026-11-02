@@ -13,9 +13,9 @@ import {inspectTranslations} from '../web/translation-quality.js';
 import {guardedAi,budgetOperation} from './ai-budget.js';
 import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
-import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
+import {safeRecognitionHints,recognitionHints,schoolRecognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261031-azure-monthly-1';
+const BUILD_ID='20261102-school-asr-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -36,8 +36,8 @@ const phraseKey=text=>String(text||'').normalize('NFC').trim().replace(/。$/,''
 export async function recognizeAudio(env,bytes,language,termHints=[],candidates=[]){
  language=spokenLanguage(language);
         let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
-        const hints=[...new Set([...termHints,...(candidates.length?[]:recognitionHints(catalog,language))])].slice(0,30).join('、').slice(0,400);
-        let result;try{result=await runAi(env,'@cf/openai/whisper-large-v3-turbo',{audio:btoa(binary),...(candidates.length?{}:{language:recognitionLanguage(language)}),task:'transcribe',...(candidates.length?{}:{initial_prompt:hints}),vad_filter:true,beam_size:recognitionDecoding(env.recognitionProfile).beamSize,condition_on_previous_text:false,no_speech_threshold:.35,compression_ratio_threshold:2.4,log_prob_threshold:-1,hallucination_silence_threshold:.6});}catch(firstError){if(candidates.length||!['input','model'].includes(aiFailure(firstError).reason))throw firstError;try{result=await runAi(env,'@cf/openai/whisper',{audio:Array.from(bytes)});}catch(secondError){throw secondError;}}
+        const schoolHints=candidates.length&&env.schoolRecognition?schoolRecognitionHints(candidates):[];const hints=(candidates.length?schoolHints:[...new Set([...termHints,...recognitionHints(catalog,language)])].slice(0,30)).join('、').slice(0,400);if(env.translationTiming){env.translationTiming.schoolHintCount=schoolHints.length;}
+        let result;try{result=await runAi(env,'@cf/openai/whisper-large-v3-turbo',{audio:btoa(binary),...(candidates.length?{}:{language:recognitionLanguage(language)}),task:'transcribe',...(hints?{initial_prompt:hints}:{}),vad_filter:true,beam_size:recognitionDecoding(env.recognitionProfile).beamSize,condition_on_previous_text:false,no_speech_threshold:.35,compression_ratio_threshold:2.4,log_prob_threshold:-1,hallucination_silence_threshold:.6});}catch(firstError){if(candidates.length||!['input','model'].includes(aiFailure(firstError).reason))throw firstError;try{result=await runAi(env,'@cf/openai/whisper',{audio:Array.from(bytes)});}catch(secondError){throw secondError;}}
 
  return result;
 }
@@ -45,7 +45,7 @@ import {LessonCodes,ROOM_TTL} from './lesson-codes.js';
 import {captionParticipant,spokenLanguage,withEasyJapanese} from '../web/core.js';
 import {verifyToken} from './auth.js';
 import {catalog} from './catalog.js';
-import {validWav,hasSpeechEnergy,cleanRecognition} from './audio.js';
+import {validWav,hasSpeechEnergy,cleanRecognition,recognitionEvidence} from './audio.js';
 import {glossaryFor,translationField,parseTranslation,validateCaption} from '../web/core.js';
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'}});
 const error=(text,status=400)=>json({error:text},status);
@@ -122,8 +122,8 @@ export default {async fetch(request,env,ctx){
       const bytes=new Uint8Array(size);let offset=0;for(const c of chunks){bytes.set(c,offset);offset+=c.length;c.fill(0);}
       try{if(!validWav(bytes))return cors(error('音声形式を確認してください。',415));if(!hasSpeechEnergy(bytes)){recognitionTiming.preprocessMs=Date.now()-preprocessStarted;return cors(json(timed({text:''})));}
         recognitionTiming.preprocessMs=Date.now()-preprocessStarted;recognitionTiming.aiCalled=true;
-        const result=await recognizeAudio({...env,recognitionProfile,translationTiming:recognitionTiming},bytes,automatic?candidates[0]:language,safeRecognitionHints(request.headers.get('X-Term-Hints')),candidates);
-        const detected=automatic?resolveSpeechLanguage(result,candidates):language;const text=cleanRecognition(result,detected||'');if(text===null)return cors(error('音声を認識できませんでした。',502));return cors(json(timed({text,...(automatic?{language:detected,languageUncertain:!!text&&!detected}:{})})));
+        const result=await recognizeAudio({...env,recognitionProfile,schoolRecognition:url.searchParams.get('context')==='school',translationTiming:recognitionTiming},bytes,automatic?candidates[0]:language,safeRecognitionHints(request.headers.get('X-Term-Hints')),candidates);
+        Object.assign(recognitionTiming,recognitionEvidence(result));const detected=automatic?resolveSpeechLanguage(result,candidates):language;const text=cleanRecognition(result,detected||'');if(text===null)return cors(error('音声を認識できませんでした。',502));return cors(json(timed({text,...(automatic?{language:detected,languageUncertain:!!text&&!detected}:{})})));
       }catch(e){const failure=aiFailure(e);return cors(json(timed({error:failure.message,aiFailure:failure,recognitionCode:failure.reason}),failure.reason==='quota'?429:['billing','auth'].includes(failure.reason)?403:502));}finally{bytes.fill(0);}
     }
     if(url.pathname==='/translate'&&request.method==='POST'){
