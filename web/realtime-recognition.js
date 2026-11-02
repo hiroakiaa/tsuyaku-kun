@@ -16,7 +16,7 @@ export function createRealtimeRecognition({endpoint,candidates,getStream,getToke
   message(event){if(!this.active||typeof event.data!=='string'||event.data.length>8000)return;let data;try{data=JSON.parse(event.data);}catch{this.fail('service');return;}
    if(data.type==='error'){const code=['quota','auth','billing','model','timeout','overloaded','input','session_limit'].includes(data.code)?data.code:'service';this.fail(code);return;}
    if(data.type==='ready'){if(this.socketReady)return;this.socketReady=true;for(const samples of this.pending.splice(0)){if(!this.active){samples.fill(0);continue;}this.sendAudio(samples);}this.started();return;}
-   if(data.type==='activity'){if(data.phase==='capturing')this.progress('capturing');return;}
+   if(data.type==='activity'){if(data.phase==='capturing'&&this.speechPending)this.progress('capturing');return;}
    if(data.type==='uncertain'){const timing=this.takeTiming();if(!Number.isSafeInteger(data.id)||data.id<0||this.resultsSeen.has(data.id))return;this.resultsSeen.add(data.id);void this.recover(data,timing);return;}
    if(data.type!=='result'||data.final!==true||!Number.isSafeInteger(data.id)||data.id<0||typeof data.text!=='string'||!data.text.trim()||data.text.length>600||!pair.includes(data.language)||this.resultsSeen.has(data.id))return;
    this.resultsSeen.add(data.id);if(this.resultsSeen.size>256)this.resultsSeen.delete(this.resultsSeen.values().next().value);
