@@ -1,5 +1,5 @@
-import {analysisReport,costOf,PRICES,percentile} from './usage.js?v=20261031-provider-report-1';
-import {safeConnectionRecord} from './network.js?v=20261031-provider-report-1';
+import {analysisReport,costOf,PRICES,percentile} from './usage.js?v=20261102-recognition-coverage-1';
+import {safeConnectionRecord} from './network.js?v=20261102-recognition-coverage-1';
 const count=v=>Number.isFinite(v)&&v>=0?v:0;
 const summary=(rows,key)=>{const v=rows.map(r=>r[key]).filter(x=>Number.isFinite(x)&&x>=0);return {samples:v.length,p50Ms:percentile(v,.5),p95Ms:percentile(v,.95)};};
 export function improvementReport(sessions,{exchange=150,transcripts=[],diagnostics=[],delivery=null,connection=null,fullHistory=false}={}){
@@ -7,6 +7,8 @@ export function improvementReport(sessions,{exchange=150,transcripts=[],diagnost
  const all=diagnostics.map(safeConnectionRecord),window=all.filter(inWindow),requests=window.filter(r=>r.operation==='transcribe'&&['ok','http_error','timeout','network_or_cors','invalid_response','auth_unavailable'].includes(r.code)),measured=requests.filter(r=>Number.isFinite(r.clientRequestMs));
  const report=JSON.parse(analysisReport(selected,{exchange,transcripts}));
  const timings=latest?.translationTimings||[];
+ report.recognitionCoverage={byLanguagePair:latest?.recognitionByPair??null,scope:'この利用内で記録開始後に集計。要求数は短区間APIのみ、除外は各方式。再試行は要求数に含み、発話数や誤認識率ではありません。最大20言語ペア。旧履歴は未計測。',diagnosticRequestsRetained:requests.length,note:'通信詳細は保存上限で欠ける場合があります。言語ペア集計は通信詳細の保存上限とは別です。空の結果には無音・雑音・認識できなかった発話が混在し、原音なしには区別できません。'};
+ report.catalogConsistency={samples:timings.filter(t=>typeof t.catalogMatch==='boolean').length,mismatches:timings.filter(t=>t.catalogMatch===false).length,note:'端末とサーバーの辞書識別値の不一致です。誤訳や辞書検索の失敗を直接示しません。'};
  report.translationProviders={timedAttempts:timings.length,azureF0:timings.filter(t=>t.provider==='azure_f0').length,otherOrUnmeasured:timings.filter(t=>t.provider!=='azure_f0').length,recordedAzureAttempts:latest?.azureFree?.attempts??null,note:'提供元は各要求で記録した値だけを分類します。旧履歴のAzure合計を個別の時間へ推測で割り当てません。aiTotalMsは互換用の名称で、翻訳サービスの処理時間です。'};
  report.latencyOverview={recognition:summary((latest?.recognitionLatencies||[]).map(ms=>({ms})),'ms'),translation:summary((latest?.latencies||[]).map(ms=>({ms})),'ms'),speechEndToDisplay:summary((latest?.speechLatencies||[]).map(ms=>({ms})),'ms'),note:'各区間の中央値は別々に集計しています。差引きや合算で未計測の待ち時間を推定しません。発話開始からの時間には話していた時間も含みます。'};
  report.reportScope={selection:fullHistory?'all_saved_sessions':'latest_session',latestSessionBuild:latest?.build??null,includedSessions:selected.length,excludedSavedSessions:ordered.length-selected.length,note:'標準は最新の利用1回。過去の異なるビルド・会話と混ぜて性能改善を判定しません。本文は明示選択時のみ。'};
@@ -18,6 +20,11 @@ export function improvementReport(sessions,{exchange=150,transcripts=[],diagnost
  if(latest?.recognitionFilters?.isolated_fragment)report.findings.push({code:'isolated_speech_tail',observation:'文末だけの認識結果を独立翻訳せず除外しました。誤認識率ではありません。'});
  if((latest?.speechLatencies||[]).length<20)report.findings.push({code:'small_sample',observation:'発話時間の標本が20件未満です。p95や10分換算を安定した性能・費用と扱いません。'});
  const recognitionMedian=report.latencyOverview.recognition.p50Ms,translationMedian=report.latencyOverview.translation.p50Ms;
+ const filters=latest?.recognitionFilters,events=latest?.events||[],pairRows=latest?.recognitionByPair;
+ if(filters&&(filters.empty||filters.language_uncertain))report.findings.push({code:'recognition_exclusions',observation:'空の認識結果 '+(filters.empty||0)+'件・言語判定不確実 '+(filters.language_uncertain||0)+'件。翻訳成功の集計には含まれません。すべてが発話の取りこぼしとは限りません。'});
+ const drops=pairRows?pairRows.reduce((n,r)=>n+r.queueDrops+r.staleDrops,0):events.filter(e=>e.type==='asr_queue_drop').length;
+ if(drops)report.findings.push({code:'audio_discarded',observation:'待機音声の破棄 '+drops+'件が記録されています。該当部分が訳に含まれない可能性があり、もう一度話す必要があります。'});
+ if(report.catalogConsistency.mismatches)report.findings.push({code:'catalog_mismatch',observation:'辞書識別値の不一致 '+report.catalogConsistency.mismatches+'件。端末とサーバーの辞書更新状態を確認します。'});
  if(recognitionMedian!==null&&translationMedian!==null&&recognitionMedian>=1000&&recognitionMedian>translationMedian*2)report.findings.push({code:'recognition_priority',observation:'今回の中央値では翻訳より音声認識の待ちが長いため、認識方式と発話区切りを優先して検証します。翻訳の品質や認識の正確さは時間から判断しません。'});
  if(!fullHistory){for(const s of report.sessions)if(s.mode==='face'&&!s.relayBytes){for(const k of ['relayBytes','packetsLost','maxJitterMs','rttMs'])delete s[k];}
  report.connectionDiagnostics=window.filter(r=>!['capture_ready','capture_active','capture_silent','ok','recognition_order','realtime_ready','realtime_result'].includes(r.code)||r.clientRequestMs>=5000);
