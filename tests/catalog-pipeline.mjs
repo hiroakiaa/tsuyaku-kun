@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {createCatalogCache,catalogRevision,exposeCatalog} from '../server/catalog-cache.js';
-import {catalogForTranslation,translateText} from '../server/worker.js';
+import {catalogForTranslation,catalogForClient,translateText} from '../server/worker.js';
 import {catalog} from '../server/catalog.js';
 import {safeConnectionRecord} from '../web/network.js';
 import {UsageLedger} from '../web/usage.js';
@@ -13,3 +13,5 @@ try{const env={SHEETS_BRIDGE:'https://sheets.test/catalog-pipeline'},ctx={waitUn
 }finally{globalThis.fetch=previous;}
 const safe=safeConnectionRecord({stage:'api',operation:'catalog',code:'ok',catalogApplyMs:12,catalogRevision:'c1-12345678',catalogSource:'spreadsheet',token:'secret',text:'private'});assert.equal(safe.catalogApplyMs,12);assert.equal(safe.catalogRevision,'c1-12345678');assert(!JSON.stringify(safe).includes('secret'));assert(!JSON.stringify(safe).includes('private'));assert.equal(safeConnectionRecord({catalogRevision:'private text'}).catalogRevision,undefined);
 console.log('PASS shared catalog pipeline: bounded cache, single flight, warm/stale/failure/backoff, no wait in translation, revised glossary to AI, private version/timing diagnostics');
+
+{const previousFetch=globalThis.fetch,tasks=[];let done,calls=0,testNow=1000;const cache=createCatalogCache(catalog,{now:()=>testNow,ttlMs:100});globalThis.fetch=async()=>{calls++;return new Promise(resolve=>done=()=>resolve(new Response(JSON.stringify(updated))));};try{const env={SHEETS_BRIDGE:'https://sheets.test/deadline-client'},ctx={waitUntil:p=>tasks.push(p)};const initial=await catalogForClient(env,'synthetic',ctx,{waitMs:1,cache});assert.equal(initial.source,'bundled');assert.equal(initial.refreshing,true);assert.equal(exposeCatalog(initial)._catalog.refreshing,true);assert.equal(calls,1);done();await Promise.all(tasks);const warm=await catalogForClient(env,'synthetic',ctx,{cache});assert.equal(warm.source,'spreadsheet');assert.equal(calls,1);testNow+=101;const stale=await catalogForClient(env,'synthetic',ctx,{cache});assert.equal(stale.source,'spreadsheet');assert.equal(stale.refreshing,true);await Promise.resolve();assert.equal(calls,2);done();await Promise.all(tasks);}finally{globalThis.fetch=previousFetch;}}console.log('PASS cold catalog response has a bounded wait, shared refresh continues, and stale shared data returns without waiting');
