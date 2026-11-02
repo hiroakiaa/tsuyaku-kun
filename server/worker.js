@@ -15,7 +15,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261102-school-guard-2';
+const BUILD_ID='20261102-vad-comparison-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -37,7 +37,7 @@ export async function recognizeAudio(env,bytes,language,termHints=[],candidates=
  language=spokenLanguage(language);
         let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
         const hints=(candidates.length?[]:[...new Set([...termHints,...recognitionHints(catalog,language)])].slice(0,30)).join('、').slice(0,400);if(env.translationTiming)env.translationTiming.schoolHintCount=0;
-        let result;try{result=await runAi(env,'@cf/openai/whisper-large-v3-turbo',{audio:btoa(binary),...(candidates.length?{}:{language:recognitionLanguage(language)}),task:'transcribe',...(hints?{initial_prompt:hints}:{}),vad_filter:true,beam_size:recognitionDecoding(env.recognitionProfile).beamSize,condition_on_previous_text:false,no_speech_threshold:.35,compression_ratio_threshold:2.4,log_prob_threshold:-1,hallucination_silence_threshold:.6});}catch(firstError){if(candidates.length||!['input','model'].includes(aiFailure(firstError).reason))throw firstError;try{result=await runAi(env,'@cf/openai/whisper',{audio:Array.from(bytes)});}catch(secondError){throw secondError;}}
+        let result;try{result=await runAi(env,'@cf/openai/whisper-large-v3-turbo',{audio:btoa(binary),...(candidates.length?{}:{language:recognitionLanguage(language)}),task:'transcribe',...(hints?{initial_prompt:hints}:{}),vad_filter:recognitionDecoding(env.recognitionProfile).vadFilter,beam_size:recognitionDecoding(env.recognitionProfile).beamSize,condition_on_previous_text:false,no_speech_threshold:.35,compression_ratio_threshold:2.4,log_prob_threshold:-1,hallucination_silence_threshold:.6});}catch(firstError){if(candidates.length||!['input','model'].includes(aiFailure(firstError).reason))throw firstError;try{result=await runAi(env,'@cf/openai/whisper',{audio:Array.from(bytes)});}catch(secondError){throw secondError;}}
 
  return result;
 }
