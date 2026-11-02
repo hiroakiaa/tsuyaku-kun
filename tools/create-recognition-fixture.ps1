@@ -1,4 +1,4 @@
-param([string]$OutputDirectory = (Join-Path $PSScriptRoot '../checks/recognition-probe'))
+﻿param([string]$OutputDirectory = (Join-Path $PSScriptRoot '../checks/recognition-probe'))
 # Synthetic test speech only. Never reads a microphone or user recordings.
 Add-Type -AssemblyName System.Speech
 $targetDirectory = [IO.Path]::GetFullPath($OutputDirectory)
@@ -14,6 +14,6 @@ $cases = @(
 try {
  $synth.Rate=1
  foreach($case in $cases){$synth.SelectVoice($case.voice);$synth.SetOutputToWaveFile((Join-Path $targetDirectory ($case.id+'.wav')),$format);$synth.Speak($case.text);$synth.SetOutputToNull()}
- $cases | Select-Object id,language,text,patterns | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $targetDirectory 'cases.json') -Encoding utf8
+ $cases | ForEach-Object { [pscustomobject]$_ } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $targetDirectory 'cases.json') -Encoding utf8
  Write-Output ('Synthetic fixture created: '+$targetDirectory)
 } finally {$synth.Dispose()}
