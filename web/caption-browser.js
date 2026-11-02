@@ -15,6 +15,7 @@ export function createBrowserRecognition({language, Native, onDiagnostic = () =>
       native.lang=language; native.continuous=true; native.interimResults=false; native.maxAlternatives=1;
       const started=()=>{if(!this.active||this.native!==native)return;cancel(this.startWatch);this.startWatch=null;};
       native.onstart=()=>{started();if(this.active&&this.native===native)onDiagnostic({code:'browser_speech_started'});};
+      native.onspeechstart=()=>{if(this.active&&this.native===native)this.onprogress?.({phase:'capturing'});};native.onspeechend=()=>{if(this.active&&this.native===native)this.onprogress?.({phase:'recognizing'});};
       native.onresult=event=>{started();
         if(!this.active||this.native!==native)return;
         for(let i=event.resultIndex;i<event.results.length;i++){
@@ -29,7 +30,7 @@ export function createBrowserRecognition({language, Native, onDiagnostic = () =>
       native.onerror=event=>{started();
         if(!this.active||this.native!==native)return;
         if(event.error==='aborted'){this.finishFragment();this.active=false;onDiagnostic({code:'browser_speech_ended'});this.onend?.();return;}
-        if(event.error==='no-speech'){this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:'empty'});return;}
+        if(event.error==='no-speech'){this.onprogress?.({phase:'waiting'});this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:'empty'});return;}
         const error=['not-allowed','service-not-allowed'].includes(event.error)?'auth':event.error==='audio-capture'?'audio-capture':'service';
         onDiagnostic({code:'browser_speech_error',recognitionCode:event.error});
         this.fail(error);
