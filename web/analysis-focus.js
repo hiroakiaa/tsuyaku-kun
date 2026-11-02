@@ -1,5 +1,5 @@
-import {analysisReport,costOf,PRICES,percentile} from './usage.js?v=20261102-playback-start-1';
-import {safeConnectionRecord} from './network.js?v=20261102-playback-start-1';
+import {analysisReport,costOf,PRICES,percentile} from './usage.js?v=20261102-playback-start-2';
+import {safeConnectionRecord} from './network.js?v=20261102-playback-start-2';
 const count=v=>Number.isFinite(v)&&v>=0?v:0;
 const summary=(rows,key)=>{const v=rows.map(r=>r[key]).filter(x=>Number.isFinite(x)&&x>=0);return {samples:v.length,p50Ms:percentile(v,.5),p95Ms:percentile(v,.95)};};
 export function improvementReport(sessions,{exchange=150,transcripts=[],diagnostics=[],delivery=null,connection=null,fullHistory=false}={}){
