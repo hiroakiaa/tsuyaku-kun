@@ -45,7 +45,9 @@ export function cleanRecognition(result, language) {
     // Never remove words solely because they repeat: confidence evidence is required.
     const unreliable = segment =>
       (Number.isFinite(segment.no_speech_prob) && segment.no_speech_prob >= .35) ||
-      (Number.isFinite(segment.avg_logprob) && segment.avg_logprob < -1);
+      (Number.isFinite(segment.avg_logprob) && segment.avg_logprob < -1) ||
+      (Number.isFinite(segment.compression_ratio) && segment.compression_ratio > 2.4 &&
+        ((Number.isFinite(segment.avg_logprob)&&segment.avg_logprob<-.5)||(Number.isFinite(segment.no_speech_prob)&&segment.no_speech_prob>=.15)));
     const kept = segments.filter(segment => !unreliable(segment));
     if (!kept.length) return '';
     // Preserve reliable speech around rejected noise, only when complete segment text is available.
@@ -55,6 +57,12 @@ export function cleanRecognition(result, language) {
     }
   }
   return finish(text);
+}
+
+// Numeric evidence only; segment text and provider payloads never enter diagnostics.
+export function recognitionEvidence(result){
+ const rows=result?.segments||result?.transcription_info?.segments;if(!Array.isArray(rows)||!rows.length)return {};
+ return {confidenceSegments:rows.length,noSpeechSegments:rows.filter(s=>Number.isFinite(s.no_speech_prob)&&s.no_speech_prob>=.35).length,lowConfidenceSegments:rows.filter(s=>Number.isFinite(s.avg_logprob)&&s.avg_logprob< -1).length,highCompressionSegments:rows.filter(s=>Number.isFinite(s.compression_ratio)&&s.compression_ratio>2.4).length,confidenceMeasuredSegments:rows.filter(s=>[s.no_speech_prob,s.avg_logprob,s.compression_ratio].some(Number.isFinite)).length};
 }
 
 
