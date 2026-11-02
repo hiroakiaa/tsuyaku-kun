@@ -102,7 +102,7 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
         const hints = [...new Set((this.automatic?[]:(this.getHints() || [])).filter(x => typeof x === 'string')
           .map(x => x.normalize('NFKC').trim()).filter(x => x && x.length <= 40))].slice(0, 30).join(',').slice(0, 300);
         const encodedHints=hints?encodeURIComponent(hints):'';
-        phase='request';httpStarted=Date.now();const response = await fetcher(endpoint, {
+        phase='request';httpStarted=Date.now();job.cancelDiagnostic=()=>segmentDiagnostic({code:'request_cancelled',clientRequestMs:Date.now()-httpStarted,queueMs});const response = await fetcher(endpoint, {
           method: 'POST', headers: { 'Content-Type': 'audio/wav', Authorization: 'Bearer ' + token,
             ...(encodedHints ? { 'X-Term-Hints': encodedHints } : {}) },
           body, signal: controller.signal, cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer'
@@ -113,7 +113,7 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
         // Record actual HTTP completion before waiting for an earlier segment. No transcript is retained.
         if(!this.active||!this.jobs.has(job)||controller.signal.aborted)return;
         chunk.samples.fill(0);if(body)new Uint8Array(body).fill(0);
-        segmentDiagnostic({code:response.ok?'ok':'http_error',...requestMetrics,at:responseReadyAt});
+        job.cancelDiagnostic=null;segmentDiagnostic({code:response.ok?'ok':'http_error',...requestMetrics,at:responseReadyAt});
         if(response.ok){job.networkDone=true;void this.drain();}
         if(!await ordered())return;
         requestMetrics.orderWaitMs=Math.max(0,Date.now()-responseReadyAt);if(requestMetrics.orderWaitMs>0)segmentDiagnostic({code:'recognition_order',orderWaitMs:requestMetrics.orderWaitMs});
@@ -130,7 +130,7 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
           // No cumulative transcript list is retained by the recognizer.
           this.acceptText(text,{recognitionRun:this.recognitionRun,segmentSequence:chunk.sequence,speechStartedAt:chunk.speechStartedAt,speechEndedAt:chunk.speechEndedAt,recognitionReadyAt:Date.now(),boundary:chunk.boundary,...(data.language?{language:data.language}:{})});
         }
-      } catch (_) {releaseSlot?.();releaseSlot=null;clearTimeout(timeout);await job.previous; if(this.active&&this.jobs.has(job)){const code=controller.signal.aborted?'timeout':phase==='parse'?'invalid_response':phase==='auth'?'auth_unavailable':'network_or_cors';segmentDiagnostic({code,queueMs,clientAuthMs,...(httpStarted?{clientRequestMs:Date.now()-httpStarted}:{})});if(phase==='auth'&&!controller.signal.aborted)this.fail('auth');else this.transientFailure();} }
+      } catch (_) {job.cancelDiagnostic=null;releaseSlot?.();releaseSlot=null;clearTimeout(timeout);if(this.active&&this.jobs.has(job)){const code=controller.signal.aborted?'timeout':phase==='parse'?'invalid_response':phase==='auth'?'auth_unavailable':'network_or_cors';segmentDiagnostic({code,queueMs,clientAuthMs,...(httpStarted?{clientRequestMs:Date.now()-httpStarted}:{})});}await job.previous;if(this.active&&this.jobs.has(job)){if(phase==='auth'&&!controller.signal.aborted)this.fail('auth');else this.transientFailure();} }
       finally {
         releaseSlot?.();chunk.samples.fill(0);if(body)new Uint8Array(body).fill(0);clearTimeout(timeout);this.jobs.delete(job);job.release();this.sending=this.jobs.size>0;this.progress();
         if (this.active) void this.drain();
@@ -190,7 +190,7 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
     fail(error,message) { const notify = this.onerror; this.abort(); notify?.({ error, message }); }
     abort() {
       clearTimeout(this.startTimer);clearTimeout(this.fragmentTimer);clearTimeout(this.tailAnchorTimer);this.tailAnchor=null;clearInterval(this.watchdog);this.watchdog=null;this.fragment=null;
-      this.active = false;this.capturing=false;for(const job of this.jobs||[]){job.controller.abort();job.release();}this.jobs?.clear();this.sending=false;
+      this.active = false;this.capturing=false;for(const job of this.jobs||[]){job.cancelDiagnostic?.();job.cancelDiagnostic=null;job.controller.abort();job.release();}this.jobs?.clear();this.sending=false;
       for (const chunk of this.queue) chunk.samples.fill(0); this.queue=[];
       if (this.node) { this.node.onprocessorerror=null;this.node.port.onmessage = null; this.node.port.postMessage('stop'); this.node.disconnect(); }
       this.source?.disconnect();
