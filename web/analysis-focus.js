@@ -1,5 +1,5 @@
-import {analysisReport,costOf,PRICES,percentile} from './usage.js?v=20261102-recognition-coverage-1';
-import {safeConnectionRecord} from './network.js?v=20261102-recognition-coverage-1';
+import {analysisReport,costOf,PRICES,percentile} from './usage.js?v=20261102-school-asr-1';
+import {safeConnectionRecord} from './network.js?v=20261102-school-asr-1';
 const count=v=>Number.isFinite(v)&&v>=0?v:0;
 const summary=(rows,key)=>{const v=rows.map(r=>r[key]).filter(x=>Number.isFinite(x)&&x>=0);return {samples:v.length,p50Ms:percentile(v,.5),p95Ms:percentile(v,.95)};};
 export function improvementReport(sessions,{exchange=150,transcripts=[],diagnostics=[],delivery=null,connection=null,fullHistory=false}={}){
@@ -7,7 +7,7 @@ export function improvementReport(sessions,{exchange=150,transcripts=[],diagnost
  const all=diagnostics.map(safeConnectionRecord),window=all.filter(inWindow),requests=window.filter(r=>r.operation==='transcribe'&&['ok','http_error','timeout','network_or_cors','invalid_response','auth_unavailable'].includes(r.code)),measured=requests.filter(r=>Number.isFinite(r.clientRequestMs));
  const report=JSON.parse(analysisReport(selected,{exchange,transcripts}));
  const timings=latest?.translationTimings||[];
- report.recognitionCoverage={byLanguagePair:latest?.recognitionByPair??null,scope:'この利用内で記録開始後に集計。要求数は短区間APIのみ、除外は各方式。再試行は要求数に含み、発話数や誤認識率ではありません。最大20言語ペア。旧履歴は未計測。',diagnosticRequestsRetained:requests.length,note:'通信詳細は保存上限で欠ける場合があります。言語ペア集計は通信詳細の保存上限とは別です。空の結果には無音・雑音・認識できなかった発話が混在し、原音なしには区別できません。'};
+ report.recognitionEvidence={schoolContextRequests:requests.filter(r=>r.schoolHintCount>0).length,contextMeasuredRequests:requests.filter(r=>Number.isInteger(r.schoolHintCount)).length,confidenceMeasuredRequests:requests.filter(r=>r.confidenceMeasuredSegments>0).length,lowConfidenceSegments:requests.some(r=>Number.isInteger(r.lowConfidenceSegments))?requests.reduce((n,r)=>n+(r.lowConfidenceSegments||0),0):null,highCompressionSegments:requests.some(r=>Number.isInteger(r.highCompressionSegments))?requests.reduce((n,r)=>n+(r.highCompressionSegments||0),0):null,note:'通信詳細に残る数値だけを集計。信頼度情報がないことを高精度と扱いません。学校用語ヒントは正しい認識を保証せず、原音との照合は別途必要です。'};report.recognitionCoverage={byLanguagePair:latest?.recognitionByPair??null,scope:'この利用内で記録開始後に集計。要求数は短区間APIのみ、除外は各方式。再試行は要求数に含み、発話数や誤認識率ではありません。最大20言語ペア。旧履歴は未計測。',diagnosticRequestsRetained:requests.length,note:'通信詳細は保存上限で欠ける場合があります。言語ペア集計は通信詳細の保存上限とは別です。空の結果には無音・雑音・認識できなかった発話が混在し、原音なしには区別できません。'};
  report.catalogConsistency={samples:timings.filter(t=>typeof t.catalogMatch==='boolean').length,mismatches:timings.filter(t=>t.catalogMatch===false).length,note:'端末とサーバーの辞書識別値の不一致です。誤訳や辞書検索の失敗を直接示しません。'};
  report.translationProviders={timedAttempts:timings.length,azureF0:timings.filter(t=>t.provider==='azure_f0').length,otherOrUnmeasured:timings.filter(t=>t.provider!=='azure_f0').length,recordedAzureAttempts:latest?.azureFree?.attempts??null,note:'提供元は各要求で記録した値だけを分類します。旧履歴のAzure合計を個別の時間へ推測で割り当てません。aiTotalMsは互換用の名称で、翻訳サービスの処理時間です。'};
  report.latencyOverview={recognition:summary((latest?.recognitionLatencies||[]).map(ms=>({ms})),'ms'),translation:summary((latest?.latencies||[]).map(ms=>({ms})),'ms'),speechEndToDisplay:summary((latest?.speechLatencies||[]).map(ms=>({ms})),'ms'),note:'各区間の中央値は別々に集計しています。差引きや合算で未計測の待ち時間を推定しません。発話開始からの時間には話していた時間も含みます。'};
