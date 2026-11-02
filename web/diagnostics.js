@@ -10,7 +10,7 @@ export function lastVoicedAt(samples,receivedAt,rate=16000){
 }
 export function latencyFromTiming(timing,displayedAt){
  if(!timing||!Number.isFinite(timing.sentAt)||displayedAt<timing.sentAt)return null;
- const result={kind:timing.kind,pipelineMs:displayedAt-timing.sentAt};
+ const result={kind:timing.kind,pipelineMs:displayedAt-timing.sentAt};for(const key of ['recognitionRun','segmentSequence'])if(Number.isSafeInteger(timing[key])&&timing[key]>0&&timing[key]<=1000000)result[key]=timing[key];
  if(timing.kind==='speech'&&Number.isFinite(timing.speechEndedAt)&&Number.isFinite(timing.recognitionReadyAt)&&timing.speechEndedAt<=timing.recognitionReadyAt&&timing.recognitionReadyAt<=displayedAt){result.recognitionMs=timing.recognitionReadyAt-timing.speechEndedAt;result.totalMs=displayedAt-timing.speechEndedAt;result.basis='local_pcm_energy_estimate';if(timing.revision===0&&Number.isFinite(timing.speechStartedAt)&&timing.speechStartedAt<=timing.speechEndedAt)result.firstDisplayMs=displayedAt-timing.speechStartedAt;}
  return result;
 }
