@@ -1,5 +1,5 @@
-import {encodeWav,tokenWithAbort} from './caption-server.js?v=20261030-dots-capture-1';
-import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261007-progressive-1';
+import {encodeWav,tokenWithAbort} from './caption-server.js?v=20261103-audio-offset-1';
+import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261103-audio-offset-1';
 import {speechTextAllowed} from './two-language.js?v=20261029-communication50-1';
 import {nonSpeechReason} from './speech-filter.js?v=20261007-learning-1';
 import {recognitionMetrics} from './recognition-metrics.js?v=20261029-communication50-1';

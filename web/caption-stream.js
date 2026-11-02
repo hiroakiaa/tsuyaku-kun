@@ -1,4 +1,4 @@
-import {lastVoicedAt} from './diagnostics.js?v=20261006-telemetry-1';
+import {lastVoicedAt} from './diagnostics.js?v=20261103-audio-offset-1';
 export function createStreamingRecognition({endpoint,getStream,getToken,onUsage=()=>{},
   Context=window.AudioContext||window.webkitAudioContext,Worklet=window.AudioWorkletNode,Socket=window.WebSocket}) {
   return class StreamingRecognition {

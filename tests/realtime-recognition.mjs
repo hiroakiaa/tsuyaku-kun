@@ -62,13 +62,20 @@ for(const scenario of ['valid','bad-auth','cancel-opening','renew-failure','rene
 console.log('PASS realtime ASR: language limits, final-only utterances, duplicate suppression, unknown languages, one renewable budget slot, monthly accounting, auth, cancellation, quota failure and bounded audio');
 
 const {createRealtimeRecognition}=await import('../web/realtime-recognition.js');
-for(const scenario of ['complete','provider-error','queue-bound']){
+for(const scenario of ['complete','provider-error','queue-bound','offset']){
  let node,ws,released=0,unknown=0,usage=0,results=0,errors=0;class C{constructor(){this.state='running';this.audioWorklet={addModule:async()=>{}};}resume(){return Promise.resolve();}createMediaStreamSource(){return {connect(){},disconnect(){}};}close(){return Promise.resolve();}}
  class W{constructor(){node=this;this.port={postMessage(){},onmessage:null};}connect(){}disconnect(){}}
  class S{constructor(){ws=this;this.readyState=0;this.bufferedAmount=0;this.sent=[];}send(v){this.sent.push(v instanceof ArrayBuffer?v.slice(0):v);}close(){this.readyState=3;}open(){this.readyState=1;this.onopen?.();}message(value){this.onmessage?.({data:JSON.stringify(value)});}}
  const Factory=createRealtimeRecognition({endpoint:'wss://example.test/transcribe-stream',candidates:['ja','en'],getStream:()=>({getAudioTracks:()=>[{enabled:true,readyState:'live'}]}),getToken:async()=>'synthetic',acquireSlot:async()=>()=>{released++;},onUsage:n=>usage+=n,onUnmeasured:()=>unknown++,Context:C,Worklet:W,Socket:S});
  const rec=new Factory();rec.onresult=e=>{results++;assert.equal(e.language,'en');assert.equal(e.results[e.resultIndex].isFinal,true);};rec.onerror=()=>errors++;rec.start();await flush();ws.open();
- const voice=()=>{const samples=Int16Array.from({length:1600},(_,i)=>i%2?1500:-1500);node.port.onmessage({data:samples});return samples;};voice();assert.equal(usage,0);
+ const voice=()=>{const samples=Int16Array.from({length:1600},(_,i)=>i%2?1500:-1500);node.port.onmessage({data:samples});return samples;};
+ if(scenario==='offset'){
+  ws.message({type:'ready'});node.port.onmessage({data:new Int16Array(1600).fill(1200)});
+  assert.equal(rec.speechPending,undefined);assert.equal(rec.firstSpeechAt,undefined);assert.notEqual(rec.phase,'capturing');
+  voice();assert.equal(rec.speechPending,true);assert.equal(rec.phase,'capturing');
+  rec.abort();ws.readyState=3;ws.onclose();assert.equal(errors,0);continue;
+ }
+ voice();assert.equal(usage,0);
  if(scenario==='queue-bound'){for(let i=0;i<30;i++)voice();assert.equal(errors,1);assert.equal(released,1);assert.equal(unknown,1);continue;}
  ws.message({type:'ready'});assert.equal(usage,.1);assert.equal(released,0);assert.equal(rec.pending.length,0);assert(ws.sent.some(v=>v instanceof ArrayBuffer));
  if(scenario==='provider-error'){ws.message({type:'error',code:'quota'});assert.equal(errors,1);assert.equal(unknown,1);assert.equal(released,1);continue;}
