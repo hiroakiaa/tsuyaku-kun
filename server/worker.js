@@ -15,7 +15,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261103-transport-audit-1';
+const BUILD_ID='20261103-pipeline-latency-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -54,6 +54,7 @@ async function body(request,max=32768){const reader=request.body?.getReader();if
 async function bridge(env,token,action,extra={}){if(!env.SHEETS_BRIDGE)return null;const r=await fetch(env.SHEETS_BRIDGE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,idToken:token,...extra}),signal:AbortSignal.timeout(20000)});if(!r.ok)throw Error('辞書との接続を確認してください。');const result=await r.json();if(result.error)throw Error(result.error);return result;}
 const sharedCatalogCache=createCatalogCache(catalog);
 async function loadSharedCatalog(env,token){return sharedCatalogCache.refresh(env.SHEETS_BRIDGE,()=>bridge(env,token,'tsuyakuCatalog'));}
+export async function catalogForClient(env,token,ctx,{waitMs=1000,cache=sharedCatalogCache}={}){const snapshot=cache.peek(env.SHEETS_BRIDGE);if(!env.SHEETS_BRIDGE||snapshot.fresh)return snapshot;const pending=cache.refresh(env.SHEETS_BRIDGE,()=>bridge(env,token,'tsuyakuCatalog'));ctx?.waitUntil?.(pending);if(snapshot.source==='spreadsheet')return {...snapshot,refreshing:true};let timer;try{return await Promise.race([pending,new Promise(resolve=>{timer=setTimeout(()=>resolve({...snapshot,refreshing:true}),waitMs);})]);}finally{clearTimeout(timer);}}
 export function catalogForTranslation(env,token,ctx){const snapshot=sharedCatalogCache.peek(env.SHEETS_BRIDGE);if(env.SHEETS_BRIDGE&&ctx?.waitUntil&&!snapshot.fresh)ctx.waitUntil(loadSharedCatalog(env,token));return snapshot;}
 export async function translateText(env,text,source,targets,context=[],unit='',data=catalog,onUsage=()=>{}){
   const knownCatalog=data._catalog,metadata=env.catalogMetadata||{catalogSource:data===catalog?'bundled':['spreadsheet','bundled'].includes(knownCatalog?.source)?knownCatalog.source:'unmeasured',...(/^c1-[a-f0-9]{8}$/.test(knownCatalog?.revision||'')?{catalogRevision:knownCatalog.revision}:{})};const timing={...metadata,serverBuild:BUILD_ID,dictionaryMs:null,aiTotalMs:null,providerMs:null,budgetWaitMs:null,budgetSettleMs:null,parseMs:null,authMs:env.authMs??null};let scenario;const reportUsage=onUsage;onUsage=u=>reportUsage({...u,translationTiming:timing,...(scenario?{translationScenario:scenario}:{})});env={...env,translationTiming:timing};
@@ -137,7 +138,7 @@ export default {async fetch(request,env,ctx){
       catch(e){const failure=e.azureFailure||aiFailure(e);return cors(json({error:failure.message,aiFailure:failure,usage},failure.reason==='quota'?429:['billing','auth'].includes(failure.reason)?403:502));}
     }
     if(url.pathname==='/ui-labels'&&request.method==='GET'){const result=await bridge(env,token,'tsuyakuUiLabels');if(!result?.labels)return cors(error('画面表記を取得できませんでした。',503));return cors(json({labels:result.labels,updatedAt:result.updatedAt}));}
-    if(url.pathname==='/catalog'&&request.method==='GET')return cors(json(exposeCatalog(await loadSharedCatalog(env,token))));
+    if(url.pathname==='/catalog'&&request.method==='GET')return cors(json(exposeCatalog(await catalogForClient(env,token,ctx))));
     if(url.pathname==='/dictionary/translate'&&request.method==='POST'){
       const data=await body(request,4096),text=String(data.text||'').trim(),language=String(data.language||'');
       if(!text||text.length>1500||!catalog.languages.some(l=>l.code===language))return cors(error('ことばと言語を確認してください。'));
