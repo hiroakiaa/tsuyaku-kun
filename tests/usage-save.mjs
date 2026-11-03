@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {UsageLedger} from '../web/usage.js';
+let raw=JSON.stringify([{id:'past',whisperSeconds:1,captionCount:1,ended:true,privateMarker:'retained'}]),fail=false,writes=0;const checkpoint=new Map();const storage={getItem:()=>raw,setItem:(k,v)=>{if(fail)throw Error('quota');raw=v;writes++;}};
+const ledger=new UsageLedger(storage,()=>10000,{getItem:k=>checkpoint.get(k),setItem:(k,v)=>checkpoint.set(k,v),removeItem:k=>checkpoint.delete(k)});
+ledger.begin('face',['ja','en']);ledger.audio(1,'whisper');const id=ledger.current.id;ledger.event('mic_on');assert.equal(ledger.list()[0].id,id);assert.equal(ledger.list()[1].privateMarker,'retained');
+const returned=ledger.list();returned[1].privateMarker='mutated';ledger.event('mic_off');assert.equal(ledger.list()[1].privateMarker,'retained','public list must remain a detached snapshot');
+const external=JSON.parse(raw);external.push({id:'other-tab',whisperSeconds:2,captionCount:2,ended:true});raw=JSON.stringify(external);ledger.event('mic_on');assert(ledger.list().some(s=>s.id==='other-tab'));
+fail=true;const last=raw;ledger.audio(1,'whisper');ledger.save();assert.equal(ledger.storageError,true);assert.equal(raw,last);assert.equal(JSON.parse(checkpoint.get('tsuyaku-ledger-checkpoint')).current.whisperSeconds,2);fail=false;ledger.save();assert.equal(ledger.storageError,false);assert.equal(ledger.list().find(s=>s.id===id).whisperSeconds,2);assert(ledger.list().some(s=>s.id==='other-tab'));
+ledger.end();assert.equal(ledger.list().find(s=>s.id===id).ended,true);ledger.begin('face',['ja']);ledger.audio(1,'whisper');ledger.save();assert.equal(ledger.list().find(s=>s.id===id).ended,true);assert.equal(ledger.list().length,4);
+raw=JSON.stringify(Array.from({length:250},(_,i)=>({id:'saved-'+i,whisperSeconds:1,ended:true})));ledger.save();assert.equal(ledger.savedRowsCache.length,200);assert.equal(ledger.list().length,200);
+console.log('PASS usage archive reuse preserves external writes, detached reads, current totals, checkpoints, ended sessions, quota recovery and 200-row bound');
