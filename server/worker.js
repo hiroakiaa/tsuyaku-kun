@@ -1,3 +1,4 @@
+import {catalogVersion} from '../web/catalog-version.js';
 import {azureConfig,azureLanguages,azureTranslate,azureBudget,azureOperation} from './azure-translator.js';
 import {realtimeUpgrade} from './realtime-recognition.js';
 import {recognitionDecoding} from './recognition-policy.js';
@@ -15,7 +16,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261103-reuse-fastpath-1';
+const BUILD_ID='20261103-lesson-economy-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -65,6 +66,8 @@ export async function translateText(env,text,source,targets,context=[],unit='',d
   timing.dictionaryMs=Date.now()-dictionaryStarted;Object.assign(out,stored.translations);
   const missing=unique.filter(c=>!out[c]);scenario.aiTargets=[...missing].sort();
   if(!missing.length){onUsage({inputTokens:0,outputTokens:0,cacheHit:true,cacheSource:stored.builtin?'builtin':'spreadsheet',bankKeys:stored.keys});return out;}
+  if(env.translationEconomy&&env.strictEconomy&&!env.AZURE_TRANSLATOR_F0)throw Object.assign(Error('授業の無料翻訳が未接続です。管理者が接続を確認してください。有料翻訳へは切り替えません。'),{azureFailure:{reason:'service',scope:'azure',message:'授業の無料翻訳が未接続です。有料翻訳へは切り替えません。',evidence:'app_policy'}});
+  if(env.translationEconomy&&env.strictEconomy&&!azureLanguages(source,missing))throw Object.assign(Error('この言語は授業の無料翻訳に未対応です。'),{azureFailure:{reason:'input',scope:'azure',message:'この言語は授業の無料翻訳に未対応です。有料翻訳へは切り替えません。',evidence:'app_policy'}});
   if(env.translationEconomy&&env.AZURE_TRANSLATOR_F0&&azureLanguages(source,missing)){const start=Date.now();try{return {...out,...await azureTranslate(env,text,source,missing,onUsage)};}finally{timing.aiTotalMs=Date.now()-start;}}
   const terms=glossaryFor(text,data.glossary||[]);
   const protectedSpeech=protectUncertainSpeech(text);
@@ -170,7 +173,7 @@ export default {async fetch(request,env,ctx){
   }catch(e){const failure=resourceFailure(e);if(failure)return cors(json({error:failure.message,resourceFailure:{reason:failure.reason,retryable:false}},failure.status));return cors(error(e.message||'接続を確認してください。',400));}
 }};
 export class TranslationRoom {
-  constructor(ctx,env){this.ctx=ctx;this.env=env;this.jobs=new Map();this.queuedCaptions=new Map();this.cachedCatalog=catalog;this.catalogUntil=0;this.activeTranslations=0;this.aiBlockedUntil=0;if(ctx.setWebSocketAutoResponse&&typeof WebSocketRequestResponsePair!=='undefined')ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair('{"type":"ping"}','{"type":"pong"}'));}
+  constructor(ctx,env){this.ctx=ctx;this.env=env;this.jobs=new Map();this.queuedCaptions=new Map();this.cachedCatalog=catalog;this.catalogUntil=0;this.activeTranslations=0;this.aiBlockedUntil=0;this.lessonTranslations=new Map();if(ctx.setWebSocketAutoResponse&&typeof WebSocketRequestResponsePair!=='undefined')ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair('{"type":"ping"}','{"type":"pong"}'));}
   async scheduleAlarm(room){
     room??=await this.info();if(!room)return;
     let next=room.expires;
@@ -270,7 +273,7 @@ export class TranslationRoom {
       // Ignore audio signaling from older clients: every room delivers text only.
       if(data.type==='signal')return;
       if(data.type==='end'){
-        if(a.role!=='teacher')throw Error('先生だけが終了できます。');await this.ctx.storage.put('room',{...room,ended:true});await this.scheduleAlarm(room);this.broadcast({type:'ended'});return;
+        if(a.role!=='teacher')throw Error('先生だけが終了できます。');await this.ctx.storage.put('room',{...room,ended:true});this.lessonTranslations.clear();await this.scheduleAlarm(room);this.broadcast({type:'ended'});return;
       }
       if(room.ended)throw Error('この授業は終了しました。');
       if(data.type!=='caption')return;
@@ -330,20 +333,24 @@ export class TranslationRoom {
     const start=Date.now();if(!await this.captionIsLive(ws,room,queuedAt))return;let usage;const saved=await this.ctx.storage.get('caption:'+id);const record={id,sequence:saved?.sequence,speaker:a.name,source:spokenLanguage(a.language),text,final:true,revision:update.revision??0,continuing:update.continuing===true,usageId:crypto.randomUUID(),at:saved?.at??start,status:'translating'};
     await this.ctx.storage.put('caption:'+id,record);
     try{
-      const languages=this.participants().map(p=>p.a.language);const targets=room.mode==='interpreter'?[...new Set([...languages,...(languages.some(code=>code!=='en')?['en']:[])])]:[...new Set(['ja','en',...this.participants().flatMap(p=>[p.a.language,p.a.viewLanguage])])];
+      const languages=this.participants().map(p=>p.a.language);const targets=room.mode==='lesson'?[...new Set([...(a.role==='teacher'?[]:['ja']),...this.participants().filter(p=>p.a.role!=='teacher').map(p=>p.a.viewLanguage==='ja-easy'?'ja':p.a.viewLanguage||p.a.language)])]:room.mode==='interpreter'?[...new Set([...languages,...(languages.some(code=>code!=='en')?['en']:[])])]:[...new Set(['ja','en',...this.participants().flatMap(p=>[p.a.language,p.a.viewLanguage])])];
       if(this.env.SHEETS_BRIDGE&&Date.now()>this.catalogUntil){this.catalogUntil=Date.now()+300000;this.ctx.waitUntil(loadSharedCatalog(this.env,a.token).then(snapshot=>{this.cachedCatalog=exposeCatalog(snapshot);}).catch(()=>{}));}
     const all=this.cachedCatalog;
       const floor=room.groupChat?Math.max(0,...this.participants().map(p=>p.a.chatAfter||0)):null;const past=(await this.ctx.storage.get('recent')||[]).filter(r=>floor===null||Number.isInteger(r.sequence)&&r.sequence>floor).map(r=>r.text);
-      if(!await this.captionIsLive(ws,room,queuedAt))return;if(Date.now()<this.aiBlockedUntil)throw Object.assign(Error('quota'),{code:3036});const translations=await translateText({...this.env,budgetUid:a.uid,executionValid:()=>this.captionIsLive(ws,room,queuedAt)},text,a.language,targets,past,room.unit,all,u=>{usage=u;if(u.translationTiming)u.translationTiming.queueMs=Math.max(0,start-queuedAt);});
+      if(!await this.captionIsLive(ws,room,queuedAt))return;if(room.mode!=='lesson'&&Date.now()<this.aiBlockedUntil)throw Object.assign(Error('quota'),{code:3036});
+      const lessonKey=room.mode==='lesson'?JSON.stringify([spokenLanguage(a.language),text,targets.slice().sort(),room.unit,catalogVersion(all)]):null;for(const [key,row]of this.lessonTranslations)if(row.expires<=Date.now())this.lessonTranslations.delete(key);const cached=lessonKey&&this.lessonTranslations.get(lessonKey);
+      const translations=cached?(usage={inputTokens:0,outputTokens:0,cacheHit:true,cacheSource:'session'},structuredClone(cached.translations)):await translateText({...this.env,...(room.mode==='lesson'?{translationEconomy:true,strictEconomy:true}:{}),budgetUid:a.uid,executionValid:()=>this.captionIsLive(ws,room,queuedAt)},text,a.language,targets,past,room.unit,all,u=>{usage=u;if(u.translationTiming)u.translationTiming.queueMs=Math.max(0,start-queuedAt);});
+      if(lessonKey&&!cached&&usage?.provider==='azure_f0'&&await this.captionIsLive(ws,room,queuedAt)){const checked=inspectTranslations(text,record.source,targets,translations);if(!checked.warnings.length&&!checked.unmeasuredLanguages.length){this.lessonTranslations.set(lessonKey,{translations:structuredClone(translations),expires:Date.now()+600000});if(this.lessonTranslations.size>100)this.lessonTranslations.delete(this.lessonTranslations.keys().next().value);}}
+
       if(!(await this.info())||room.expires<=Date.now())return;const currentRoom=await this.info(),publish=!!currentRoom&&!currentRoom.ended&&currentRoom.expires>Date.now();const quality=inspectTranslations(text,record.source,targets,translations);const done={...record,translations,quality,usage,status:'ready',latencyMs:Date.now()-start};await this.ctx.storage.put('caption:'+id,done);const recent=await this.ctx.storage.get('recent')||[];await this.ctx.storage.put('recent',[...recent.filter(r=>r.id!==id),{id,sequence:record.sequence,at:record.at,text}].sort((a,b)=>a.at-b.at).slice(-3));if(publish)this.broadcast({type:'translation',...done});if(publish&&!quality.warnings.length&&!quality.unmeasuredLanguages.length&&a.language==='ja'&&!usage?.cacheHit&&((all.learnableTexts||[]).includes(text)||(all.phrases||[]).some(p=>p.jaText===text)))this.ctx.waitUntil(bridge(this.env,a.token,'tsuyakuLearn',{text,translations}).catch(()=>{}));
-    }catch(e){if(['quota','billing','auth'].includes(aiFailure(e).reason))this.aiBlockedUntil=Math.floor(Date.now()/86400000)*86400000+86400000;if(!(await this.info())||room.expires<=Date.now())return;const currentRoom=await this.info(),publish=!!currentRoom&&!currentRoom.ended&&currentRoom.expires>Date.now(),failure=aiFailure(e),failed={...record,usage,status:'failed',latencyMs:Date.now()-start,error:failure.message,aiFailure:failure};await this.ctx.storage.put('caption:'+id,failed);if(publish)this.broadcast({type:'translation',...failed});}
+    }catch(e){if(room.mode!=='lesson'&&['quota','billing','auth'].includes(aiFailure(e).reason))this.aiBlockedUntil=Math.floor(Date.now()/86400000)*86400000+86400000;if(!(await this.info())||room.expires<=Date.now())return;const currentRoom=await this.info(),publish=!!currentRoom&&!currentRoom.ended&&currentRoom.expires>Date.now(),failure=e.azureFailure||aiFailure(e),failed={...record,usage,status:'failed',latencyMs:Date.now()-start,error:failure.message,aiFailure:failure};await this.ctx.storage.put('caption:'+id,failed);if(publish)this.broadcast({type:'translation',...failed});}
   }
   async webSocketClose(ws){for(const [id,job]of this.queuedCaptions)if(job.ws===ws){this.queuedCaptions.delete(id);await this.rejectCaption(ws,id,job.cap,'発言側の接続が切れたため、この文の翻訳は開始していません。');}const a=ws.deserializeAttachment();if(a?.left)return;ws.serializeAttachment({...a,left:true});try{ws.close(1000,'left');}catch{}if(a?.uid&&!a.pending)this.broadcast({type:'notice',text:a.name+'さんが退室しました。'});this.roster();await this.scheduleAlarm();}
   async webSocketError(ws){await this.webSocketClose(ws);}
   async alarm(){
     if(await this.ctx.storage.get('codesDirectory')){await new LessonCodes(this.ctx.storage).cleanup();return;}
     const room=await this.info();
-    if(!room||room.expires<=Date.now()){for(const ws of this.ctx.getWebSockets()){try{ws.close(1000,'expired');}catch{}}await this.ctx.storage.deleteAll();return;}
+    if(!room||room.expires<=Date.now()){for(const ws of this.ctx.getWebSockets()){try{ws.close(1000,'expired');}catch{}}await this.ctx.storage.deleteAll();this.lessonTranslations.clear();return;}
     for(const ws of this.ctx.getWebSockets()){
       const a=ws.deserializeAttachment();if(a?.left)continue;
       if(a?.pending&&a.requestUntil<=Date.now()){this.send(ws,{type:'join_declined',text:'参加の確認が時間切れになりました。招待リンクから入り直してください。'});await this.webSocketClose(ws);continue;}
