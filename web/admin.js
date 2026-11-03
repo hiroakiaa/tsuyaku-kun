@@ -1,4 +1,4 @@
-import {improvementReport} from './analysis-focus.js?v=20261103-storage-latency-1';
+import {improvementReport} from './analysis-focus.js?v=20261103-reuse-fastpath-1';
 import {createRecognitionCostView} from './recognition-cost-view.js?v=20261102-recognition-outcome-1';
 import {guardedStorage} from './storage-access.js?v=20261024-usability20-4';
 const localStorage=guardedStorage(()=>globalThis.localStorage);
