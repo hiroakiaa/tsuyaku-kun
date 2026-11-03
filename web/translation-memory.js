@@ -31,10 +31,12 @@ export class TranslationMemory {
  for(const code of targets)if(!out[code]){const candidates=[...bank,...phraseRows,...(glossary?[glossary]:[])];const values=[...new Set(candidates.map(r=>r[translationField(code)]||(r===glossary&&code==='en'?r.en:'')).filter(usableTranslation))];if(values.length===1)out[code]=values[0];}
  const matches=bucket?.materials||[];
  for(const code of targets)if(!out[code]){const values=[...new Set(matches.map(r=>translationOf(r,code)).filter(usableTranslation))];if(values.length===1)out[code]=values[0];}
+ if(!row&&!bucket&&this.store.factory===null){const fixed=builtInTranslation(source,text,targets,{partial});if(fixed)return fixed;}
  if(partial)return {translations:out,missing:targets.filter(c=>!out[c]),source:row?'reviewed':'spreadsheet',diagnostic:{reason:targets.every(c=>out[c])?'complete':row||bucket?'missing_languages':'no_match',missing:targets.filter(c=>!out[c])}};
  return targets.every(c=>typeof out[c]==='string'&&out[c].trim())?{translations:out,source:row?'reviewed':'spreadsheet'}:null;}
  async lookupAsync(source,text,targets,unit='',catalog=this.catalog||{},partial=false){
  text=exact(text);const hotResult=this.lookup(source,text,targets,unit,catalog,partial);if(hotResult&&(!partial||!hotResult.missing.length))return hotResult;
+ if(this.store.factory===null)return hotResult;
  let timer,timedOut=false;const id=memoryKey(source,text,unit),legacy=JSON.stringify([source,text,unit]);const read=async()=>this.store.getFirst?this.store.getFirst(id===legacy?[id]:[id,legacy]):await this.store.get(id)||(id!==legacy?await this.store.get(legacy):null);const row=await Promise.race([read(),new Promise(resolve=>timer=setTimeout(()=>{timedOut=true;resolve(null);},120))]);clearTimeout(timer);
  if(row&&row.catalogVersion===catalogVersion(catalog)&&row.source===source&&phraseIdentity(row.text,source)===phraseIdentity(text,source)&&row.unit===unit&&row.translations){row.lastUsed=Date.now();row.hits=(row.hits||0)+1;this.hot.set(id,row);this.persist();void this.store.put(row);return this.lookup(source,text,targets,unit,catalog,partial);}return !timedOut&&hotResult?.diagnostic?.reason==='no_match'?(builtInTranslation(source,text,targets,{partial})||hotResult):hotResult;
  }
