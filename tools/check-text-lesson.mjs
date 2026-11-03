@@ -2,12 +2,13 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {createUiFixture} from './browser-fixture.mjs';
 import {TranslationRoom} from '../server/worker.js';
-const fixture=await createUiFixture(),{browser,setup,origin}=fixture,results=[],errors=[];
+const originalFetch=globalThis.fetch;const fixture=await createUiFixture(),{browser,setup,origin}=fixture,results=[],errors=[];
 try{for(const [width,height] of [[390,844],[568,320],[1024,600]]){
  const db=new Map([['room',{mode:'lesson',owner:'teacher',key:'a'.repeat(32),code:'1234',unit:'学校',expires:Date.now()+86400000}]]),sockets=[],jobs=[],requests=[];let serial=0;
  const ctx={storage:{get:async k=>db.get(k),put:async(k,v)=>db.set(k,v),getAlarm:async()=>0,setAlarm:async()=>{},list:async({prefix})=>new Map([...db].filter(([k])=>k.startsWith(prefix)))},getWebSockets:()=>sockets,waitUntil:p=>jobs.push(p)};
  const labels={es:'Traigan el almuerzo mañana.',de:'Bitte bringt morgen ein Mittagessen mit.',fil:'Magdala ng tanghalian bukas.',en:'Bring lunch tomorrow.',pt:'Tragam almoço amanhã.'};
- const room=new TranslationRoom(ctx,{AI:{run:async(model,{messages})=>{const request=JSON.parse(messages.at(-1).content);requests.push(request.targets);return {response:JSON.stringify(Object.fromEntries(request.targets.map(code=>[code,(labels[code]||request.speech).repeat(request.speech.includes('長文')?35:1)])))};}}});
+ globalThis.fetch=async(url,options)=>{assert.equal(new URL(url).origin,'https://api.cognitive.microsofttranslator.com');const targets=new URL(url).searchParams.getAll('to'),text=JSON.parse(options.body)[0].Text;requests.push(targets);return Response.json([{translations:targets.map(to=>({to,text:(labels[to]||text).repeat(text.includes('長文')?35:1)}))}]);};
+ const room=new TranslationRoom(ctx,{AZURE_TRANSLATOR_F0:JSON.stringify({key:'synthetic',region:'japaneast',sku:'F0',monthlyF0:true}),ROOMS:{idFromName:n=>n,get:()=>({fetch:async req=>Response.json((await req.json()).action==='reserve'?{id:crypto.randomUUID()}:{ok:true})})},AI:{run:async()=>{throw Error('Paid lesson fallback is forbidden');}}});
  const contexts=[],pages=[];let turn=0,outgoingSignals=0;
  for(const language of ['ja','es','de','fil']){
   const context=await browser.newContext({viewport:{width,height}});contexts.push(context);await setup(context);context.on('request',r=>{if(r.url().includes('turn-credentials'))turn++;});
@@ -25,5 +26,5 @@ try{for(const [width,height] of [[390,844],[568,320],[1024,600]]){
  const firstStudent=sockets[1].deserializeAttachment();await teacher.locator('#participants [data-participant-id="'+firstStudent.id+'"] select').selectOption('es');await student.waitForFunction(()=>document.querySelector('#lesson-language').value==='es');
  const beforeCount=await student.locator('.caption').count(),teacherAttachment=sockets[0].deserializeAttachment();teacherAttachment.left=true;room.roster();await student.locator('.lesson-waiting').filter({hasText:'先生の接続'}).waitFor();assert.equal(await student.locator('.caption').count(),beforeCount);teacherAttachment.left=false;room.roster();await student.locator('#participants').waitFor({state:'hidden'});
  await teacher.locator('#microphone').click();assert.equal(turn,0);assert.equal(outgoingSignals,0);await pages[2].screenshot({path:`checks/lesson-text-${width}x${height}.png`});results.push({width,height,students:['es','de','fil'],teacherRecognition:true,languageChange:'es→pt',turnRequests:turn,outgoingSignals,realRoomLogic:true});for(const context of contexts)await context.close();
-}}finally{await browser.close();await fs.writeFile('checks/lesson-text-results.json',JSON.stringify({results,errors,note:'Real frontend and TranslationRoom logic; synthetic auth, speech recognition, model and transport. Not physical-device confirmation.'},null,2));}
+}}finally{globalThis.fetch=originalFetch;await browser.close();await fs.writeFile('checks/lesson-text-results.json',JSON.stringify({results,errors,note:'Real frontend and TranslationRoom logic; synthetic auth, speech recognition, Azure response and transport. Not physical-device confirmation.'},null,2));}
 assert.deepEqual(errors,[]);console.log(JSON.stringify(results,null,2));
