@@ -18,7 +18,7 @@ export async function azureBudget(storage,data,now=Date.now()){
   const status=()=>({provider:'azure_f0',sku:'F0',rollingDays:P.rollingDays,usedCharacters:used,limitCharacters:P.characters,remainingCharacters:Math.max(0,P.characters-used),userUsedCharacters:own,userLimitCharacters:P.userCharacters,userRemainingCharacters:Math.max(0,P.userCharacters-own),blocked:state.blockedUntil>now,freePlanUSD:0,asOf:now});
   if(data.action==='status')return status();
   if(data.action==='reserve'){
-   if(!uid||!Number.isSafeInteger(data.characters)||data.characters<1||data.characters>4800)throw fail('Azure翻訳の入力を確認してください。',400,'input');
+   if(!uid||!Number.isSafeInteger(data.characters)||data.characters<1||data.characters>P.requestCharacters)throw fail('Azure翻訳の入力を確認してください。',400,'input');
    if(state.blockedUntil>now||used+data.characters>P.characters||own+data.characters>P.userCharacters)throw fail('Azure無料翻訳の上限です。有料翻訳へは自動で切り替えません。',429,'quota');
    const leases=Object.values(state.leases);if(leases.length>=8||leases.filter(l=>l.uid===uid).length>=2)throw fail('Azure翻訳を処理中です。少し待ってから再試行してください。',429,'overloaded');
    const entry=state.days[day]||{used:0,users:{}};if(!Object.hasOwn(entry.users,uid)&&Object.keys(entry.users).length>=1000)throw fail('Azure無料翻訳の利用人数上限です。',429,'quota');
@@ -37,7 +37,9 @@ export async function azureTranslate(env,text,source,targets,onUsage=()=>{},fetc
  const timing=env.translationTiming;if(timing)timing.providerScope='azure_http_headers';const measure=async(key,work)=>{const started=now();try{return await work();}finally{if(timing)timing[key]=(timing[key]||0)+Math.max(0,now()-started);}};
  const config=azureConfig(env);if(!config)throw fail('Azure無料翻訳は未接続です。');const langs=azureLanguages(source,targets);if(!langs)throw fail('Azure翻訳の言語を確認してください。',400,'input');
  const hash=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(env.budgetUid||''))),uid=Array.from(hash,x=>x.toString(16).padStart(2,'0')).join('').slice(0,32);
- const characters=[...text].length*langs.targets.length;if(env.executionValid&&!await env.executionValid())throw fail('この翻訳の有効期限が切れました。');
+ const sourceCharacters=[...text].length,characters=sourceCharacters*langs.targets.length;
+ if(characters>P.requestCharacters&&sourceCharacters>0&&sourceCharacters<=P.requestCharacters){const width=Math.max(1,Math.floor(P.requestCharacters/sourceCharacters)),out={},total={inputTokens:0,outputTokens:0,unknown:false,provider:'azure_f0',azureCharacters:0,azureAttempts:0,azureFreePlanUSD:0,azureAttempted:true};for(let offset=0;offset<targets.length;offset+=width){Object.assign(out,await azureTranslate(env,text,source,targets.slice(offset,offset+width),u=>{total.azureCharacters+=u.azureCharacters;total.azureAttempts++;onUsage({...total});},fetcher,now));}return out;}
+ if(env.executionValid&&!await env.executionValid())throw fail('この翻訳の有効期限が切れました。');
  const lease=await measure('budgetWaitMs',()=>azureOperation(env,{action:'reserve',uid,characters}));
  const usage={inputTokens:0,outputTokens:0,unknown:false,provider:'azure_f0',azureCharacters:characters,azureFreePlanUSD:0,azureAttempted:true};onUsage(usage);
  try{
