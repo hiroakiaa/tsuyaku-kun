@@ -1,3 +1,4 @@
+import {completeBudgetCleanup} from './budget-cleanup.js';
 import {azureLanguageCode} from '../web/language-registry.js';
 import {AZURE_F0_POLICY as P} from '../web/cost-policy.js';
 import {parseTranslation} from '../web/core.js';
@@ -51,5 +52,5 @@ export async function azureTranslate(env,text,source,targets,onUsage=()=>{},fetc
   const raw=await measure('parseMs',()=>response.json());if(!Array.isArray(raw)||raw.length!==1||!Array.isArray(raw[0]?.translations))throw fail('Azureの翻訳結果を確認できませんでした。',502);
   const out={};for(const target of targets){const rows=raw[0].translations.filter(r=>r.to===langs.map(target));if(rows.length!==1||typeof rows[0].text!=='string')throw fail('Azureの翻訳結果がそろいませんでした。',502);out[target]=rows[0].text;}
   return parseTranslation(JSON.stringify(out),targets);
- }catch(e){if(e.azureFailure)throw e;throw fail('Azure無料翻訳を完了できませんでした。有料翻訳へは切り替えません。',502);}finally{await measure('budgetSettleMs',()=>azureOperation(env,{action:'release',id:lease.id})).catch(()=>{});}
+ }catch(e){if(e.azureFailure)throw e;throw fail('Azure無料翻訳を完了できませんでした。有料翻訳へは切り替えません。',502);}finally{await completeBudgetCleanup(env,()=>azureOperation(env,{action:'release',id:lease.id}),timing,now);}
 }
