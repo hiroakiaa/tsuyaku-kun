@@ -1,3 +1,4 @@
+import './budget-cleanup.mjs';
 import {speechLanguageCandidates} from '../web/language-discovery.js';
 import './languages.mjs';
 import {isRecognitionLanguage} from '../web/language-registry.js';
