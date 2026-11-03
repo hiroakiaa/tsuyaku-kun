@@ -1,3 +1,4 @@
+import {speechLanguageCandidates} from '../web/language-discovery.js';
 import {isRecognitionLanguage} from '../web/language-registry.js';
 import {catalogVersion} from '../web/catalog-version.js';
 import {azureConfig,azureLanguages,azureTranslate,azureBudget,azureOperation} from './azure-translator.js';
@@ -17,7 +18,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261103-language-search-1';
+const BUILD_ID='20261103-language-candidate-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -128,7 +129,7 @@ export default {async fetch(request,env,ctx){
       try{if(!validWav(bytes))return cors(error('音声形式を確認してください。',415));if(!hasSpeechEnergy(bytes)){recognitionTiming.preprocessMs=Date.now()-preprocessStarted;return cors(json(timed({text:''})));}
         recognitionTiming.preprocessMs=Date.now()-preprocessStarted;recognitionTiming.aiCalled=true;
         const result=await recognizeAudio({...env,recognitionProfile,translationTiming:recognitionTiming},bytes,automatic?candidates[0]:language,safeRecognitionHints(request.headers.get('X-Term-Hints')),candidates);
-        Object.assign(recognitionTiming,recognitionEvidence(result));const detected=automatic?resolveSpeechLanguage(result,candidates):language;const schoolContext=url.searchParams.get('context')==='school',stockOutroRejected=schoolContext&&suspectedSchoolOutro(result);recognitionTiming.stockOutroRejected=stockOutroRejected;const text=cleanRecognition(result,detected||'',{schoolContext});if(text===null)return cors(error('音声を認識できませんでした。',502));return cors(json(timed({text,...(stockOutroRejected?{recognitionRejected:'stock_outro'}:{}),...(automatic?{language:detected,languageUncertain:!!text&&!detected}:{})})));
+        Object.assign(recognitionTiming,recognitionEvidence(result));const detected=automatic?resolveSpeechLanguage(result,candidates):language;const schoolContext=url.searchParams.get('context')==='school',stockOutroRejected=schoolContext&&suspectedSchoolOutro(result);recognitionTiming.stockOutroRejected=stockOutroRejected;const text=cleanRecognition(result,detected||'',{schoolContext});if(text===null)return cors(error('音声を認識できませんでした。',502));return cors(json(timed({text,...(stockOutroRejected?{recognitionRejected:'stock_outro'}:{}),...(automatic?{language:detected,languageUncertain:!!text&&!detected,...(!detected&&text?{languageCandidates:speechLanguageCandidates(result,candidates)}:{})}:{})})));
       }catch(e){const failure=aiFailure(e);return cors(json(timed({error:failure.message,aiFailure:failure,recognitionCode:failure.reason}),failure.reason==='quota'?429:['billing','auth'].includes(failure.reason)?403:502));}finally{bytes.fill(0);}
     }
     if(url.pathname==='/translate'&&request.method==='POST'){
