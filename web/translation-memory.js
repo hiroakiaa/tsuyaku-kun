@@ -1,5 +1,5 @@
 import {catalogVersion} from './catalog-version.js?v=20261008-safety-1';
-import {ReviewedStore,memoryKey,retentionScore} from './reviewed-store.js?v=20261008-report-2';
+import {ReviewedStore,memoryKey,retentionScore} from './reviewed-store.js?v=20261103-storage-latency-1';
 import {translationField,translationOf} from './core.js?v=20261007-progressive-1';
 import {phraseIdentity} from './phrase-equivalence.js?v=20261008-report-2';
 import {hasInternalMarker,needsTranslationReview,usableTranslation} from './translation-safety.js?v=20261029-faithful-pipeline-1';
@@ -35,7 +35,7 @@ export class TranslationMemory {
  return targets.every(c=>typeof out[c]==='string'&&out[c].trim())?{translations:out,source:row?'reviewed':'spreadsheet'}:null;}
  async lookupAsync(source,text,targets,unit='',catalog=this.catalog||{},partial=false){
  text=exact(text);const hotResult=this.lookup(source,text,targets,unit,catalog,partial);if(hotResult&&(!partial||!hotResult.missing.length))return hotResult;
- let timer,timedOut=false;const id=memoryKey(source,text,unit),legacy=JSON.stringify([source,text,unit]);const read=async()=>await this.store.get(id)||(id!==legacy?await this.store.get(legacy):null);const row=await Promise.race([read(),new Promise(resolve=>timer=setTimeout(()=>{timedOut=true;resolve(null);},120))]);clearTimeout(timer);
+ let timer,timedOut=false;const id=memoryKey(source,text,unit),legacy=JSON.stringify([source,text,unit]);const read=async()=>this.store.getFirst?this.store.getFirst(id===legacy?[id]:[id,legacy]):await this.store.get(id)||(id!==legacy?await this.store.get(legacy):null);const row=await Promise.race([read(),new Promise(resolve=>timer=setTimeout(()=>{timedOut=true;resolve(null);},120))]);clearTimeout(timer);
  if(row&&row.catalogVersion===catalogVersion(catalog)&&row.source===source&&phraseIdentity(row.text,source)===phraseIdentity(text,source)&&row.unit===unit&&row.translations){row.lastUsed=Date.now();row.hits=(row.hits||0)+1;this.hot.set(id,row);this.persist();void this.store.put(row);return this.lookup(source,text,targets,unit,catalog,partial);}return !timedOut&&hotResult?.diagnostic?.reason==='no_match'?(builtInTranslation(source,text,targets,{partial})||hotResult):hotResult;
  }
  correct(heard,corrected,unit=''){heard=exact(heard);corrected=exact(corrected);if(!heard||!corrected||heard===corrected||heard.length>600||corrected.length>600)return;const existing=this.corrections.find(r=>r.heard===heard&&r.unit===unit);if(existing)existing.corrected=corrected;else this.corrections.push({heard,corrected,unit});this.persist();}
