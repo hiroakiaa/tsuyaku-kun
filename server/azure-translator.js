@@ -33,18 +33,19 @@ export async function azureOperation(env,data){
  if(!env.ROOMS)throw fail('Azure無料枠の上限制御を確認できません。');
  const target=env.ROOMS.get(env.ROOMS.idFromName('__azure_f0_budget_v1__')),r=await target.fetch(new Request('https://azure/azure-budget',{method:'POST',body:JSON.stringify(data)})),result=await r.json();if(!r.ok)throw fail(result.error||'Azure無料翻訳を利用できません。',r.status,result.reason||'service');return result;
 }
-export async function azureTranslate(env,text,source,targets,onUsage=()=>{},fetcher=fetch){
+export async function azureTranslate(env,text,source,targets,onUsage=()=>{},fetcher=fetch,now=()=>Date.now()){
+ const timing=env.translationTiming;if(timing)timing.providerScope='azure_http_headers';const measure=async(key,work)=>{const started=now();try{return await work();}finally{if(timing)timing[key]=(timing[key]||0)+Math.max(0,now()-started);}};
  const config=azureConfig(env);if(!config)throw fail('Azure無料翻訳は未接続です。');const langs=azureLanguages(source,targets);if(!langs)throw fail('Azure翻訳の言語を確認してください。',400,'input');
  const hash=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(env.budgetUid||''))),uid=Array.from(hash,x=>x.toString(16).padStart(2,'0')).join('').slice(0,32);
  const characters=[...text].length*langs.targets.length;if(env.executionValid&&!await env.executionValid())throw fail('この翻訳の有効期限が切れました。');
- const lease=await azureOperation(env,{action:'reserve',uid,characters});
+ const lease=await measure('budgetWaitMs',()=>azureOperation(env,{action:'reserve',uid,characters}));
  const usage={inputTokens:0,outputTokens:0,unknown:false,provider:'azure_f0',azureCharacters:characters,azureFreePlanUSD:0,azureAttempted:true};onUsage(usage);
  try{
   const url=new URL('https://api.cognitive.microsofttranslator.com/translate');url.searchParams.set('api-version','3.0');url.searchParams.set('from',langs.source);for(const code of langs.targets)url.searchParams.append('to',code);
-  const response=await fetcher(url,{method:'POST',headers:{'Content-Type':'application/json','Ocp-Apim-Subscription-Key':config.key,'Ocp-Apim-Subscription-Region':config.region},body:JSON.stringify([{Text:text}]),signal:AbortSignal.timeout(10000)});
-  if(!response.ok){let code;try{code=(await response.json())?.error?.code;}catch{}if(code===403001){await azureOperation(env,{action:'block'});throw fail('Azureの無料枠上限です。有料翻訳へは切り替えません。',429,'quota');}throw fail(response.status===429?'Azure翻訳が混み合っています。':'Azure無料翻訳との接続を確認してください。',response.status===429?429:502,response.status===429?'overloaded':'service');}
-  const raw=await response.json();if(!Array.isArray(raw)||raw.length!==1||!Array.isArray(raw[0]?.translations))throw fail('Azureの翻訳結果を確認できませんでした。',502);
+  const response=await measure('providerMs',()=>fetcher(url,{method:'POST',headers:{'Content-Type':'application/json','Ocp-Apim-Subscription-Key':config.key,'Ocp-Apim-Subscription-Region':config.region},body:JSON.stringify([{Text:text}]),signal:AbortSignal.timeout(10000)}));
+  if(!response.ok){let code;try{code=(await measure('parseMs',()=>response.json()))?.error?.code;}catch{}if(code===403001){await azureOperation(env,{action:'block'});throw fail('Azureの無料枠上限です。有料翻訳へは切り替えません。',429,'quota');}throw fail(response.status===429?'Azure翻訳が混み合っています。':'Azure無料翻訳との接続を確認してください。',response.status===429?429:502,response.status===429?'overloaded':'service');}
+  const raw=await measure('parseMs',()=>response.json());if(!Array.isArray(raw)||raw.length!==1||!Array.isArray(raw[0]?.translations))throw fail('Azureの翻訳結果を確認できませんでした。',502);
   const out={};for(const target of targets){const rows=raw[0].translations.filter(r=>r.to===langs.map(target));if(rows.length!==1||typeof rows[0].text!=='string')throw fail('Azureの翻訳結果がそろいませんでした。',502);out[target]=rows[0].text;}
   return parseTranslation(JSON.stringify(out),targets);
- }catch(e){if(e.azureFailure)throw e;throw fail('Azure無料翻訳を完了できませんでした。有料翻訳へは切り替えません。',502);}finally{await azureOperation(env,{action:'release',id:lease.id}).catch(()=>{});}
+ }catch(e){if(e.azureFailure)throw e;throw fail('Azure無料翻訳を完了できませんでした。有料翻訳へは切り替えません。',502);}finally{await measure('budgetSettleMs',()=>azureOperation(env,{action:'release',id:lease.id})).catch(()=>{});}
 }
