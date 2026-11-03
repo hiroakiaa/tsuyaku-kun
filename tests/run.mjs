@@ -13,6 +13,8 @@ import {createSpeechInputGate} from '../web/speech-input-gate.js';
 import './billing-report.mjs';
 import './monthly-costs.mjs';
 import './cost-accounting.mjs';
+import './usage-save.mjs';
+import './module-map.mjs';
 import './async-ui.mjs';
 import {lessonCode} from '../web/entry-feedback.js';
 import './entry-feedback.mjs';
@@ -27,6 +29,7 @@ import './ui-english.mjs';
 import {wordStats,validateWordEvents} from '../server/word-stats.js';
 import {SharedWordUsage} from '../web/shared-word-usage.js';
 import './reviewed-memory.mjs';
+import './reviewed-read.mjs';
 import './conversation-ui.mjs';
 import './reuse-quality.mjs';
 import {protectUncertainSpeech,restoreUncertainSpeech} from '../server/quality.js';
@@ -551,7 +554,7 @@ await test('自動言語判定では辞書ヒントを送らずJSON不正を成�
  const notices=[];let headers;const R=createServerRecognition({endpoint:'https://test/transcribe?language=auto&languages=ja,en',getStream:()=>null,getToken:async()=>'',onDiagnostic:r=>notices.push(r),fetcher:async(_,o)=>{headers=o.headers;return {ok:true,status:200,json:async()=>({text:undefined})};}}),r=new R();r.active=true;r.setHints(()=>['日本語ヒント']);r.queue.push({samples:new Int16Array(16000),at:Date.now()});await r.drain();assert.equal(headers['X-Term-Hints'],undefined);assert.ok(notices.some(n=>n.code==='invalid_response'));assert.ok(!notices.some(n=>n.code==='ok'));r.abort();
 });
 await test('認識の段階を本文なしで通知し数値の計測を制限する',async()=>{
- const phases=[],records=[];const R=createServerRecognition({endpoint:'https://test/transcribe',getStream:()=>null,getToken:async()=>'',onDiagnostic:r=>records.push(r),fetcher:async()=>({ok:true,status:200,json:async()=>({text:'こんにちは'})})}),r=new R();r.active=true;r.onprogress=e=>phases.push(e.phase);r.queue.push({samples:new Int16Array(16000),at:Date.now(),speechEndedAt:Date.now()-500});await r.drain();assert.ok(phases.includes('recognizing'));assert.equal(phases.at(-1),'waiting');const ok=records.find(r=>r.code==='ok');assert.ok(ok.captureTailMs>=500);assert.ok(Number.isFinite(ok.clientAuthMs));assert.ok(Number.isFinite(ok.clientRequestMs));r.abort();
+ const phases=[],records=[];const R=createServerRecognition({endpoint:'https://test/transcribe',getStream:()=>null,getToken:async()=>'',onDiagnostic:r=>records.push(r),fetcher:async()=>({ok:true,status:200,json:async()=>({text:'こんにちは'})})}),r=new R();r.active=true;r.onprogress=e=>phases.push(e.phase);const capturedAt=Date.now();r.queue.push({samples:new Int16Array(16000),at:capturedAt,speechEndedAt:capturedAt-500});await r.drain();assert.ok(phases.includes('recognizing'));assert.equal(phases.at(-1),'waiting');const ok=records.find(r=>r.code==='ok');assert.equal(ok.captureTailMs,500);assert.ok(Number.isFinite(ok.clientAuthMs));assert.ok(Number.isFinite(ok.clientRequestMs));r.abort();
 });
 await test('音声診断は許可した数値だけを残し本文や秘密を保存しない',()=>{
  const r=safeConnectionRecord({code:'stale_audio',clientAuthMs:5,clientRequestMs:20,captureTailMs:500,text:'private',token:'secret',audio:'secret'});assert.equal(r.code,'stale_audio');assert.equal(r.clientAuthMs,5);assert.equal(r.captureTailMs,500);assert.equal(r.text,undefined);assert.equal(r.token,undefined);assert.equal(safeConnectionRecord({clientAuthMs:-1,clientRequestMs:Infinity}).clientAuthMs,undefined);
