@@ -1,3 +1,4 @@
+import './frequent-sources.mjs';
 import {faceTranslationTargets} from '../web/economy-policy.js';
 import {createAiGate} from '../web/ai-gate.js';
 import {guardCaptionTranslation} from '../web/translation-safety.js';
