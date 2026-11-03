@@ -292,3 +292,12 @@ body.phone-home .caption-waiting{display:flex;align-items:center;gap:8px;width:f
 @keyframes caption-wait-dot{0%,70%,100%{opacity:.3;transform:translateY(0);}35%{opacity:1;transform:translateY(-3px);}}
 @media(prefers-reduced-motion:reduce){.waiting-dots>span{animation:none;opacity:1;}}
 @media(forced-colors:active){body.phone-home .caption-waiting{border:1px solid CanvasText;}}
+
+/* Both local face and remote interpreter captions use the same speaker cues. */
+body.phone-home #captions .caption:is(.caption-face[data-face-side],.caption-chat[data-chat-side]){box-sizing:border-box;width:calc(100% - clamp(16px,5vw,28px))!important;max-width:none!important;}
+body.phone-home #captions .caption:is(.caption-face[data-face-side=self],.caption-chat[data-chat-side=self]){margin-left:auto!important;margin-right:0!important;background:#202a35!important;border-color:#354454!important;}
+body.phone-home #captions .caption:is(.caption-face[data-face-side=other],.caption-chat[data-chat-side=other]){margin-left:0!important;margin-right:auto!important;background:#222e2a!important;border-color:#394b43!important;}
+@media(forced-colors:active){body.phone-home #captions .caption:is(.caption-face[data-face-side],.caption-chat[data-chat-side]){background:Canvas!important;border-color:CanvasText!important;}}
+
+/* Match caption outer edges to the language controls, without the extra inner gutter. */
+body.phone-home[data-active-mode=face] #captions,body.phone-home[data-active-mode=interpreter] #captions{padding-left:0!important;padding-right:0!important;}
