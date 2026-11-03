@@ -1,7 +1,8 @@
+import {mergeLanguages} from './language-registry.js';
 export const spokenLanguage=code=>code==='ja-easy'?'ja':code;
 export const LANGUAGE_ORDER=['ja','en','pt','es','tl','vi','zh-CN','ko','id','ne','de','fil','ja-easy'];
 export function withEasyJapanese(data){
- const languages=[...data.languages.filter(l=>l.code!=='ja-easy'),...(!data.languages.some(l=>l.code==='de')?[{code:'de',speechCode:'de-DE',labelJa:'ドイツ語',labelNative:'Deutsch'}]:[]),{code:'ja-easy',speechCode:'ja-JP',labelJa:'やさしい日本語',labelNative:'やさしい日本語',icon:'comment'}];
+ const languages=mergeLanguages([...data.languages.filter(l=>l.code!=='ja-easy'),...(!data.languages.some(l=>l.code==='de')?[{code:'de',speechCode:'de-DE',labelJa:'ドイツ語',labelNative:'Deutsch'}]:[]),{code:'ja-easy',speechCode:'ja-JP',labelJa:'やさしい日本語',labelNative:'やさしい日本語',icon:'comment'}]);
  const rank=code=>{const index=LANGUAGE_ORDER.indexOf(code);return index<0?LANGUAGE_ORDER.length:index;};
  languages.sort((a,b)=>rank(a.code)-rank(b.code)||a.code.localeCompare(b.code));
  return {...data,languages};
