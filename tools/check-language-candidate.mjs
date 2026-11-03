@@ -11,7 +11,7 @@ try{
   assert.equal(await p.locator('#face-other-language').inputValue(),'en');
   await p.getByRole('button',{name:'言語の候補を選ぶ',exact:true}).click();
   await p.screenshot({path:'checks/language-candidate-'+width+'.png'});
-  await p.getByRole('button',{name:'相手の言語をドイツ語にする',exact:true}).click();
+  await p.evaluate(()=>window.testRecognition.onerror({error:'auth'}));await p.getByRole('button',{name:'相手の言語をドイツ語にする',exact:true}).click();assert.equal(await p.locator('#face-other-language').inputValue(),'en');await p.locator('#microphone').click();await p.waitForFunction(()=>!!window.testRecognition);await p.evaluate(()=>window.testRecognition.onlanguageuncertain({reason:'outside_pair',candidates:['de']}));await p.getByRole('button',{name:'言語の候補を選ぶ',exact:true}).click();await p.getByRole('button',{name:'相手の言語をドイツ語にする',exact:true}).click();
   assert.equal(await p.locator('#face-other-language').inputValue(),'de');
   assert.equal(await p.locator('#face-self-language').inputValue(),'ja');
   assert.equal(await p.locator('#captions .caption').count(),0);
