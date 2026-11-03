@@ -1,3 +1,4 @@
+import {mergeLanguages} from '../web/language-registry.js';
 // Generic reference data from the shared dictionary; no participants or conversation logs.
 export const catalog = {
   "languages": [
@@ -14807,3 +14808,5 @@ export const catalog = {
   ],
   "databaseVersion": "20261020-german-fallback-1"
 };
+
+catalog.languages=mergeLanguages(catalog.languages);
