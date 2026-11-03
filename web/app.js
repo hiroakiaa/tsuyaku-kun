@@ -4,7 +4,7 @@ import {createRealtimeRecognition} from './realtime-recognition.js?v=20261103-sp
 import {createAiGate} from './ai-gate.js?v=20261029-faithful-pipeline-1';
 import {localIcon,installLocalIcons} from './icons.js?v=20261029-communication50-1';
 installLocalIcons(document);
-import {compactFaceCaption} from './face-caption.js?v=20261103-caption-clean-1';
+import {compactFaceCaption} from './face-caption.js?v=20261103-lesson-economy-1';
 import {speechSide} from './two-language.js?v=20261029-communication50-1';
 import {createSpeechInputGate} from './speech-input-gate.js?v=20261029-two-language-1';
 import {guardedStorage} from './storage-access.js?v=20261024-usability20-4';
@@ -12,27 +12,27 @@ const localStorage=guardedStorage(()=>globalThis.localStorage);
 const sessionStorage=guardedStorage(()=>globalThis.sessionStorage);
 import {installFormTask} from './form-task.js?v=20261024-usability20-3';
 import {safeSocketSend,microphoneHelp,participantLabel} from './session-reliability.js?v=20261022-billing-auto-1';
-import {singleFlight,installLazyAction} from './async-ui.js?v=20261103-caption-clean-1';
+import {singleFlight,installLazyAction} from './async-ui.js?v=20261103-lesson-economy-1';
 import {lessonCode,installModalFeedback,backdropClick,updateMode,searchBounds,resilientPreferences} from './entry-feedback.js?v=20261022-language-storage-1';
 import {deviceCheckPanel,microphoneUnavailable} from './device-check.js?v=20261021-text-chat-1';
 import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261022-billing-auto-1';
 import {installPhotoTranslate} from './photo-translate.js?v=20261024-usability20-3';
 import {refreshEnglishGuides,applyEnglishLabels} from './ui-english.js?v=20261029-two-language-1';
-import {SharedWordUsage} from './shared-word-usage.js?v=20261103-caption-clean-1';
+import {SharedWordUsage} from './shared-word-usage.js?v=20261103-lesson-economy-1';
 import {installConversationUI,createWaitingBubble} from './conversation-ui.js?v=20261103-pipeline-latency-1';
 import {guardCaptionTranslation,hasInternalMarker,needsTranslationReview} from './translation-safety.js?v=20261029-faithful-pipeline-1';
 import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261029-faithful-pipeline-1';
 import {IdleWatch} from './idle-watch.js?v=20261008-safety-1';
-import {recordResource,recordPause,recordResume} from './resource-usage.js?v=20261103-caption-clean-1';
+import {recordResource,recordPause,recordResume} from './resource-usage.js?v=20261103-lesson-economy-1';
 import {mayReconnect} from './resource-policy.js';
-import {TranslationMemory} from './translation-memory.js?v=20261103-caption-clean-1';
+import {TranslationMemory} from './translation-memory.js?v=20261103-lesson-economy-1';
 import {ReviewedStore} from './reviewed-store.js';
-import {FrequentSources} from './frequent-sources.js?v=20261103-caption-clean-1';
-import {schoolPhraseList} from './school-phrases.js?v=20261103-caption-clean-1';
+import {FrequentSources} from './frequent-sources.js?v=20261103-lesson-economy-1';
+import {schoolPhraseList} from './school-phrases.js?v=20261103-lesson-economy-1';
 import {PersonalPhrases} from './personal-phrases.js?v=20261007-learning-1';
 import {recognitionHints} from './recognition-hints.js?v=20261007-progressive-1';
 import {acquireMicrophone,needsMicrophoneRefresh} from './microphone.js?v=20261029-ios-mic-recovery-1';
-import {UsageLedger,WordUsage} from './usage.js?v=20261103-caption-clean-1';
+import {UsageLedger,WordUsage} from './usage.js?v=20261103-lesson-economy-1';
 import {CloudSpeechPlayer,createSpeechCache} from './cloud-speech-player.js?v=20261103-pipeline-latency-1';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261103-speech-activity-1';
 import {config} from './config.js';
@@ -59,7 +59,7 @@ const sharedWords=new SharedWordUsage(localStorage,{api,catalog:()=>seed});
 const wordUsage=new WordUsage(localStorage);const ledger=new UsageLedger(localStorage,()=>Date.now(),sessionStorage),connections=new ConnectionDiary(localStorage);
 const showModalFeedback=installModalFeedback({dialog:$('#modal'),message:$('#message'),close:$('#modal-close'),resolveFocus:referenceReturnFocus});
 let messageTimer;const message=text=>{clearTimeout(messageTimer);const n=$('#message');n.textContent=text;n.hidden=!text;if(text)messageTimer=setTimeout(()=>{n.replaceChildren();n.hidden=true;},6000);};
-installLazyAction($('#admin'),async attempt=>{const {installAdmin}=await import('./admin.js?v=20261103-caption-clean-1'+(attempt>1?'&retry='+attempt:''));installAdmin({wordUsage,sharedWords,api,getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});},{onError:()=>message('管理画面を読み込めませんでした。接続を確認して、もう一度ひらいてください。')});
+installLazyAction($('#admin'),async attempt=>{const {installAdmin}=await import('./admin.js?v=20261103-lesson-economy-1'+(attempt>1?'&retry='+attempt:''));installAdmin({wordUsage,sharedWords,api,getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});},{onError:()=>message('管理画面を読み込めませんでした。接続を確認して、もう一度ひらいてください。')});
 const status=text=>{$('#connection').textContent=text;connectionHint(text);};
 function connectionHint(text){let box=$('#connection-hint');const show=room&&!room.local&&/再接続|切れ|停止|接続でき|別のタブ/.test(text);if(!box&&show){box=el('div',undefined,'connection-hint');box.id='connection-hint';box.setAttribute('role','status');const note=el('span'),retry=el('button','再接続','secondary');retry.onclick=()=>{if(!room||room.joinBlocked)return;intentionalClose=false;reconnectAttempts=0;clearTimeout(reconnectTimer);if(socket?.readyState===1)socket.close(4000,'manual reconnect');else void connect().then(startConnectionTimers).catch(showConnectionError);};box.append(note,retry);$('#live .live-tools').prepend(box);}if(box){box.hidden=!show;box.firstChild.textContent=text;box.querySelector('button').disabled=!navigator.onLine||room?.joinBlocked===true;}}
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;if(tag==='button'&&text){const icons={'接続を確認':'network-wired','再試行':'rotate-right','リンクをコピー':'copy','ひらく':'book-open','候補として送る':'plus','授業をおわる':'stop','じぶんだけホームにもどる':'door-open'};if(icons[text])n.prepend(icon(icons[text]));}return n;}
@@ -435,7 +435,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 window.addEventListener('pagehide',suspendBackgroundInterpretation);
 
 // Presentation observes state changes without polling or starting network work.
-function currentBudgetScenario(){if(!room)return null;const source=currentSource();let targets;if(room.mode==='interpreter'){const langs=participants.map(p=>p.language);targets=[...langs,...(langs.some(c=>c!=='en')?['en']:[])];}else if(room.mode==='lesson')targets=['ja','en',...participants.flatMap(p=>[p.language,p.viewLanguage]).filter(Boolean)];else targets=faceTranslationTargets(source,$('#face-self-language').value,$('#face-other-language').value,{economy:!preferRealtime()});return {mode:room.mode,source,targets};}
+function currentBudgetScenario(){if(!room)return null;const source=currentSource();let targets;if(room.mode==='interpreter'){const langs=participants.map(p=>p.language);targets=[...langs,...(langs.some(c=>c!=='en')?['en']:[])];}else if(room.mode==='lesson')targets=[...(role==='teacher'?[]:['ja']),...participants.filter(p=>p.role!=='teacher').map(p=>p.viewLanguage==='ja-easy'?'ja':p.viewLanguage||p.language).filter(Boolean)];else targets=faceTranslationTargets(source,$('#face-self-language').value,$('#face-other-language').value,{economy:!preferRealtime()});return {mode:room.mode,source,targets};}
 function conversationState(){return {mode:room?.mode,role:room?.mode==='lesson'?(role||lessonRole):(tab==='lesson'?lessonRole:null),mic,preparing:$('#microphone').getAttribute('aria-busy')==='true',recognitionKind,speechPhase,speechPending,recognitionRequestAt,paused:backgroundCallPaused,connection:$('#connection').textContent,local:room?.local===true,translating:[...records.values()].some(r=>r.status==='translating'||r.updating)};}
 conversationUI=installConversationUI({getState:conversationState});
 
