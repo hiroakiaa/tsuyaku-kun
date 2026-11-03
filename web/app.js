@@ -4,7 +4,7 @@ import {createRealtimeRecognition} from './realtime-recognition.js?v=20261103-sp
 import {createAiGate} from './ai-gate.js?v=20261029-faithful-pipeline-1';
 import {localIcon,installLocalIcons} from './icons.js?v=20261029-communication50-1';
 installLocalIcons(document);
-import {compactFaceCaption} from './face-caption.js?v=20261103-source-timing-1';
+import {compactFaceCaption} from './face-caption.js?v=20261103-frequent-sources-1';
 import {speechSide} from './two-language.js?v=20261029-communication50-1';
 import {createSpeechInputGate} from './speech-input-gate.js?v=20261029-two-language-1';
 import {guardedStorage} from './storage-access.js?v=20261024-usability20-4';
@@ -12,31 +12,33 @@ const localStorage=guardedStorage(()=>globalThis.localStorage);
 const sessionStorage=guardedStorage(()=>globalThis.sessionStorage);
 import {installFormTask} from './form-task.js?v=20261024-usability20-3';
 import {safeSocketSend,microphoneHelp,participantLabel} from './session-reliability.js?v=20261022-billing-auto-1';
-import {singleFlight,installLazyAction} from './async-ui.js?v=20261103-source-timing-1';
+import {singleFlight,installLazyAction} from './async-ui.js?v=20261103-frequent-sources-1';
 import {lessonCode,installModalFeedback,backdropClick,updateMode,searchBounds,resilientPreferences} from './entry-feedback.js?v=20261022-language-storage-1';
 import {deviceCheckPanel,microphoneUnavailable} from './device-check.js?v=20261021-text-chat-1';
 import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261022-billing-auto-1';
 import {installPhotoTranslate} from './photo-translate.js?v=20261024-usability20-3';
 import {refreshEnglishGuides,applyEnglishLabels} from './ui-english.js?v=20261029-two-language-1';
-import {SharedWordUsage} from './shared-word-usage.js?v=20261103-source-timing-1';
+import {SharedWordUsage} from './shared-word-usage.js?v=20261103-frequent-sources-1';
 import {installConversationUI,createWaitingBubble} from './conversation-ui.js?v=20261103-pipeline-latency-1';
 import {guardCaptionTranslation,hasInternalMarker,needsTranslationReview} from './translation-safety.js?v=20261029-faithful-pipeline-1';
 import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261029-faithful-pipeline-1';
 import {IdleWatch} from './idle-watch.js?v=20261008-safety-1';
-import {recordResource,recordPause,recordResume} from './resource-usage.js?v=20261103-source-timing-1';
+import {recordResource,recordPause,recordResume} from './resource-usage.js?v=20261103-frequent-sources-1';
 import {mayReconnect} from './resource-policy.js';
-import {TranslationMemory} from './translation-memory.js?v=20261103-source-timing-1';
+import {TranslationMemory} from './translation-memory.js?v=20261103-frequent-sources-1';
 import {ReviewedStore} from './reviewed-store.js';
+import {FrequentSources} from './frequent-sources.js?v=20261103-frequent-sources-1';
+import {schoolPhraseList} from './school-phrases.js?v=20261103-frequent-sources-1';
 import {PersonalPhrases} from './personal-phrases.js?v=20261007-learning-1';
 import {recognitionHints} from './recognition-hints.js?v=20261007-progressive-1';
 import {acquireMicrophone,needsMicrophoneRefresh} from './microphone.js?v=20261029-ios-mic-recovery-1';
-import {UsageLedger,WordUsage} from './usage.js?v=20261103-source-timing-1';
+import {UsageLedger,WordUsage} from './usage.js?v=20261103-frequent-sources-1';
 import {CloudSpeechPlayer,createSpeechCache} from './cloud-speech-player.js?v=20261103-pipeline-latency-1';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261103-speech-activity-1';
 import {config} from './config.js';
 import {ConnectionDiary,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261103-request-lifecycle-1';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
-import {translationOf,spokenLanguage,withEasyJapanese,supplementCatalog} from './core.js?v=20261029-communication50-1';
+import {translationField,translationOf,spokenLanguage,withEasyJapanese,supplementCatalog} from './core.js?v=20261029-communication50-1';
 import {speakerCaption,speakerInfo} from './face-mode.js?v=20261006-school-1';
 import {callCaptionLanguages,chatCaptionLanguages,isDisplayableCaption} from './call-mode.js?v=20261021-chat-bubbles-1';
 import {listHistory as storedHistory} from './history.js?v=20261006-school-1';
@@ -57,7 +59,7 @@ const sharedWords=new SharedWordUsage(localStorage,{api,catalog:()=>seed});
 const wordUsage=new WordUsage(localStorage);const ledger=new UsageLedger(localStorage,()=>Date.now(),sessionStorage),connections=new ConnectionDiary(localStorage);
 const showModalFeedback=installModalFeedback({dialog:$('#modal'),message:$('#message'),close:$('#modal-close'),resolveFocus:referenceReturnFocus});
 let messageTimer;const message=text=>{clearTimeout(messageTimer);const n=$('#message');n.textContent=text;n.hidden=!text;if(text)messageTimer=setTimeout(()=>{n.replaceChildren();n.hidden=true;},6000);};
-installLazyAction($('#admin'),async attempt=>{const {installAdmin}=await import('./admin.js?v=20261103-source-timing-1'+(attempt>1?'&retry='+attempt:''));installAdmin({wordUsage,sharedWords,api,getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});},{onError:()=>message('管理画面を読み込めませんでした。接続を確認して、もう一度ひらいてください。')});
+installLazyAction($('#admin'),async attempt=>{const {installAdmin}=await import('./admin.js?v=20261103-frequent-sources-1'+(attempt>1?'&retry='+attempt:''));installAdmin({wordUsage,sharedWords,api,getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});},{onError:()=>message('管理画面を読み込めませんでした。接続を確認して、もう一度ひらいてください。')});
 const status=text=>{$('#connection').textContent=text;connectionHint(text);};
 function connectionHint(text){let box=$('#connection-hint');const show=room&&!room.local&&/再接続|切れ|停止|接続でき|別のタブ/.test(text);if(!box&&show){box=el('div',undefined,'connection-hint');box.id='connection-hint';box.setAttribute('role','status');const note=el('span'),retry=el('button','再接続','secondary');retry.onclick=()=>{if(!room||room.joinBlocked)return;intentionalClose=false;reconnectAttempts=0;clearTimeout(reconnectTimer);if(socket?.readyState===1)socket.close(4000,'manual reconnect');else void connect().then(startConnectionTimers).catch(showConnectionError);};box.append(note,retry);$('#live .live-tools').prepend(box);}if(box){box.hidden=!show;box.firstChild.textContent=text;box.querySelector('button').disabled=!navigator.onLine||room?.joinBlocked===true;}}
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;if(tag==='button'&&text){const icons={'接続を確認':'network-wired','再試行':'rotate-right','リンクをコピー':'copy','ひらく':'book-open','候補として送る':'plus','授業をおわる':'stop','じぶんだけホームにもどる':'door-open'};if(icons[text])n.prepend(icon(icons[text]));}return n;}
@@ -289,6 +291,8 @@ function showReference(row,type){
 }
 const sharedTerminal=localStorage.getItem('tsuyaku-device-mode')!=='personal',privateRows=new Map(),privateStorage={getItem:key=>privateRows.get(key)||null,setItem:(key,value)=>privateRows.set(key,value)};const translationMemory=new TranslationMemory(sharedTerminal?privateStorage:localStorage,sharedTerminal?new ReviewedStore(null):undefined);
 const personalPhrases=new PersonalPhrases(sharedTerminal?privateStorage:localStorage);
+const frequentSources=new FrequentSources(localStorage,{personal:!sharedTerminal});
+const frequentButton=el('button','この端末の頻出候補','secondary');frequentButton.type='button';$('#panel-phrases').prepend(frequentButton);frequentButton.onclick=()=>{const content=el('div');content.append(el('p',sharedTerminal?'共有端末では同梱の定型文だけ記録します。会話原文は保存しません。':'原文の候補をこの端末に24時間・最大200件保存します。翻訳待ちやアプリ終了前でも保存します。'));content.append(el('p','2回以上の表現を自動で並べています。誤認識も含み得ます。確認済み訳ではなく、自動共有・AI送信・自動再利用はしません。'));const rows=frequentSources.list();if(!rows.length)content.append(el('p','繰り返し使った表現はまだありません。'));for(const row of rows)content.append(el('p',row.source+' · '+row.count+'回 · '+row.text));const clear=el('button','頻出候補を消す','secondary');clear.type='button';clear.onclick=()=>{frequentSources.clear();$('#modal').close();};content.append(clear);modal('この端末の頻出候補',content);};
 const referenceCategory={phrase:'すべて',term:'すべて'};
 function referenceCategoryName(row){
  const c=String(row.category||row.subject||'その他').trim();
@@ -304,7 +308,7 @@ function referenceCategoryName(row){
 }
 const referenceVisibleLimits=new Map();let referenceRenderEpoch=0;
 function referenceReturnFocus(previous){if(previous?.isConnected)return previous;const key=previous?.dataset?.referenceKey;return key?$$('[data-reference-key]').find(n=>n.dataset.referenceKey===key&&n.getClientRects().length):null;}
-function renderReferences({preserveFilterScroll=true}={}){const focused=document.activeElement;const renderEpoch=++referenceRenderEpoch;for(const [type,list,q,rawRows]of[['phrase',$('#phrase-list'),$('#phrase-search').value,[...personalPhrases.list(),...catalog.phrases]],['term',$('#term-list'),$('#term-search').value,[...personalPhrases.list('term'),...catalog.glossary,...catalog.terms]]]){
+function renderReferences({preserveFilterScroll=true}={}){const focused=document.activeElement;const renderEpoch=++referenceRenderEpoch;for(const [type,list,q,rawRows]of[['phrase',$('#phrase-list'),$('#phrase-search').value,[...personalPhrases.list(),...schoolPhraseList().map(r=>({...r,...Object.fromEntries(Object.entries(r).filter(([code])=>translationField(code)).map(([code,text])=>[translationField(code),text])),jaText:r.ja,enText:r.en,title:r.ja,category:'学校の定型文'})),...catalog.phrases]],['term',$('#term-list'),$('#term-search').value,[...personalPhrases.list('term'),...catalog.glossary,...catalog.terms]]]){
  const rows=[...new Map(rawRows.map(r=>[r.jaText||r.ja||r.title,r])).values()];const categories=[...new Set(rows.map(referenceCategoryName))].sort((a,b)=>a==='あなたのよく使う文'?-1:b==='あなたのよく使う文'?1:a.localeCompare(b,'ja'));
  if(!categories.includes(referenceCategory[type]))referenceCategory[type]='すべて';
  const filters=$('#'+type+'-categories'),filterLeft=filters.scrollLeft;filters.replaceChildren(...['すべて',...categories].map(name=>{const button=el('button',name,'category-filter');button.type='button';button.dataset.referenceKey=JSON.stringify(['filter',type,name]);button.setAttribute('aria-pressed',String(referenceCategory[type]===name));button.onclick=()=>{const oldLeft=filters.scrollLeft;referenceCategory[type]=name;renderReferences({preserveFilterScroll:false});filters.scrollLeft=oldLeft;const selected=[...filters.children].find(b=>b.textContent===name);if(selected){selected.focus({preventScroll:true});requestAnimationFrame(()=>{if(renderEpoch+1!==referenceRenderEpoch)return;const target=selected.offsetLeft-filters.offsetLeft+selected.offsetWidth/2-filters.clientWidth/2;filters.scrollTo({left:Math.max(0,Math.min(target,filters.scrollWidth-filters.clientWidth)),behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});});}};return button;}));filters.scrollLeft=filterLeft;if(preserveFilterScroll)requestAnimationFrame(()=>{if(renderEpoch===referenceRenderEpoch)filters.scrollLeft=filterLeft;});
@@ -331,7 +335,7 @@ function editJapanese(record){
  const previousSide=record.speaker==='相手'?'other':'self',side=face?(speechSide(source,pair[0],pair[1],previousSide)||previousSide):previousSide;
  const cap={type:'caption',kind:'text',id:record.id.slice(selfId.length+1),text,final:true,revision:(record.revision??0)+1,...(face?{source,speakerSide:side,speaker:side==='other'?'相手':'自分'}:{})};localTimings.set(cap.id+':'+cap.revision,{id:cap.id,revision:cap.revision,kind:'text',sentAt:Date.now()});renderCaption({...record,updating:true});submitCaption(cap);$('#modal').close();};modal(face?'聞き取った原文と言語を直す':'聞き取った日本語を直す',form);
 }
-function submitCaption(cap,speech=false){if(!room||chatWaiting)return false;if(room.mode==='face'&&!cap.speaker)cap={...cap,speaker:cap.speakerSide==='other'?'相手':'自分'};const source=cap.source||currentSource(),unit=room?.unit||'';if(speech&&source==='ja')cap.text=translationMemory.corrected(cap.text,unit);const previous=records.get(selfId+'_'+cap.id);if(room?.mode==='face'&&cap.final){const targets=faceTranslationTargets(source,$('#face-self-language').value,$('#face-other-language').value,{economy:!preferRealtime()});const cached=translationMemory.lookup(source,cap.text,targets,unit,catalog);if(cached){const same=cap.metadataOnly&&previous?.memorySource&&previous.text===cap.text;void handle({type:'translation',id:selfId+'_'+cap.id,source,text:cap.text,speaker:cap.speaker||(cap.speakerSide==='other'?'相手':previous?.speaker||'自分'),translations:cached.translations,status:'ready',final:true,revision:cap.revision??0,continuing:cap.continuing===true,at:Date.now(),latencyMs:0,memorySource:cached.source,usageId:same?previous.usageId:'local-'+cap.id+'-'+(cap.revision??0),usage:{inputTokens:0,outputTokens:0,cacheHit:true}});return true;}}if(cap.final){pending.set(cap.id,cap);if(!cap.metadataOnly)renderCaption({id:selfId+'_'+cap.id,text:cap.text,source,speaker:cap.speaker||(cap.speakerSide==='other'?'相手':previous?.speaker||'自分'),translations:{[source]:cap.text},final:true,revision:cap.revision??0,status:'translating',continuing:!!cap.continuing,updating:false,quality:undefined,memorySource:null});}if(room?.local){void translateLocally(cap,source);return true;}return trackCaptionSend(cap);}
+function submitCaption(cap,speech=false){if(!room||chatWaiting)return false;if(room.mode==='face'&&!cap.speaker)cap={...cap,speaker:cap.speakerSide==='other'?'相手':'自分'};const source=cap.source||currentSource(),unit=room?.unit||'';if(cap.final&&!cap.continuing)frequentSources.observe({id:selfId+'_'+cap.id,source,text:cap.text,revision:cap.revision||0});if(speech&&source==='ja')cap.text=translationMemory.corrected(cap.text,unit);const previous=records.get(selfId+'_'+cap.id);if(room?.mode==='face'&&cap.final){const targets=faceTranslationTargets(source,$('#face-self-language').value,$('#face-other-language').value,{economy:!preferRealtime()});const cached=translationMemory.lookup(source,cap.text,targets,unit,catalog);if(cached){const same=cap.metadataOnly&&previous?.memorySource&&previous.text===cap.text;void handle({type:'translation',id:selfId+'_'+cap.id,source,text:cap.text,speaker:cap.speaker||(cap.speakerSide==='other'?'相手':previous?.speaker||'自分'),translations:cached.translations,status:'ready',final:true,revision:cap.revision??0,continuing:cap.continuing===true,at:Date.now(),latencyMs:0,memorySource:cached.source,usageId:same?previous.usageId:'local-'+cap.id+'-'+(cap.revision??0),usage:{inputTokens:0,outputTokens:0,cacheHit:true}});return true;}}if(cap.final){pending.set(cap.id,cap);if(!cap.metadataOnly)renderCaption({id:selfId+'_'+cap.id,text:cap.text,source,speaker:cap.speaker||(cap.speakerSide==='other'?'相手':previous?.speaker||'自分'),translations:{[source]:cap.text},final:true,revision:cap.revision??0,status:'translating',continuing:!!cap.continuing,updating:false,quality:undefined,memorySource:null});}if(room?.local){void translateLocally(cap,source);return true;}return trackCaptionSend(cap);}
 
 
 const localJobs=new Map(),localRevisions=new Map(),localCompletions=new Map(),sessionTranslations=new Map();const faceAiGate=createAiGate(2),localActive=new Map();let localRequest,aiBlockedUntil=0,azureBlockedUntil=0;
