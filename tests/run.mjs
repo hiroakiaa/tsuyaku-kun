@@ -1,3 +1,4 @@
+import './responsive-capture.mjs';
 import './budget-cleanup.mjs';
 import {speechLanguageCandidates} from '../web/language-discovery.js';
 import './languages.mjs';
