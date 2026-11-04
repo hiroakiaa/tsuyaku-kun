@@ -343,3 +343,5 @@ body.phone-home #student-entry #join-lesson{height:60px;min-height:60px;padding:
 
 /* Leave breathing room between dictionary categories, including expansion controls. */
 body.phone-home .reference-list>.reference-group+.reference-group{margin-top:24px;}
+
+@media(max-width:899px){body.phone-home .face-controls[data-automatic=true]{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;}}
