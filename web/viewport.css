@@ -301,3 +301,15 @@ body.phone-home #captions .caption:is(.caption-face[data-face-side=other],.capti
 
 /* Match caption outer edges to the language controls, without the extra inner gutter. */
 body.phone-home[data-active-mode=face] #captions,body.phone-home[data-active-mode=interpreter] #captions{padding-left:0!important;padding-right:0!important;}
+
+/* A single corner radius for lesson toolbar controls. */
+body.phone-home #lesson-toolbar{--lesson-control-radius:16px;}
+body.phone-home #lesson-toolbar :is(#lesson-role-back,#lesson-code-card,#copy-lesson-code,input,select){border-radius:var(--lesson-control-radius)!important;}
+body.phone-home #lesson-toolbar #copy-lesson-code{background:transparent!important;border:0!important;box-shadow:none;}
+@media(max-width:599px){
+ body.phone-home #lesson-toolbar:not([hidden]){grid-template-columns:minmax(76px,.72fr) minmax(0,1.28fr);}
+ body.phone-home #lesson-toolbar #lesson-role-back{min-width:0;padding-inline:10px;}
+ body.phone-home #lesson-toolbar .lesson-code-card>div{display:flex;align-items:center;gap:8px;min-width:0;}
+ body.phone-home #lesson-toolbar .lesson-code-card span{display:block;font-size:10px;white-space:nowrap;}
+ body.phone-home #lesson-toolbar .lesson-code-card strong{letter-spacing:.1em;}
+}
