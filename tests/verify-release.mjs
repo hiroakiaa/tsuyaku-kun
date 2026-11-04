@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-const original=globalThis.fetch,root=new URL('../',import.meta.url),local=await fs.readFile(new URL('index.html',root),'utf8'),build=/web\/app\.js\?v=([^"']+)/.exec(local)[1];
+const original=globalThis.fetch,root=new URL('../',import.meta.url),local=await fs.readFile(new URL('index.html',root),'utf8'),build=/web\/app\.js\?v=([^"'&]+)/.exec(local)[1];
 let wrongBuild=false,requests=[];
 globalThis.fetch=async input=>{const u=new URL(input);requests.push(u.href);if(u.pathname==='/health')return Response.json({ok:true,build:wrongBuild?'old-build':build});assert.equal(u.hostname,'hiroakiaa.github.io');assert(u.pathname.startsWith('/tsuyaku-kun/'));const path=u.pathname.slice('/tsuyaku-kun/'.length);assert(!path.includes('..'));return new Response(await fs.readFile(new URL(path,root)));};
 try{
