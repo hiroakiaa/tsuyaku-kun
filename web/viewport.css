@@ -320,3 +320,23 @@ body.phone-home #lesson-toolbar #copy-lesson-code{background:transparent!importa
 }
 
 @media(max-width:599px){body.phone-home #lesson-toolbar #lesson-role-back{white-space:nowrap;gap:6px;font-size:14px;}}
+
+/* Student entry: language, room number, then one primary action. */
+body.phone-home #lesson-toolbar:has(#lesson-code-entry:not([hidden])){display:grid;grid-template-columns:1fr;gap:22px;width:min(100%,520px);margin:0 auto 22px;align-items:start;}
+body.phone-home #lesson-toolbar:has(#lesson-code-entry:not([hidden])) #lesson-role-back{width:auto;justify-self:start;min-width:100px;height:48px;min-height:48px;margin-bottom:0;}
+body.phone-home #lesson-toolbar #lesson-language-entry{display:flex;flex-direction:column;gap:10px;width:100%;}
+body.phone-home #lesson-language-entry>span{order:0;font-size:14px;font-weight:600;}
+body.phone-home #lesson-language-entry>select{order:1;width:100%;min-height:52px;}
+body.phone-home #lesson-language-entry>small:not([id]){order:2;font-size:11px;color:#a5a5ad;}
+body.phone-home #lesson-language-entry>input[type=search]{order:3;min-height:42px;height:42px;font-size:13px;padding:8px 12px;}
+body.phone-home #lesson-language-entry>small[id]{order:4;font-size:11px;}
+body.phone-home #lesson-language-entry>small[id]:empty{display:none!important;}
+body.phone-home #lesson-toolbar #lesson-code-entry{display:flex;flex-direction:column;gap:10px;width:100%;}
+body.phone-home #lesson-toolbar #lesson-code-entry>span{position:static;width:auto;height:auto;overflow:visible;clip-path:none;white-space:normal;font-size:14px;font-weight:600;}
+body.phone-home #lesson-toolbar #lesson-code-input{height:56px;min-height:56px;font-size:24px!important;line-height:1.2;}
+body.phone-home #student-entry{width:min(100%,520px);margin-inline:auto;}
+body.phone-home #student-entry #join-lesson-form{display:grid;grid-template-columns:1fr;margin:0;padding:0!important;border:0!important;background:transparent!important;box-shadow:none;border-radius:0;}
+body.phone-home #student-entry #join-lesson{width:100%;min-height:52px;padding:14px 18px!important;border:1px solid #f5f5f7!important;border-radius:14px!important;background:#f5f5f7!important;color:#151517!important;font-size:15px;font-weight:600;}
+body.phone-home #student-entry #join-lesson i{color:inherit!important;}
+
+body.phone-home #student-entry #join-lesson{height:60px;min-height:60px;padding:8px 18px!important;}
