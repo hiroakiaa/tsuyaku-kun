@@ -18,7 +18,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261103-responsive-capture-1';
+const BUILD_ID='20261104-lesson-simple-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -68,8 +68,8 @@ export async function translateText(env,text,source,targets,context=[],unit='',d
   timing.dictionaryMs=Date.now()-dictionaryStarted;Object.assign(out,stored.translations);
   const missing=unique.filter(c=>!out[c]);scenario.aiTargets=[...missing].sort();
   if(!missing.length){onUsage({inputTokens:0,outputTokens:0,cacheHit:true,cacheSource:stored.builtin?'builtin':'spreadsheet',bankKeys:stored.keys});return out;}
-  if(env.translationEconomy&&env.strictEconomy&&!env.AZURE_TRANSLATOR_F0)throw Object.assign(Error('授業の無料翻訳が未接続です。管理者が接続を確認してください。有料翻訳へは切り替えません。'),{azureFailure:{reason:'service',scope:'azure',message:'授業の無料翻訳が未接続です。有料翻訳へは切り替えません。',evidence:'app_policy'}});
-  if(env.translationEconomy&&env.strictEconomy&&!azureLanguages(source,missing))throw Object.assign(Error('この言語は授業の無料翻訳に未対応です。'),{azureFailure:{reason:'input',scope:'azure',message:'この言語は授業の無料翻訳に未対応です。有料翻訳へは切り替えません。',evidence:'app_policy'}});
+  if(env.translationEconomy&&env.strictEconomy&&!env.AZURE_TRANSLATOR_F0)throw Object.assign(Error('無料翻訳が未接続です。管理者が接続を確認してください。有料翻訳へは切り替えません。'),{azureFailure:{reason:'service',scope:'azure',message:'無料翻訳が未接続です。有料翻訳へは切り替えません。',evidence:'app_policy'}});
+  if(env.translationEconomy&&env.strictEconomy&&!azureLanguages(source,missing))throw Object.assign(Error('この言語は無料翻訳に未対応です。'),{azureFailure:{reason:'input',scope:'azure',message:'この言語は無料翻訳に未対応です。有料翻訳へは切り替えません。',evidence:'app_policy'}});
   if(env.translationEconomy&&env.AZURE_TRANSLATOR_F0&&azureLanguages(source,missing)){const start=Date.now();try{return {...out,...await azureTranslate(env,text,source,missing,onUsage)};}finally{timing.aiTotalMs=Date.now()-start;}}
   const terms=glossaryFor(text,data.glossary||[]);
   const protectedSpeech=protectUncertainSpeech(text);
@@ -338,9 +338,9 @@ export class TranslationRoom {
       const languages=this.participants().map(p=>p.a.language);const targets=room.mode==='lesson'?[...new Set([...(a.role==='teacher'?[]:['ja']),...this.participants().filter(p=>p.a.role!=='teacher').map(p=>p.a.viewLanguage==='ja-easy'?'ja':p.a.viewLanguage||p.a.language)])]:room.mode==='interpreter'?[...new Set([...languages,...(languages.some(code=>code!=='en')?['en']:[])])]:[...new Set(['ja','en',...this.participants().flatMap(p=>[p.a.language,p.a.viewLanguage])])];
       if(this.env.SHEETS_BRIDGE&&Date.now()>this.catalogUntil){this.catalogUntil=Date.now()+300000;this.ctx.waitUntil(loadSharedCatalog(this.env,a.token).then(snapshot=>{this.cachedCatalog=exposeCatalog(snapshot);}).catch(()=>{}));}
     const all=this.cachedCatalog;
-      const economy=room.mode==='lesson'||![spokenLanguage(a.language),...targets].every(isRecognitionLanguage);const floor=room.groupChat?Math.max(0,...this.participants().map(p=>p.a.chatAfter||0)):null;const past=(await this.ctx.storage.get('recent')||[]).filter(r=>floor===null||Number.isInteger(r.sequence)&&r.sequence>floor).map(r=>r.text);
+      const economy=room.mode==='lesson'||room.mode==='interpreter'&&!!this.env.AZURE_TRANSLATOR_F0||![spokenLanguage(a.language),...targets].every(isRecognitionLanguage);const floor=room.groupChat?Math.max(0,...this.participants().map(p=>p.a.chatAfter||0)):null;const past=(await this.ctx.storage.get('recent')||[]).filter(r=>floor===null||Number.isInteger(r.sequence)&&r.sequence>floor).map(r=>r.text);
       if(!await this.captionIsLive(ws,room,queuedAt))return;if(!economy&&Date.now()<this.aiBlockedUntil)throw Object.assign(Error('quota'),{code:3036});
-      const lessonKey=room.mode==='lesson'?JSON.stringify([spokenLanguage(a.language),text,targets.slice().sort(),room.unit,catalogVersion(all)]):null;for(const [key,row]of this.lessonTranslations)if(row.expires<=Date.now())this.lessonTranslations.delete(key);const cached=lessonKey&&this.lessonTranslations.get(lessonKey);
+      const lessonKey=(room.mode==='lesson'||room.mode==='interpreter'&&economy)?JSON.stringify([spokenLanguage(a.language),text,targets.slice().sort(),room.unit,catalogVersion(all)]):null;for(const [key,row]of this.lessonTranslations)if(row.expires<=Date.now())this.lessonTranslations.delete(key);const cached=lessonKey&&this.lessonTranslations.get(lessonKey);
       const translations=cached?(usage={inputTokens:0,outputTokens:0,cacheHit:true,cacheSource:'session'},structuredClone(cached.translations)):await translateText({...this.env,backgroundBudgetCleanup:task=>this.ctx.waitUntil(task),...(economy?{translationEconomy:true,strictEconomy:true}:{}),budgetUid:a.uid,executionValid:()=>this.captionIsLive(ws,room,queuedAt)},text,a.language,targets,past,room.unit,all,u=>{usage=u;if(u.translationTiming)u.translationTiming.queueMs=Math.max(0,start-queuedAt);});
       if(lessonKey&&!cached&&usage?.provider==='azure_f0'&&await this.captionIsLive(ws,room,queuedAt)){const checked=inspectTranslations(text,record.source,targets,translations);if(!checked.warnings.length&&!checked.unmeasuredLanguages.length){this.lessonTranslations.set(lessonKey,{translations:structuredClone(translations),expires:Date.now()+600000});if(this.lessonTranslations.size>100)this.lessonTranslations.delete(this.lessonTranslations.keys().next().value);}}
 

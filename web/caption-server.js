@@ -132,7 +132,7 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
           // No cumulative transcript list is retained by the recognizer.
           this.acceptText(text,{recognitionRun:this.recognitionRun,segmentSequence:chunk.sequence,speechStartedAt:chunk.speechStartedAt,speechEndedAt:chunk.speechEndedAt,recognitionReadyAt:Date.now(),boundary:chunk.boundary,...(data.language?{language:data.language}:{})});
         }
-      } catch (_) {job.cancelDiagnostic=null;releaseSlot?.();releaseSlot=null;clearTimeout(timeout);if(this.active&&this.jobs.has(job)){const code=controller.signal.aborted?'timeout':phase==='parse'?'invalid_response':phase==='auth'?'auth_unavailable':'network_or_cors';segmentDiagnostic({code,queueMs,clientAuthMs,...(httpStarted?{clientRequestMs:Date.now()-httpStarted}:{})});}await job.previous;if(this.active&&this.jobs.has(job)){if(phase==='auth'&&!controller.signal.aborted)this.fail('auth');else this.transientFailure();} }
+      } catch (_) {job.cancelDiagnostic=null;releaseSlot?.();releaseSlot=null;clearTimeout(timeout);if(this.active&&this.jobs.has(job)){const code=controller.signal.aborted?'timeout':phase==='parse'?'invalid_response':phase==='auth'?'auth_unavailable':'network_or_cors';segmentDiagnostic({code,queueMs,clientAuthMs,...(httpStarted?{clientRequestMs:Date.now()-httpStarted}:{})});}await job.previous;if(this.active&&this.jobs.has(job)){if(phase==='auth'&&!controller.signal.aborted)this.fail('auth');else this.transientFailure(phase==='request'||phase==='parse');} }
       finally {
         releaseSlot?.();chunk.samples.fill(0);if(body)new Uint8Array(body).fill(0);clearTimeout(timeout);this.jobs.delete(job);job.release();this.sending=this.jobs.size>0;this.progress();
         if (this.active) void this.drain();
@@ -186,13 +186,13 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
         this.fragmentTimer=setTimeout(flush,timing.boundary==='limit'?8000:2500);
       }
     }
-    transientFailure() {
+    transientFailure(connectionIssue=false) {
       // Keep capturing after a brief service/network failure. A later utterance retries; never replay stale speech.
       this.failures++;this.breakContinuity=true;
       this.onrecovering?.({attempt:this.failures});
-      if(this.failures>=3)this.fail('network');
+      if(this.failures>=3)this.fail('network',undefined,connectionIssue);
     }
-    fail(error,message) { const notify = this.onerror; this.abort(); notify?.({ error, message }); }
+    fail(error,message,connectionIssue=false) { const notify = this.onerror; this.abort(); notify?.({ error, message,...(connectionIssue?{connectionIssue:true}:{}) }); }
     abort() {
       clearTimeout(this.startTimer);clearTimeout(this.fragmentTimer);clearTimeout(this.tailAnchorTimer);this.tailAnchor=null;clearInterval(this.watchdog);this.watchdog=null;this.fragment=null;
       this.active = false;this.capturing=false;for(const job of this.jobs||[]){job.cancelDiagnostic?.();job.cancelDiagnostic=null;job.controller.abort();job.release();}this.jobs?.clear();this.sending=false;

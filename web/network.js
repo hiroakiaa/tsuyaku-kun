@@ -84,3 +84,11 @@ export function recentSessionEvents(sessions,now=Date.now()){
   const at=s.startedAt+e.seconds*1000;return at<=now&&now-at<=300000;
  }));
 }
+
+// Only a recent failure at this API origin triggers an audio-free preflight.
+export function speechConnectionNeedsCheck(records,api,now=Date.now()){
+ let origin;try{origin=new URL(api).origin;}catch{return false;}
+ const recent=(records||[]).filter(r=>r.endpoint===origin&&Number.isFinite(r.at)&&r.at<=now&&now-r.at<=60000);
+ const failed=recent.filter(r=>["network_or_cors","timeout","invalid_response"].includes(r.code));if(!failed.length)return false;
+ const lastFailure=Math.max(...failed.map(r=>r.at));return !recent.some(r=>r.at>=lastFailure&&r.code==="ok"&&r.operation==="health"&&r.stage==="api_headers");
+}
