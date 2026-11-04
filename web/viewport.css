@@ -345,3 +345,6 @@ body.phone-home #student-entry #join-lesson{height:60px;min-height:60px;padding:
 body.phone-home .reference-list>.reference-group+.reference-group{margin-top:24px;}
 
 @media(max-width:899px){body.phone-home .face-controls[data-automatic=true]{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;}}
+
+body.phone-home .face-controls :is(#face-language,#face-listening-language){box-sizing:border-box;width:100%!important;height:48px!important;min-height:48px!important;max-height:48px;font-size:16px!important;padding:0 24px 0 10px!important;}
+body.phone-home .face-controls .face-language-field>:is(#face-speaker,#face-listener){font-size:14px!important;line-height:1.4;min-height:20px;color:#b9b9bf!important;}
