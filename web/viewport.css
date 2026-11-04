@@ -340,3 +340,6 @@ body.phone-home #student-entry #join-lesson{width:100%;min-height:52px;padding:1
 body.phone-home #student-entry #join-lesson i{color:inherit!important;}
 
 body.phone-home #student-entry #join-lesson{height:60px;min-height:60px;padding:8px 18px!important;}
+
+/* Leave breathing room between dictionary categories, including expansion controls. */
+body.phone-home .reference-list>.reference-group+.reference-group{margin-top:24px;}
