@@ -295,8 +295,8 @@ body.phone-home .caption-waiting{display:flex;align-items:center;gap:8px;width:f
 
 /* Both local face and remote interpreter captions use the same speaker cues. */
 body.phone-home #captions .caption:is(.caption-face[data-face-side],.caption-chat[data-chat-side]){box-sizing:border-box;width:calc(100% - clamp(16px,5vw,28px))!important;max-width:none!important;}
-body.phone-home #captions .caption:is(.caption-face[data-face-side=self],.caption-chat[data-chat-side=self]){margin-left:auto!important;margin-right:0!important;background:#202a35!important;border-color:#354454!important;}
-body.phone-home #captions .caption:is(.caption-face[data-face-side=other],.caption-chat[data-chat-side=other]){margin-left:0!important;margin-right:auto!important;background:#222e2a!important;border-color:#394b43!important;}
+body.phone-home #captions .caption:is(.caption-face[data-face-side=self],.caption-chat[data-chat-side=self]){margin-left:auto!important;margin-right:0!important;background:#28282b!important;border:0!important;}
+body.phone-home #captions .caption:is(.caption-face[data-face-side=other],.caption-chat[data-chat-side=other]){margin-left:0!important;margin-right:auto!important;background:#1b1b1e!important;border:0!important;}
 @media(forced-colors:active){body.phone-home #captions .caption:is(.caption-face[data-face-side],.caption-chat[data-chat-side]){background:Canvas!important;border-color:CanvasText!important;}}
 
 /* Match caption outer edges to the language controls, without the extra inner gutter. */
