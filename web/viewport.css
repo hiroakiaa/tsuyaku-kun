@@ -348,3 +348,6 @@ body.phone-home .reference-list>.reference-group+.reference-group{margin-top:24p
 
 body.phone-home .face-controls :is(#face-language,#face-listening-language){box-sizing:border-box;width:100%!important;height:48px!important;min-height:48px!important;max-height:48px;font-size:16px!important;padding:0 24px 0 10px!important;}
 body.phone-home .face-controls .face-language-field>:is(#face-speaker,#face-listener){font-size:14px!important;line-height:1.4;min-height:20px;color:#b9b9bf!important;}
+
+/* Keep the initial two-column guide, then clear it when captions occupy the pane. */
+body.phone-home .caption-stage>.captions:has(.caption){border-left-color:transparent!important;}
