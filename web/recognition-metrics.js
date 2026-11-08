@@ -7,5 +7,5 @@ export function recognitionMetrics(value){
  if(typeof value.aiCalled==='boolean')out.aiCalled=value.aiCalled;
  if(typeof value.serverBuild==='string'&&/^\d{8}-[a-z0-9-]{1,60}$/.test(value.serverBuild))out.serverBuild=value.serverBuild;
  if(['baseline','beam1'].includes(value.profile))out.recognitionProfile=value.profile;
- for(const key of ['schoolHintCount','confidenceSegments','confidenceMeasuredSegments','noSpeechSegments','lowConfidenceSegments','highCompressionSegments'])if(Number.isInteger(value[key])&&value[key]>=0&&value[key]<=10000)out[key]=value[key];if(typeof value.stockOutroRejected==='boolean')out.stockOutroRejected=value.stockOutroRejected;return out;
+ for(const key of ['schoolHintCount','confidenceSegments','confidenceMeasuredSegments','noSpeechSegments','lowConfidenceSegments','highCompressionSegments','invalidConfidenceSegments'])if(Number.isInteger(value[key])&&value[key]>=0&&value[key]<=10000)out[key]=value[key];if(typeof value.stockOutroRejected==='boolean')out.stockOutroRejected=value.stockOutroRejected;return out;
 }
