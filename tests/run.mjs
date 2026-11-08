@@ -190,9 +190,9 @@ await test('くしゃみ由来の単独んだけを日本語音声から除外�
  assert.equal(cleanRecognition({text:'ん'},'ja-easy'),'');
  assert.equal(cleanRecognition({text:'雑音 ん',segments:[{text:'雑音',no_speech_prob:.9},{text:'ん',no_speech_prob:.01}]},'ja'),'');
 });
-await test('環境音の誤認識を確信度で除外し正常な前後の声を残す',()=>{
+await test('不確かな認識部分を削って前後を別の発言へ継ぎ合わせない',()=>{
  const result={text:'授業を始めます エアガーフ エアガーフ お願いします',transcription_info:{segments:[{text:'授業を始めます',no_speech_prob:.01,avg_logprob:-.2,compression_ratio:1},{text:'エアガーフ エアガーフ',no_speech_prob:.8},{text:'お願いします',no_speech_prob:.02}]}};
- assert.equal(cleanRecognition(result),'授業を始めます お願いします');
+ assert.equal(cleanRecognition(result),'');
  assert.equal(cleanRecognition({text:'エアガーフ',segments:[{text:'エアガーフ',avg_logprob:-1.5,compression_ratio:3}]}),'');
  assert.equal(cleanRecognition({text:'はい はい はい',segments:[{text:'はい はい はい',no_speech_prob:.01,avg_logprob:-.2,compression_ratio:3}]}),'はい はい はい');
  assert.equal(cleanRecognition({text:'はい',segments:[{avg_logprob:-1.5,compression_ratio:1}]}),'');

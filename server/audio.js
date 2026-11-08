@@ -53,13 +53,10 @@ export function cleanRecognition(result, language, {schoolContext=false}={}) {
       (Number.isFinite(segment.avg_logprob) && segment.avg_logprob < -1) ||
       (Number.isFinite(segment.compression_ratio) && segment.compression_ratio > 2.4 &&
         ((Number.isFinite(segment.avg_logprob)&&segment.avg_logprob<-.5)||(Number.isFinite(segment.no_speech_prob)&&segment.no_speech_prob>=.15)));
-    const kept = segments.filter(segment => !unreliable(segment));
-    if (!kept.length) return '';
-    // Preserve reliable speech around rejected noise, only when complete segment text is available.
-    if (kept.length !== segments.length) {
-      if(!segments.every(segment => typeof segment.text === 'string'))return '';
-      return finish(kept.map(segment => segment.text.trim()).filter(Boolean).join(' '));
-    }
+    // A low-confidence span may contain a negation, condition, amount or name.
+    // Removing it and joining the remaining words can invent a different claim.
+    // Suppress this captured interval as a whole; never guess its missing words.
+    if (segments.some(unreliable)) return '';
   }
   return finish(text);
 }
