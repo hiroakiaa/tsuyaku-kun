@@ -1,9 +1,9 @@
 import {recognitionLanguage,speechTextAllowed} from './two-language.js?v=20261029-communication50-1';
-import {nonSpeechReason} from './speech-filter.js?v=20261007-learning-1';
+import {nonSpeechReason} from './speech-filter.js?v=20261108-reliability30-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261103-audio-offset-1';
 import {recognitionMetrics} from './recognition-metrics.js?v=20261103-budget-cleanup-1';
 import {trimmedAudioLength} from './audio-trim.js?v=20261029-communication50-1';
-import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish,japaneseSpeechTail,japaneseNumericCompletion} from './speech-continuity.js?v=20261103-boundary-numbers-1';
+import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish,japaneseSpeechTail,japaneseNumericCompletion} from './speech-continuity.js?v=20261108-reliability30-1';
 export const capturePauseMs=profile=>profile==='fast'||profile==='responsive'?300:profile==='balanced'?400:500;
 // Browser-independent recognition using the call's existing microphone stream.
 export function encodeWav(samples) {
@@ -122,7 +122,7 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
         this.failures=0;
         if (!this.active || controller.signal.aborted) return;
         if(stale()){this.breakContinuity=true;segmentDiagnostic({code:'stale_audio',queueMs,orderWaitMs:requestMetrics.orderWaitMs});this.onrecovering?.({reason:'stale_audio',attempt:1});return;}
-        const automatic=this.automatic,candidates=this.candidates;if(data.recognitionRejected==='stock_outro'){this.breakContinuity=true;this.finishFragment();segmentDiagnostic({code:'filtered',filterReason:'empty'});this.onlanguageuncertain?.({reason:'stock_outro'});return;}
+        const automatic=this.automatic,candidates=this.candidates;if(['low_confidence','invalid_result','too_long','control_text','model_no_speech'].includes(data.recognitionRejected)){this.breakContinuity=true;this.finishFragment();const reason=data.recognitionRejected==='model_no_speech'?'model_no_speech':'low_confidence';segmentDiagnostic({code:'filtered',filterReason:reason});if(reason==='low_confidence')this.onlanguageuncertain?.({reason:'low_confidence'});return;}if(data.recognitionRejected==='stock_outro'){this.breakContinuity=true;this.finishFragment();segmentDiagnostic({code:'filtered',filterReason:'empty'});this.onlanguageuncertain?.({reason:'stock_outro'});return;}
         if(automatic&&Array.isArray(data.languageCandidates)&&data.languageCandidates.some(c=>typeof c==='string'&&/^[a-z]{2,3}(?:-[A-Za-z]{2,8})?$/.test(c)&&!candidates.includes(c))){this.breakContinuity=true;this.finishFragment();segmentDiagnostic({code:'filtered',filterReason:'language_uncertain',languageDecision:'candidate_available'});this.onlanguageuncertain?.({reason:'outside_pair',candidates:data.languageCandidates.filter(c=>typeof c==='string'&&/^[a-z]{2,3}(?:-[A-Za-z]{2,8})?$/.test(c)).slice(0,3)});return;}
         if(automatic&&typeof data.text==='string'&&data.text.trim()&&(data.languageUncertain||!data.language||!candidates.includes(data.language)||!speechTextAllowed(data.text,candidates))){this.breakContinuity=true;this.finishFragment();segmentDiagnostic({code:'filtered',filterReason:'language_uncertain',languageDecision:speechTextAllowed(data.text,candidates)?'uncertain':'outside_pair'});this.onlanguageuncertain?.({reason:speechTextAllowed(data.text,candidates)?'uncertain':'outside_pair'});return;}
         const rejected=nonSpeechReason(data,data.language||new URL(endpoint).searchParams.get('language'));
