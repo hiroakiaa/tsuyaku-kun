@@ -10,7 +10,7 @@ export function budgetError(reason='budget'){
 export function reserveCost(model,input){
  if(model==='@cf/google/gemma-4-26b-a4b-it')return Math.ceil((new TextEncoder().encode(JSON.stringify(input.messages||[])).length*TRANSLATION_PRICE.inputPerMillion+Math.min(4096,input.max_completion_tokens||4096)*TRANSLATION_PRICE.outputPerMillion)*1.1);
  if(model===RECOGNITION_PRICE.streamModel){if(!Number.isFinite(input.seconds)||input.seconds<=0||input.seconds>30)throw budgetError();return Math.ceil(input.seconds/60*RECOGNITION_PRICE.streamPerMinute*1e6*1.1);}
- if(model==='@cf/openai/whisper-large-v3-turbo')return Math.ceil((input.audio?.length||0)*.75/32000/60*.000513*1e6*1.1);
+ if(model==='@cf/openai/whisper-large-v3-turbo')return Math.ceil((input.audio?.length||0)*.75/32000/60*RECOGNITION_PRICE.whisperPerMinute*1e6*1.1);
  if(model==='@cf/openai/whisper')return Math.ceil((input.audio?.length||0)/32000/60*.0006*1e6*1.1);
  throw budgetError();
 }
