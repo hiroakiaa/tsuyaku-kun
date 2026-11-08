@@ -1,9 +1,11 @@
 // Reject confirmed nonverbal Japanese outputs, never a meaningful short reply.
 export function nonSpeechReason(result,language){
+ if(['low_confidence','invalid_result','too_long','control_text'].includes(result?.recognitionRejected))return 'low_confidence';
+ if(result?.recognitionRejected==='model_no_speech')return 'model_no_speech';
  const text=String(result?.text||'').normalize('NFKC').trim();
  if(!text)return 'empty';
  const segments=result?.segments||result?.transcription_info?.segments;
- if(Array.isArray(segments)&&segments.length&&segments.every(s=>Number.isFinite(s.no_speech_prob)&&s.no_speech_prob>=.6))return 'model_no_speech';
+ if(Array.isArray(segments)&&segments.length&&segments.every(s=>Number.isFinite(s?.no_speech_prob)&&s.no_speech_prob>=.6))return 'model_no_speech';
  if(!['ja','ja-easy'].includes(language))return null;
  const compact=text.replace(/[\s、。,.!！…]/g,'');
  if(/^(?:ん|ン|はっくしょん|ハックション|ハクション|くしゅん|クシュン)+$/.test(compact))return 'nonverbal';

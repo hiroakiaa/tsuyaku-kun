@@ -1,0 +1,24 @@
+import assert from 'node:assert/strict';
+import {createUiFixture} from './browser-fixture.mjs';
+const f=await createUiFixture({automaticLanguage:true});
+try{for(const width of [390,1024]){
+ let requests=0;f.setApiHandler(async request=>{if(new URL(request.url()).pathname==='/transcribe'){requests++;return {json:{text:'',recognitionRejected:'low_confidence',recognitionTiming:{confidenceSegments:1,lowConfidenceSegments:1,confidenceMeasuredSegments:1}}};}});
+ const c=await f.browser.newContext({viewport:{width,height:844}});await f.setup(c);
+ await c.addInitScript(()=>{localStorage.setItem('tsuyaku-english-guides-v1','off');const Base=window.AudioContext;Object.defineProperty(navigator.mediaDevices,'getUserMedia',{value:async()=>new Base().createMediaStreamDestination().stream});window.AudioContext=class extends Base{get audioWorklet(){return {addModule:async()=>{}};}createMediaStreamSource(){return {connect(){},disconnect(){}};}};window.AudioWorkletNode=class{constructor(){this.port={postMessage(){}};window.asrNode=this;}connect(){}disconnect(){}};});
+ const p=await c.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto(f.origin);await p.locator('#microphone:not([disabled])').waitFor();assert.equal(await p.locator('#face-language').getAttribute('aria-label'),'自分の言語');assert.equal(await p.locator('#face-listening-language').getAttribute('aria-label'),'相手の言語');await p.locator('#microphone').click();await p.waitForFunction(()=>window.asrNode?.port.onmessage);
+ for(let i=1;i<=8;i++){
+  await p.evaluate(()=>window.asrNode.port.onmessage({data:{samples:Int16Array.from({length:16000},(_,i)=>i%2?800:-800),boundary:'pause'}}));
+  await p.waitForFunction(n=>{const rows=JSON.parse(localStorage.getItem('tsuyaku-connection-v1')||'[]');return rows.filter(r=>r.code==='filtered'&&r.filterReason==='low_confidence').length>=n;},i);
+ }
+ await p.waitForFunction(()=>document.querySelector('#microphone').getAttribute('aria-pressed')==='false');assert.equal(await p.locator('#captions .caption').count(),0);assert.match(await p.locator('#message').innerText(),/マイクを止めました/);assert.equal(requests,8);await p.screenshot({path:'checks/reliability30-noise-'+width+'.png'});
+ await p.locator('#admin').click();await p.locator('input[type=password]').fill('1111');await p.locator('#modal-body button[type=submit]').click();await p.getByRole('tab',{name:'分析',exact:true}).click();await p.getByText('分析データを書き出す',{exact:true}).click();await p.getByRole('button',{name:/分析を作る/}).click();const report=JSON.parse(await p.locator('#modal-body textarea').inputValue());assert.equal(report.sessions[0].recognitionFilters.low_confidence,8);assert.equal(report.sessions[0].recognitionFilters.empty,0);assert(report.findings.some(f=>f.code==='uncertain_recognition'));assert(!JSON.stringify(report).includes('synthetic-test-token'));assert.deepEqual(errors,[]);await c.close();console.log('PASS actual UI '+width+': accessible labels, 8 uncertain exclusions, mic pause, no false captions, separate analysis counts, no secret export');
+ }}finally{await f.browser.close();}
+
+const nativeFixture=await createUiFixture();
+try{
+ const c=await nativeFixture.browser.newContext({viewport:{width:390,height:844}});await nativeFixture.setup(c);
+ await c.addInitScript(()=>{localStorage.setItem('tsuyaku-english-guides-v1','off');const Base=window.AudioContext;Object.defineProperty(navigator.mediaDevices,'getUserMedia',{value:async()=>new Base().createMediaStreamDestination().stream});window.SpeechRecognition=class{constructor(){window.nativeSpeech=this;}start(){queueMicrotask(()=>this.onstart?.());}abort(){}};});
+ const p=await c.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto(nativeFixture.origin);await p.locator('#microphone:not([disabled])').waitFor();await p.locator('#microphone').click();await p.waitForFunction(()=>window.nativeSpeech?.onerror);
+ await p.evaluate(()=>{for(let i=0;i<8;i++)window.nativeSpeech.onerror?.({error:'no-speech'});});await p.waitForFunction(()=>document.querySelector('#microphone').getAttribute('aria-pressed')==='false');
+ await p.locator('#admin').click();await p.locator('input[type=password]').fill('1111');await p.locator('#modal-body button[type=submit]').click();await p.getByRole('tab',{name:'分析',exact:true}).click();await p.getByText('分析データを書き出す',{exact:true}).click();await p.getByRole('button',{name:/分析を作る/}).click();const report=JSON.parse(await p.locator('#modal-body textarea').inputValue());assert.equal(report.sessions[0].recognitionFilters.empty,8);assert.equal(report.sessions[0].recognitionByPair[0].requests,0);assert.deepEqual(errors,[]);console.log('PASS actual native browser UI: exclusions update the ledger and pause microphone; no short-segment HTTP requests invented');await c.close();
+}finally{await nativeFixture.browser.close();}
