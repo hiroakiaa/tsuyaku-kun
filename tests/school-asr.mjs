@@ -9,3 +9,28 @@ assert.equal(cleanRecognition({text:'repeated noise',segments:[{text:'repeated n
 assert.equal(cleanRecognition({text:'yes yes yes',segments:[{text:'yes yes yes',compression_ratio:3,avg_logprob:-.2,no_speech_prob:.01}]}),'yes yes yes');
 const evidence=recognitionEvidence({segments:[{text:'private text',avg_logprob:-.7,compression_ratio:3},{no_speech_prob:.8}]});assert.equal(evidence.highCompressionSegments,1);assert.equal(evidence.noSpeechSegments,1);assert.equal(evidence.confidenceMeasuredSegments,2);assert(!JSON.stringify(evidence).includes('private'));assert.deepEqual(recognitionEvidence({text:'unknown confidence'}),{});assert.equal(safeConnectionRecord(recognitionMetrics({...evidence,schoolHintCount:0,stockOutroRejected:true})).stockOutroRejected,true);
 console.log('PASS unsafe bilingual prompting disabled; standalone school outro guard preserves quotes, lessons and confident repetitions');
+
+// A dropped span must never turn a prohibition into permission, or remove a
+// condition/amount. These synthetic provider responses do not measure ASR accuracy.
+for(const [language,parts] of [
+ ['ja',['ここへ入っては','いけません','。']],
+ ['en',['You must','not','enter.']],
+ ['pt',['Você','não','deve entrar.']],
+ ['ja',['雨の場合は','中止です','。']],
+ ['ja',['参加費は','1200円','です。']]
+]){
+ const text=parts.join(' ');
+ for(const bad of [{avg_logprob:-1.01},{no_speech_prob:.35},{compression_ratio:2.5,avg_logprob:-.6}]){
+  const segments=parts.map((text,index)=>({text,avg_logprob:-.2,no_speech_prob:.01,...(index===1?bad:{})}));
+  assert.equal(cleanRecognition({text,segments},language),'');
+  assert.equal(cleanRecognition({text,transcription_info:{segments}},language),'');
+ }
+ const segments=parts.map(text=>({text,avg_logprob:-.2,no_speech_prob:.01}));
+ assert.equal(cleanRecognition({text,segments},language),text);
+}
+for(const text of ['はい','いいえ','うん','Yes.','No.','Thank you.']){
+ assert.equal(cleanRecognition({text,segments:[{text,avg_logprob:-.2,no_speech_prob:.01}]},text.match(/[ぁ-ん]/)?'ja':'en'),text);
+}
+assert.equal(cleanRecognition({text:'信頼度未取得'},'ja'),'信頼度未取得');
+assert.equal(cleanRecognition({text:'not measured',segments:[{text:'not'},{text:'measured'}]},'en'),'not measured');
+console.log('PASS uncertain spans suppress the whole interval; negations, conditions and amounts cannot be spliced out; reliable short replies remain');
