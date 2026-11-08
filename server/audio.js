@@ -29,42 +29,48 @@ export function suspectedSchoolOutro(result){
  const text=String(result?.text??result?.transcription_info?.text??'').normalize('NFKC').trim().replace(/[\s、。,.!！?？]/gu,'');
  return /^(?:これから(?:も)?(?:数多くの|たくさんの)?動画で(?:また)?お会いしましょう|(?:それでは)?(?:また)?次の動画でお会いしましょう)$/.test(text);
 }
-export function cleanRecognition(result, language, {schoolContext=false}={}) {
-  const text = result?.text ?? result?.transcription_info?.text;
-  if (typeof text !== 'string') return null;
-  if(schoolContext&&suspectedSchoolOutro(result))return '';
-  // Ignore the confirmed sneeze-like standalone Japanese ASR result only.
-  // Keep questions, meaningful short replies, and text in every other language.
-  const finish = value => {
-    const trimmed = value.trim().slice(0, 600);
-    return (language === 'ja' || language === 'ja-easy') && /^[\sんン、。,.!！…]+$/.test(trimmed) ? '' : trimmed;
-  };
-  const normalized = text.normalize('NFKC').replace(/[\s、。,.!！?？…]/g, '');
-  // A standalone stock outro is a known silence hallucination. Preserve quotes
-  // and ordinary sentences containing these words rather than rewriting speech.
-  if (/^(?:ご視聴(?:どうも)?ありがとうございました|ご視聴ありがとうございます)+$/.test(normalized)) return '';
-  const vadDuration=result.transcription_info?.duration_after_vad;
-  if(Number.isFinite(vadDuration)&&vadDuration<=0)return '';
-  const segments = result.segments || result.transcription_info?.segments;
-  if (Array.isArray(segments) && segments.length) {
-    // Never remove words solely because they repeat: confidence evidence is required.
-    const unreliable = segment =>
-      (Number.isFinite(segment.no_speech_prob) && segment.no_speech_prob >= .35) ||
-      (Number.isFinite(segment.avg_logprob) && segment.avg_logprob < -1) ||
-      (Number.isFinite(segment.compression_ratio) && segment.compression_ratio > 2.4 &&
-        ((Number.isFinite(segment.avg_logprob)&&segment.avg_logprob<-.5)||(Number.isFinite(segment.no_speech_prob)&&segment.no_speech_prob>=.15)));
-    // A low-confidence span may contain a negation, condition, amount or name.
-    // Removing it and joining the remaining words can invent a different claim.
-    // Suppress this captured interval as a whole; never guess its missing words.
-    if (segments.some(unreliable)) return '';
-  }
-  return finish(text);
+// Keep missing confidence distinct from invalid provider metadata.
+function recognitionSegments(result){
+ const top=result?.segments,nested=result?.transcription_info?.segments;
+ if(top!=null&&!Array.isArray(top)||nested!=null&&!Array.isArray(nested))return null;
+ return Array.isArray(top)&&top.length?top:Array.isArray(nested)?nested:[];
 }
+function invalidConfidence(segment){
+ if(!segment||typeof segment!=='object'||Array.isArray(segment))return true;
+ for(const [name,min,max] of [['no_speech_prob',0,1],['avg_logprob',-Infinity,0],['compression_ratio',0,Infinity]]){
+  const n=segment[name];if(n!=null&&(typeof n!=='number'||!Number.isFinite(n)||n<min||n>max))return true;
+ }
+ return false;
+}
+function unreliable(segment){
+ return Number.isFinite(segment.no_speech_prob)&&segment.no_speech_prob>=.35||
+  Number.isFinite(segment.avg_logprob)&&segment.avg_logprob< -1||
+  Number.isFinite(segment.compression_ratio)&&segment.compression_ratio>2.4&&
+   (Number.isFinite(segment.avg_logprob)&&segment.avg_logprob< -.5||Number.isFinite(segment.no_speech_prob)&&segment.no_speech_prob>=.15);
+}
+export function recognitionDecision(result,language,{schoolContext=false}={}){
+ const raw=result?.text??result?.transcription_info?.text;
+ if(typeof raw!=='string')return {text:null,reason:'invalid_result'};
+ const text=raw.trim();if(!text)return {text:'',reason:'empty'};
+ if(text.length>600)return {text:'',reason:'too_long'};
+ if(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/u.test(text))return {text:'',reason:'control_text'};
+ if(schoolContext&&suspectedSchoolOutro(result))return {text:'',reason:'stock_outro'};
+ const normalized=text.normalize('NFKC').replace(/[\s、。,.!！?？…]/gu,'');
+ if(/^(?:ご視聴(?:どうも)?ありがとうございました|ご視聴ありがとうございます)+$/u.test(normalized))return {text:'',reason:'stock_outro'};
+ const duration=result?.transcription_info?.duration_after_vad;
+ if(Number.isFinite(duration)&&duration<=0)return {text:'',reason:'model_no_speech'};
+ const segments=recognitionSegments(result);
+ if(!segments||segments.length>256||segments.some(invalidConfidence))return {text:'',reason:'invalid_result'};
+ if(segments.some(unreliable))return {text:'',reason:segments.every(s=>Number.isFinite(s.no_speech_prob)&&s.no_speech_prob>=.35)?'model_no_speech':'low_confidence'};
+ if(['ja','ja-easy'].includes(language)&&/^[\sんン、。,.!！…]+$/u.test(text))return {text:'',reason:'nonverbal'};
+ return {text,reason:null};
+}
+export function cleanRecognition(result,language,options){return recognitionDecision(result,language,options).text;}
 
-// Numeric evidence only; segment text and provider payloads never enter diagnostics.
+// Numeric evidence only: never retain provider text or arbitrary properties.
 export function recognitionEvidence(result){
- const rows=result?.segments||result?.transcription_info?.segments;if(!Array.isArray(rows)||!rows.length)return {};
- return {confidenceSegments:rows.length,noSpeechSegments:rows.filter(s=>Number.isFinite(s.no_speech_prob)&&s.no_speech_prob>=.35).length,lowConfidenceSegments:rows.filter(s=>Number.isFinite(s.avg_logprob)&&s.avg_logprob< -1).length,highCompressionSegments:rows.filter(s=>Number.isFinite(s.compression_ratio)&&s.compression_ratio>2.4).length,confidenceMeasuredSegments:rows.filter(s=>[s.no_speech_prob,s.avg_logprob,s.compression_ratio].some(Number.isFinite)).length};
+ const rows=recognitionSegments(result);if(!rows?.length)return {};
+ const safe=rows.slice(0,256),valid=safe.filter(s=>s&&typeof s==='object'&&!Array.isArray(s));
+ const invalid=safe.filter(invalidConfidence).length;
+ return {confidenceSegments:safe.length,noSpeechSegments:valid.filter(s=>Number.isFinite(s.no_speech_prob)&&s.no_speech_prob>=.35).length,lowConfidenceSegments:valid.filter(s=>Number.isFinite(s.avg_logprob)&&s.avg_logprob< -1).length,highCompressionSegments:valid.filter(s=>Number.isFinite(s.compression_ratio)&&s.compression_ratio>2.4).length,confidenceMeasuredSegments:valid.filter(s=>[s.no_speech_prob,s.avg_logprob,s.compression_ratio].some(Number.isFinite)).length,...(invalid?{invalidConfidenceSegments:invalid}:{})};
 }
-
-
