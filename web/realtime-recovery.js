@@ -1,7 +1,7 @@
-import {encodeWav,tokenWithAbort} from './caption-server.js?v=20261103-request-lifecycle-1';
+import {encodeWav,tokenWithAbort} from './caption-server.js?v=20261108-reliability30-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261103-audio-offset-1';
 import {speechTextAllowed} from './two-language.js?v=20261029-communication50-1';
-import {nonSpeechReason} from './speech-filter.js?v=20261007-learning-1';
+import {nonSpeechReason} from './speech-filter.js?v=20261108-reliability30-1';
 import {recognitionMetrics} from './recognition-metrics.js?v=20261029-communication50-1';
 export class FreshAudioWindow{
  constructor(){this.frames=[];this.length=0;}
@@ -29,6 +29,7 @@ export function createRealtimeRecovery({endpoint,getToken,acquireSlot,onUsage=()
    const data=await response.json();known=response.ok||[400,401,403,429].includes(response.status);
    onDiagnostic({code:response.ok?'ok':'http_error',status:response.status,clientRequestMs:Date.now()-started,audioSeconds:samples.length/16000,...recognitionMetrics(data?.recognitionTiming),...(['quota','billing','input','model','auth','overloaded','timeout','service'].includes(data?.aiFailure?.reason)?{aiReason:data.aiFailure.reason}:{}),...(Number.isInteger(data?.aiFailure?.code)?{aiCode:data.aiFailure.code}:{})});
    if(!response.ok)throw Object.assign(Error('Recognition recovery failed'),{error:response.status===401?'auth':data?.aiFailure?.reason||'service'});
+   const rejected=nonSpeechReason(data,data?.language);if(rejected){onDiagnostic({code:'filtered',filterReason:rejected});return null;}
    if(typeof data?.text!=='string'||data.text.length>600||data.languageUncertain||!candidates.includes(data.language)||!speechTextAllowed(data.text,candidates)||nonSpeechReason(data,data.language))return null;
    return {text:data.text,language:data.language};
   }finally{if(sent&&!known)onUnmeasured();release?.();clearTimeout(timer);signal.removeEventListener('abort',abort);}
