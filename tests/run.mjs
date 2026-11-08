@@ -1,3 +1,4 @@
+import './reliability30.mjs';
 import './recognition-noise-guard.mjs';
 import './speech-connection.mjs';
 import './responsive-capture.mjs';
@@ -256,16 +257,16 @@ await test('再接続は認証拒否と連続失敗とオフラインで停止�
  const {resourceFailure,mayReconnect}=await import('../web/resource-policy.js');assert.equal(resourceFailure(Error('Daily request limit exceeded')).reason,'quota');assert.equal(resourceFailure(Error('upstream timeout')),null);assert.equal(resourceFailure(Error('Exceeded allowed volume of requests in Durable Objects free tier.')).reason,'quota');
  assert.equal(mayReconnect(1008,1),false);assert.equal(mayReconnect(1006,6),false);assert.equal(mayReconnect(1006,1,false),false);assert.equal(mayReconnect(1006,1),true);
 });
-await test('ブラウザー認識は確定文だけ処理し日付と内容を同じ字幕へ更新する',async()=>{
+await test('ブラウザー認識は確定文だけ処理し時刻不明の別結果を結合しない',async()=>{
  const {createBrowserRecognition}=await import('../web/caption-browser.js');assert.equal(createBrowserRecognition({language:'ja'}),null);
  let native;class Native{constructor(){native=this;}start(){}abort(){this.aborted=true;}}
  const Recognizer=createBrowserRecognition({language:'ja',Native});const r=new Recognizer(),events=[];r.onresult=e=>events.push(e);r.start();assert.equal(native.lang,'ja');
  const feed=(text,isFinal=true)=>{const row=[{transcript:text}];row.isFinal=isFinal;native.onresult({resultIndex:0,results:[row]});};
- feed('まだ途中',false);feed('ん');assert.equal(events.length,0);feed('10月9日');feed('金曜日に終業式があります');assert.equal(events.length,2);assert.equal(events[0].resultIndex,events[1].resultIndex);assert.equal(events[1].results[0][0].transcript,'10月9日 金曜日に終業式があります');assert.equal(events[1].speechEndedAt,undefined);r.abort();assert.equal(native.aborted,true);
+ feed('まだ途中',false);feed('ん');assert.equal(events.length,0);feed('10月9日');feed('金曜日に終業式があります');const final=events.filter(e=>!e.metadataOnly);assert.equal(final.length,2);assert.notEqual(final[0].resultIndex,final[1].resultIndex);assert.equal(final[1].results[final[1].resultIndex][0].transcript,'金曜日に終業式があります');assert.equal(final[1].speechEndedAt,undefined);r.abort();assert.equal(native.aborted,true);
 });
 await test('ブラウザー認識の失敗・停止後は古い結果を届けない',async()=>{
  const {createBrowserRecognition}=await import('../web/caption-browser.js');let native;class Native{constructor(){native=this;}start(){}abort(){}}
- const R=createBrowserRecognition({language:'es',Native}),r=new R();let error,results=0;r.onerror=e=>error=e;r.onresult=()=>results++;r.start();const callback=native.onresult;native.onerror({error:'network'});assert.equal(error.error,'service');callback({resultIndex:0,results:[Object.assign([{transcript:'hola'}],{isFinal:true})]});assert.equal(results,0);
+ const R=createBrowserRecognition({language:'es',Native}),r=new R();let error,results=0;r.onerror=e=>error=e;r.onresult=()=>results++;r.start();const callback=native.onresult;native.onerror({error:'network'});assert.equal(error.error,'network');callback({resultIndex:0,results:[Object.assign([{transcript:'hola'}],{isFinal:true})]});assert.equal(results,0);
 });
 await test('登録済みの逆方向訳と不足言語を区別し曖昧な辞書一致は使わない',async()=>{
  const {TranslationMemory}=await import('../web/translation-memory.js');const m=new TranslationMemory({getItem:()=>null,setItem(){}}),catalog={phrases:[{id:'a',jaText:'こんにちは',esText:'Hola',enText:'Hello'}]};assert.equal(m.lookup('es','Hola',['ja','en'],'',catalog).translations.ja,'こんにちは');const partial=m.lookup('es','Hola',['ja','pt'],'',catalog,true);assert.deepEqual(partial.missing,['pt']);catalog.phrases.push({id:'b',jaText:'やあ',esText:'Hola'});assert.equal(m.lookup('es','Hola',['ja'],'',catalog),null);
