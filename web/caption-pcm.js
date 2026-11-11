@@ -2,8 +2,8 @@
 // Audio stays in bounded memory only; natural pauses do not duplicate billing.
 const initialSpeechWaitSamples=8*16000;
 export class PcmSegmenter {
-  constructor(rate, emit, activity=()=>{}, {pauseMs=500,oneUtterance=false}={}) {
-    this.oneUtterance=oneUtterance;this.pauseSamples=pauseMs===300?4800:pauseMs===400?6400:8000;this.rate=rate;this.emit=emit;this.activity=activity;this.samples=new Int16Array(48000);
+  constructor(rate, emit, activity=()=>{}, {pauseMs=500,oneUtterance=false,manualRelease=false}={}) {
+    this.oneUtterance=oneUtterance;this.manualRelease=manualRelease;this.pauseSamples=pauseMs===300?4800:pauseMs===400?6400:8000;this.rate=rate;this.emit=emit;this.activity=activity;this.samples=new Int16Array(48000);
     this.preroll=new Int16Array(3200);this.frame=new Int16Array(320);
     this.clear();
   }
@@ -32,7 +32,7 @@ export class PcmSegmenter {
       }
       if(this.oneUtterance&&this.emittedAtLimit){
         this.limitSilence=voiced?0:this.limitSilence+320;
-        if(this.limitSilence>=this.pauseSamples){this.completed=true;return;}
+        if(!this.manualRelease&&this.limitSilence>=this.pauseSamples){this.completed=true;return;}
       }
       if(!voiced){this.onset=0;this.noise=this.noise*.98+Math.min(rms,.006)*.02;this.preroll.set(this.frame,this.preIndex);this.preIndex=(this.preIndex+320)%this.preroll.length;return;}
       // Require 60ms of sustained activity, not six scattered handling clicks.
@@ -56,7 +56,7 @@ export class PcmSegmenter {
       const overlap=forced?this.samples.slice(this.length-this.preroll.length,this.length):null;
       this.samples.fill(0);this.length=0;this.voiced=0;this.silence=0;this.onset=0;this.started=false;
       if(overlap)this.preroll.set(overlap);
-      if(this.oneUtterance&&!forced&&(hasSpeech||this.emittedAtLimit))this.completed=true;
+      if(this.oneUtterance&&!this.manualRelease&&!forced&&(hasSpeech||this.emittedAtLimit))this.completed=true;
     }
   }
   hasSpeech(){
