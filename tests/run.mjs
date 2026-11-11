@@ -771,6 +771,7 @@ await test('発話終了は残った認識結果を届けてから終了する',
  recognizer.active=true;
  recognizer.context={state:'running',audioWorklet:{async addModule(){}},createMediaStreamSource:()=>({connect(){},disconnect(){}}),async close(){}};
  recognizer.onresult=()=>events.push('result');
+ recognizer.onCaptureFinished=()=>events.push('captured');
  const ended=new Promise(resolve=>{recognizer.onend=()=>{events.push('end');resolve();};});
  try{
   await recognizer.prepare({},Promise.resolve());
@@ -778,11 +779,12 @@ await test('発話終了は残った認識結果を届けてから終了する',
   assert.equal(recognizer.finishCapture(),false);
   worklet.port.onmessage({data:{samples:new Int16Array(3200)}});
   worklet.port.onmessage({data:{captureFinished:true}});
+  worklet.port.onmessage({data:{captureFinished:true}});
   await new Promise(resolve=>setImmediate(resolve));
-  assert.deepEqual(events,['finish']);
+  assert.deepEqual(events,['finish','captured']);
   complete({ok:true,status:200,json:async()=>({text:'はい',language:'ja'})});
   await ended;
-  assert.deepEqual(events,['finish','result','stop','end']);
+  assert.deepEqual(events,['finish','captured','result','stop','end']);
  }finally{if(recognizer.active)recognizer.abort();}
 });
 
@@ -809,4 +811,30 @@ await test('ブラウザー音声認識は停止後の確定結果も届ける',
   native.onend();
   assert.deepEqual(events,['result','end']);
  }finally{recognizer.abort();}
+});
+
+await test('一発話の収録は区切り後の声を送らず強制分割の後も続く',()=>{
+ const speech=length=>Float32Array.from({length},(_,i)=>Math.sin(i*.15)*.08);
+ const silence=new Float32Array(9600);
+ const segments=[];
+ const capture=new PcmSegmenter(16000,(_samples,detail)=>segments.push(detail.boundary),()=>{},{oneUtterance:true});
+ capture.push(speech(64000));
+ assert.deepEqual(segments,['limit']);
+ capture.push(silence);
+ assert.deepEqual(segments,['limit','pause']);
+ capture.push(speech(9600));
+ capture.push(silence);
+ assert.deepEqual(segments,['limit','pause']);
+ capture.clear();
+ capture.push(speech(9600));
+ capture.push(silence);
+ assert.deepEqual(segments,['limit','pause','pause']);
+});
+
+await test('上限ちょうどで発話が終わった場合も次の声を待たずに収録を閉じる',()=>{
+ const capture=new PcmSegmenter(16000,()=>{},()=>{},{oneUtterance:true});
+ capture.push(Float32Array.from({length:45440},(_,i)=>Math.sin(i*.15)*.08));
+ assert.equal(capture.emittedAtLimit,true);
+ capture.push(new Float32Array(9600));
+ assert.equal(capture.completed,true);
 });
