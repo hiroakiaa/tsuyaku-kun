@@ -1,6 +1,6 @@
 import {splitRecognizedText} from './session-reliability.js?v=20261022-reliability-20-1';
-import {createServerRecognition} from './caption-server.js?v=20261111-classroom-recovery-1';
-import {nonSpeechReason} from './speech-filter.js?v=20261111-classroom-recovery-1';
+import {createServerRecognition} from './caption-server.js?v=20261111-classroom-mic-finish-1';
+import {nonSpeechReason} from './speech-filter.js?v=20261111-classroom-mic-finish-1';
 
 // The browser may use its vendor's speech service. This is not an offline guarantee.
 // Reuse the bounded fragment assembler so dates and their following sentence stay together.
@@ -30,16 +30,22 @@ export function createBrowserRecognition({language, Native, onDiagnostic = () =>
       };
       native.onerror=event=>{started();
         if(!this.active||this.native!==native)return;
-        if(event.error==='aborted'){this.finishFragment();this.active=false;onDiagnostic({code:'browser_speech_ended'});this.onend?.();return;}
+        if(event.error==='aborted'){cancel(this.finishCaptureTimer);this.finishCaptureTimer=null;this.finishFragment();this.active=false;onDiagnostic({code:'browser_speech_ended'});this.onend?.();return;}
         if(event.error==='no-speech'){this.onprogress?.({phase:'waiting'});this.breakContinuity=true;this.finishFragment();onDiagnostic({code:'filtered',filterReason:'empty'});return;}
         const error=event.error==='network'?'network':['not-allowed','service-not-allowed'].includes(event.error)?'auth':event.error==='audio-capture'?'audio-capture':'service';
         onDiagnostic({code:'browser_speech_error',recognitionCode:event.error});
         this.fail(error);
       };
-      native.onend=()=>{started();if(!this.active||this.native!==native)return;this.finishFragment();this.active=false;onDiagnostic({code:'browser_speech_ended'});this.onend?.();};
+      native.onend=()=>{started();if(!this.active||this.native!==native)return;cancel(this.finishCaptureTimer);this.finishCaptureTimer=null;this.finishFragment();this.active=false;onDiagnostic({code:'browser_speech_ended'});this.onend?.();};
       this.startWatch=schedule(()=>{if(this.active&&this.native===native){onDiagnostic({code:'browser_speech_error',recognitionCode:'start_timeout'});this.fail('audio-capture');}},8000);
       try{native.start();}catch{this.fail('service');}
     }
-    abort(){cancel(this.startWatch);this.startWatch=null;super.abort();if(this.native){this.native.onstart=this.native.onspeechstart=this.native.onspeechend=this.native.onresult=this.native.onerror=this.native.onend=null;try{this.native.abort();}catch{}this.native=null;}}
+    finishCapture(){
+      if(!this.active||typeof this.native?.stop!=='function'||this.finishCaptureTimer)return false;
+      this.finishingCapture=true;
+      this.finishCaptureTimer=schedule(()=>this.fail('interrupted'),5000);
+      try{this.native.stop();return true;}catch{cancel(this.finishCaptureTimer);this.finishCaptureTimer=null;this.finishingCapture=false;return false;}
+    }
+    abort(){this.finishingCapture=false;cancel(this.finishCaptureTimer);this.finishCaptureTimer=null;cancel(this.startWatch);this.startWatch=null;super.abort();if(this.native){this.native.onstart=this.native.onspeechstart=this.native.onspeechend=this.native.onresult=this.native.onerror=this.native.onend=null;try{this.native.abort();}catch{}this.native=null;}}
   };
 }
