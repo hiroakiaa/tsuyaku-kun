@@ -1,5 +1,6 @@
 // 20 ms RMS frames avoid treating every waveform zero crossing as silence.
 // Audio stays in bounded memory only; natural pauses do not duplicate billing.
+const initialSpeechWaitSamples=8*16000;
 export class PcmSegmenter {
   constructor(rate, emit, activity=()=>{}, {pauseMs=500,oneUtterance=false}={}) {
     this.oneUtterance=oneUtterance;this.pauseSamples=pauseMs===300?4800:pauseMs===400?6400:8000;this.rate=rate;this.emit=emit;this.activity=activity;this.samples=new Int16Array(48000);
@@ -23,6 +24,12 @@ export class PcmSegmenter {
     const threshold=Math.max(.004,Math.min(.006,this.noise*1.5));
     const voiced=rms>=threshold;
     if(!this.started){
+      if(this.oneUtterance&&!this.emittedAtLimit&&!this.heardSpeech){
+        this.waitedForSpeech+=320;
+        if(this.waitedForSpeech>=initialSpeechWaitSamples&&this.onset===0&&!voiced){
+          this.completed=true;this.completionReason="no_speech";return;
+        }
+      }
       if(this.oneUtterance&&this.emittedAtLimit){
         this.limitSilence=voiced?0:this.limitSilence+320;
         if(this.limitSilence>=this.pauseSamples){this.completed=true;return;}
@@ -40,6 +47,7 @@ export class PcmSegmenter {
     const forced=this.length===this.samples.length;
     if(forced||this.silence>=this.pauseSamples){
       const hasSpeech=this.voiced>=1920;
+      if(hasSpeech)this.heardSpeech=true;
       if(hasSpeech)this.emit(this.samples.slice(0,this.length),{boundary:forced?'limit':'pause'});
       if(forced&&hasSpeech)this.emittedAtLimit=true;
       // Every emitted segment ends its capture state, including a forced limit.
@@ -62,7 +70,7 @@ export class PcmSegmenter {
     }
     this.clear();
   }
-  clear(){this.completed=false;this.emittedAtLimit=false;this.limitSilence=0;this.samples.fill(0);this.preroll.fill(0);this.frame.fill(0);this.preIndex=0;this.frameLength=0;this.started=false;this.length=0;this.sum=0;this.count=0;this.phase=0;this.onset=0;this.voiced=0;this.silence=0;this.noise=.001;}
+  clear(){this.completed=false;this.completionReason=null;this.waitedForSpeech=0;this.heardSpeech=false;this.emittedAtLimit=false;this.limitSilence=0;this.samples.fill(0);this.preroll.fill(0);this.frame.fill(0);this.preIndex=0;this.frameLength=0;this.started=false;this.length=0;this.sum=0;this.count=0;this.phase=0;this.onset=0;this.voiced=0;this.silence=0;this.noise=.001;}
 }
 if(typeof AudioWorkletProcessor!=='undefined'){
   class CaptionPcmProcessor extends AudioWorkletProcessor{
@@ -74,7 +82,7 @@ if(typeof AudioWorkletProcessor!=='undefined'){
         this.port.postMessage({captureFinished:true});
       }else this.segmenter.clear();
     };}
-    process(inputs){if(!this.active)return false;const input=inputs[0]?.[0];if(input){this.inputFrames+=input.length;if(input.some(value=>Math.abs(value)>.0001))this.signalFrames+=input.length;this.segmenter.push(input);if(this.segmenter.completed){this.active=false;this.segmenter.clear();this.port.postMessage({captureFinished:true});return false;}}if((this.frames+=(input?.length||128))>=sampleRate*2){this.frames=0;this.port.postMessage({alive:true,inputFrames:this.inputFrames,signalFrames:this.signalFrames});this.inputFrames=this.signalFrames=0;}return true;}
+    process(inputs){if(!this.active)return false;const input=inputs[0]?.[0];if(input){this.inputFrames+=input.length;if(input.some(value=>Math.abs(value)>.0001))this.signalFrames+=input.length;this.segmenter.push(input);if(this.segmenter.completed){this.active=false;const reason=this.segmenter.completionReason;this.segmenter.clear();this.port.postMessage({captureFinished:true,reason});return false;}}if((this.frames+=(input?.length||128))>=sampleRate*2){this.frames=0;this.port.postMessage({alive:true,inputFrames:this.inputFrames,signalFrames:this.signalFrames});this.inputFrames=this.signalFrames=0;}return true;}
   }
   registerProcessor('caption-pcm',CaptionPcmProcessor);
 }
