@@ -44,7 +44,7 @@ export function createBillingView({el,connect=connectOwner,fetcher=fetch,now=()=
   lastRead=now();lastMonth=month;const serial=epoch;render('無料の読取APIで確認しています…');
   const access=await api('/billing/access');if(serial!==epoch)return;if(access.paidQueries!==false||access.readMethod!=='tabledata.list')throw Error('無料閲覧の設定を確認できないため停止しました。');
   const settled=await Promise.allSettled([api('/billing/google'),api('/billing/cloudflare')]);if(serial!==epoch)return;
-  reports=settled.map((r,i)=>r.status==='fulfilled'?r.value:{provider:i?'cloudflare':'google',month,status:'error',message:r.reason?.message||'未取得'});render();
+  ((r,i)=>r.status==='fulfilled'?r.value:{provider:i?'cloudflare':'google',month,status:'error',message:r.reason?.messageconst openai=await api('/billing/openai-connection').catch(()=>null);if(serial!==epoch)return;reports=settled.map
  }
  login.onclick=async()=>{if(busy)return;busy=true;login.disabled=true;const serial=++epoch;render('管理者本人を確認しています…');try{const connection=await connect();if(serial!==epoch){await connection.close();return;}owner=connection;await load();}catch(e){render(e?.code==='auth/popup-closed-by-user'?'確認を取り消しました。':e?.message||'確認できませんでした。');}finally{busy=false;login.disabled=false;schedule();}};
  refresh.onclick=update;
