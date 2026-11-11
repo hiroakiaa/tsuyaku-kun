@@ -322,6 +322,12 @@ function clearLessonSpeechReview(){
  $('#lesson-review-text').value='';
 }
 $('#lesson-single-speech').onchange=updateLiveActions;
+const holdSpeechOption=$('#lesson-hold');
+const holdSpeechPreference='tsuyaku-lesson-hold-v1';
+try{holdSpeechOption.checked=localStorage.getItem(holdSpeechPreference)==='on';}catch{}
+holdSpeechOption.onchange=()=>{
+ try{localStorage.setItem(holdSpeechPreference,holdSpeechOption.checked?'on':'off');}catch{}
+};
 const microphoneButton=$('#microphone');
 let heldMicrophone=null;
 function finishHeldMicrophone(event,cancelled=false){
@@ -341,7 +347,7 @@ function finishHeldMicrophone(event,cancelled=false){
 }
 microphoneButton.addEventListener('pointerdown',event=>{
  if(event.button!==0||!event.isPrimary||!room||room.mode!=='lesson'||role!=='teacher'||mic||
-  !$('#lesson-single-speech').checked||!$('#lesson-hold').checked||microphoneButton.disabled)return;
+  !$('#lesson-single-speech').checked||!holdSpeechOption.checked||microphoneButton.disabled)return;
  event.preventDefault();
  heldMicrophone=event.pointerId;
  microphoneButton.setPointerCapture(event.pointerId);
@@ -351,7 +357,7 @@ window.addEventListener('pointerup',event=>finishHeldMicrophone(event),true);
 window.addEventListener('pointercancel',event=>finishHeldMicrophone(event,true),true);
 window.addEventListener('blur',()=>{if(heldMicrophone!==null)finishHeldMicrophone({pointerId:heldMicrophone},true);});
 microphoneButton.addEventListener('click',event=>{
- if(event.detail>0&&room?.mode==='lesson'&&role==='teacher'&&$('#lesson-single-speech').checked&&$('#lesson-hold').checked)
+ if(event.detail>0&&room?.mode==='lesson'&&role==='teacher'&&$('#lesson-single-speech').checked&&holdSpeechOption.checked)
   event.stopImmediatePropagation();
 },true);
 $('#lesson-review-discard').onclick=()=>{clearLessonSpeechReview();$('#microphone').focus();};
