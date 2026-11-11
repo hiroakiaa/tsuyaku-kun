@@ -749,6 +749,7 @@ await test('PCMの録音確定は無音待ちなしで短い発話を一度だ�
  assert.equal(output.length,1);
  assert.equal(output[0].detail.boundary,'pause');
  assert(output[0].samples.some(sample=>sample!==0));
+ assert.ok(validWav(new Uint8Array(encodeWav(output[0].samples,8000))));
  assert.deepEqual(activity,['start','end']);
  segmenter.push(new Float32Array(16000));
  segmenter.finish();
@@ -883,4 +884,50 @@ await test('無音の自動停止は先生のマイクを閉じて案内する',
  assert.deepEqual(events,[false,'mic_no_speech_timeout']);
  assert.deepEqual(pauses,['idle']);
  assert.equal(messages.length,1);
+});
+
+await test('一発話モードでは長い発話の末尾だけを短区間として保持する',()=>{
+ const wave=n=>Float32Array.from({length:n},(_,i)=>Math.sin(i*.15)*.08);
+ const silence=new Float32Array(9600);
+ const segments=[];
+ const capture=new PcmSegmenter(16000,(samples,detail)=>{
+  if(detail.boundary==='pause')assert.ok(hasSpeechEnergy(new Uint8Array(encodeWav(samples))));
+  segments.push(detail.boundary);
+ },()=>{},{oneUtterance:true});
+ capture.push(wave(45440));
+ capture.push(wave(960));
+ capture.push(silence);
+ assert.deepEqual(segments,['limit','pause']);
+ capture.clear();
+ capture.push(wave(960));
+ capture.push(silence);
+ assert.deepEqual(segments,['limit','pause'],'An isolated short burst is still rejected');
+});
+
+await test('短い発話の補完は送信秒数だけに反映し発話時刻は保つ',async()=>{
+ const usage=[],diagnostics=[],results=[];
+ const Recognition=createServerRecognition({
+  endpoint:'https://test/transcribe?language=ja',getToken:async()=> 'token',
+  onUsage:seconds=>usage.push(seconds),onDiagnostic:entry=>diagnostics.push(entry),
+  fetcher:async(_url,{body})=>{
+   const wav=new Uint8Array(body);
+   assert.ok(validWav(wav));
+   assert.ok(hasSpeechEnergy(wav));
+   assert.equal(wav.length,16044);
+   assert.ok(wav.subarray(44+2450*2).every(value=>value===0));
+   return {ok:true,status:200,json:async()=>({text:'はい',language:'ja'})};
+  }
+ });
+ const recognition=new Recognition(),at=Date.now();
+ recognition.active=true;
+ recognition.onresult=result=>results.push(result);
+ const samples=Int16Array.from({length:2450},(_,i)=>Math.round(Math.sin(i*.15)*2600));
+ recognition.queue.push({samples,at,sequence:1,boundary:'pause',speechStartedAt:at-150,speechEndedAt:at-10});
+ try{
+  await recognition.drain();
+  assert.deepEqual(usage,[.5]);
+  assert.equal(diagnostics.find(entry=>entry.code==='ok').captureTailMs,10);
+  assert.equal(diagnostics.find(entry=>entry.code==='ok').audioSeconds,.5);
+  assert.equal(results[0].speechEndedAt,at-10);
+ }finally{recognition.abort();}
 });

@@ -46,7 +46,7 @@ export class PcmSegmenter {
     if(voiced){this.voiced+=320;this.silence=0;}else this.silence+=320;
     const forced=this.length===this.samples.length;
     if(forced||this.silence>=this.pauseSamples){
-      const hasSpeech=this.voiced>=1920;
+      const hasSpeech=this.hasSpeech();
       if(hasSpeech)this.heardSpeech=true;
       if(hasSpeech)this.emit(this.samples.slice(0,this.length),{boundary:forced?'limit':'pause'});
       if(forced&&hasSpeech)this.emittedAtLimit=true;
@@ -59,13 +59,17 @@ export class PcmSegmenter {
       if(this.oneUtterance&&!forced&&(hasSpeech||this.emittedAtLimit))this.completed=true;
     }
   }
+  hasSpeech(){
+    const minimum=this.oneUtterance&&this.emittedAtLimit?960:1920;
+    return this.voiced>=minimum;
+  }
   finish(){
     if(this.frameLength){
       this.frame.fill(0,this.frameLength);
       this.acceptFrame();
     }
     if(this.started){
-      if(this.voiced>=1920)this.emit(this.samples.slice(0,this.length),{boundary:'pause'});
+      if(this.hasSpeech())this.emit(this.samples.slice(0,this.length),{boundary:'pause'});
       this.activity('end');
     }
     this.clear();
