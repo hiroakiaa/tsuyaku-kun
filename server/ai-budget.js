@@ -8,6 +8,11 @@ export function budgetError(reason='budget'){
  e.appBudget=true;e.aiReason=reason;e.code=reason==='busy'?3040:3036;return e;
 }
 export function reserveCost(model,input){
+ if(model==='gpt-realtime-translate'){
+  // A 15-second slice fits within the existing per-reservation limit.
+  if(!Number.isFinite(input.seconds)||input.seconds<=0||input.seconds>15)throw budgetError();
+  return Math.ceil(input.seconds*34000/60);
+ }
  if(model==='@cf/google/gemma-4-26b-a4b-it')return Math.ceil((new TextEncoder().encode(JSON.stringify(input.messages||[])).length*TRANSLATION_PRICE.inputPerMillion+Math.min(4096,input.max_completion_tokens||4096)*TRANSLATION_PRICE.outputPerMillion)*1.1);
  if(model===RECOGNITION_PRICE.streamModel){if(!Number.isFinite(input.seconds)||input.seconds<=0||input.seconds>30)throw budgetError();return Math.ceil(input.seconds/60*RECOGNITION_PRICE.streamPerMinute*1e6*1.1);}
  if(model==='@cf/openai/whisper-large-v3-turbo')return Math.ceil((input.audio?.length||0)*.75/32000/60*RECOGNITION_PRICE.whisperPerMinute*1e6*1.1);

@@ -1,0 +1,63 @@
+import { readLiveTranslationEvent } from './live-translation-events.js';
+
+export async function connectLiveTranslation({
+  apiOrigin, language, getToken, signal, onTranscript, onDisconnected,
+}) {
+  const token = await getToken();
+  signal?.throwIfAborted();
+  const url = new URL('/live-translation', apiOrigin);
+  url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+  url.searchParams.set('language', language);
+
+  const socket = new WebSocket(url);
+  let ready = false;
+  let stopped = false;
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => finish('timeout'), 9000);
+
+    function finish(reason, intentional = false) {
+      if (stopped) return;
+      stopped = true;
+      clearTimeout(timeout);
+      signal?.removeEventListener('abort', abort);
+      socket.close();
+      if (!ready) reject(new Error(reason));
+      else if (!intentional) onDisconnected(reason);
+    }
+
+    function abort() {
+      finish('cancelled', true);
+    }
+
+    signal?.addEventListener('abort', abort, { once: true });
+    socket.onopen = () => socket.send(JSON.stringify({ token }));
+    socket.onerror = () => finish('connection failed');
+    socket.onclose = () => finish('connection closed');
+    socket.onmessage = ({ data }) => {
+      if (stopped) return;
+      if (!ready) {
+        let message;
+        try { message = JSON.parse(data); } catch { return finish('invalid response'); }
+        if (message?.type !== 'ready') return finish('unexpected response');
+        ready = true;
+        clearTimeout(timeout);
+        resolve({
+          send(pcm) {
+            if (stopped || socket.readyState !== WebSocket.OPEN) return false;
+            if (socket.bufferedAmount > 48000) {
+              finish('connection overloaded');
+              return false;
+            }
+            socket.send(pcm);
+            return true;
+          },
+          stop: abort,
+        });
+        return;
+      }
+      const event = readLiveTranslationEvent(data);
+      if (event?.type === 'transcript') onTranscript(event);
+      else if (event?.type === 'closed' || event?.type === 'error') finish(event.type);
+    };
+  });
+}

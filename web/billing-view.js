@@ -1,8 +1,8 @@
 import {config} from './config.js';
 import {billingTotals,billingRefreshInterval} from './billing-data.js?v=20261022-billing-auto-1';
-async function connectOwner(){
+export async function connectOwner(appName='billing-admin'){
  const [appSdk,authSdk]=await Promise.all([import('https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js')]);
- const app=appSdk.getApps().find(a=>a.name==='billing-admin')||appSdk.initializeApp(config.firebase,'billing-admin'),auth=authSdk.getAuth(app);await authSdk.setPersistence(auth,authSdk.inMemoryPersistence);
+ const app=appSdk.getApps().find(a=>a.name===appName)||appSdk.initializeApp(config.firebase,appName),auth=authSdk.getAuth(app);await authSdk.setPersistence(auth,authSdk.inMemoryPersistence);
  const provider=new authSdk.GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});
  const result=await authSdk.signInWithPopup(auth,provider);
  return {token:()=>result.user.getIdToken(),close:()=>authSdk.signOut(auth)};

@@ -1,3 +1,4 @@
+import {upgradeLiveTranslation} from './live-translation-relay.js';
 import {speechLanguageCandidates} from '../web/language-discovery.js';
 import {isRecognitionLanguage} from '../web/language-registry.js';
 import {catalogVersion} from '../web/catalog-version.js';
@@ -90,12 +91,26 @@ export default {async fetch(request,env,ctx){
 
     const match=url.pathname.match(/^\/rooms\/([a-f0-9]{32})(\/socket)?$/);
     if(match){if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'socket:'+(request.headers.get('CF-Connecting-IP')||'local')})).success))return cors(error('少し待ってから再試行してください。',429));const room=env.ROOMS.get(env.ROOMS.idFromName(match[1]));const r=await room.fetch(request);return r.status===101?r:cors(r);}
+    if(url.pathname==='/live-translation')return upgradeLiveTranslation(request,env,ctx);
     if(url.pathname==='/transcribe-stream')return realtimeUpgrade(request,env,{verifyToken,aiFailure,ctx});
     const token=(request.headers.get('Authorization')||'').replace(/^Bearer /,'');const authStarted=Date.now(),auth=await verifyToken(token,env.FIREBASE_PROJECT,url.pathname.startsWith('/billing/'));env={...env,...(ctx?.waitUntil?{backgroundBudgetCleanup:task=>ctx.waitUntil(task)}:{}),authMs:Date.now()-authStarted,budgetUid:auth.uid,executionValid:()=>requestExecutionValid(request,requestStarted)};if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'user:'+auth.uid})).success))return cors(error('少し待ってから再試行してください。',429));
     if(url.pathname.startsWith('/billing/')){
       if(!await isBillingAdministrator(auth,env.BILLING_ADMIN_EMAIL_HASH))return cors(error('請求データは管理者本人のGoogle認証が必要です。',403));
       if(request.method!=='GET')return cors(error('読取だけ利用できます。',405));
-      if(url.pathname==='/billing/openai-connection'){if(!env.OPENAI_API_KEY)return cors(json({connected:false,reason:'missing_secret'}));try{const upstream=await fetch('https://api.openai.com/v1/models/gpt-realtime-translate',{headers:{Authorization:'Bearer '+env.OPENAI_API_KEY},signal:AbortSignal.timeout(7000)});const model=upstream.ok?await upstream.json():null;return cors(json({connected:upstream.ok,upstreamStatus:upstream.status,modelAvailable:model?.id==='gpt-realtime-translate'}));}catch{return cors(json({connected:false,reason:'upstream_unreachable'}));}}      if(url.pathname==='/billing/access')return cors(json({readMethod:'tabledata.list',paidQueries:false}));
+      if(url.pathname==='/billing/openai-connection'){
+        if(!env.OPENAI_API_KEY)return cors(json({connected:false,reason:'missing_secret'}));
+        try{
+          const upstream=await fetch('https://api.openai.com/v1/models/gpt-realtime-translate',{
+            headers:{Authorization:'Bearer '+env.OPENAI_API_KEY},
+            signal:AbortSignal.timeout(7000),
+          });
+          const model=upstream.ok?await upstream.json():null;
+          return cors(json({connected:upstream.ok,upstreamStatus:upstream.status,modelAvailable:model?.id==='gpt-realtime-translate'}));
+        }catch{
+          return cors(json({connected:false,reason:'upstream_unreachable'}));
+        }
+      }
+      if(url.pathname==='/billing/access')return cors(json({readMethod:'tabledata.list',paidQueries:false}));
       if(url.pathname==='/billing/google')return cors(json(await googleBillingReport(env)));
       if(url.pathname==='/billing/cloudflare')return cors(json(await cloudflareBillingReport(env)));
       return cors(error('請求の操作を確認してください。',404));
