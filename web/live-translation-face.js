@@ -20,10 +20,12 @@ export async function startLiveTranslation({
 
   const controller = new AbortController();
   const connections = [];
-  let active = false, draining = false;
+  let active = false, draining = false, receivedSubtitle = false, audioDeadline, captureDeadline;
   function stop() {
     if (controller.signal.aborted) return;
     signal?.removeEventListener('abort', stop);
+    clearTimeout(audioDeadline);
+    clearTimeout(captureDeadline);
     controller.abort();
     for (const connection of connections) connection.stop();
   }
@@ -40,6 +42,10 @@ export async function startLiveTranslation({
       const connection = await connect({
         apiOrigin, language, getToken, signal: controller.signal,
         onTranscript: event => {
+          if (event.field === 'translation' && event.delta.trim()) {
+            receivedSubtitle = true;
+            clearTimeout(audioDeadline);
+          }
           if (active && !controller.signal.aborted) onTranscript(language, event);
         },
         onDisconnected: disconnected,
@@ -51,10 +57,15 @@ export async function startLiveTranslation({
       connections.push(connection);
     }));
 
+    captureDeadline = setTimeout(() => disconnected('capture timeout'), 5000);
     await capture(stream, {
       signal: controller.signal,
       onAudio: pcm => {
         if (controller.signal.aborted || draining) return;
+        clearTimeout(captureDeadline);
+        if (!receivedSubtitle && !audioDeadline && new Int16Array(pcm).some(sample => Math.abs(sample) >= 600)) {
+          audioDeadline = setTimeout(() => disconnected('subtitle timeout'), 8000);
+        }
         try {
           if (!connections.every(connection => connection.send(pcm))) disconnected('audio unavailable');
         } catch {
@@ -66,6 +77,7 @@ export async function startLiveTranslation({
     active = true;
     stop.finish = async () => {
       draining = true;
+      clearTimeout(audioDeadline);
       const results = await Promise.all(connections.map(connection => connection.finish()));
       stop();
       return results.every(Boolean);
