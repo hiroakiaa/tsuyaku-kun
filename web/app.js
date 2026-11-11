@@ -384,6 +384,19 @@ microphoneButton.addEventListener('pointerdown',event=>{
  microphoneButton.setPointerCapture(event.pointerId);
  void microphoneButton.onclick();
 });
+microphoneButton.addEventListener('keydown',event=>{
+ if(!['Space','Enter'].includes(event.code)||room?.mode!=='lesson'||role!=='teacher'||
+  !$('#lesson-single-speech').checked||!holdSpeechOption.checked)return;
+ event.preventDefault();
+ if(event.repeat||mic||heldMicrophone!==null||microphoneButton.disabled)return;
+ heldMicrophone=event.code;
+ void microphoneButton.onclick();
+});
+window.addEventListener('keyup',event=>{
+ if(event.code!==heldMicrophone)return;
+ event.preventDefault();
+ finishHeldMicrophone({pointerId:event.code});
+},true);
 window.addEventListener('pointerup',event=>finishHeldMicrophone(event),true);
 window.addEventListener('pointercancel',event=>finishHeldMicrophone(event,true),true);
 window.addEventListener('blur',()=>{if(heldMicrophone!==null)finishHeldMicrophone({pointerId:heldMicrophone},true);});
