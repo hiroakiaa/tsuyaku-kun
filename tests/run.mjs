@@ -931,3 +931,44 @@ await test('短い発話の補完は送信秒数だけに反映し発話時刻�
   assert.equal(results[0].speechEndedAt,at-10);
  }finally{recognition.abort();}
 });
+
+await test('授業の確認字幕は先生の送信操作までは配信せず破棄できる',async()=>{
+ const app=await readFile(new URL('../web/app.js',import.meta.url),'utf8');
+ const begin=app.indexOf('function clearLessonSpeechReview(');
+ const end=app.indexOf("$('#text-form').onsubmit=",begin);
+ const review={hidden:false},text={value:'はい'},discard={},send=[],pending=new Map(),button={focus(){}};
+ const elements={'#lesson-review-form':review,'#lesson-review-text':text,'#lesson-single-speech':{},'#lesson-review-discard':discard,'#microphone':button};
+ const scope={$:selector=>elements[selector],room:{mode:'lesson'},role:'teacher',navigator:{onLine:false},pending,
+  updateLiveActions(){},message(){},crypto:{randomUUID:()=> 'approved'},submitCaption:caption=>{send.push(caption);return true;}};
+ runInNewContext(app.slice(begin,end),scope);
+ review.onsubmit({preventDefault(){}});
+ assert.equal(send.length,0);
+ assert.equal(text.value,'はい');
+ discard.onclick();
+ assert.equal(send.length,0);
+ assert.equal(review.hidden,true);
+ assert.equal(text.value,'');
+ review.hidden=false;text.value='訂正した字幕';scope.navigator.onLine=true;
+ review.onsubmit({preventDefault(){}});
+ assert.equal(send.length,1);
+ assert.equal(send[0].text,'訂正した字幕');
+ assert.equal(pending.size,1);
+ assert.equal(review.hidden,true);
+});
+
+await test('先生の音声認識結果は確認モードでは自動配信経路に入らない',async()=>{
+ const app=await readFile(new URL('../web/app.js',import.meta.url),'utf8');
+ const begin=app.indexOf('recognition.onresult=e=>');
+ const end=app.indexOf('recognition.onerror=',begin);
+ const room={mode:'lesson'},recognition={},reviewParts=new Map(),sent=[];
+ const scope={room,activeRoom:room,sessionEpoch:1,epoch:1,recognition,activeRecognition:recognition,
+  recognitionRetries:0,speechPending:true,conversationUI:null,automatic:false,side:'self',
+  noiseGuard:{observe(){}},reviewSpeech:true,reviewParts,submitCaption:caption=>sent.push(caption)};
+ runInNewContext(app.slice(begin,end),scope);
+ for(const transcript of ['プリントを提出してください','プリントはまだ提出しないでください']){
+  const result=[{transcript}];result.isFinal=true;
+  recognition.onresult({results:[result],resultIndex:0});
+ }
+ assert.equal(sent.length,0);
+ assert.deepEqual([...reviewParts.values()],['プリントはまだ提出しないでください']);
+});

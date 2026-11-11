@@ -351,3 +351,15 @@ body.phone-home .face-controls .face-language-field>:is(#face-speaker,#face-list
 
 /* Keep the initial two-column guide, then clear it when captions occupy the pane. */
 body.phone-home .caption-stage>.captions:has(.caption){border-left-color:transparent!important;}
+
+#lesson-review-form:not([hidden]){
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:8px;
+ min-width:0;
+}
+#lesson-review-form>label,
+#lesson-review-text{grid-column:1/-1;}
+#lesson-review-text{width:100%;min-width:0;box-sizing:border-box;resize:vertical;font-size:16px;}
+#lesson-review-form>button{min-height:44px;}
+#lesson-review-option:not([hidden]){display:flex;align-items:center;gap:8px;min-height:44px;}
