@@ -315,6 +315,10 @@ function beginFaceLiveTranslation(){
  if(room.mode!=='face'||!localStream||!liveTranslationEnabled()||!languages.includes('ja')||!languages.includes('en'))return false;
  const controller=new AbortController(),preview=el('section');
  preview.setAttribute('aria-label','Live翻訳の試験字幕');
+ const startedAt=performance.now(),liveStatus=el('p','Live翻訳に接続しています。');
+ liveStatus.setAttribute('role','status');
+ preview.append(liveStatus);
+ let firstSubtitle=false;
  const outputs=new Map(languages.map(language=>{
   const text=el('p');
   preview.append(el('strong',language==='ja'?'日本語':'English'),text);
@@ -331,10 +335,16 @@ function beginFaceLiveTranslation(){
   apiOrigin:config.api,languages,stream:localStream,getToken:liveTranslationToken,signal:controller.signal,
   onTranscript:(language,event)=>{
    if(event.field!=='translation')return;
+   if(!firstSubtitle&&event.delta.trim()){
+    firstSubtitle=true;
+    liveStatus.textContent='マイク開始処理から最初のLive字幕まで '+((performance.now()-startedAt)/1000).toFixed(2)+'秒';
+   }
    const output=outputs.get(language);
    output.textContent=(output.textContent+event.delta).slice(-1000);
   },
   onFallback:fallback,
+ }).then(()=>{
+  if(faceLiveAttempt===attempt&&!firstSubtitle)liveStatus.textContent='Live翻訳に接続しました。話してください。';
  }).catch(fallback);
  return true;
 }
