@@ -1,7 +1,7 @@
 import {median} from './statistics.js?v=20261029-faithful-pipeline-1';
 const STAGES=new Set(['api','auth','turn','api_simple','api_headers','asr','browser_speech']);
 const OPERATIONS=new Set(['capture','translation','transcribe','room_create','lesson_join','catalog','dictionary_translate','dictionary_candidate','token','initial_auth','turn_credentials','health','other']);
-const RESULTS=new Set(['realtime_ready','realtime_result','capture_ready','capture_stalled','capture_missing','capture_silent','capture_active','recognition_order','request_cancelled','recognition_repair','filtered','queue_overflow','stale_audio','invalid_audio','ok','network_or_cors','timeout','http_error','invalid_response','auth_unavailable','no_turn_server','browser_speech_started','browser_speech_ended','browser_speech_error']);
+const RESULTS=new Set(['realtime_ready','realtime_result','capture_ready','capture_stalled','capture_missing','capture_silent','capture_active','recognition_order','request_cancelled','recognition_repair','filtered','queue_overflow','stale_audio','stale_result','invalid_audio','ok','network_or_cors','timeout','http_error','invalid_response','auth_unavailable','no_turn_server','browser_speech_started','browser_speech_ended','browser_speech_error']);
 export function connectionFailure(error,{stage='api',endpoint='',operation='other',status}={}){
  const code=error?.code&&RESULTS.has(error.code)?error.code:error?.name==='TimeoutError'||error?.name==='AbortError'?'timeout':Number.isInteger(status)?'http_error':'network_or_cors';
  const subject=stage==='auth'?'参加の認証':stage==='turn'?'音声中継サーバー':'字幕・翻訳サーバー';
