@@ -27,19 +27,28 @@ export function createLiveTranslationSetting(el) {
     }
     input.disabled = true;
     status.textContent = 'Googleで管理者本人を確認しています。';
+    const timeout = setTimeout(() => {
+      if (attempt !== activation) return;
+      activation++;
+      input.checked = false;
+      input.disabled = false;
+      status.textContent = 'Googleの確認画面を閉じてから、もう一度お試しください。';
+    }, 90000);
     try {
       const connection = await connectOwner('live-translation-admin');
       if (attempt !== activation || !label.isConnected) {
-        await connection.close();
+        if (attempt === activation) await connection.close();
         return;
       }
       owner = connection;
       status.textContent = '次のマイク開始から試験設定を適用します。';
     } catch {
+      if (attempt !== activation) return;
       input.checked = false;
       status.textContent = '管理者認証を完了できませんでした。';
     } finally {
-      input.disabled = false;
+      clearTimeout(timeout);
+      if (attempt === activation) input.disabled = false;
     }
   });
   label.prepend(input);

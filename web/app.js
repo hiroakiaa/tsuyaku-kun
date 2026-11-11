@@ -1,5 +1,5 @@
 import {startFaceLiveTranslation} from './live-translation-face.js';
-import {liveTranslationEnabled,liveTranslationToken} from './live-translation-setting.js';
+import {liveTranslationEnabled,liveTranslationToken} from './live-translation-setting.js?v=live-auth-timeout-1';
 import {RecognitionNoiseGuard} from './recognition-noise-guard.js?v=20261111-classroom-caption-review-1';
 import {isRecognitionLanguage} from './language-registry.js?v=20261103-analysis-stages-1';
 import {fillLanguageOptions,installLanguageSearch} from './language-picker.js?v=20261103-analysis-stages-1';
