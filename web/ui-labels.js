@@ -274,6 +274,8 @@ export const uiLabels = {
   "字幕にできませんでした。マイクに向かってもう一度話してください。": "No caption was generated. Please speak into the microphone again.",
   "字幕を作成中": "Preparing caption",
   "離すと字幕にする": "Release to transcribe",
+  "このマイクでは端末の音声分離を確認できませんでした。": "Device voice isolation was not confirmed for this microphone.",
+  "端末の音声分離を使う": "Use device voice isolation",
   "入力マイク": "Input microphone",
   "接続されていないマイク": "Disconnected microphone",
   "端末の既定": "System default",
