@@ -363,3 +363,14 @@ body.phone-home .caption-stage>.captions:has(.caption){border-left-color:transpa
 #lesson-review-text{width:100%;min-width:0;box-sizing:border-box;resize:vertical;font-size:16px;}
 #lesson-review-form>button{min-height:44px;}
 #lesson-review-option:not([hidden]){display:flex;align-items:center;gap:8px;min-height:44px;}
+
+#lesson-microphone-option:not([hidden]){
+ display:flex;
+ align-items:center;
+ gap:8px;
+}
+#lesson-microphone-device{
+ flex:1;
+ min-width:0;
+ max-width:100%;
+}
