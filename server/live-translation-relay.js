@@ -1,6 +1,5 @@
 import { startBudgetedLiveTranslation } from './live-translation-budget.js';
 import { LIVE_TRANSLATION_PCM_BYTES_PER_SECOND, liveTranslationAudio, liveTranslationConfiguration } from './live-translation-protocol.js';
-import { isBillingAdministrator } from './billing-report.js';
 import { verifyToken } from './auth.js';
 
 export async function upgradeLiveTranslation(request, env, ctx) {
@@ -69,8 +68,7 @@ export async function upgradeLiveTranslation(request, env, ctx) {
 
   async function authenticate(data) {
     if (typeof data !== 'string' || data.length > 10000) throw new Error('Invalid authentication');
-    const auth = await verifyToken(JSON.parse(data).token, env.FIREBASE_PROJECT, true);
-    if (!await isBillingAdministrator(auth, env.BILLING_ADMIN_EMAIL_HASH)) throw new Error('Administrator required');
+    const auth = await verifyToken(JSON.parse(data).token, env.FIREBASE_PROJECT);
     const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(auth.uid));
     const safetyIdentifier = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
     session = await startBudgetedLiveTranslation(env, {

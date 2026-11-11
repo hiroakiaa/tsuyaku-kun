@@ -36,7 +36,7 @@ try{
  const snapshot={type:'live_caption',streamId:crypto.randomUUID(),revision:1,language:'en',text:'Live sample',token:await token('ordinary')};
  await live.send(liveOwner,snapshot);
  assert.equal(english.events.some(e=>e.type==='live_caption'),false);
- snapshot.token=await token('live-admin',{email:liveEmail,email_verified:true,firebase:{sign_in_provider:'google.com'}});
+ snapshot.token=await token('owner');
  await live.send(liveOwner,snapshot);
  assert.deepEqual(english.events.filter(e=>e.type==='live_caption'),[{type:'live_caption',sender:liveOwner.a.id,speaker:liveOwner.a.name,language:'en',text:'Live sample'}]);
  for(const client of [liveOwner,japanese,waitingLive])assert.equal(client.events.some(e=>e.type==='live_caption'),false);

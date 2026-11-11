@@ -19,7 +19,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261112-live-room-pilot-1';
+const BUILD_ID='20261112-live-no-google-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -299,8 +299,8 @@ export class TranslationRoom {
           if(!['interpreter','lesson'].includes(room.mode)||room.mode==='lesson'&&a.role!=='teacher')return;
           if(!/^[a-f0-9-]{36}$/.test(data.streamId||'')||!Number.isSafeInteger(data.revision)||data.revision<1)return;
           if(!['ja','en'].includes(data.language)||typeof data.text!=='string'||data.text.length>(data.final===true?6000:1000)||typeof data.token!=='string'||data.token.length>10000)return;
-          const owner=await verifyToken(data.token,this.env.FIREBASE_PROJECT,true);
-          if(!await isBillingAdministrator(owner,this.env.BILLING_ADMIN_EMAIL_HASH)||!await this.captionIsLive(ws,room))return;
+          const owner=await verifyToken(data.token,this.env.FIREBASE_PROJECT);
+          if(owner.uid!==a.uid||!await this.captionIsLive(ws,room))return;
           this.liveAudiences??=new WeakMap();
           let stream=this.liveAudiences.get(ws);
           if(stream?.id!==data.streamId){
