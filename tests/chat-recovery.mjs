@@ -13,7 +13,7 @@ console.log('Chat recovery: replayed display receipts, stale revision protection
 
 const offlineScope={
   current:()=>true,intentionalClose:false,authTimer:null,clearTimeout(){},
-  navigator:{onLine:false},connectedAt:1000,recoveryStartedAt:null,lessonCaptionRecoveryAt:500,
+  navigator:{onLine:false},recognition:null,connectedAt:1000,recoveryStartedAt:null,lessonCaptionRecoveryAt:500,
   Date:{now:()=>2000},stopRecognition(){},status(){},ws:{}
 };
 const closeHandler=app.split('\n').find(line=>line.trimStart().startsWith('ws.onclose='));
