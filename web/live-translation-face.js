@@ -10,7 +10,7 @@ export function startFaceLiveTranslation(options) {
 }
 
 export async function startLiveTranslation({
-  apiOrigin, languages, stream, getToken, signal, onTranscript, onFallback,
+  apiOrigin, languages, stream, getToken, signal, onTranscript, onFallback, onFirstAudio,
   connect = connectLiveTranslation, capture = captureLiveTranslationPcm,
 }) {
   if (!languages.length || new Set(languages).size !== languages.length ||
@@ -20,7 +20,7 @@ export async function startLiveTranslation({
 
   const controller = new AbortController();
   const connections = [];
-  let active = false, draining = false, receivedSubtitle = false, audioDeadline, captureDeadline;
+  let active = false, draining = false, receivedSubtitle = false, audioDeadline, captureDeadline, sentAudio = false;
   function stop() {
     if (controller.signal.aborted) return;
     signal?.removeEventListener('abort', stop);
@@ -67,7 +67,14 @@ export async function startLiveTranslation({
           audioDeadline = setTimeout(() => disconnected('subtitle timeout'), 8000);
         }
         try {
-          if (!connections.every(connection => connection.send(pcm))) disconnected('audio unavailable');
+          if (!connections.every(connection => connection.send(pcm))) {
+            disconnected('audio unavailable');
+            return;
+          }
+          if (!sentAudio) {
+            sentAudio = true;
+            onFirstAudio?.();
+          }
         } catch {
           disconnected('audio unavailable');
         }
