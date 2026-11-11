@@ -32,15 +32,19 @@ export async function startBudgetedLiveTranslation(env, options) {
   }
 
   let socket;
+  const handshake = new AbortController();
+  const handshakeTimeout = setTimeout(() => handshake.abort(), 7000);
   try {
     socket = await openLiveTranslation(env, {
       ...options,
-      signal: AbortSignal.any([AbortSignal.timeout(7000), ...(options.signal ? [options.signal] : [])]),
+      signal: AbortSignal.any([handshake.signal, ...(options.signal ? [options.signal] : [])]),
     });
   } catch (error) {
     // Keep the reservation if the upstream request may have started.
     await settle();
     throw error;
+  } finally {
+    clearTimeout(handshakeTimeout);
   }
 
   let renewalInFlight, finishing;
