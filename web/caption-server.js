@@ -27,7 +27,7 @@ export function tokenWithAbort(getToken,signal){
 }
 const maxQueuedAudioAgeMs=15000;
 let recognitionRunCounter=0;
-export function createServerRecognition({ endpoint, captureProfile='baseline', oneUtterance=false, getStream, getToken, fetcher = fetch, onUsage = () => {}, onDiagnostic = () => {}, canParallel = () => true, acquireSlot = async () => () => {},
+export function createServerRecognition({ endpoint, captureProfile='baseline', oneUtterance=false, manualRelease=false, getStream, getToken, fetcher = fetch, onUsage = () => {}, onDiagnostic = () => {}, canParallel = () => true, acquireSlot = async () => () => {},
   Context = globalThis.AudioContext || globalThis.webkitAudioContext, Worklet = globalThis.AudioWorkletNode }) {
   return class ServerRecognition {
     constructor() { this.recognitionRun=++recognitionRunCounter;this.active = false; this.queue = []; this.sending = false; this.index = 0; this.failures = 0; this.getHints = () => [];const query=new URL(endpoint||'https://invalid.local').searchParams;this.automatic=query.get('language')==='auto';this.candidates=(query.get('languages')||'').split(','); }
@@ -52,7 +52,7 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', o
         await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261111-classroom-caption-review-1', import.meta.url));
         if (!this.active) return;
         this.source = this.context.createMediaStreamSource(stream);
-        this.node = new Worklet(this.context, 'caption-pcm',{processorOptions:{pauseMs:capturePauseMs(captureProfile),oneUtterance}});
+        this.node = new Worklet(this.context, 'caption-pcm',{processorOptions:{pauseMs:capturePauseMs(captureProfile),oneUtterance,manualRelease}});
         this.node.port.onmessage = event => {
           if (!this.active) return;
           if(event.data?.captureFinished){
