@@ -1,4 +1,4 @@
-import {createLiveTranslationSetting} from './live-translation-setting.js?v=live-auth-timeout-1';
+import {createLiveTranslationSetting} from './live-translation-setting.js?v=live-auth-check-1';
 import {improvementReport} from './analysis-focus.js?v=20261111-classroom-caption-review-1';
 import {createRecognitionCostView} from './recognition-cost-view.js?v=20261111-classroom-caption-review-1';
 import {guardedStorage} from './storage-access.js?v=20261024-usability20-4';
