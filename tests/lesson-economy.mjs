@@ -14,6 +14,25 @@ try{
 {requests=[];const f=fixture(['en','pt','es','de','ko']);const r=await f.send(f.teacher,'long','あ'.repeat(1100));assert.equal(r.status,'ready');assert.equal(requests.length,2);assert.equal(r.usage.azureCharacters,5500);assert.equal(r.usage.azureAttempts,2);const values=new Map(),l=new UsageLedger({getItem:k=>values.get(k),setItem:(k,v)=>values.set(k,v)});l.begin('lesson',['ja']);l.caption(r);assert.equal(l.current.azureFree.attempts,2);assert.equal(l.current.azureFree.characters,5500);assert.equal(f.ai(),0);}
 {requests=[];const f=fixture(['pt']);await f.send(f.teacher,'one','授業用の独自の説明です。');await f.room.webSocketMessage(f.students[0].ws,JSON.stringify({type:'participant_language',to:f.students[0].a.id,language:'es'}));const r=await f.send(f.teacher,'two','授業用の独自の説明です。');assert.equal(requests.length,2);assert.deepEqual(requests[1].targets,['es']);assert.equal(r.translations.es,texts.es);await f.room.webSocketMessage(f.students[0].ws,JSON.stringify({type:'lesson_unit',unit:'unauthorized'}));assert.equal(f.db.get('room').unit,'数学');await f.room.webSocketMessage(f.teacher.ws,JSON.stringify({type:'lesson_unit',unit:'理科'}));assert.equal(f.db.get('room').unit,'理科');await f.send(f.teacher,'three','授業用の独自の説明です。');assert.equal(requests.length,3);for(const row of f.room.lessonTranslations.values())row.expires=0;await f.send(f.teacher,'four','授業用の独自の説明です。');assert.equal(requests.length,4);await f.room.webSocketMessage(f.teacher.ws,JSON.stringify({type:'end'}));assert.equal(f.room.lessonTranslations.size,0);}
 {requests=[];const f=fixture(['pt']);delete f.env.AZURE_TRANSLATOR_F0;const r=await f.send(f.teacher,'one','こんにちは。');assert.equal(r.status,'ready');assert.equal(requests.length,0);assert.equal(f.ai(),0);const values=new Map(),l=new UsageLedger({getItem:k=>values.get(k),setItem:(k,v)=>values.set(k,v)});l.begin('lesson',['ja']);l.caption(r);assert.equal(l.current.reuseCounts.builtin,1);}
+{
+ requests=[];
+ const f=fixture(['en']);
+ delete f.env.AZURE_TRANSLATOR_F0;
+ for(const [id,source,expected] of [
+  ['wait-submit','まだ提出しないでください。',"Please don't submit it yet."],
+  ['finished-only','終わった人だけ、次のページに進んでください。','Only those who have finished should go to the next page.'],
+  ['ask-if-needed','分からないときは手を挙げてください。','If you do not understand, please raise your hand.']
+ ]){
+  const result=await f.send(f.teacher,id,source);
+  assert.equal(result.translations.en,expected);
+  assert.equal(result.usage.cacheSource,'builtin');
+  assert(f.students[0].messages.some(m=>m.type==='translation'&&m.status==='ready'&&m.translations.en===expected));
+ }
+ const different=await f.send(f.teacher,'submit-now','もう提出してください。');
+ assert.equal(different.status,'failed');
+ assert.equal(requests.length,0);
+ assert.equal(f.ai(),0);
+}
 {requests=[];networkFailure=true;const f=fixture(['pt']);const r=await f.send(f.teacher,'one','授業用の独自の説明です。');assert.equal(r.status,'failed');assert.equal(r.aiFailure.scope,'azure');assert.equal(f.ai(),0);networkFailure=false;}
 {requests=[];const f=fixture(['ja-easy','pt']);const r=await f.send(f.teacher,'one','授業用の独自の説明です。');assert.equal(r.status,'ready');assert.deepEqual(requests[0].targets,['pt']);assert.equal(r.translations['ja-easy'],undefined);}
 {requests=[];const f=fixture(['ar','hi','uk']);const r=await f.send(f.teacher,'expanded','授業用の独自の説明です。');assert.equal(r.status,'ready');assert.deepEqual(requests[0].targets.sort(),['ar','hi','uk']);for(const student of f.students)assert(student.messages.some(m=>m.type==='translation'&&m.translations?.[student.a.language]));assert.equal(f.ai(),0);}
