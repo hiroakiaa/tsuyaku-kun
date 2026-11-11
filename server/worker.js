@@ -19,7 +19,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261111-classroom-caption-review-1';
+const BUILD_ID='20261112-live-room-pilot-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -293,6 +293,34 @@ export class TranslationRoom {
         if(a.role!=='teacher')throw Error('先生だけが終了できます。');await this.ctx.storage.put('room',{...room,ended:true});this.lessonTranslations.clear();await this.scheduleAlarm(room);this.broadcast({type:'ended'});return;
       }
       if(room.ended)throw Error('この授業は終了しました。');
+      if(data.type==='live_caption'){
+        const initialPeers=data.revision===1?new Set(this.participants().map(peer=>peer.ws)):null;
+        return await this.admission(async()=>{
+          if(!['interpreter','lesson'].includes(room.mode)||room.mode==='lesson'&&a.role!=='teacher')return;
+          if(!/^[a-f0-9-]{36}$/.test(data.streamId||'')||!Number.isSafeInteger(data.revision)||data.revision<1)return;
+          if(!['ja','en'].includes(data.language)||typeof data.text!=='string'||data.text.length>1000||typeof data.token!=='string'||data.token.length>10000)return;
+          const owner=await verifyToken(data.token,this.env.FIREBASE_PROJECT,true);
+          if(!await isBillingAdministrator(owner,this.env.BILLING_ADMIN_EMAIL_HASH)||!await this.captionIsLive(ws,room))return;
+          this.liveAudiences??=new WeakMap();
+          let stream=this.liveAudiences.get(ws);
+          if(stream?.id!==data.streamId){
+            if(data.revision!==1)return;
+            stream={id:data.streamId,peers:initialPeers,revisions:new Map()};
+            this.liveAudiences.set(ws,stream);
+          }
+          if(data.revision<=(stream.revisions.get(data.language)||0))return;
+          stream.revisions.set(data.language,data.revision);
+          if(!data.text){
+            if(data.revision===1)this.send(ws,{type:'live_caption_ready',streamId:data.streamId});
+            return;
+          }
+          for(const peer of this.participants()){
+            if(!stream.peers.has(peer.ws))continue;
+            if(peer.a.id===a.id||(peer.a.viewLanguage||peer.a.language)!==data.language)continue;
+            this.send(peer.ws,{type:'live_caption',speaker:a.name,sender:a.id,language:data.language,text:data.text});
+          }
+        });
+      }
       if(data.type!=='caption')return;
       if(room.mode==='lesson'&&a.role!=='teacher'&&(data.kind!=='text'||data.final!==true||data.continuing||data.metadataOnly))throw Error('生徒は文字入力で伝えてください。');
       const admission=(this.admissionTail||Promise.resolve()).then(()=>this.acceptCaption(ws,a,room,data));

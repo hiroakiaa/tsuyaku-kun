@@ -43,13 +43,15 @@ export async function startBudgetedLiveTranslation(env, options) {
     throw error;
   }
 
+  let renewalInFlight, finishing;
   const finish = () => {
+    if (finishing) return finishing;
     finished = true;
     clearTimeout(deadline); clearTimeout(renewal);
     options.signal?.removeEventListener('abort', stop);
-    const task = settle().catch(() => {});
-    options.waitUntil?.(task);
-    return task;
+    finishing = Promise.resolve(renewalInFlight).catch(() => {}).then(() => settle()).catch(() => {});
+    options.waitUntil?.(finishing);
+    return finishing;
   };
   const stop = () => {
     try {
@@ -69,10 +71,10 @@ export async function startBudgetedLiveTranslation(env, options) {
     if (reservedSeconds >= 90) return;
     renewal = setTimeout(async () => {
       try {
-        await call({
+        await (renewalInFlight = call({
           action: 'extend', ...reservation, uid: options.uid,
           cost: reserveCost(LIVE_TRANSLATION_MODEL, { seconds: reservationSeconds }),
-        });
+        }));
         if (finished) return;
         reservedSeconds += reservationSeconds;
         arm();

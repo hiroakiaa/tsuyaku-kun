@@ -6,10 +6,12 @@ const pair=await crypto.subtle.generateKey({name:'RSASSA-PKCS1-v1_5',modulusLeng
 const jwk=await crypto.subtle.exportKey('jwk',pair.publicKey);jwk.kid='group-test';
 const original=globalThis.fetch;globalThis.fetch=async()=>new Response(JSON.stringify({keys:[jwk]}));
 const b64=x=>Buffer.from(JSON.stringify(x)).toString('base64url');
-async function token(uid){const now=Math.floor(Date.now()/1000),payload=b64({alg:'RS256',kid:jwk.kid})+'.'+b64({sub:uid,aud:'group-test',iss:'https://securetoken.google.com/group-test',iat:now,exp:now+3600});return payload+'.'+Buffer.from(await crypto.subtle.sign('RSASSA-PKCS1-v1_5',pair.privateKey,new TextEncoder().encode(payload))).toString('base64url');}
+async function token(uid,claims={}){const now=Math.floor(Date.now()/1000),payload=b64({alg:'RS256',kid:jwk.kid})+'.'+b64({sub:uid,aud:'group-test',iss:'https://securetoken.google.com/group-test',iat:now,exp:now+3600,...claims});return payload+'.'+Buffer.from(await crypto.subtle.sign('RSASSA-PKCS1-v1_5',pair.privateKey,new TextEncoder().encode(payload))).toString('base64url');}
+const liveEmail='live-admin@example.invalid';
+const liveHash=Buffer.from(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(liveEmail))).toString('hex');
 function fixture(){const db=new Map([['room',{mode:'interpreter',groupChat:true,owner:'owner',key:'secret',unit:'',expires:Date.now()+86400000}]]),sockets=[],jobs=[],requests=[];let hold;
 const ctx={storage:{get:async k=>db.get(k),put:async(k,v)=>db.set(k,structuredClone(v)),getAlarm:async()=>0,setAlarm:async()=>{},list:async({prefix})=>new Map([...db].filter(([k])=>k.startsWith(prefix))),deleteAll:async()=>db.clear()},getWebSockets:()=>sockets,waitUntil:p=>jobs.push(p)};
-const room=new TranslationRoom(ctx,{FIREBASE_PROJECT:'group-test',AI:{run:async(model,{messages})=>{const request=JSON.parse(messages.at(-1).content);requests.push(request);if(hold)await hold;return {response:JSON.stringify(Object.fromEntries(request.targets.map(code=>[code,code+': '+request.speech])))};}}});
+const room=new TranslationRoom(ctx,{FIREBASE_PROJECT:'group-test',BILLING_ADMIN_EMAIL_HASH:liveHash,AI:{run:async(model,{messages})=>{const request=JSON.parse(messages.at(-1).content);requests.push(request);if(hold)await hold;return {response:JSON.stringify(Object.fromEntries(request.targets.map(code=>[code,code+': '+request.speech])))};}}});
 async function join(uid,language='ja',extra={}){let a={opened:Date.now(),window:Date.now(),count:0};const events=[];const ws={readyState:1,deserializeAttachment:()=>a,serializeAttachment:value=>a=value,send:raw=>events.push(JSON.parse(raw)),close(){this.readyState=3;}};sockets.push(ws);await room.webSocketMessage(ws,JSON.stringify({type:'auth',chatProtocol:1,token:await token(uid),key:'secret',language,...extra}));return {ws,events,get a(){return a;}};}
 return {db,room,sockets,jobs,requests,join,hold(p){hold=p;},send:(client,data)=>room.webSocketMessage(client.ws,JSON.stringify(data)),async flush(){for(let i=0;i<10;i++){await Promise.all(jobs);if(!room.jobs.size&&!room.queuedCaptions.size)return;}throw Error('Jobs did not settle');}};}
 try{
@@ -29,6 +31,43 @@ try{
  const race=fixture(),raceOwner=await race.join('owner'),waiters=await Promise.all(['r1','r2','r3','r4','r5'].map(uid=>race.join(uid)));await Promise.all(waiters.map(c=>race.send(raceOwner,{type:'chat_admit',to:c.a.id,allow:true})));assert.equal(race.room.participants().length,5,'Concurrent approvals cannot exceed capacity');assert.equal(race.db.get('memberCount'),5);
  const absent=fixture(),host=await absent.join('owner'),waiting=await absent.join('new');await absent.room.webSocketClose(host.ws);assert.equal(waiting.events.filter(e=>e.type==='join_waiting').at(-1).ownerPresent,false);const hostBack=await absent.join('owner');assert.equal(waiting.events.filter(e=>e.type==='join_waiting').at(-1).ownerPresent,true);await absent.send(hostBack,{type:'chat_admit',to:waiting.a.id,allow:true});const duplicate=await absent.join('new');assert.ok(duplicate.events.some(e=>e.errorCode==='duplicate_tab'));const freshIdentity=await absent.join('new-after-site-clear');assert.equal(freshIdentity.a.pending,true);assert.equal(freshIdentity.events.some(e=>e.type==='ready'),false);
  const old=fixture();old.db.get('room').groupChat=false;const oldOwner=await old.join('owner'),oldGuest=await old.join('old');assert.equal(oldGuest.a.pending,undefined);const oldThird=await old.join('third');assert.ok(oldThird.events.some(e=>e.error?.includes('2人')));assert.equal(old.room.participants().length,2);
+ const live=fixture(),liveOwner=await live.join('owner'),english=await live.join('english','en'),japanese=await live.join('japanese','ja'),waitingLive=await live.join('waiting-live','en');
+ for(const client of [english,japanese])await live.send(liveOwner,{type:'chat_admit',to:client.a.id,allow:true});
+ const snapshot={type:'live_caption',streamId:crypto.randomUUID(),revision:1,language:'en',text:'Live sample',token:await token('ordinary')};
+ await live.send(liveOwner,snapshot);
+ assert.equal(english.events.some(e=>e.type==='live_caption'),false);
+ snapshot.token=await token('live-admin',{email:liveEmail,email_verified:true,firebase:{sign_in_provider:'google.com'}});
+ await live.send(liveOwner,snapshot);
+ assert.deepEqual(english.events.filter(e=>e.type==='live_caption'),[{type:'live_caption',sender:liveOwner.a.id,speaker:liveOwner.a.name,language:'en',text:'Live sample'}]);
+ for(const client of [liveOwner,japanese,waitingLive])assert.equal(client.events.some(e=>e.type==='live_caption'),false);
+ await live.send(liveOwner,{type:'chat_admit',to:waitingLive.a.id,allow:true});
+ await live.send(liveOwner,{...snapshot,revision:2,text:'Live sample continued'});
+ assert.equal(waitingLive.events.some(e=>e.type==='live_caption'),false);
+ assert.equal(english.events.filter(e=>e.type==='live_caption').at(-1).text,'Live sample continued');
+ assert.equal(live.db.has('captionCount'),false);
+ const preSpeech=await live.join('pre-speech','en');
+ const nextStream={...snapshot,streamId:crypto.randomUUID(),text:''};
+ await live.send(liveOwner,nextStream);
+ assert.ok(liveOwner.events.some(e=>e.type==='live_caption_ready'&&e.streamId===nextStream.streamId));
+ assert.equal(english.events.some(e=>e.type==='live_caption_ready'),false);
+ await live.send(liveOwner,{type:'chat_admit',to:preSpeech.a.id,allow:true});
+ await live.send(liveOwner,{...nextStream,revision:2,text:'First audible subtitle'});
+ assert.equal(preSpeech.events.some(e=>e.type==='live_caption'),false);
+ assert.equal(english.events.filter(e=>e.type==='live_caption').at(-1).text,'First audible subtitle');
+ live.db.get('room').mode='lesson';
+ liveOwner.ws.serializeAttachment({...liveOwner.a,role:'teacher'});
+ const lessonSnapshot={...snapshot,streamId:crypto.randomUUID(),text:'Please turn to page three.'};
+ const englishCount=english.events.filter(e=>e.type==='live_caption').length;
+ await live.send(japanese,lessonSnapshot);
+ assert.equal(english.events.filter(e=>e.type==='live_caption').length,englishCount,'A student cannot broadcast Live captions');
+ await live.send(liveOwner,lessonSnapshot);
+ assert.equal(english.events.filter(e=>e.type==='live_caption').at(-1).text,lessonSnapshot.text);
+ assert.equal(waitingLive.events.filter(e=>e.type==='live_caption').at(-1).text,lessonSnapshot.text);
+ assert.equal(japanese.events.some(e=>e.type==='live_caption'),false);
+ await live.send(liveOwner,{type:'end'});
+ await live.send(liveOwner,{...lessonSnapshot,revision:2,text:'After class'});
+ assert.equal(english.events.filter(e=>e.type==='live_caption').at(-1).text,lessonSnapshot.text);
+ assert.equal(live.db.has('captionCount'),false);
  const tracker=new CaptionDelivery();tracker.delivered('id',0,1,4);assert.equal(tracker.get('id').state,'accepted');assert.match(deliveryLabel(tracker.get('id')),/1 \/ 4/);tracker.delivered('id',0,4,4);assert.equal(tracker.get('id').state,'delivered');
  console.log('Group chat: signed auth, approval, five-person limit, pending send protection, in-flight/replay/edit privacy, reconnect, aliases, multilingual deduplication, concurrent receipts, decline/timeout and legacy compatibility passed');
 }finally{globalThis.fetch=original;}

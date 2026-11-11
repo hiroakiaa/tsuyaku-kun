@@ -1,18 +1,28 @@
 import { captureLiveTranslationPcm } from './live-translation-capture.js';
 import { connectLiveTranslation } from './live-translation-client.js';
 
-export async function startFaceLiveTranslation({
+export function startFaceLiveTranslation(options) {
+  const { languages } = options;
+  if (languages.length !== 2 || !languages.includes('ja') || !languages.includes('en')) {
+    throw new Error('Live translation pilot requires Japanese and English');
+  }
+  return startLiveTranslation(options);
+}
+
+export async function startLiveTranslation({
   apiOrigin, languages, stream, getToken, signal, onTranscript, onFallback,
   connect = connectLiveTranslation, capture = captureLiveTranslationPcm,
 }) {
-  if (languages.length !== 2 || !languages.includes('ja') || !languages.includes('en')) {
-    throw new Error('Live translation pilot requires Japanese and English');
+  if (!languages.length || new Set(languages).size !== languages.length ||
+      languages.some(language => !['ja', 'en'].includes(language))) {
+    throw new Error('Live translation requires distinct supported target languages');
   }
 
   const controller = new AbortController();
   const connections = [];
   let active = false;
   function stop() {
+    if (controller.signal.aborted) return;
     signal?.removeEventListener('abort', stop);
     controller.abort();
     for (const connection of connections) connection.stop();

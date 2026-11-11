@@ -1,6 +1,6 @@
-import {createLiveTranslationSetting} from './live-translation-setting.js?v=live-auth-check-1';
-import {improvementReport} from './analysis-focus.js?v=20261111-classroom-caption-review-1';
-import {createRecognitionCostView} from './recognition-cost-view.js?v=20261111-classroom-caption-review-1';
+import {createLiveTranslationSetting} from './live-translation-setting.js?v=20261112-live-room-pilot-1';
+import {improvementReport} from './analysis-focus.js?v=20261112-live-room-pilot-1';
+import {createRecognitionCostView} from './recognition-cost-view.js?v=20261112-live-room-pilot-1';
 import {guardedStorage} from './storage-access.js?v=20261024-usability20-4';
 const localStorage=guardedStorage(()=>globalThis.localStorage);
 import {createBillingView} from './billing-view.js?v=20261022-billing-auto-1';
