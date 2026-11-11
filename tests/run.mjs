@@ -738,3 +738,75 @@ await test('認識の区間番号が飛んだら前後の発話を結合しな�
  assert.deepEqual(outputs,['明日は','弁当が必要です']);
  recognition.abort();
 });
+
+await test('PCMの録音確定は無音待ちなしで短い発話を一度だけ送る',()=>{
+ const output=[],activity=[];
+ const segmenter=new PcmSegmenter(16000,(samples,detail)=>output.push({samples,detail}),value=>activity.push(value));
+ segmenter.push(Float32Array.from({length:2450},(_,i)=>Math.sin(i*.15)*.08));
+ assert.equal(output.length,0);
+ segmenter.finish();
+ segmenter.finish();
+ assert.equal(output.length,1);
+ assert.equal(output[0].detail.boundary,'pause');
+ assert(output[0].samples.some(sample=>sample!==0));
+ assert.deepEqual(activity,['start','end']);
+ segmenter.push(new Float32Array(16000));
+ segmenter.finish();
+ assert.equal(output.length,1);
+});
+
+await test('発話終了は残った認識結果を届けてから終了する',async()=>{
+ let worklet,complete;
+ const events=[];
+ class Worklet{
+  constructor(){worklet=this;this.port={postMessage:value=>events.push(value)};}
+  connect(){}
+  disconnect(){}
+ }
+ const Recognition=createServerRecognition({
+  endpoint:'https://test/transcribe?language=ja',getToken:async()=> 'token',Worklet,
+  fetcher:()=>new Promise(resolve=>{complete=resolve;})
+ });
+ const recognizer=new Recognition();
+ recognizer.active=true;
+ recognizer.context={state:'running',audioWorklet:{async addModule(){}},createMediaStreamSource:()=>({connect(){},disconnect(){}}),async close(){}};
+ recognizer.onresult=()=>events.push('result');
+ const ended=new Promise(resolve=>{recognizer.onend=()=>{events.push('end');resolve();};});
+ try{
+  await recognizer.prepare({},Promise.resolve());
+  assert.equal(recognizer.finishCapture(),true);
+  assert.equal(recognizer.finishCapture(),false);
+  worklet.port.onmessage({data:{samples:new Int16Array(3200)}});
+  worklet.port.onmessage({data:{captureFinished:true}});
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.deepEqual(events,['finish']);
+  complete({ok:true,status:200,json:async()=>({text:'はい',language:'ja'})});
+  await ended;
+  assert.deepEqual(events,['finish','result','stop','end']);
+ }finally{if(recognizer.active)recognizer.abort();}
+});
+
+await test('ブラウザー音声認識は停止後の確定結果も届ける',async()=>{
+ const {createBrowserRecognition}=await import('../web/caption-browser.js');
+ let native;
+ class Native{
+  constructor(){native=this;}
+  start(){}
+  stop(){this.stopped=true;}
+  abort(){}
+ }
+ const Recognition=createBrowserRecognition({language:'ja',Native});
+ const recognizer=new Recognition(),events=[];
+ recognizer.onresult=()=>events.push('result');
+ recognizer.onend=()=>events.push('end');
+ try{
+  recognizer.start();
+  assert.equal(recognizer.finishCapture(),true);
+  assert.equal(recognizer.finishCapture(),false);
+  assert.equal(native.stopped,true);
+  const row=[{transcript:'はい'}];row.isFinal=true;
+  native.onresult({resultIndex:0,results:[row]});
+  native.onend();
+  assert.deepEqual(events,['result','end']);
+ }finally{recognizer.abort();}
+});
