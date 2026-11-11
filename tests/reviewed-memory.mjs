@@ -18,8 +18,8 @@ assert.equal(memory.corrected('鳥の4を解きます','数学'),'鳥の4を解�
 assert.equal(memory.corrected('鳥の3を解きます','生物'),'鳥の3を解きます');
 assert.equal(memory.lookup('ja','持参',['en'],'',{glossary:[{ja:'持参',en:'bring',status:'pending'}]}),null);
 assert.equal(memory.lookup('ja','持参',['en'],'',{glossary:[{ja:'持参',en:'bring',status:'approved'}]}).translations.en,'bring');
-for(const text of ['ん','はっくしょん','ハックション！','くしゅん'])assert.equal(nonSpeechReason({text},'ja'),'nonverbal');
-for(const text of ['はい','いいえ','うん','ん？','弁当が必要です'])assert.equal(nonSpeechReason({text},'ja'),null);
+for(const text of ['はっくしょん','ハックション！','くしゅん'])assert.equal(nonSpeechReason({text},'ja'),'nonverbal');
+for(const text of ['はい','いいえ','うん','ん','ン','ん？','弁当が必要です'])assert.equal(nonSpeechReason({text},'ja'),null);
 assert.equal(nonSpeechReason({text:'Hello',segments:[{no_speech_prob:.9}]},'en'),'model_no_speech');
 assert.equal(isIncompleteJapanese('来週の木曜日'),true);
 assert.equal(isIncompleteJapanese('午後3時40分'),true);

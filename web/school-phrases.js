@@ -27,6 +27,11 @@ const bilingual=[
 ];
 bilingual.push(...[["ペアで話し合ってください。","Please discuss this with your partner."],["グループで考えてください。","Please think about this in your group."],["順番に読んでください。","Please take turns reading."],["自分の考えを書いてください。","Please write down your own ideas."],["理由を説明してください。","Please explain your reason."],["答えを確認しましょう。","Let’s check the answers."],["質問してもいいですか？","May I ask a question?"],["もう少し説明してください。","Please explain a little more."],["例を挙げてください。","Please give an example."],["ここまで分かりましたか？","Do you understand so far?"],["まだ終わっていません。","I have not finished yet."],["終わりました。","I have finished."],["少し時間をください。","Please give me a little time."],["鉛筆を貸してください。","Please lend me a pencil."],["トイレに行ってもいいですか？","May I go to the restroom?"],["保健室に行きたいです。","I would like to go to the school nurse’s office."],["具合が悪いです。","I feel unwell."],["水を飲んでもいいですか？","May I drink some water?"],["宿題を確認しましょう。","Let’s check the homework."],["宿題を提出してください。","Please hand in your homework."],["プリントを配ります。","I will hand out the worksheets."],["プリントを集めます。","I will collect the worksheets."],["机の上を片付けてください。","Please clear your desk."],["使った物を元に戻してください。","Please put the things you used back where they belong."],["順番を守ってください。","Please wait your turn."],["廊下は歩いてください。","Please walk in the hallway."],["困ったら教えてください。","Please let me know if you need help."],["間違えても大丈夫です。","It is okay to make mistakes."],["一緒に練習しましょう。","Let’s practice together."],["どこが分かりませんか？","Which part do you not understand?"]]);
 bilingual.push(['これから数学の授業を始めましょう。',"Let's start our math class."],['プリントを提出してください。','Please hand in your worksheet.']);
+bilingual.push(
+ ['まだ提出しないでください。',"Please don't submit it yet."],
+ ['終わった人だけ、次のページに進んでください。','Only those who have finished should go to the next page.'],
+ ['分からないときは手を挙げてください。','If you do not understand, please raise your hand.']
+);
 const rows=[...multilingual.map(row=>Object.fromEntries(columns.map((code,i)=>[code,row[i]]))),...bilingual.map(([ja,en])=>({ja,en}))];
 export const schoolPhraseList=()=>rows.map((row,index)=>({...row,id:'school-fixed-'+index}));
 const canonical=code=>code==='fil'?'tl':code;

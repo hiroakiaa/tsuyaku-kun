@@ -1,9 +1,9 @@
 import {recognitionLanguage,speechTextAllowed} from './two-language.js?v=20261029-communication50-1';
-import {nonSpeechReason} from './speech-filter.js?v=20261108-reliability30-1';
+import {nonSpeechReason} from './speech-filter.js?v=20261111-classroom-recovery-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261103-audio-offset-1';
 import {recognitionMetrics} from './recognition-metrics.js?v=20261103-budget-cleanup-1';
 import {trimmedAudioLength} from './audio-trim.js?v=20261029-communication50-1';
-import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish,japaneseSpeechTail,japaneseNumericCompletion} from './speech-continuity.js?v=20261108-reliability30-1';
+import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish,japaneseSpeechTail,japaneseNumericCompletion} from './speech-continuity.js?v=20261111-classroom-recovery-1';
 export const capturePauseMs=profile=>profile==='fast'||profile==='responsive'?300:profile==='balanced'?400:500;
 // Browser-independent recognition using the call's existing microphone stream.
 export function encodeWav(samples) {
@@ -25,6 +25,7 @@ export function tokenWithAbort(getToken,signal){
   Promise.resolve().then(getToken).then(value=>{signal.removeEventListener('abort',aborted);resolve(value);},error=>{signal.removeEventListener('abort',aborted);reject(error);});
  });
 }
+const maxQueuedAudioAgeMs=15000;
 let recognitionRunCounter=0;
 export function createServerRecognition({ endpoint, captureProfile='baseline', getStream, getToken, fetcher = fetch, onUsage = () => {}, onDiagnostic = () => {}, canParallel = () => true, acquireSlot = async () => () => {},
   Context = globalThis.AudioContext || globalThis.webkitAudioContext, Worklet = globalThis.AudioWorkletNode }) {
@@ -59,7 +60,8 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
           const samples=event.data?.samples||event.data,boundary=event.data?.boundary==='limit'?'limit':'pause';
           if(!(samples instanceof Int16Array)||samples.length<1||samples.length>48000){onDiagnostic({stage:'asr',operation:'capture',code:'invalid_audio'});return;}
           clearTimeout(this.startTimer);this.lastAlive=Date.now();
-          if (this.queue.length >= 2) { this.queue.shift().samples.fill(0);this.breakContinuity=true; onDiagnostic({stage:'asr',operation:'capture',code:'queue_overflow'}); this.onrecovering?.({reason:'queue_overflow',attempt:1}); }
+          // Commit order detects the missing sequence when it reaches the gap.
+          if (this.queue.length >= 2) { this.queue.shift().samples.fill(0); onDiagnostic({stage:'asr',operation:'capture',code:'queue_overflow'}); this.onrecovering?.({reason:'queue_overflow',attempt:1}); }
           const at=Date.now(),sequence=this.captureSequence=(this.captureSequence||0)+1;this.queue.push({samples,boundary,at,sequence,speechStartedAt:firstVoicedAt(samples,at),speechEndedAt:lastVoicedAt(samples,at)});this.progress();
           void this.drain();
         };
@@ -78,10 +80,19 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
       // Bound the whole pipeline to three jobs and actual network work to two.
       // A completed response waiting for order must not block the second network lane.
       while(this.active&&this.queue.length&&this.jobs.size<3&&[...this.jobs].filter(j=>!j.networkDone).length<2&&(![...this.jobs].some(j=>!j.networkDone)||canParallel())){
-        const chunk=this.queue.shift(),job={controller:new AbortController(),previous:this.commitTail,startedAt:Date.now()};
+        const chunk=this.queue.shift();
+        const queueMs=Date.now()-chunk.at;
+        if(queueMs>maxQueuedAudioAgeMs){
+          chunk.samples.fill(0);
+          onDiagnostic({code:'stale_audio',queueMs,recognitionRun:this.recognitionRun,...(Number.isSafeInteger(chunk.sequence)?{segmentSequence:chunk.sequence}:{})});
+          this.onrecovering?.({reason:'stale_audio',attempt:1});
+          continue;
+        }
+        const job={controller:new AbortController(),previous:this.commitTail,startedAt:Date.now()};
         this.commitTail=new Promise(resolve=>job.release=resolve);this.jobs.add(job);this.sending=true;this.progress();
         started.push(this.recognizeChunk(chunk,job));
       }
+      if(!started.length)this.progress();
       await Promise.all(started);
     }
     async recognizeChunk(chunk,job) {
@@ -89,15 +100,26 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
       const requestAt=Date.now(), queueMs=Math.max(0,requestAt-chunk.at);
       const controller = job.controller;let phase='auth',body,releaseSlot,clientSlotWaitMs=null,clientAuthMs=null,httpStarted=null,sentSamples=chunk.samples.length;
       const ordered=async()=>{await job.previous;if(!this.active||!this.jobs.has(job)||controller.signal.aborted)return false;if(Number.isFinite(chunk.sequence)){if(Number.isFinite(this.lastSequence)&&chunk.sequence!==this.lastSequence+1)this.breakContinuity=true;this.lastSequence=chunk.sequence;}return true;};
-      const stale=()=>Date.now()-chunk.at>15000;
+      const stale=()=>Date.now()-chunk.at>maxQueuedAudioAgeMs;
       const timeout = setTimeout(() => controller.abort(), 12000);
+      const discardUnsentAudio=async()=>{
+        releaseSlot?.();releaseSlot=null;
+        clearTimeout(timeout);
+        job.networkDone=true;
+        void this.drain();
+        if(!await ordered())return;
+        this.breakContinuity=true;
+        segmentDiagnostic({code:'stale_audio',queueMs,clientAuthMs});
+        this.onrecovering?.({reason:'stale_audio',attempt:1});
+      };
       try {
-        if(stale()){if(await ordered()){this.breakContinuity=true;segmentDiagnostic({code:'stale_audio',queueMs});this.onrecovering?.({reason:'stale_audio',attempt:1});}return;}
+        if(stale()){await discardUnsentAudio();return;}
         const token = await tokenWithAbort(getToken,controller.signal);clientAuthMs=Date.now()-requestAt;
+        if(stale()){await discardUnsentAudio();return;}
         phase='slot';const slotStarted=Date.now();releaseSlot=await acquireSlot(controller.signal);clientSlotWaitMs=Date.now()-slotStarted;
         if (!this.active) return;
         if (controller.signal.aborted) throw new DOMException('Recognition cancelled','AbortError');
-        if(stale()){if(await ordered()){this.breakContinuity=true;segmentDiagnostic({code:'stale_audio',queueMs,clientAuthMs});this.onrecovering?.({reason:'stale_audio',attempt:1});}return;}
+        if(stale()){await discardUnsentAudio();return;}
         sentSamples=trimmedAudioLength(chunk.samples,chunk.boundary);body = encodeWav(chunk.samples.subarray(0,sentSamples)); chunk.samples.fill(0);
         onUsage(sentSamples / 16000);
         const hints = [...new Set((this.automatic?[]:(this.getHints() || [])).filter(x => typeof x === 'string')
@@ -121,7 +143,7 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
         if (!response.ok) { const error=failure?.reason|| (response.status === 429 ? 'quota' : [401,403].includes(response.status) ? 'auth' : 'network'); if (['network','service','timeout','overloaded'].includes(error) && (response.status>=500||error==='overloaded')) { this.transientFailure(); return; } this.fail(error,failure?.message); return; }
         this.failures=0;
         if (!this.active || controller.signal.aborted) return;
-        if(stale()){this.breakContinuity=true;segmentDiagnostic({code:'stale_audio',queueMs,orderWaitMs:requestMetrics.orderWaitMs});this.onrecovering?.({reason:'stale_audio',attempt:1});return;}
+        if(stale()){this.breakContinuity=true;segmentDiagnostic({code:'stale_result',queueMs,orderWaitMs:requestMetrics.orderWaitMs});this.onrecovering?.({reason:'stale_result',attempt:1});return;}
         const automatic=this.automatic,candidates=this.candidates;if(['low_confidence','invalid_result','too_long','control_text','model_no_speech'].includes(data.recognitionRejected)){this.breakContinuity=true;this.finishFragment();const reason=data.recognitionRejected==='model_no_speech'?'model_no_speech':'low_confidence';segmentDiagnostic({code:'filtered',filterReason:reason});if(reason==='low_confidence')this.onlanguageuncertain?.({reason:'low_confidence'});return;}if(data.recognitionRejected==='stock_outro'){this.breakContinuity=true;this.finishFragment();segmentDiagnostic({code:'filtered',filterReason:'empty'});this.onlanguageuncertain?.({reason:'stock_outro'});return;}
         if(automatic&&Array.isArray(data.languageCandidates)&&data.languageCandidates.some(c=>typeof c==='string'&&/^[a-z]{2,3}(?:-[A-Za-z]{2,8})?$/.test(c)&&!candidates.includes(c))){this.breakContinuity=true;this.finishFragment();segmentDiagnostic({code:'filtered',filterReason:'language_uncertain',languageDecision:'candidate_available'});this.onlanguageuncertain?.({reason:'outside_pair',candidates:data.languageCandidates.filter(c=>typeof c==='string'&&/^[a-z]{2,3}(?:-[A-Za-z]{2,8})?$/.test(c)).slice(0,3)});return;}
         if(automatic&&typeof data.text==='string'&&data.text.trim()&&(data.languageUncertain||!data.language||!candidates.includes(data.language)||!speechTextAllowed(data.text,candidates))){this.breakContinuity=true;this.finishFragment();segmentDiagnostic({code:'filtered',filterReason:'language_uncertain',languageDecision:speechTextAllowed(data.text,candidates)?'uncertain':'outside_pair'});this.onlanguageuncertain?.({reason:speechTextAllowed(data.text,candidates)?'uncertain':'outside_pair'});return;}

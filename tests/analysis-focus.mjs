@@ -40,3 +40,35 @@ for(const [base,timing] of [['3.12。',before],['12。',{...before,boundary:'pau
 
 {const session={...base,recognitionByPair:[{requests:2}],recognitionSegments:[{recognitionRun:1,segmentSequence:2,firstDisplayMs:5500,totalMs:3000}]};const report=improvementReport([session],{diagnostics:[{at:2000,operation:'transcribe',code:'ok',recognitionRun:1,segmentSequence:2,clientRequestMs:900,serverProviderMs:1000},{at:3000,operation:'transcribe',code:'ok',recognitionRun:1,segmentSequence:1,clientRequestMs:4000,serverProviderMs:3000},{at:3001,operation:'transcribe',code:'filtered',recognitionRun:1,segmentSequence:1,filterReason:'empty',text:'private'}]});assert.equal(report.recognitionStartup.firstRequest.clientRequestMs,4000);assert.equal(report.recognitionStartup.firstRequestOutcome.excluded,'empty');assert.equal(report.recognitionStartup.requestsBeforeFirstCaption,1);assert.equal(report.recognitionStartup.excludedBeforeFirstCaption,1);assert.equal(report.recognitionStartup.firstCaptionTiming.segment,2);assert.equal(report.recognitionStages.requests[0].outsideProviderMs,1000);assert.equal(report.recognitionStages.requests[1].outsideProviderMs,null);assert(!JSON.stringify(report.recognitionStages).includes('private'));assert.equal(report.recognitionLanguageDecisions,null);assert.equal(improvementReport([]).recognitionStages.requests.length,0);}
 console.log('PASS startup uses capture sequence despite out-of-order responses; first exclusion/caption and paired timings remain distinct');
+
+for(const mode of ['interpreter','lesson',undefined]){
+ const shared=improvementReport([{...base,mode,micSeconds:7.874,inputTokens:248,outputTokens:17}],{exchange:150}).latestSessionCost;
+ assert.equal(shared.extrapolationUnavailableReason,'shared_or_unknown_session_scope');
+ assert.equal(shared.extrapolated10MicMinutesJPY,null);
+ assert.ok(shared.translationJPY>0);
+ assert.ok(shared.observedJPY>=shared.translationJPY);
+}
+console.log('PASS shared room cost remains visible without scaling by one device microphone time');
+
+const recovery=improvementReport([base,{...base,id:'lesson',mode:'lesson',startedAt:11000,events:[
+ {type:'connection_restored',recoverySeconds:1.5},
+ {type:'connection_restored',recoverySeconds:2.5},
+ {type:'lesson_caption_restored',recoverySeconds:4},
+ {type:'lesson_caption_restored',recoverySeconds:-1},
+ {type:'lesson_caption_restored',recoverySeconds:null}
+]}],{fullHistory:true}).connectionRecovery;
+assert.deepEqual(recovery.room,{samples:2,p50Ms:2000,p95Ms:2500});
+assert.deepEqual(recovery.lessonStudentCaption,{samples:1,p50Ms:4000,p95Ms:4000});
+assert.equal(improvementReport([base]).connectionRecovery.lessonStudentCaption,null);
+assert.deepEqual(improvementReport([{...base,mode:'lesson'}]).connectionRecovery.lessonStudentCaption,{samples:0,p50Ms:null,p95Ms:null});
+console.log('PASS recovery report separates room reconnect and first new student caption');
+
+const expired=improvementReport([base],{diagnostics:[
+ {at:2000,stage:'api',operation:'transcribe',code:'stale_audio',queueMs:16000},
+ {at:3000,stage:'api',operation:'transcribe',code:'stale_result',orderWaitMs:5},
+ {at:4000,stage:'api',operation:'transcribe',code:'stale_audio',orderWaitMs:0},
+ {at:500,stage:'api',operation:'transcribe',code:'stale_audio'}
+]}).recognitionCoverage.retainedExpiredResults;
+assert.equal(expired.beforeSend,1);
+assert.equal(expired.afterResponse,2);
+console.log('PASS expired recognition distinguishes unsent and already responded records');

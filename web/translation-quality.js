@@ -1,12 +1,22 @@
 // Conservative checks: warnings are review prompts, never accuracy scores.
 import {QUALITY_VERSION,hasInternalMarker,needsTranslationReview} from './translation-safety.js?v=20261029-faithful-pipeline-1';
 export {QUALITY_VERSION};
+function timePeriod(text,language){
+ const normalized=String(text||'').normalize('NFKC');
+ const matches=language==='en'
+  ? normalized.matchAll(/(?<![:\d])\b(?:0?[1-9]|1[0-2])(?::[0-5]\d)?\s*(a\.?\s*m|p\.?\s*m)\b/gi)
+  : normalized.matchAll(/(午前|午後)\s*(?:0?[1-9]|1[0-2])\s*(?:時|[:：])/g);
+ const periods=[...matches].map(match=>/^(?:a|午前)/i.test(match[1])?'am':'pm');
+ return periods.length===1?periods[0]:null;
+}
+const japaneseLanguage=language=>language==='ja'||language==='ja-easy';
 export function inspectTranslations(text,source,targets,translations={}){
  const normalize=s=>String(s||'').normalize('NFKC');
  const numbers=s=>(normalize(s).replaceAll('−','-').replace(/(?<=\d)[,\s](?=\d{3}(?:\D|$))/g,'').match(/-?\d+(?:[.,]\d+)?/g)||[]).map(n=>String(Number(n.replace(',','.')))).sort();
  const original=numbers(text),warnings=[],checkedLanguages=[],unmeasuredLanguages=[];
+ const englishInstructionNegative=source==='en'&&/^(?:please\s+)?(?:do not|don['’]t|never)\s+\p{L}/iu.test(normalize(text).trim());
  const negative=source==='ja'&&/(?:必要(?:あり|はあり)ません|必要ない|不要|禁止|しないで|持ってこないで)/.test(text)&&!/(?:ないわけ|ないことはない)/.test(text);
- const negation={de:/\b(?:nicht|kein(?:e|en|er|es|em)?|niemals|ohne|unnötig|verboten)\b/i,en:/\b(?:not|no|never|without|don['’]t|mustn['’]t|unnecessary|prohibited|forbidden)\b/i,es:/\b(?:no|nunca|sin|innecesari[oa]|prohibid[oa])\b/i,pt:/\b(?:não|nunca|sem|desnecessári[oa]|proibid[oa])\b/i,'ja-easy':/ない|ません|不要|禁止/};
+ const negation={de:/\b(?:nicht|kein(?:e|en|er|es|em)?|niemals|ohne|unnötig|verboten)\b/i,en:/\b(?:not|no|never|without|(?:do|does|did|must|should|need|could|would|is|are|was|were|ca|wo)n['’]t|cannot|unnecessary|prohibited|forbidden)\b/i,es:/\b(?:no|nunca|sin|innecesari[oa]|prohibid[oa])\b/i,pt:/\b(?:não|nunca|sem|desnecessári[oa]|proibid[oa])\b/i,'ja-easy':/ない|ません|不要|禁止/};
  for(const language of new Set(targets||[])){
   if(language===source)continue;
   const value=translations?.[language];
@@ -23,8 +33,19 @@ export function inspectTranslations(text,source,targets,translations={}){
   // Word-form numbers and dates require semantic interpretation: do not guess.
   const wordNumbers=/\b(?:one|two|three|four|five|six|seven|eight|nine|ten|hundred|thousand|january|february|march|april|may|june|july|august|september|october|november|december|uno|dos|tres|cuatro|cinco|um|dois|três|quatro|janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro|eins|zwei|drei|vier|fünf|sechs|sieben|acht|neun|zehn|hundert|tausend|januar|februar|märz|april|mai|juni|juli|august|september|oktober|november|dezember|enero|febrero|marzo|mayo|junio|julio|septiembre|octubre|diciembre)\b/i;
   if(original.length){if(!['en','es','pt','de','ja-easy'].includes(language)||wordNumbers.test(value))unmeasuredLanguages.push(language);else if(JSON.stringify(original)!==JSON.stringify(numbers(value)))warnings.push({language,code:'number_mismatch'});}
+  if((source==='en'&&japaneseLanguage(language))||(japaneseLanguage(source)&&language==='en')){
+   const originalPeriod=timePeriod(text,source),translatedPeriod=timePeriod(value,language);
+   if(originalPeriod&&translatedPeriod&&originalPeriod!==translatedPeriod)warnings.push({language,code:'time_period_mismatch'});
+  }
+  if(japaneseLanguage(source)&&language==='en'&&/(?:人|児童|生徒|参加者|保護者)\s*(?:だけ|のみ)(?=[、。\sがはにでを、]|$)/u.test(normalize(text))&&/\b(?:everyone|everybody|all of you|the whole class)\b/i.test(value)&&!/\b(?:only|except|unless|if|who|that)\b/i.test(value)){
+   warnings.push({language,code:'audience_scope_check'});
+  }
+  if(source==='en'&&japaneseLanguage(language)&&/^\s*only\s+(?:those|people|students|participants)\s+who\b/i.test(normalize(text))&&/(?:全員|皆さん|みなさん|誰でも)/u.test(value)&&!/(?:だけ|のみ|限り|限る|場合|なら|以外)/u.test(value)){
+   warnings.push({language,code:'audience_scope_check'});
+  }
+  if(englishInstructionNegative&&['ja','ja-easy'].includes(language)&&!/(?:ない|ません|せんよう|ずに|禁止|厳禁|不可|ご遠慮|お控え|控えて|やめて|べからず)/u.test(normalize(value)))warnings.push({language,code:'negation_check'});
   if(negative){if(!negation[language]){if(!unmeasuredLanguages.includes(language))unmeasuredLanguages.push(language);}else if(!negation[language].test(normalize(value)))warnings.push({language,code:'negation_check'});}
  }
  return {version:QUALITY_VERSION,checkedLanguages,unmeasuredLanguages,warnings};
 }
-export function qualityMessage(code){return {untranslated_target:'原文の英語が残っています。訳を確認してください',added_audience:'原文にない相手・学年の説明が加わっていないか確認してください',internal_marker:'訳を確認できませんでした。原文を確認してください',translation_needs_review:'不明な言葉があります。原文を確認してください',source_script_remaining:'日本語の文字が残っています。訳を確認してください',number_mismatch:'数字・日付を確認してください',negation_check:'否定の意味を確認してください',missing_translation:'訳がありません'}[code]||'訳を確認してください';}
+export function qualityMessage(code){return {untranslated_target:'原文の英語が残っています。訳を確認してください',added_audience:'原文にない相手・学年の説明が加わっていないか確認してください',internal_marker:'訳を確認できませんでした。原文を確認してください',translation_needs_review:'不明な言葉があります。原文を確認してください',source_script_remaining:'日本語の文字が残っています。訳を確認してください',number_mismatch:'数字・日付を確認してください',time_period_mismatch:'時刻の午前・午後を確認してください',audience_scope_check:'指示の対象者を確認してください',negation_check:'否定の意味を確認してください',missing_translation:'訳がありません'}[code]||'訳を確認してください';}

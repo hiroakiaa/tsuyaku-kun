@@ -179,7 +179,7 @@ await test('用語ヒントを音声モデルに渡し未知言語に英語を�
 await test('比較評価は数字の誤りと未計測を成功扱いにしない',()=>{assert.equal(speechScore('15ページ','16ページ').numbersMatch,false);assert.equal(speechScore('はい。','はい').characterErrorRate,0);assert.ok(speechScore('必要ありません','必要です').characterErrorRate>0);assert.equal(speechScore('','').characterErrorRate,null);});
 await test('不自然な序数は数学の概念や数字を推測せず原文確認として残す',()=>{const p=protectUncertainSpeech('13番から二次つ目になります');assert.equal(p.speech,'13番から__UNCLEAR_1__になります');assert.deepEqual(p.spans,['二次つ目']);const restored=restoreUncertainSpeech({en:'From 13 to __UNCLEAR_1__'},'13番から二次つ目になります',p.spans);assert.ok(restored.en.includes('二次つ目'));assert.ok(restored.en.includes('unclear wording'));assert.ok(!restored.en.includes('quadratic'));assert.ok(restoreUncertainSpeech({en:'second quadratic'},'13番から二次つ目になります',p.spans).en.includes('Translation needs review'));assert.deepEqual(protectUncertainSpeech('二次方程式と13番').spans,[]);});
 await test('未完の短い日本語だけ次の発話と結合し完成文は待たせない',()=>{assert.equal(isIncompleteJapanese('明日は'),true);assert.equal(isIncompleteJapanese('弁当が必要です'),false);assert.equal(isIncompleteJapanese('はい'),false);assert.equal(isIncompleteJapanese('Tomorrow is'),false);const R=createServerRecognition({endpoint:'https://example.test',getStream:()=>null,getToken:async()=>'',Context:class{},Worklet:class{}}),r=new R(),out=[];r.active=true;r.onresult=e=>out.push(e.results[e.resultIndex][0].transcript);r.acceptText('明日は',{speechEndedAt:1,recognitionReadyAt:2});assert.equal(out.length,1);r.acceptText('6時間目に生徒会選挙があります',{speechEndedAt:3,recognitionReadyAt:4});assert.deepEqual(out,['明日は','明日は 6時間目に生徒会選挙があります']);r.abort();});
-await test('待ち行列が増えてもマイクを停止せず古い音声を消去する',async()=>{let node,diag,recover;class W{constructor(){node=this;this.port={postMessage(){}};}connect(){}disconnect(){}}const ctx={state:'running',audioWorklet:{async addModule(){}},createMediaStreamSource(){return {connect(){},disconnect(){}};},async close(){}};const R=createServerRecognition({endpoint:'https://example.test',getStream:()=>null,getToken:async()=>'',Context:class{},Worklet:W,onDiagnostic:d=>diag=d}),r=new R();r.context=ctx;r.active=true;r.drain=async()=>{};r.onrecovering=e=>recover=e;r.onerror=()=>assert.fail('停止してはいけない');await r.prepare({},Promise.resolve());const old=new Int16Array([123]),next=new Int16Array([456]);r.queue=[{samples:old,at:Date.now()},{samples:next,at:Date.now()}];node.port.onmessage({data:new Int16Array(16000)});assert.equal(r.active,true);assert.equal(old[0],0);assert.equal(r.queue.length,2);assert.equal(diag.code,'queue_overflow');assert.equal(recover.reason,'queue_overflow');r.abort();});
+await test('待ち行列が増えてもマイクを停止せず古い音声を消去する',async()=>{let node,diag,recover;class W{constructor(){node=this;this.port={postMessage(){}};}connect(){}disconnect(){}}const ctx={state:'running',audioWorklet:{async addModule(){}},createMediaStreamSource(){return {connect(){},disconnect(){}};},async close(){}};const R=createServerRecognition({endpoint:'https://example.test',getStream:()=>null,getToken:async()=>'',Context:class{},Worklet:W,onDiagnostic:d=>diag=d}),r=new R();r.context=ctx;r.active=true;r.drain=async()=>{};r.onrecovering=e=>recover=e;r.onerror=()=>assert.fail('停止してはいけない');await r.prepare({},Promise.resolve());const old=new Int16Array([123]),next=new Int16Array([456]);r.queue=[{samples:old,at:Date.now()},{samples:next,at:Date.now()}];node.port.onmessage({data:new Int16Array(16000)});assert.equal(r.active,true);assert.equal(old[0],0);assert.equal(r.queue.length,2);assert.equal(diag.code,'queue_overflow');assert.equal(recover.reason,'queue_overflow');assert.notEqual(r.breakContinuity,true,'Dropping queued audio must not break an earlier in-flight caption');r.abort();});
 await test('最後のAPI成功で途中の認識エラーやHTTP失敗を隠さない',()=>{const now=Date.now(),s={startedAt:now-20000,updatedAt:now,captionCount:1,failedCaptions:0,events:[{type:'recognition_error',seconds:1,recognitionCode:'overloaded'},{type:'asr_restart',seconds:2},{type:'asr_queue_drop',seconds:3}]};const r=explainConnection([{at:now-1000,stage:'api',operation:'transcribe',code:'http_error',status:502},{at:now,stage:'api',operation:'transcribe',code:'ok',status:200}],{now,sessions:[s]});assert.ok(r.candidates.some(x=>x.cause==='サーバー側のエラー'));assert.ok(r.candidates.some(x=>x.cause==='利用中の音声認識の中断'));assert.equal(r.sessionResults[0].recognitionRestartCount,1);assert.equal(r.sessionResults[0].queueDropCount,1);assert.ok(r.facts.some(x=>x.includes('最後のAPI成功')));});
 await test('日付・曜日を内容と結合し処理上の分割だけで文章を確定しない',()=>{const R=createServerRecognition({endpoint:'https://example.test',getStream:()=>null,getToken:async()=>'',Context:class{},Worklet:class{}});for(const prefix of ['10月9日','１０月９日。','金曜日']){const r=new R(),out=[];r.active=true;r.onresult=e=>out.push(e.results[e.resultIndex][0].transcript);r.acceptText(prefix,{boundary:'pause'});assert.equal(out.length,1);r.acceptText('終業式があります',{boundary:'pause'});assert.equal(out.length,2);assert.ok(out[1].includes('終業式があります'));r.abort();}const r=new R(),out=[];r.active=true;r.onresult=e=>out.push(e.results[e.resultIndex][0].transcript);r.acceptText('これから教科書を開いて問題を確認してください',{boundary:'limit'});assert.equal(out.length,1);r.acceptText('15ページの問1を解きます',{boundary:'pause'});assert.equal(out.length,2);assert.ok(out[1].includes('15ページ'));r.acceptText('別の長い発話の処理用の区切りです',{boundary:'limit'});r.acceptText('さらに続く発話の処理用の区切りです',{boundary:'limit'});assert.equal(out.length,4);assert.ok(r.fragment);r.acceptText("完成しました",{boundary:"pause"});assert.equal(r.fragment,null);r.abort();});
 await test('400msの間は保ち3秒の処理区切りを発話末尾と区別',()=>{const out=[],boundaries=[],s=new PcmSegmenter(16000,(x,d)=>{out.push(x);boundaries.push(d.boundary);}),wave=n=>Float32Array.from({length:n},(_,i)=>Math.sin(i*.1)*.03);s.push(wave(9600));s.push(new Float32Array(6400));assert.equal(out.length,0);s.push(wave(16000));assert.equal(out.length,0);s.push(new Float32Array(9600));assert.equal(out.length,1);assert.equal(boundaries[0],'pause');const q=new PcmSegmenter(16000,(x,d)=>boundaries.push(d.boundary));q.push(wave(64000));assert.equal(boundaries.at(-1),'limit');});
@@ -262,7 +262,7 @@ await test('ブラウザー認識は確定文だけ処理し時刻不明の別�
  let native;class Native{constructor(){native=this;}start(){}abort(){this.aborted=true;}}
  const Recognizer=createBrowserRecognition({language:'ja',Native});const r=new Recognizer(),events=[];r.onresult=e=>events.push(e);r.start();assert.equal(native.lang,'ja');
  const feed=(text,isFinal=true)=>{const row=[{transcript:text}];row.isFinal=isFinal;native.onresult({resultIndex:0,results:[row]});};
- feed('まだ途中',false);feed('ん');assert.equal(events.length,0);feed('10月9日');feed('金曜日に終業式があります');const final=events.filter(e=>!e.metadataOnly);assert.equal(final.length,2);assert.notEqual(final[0].resultIndex,final[1].resultIndex);assert.equal(final[1].results[final[1].resultIndex][0].transcript,'金曜日に終業式があります');assert.equal(final[1].speechEndedAt,undefined);r.abort();assert.equal(native.aborted,true);
+ feed('まだ途中',false);assert.equal(events.length,0);feed('10月9日');feed('金曜日に終業式があります');const final=events.filter(e=>!e.metadataOnly);assert.equal(final.length,2);assert.notEqual(final[0].resultIndex,final[1].resultIndex);assert.equal(final[1].results[final[1].resultIndex][0].transcript,'金曜日に終業式があります');assert.equal(final[1].speechEndedAt,undefined);r.abort();assert.equal(native.aborted,true);
 });
 await test('ブラウザー認識の失敗・停止後は古い結果を届けない',async()=>{
  const {createBrowserRecognition}=await import('../web/caption-browser.js');let native;class Native{constructor(){native=this;}start(){}abort(){}}
@@ -295,7 +295,7 @@ await test('非発話の除外をネットワーク障害と誤診断しない',
 });
 await test('ブラウザー認識のくしゃみは前後の字幕を結合しない',async()=>{
  const {createBrowserRecognition}=await import('../web/caption-browser.js');let native;class Native{constructor(){native=this;}start(){}abort(){}}
- const diagnostics=[],events=[];const R=createBrowserRecognition({language:'ja',Native,onDiagnostic:r=>diagnostics.push(r)}),r=new R();r.onresult=e=>events.push(e);r.start();const send=text=>{const row=[{transcript:text}];row.isFinal=true;native.onresult({resultIndex:0,results:[row]});};send('10月9日');send('ハックション！');send('はい');assert(diagnostics.some(d=>d.code==='filtered'&&d.filterReason==='nonverbal'));assert(!events.some(e=>e.results[e.resultIndex][0].transcript.includes('ハックション')));assert(!events.some(e=>e.results[e.resultIndex][0].transcript.includes('10月9日 はい')));assert(events.some(e=>e.results[e.resultIndex][0].transcript==='はい'));r.abort();
+ const diagnostics=[],events=[];const R=createBrowserRecognition({language:'ja',Native,onDiagnostic:r=>diagnostics.push(r)}),r=new R();r.onresult=e=>events.push(e);r.start();const send=text=>{const row=[{transcript:text}];row.isFinal=true;native.onresult({resultIndex:0,results:[row]});};send('10月9日');send('ハックション！');send('はい');send('ん');assert(events.some(e=>e.results[e.resultIndex][0].transcript==='ん'));assert(diagnostics.some(d=>d.code==='filtered'&&d.filterReason==='nonverbal'));assert(!events.some(e=>e.results[e.resultIndex][0].transcript.includes('ハックション')));assert(!events.some(e=>e.results[e.resultIndex][0].transcript.includes('10月9日 はい')));assert(events.some(e=>e.results[e.resultIndex][0].transcript==='はい'));r.abort();
 });
 await test('背景停止は録音と待機処理を止め字幕と再利用を保持する',async()=>{
  const app=await readFile(new URL('../web/app.js',import.meta.url),'utf8'),code=app.slice(app.indexOf('function pauseConversation('),app.indexOf("document.addEventListener('visibilitychange'"));
@@ -634,3 +634,107 @@ await test('公開検査はAPIと共有モジュールの版を確認する',asy
 await test('授業の戻るは先生の終了選択を保ち、生徒は自分だけ退出する',async()=>{const app=await readFile(new URL('../web/app.js',import.meta.url),'utf8'),handler=app.slice(app.indexOf("$('#lesson-role-back').onclick="),app.indexOf("$('#lesson-role-back').onclick=")+app.slice(app.indexOf("$('#lesson-role-back').onclick=")).indexOf(';\n')+1);const nodes=new Map(),node=id=>{if(!nodes.has(id))nodes.set(id,{});return nodes.get(id);};let choices=0,exits=0,resets=0;const scope={$:node,room:{mode:'lesson'},role:'teacher',requestLeave:()=>choices++,chooseLessonRole:()=>resets++,leave:async()=>exits++};runInNewContext(handler,scope);await node('#lesson-role-back').onclick();assert.equal(choices,1);assert.equal(exits,0);assert.equal(resets,0);scope.role='guest';await node('#lesson-role-back').onclick();assert.equal(exits,1);assert.equal(resets,1);assert.equal(node('#live').hidden,true);const html=await readFile(new URL('../index.html',import.meta.url),'utf8');assert(!html.includes('id="lesson-theme"'));assert(!app.includes('syncLessonUnit'));});
 
 await test('起動時の表示領域変動は高さを書き換えずキーボード時だけ補正する',async()=>{const app=await readFile(new URL('../web/app.js',import.meta.url),'utf8'),a=app.indexOf('function fitVisibleViewport(){'),b=app.indexOf('window.visualViewport?.addEventListener',a),values=new Map();let writes=0,focused=false;const root={dataset:{},style:{getPropertyValue:k=>values.get(k)||'',setProperty:(k,v)=>{writes++;values.set(k,v);},removeProperty:k=>{writes++;values.delete(k);}}},v={height:844,offsetTop:0,scale:1},scope={document:{documentElement:root,activeElement:{matches:()=>focused}},window:{visualViewport:v},innerHeight:844};runInNewContext(app.slice(a,b),scope);for(let i=0;i<100;i++){v.height=760+(i%2)*.4;v.offsetTop=i%2;scope.fitVisibleViewport();}assert.equal(writes,0);assert.equal(root.dataset.keyboardOpen,'false');focused=true;v.height=380;v.offsetTop=0;scope.fitVisibleViewport();assert.equal(values.get('--visible-app-height'),'380px');assert.equal(root.dataset.keyboardOpen,'true');const before=writes;scope.fitVisibleViewport();assert.equal(writes,before);v.scale=2;scope.fitVisibleViewport();assert.equal(values.size,0);assert.equal(root.dataset.keyboardOpen,'false');});
+
+await test('期限切れ音声は順番待ちより前に送信枠を解放する',async()=>{
+ let releasePrevious,releaseCount=0,requests=0;
+ const diagnostics=[];
+ const Recognition=createServerRecognition({
+  endpoint:'https://test/transcribe',getToken:async()=> 'token',
+  acquireSlot:async()=>{chunk.at=Date.now()-16000;return ()=>releaseCount++;},
+  fetcher:async()=>{requests++;throw Error('must not send');},
+  onDiagnostic:entry=>diagnostics.push(entry)
+ });
+ const recognition=new Recognition();
+ recognition.active=true;
+ const chunk={samples:new Int16Array(16000).fill(1),at:Date.now(),sequence:2};
+ const job={controller:new AbortController(),release(){},previous:new Promise(resolve=>{releasePrevious=resolve;})};
+ recognition.jobs=new Set([job]);
+ const running=recognition.recognizeChunk(chunk,job);
+ await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(releaseCount,1);
+ assert.equal(job.networkDone,true);
+ assert.equal(requests,0);
+ assert.equal(diagnostics.length,0);
+ releasePrevious();
+ await running;
+ assert.equal(releaseCount,1);
+ assert.equal(diagnostics[0].code,'stale_audio');
+ assert.ok(chunk.samples.every(sample=>sample===0));
+ recognition.abort();
+});
+
+await test('日英の禁止指示で否定が落ちた場合を検出する',async()=>{
+ const {inspectTranslations}=await import('../web/translation-quality.js');
+ const warns=(text,source,target,value)=>inspectTranslations(text,source,[target],{[target]:value}).warnings.some(row=>row.code==='negation_check');
+ assert.equal(warns("Please don't submit it yet.",'en','ja','もう提出してください。'),true);
+ assert.equal(warns("Please don't submit it yet.",'en','ja','まだ提出しないでください。'),false);
+ assert.equal(warns('Do not enter.','en','ja-easy','入ってください。'),true);
+ assert.equal(warns('Do not enter.','en','ja','立入禁止'),false);
+ assert.equal(warns("Don't touch it.",'en','ja','触れるのはお控えください。'),false);
+ assert.equal(warns('持ってこないでください。','ja','en',"You shouldn't bring it."),false);
+ assert.equal(warns('持ってこないでください。','ja','en','Please bring it.'),true);
+});
+
+await test('日英の時刻で明示された午前と午後の反転を検出する',async()=>{
+ const {inspectTranslations,qualityMessage}=await import('../web/translation-quality.js');
+ const warns=(text,source,target,value)=>inspectTranslations(text,source,[target],{[target]:value}).warnings.some(row=>row.code==='time_period_mismatch');
+ assert.equal(warns('午後2時15分に集合してください。','ja','en','Meet at 2:15 a.m.'),true);
+ assert.equal(warns('午後２時１５分に集合してください。','ja','en','Meet at 2:15 p.m.'),false);
+ assert.equal(warns('Meet at 2:15 PM.','en','ja','午前2時15分に集合してください。'),true);
+ assert.equal(warns('Meet at 2:15 PM.','en','ja-easy','14:15に 集まって ください。'),false);
+ assert.equal(warns('午前9時または午後2時です。','ja','en','It is at 2 p.m. or 9 a.m.'),false);
+ assert.equal(qualityMessage('time_period_mismatch'),'時刻の午前・午後を確認してください');
+});
+
+await test('認証前に期限切れの音声は後続の送信を妨げない',async()=>{
+ let unblock,requests=0,auth=0;
+ const Recognition=createServerRecognition({
+  endpoint:'https://test/transcribe',getToken:async()=>{auth++;return 'token';},
+  fetcher:async()=>{requests++;return {ok:true,status:200,json:async()=>({text:'はい'})};}
+ });
+ const recognition=new Recognition();
+ recognition.active=true;
+ const previous=new Promise(resolve=>{unblock=resolve;});
+ recognition.commitTail=previous;
+ recognition.jobs=new Set([{networkDone:false}]);
+ const now=Date.now();
+ recognition.queue.push({samples:new Int16Array(320),at:now-16000,sequence:2},
+  {samples:new Int16Array(320),at:now-16000,sequence:3},
+  {samples:new Int16Array(320),at:now,sequence:4});
+ const draining=recognition.drain();
+ await new Promise(resolve=>setImmediate(resolve));
+ const observed=[auth,requests];
+ unblock();
+ await draining;
+ assert.deepEqual(observed,[1,1]);
+});
+
+await test('授業の対象者を全員に広げた日英訳を検出する',async()=>{
+ const {inspectTranslations}=await import('../web/translation-quality.js');
+ const warns=(text,source,target,value)=>inspectTranslations(text,source,[target],{[target]:value}).warnings.some(row=>row.code==='audience_scope_check');
+ const ja='終わった人だけ、次のページに進んでください。';
+ const en='Only those who have finished should go to the next page.';
+ assert.equal(warns(ja,'ja','en','Everyone should go to the next page.'),true);
+ assert.equal(warns(ja,'ja','en',en),false);
+ assert.equal(warns(ja,'ja','en','If you have finished, please go to the next page.'),false);
+ assert.equal(warns(en,'en','ja','全員、次のページに進んでください。'),true);
+ assert.equal(warns(en,'en','ja',ja),false);
+ assert.equal(warns(en,'en','ja','終わった場合は、皆さん次のページに進んでください。'),false);
+});
+
+await test('認識の区間番号が飛んだら前後の発話を結合しない',async()=>{
+ const Recognition=createServerRecognition({
+  endpoint:'https://test/transcribe?language=ja',getToken:async()=> 'token',
+  fetcher:async()=>({ok:true,status:200,json:async()=>({text:'弁当が必要です',language:'ja'})})
+ });
+ const recognition=new Recognition(),outputs=[];
+ recognition.active=true;
+ recognition.lastSequence=1;
+ const now=Date.now();
+ recognition.onresult=e=>{if(!e.metadataOnly)outputs.push(e.results[e.resultIndex][0].transcript);};
+ recognition.acceptText('明日は',{language:'ja',boundary:'limit',speechStartedAt:now-500,speechEndedAt:now-50});
+ recognition.queue.push({samples:new Int16Array(320),at:now,sequence:3,boundary:'pause',speechStartedAt:now,speechEndedAt:now});
+ await recognition.drain();
+ assert.deepEqual(outputs,['明日は','弁当が必要です']);
+ recognition.abort();
+});

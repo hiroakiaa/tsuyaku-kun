@@ -8,6 +8,6 @@ export function nonSpeechReason(result,language){
  if(Array.isArray(segments)&&segments.length&&segments.every(s=>Number.isFinite(s?.no_speech_prob)&&s.no_speech_prob>=.6))return 'model_no_speech';
  if(!['ja','ja-easy'].includes(language))return null;
  const compact=text.replace(/[\s、。,.!！…]/g,'');
- if(/^(?:ん|ン|はっくしょん|ハックション|ハクション|くしゅん|クシュン)+$/.test(compact))return 'nonverbal';
+ if(/^(?:はっくしょん|ハックション|ハクション|くしゅん|クシュン)+$/.test(compact))return 'nonverbal';
  return null;
 }
