@@ -1,18 +1,18 @@
 import {recognitionLanguage,speechTextAllowed} from './two-language.js?v=20261029-communication50-1';
-import {nonSpeechReason} from './speech-filter.js?v=20261111-classroom-mic-timeout-1';
+import {nonSpeechReason} from './speech-filter.js?v=20261111-classroom-short-reply-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261103-audio-offset-1';
 import {recognitionMetrics} from './recognition-metrics.js?v=20261103-budget-cleanup-1';
 import {trimmedAudioLength} from './audio-trim.js?v=20261029-communication50-1';
-import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish,japaneseSpeechTail,japaneseNumericCompletion} from './speech-continuity.js?v=20261111-classroom-mic-timeout-1';
+import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish,japaneseSpeechTail,japaneseNumericCompletion} from './speech-continuity.js?v=20261111-classroom-short-reply-1';
 export const capturePauseMs=profile=>profile==='fast'||profile==='responsive'?300:profile==='balanced'?400:500;
 // Browser-independent recognition using the call's existing microphone stream.
-export function encodeWav(samples) {
-  const bytes = new ArrayBuffer(44 + samples.length * 2), view = new DataView(bytes);
+export function encodeWav(samples,minimumSamples=0) {
+  const bytes = new ArrayBuffer(44 + Math.max(minimumSamples,samples.length) * 2), view = new DataView(bytes);
   const word = (at, text) => { for (let i = 0; i < text.length; i++) view.setUint8(at + i, text.charCodeAt(i)); };
   word(0, 'RIFF'); view.setUint32(4, bytes.byteLength - 8, true); word(8, 'WAVE'); word(12, 'fmt ');
   view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
   view.setUint32(24, 16000, true); view.setUint32(28, 32000, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true);
-  word(36, 'data'); view.setUint32(40, samples.length * 2, true);
+  word(36, 'data'); view.setUint32(40, bytes.byteLength - 44, true);
   for (let i = 0; i < samples.length; i++) view.setInt16(44 + i * 2, samples[i], true);
   return bytes;
 }
@@ -49,7 +49,7 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', o
       try {
         await resumed;
         if (!this.active) return;
-        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261111-one-utterance-timeout-1', import.meta.url));
+        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261111-classroom-short-reply-1', import.meta.url));
         if (!this.active) return;
         this.source = this.context.createMediaStreamSource(stream);
         this.node = new Worklet(this.context, 'caption-pcm',{processorOptions:{pauseMs:capturePauseMs(captureProfile),oneUtterance}});
@@ -144,8 +144,9 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', o
         if (!this.active) return;
         if (controller.signal.aborted) throw new DOMException('Recognition cancelled','AbortError');
         if(stale()){await discardUnsentAudio();return;}
-        sentSamples=trimmedAudioLength(chunk.samples,chunk.boundary);body = encodeWav(chunk.samples.subarray(0,sentSamples)); chunk.samples.fill(0);
-        onUsage(sentSamples / 16000);
+        sentSamples=trimmedAudioLength(chunk.samples,chunk.boundary);body = encodeWav(chunk.samples.subarray(0,sentSamples),8000); chunk.samples.fill(0);
+        const uploadedSeconds=(body.byteLength-44)/32000;
+        onUsage(uploadedSeconds);
         const hints = [...new Set((this.automatic?[]:(this.getHints() || [])).filter(x => typeof x === 'string')
           .map(x => x.normalize('NFKC').trim()).filter(x => x && x.length <= 40))].slice(0, 30).join(',').slice(0, 300);
         const encodedHints=hints?encodeURIComponent(hints):'';
@@ -156,7 +157,7 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', o
         });
         phase='parse';let data,failure,failureData;if(response.ok){data=await response.json();if(!data||typeof data!=='object'||typeof data.text!=='string')throw Error('invalid response');}else{try{failureData=await response.json();failure=failureData.aiFailure;}catch{}}
         const responseReadyAt=Date.now();clearTimeout(timeout);releaseSlot?.();releaseSlot=null;
-        const requestMetrics={status:response.status,elapsedMs:responseReadyAt-requestAt,queueMs,clientAuthMs,clientSlotWaitMs,clientRequestMs:responseReadyAt-httpStarted,captureTailMs:Number.isFinite(chunk.speechEndedAt)?Math.max(0,chunk.at-chunk.speechEndedAt):null,audioSeconds:sentSamples/16000,trimmedTailMs:(chunk.samples.length-sentSamples)/16,segmentBoundary:chunk.boundary,...recognitionMetrics((data||failureData)?.recognitionTiming),...(failure?{aiReason:failure.reason,aiCode:failure.code,aiEvidence:failure.evidence,aiModel:failure.model}:{})};
+        const requestMetrics={status:response.status,elapsedMs:responseReadyAt-requestAt,queueMs,clientAuthMs,clientSlotWaitMs,clientRequestMs:responseReadyAt-httpStarted,captureTailMs:Number.isFinite(chunk.speechEndedAt)?Math.max(0,chunk.at-chunk.speechEndedAt):null,audioSeconds:uploadedSeconds,trimmedTailMs:(chunk.samples.length-sentSamples)/16,segmentBoundary:chunk.boundary,...recognitionMetrics((data||failureData)?.recognitionTiming),...(failure?{aiReason:failure.reason,aiCode:failure.code,aiEvidence:failure.evidence,aiModel:failure.model}:{})};
         // Record actual HTTP completion before waiting for an earlier segment. No transcript is retained.
         if(!this.active||!this.jobs.has(job)||controller.signal.aborted)return;
         chunk.samples.fill(0);if(body)new Uint8Array(body).fill(0);
