@@ -43,11 +43,29 @@ export class PcmSegmenter {
       if(overlap)this.preroll.set(overlap);
     }
   }
+  finish(){
+    if(this.frameLength){
+      this.frame.fill(0,this.frameLength);
+      this.acceptFrame();
+    }
+    if(this.started){
+      if(this.voiced>=1920)this.emit(this.samples.slice(0,this.length),{boundary:'pause'});
+      this.activity('end');
+    }
+    this.clear();
+  }
   clear(){this.samples.fill(0);this.preroll.fill(0);this.frame.fill(0);this.preIndex=0;this.frameLength=0;this.started=false;this.length=0;this.sum=0;this.count=0;this.phase=0;this.onset=0;this.voiced=0;this.silence=0;this.noise=.001;}
 }
 if(typeof AudioWorkletProcessor!=='undefined'){
   class CaptionPcmProcessor extends AudioWorkletProcessor{
-    constructor(options){super();this.active=true;this.frames=0;this.inputFrames=0;this.signalFrames=0;this.port.postMessage({alive:true});this.segmenter=new PcmSegmenter(sampleRate,(samples,detail)=>this.port.postMessage({samples,...detail},[samples.buffer]),activity=>this.port.postMessage({activity}),options?.processorOptions);this.port.onmessage=()=>{this.active=false;this.segmenter.clear();};}
+    constructor(options){super();this.active=true;this.frames=0;this.inputFrames=0;this.signalFrames=0;this.port.postMessage({alive:true});this.segmenter=new PcmSegmenter(sampleRate,(samples,detail)=>this.port.postMessage({samples,...detail},[samples.buffer]),activity=>this.port.postMessage({activity}),options?.processorOptions);this.port.onmessage=event=>{
+      if(!this.active)return;
+      this.active=false;
+      if(event.data==='finish'){
+        this.segmenter.finish();
+        this.port.postMessage({captureFinished:true});
+      }else this.segmenter.clear();
+    };}
     process(inputs){if(!this.active)return false;const input=inputs[0]?.[0];if(input){this.inputFrames+=input.length;if(input.some(value=>Math.abs(value)>.0001))this.signalFrames+=input.length;this.segmenter.push(input);}if((this.frames+=(input?.length||128))>=sampleRate*2){this.frames=0;this.port.postMessage({alive:true,inputFrames:this.inputFrames,signalFrames:this.signalFrames});this.inputFrames=this.signalFrames=0;}return true;}
   }
   registerProcessor('caption-pcm',CaptionPcmProcessor);

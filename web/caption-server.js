@@ -1,9 +1,9 @@
 import {recognitionLanguage,speechTextAllowed} from './two-language.js?v=20261029-communication50-1';
-import {nonSpeechReason} from './speech-filter.js?v=20261111-classroom-recovery-1';
+import {nonSpeechReason} from './speech-filter.js?v=20261111-classroom-mic-finish-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261103-audio-offset-1';
 import {recognitionMetrics} from './recognition-metrics.js?v=20261103-budget-cleanup-1';
 import {trimmedAudioLength} from './audio-trim.js?v=20261029-communication50-1';
-import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish,japaneseSpeechTail,japaneseNumericCompletion} from './speech-continuity.js?v=20261111-classroom-recovery-1';
+import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish,japaneseSpeechTail,japaneseNumericCompletion} from './speech-continuity.js?v=20261111-classroom-mic-finish-1';
 export const capturePauseMs=profile=>profile==='fast'||profile==='responsive'?300:profile==='balanced'?400:500;
 // Browser-independent recognition using the call's existing microphone stream.
 export function encodeWav(samples) {
@@ -49,12 +49,20 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
       try {
         await resumed;
         if (!this.active) return;
-        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261102-economy-pause-1', import.meta.url));
+        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261111-speech-finish-1', import.meta.url));
         if (!this.active) return;
         this.source = this.context.createMediaStreamSource(stream);
         this.node = new Worklet(this.context, 'caption-pcm',{processorOptions:{pauseMs:capturePauseMs(captureProfile)}});
         this.node.port.onmessage = event => {
           if (!this.active) return;
+          if(event.data?.captureFinished){
+            if(!this.finishingCapture)return;
+            this.captureFinished=true;
+            clearTimeout(this.finishCaptureTimer);
+            this.capturing=false;
+            void this.drain();
+            return;
+          }
           if(event.data?.alive){this.lastAlive=Date.now();clearTimeout(this.startTimer);const {inputFrames,signalFrames}=event.data;if(Number.isFinite(inputFrames)&&Number.isFinite(signalFrames)){this.missingInputs=inputFrames===0?(this.missingInputs||0)+1:0;if(this.missingInputs>=3){onDiagnostic({stage:'asr',operation:'capture',code:'capture_missing',inputFrames,signalFrames});this.fail('audio-capture','マイクから音声データが届いていません。マイクをONにし直してください。');return;}const code=inputFrames===0?'capture_missing':signalFrames===0?'capture_silent':'capture_active';if(code!==this.captureState||Date.now()-(this.captureStateAt||0)>=15000){this.captureState=code;this.captureStateAt=Date.now();onDiagnostic({stage:'asr',operation:'capture',code,inputFrames,signalFrames,trackMuted:(stream.getAudioTracks?.()||[]).some(t=>t.muted===true)});}}return;}
           if(event.data?.activity){clearTimeout(this.startTimer);this.lastAlive=Date.now();this.capturing=event.data.activity==='start';this.progress();return;}
           const samples=event.data?.samples||event.data,boundary=event.data?.boundary==='limit'?'limit':'pause';
@@ -73,6 +81,14 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
         if (this.context.state !== 'running') { this.fail('interrupted'); return; }
         this.lastAlive=Date.now();this.watchdog=setInterval(()=>{if(this.active&&Date.now()-this.lastAlive>12000){onDiagnostic({stage:'asr',operation:'capture',code:'capture_stalled'});this.fail('interrupted');}},3000);onDiagnostic({stage:'asr',operation:'capture',code:'capture_ready',trackMuted:(stream.getAudioTracks?.()||[]).some(t=>t.muted===true)});this.onstart?.();this.progress();
       } catch (_) { if (this.active) this.fail('audio-capture'); }
+    }
+    finishCapture() {
+      if(!this.active||!this.node||this.finishingCapture)return false;
+      this.finishingCapture=true;
+      clearInterval(this.watchdog);
+      this.finishCaptureTimer=setTimeout(()=>this.fail('interrupted'),1500);
+      this.node.port.postMessage('finish');
+      return true;
     }
     async drain() {
       this.jobs??=new Set();this.commitTail??=Promise.resolve();
@@ -94,6 +110,11 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
       }
       if(!started.length)this.progress();
       await Promise.all(started);
+      if(this.active&&this.captureFinished&&!this.jobs.size&&!this.queue.length){
+        this.finishFragment();
+        this.abort();
+        this.onend?.();
+      }
     }
     async recognizeChunk(chunk,job) {
       const segmentDiagnostic=record=>onDiagnostic({...record,recognitionRun:this.recognitionRun,...(Number.isSafeInteger(chunk.sequence)?{segmentSequence:chunk.sequence}:{})});
@@ -216,7 +237,7 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', g
     }
     fail(error,message,connectionIssue=false) { const notify = this.onerror; this.abort(); notify?.({ error, message,...(connectionIssue?{connectionIssue:true}:{}) }); }
     abort() {
-      clearTimeout(this.startTimer);clearTimeout(this.fragmentTimer);clearTimeout(this.tailAnchorTimer);this.tailAnchor=null;clearInterval(this.watchdog);this.watchdog=null;this.fragment=null;
+      clearTimeout(this.finishCaptureTimer);clearTimeout(this.startTimer);clearTimeout(this.fragmentTimer);clearTimeout(this.tailAnchorTimer);this.tailAnchor=null;clearInterval(this.watchdog);this.watchdog=null;this.fragment=null;
       this.active = false;this.capturing=false;for(const job of this.jobs||[]){job.cancelDiagnostic?.();job.cancelDiagnostic=null;job.controller.abort();job.release();}this.jobs?.clear();this.sending=false;
       for (const chunk of this.queue) chunk.samples.fill(0); this.queue=[];
       if (this.node) { this.node.onprocessorerror=null;this.node.port.onmessage = null; this.node.port.postMessage('stop'); this.node.disconnect(); }
