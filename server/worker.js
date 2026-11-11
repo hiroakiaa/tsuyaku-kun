@@ -95,7 +95,7 @@ export default {async fetch(request,env,ctx){
     if(url.pathname.startsWith('/billing/')){
       if(!await isBillingAdministrator(auth,env.BILLING_ADMIN_EMAIL_HASH))return cors(error('請求データは管理者本人のGoogle認証が必要です。',403));
       if(request.method!=='GET')return cors(error('読取だけ利用できます。',405));
-      if(url.pathname==='/billing/access')return cors(json({readMethod:'tabledata.list',paidQueries:false}));
+      if(url.pathname==='/billing/openai-connection'){if(!env.OPENAI_API_KEY)return cors(json({connected:false,reason:'missing_secret'}));try{const upstream=await fetch('https://api.openai.com/v1/models/gpt-realtime-translate',{headers:{Authorization:'Bearer '+env.OPENAI_API_KEY},signal:AbortSignal.timeout(7000)});const model=upstream.ok?await upstream.json():null;return cors(json({connected:upstream.ok,upstreamStatus:upstream.status,modelAvailable:model?.id==='gpt-realtime-translate'}));}catch{return cors(json({connected:false,reason:'upstream_unreachable'}));}}      if(url.pathname==='/billing/access')return cors(json({readMethod:'tabledata.list',paidQueries:false}));
       if(url.pathname==='/billing/google')return cors(json(await googleBillingReport(env)));
       if(url.pathname==='/billing/cloudflare')return cors(json(await cloudflareBillingReport(env)));
       return cors(error('請求の操作を確認してください。',404));
