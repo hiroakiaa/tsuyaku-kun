@@ -206,7 +206,7 @@ export class TranslationRoom {
   participants(){return this.ctx.getWebSockets().map(ws=>({ws,a:ws.deserializeAttachment()})).filter(x=>x.a?.uid&&!x.a.left&&!x.a.pending&&(x.ws.readyState===undefined||x.ws.readyState===1));}
   send(ws,data){try{ws.send(JSON.stringify(data));}catch{}}
   broadcast(data){for(const {ws,a} of this.participants())if(this.visibleTo(a,data))this.send(ws,data);}
-  visibleTo(a,data){return !['caption','caption_pending','translation'].includes(data.type)||a.chatAfter===undefined||data.id?.startsWith(a.id+'_')||Number.isInteger(data.sequence)&&data.sequence>a.chatAfter;}
+  visibleTo(a,data){if(Array.isArray(data.liveAudience)&&!data.liveAudience.includes(a.id))return false;return !['caption','caption_pending','translation'].includes(data.type)||a.chatAfter===undefined||data.id?.startsWith(a.id+'_')||Number.isInteger(data.sequence)&&data.sequence>a.chatAfter;}
   admission(fn){const work=(this.admissionTail||Promise.resolve()).then(fn);this.admissionTail=work.catch(()=>{});return work;}
   waiting(){return this.ctx.getWebSockets().map(ws=>({ws,a:ws.deserializeAttachment()})).filter(p=>p.a?.pending&&!p.a.left&&p.a.requestUntil>Date.now()&&(p.ws.readyState===undefined||p.ws.readyState===1));}
   requests(){const ownerPresent=this.participants().some(({a})=>a.role==='teacher');for(const {ws,a}of this.waiting())this.send(ws,{type:'join_waiting',expires:a.requestUntil,ownerPresent});const requests=this.waiting().map(({a})=>({id:a.id,name:a.name,language:a.language}));for(const {ws,a}of this.participants())if(a.role==='teacher'&&a.chatAfter!==undefined)this.send(ws,{type:'chat_requests',requests});}
@@ -298,7 +298,7 @@ export class TranslationRoom {
         return await this.admission(async()=>{
           if(!['interpreter','lesson'].includes(room.mode)||room.mode==='lesson'&&a.role!=='teacher')return;
           if(!/^[a-f0-9-]{36}$/.test(data.streamId||'')||!Number.isSafeInteger(data.revision)||data.revision<1)return;
-          if(!['ja','en'].includes(data.language)||typeof data.text!=='string'||data.text.length>1000||typeof data.token!=='string'||data.token.length>10000)return;
+          if(!['ja','en'].includes(data.language)||typeof data.text!=='string'||data.text.length>(data.final===true?6000:1000)||typeof data.token!=='string'||data.token.length>10000)return;
           const owner=await verifyToken(data.token,this.env.FIREBASE_PROJECT,true);
           if(!await isBillingAdministrator(owner,this.env.BILLING_ADMIN_EMAIL_HASH)||!await this.captionIsLive(ws,room))return;
           this.liveAudiences??=new WeakMap();
@@ -312,6 +312,20 @@ export class TranslationRoom {
           stream.revisions.set(data.language,data.revision);
           if(!data.text){
             if(data.revision===1)this.send(ws,{type:'live_caption_ready',streamId:data.streamId});
+            return;
+          }
+          if(data.final===true){
+            const id=a.id+'_'+data.streamId+'_'+data.language;
+            if(await this.ctx.storage.get('caption:'+id))return;
+            const audience=this.participants().filter(peer=>stream.peers.has(peer.ws)&&(peer.a.viewLanguage||peer.a.language)===data.language).map(peer=>peer.a.id);
+            if(!audience.length)return;
+            const sequence=(await this.ctx.storage.get('captionCount')||0)+1;
+            if(sequence>3000)return;
+            const record={id,sequence,source:data.language,speaker:a.name+' · Live',text:data.text,
+              translations:{[data.language]:data.text},status:'ready',final:true,revision:0,at:Date.now(),liveAudience:audience};
+            await this.ctx.storage.put('captionCount',sequence);
+            await this.ctx.storage.put('caption:'+id,record);
+            this.broadcast({type:'translation',...record});
             return;
           }
           for(const peer of this.participants()){

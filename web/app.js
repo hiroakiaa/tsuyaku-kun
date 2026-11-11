@@ -327,7 +327,7 @@ async function handle(data){
 }
 async function ensureMicrophone(fresh=false){const epoch=sessionEpoch,activation=microphoneActivation;const lessonTeacher=room?.mode==='lesson'&&role==='teacher';const deviceId=lessonTeacher?$('#lesson-microphone-device').value:'';const voiceIsolation=lessonTeacher&&$('#lesson-voice-isolation').checked&&navigator.mediaDevices?.getSupportedConstraints?.().voiceIsolation===true;if(localStream&&(fresh||deviceId&&localStream.getAudioTracks()[0]?.getSettings?.().deviceId!==deviceId||microphoneUnavailable(localStream)||localStream.getAudioTracks().some(t=>t.muted))){const previous=localStream;localStream=null;previous.getTracks().forEach(t=>t.stop());}if(!localStream)localStream=await acquireMicrophone(()=>navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true,...(voiceIsolation?{voiceIsolation:{ideal:true}}:{}),...(deviceId?{deviceId:{exact:deviceId}}:{})},video:false}),()=>!!room&&epoch===sessionEpoch&&activation===microphoneActivation&&document.visibilityState==='visible');const stream=localStream;if(voiceIsolation&&stream.getAudioTracks()[0]?.getSettings?.().voiceIsolation!==true)message('このマイクでは端末の音声分離を確認できませんでした。');if(room?.mode==='lesson'&&role==='teacher')void refreshLessonMicrophones();for(const track of stream.getAudioTracks())track.onended=()=>{if(localStream!==stream||!mic)return;mic=false;ledger.microphone(false);ledger.event('microphone_device_ended');idleWatch.stop();stopRecognition();paintButton($('#microphone'),'マイクをONにする','microphone');$('#microphone').setAttribute('aria-pressed','false');message('マイクとの接続が切れました。イヤホンなどを確認し、マイクをONにし直してください。');};return localStream;}
 let speechInputGate;let microphoneStarting=false,microphoneActivation=0,backgroundCallPaused=false;
-$('#microphone').onclick=async()=>{if(!room||chatWaiting||microphoneStarting)return;if(!mic&&room.mode==='lesson'&&!$('#lesson-review-form').hidden){message('直前の字幕を送るか、取り消してください。');return;}if(!mic&&room.mode==='lesson'&&role==='teacher'&&$('#lesson-microphone-device').dataset.unavailable==='true'){message('選んだマイクが外れました。入力マイクを確認してください。');return;}if(!mic&&room.mode==='lesson'&&recognition?.finishingCapture){message('直前の発話を字幕にしています。少し待ってください。');return;}if(!mic&&typeof navigator!=='undefined'&&navigator.onLine===false){message('オフラインです。接続後にマイクをONにしてください。');return;}if(!mic&&!isRecognitionLanguage(currentSource())){setTextComposer(true);message('この言語は文字入力で利用できます。音声入力はまだ対応していません。');return;}const epoch=sessionEpoch,activation=++microphoneActivation,button=$('#microphone');microphoneStarting=true;button.disabled=true;try{if(!mic){speechPlayer.stop();paintButton(button,'マイクを準備しています','microphone');if(typeof speechConnectionNeedsCheck==='function'&&speechConnectionNeedsCheck(connections.list(),config.api)){paintButton(button,'接続を確認しています','microphone');const checks=await probeNetwork(config.api);if(!room||sessionEpoch!==epoch||activation!==microphoneActivation||document.visibilityState!=='visible')return;checks.forEach(check=>connections.add({...check,online:navigator.onLine}));if(!checks.every(check=>check.code==='ok')){paintButton(button,'マイクをONにする','microphone');showSpeechConnectionFailure();return;}}if(backgroundCallPaused){backgroundCallPaused=false;intentionalClose=false;await connect();if(sessionEpoch!==epoch||activation!==microphoneActivation)return;startConnectionTimers();}await ensureMicrophone(room.mode!=='lesson'||heldMicrophone===null);if(!room||sessionEpoch!==epoch||activation!==microphoneActivation||(document.visibilityState!=='visible'))return;mic=true;recordResume();if(speechPlayer.key&&!speechPlayer.paused){speechInputGate.begin();return;}void idleWatch.start(localStream);localStream.getAudioTracks().forEach(t=>t.enabled=true);startRecognition(false,{immediate:true});}else{mic=false;recordPause('manual',undefined,{mode:room.mode,scope:'microphone'});idleWatch.stop();if(room.mode!=='lesson'||role!=='teacher'||!recognition?.finishCapture?.())stopRecognition(true);localStream?.getAudioTracks().forEach(t=>t.enabled=false);}ledger.microphone(mic);ledger.event(mic?'mic_on':'mic_off');const stopLabel=room.mode==='lesson'&&role==='teacher'&&$('#lesson-single-speech').checked?'ここまでを字幕にする':'マイクをとめる';const finishing=!mic&&room.mode==='lesson'&&recognition?.finishingCapture;paintButton(button,finishing?'字幕を作成中':mic&&stopLabel==='ここまでを字幕にする'?'マイクを準備しています':mic?stopLabel:'マイクをONにする',finishing?'spinner':mic?'microphone':'microphone-slash');button.setAttribute('aria-pressed',mic);}catch(e){if(sessionEpoch!==epoch||activation!==microphoneActivation)return;mic=false;idleWatch.stop();stopRecognition();localStream?.getAudioTracks().forEach(t=>t.enabled=false);button.setAttribute('aria-pressed','false');paintButton(button,'マイクをONにする','microphone');ledger.microphone(false);ledger.event('microphone_error');message(microphoneHelp(e));}finally{microphoneStarting=false;button.disabled=false;if(room?.mode==='lesson')updateLiveActions();}};
+$('#microphone').onclick=async()=>{if(!room||chatWaiting||microphoneStarting)return;if(!mic&&room.mode==='lesson'&&!$('#lesson-review-form').hidden){message('直前の字幕を送るか、取り消してください。');return;}if(!mic&&room.mode==='lesson'&&role==='teacher'&&$('#lesson-microphone-device').dataset.unavailable==='true'){message('選んだマイクが外れました。入力マイクを確認してください。');return;}if(!mic&&room.mode==='lesson'&&recognition?.finishingCapture){message('直前の発話を字幕にしています。少し待ってください。');return;}if(!mic&&typeof navigator!=='undefined'&&navigator.onLine===false){message('オフラインです。接続後にマイクをONにしてください。');return;}if(!mic&&!isRecognitionLanguage(currentSource())){setTextComposer(true);message('この言語は文字入力で利用できます。音声入力はまだ対応していません。');return;}const epoch=sessionEpoch,activation=++microphoneActivation,button=$('#microphone');microphoneStarting=true;button.disabled=true;try{if(!mic){speechPlayer.stop();paintButton(button,'マイクを準備しています','microphone');if(typeof speechConnectionNeedsCheck==='function'&&speechConnectionNeedsCheck(connections.list(),config.api)){paintButton(button,'接続を確認しています','microphone');const checks=await probeNetwork(config.api);if(!room||sessionEpoch!==epoch||activation!==microphoneActivation||document.visibilityState!=='visible')return;checks.forEach(check=>connections.add({...check,online:navigator.onLine}));if(!checks.every(check=>check.code==='ok')){paintButton(button,'マイクをONにする','microphone');showSpeechConnectionFailure();return;}}if(backgroundCallPaused){backgroundCallPaused=false;intentionalClose=false;await connect();if(sessionEpoch!==epoch||activation!==microphoneActivation)return;startConnectionTimers();}await ensureMicrophone(room.mode!=='lesson'||heldMicrophone===null);if(!room||sessionEpoch!==epoch||activation!==microphoneActivation||(document.visibilityState!=='visible'))return;mic=true;recordResume();if(speechPlayer.key&&!speechPlayer.paused){speechInputGate.begin();return;}void idleWatch.start(localStream);localStream.getAudioTracks().forEach(t=>t.enabled=true);startRecognition(false,{immediate:true});}else{mic=false;recordPause('manual',undefined,{mode:room.mode,scope:'microphone'});idleWatch.stop();if(!finishLiveCapture()&&(room.mode!=='lesson'||role!=='teacher'||!recognition?.finishCapture?.()))stopRecognition(true);localStream?.getAudioTracks().forEach(t=>t.enabled=false);}ledger.microphone(mic);ledger.event(mic?'mic_on':'mic_off');const stopLabel=room.mode==='lesson'&&role==='teacher'&&$('#lesson-single-speech').checked?'ここまでを字幕にする':'マイクをとめる';const finishing=!mic&&room.mode==='lesson'&&recognition?.finishingCapture;paintButton(button,finishing?'字幕を作成中':mic&&stopLabel==='ここまでを字幕にする'?'マイクを準備しています':mic?stopLabel:'マイクをONにする',finishing?'spinner':mic?'microphone':'microphone-slash');button.setAttribute('aria-pressed',mic);}catch(e){if(sessionEpoch!==epoch||activation!==microphoneActivation)return;mic=false;idleWatch.stop();stopRecognition();localStream?.getAudioTracks().forEach(t=>t.enabled=false);button.setAttribute('aria-pressed','false');paintButton(button,'マイクをONにする','microphone');ledger.microphone(false);ledger.event('microphone_error');message(microphoneHelp(e));}finally{microphoneStarting=false;button.disabled=false;if(room?.mode==='lesson')updateLiveActions();}};
 let recognitionStartTimer,speechPending=false,speechPhase='waiting',recognitionRequestAt=null,recognitionRecovering=false;
 let faceLiveAttempt;
 function stopFaceLiveTranslation(){
@@ -335,6 +335,25 @@ function stopFaceLiveTranslation(){
  faceLiveAttempt=null;
  previous?.controller.abort();
  previous?.preview.remove();
+}
+function liveCaptureEnded(attempt,complete){
+ const status=attempt.preview.querySelector('[role="status"]');
+ if(status)status.textContent=complete?'Live翻訳を終了しました。':'Live字幕の末尾を確認できませんでした。';
+}
+function finishLiveCapture(){
+ const attempt=faceLiveAttempt;
+ if(!attempt?.finish)return false;
+ attempt.flush?.();
+ if(faceLiveAttempt!==attempt)return true;
+ void attempt.finish().then(complete=>{
+  if(faceLiveAttempt!==attempt)return;
+  attempt.finish=null;
+  if(complete)attempt.save?.();
+  liveCaptureEnded(attempt,complete);
+ }).catch(()=>{
+  if(faceLiveAttempt===attempt)stopFaceLiveTranslation();
+ });
+ return true;
 }
 function beginLiveTranslation(){
  if(!localStream||!liveTranslationEnabled())return false;
@@ -371,7 +390,8 @@ function beginLiveTranslation(){
   pendingSnapshots.clear();
  },{once:true});
  function publishSnapshot(language,output){
-  if(face||!ownerToken||controller.signal.aborted||pendingSnapshots.has(language))return;
+  if(face||!ownerToken||controller.signal.aborted)return;
+  if(pendingSnapshots.has(language)){if(mic)return;clearTimeout(pendingSnapshots.get(language));}
   const publish=()=>{
    pendingSnapshots.delete(language);
    if(faceLiveAttempt!==attempt||controller.signal.aborted)return;
@@ -381,11 +401,25 @@ function beginLiveTranslation(){
    }
    lastSent.set(language,performance.now());
   };
-  const delay=350-(performance.now()-(lastSent.get(language)??-Infinity));
+  const delay=mic?350-(performance.now()-(lastSent.get(language)??-Infinity)):0;
   if(delay<=0)publish();
   else pendingSnapshots.set(language,setTimeout(publish,delay));
  }
  let ownerToken;
+ attempt.flush=()=>{
+  for(const language of [...pendingSnapshots.keys()])publishSnapshot(language,outputs.get(language));
+ };
+ attempt.save=()=>{
+  if(face||!ownerToken)return;
+  for(const [language,output] of outputs){
+   const text=captions.complete(language);
+   if(!text&&output.textContent.trim())message('Live字幕が履歴の文字数上限を超えました。');
+   if(text&&!send({type:'live_caption',streamId,revision:++revision,language,text,token:ownerToken,final:true})){
+    message('Live字幕を履歴に保存できませんでした。');
+    return;
+   }
+  }
+ };
  let tokenPromise;
  attempt.streamId=streamId;
  const getToken=()=>tokenPromise??=liveTranslationToken().then(async token=>{
@@ -422,7 +456,8 @@ function beginLiveTranslation(){
    publishSnapshot(language,output);
   },
   onFallback:fallback,
- }).then(()=>{
+ }).then(session=>{
+  if(faceLiveAttempt===attempt)attempt.finish=session.finish;
   if(faceLiveAttempt===attempt&&!firstSubtitle)liveStatus.textContent='Live翻訳に接続しました。話してください。';
  }).catch(fallback);
  return true;

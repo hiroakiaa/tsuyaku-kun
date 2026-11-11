@@ -9,7 +9,7 @@ for(const match of app.matchAll(/from '(\.\/[a-z0-9-]+\.js[^']*)'/g))assets.push
 for(const match of app.matchAll(/import\('(\.\/[a-z0-9-]+\.js[^']*)'/g))assets.push('web/'+match[1].slice(2));
 assets.push('web/realtime-protocol.js?v=20261030-realtime-1','web/caption-stream-pcm.js?v=20261030-realtime-1','web/cost-policy.js?v=20261030-realtime-1');
 assets.push('web/statistics.js?v=20261029-faithful-pipeline-1');
-for(const module of ['admin.js','analysis-focus.js']){
+for(const module of ['admin.js','analysis-focus.js','live-translation-face.js','live-translation-client.js']){
  const source=await fs.readFile(new URL('../web/'+module,import.meta.url),'utf8');
  for(const match of source.matchAll(/from '(\.\/[a-z0-9-]+\.js[^']*)'/g))assets.push('web/'+match[1].slice(2));
 }

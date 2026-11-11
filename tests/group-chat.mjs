@@ -54,6 +54,13 @@ try{
  await live.send(liveOwner,{...nextStream,revision:2,text:'First audible subtitle'});
  assert.equal(preSpeech.events.some(e=>e.type==='live_caption'),false);
  assert.equal(english.events.filter(e=>e.type==='live_caption').at(-1).text,'First audible subtitle');
+ await live.send(liveOwner,{...nextStream,revision:3,text:'Final Live subtitle',final:true});
+ await live.send(liveOwner,{...nextStream,revision:4,text:'Duplicate final',final:true});
+ const liveId=liveOwner.a.id+'_'+nextStream.streamId+'_en';
+ assert.equal(live.db.get('caption:'+liveId).text,'Final Live subtitle');
+ assert.equal(english.events.filter(e=>e.type==='translation'&&e.id===liveId).length,1);
+ assert.equal(preSpeech.events.some(e=>e.id===liveId),false);
+ assert.equal(live.room.visibleTo(preSpeech.a,{type:'translation',...live.db.get('caption:'+liveId)}),false);
  live.db.get('room').mode='lesson';
  liveOwner.ws.serializeAttachment({...liveOwner.a,role:'teacher'});
  const lessonSnapshot={...snapshot,streamId:crypto.randomUUID(),text:'Please turn to page three.'};
@@ -67,7 +74,7 @@ try{
  await live.send(liveOwner,{type:'end'});
  await live.send(liveOwner,{...lessonSnapshot,revision:2,text:'After class'});
  assert.equal(english.events.filter(e=>e.type==='live_caption').at(-1).text,lessonSnapshot.text);
- assert.equal(live.db.has('captionCount'),false);
+ assert.equal(live.db.get('captionCount'),1);
  const tracker=new CaptionDelivery();tracker.delivered('id',0,1,4);assert.equal(tracker.get('id').state,'accepted');assert.match(deliveryLabel(tracker.get('id')),/1 \/ 4/);tracker.delivered('id',0,4,4);assert.equal(tracker.get('id').state,'delivered');
  console.log('Group chat: signed auth, approval, five-person limit, pending send protection, in-flight/replay/edit privacy, reconnect, aliases, multilingual deduplication, concurrent receipts, decline/timeout and legacy compatibility passed');
 }finally{globalThis.fetch=original;}

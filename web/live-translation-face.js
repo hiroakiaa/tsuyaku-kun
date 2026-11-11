@@ -20,7 +20,7 @@ export async function startLiveTranslation({
 
   const controller = new AbortController();
   const connections = [];
-  let active = false;
+  let active = false, draining = false;
   function stop() {
     if (controller.signal.aborted) return;
     signal?.removeEventListener('abort', stop);
@@ -30,7 +30,7 @@ export async function startLiveTranslation({
   function disconnected(reason) {
     if (controller.signal.aborted) return;
     stop();
-    if (active) onFallback(reason);
+    if (active && !draining) onFallback(reason);
   }
 
   try {
@@ -54,7 +54,7 @@ export async function startLiveTranslation({
     await capture(stream, {
       signal: controller.signal,
       onAudio: pcm => {
-        if (controller.signal.aborted) return;
+        if (controller.signal.aborted || draining) return;
         try {
           if (!connections.every(connection => connection.send(pcm))) disconnected('audio unavailable');
         } catch {
@@ -64,6 +64,12 @@ export async function startLiveTranslation({
     });
     controller.signal.throwIfAborted();
     active = true;
+    stop.finish = async () => {
+      draining = true;
+      const results = await Promise.all(connections.map(connection => connection.finish()));
+      stop();
+      return results.every(Boolean);
+    };
     return stop;
   } catch (error) {
     stop();

@@ -120,3 +120,53 @@ try {
   globalThis.clearTimeout = originalClearTimeout;
 }
 console.log('PASS: closing during budget extension settles exactly once after extension');
+
+const { connectLiveTranslation } = await import('../web/live-translation-client.js');
+const originalSocket = globalThis.WebSocket;
+let fakeSocket;
+class LiveSocket {
+  static OPEN = 1;
+  readyState = LiveSocket.OPEN;
+  bufferedAmount = 0;
+  sent = [];
+  constructor() { fakeSocket = this; }
+  send(data) { this.sent.push(data); }
+  close() { this.readyState = 3; }
+  receive(data) { this.onmessage({ data: JSON.stringify(data) }); }
+}
+try {
+  globalThis.WebSocket = LiveSocket;
+  for (const cleanClose of [true, false]) {
+    const subtitles = [], disconnects = [];
+    const connecting = connectLiveTranslation({
+      apiOrigin: 'https://example.invalid', language: 'en', getToken: async () => 'synthetic',
+      onTranscript: event => subtitles.push(event.delta),
+      onDisconnected: reason => disconnects.push(reason),
+    });
+    await new Promise(resolve => setImmediate(resolve));
+    fakeSocket.onopen();
+    fakeSocket.receive({ type: 'ready' });
+    const client = await connecting;
+    const finished = client.finish();
+    assert.equal(fakeSocket.sent.at(-1), 'finish');
+    assert.equal(client.send(new ArrayBuffer(16)), false);
+    fakeSocket.receive({ type: 'session.output_transcript.delta', delta: 'Last words.' });
+    if (cleanClose) fakeSocket.receive({ type: 'session.closed' });
+    else fakeSocket.onclose();
+    assert.equal(await finished, cleanClose);
+    assert.deepEqual(subtitles, ['Last words.']);
+    assert.deepEqual(disconnects, []);
+  }
+} finally {
+  globalThis.WebSocket = originalSocket;
+}
+console.log('PASS: graceful stop drains transcript and distinguishes upstream confirmation from disconnect');
+
+const { createLiveCaptionBuffer } = await import('../web/live-caption-buffer.js');
+const captionBuffer = createLiveCaptionBuffer(['en']);
+const longText = 'First sentence. ' + 'word '.repeat(500);
+assert.equal(captionBuffer.append('en', { field: 'translation', delta: longText }), longText.slice(-1000));
+assert.equal(captionBuffer.complete('en'), longText.trim());
+captionBuffer.append('en', { field: 'translation', delta: 'x'.repeat(6000) });
+assert.equal(captionBuffer.complete('en'), null);
+assert.equal(captionBuffer.append('en', { field: 'translation', delta: 'last' }), 'x'.repeat(996) + 'last');

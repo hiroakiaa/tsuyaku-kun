@@ -22,10 +22,10 @@ export async function upgradeLiveTranslation(request, env, ctx) {
   let upstream, session;
   let sentBytes = 0;
   let readyAt = 0;
-  let awaitingAuth = true;
+  let awaitingAuth = true, draining = false, drainTimeout;
   const authTimeout = setTimeout(() => stop(1008, 'authentication timeout'), 8000);
   function stop(code = 1000, reason = 'finished') {
-    clearTimeout(authTimeout);
+    clearTimeout(authTimeout); clearTimeout(drainTimeout);
     lifecycle.abort();
     try { relay.close(code, reason); } catch {}
   }
@@ -41,6 +41,17 @@ export async function upgradeLiveTranslation(request, env, ctx) {
       return;
     }
     if (!upstream) return stop(1008, 'connection pending');
+    if (draining) return;
+    if (data === 'finish') {
+      draining = true;
+      try {
+        upstream.send(JSON.stringify({ type: 'session.close' }));
+        drainTimeout = setTimeout(() => stop(1011, 'finalization timeout'), 5000);
+      } catch {
+        stop(1011, 'finalization failed');
+      }
+      return;
+    }
     try {
       const message = liveTranslationAudio(data);
       sentBytes += data.byteLength;
@@ -75,6 +86,10 @@ export async function upgradeLiveTranslation(request, env, ctx) {
       try {
         const event = JSON.parse(data);
         if (event.type === 'error') return stop(1011, 'upstream error');
+        if (event.type === 'session.closed') {
+          relay.send(JSON.stringify({ type: 'session.closed' }));
+          return stop();
+        }
         if (['session.input_transcript.delta', 'session.output_transcript.delta'].includes(event.type)
           && typeof event.delta === 'string') relay.send(JSON.stringify({ type: event.type, delta: event.delta }));
       } catch {

@@ -11,18 +11,19 @@ export async function connectLiveTranslation({
 
   const socket = new WebSocket(url);
   let ready = false;
-  let stopped = false;
+  let stopped = false, drain, drainTimeout;
   return new Promise((resolve, reject) => {
     const timeout = setTimeout(() => finish('timeout'), 9000);
 
     function finish(reason, intentional = false) {
       if (stopped) return;
       stopped = true;
-      clearTimeout(timeout);
+      clearTimeout(timeout); clearTimeout(drainTimeout);
       signal?.removeEventListener('abort', abort);
       socket.close();
+      drain?.(reason === 'closed');
       if (!ready) reject(new Error(reason));
-      else if (!intentional) onDisconnected(reason);
+      else if (!intentional && !drain) onDisconnected(reason);
     }
 
     function abort() {
@@ -43,7 +44,7 @@ export async function connectLiveTranslation({
         clearTimeout(timeout);
         resolve({
           send(pcm) {
-            if (stopped || socket.readyState !== WebSocket.OPEN) return false;
+            if (stopped || drain || socket.readyState !== WebSocket.OPEN) return false;
             if (socket.bufferedAmount > 48000) {
               finish('connection overloaded');
               return false;
@@ -51,13 +52,21 @@ export async function connectLiveTranslation({
             socket.send(pcm);
             return true;
           },
+          finish() {
+            if (stopped || drain) return Promise.resolve(false);
+            return new Promise(resolve => {
+              drain = resolve;
+              drainTimeout = setTimeout(() => finish('finalization timeout'), 6000);
+              try { socket.send('finish'); } catch { finish('send failed'); }
+            });
+          },
           stop: abort,
         });
         return;
       }
       const event = readLiveTranslationEvent(data);
       if (event?.type === 'transcript') onTranscript(event);
-      else if (event?.type === 'closed' || event?.type === 'error') finish(event.type);
+      else if (event?.type === 'closed' || event?.type === 'error') finish(event.type, Boolean(drain));
     };
   });
 }
