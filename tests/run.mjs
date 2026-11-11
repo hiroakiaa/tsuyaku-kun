@@ -937,7 +937,7 @@ await test('授業の確認字幕は先生の送信操作までは配信せず�
  const begin=app.indexOf('function clearLessonSpeechReview(');
  const end=app.indexOf("$('#text-form').onsubmit=",begin);
  const review={hidden:false},text={value:'はい'},discard={},send=[],pending=new Map(),button={focus(){},addEventListener(){}};
- const elements={'#lesson-review-form':review,'#lesson-review-text':text,'#lesson-single-speech':{},'#lesson-review-discard':discard,'#microphone':button};
+ const elements={'#lesson-review-form':review,'#lesson-review-text':text,'#lesson-single-speech':{},'#lesson-hold':{},'#lesson-review-discard':discard,'#microphone':button};
  const scope={$:selector=>elements[selector],room:{mode:'lesson'},role:'teacher',navigator:{onLine:false},pending,
   window:{addEventListener(){}},updateLiveActions(){},message(){},crypto:{randomUUID:()=> 'approved'},submitCaption:caption=>{send.push(caption);return true;}};
  runInNewContext(app.slice(begin,end),scope);
