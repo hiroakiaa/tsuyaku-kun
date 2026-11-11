@@ -271,6 +271,8 @@ export const uiLabels = {
   "マイクで話せます。短い文に分けると伝わりやすくなります。": "You can speak into the microphone. Breaking your message into short sentences will make it easier to understand.",
   "マイクボタンで音声入力できます。動かない場合はキーボードのマイクを使ってください。": "You can use the microphone button for voice input. If it doesn't work, please use the microphone on your keyboard.",
   "マイクをONにする": "Turn mic on",
+  "字幕にできませんでした。マイクに向かってもう一度話してください。": "No caption was generated. Please speak into the microphone again.",
+  "ここまでを字幕にする": "Finish and transcribe",
   "マイクをとめる": "Stop mic",
   "マイクを開始できません。別のアプリがマイクを使っていないか、Chromebook/PCの入力デバイスを確認してください。": "The microphone cannot be started. Please check your Chromebook/PC's input devices to ensure another app is not using the microphone.",
   "マイクを確認しています。話し始めてください。": "Checking the microphone. Please start speaking.",
