@@ -1,5 +1,5 @@
-import {improvementReport} from './analysis-focus.js?v=20261111-classroom-single-speech-1';
-import {createRecognitionCostView} from './recognition-cost-view.js?v=20261111-classroom-single-speech-1';
+import {improvementReport} from './analysis-focus.js?v=20261111-classroom-mic-timeout-1';
+import {createRecognitionCostView} from './recognition-cost-view.js?v=20261111-classroom-mic-timeout-1';
 import {guardedStorage} from './storage-access.js?v=20261024-usability20-4';
 const localStorage=guardedStorage(()=>globalThis.localStorage);
 import {createBillingView} from './billing-view.js?v=20261022-billing-auto-1';

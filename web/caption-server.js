@@ -1,9 +1,9 @@
 import {recognitionLanguage,speechTextAllowed} from './two-language.js?v=20261029-communication50-1';
-import {nonSpeechReason} from './speech-filter.js?v=20261111-classroom-single-speech-1';
+import {nonSpeechReason} from './speech-filter.js?v=20261111-classroom-mic-timeout-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261103-audio-offset-1';
 import {recognitionMetrics} from './recognition-metrics.js?v=20261103-budget-cleanup-1';
 import {trimmedAudioLength} from './audio-trim.js?v=20261029-communication50-1';
-import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish,japaneseSpeechTail,japaneseNumericCompletion} from './speech-continuity.js?v=20261111-classroom-single-speech-1';
+import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish,japaneseSpeechTail,japaneseNumericCompletion} from './speech-continuity.js?v=20261111-classroom-mic-timeout-1';
 export const capturePauseMs=profile=>profile==='fast'||profile==='responsive'?300:profile==='balanced'?400:500;
 // Browser-independent recognition using the call's existing microphone stream.
 export function encodeWav(samples) {
@@ -49,7 +49,7 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', o
       try {
         await resumed;
         if (!this.active) return;
-        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261111-one-utterance-1', import.meta.url));
+        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261111-one-utterance-timeout-1', import.meta.url));
         if (!this.active) return;
         this.source = this.context.createMediaStreamSource(stream);
         this.node = new Worklet(this.context, 'caption-pcm',{processorOptions:{pauseMs:capturePauseMs(captureProfile),oneUtterance}});
@@ -60,7 +60,7 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', o
             this.finishingCapture=true;
             this.captureFinished=true;
             clearInterval(this.watchdog);
-            this.onCaptureFinished?.();
+            this.onCaptureFinished?.(event.data.reason);
             clearTimeout(this.finishCaptureTimer);
             this.capturing=false;
             void this.drain();
