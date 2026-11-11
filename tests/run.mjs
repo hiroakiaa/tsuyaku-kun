@@ -838,3 +838,49 @@ await test('上限ちょうどで発話が終わった場合も次の声を待�
  capture.push(new Float32Array(9600));
  assert.equal(capture.completed,true);
 });
+
+await test('一発話モードで発話開始がないときだけマイクの入力を閉じる',()=>{
+ const output=[];
+ const single=new PcmSegmenter(16000,samples=>output.push(samples),()=>{},{oneUtterance:true});
+ single.push(new Float32Array(8*16000-320));
+ assert.equal(single.completed,false);
+ single.push(new Float32Array(320));
+ assert.equal(single.completionReason,'no_speech');
+ single.push(Float32Array.from({length:9600},(_,i)=>Math.sin(i*.15)*.08));
+ assert.equal(output.length,0);
+ const continuous=new PcmSegmenter(16000,()=>{});
+ continuous.push(new Float32Array(9*16000));
+ assert.equal(continuous.completed,false);
+});
+
+await test('待機期限の直前に始まった発話を無音として捨てない',()=>{
+ const output=[];
+ const capture=new PcmSegmenter(16000,samples=>output.push(samples),()=>{},{oneUtterance:true});
+ capture.push(new Float32Array(8*16000-320));
+ capture.push(Float32Array.from({length:6400},(_,i)=>Math.sin(i*.15)*.08));
+ capture.push(new Float32Array(9600));
+ assert.equal(output.length,1);
+ assert.equal(capture.completed,true);
+ assert.equal(capture.completionReason,null);
+});
+
+await test('無音の自動停止は先生のマイクを閉じて案内する',async()=>{
+ const app=await readFile(new URL('../web/app.js',import.meta.url),'utf8');
+ const begin=app.indexOf('recognition.onCaptureFinished=');
+ const end=app.indexOf('recognition.onend=',begin);
+ const room={mode:'lesson'},recognition={},track={enabled:true},events=[],messages=[],pauses=[];
+ const scope={room,activeRoom:room,recognition,activeRecognition:recognition,oneUtterance:true,
+  epoch:1,sessionEpoch:1,mic:true,idleWatch:{stop(){}},localStream:{getAudioTracks:()=>[track]},
+  ledger:{microphone:value=>events.push(value),event:value=>events.push(value)},
+  message:value=>messages.push(value),recordPause:reason=>pauses.push(reason),
+  paintButton(){},$:()=>({setAttribute(){}})
+ };
+ runInNewContext(app.slice(begin,end),scope);
+ recognition.onCaptureFinished('no_speech');
+ recognition.onCaptureFinished('no_speech');
+ assert.equal(scope.mic,false);
+ assert.equal(track.enabled,false);
+ assert.deepEqual(events,[false,'mic_no_speech_timeout']);
+ assert.deepEqual(pauses,['idle']);
+ assert.equal(messages.length,1);
+});
