@@ -272,6 +272,7 @@ export const uiLabels = {
   "マイクボタンで音声入力できます。動かない場合はキーボードのマイクを使ってください。": "You can use the microphone button for voice input. If it doesn't work, please use the microphone on your keyboard.",
   "マイクをONにする": "Turn mic on",
   "字幕にできませんでした。マイクに向かってもう一度話してください。": "No caption was generated. Please speak into the microphone again.",
+  "字幕を作成中": "Preparing caption",
   "離すと字幕にする": "Release to transcribe",
   "入力マイク": "Input microphone",
   "接続されていないマイク": "Disconnected microphone",
