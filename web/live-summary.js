@@ -16,7 +16,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  const pending=new Map(),seen=new Map(),history=[];
  let checkpoint=null,pendingSince=null,bufferNotice,bufferDiscarded=false;
  const wide=matchMedia('(min-width:900px), (min-width:480px) and (max-height:620px)');
- let timer,request,panel,output,status,button,badge,dialog,wiki,wikiRequest,translationButton,translationRequest,summaryLanguage,historyPanel,finalizeButton,retryButton,finalSummaryTime,finalizing=false,isFinal=false,summary='';
+ let timer,request,panel,output,status,button,badge,dialog,wiki,wikiRequest,translationButton,translationStatus,translationRequest,summaryLanguage,historyPanel,finalizeButton,retryButton,finalSummaryTime,finalizing=false,isFinal=false,summary='';
  function notifySummary(label){
   badge.textContent=' '+label;
   badge.hidden=false;
@@ -207,6 +207,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    isFinal=final;
    if(final)finalSummaryTime=new Date();
    summaryLanguage=target;
+   translationStatus.textContent='';
    translationButton.hidden=/^ja(?:-|$)/.test(summaryLanguage);
    translationButton.disabled=false;
    translationButton.textContent='日本語に翻訳';
@@ -241,6 +242,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   const controller=new AbortController();
   translationRequest=controller;
   translationButton.disabled=true;
+  translationStatus.textContent='日本語に翻訳中…';
   const started=performance.now();
   record('requested',{operation:'translation',characters:summary.length});
   try{
@@ -253,10 +255,11 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
     translationButton.onclick=()=>toggle(!showJapanese);
    };
    toggle(true);
+   translationStatus.textContent='';
   }catch{
    if(controller.signal.aborted)return;
    record('failed',{operation:'translation',elapsedMs:Math.round(performance.now()-started)});
-   status.textContent='要約の日本語訳を取得できませんでした。';
+   translationStatus.textContent='要約の日本語訳を取得できませんでした。';
   }finally{
    if(translationRequest===controller){translationRequest=null;translationButton.disabled=false;}
   }
@@ -313,7 +316,9 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    bufferNotice=el('p','保持上限に達したため、要約に含まれない字幕があります。','admin-caption');
    bufferNotice.hidden=!bufferDiscarded;
    bufferNotice.setAttribute('role','status');
-   panel.append(finalizeButton,translationButton,bufferNotice,output,status,retryButton,historyPanel);
+   translationStatus=el('small');
+   translationStatus.setAttribute('role','status');
+   panel.append(finalizeButton,translationButton,bufferNotice,output,status,retryButton,translationStatus,historyPanel);
    dialog=makeDialog('Live要約');
    button=el('button','要約を表示');
    button.type='button';
