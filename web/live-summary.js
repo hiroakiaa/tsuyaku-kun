@@ -129,12 +129,24 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  function schedule(){
   if(enabled&&pending.size&&!timer&&!request)timer=setTimeout(update,Math.max(0,60000-(performance.now()-(pendingSince??performance.now()))));
  }
+ function boundedText(text,limit,fromEnd=false){
+  if(text.length<=limit)return text;
+  record('bufferDiscarded',{characters:text.length-limit});
+  return fromEnd?text.slice(-limit):text.slice(0,limit);
+ }
+ function trimPending(){
+  while(pending.size>80){
+   const oldest=pending.keys().next().value;
+   record('bufferDiscarded',{captionCount:1,characters:pending.get(oldest).length});
+   pending.delete(oldest);
+  }
+ }
  function restorePending(batch){
   const newer=[...pending];
   pending.clear();
   for(const [id,text] of batch)pending.set(id,text);
-  for(const [id,text] of newer)pending.set(id,typeof id==='string'&&id.endsWith(':live')?((pending.get(id)||'')+text).slice(-6000):text);
-  while(pending.size>80)pending.delete(pending.keys().next().value);
+  for(const [id,text] of newer)pending.set(id,typeof id==='string'&&id.endsWith(':live')?boundedText((pending.get(id)||'')+text,6000,true):text);
+  trimPending();
  }
  async function update(final=false){
   let languageChanged=false;
@@ -260,13 +272,13 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  }
  function add(id,text,append=false){
   if(!enabled||typeof text!=='string'||(!text.trim()&&!(append&&pending.has(id))))return;
-  const value=append?((pending.get(id)||'')+text).slice(-6000):text.trim().slice(0,1200);
+  const value=append?((pending.get(id)||'')+text).slice(-6000):boundedText(text.trim(),1200);
   if(!append&&seen.get(id)===value)return;
   seen.set(id,value);
   if(seen.size>256)seen.delete(seen.keys().next().value);
   pendingSince??=performance.now();
   pending.set(id,value);
-  if(pending.size>80)pending.delete(pending.keys().next().value);
+  trimPending();
   if(!panel){
    panel=el('section',undefined,'admin-detail');
    panel.style.flexShrink='0';

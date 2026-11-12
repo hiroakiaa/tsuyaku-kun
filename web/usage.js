@@ -3,7 +3,7 @@ import {percentile} from './statistics.js?v=20261029-faithful-pipeline-1';
 export {percentile};
 import {TRANSLATION_PRICE,translationScenario,RECOGNITION_PRICE} from './cost-policy.js?v=20261030-realtime-1';
 import {resourceSnapshot} from './resource-usage.js?v=20261103-analysis-stages-1';
-export const BUILD_ID='20261112-summary-replay-1';
+export const BUILD_ID='20261112-summary-overflow-1';
 // Device-local operational history. No names, room keys, tokens or speech are stored here.
 export const PRICES={checkedAt:TRANSLATION_PRICE.checkedAt,inputPerMillion:TRANSLATION_PRICE.inputPerMillion,outputPerMillion:TRANSLATION_PRICE.outputPerMillion,streamPerMinute:RECOGNITION_PRICE.streamPerMinute,whisperPerMinute:RECOGNITION_PRICE.whisperPerMinute,turnPerGB:.05};
 export function costOf(s,p=PRICES){const translation=(s.inputTokens||0)/1e6*p.inputPerMillion+(s.outputTokens||0)/1e6*p.outputPerMillion,recognition=(s.streamSeconds||0)/60*p.streamPerMinute+(s.whisperSeconds||0)/60*p.whisperPerMinute,turn=(s.relayBytes||0)/1e9*p.turnPerGB;return {translation,recognition,turn,total:translation+recognition+turn};}
@@ -20,13 +20,18 @@ export class UsageLedger{
  recordLiveSummary(type,{captionCount=0,characters=0,elapsedMs,usage,operation}={}){
   if(!this.current)return;
   const empty=()=>({requested:0,succeeded:0,failed:0,cancelled:0,submittedCaptions:0,submittedCharacters:0,responseMs:[],measuredCalls:0,inputTokens:0,outputTokens:0});
-  const total=this.current.liveSummary??=empty();
+  const total=this.current.liveSummary??={...empty(),discardedCaptions:0,discardedCharacters:0};
   const groups=[total];
   if(['interval','final','translation'].includes(operation)){
    total.byOperation??={};
    groups.push(total.byOperation[operation]??=empty());
   }
   for(const s of groups){
+   if(type==='bufferDiscarded'){
+    s.discardedCaptions=(s.discardedCaptions??0)+captionCount;
+    s.discardedCharacters=(s.discardedCharacters??0)+characters;
+    continue;
+   }
    s[type]++;
    if(type==='requested'){s.submittedCaptions+=captionCount;s.submittedCharacters+=characters;}
    if(type==='succeeded'&&Number.isFinite(elapsedMs)){s.responseMs.push(elapsedMs);if(s.responseMs.length>100)s.responseMs.shift();}
@@ -52,7 +57,7 @@ export class UsageLedger{
  rtc(id,data){if(!this.current)return;const prev=this.rtcPrevious.get(id)||{bytes:0,lost:0};const bytes=Math.max(0,data.bytes||0),lost=Math.max(0,data.lost||0);if(data.relay)this.current.relayBytes+=Math.max(0,bytes-prev.bytes);this.current.packetsLost+=Math.max(0,lost-prev.lost);this.current.maxJitterMs=Math.max(this.current.maxJitterMs,data.jitterMs||0);if(Number.isFinite(data.rttMs))this.current.rttMs.push(data.rttMs);this.current.rttMs=this.current.rttMs.slice(-1000);this.rtcPrevious.set(id,{bytes,lost});this.save();}
 }
 export function analysisReport(sessions,{exchange=150,transcripts=[]}={}){const attempts=sessions.reduce((n,s)=>n+s.attemptCount,0),failed=sessions.reduce((n,s)=>n+s.failedCaptions,0),captions=sessions.reduce((n,s)=>n+s.captionCount,0),latencies=sessions.flatMap(s=>s.latencies||[]),total=sessions.reduce((n,s)=>n+costOf(s,s.priceSnapshot||PRICES).total,0);const live=sessions.reduce((latest,row)=>!latest||row.startedAt>latest.startedAt?row:latest,null)?.liveSummary;
- const describeSummary=live=>({...live,responseMs:undefined,latencySamples:live.responseMs.length,p50ResponseMs:percentile(live.responseMs,.5),p95ResponseMs:percentile(live.responseMs,.95),unmeasuredCalls:live.requested-live.measuredCalls,observedCostJPY:live.measuredCalls?(live.inputTokens*PRICES.inputPerMillion+live.outputTokens*PRICES.outputPerMillion)*exchange/1e6:null});
+ const describeSummary=live=>({...live,responseMs:undefined,discardedCaptions:live.discardedCaptions??null,discardedCharacters:live.discardedCharacters??null,latencySamples:live.responseMs.length,p50ResponseMs:percentile(live.responseMs,.5),p95ResponseMs:percentile(live.responseMs,.95),unmeasuredCalls:live.requested-live.measuredCalls,observedCostJPY:live.measuredCalls?(live.inputTokens*PRICES.inputPerMillion+live.outputTokens*PRICES.outputPerMillion)*exchange/1e6:null});
  const liveSummary=live?{...describeSummary(live),byOperation:live.byOperation?Object.fromEntries(Object.entries(live.byOperation).map(([key,value])=>[key,describeSummary(value)])):null,note:'最新の利用。要約の成功応答時間は約1分の更新待ちを含みません。費用はトークン取得分のみの試算で、既存の字幕費用の合計には含みません。本文は保存しません。'}:null;
  return JSON.stringify({liveSummary,app:'通訳君',schema:'tsuyaku-analysis-v1',version:'0.6.9',build:BUILD_ID,exportedAt:new Date().toISOString(),currentBuildSummary:currentBuildSummary(sessions),scope:'この端末で記録した利用のみ。複数端末の同一ルームの値を合算しない。翻訳費用はルームの観測分、音声認識とTURNはこの端末の観測分。',billing:'無料枠適用前の変動費推定。固定費・Workers/DO・Firestore・Google Apps Script・他端末の音声認識・Googleの音声生成と写真読取は含まない。写真のAI翻訳も会話履歴には含めず、サーバーの日次AI予算で確認する。未計測呼び出しは0円と断定しない。',resourceConsumption:{...resourceSnapshot(),scope:'この端末の当日UTCの呼び出し試行のみ。サーバーのalarm・ストレージ操作・他端末は未計測。Cloudflare請求値ではありません。'},qualityNote:'数字・日付の数字表記、限定した否定、訳の欠落、日本語の文字の残存、一部の英語の未翻訳・対象者の追加のルール確認です。未確認の履歴は警告0件とは扱いません。警告は誤訳率ではなく、警告なしも正確さの保証ではありません。数詞・月名表記や未対応言語は未計測。旧履歴は未確認。本文は確認統計に保存しません。',exchangeSetting:exchange,reuse:reuseSummary(sessions),summary:{sessions:sessions.length,activeSessions:sessions.filter(s=>s.micSeconds>0||s.attemptCount>0||s.relayBytes>0).length,preparationOnlySessions:sessions.filter(s=>!(s.micSeconds>0||s.attemptCount>0||s.relayBytes>0)).length,captions,attempts,failedCaptions:failed,p50TranslationMs:percentile(latencies,.5),p95TranslationMs:percentile(latencies,.95),p95FirstDisplayMs:percentile(sessions.flatMap(s=>s.firstDisplayLatencies||[]),.95),firstDisplaySamples:sessions.reduce((n,s)=>n+(s.firstDisplayLatencies||[]).length,0),p95SpeechToDisplayMs:percentile(sessions.flatMap(s=>s.speechLatencies||[]),.95),p95RecognitionMs:percentile(sessions.flatMap(s=>s.recognitionLatencies||[]),.95),speechTimingSamples:sessions.reduce((n,s)=>n+(s.speechLatencies||[]).length,0),reconnectCount:sessions.reduce((n,s)=>n+(s.events||[]).filter(e=>e.type==='reconnect').length,0),observedVariableCostUSD:total,observedVariableCostJPY:total*exchange},sessions:sessions.map(s=>({...s,cost:costOf(s,s.priceSnapshot||PRICES)})),...(transcripts.length?{transcripts}:{}),timingNote:'firstDisplayLatenciesは最初の音声区間の発話開始から最初の訳の表示まで（PCM音量からの推定）。続きの更新は対象外。speechLatenciesとrecognitionLatenciesは送信端末のPCM音量から推定した発話末尾基準。相手端末・過去の字幕・無音・文字入力は対象外。pipelineLatenciesは送信から画面反映直前まで。翻訳latenciesはサーバー処理だけ。translationTimingsのaiTotalMsは費用制御・有効性確認とAI処理の合計、providerScopeがazure_http_headersの場合、providerMsはAzureへのHTTP要求開始からヘッダー受信まで、budgetWaitMsは無料枠予約、budgetSettleMsは終了処理、parseMsは応答JSON解析。aiTotalMsはこれらを含む翻訳経路全体。旧AzureのproviderMsは予約・終了処理も含み、新しい値と直接比較しません。その他のproviderMsはAI.runの待ち時間（通信・AI側の待機を含む）。queueMsはルーム内の翻訳待ち、clientQueueMsは端末の順番待ち、clientSlotWaitMsは認識と翻訳で共有する最大2件のAI枠待ち。p50は中央2値の平均、p95はnearest-rank。clientLookupMsは端末の辞書・確認済み訳の検索。clientRequestMsは認証を含むHTTP往復。authMsはサーバー認証、budgetWaitMsとbudgetSettleMsは利用予算の確保・精算、budgetSettleDeferredがtrueなら精算はサーバー継続処理で表示待ちに含めず、完了時間はnull（未計測）、parseMsは応答解析。catalogSourceはサーバー辞書の取得元、catalogAgeMsは取得後の経過時間、catalogFreshは有効期間内か、catalogMatchは端末が申告した辞書識別値との一致です。識別値がない旧版の一致は未計測。カタログ取得診断のclientRequestMsは認証・通信・解析を含み、catalogApplyMsは保存・画面反映です。各値は区間が重なるため単純合算しません。キャッシュではAI時間を再利用せず未計測にします。未計測はnull。旧履歴にはbuildや内訳がありません。nullは未計測。',request:'上の計測結果から、翻訳品質・反応速度・音声接続・費用の改善候補を整理してください。未計測値と観測事実を区別し、通訳君のコード改善に必要な確認項目を示してください。'},null,2);}
 
