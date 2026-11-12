@@ -12,12 +12,12 @@ export function createLiveSummarySetting(el){
  return section;
 }
 
-export function createLiveSummary({el,api,captions,language}){
+export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  const pending=new Map(),seen=new Map();
  let timer,request,panel,output,status,summary='';
  function reset(){
   clearTimeout(timer);timer=null;
-  request?.abort();request=null;
+  if(request){request.abort();record('cancelled');}request=null;
   pending.clear();seen.clear();summary='';
   panel?.remove();panel=null;
  }
@@ -30,15 +30,21 @@ export function createLiveSummary({el,api,captions,language}){
   const controller=new AbortController();
   request=controller;
   const transcript=[...pending.values()].join('\n').slice(-6000);
+  const started=performance.now(),captionCount=pending.size;
   pending.clear();
+  record('requested',{captionCount,characters:transcript.length});
   try{
    const result=await api('/live-summary',{transcript,previous:summary,language:language()},{signal:controller.signal});
    if(controller.signal.aborted)return;
    summary=result.summary;
    output.textContent=summary;
    status.textContent='';
+   record('succeeded',{elapsedMs:Math.round(performance.now()-started),usage:result.usage});
   }catch{
-   if(!controller.signal.aborted)status.textContent='要約を更新できませんでした。';
+   if(!controller.signal.aborted){
+    record('failed',{elapsedMs:Math.round(performance.now()-started)});
+    status.textContent='要約を更新できませんでした。';
+   }
   }finally{
    if(request===controller){request=null;schedule();}
   }
@@ -54,8 +60,11 @@ export function createLiveSummary({el,api,captions,language}){
   if(!panel){
    panel=el('details',undefined,'admin-detail');
    panel.open=true;
+   panel.style.flexShrink='0';
    output=el('p');
-   output.style.whiteSpace='pre-wrap';
+   Object.assign(output.style,{whiteSpace:'pre-wrap',overflowWrap:'anywhere',maxBlockSize:'min(32dvh, 16rem)',overflowY:'auto',overscrollBehaviorY:'contain',touchAction:'pan-y'});
+   output.tabIndex=0;
+   output.setAttribute('aria-label','Live要約の本文');
    status=el('small','最初の要約は約2分後に表示します。');
    status.setAttribute('role','status');
    panel.append(el('summary','Live要約'),output,status);

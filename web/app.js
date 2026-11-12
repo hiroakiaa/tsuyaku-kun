@@ -1,13 +1,13 @@
-import {createLiveSummary} from './live-summary.js?v=20261112-live-summary-1';
-import {createLiveCaptionBuffer} from './live-caption-buffer.js?v=20261112-live-summary-1';
-import {startLiveTranslation} from './live-translation-face.js?v=20261112-live-summary-1';
-import {liveTranslationEnabled,disableLiveTranslation} from './live-translation-setting.js?v=20261112-live-summary-1';
-import {RecognitionNoiseGuard} from './recognition-noise-guard.js?v=20261112-live-summary-1';
+import {createLiveSummary} from './live-summary.js?v=20261112-live-summary-2';
+import {createLiveCaptionBuffer} from './live-caption-buffer.js?v=20261112-live-summary-2';
+import {startLiveTranslation} from './live-translation-face.js?v=20261112-live-summary-2';
+import {liveTranslationEnabled,disableLiveTranslation} from './live-translation-setting.js?v=20261112-live-summary-2';
+import {RecognitionNoiseGuard} from './recognition-noise-guard.js?v=20261112-live-summary-2';
 import {isRecognitionLanguage} from './language-registry.js?v=20261103-analysis-stages-1';
 import {fillLanguageOptions,installLanguageSearch} from './language-picker.js?v=20261103-analysis-stages-1';
 import {faceTranslationTargets,speedPasswordMatches} from './economy-policy.js?v=20261103-pipeline-latency-1';
-import {createRealtimeRecovery} from './realtime-recovery.js?v=20261112-live-summary-1';
-import {createRealtimeRecognition} from './realtime-recognition.js?v=20261112-live-summary-1';
+import {createRealtimeRecovery} from './realtime-recovery.js?v=20261112-live-summary-2';
+import {createRealtimeRecognition} from './realtime-recognition.js?v=20261112-live-summary-2';
 import {createAiGate} from './ai-gate.js?v=20261029-faithful-pipeline-1';
 import {localIcon,installLocalIcons} from './icons.js?v=20261029-communication50-1';
 installLocalIcons(document);
@@ -22,13 +22,13 @@ import {safeSocketSend,microphoneHelp,participantLabel} from './session-reliabil
 import {singleFlight,installLazyAction} from './async-ui.js?v=20261103-analysis-stages-1';
 import {lessonCode,installModalFeedback,backdropClick,updateMode,searchBounds,resilientPreferences} from './entry-feedback.js?v=20261022-language-storage-1';
 import {deviceCheckPanel,microphoneUnavailable} from './device-check.js?v=20261021-text-chat-1';
-import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261112-live-summary-1';
+import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261112-live-summary-2';
 import {installPhotoTranslate} from './photo-translate.js?v=20261024-usability20-3';
 import {refreshEnglishGuides,applyEnglishLabels} from './ui-english.js?v=20261029-two-language-1';
 import {SharedWordUsage} from './shared-word-usage.js?v=20261104-student-simple-2';
 import {installConversationUI,createWaitingBubble} from './conversation-ui.js?v=20261103-pipeline-latency-1';
 import {guardCaptionTranslation,hasInternalMarker,needsTranslationReview} from './translation-safety.js?v=20261029-faithful-pipeline-1';
-import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261112-live-summary-1';
+import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261112-live-summary-2';
 import {IdleWatch} from './idle-watch.js?v=20261008-safety-1';
 import {recordResource,recordPause,recordResume} from './resource-usage.js?v=20261104-student-simple-2';
 import {mayReconnect} from './resource-policy.js';
@@ -43,15 +43,15 @@ import {UsageLedger,WordUsage} from './usage.js?v=20261104-student-simple-2';
 import {CloudSpeechPlayer,createSpeechCache} from './cloud-speech-player.js?v=20261103-pipeline-latency-1';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261103-speech-activity-1';
 import {config} from './config.js';
-import {ConnectionDiary,speechConnectionNeedsCheck,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261112-live-summary-1';
+import {ConnectionDiary,speechConnectionNeedsCheck,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261112-live-summary-2';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
 import {translationField,translationOf,spokenLanguage,withEasyJapanese,supplementCatalog} from './core.js?v=20261029-communication50-1';
 import {speakerCaption,speakerInfo} from './face-mode.js?v=20261006-school-1';
 import {callCaptionLanguages,chatCaptionLanguages,isDisplayableCaption} from './call-mode.js?v=20261021-chat-bubbles-1';
 import {listHistory as storedHistory} from './history.js?v=20261006-school-1';
 const listHistory=()=>localStorage.getItem('tsuyaku-device-mode')==='personal'?storedHistory():Promise.resolve([]);
-import {createServerRecognition,encodeWav} from './caption-server.js?v=20261112-live-summary-1';
-import {createBrowserRecognition} from './caption-browser.js?v=20261112-live-summary-1';
+import {createServerRecognition,encodeWav} from './caption-server.js?v=20261112-live-summary-2';
+import {createBrowserRecognition} from './caption-browser.js?v=20261112-live-summary-2';
 const browserSpeechUnavailable=new Set();let recognitionKind=null,conversationUI,realtimeUnavailable=false;
 let speedAuthorized=false;localStorage.setItem('tsuyaku-recognition-speed-v1','economy');
 const preferRealtime=()=>speedAuthorized;
@@ -67,7 +67,7 @@ const sharedWords=new SharedWordUsage(localStorage,{api,catalog:()=>seed});
 const wordUsage=new WordUsage(localStorage);const ledger=new UsageLedger(localStorage,()=>Date.now(),sessionStorage),connections=new ConnectionDiary(localStorage);
 const showModalFeedback=installModalFeedback({dialog:$('#modal'),message:$('#message'),close:$('#modal-close'),resolveFocus:referenceReturnFocus});
 let messageTimer;const message=text=>{clearTimeout(messageTimer);const n=$('#message');n.textContent=text;n.hidden=!text;if(text)messageTimer=setTimeout(()=>{n.replaceChildren();n.hidden=true;},6000);};
-installLazyAction($('#admin'),async attempt=>{const {installAdmin}=await import('./admin.js?v=20261112-live-summary-1'+(attempt>1?'&retry='+attempt:''));installAdmin({wordUsage,sharedWords,api,createRecognitionSettings,showFrequentSources:()=>frequentButton.onclick(),getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});},{onError:()=>message('管理画面を読み込めませんでした。接続を確認して、もう一度ひらいてください。')});
+installLazyAction($('#admin'),async attempt=>{const {installAdmin}=await import('./admin.js?v=20261112-live-summary-2'+(attempt>1?'&retry='+attempt:''));installAdmin({wordUsage,sharedWords,api,createRecognitionSettings,showFrequentSources:()=>frequentButton.onclick(),getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});},{onError:()=>message('管理画面を読み込めませんでした。接続を確認して、もう一度ひらいてください。')});
 const lessonCaptionWaiting='再接続しました。次の字幕を待っています。';
 const status=text=>{$('#connection').textContent=text;connectionHint(text);};
 function connectionHint(text){let box=$('#connection-hint');const show=room&&!room.local&&/再接続|切れ|停止|接続でき|別のタブ/.test(text);if(!box&&show){box=el('div',undefined,'connection-hint');box.id='connection-hint';box.setAttribute('role','status');const note=el('span'),retry=el('button','再接続','secondary');retry.onclick=retryConnection;box.append(note,retry);$('#live .live-tools').prepend(box);}if(box){box.hidden=!show;box.firstChild.textContent=text;const retry=box.querySelector('button');retry.hidden=text===lessonCaptionWaiting;retry.disabled=!navigator.onLine||room?.joinBlocked===true;}}
@@ -170,7 +170,7 @@ function setTab(next){if(next==="student")next="lesson";if(next==='lesson'&&!roo
 function mountConversation(mode){if(mode!=='interpreter'){const invite=$('#call-invite');invite.hidden=true;invite.replaceChildren();delete invite.dataset.room;}const panel=$('#panel-'+mode);panel.append($('#live'));const entry=panel.querySelector('.entry-card');if(entry&&mode!=='lesson')entry.hidden=true;if(mode!=='lesson')$('#lesson-toolbar').hidden=true;if(mode==='lesson'){$('#live>.live-tools').prepend($('#lesson-toolbar'));for(const id of ['lesson-role-picker','teacher-entry','student-entry'])$('#'+id).hidden=true;$('#lesson-role-back').hidden=false;}}
 const qrModule=import('./qr.js?v=20261022-readable-qr-1').catch(()=>null);
 const roomLiveCaptions=new Map();
-const liveSummary=createLiveSummary({el,api,captions:()=>$("#captions"),language:()=>room?.mode==="face"?$("#face-self-language").value:room?.mode==="lesson"?sharedLanguage():currentSource()});
+const liveSummary=createLiveSummary({el,api,record:(type,data)=>ledger.recordLiveSummary(type,data),captions:()=>$("#captions"),language:()=>room?.mode==="face"?$("#face-self-language").value:room?.mode==="lesson"?sharedLanguage():currentSource()});
 function resetConversationContents(){liveSummary.reset();for(const caption of roomLiveCaptions.values()){clearTimeout(caption.timer);caption.panel.remove();}roomLiveCaptions.clear();faceDrafts.clear();setTextComposer(false);const empty=el('div',undefined,'empty');empty.id='empty-caption';empty.append(icon('comments'),el('h2','話したことばが、ここに。'));$('#captions').replaceChildren(empty);$('#text-input').value='';if(typeof refreshEnglishGuides==='function')refreshEnglishGuides($('#captions'));}
 function showConversationPreparation(mode){paintButton($('#microphone'),'準備中','spinner');
  $('#leave').hidden=true;const endLabel=mode==='interpreter'?'チャットをおわる':'会話をおわる';paintButton($('#leave'),endLabel,'door-open');$('#leave').setAttribute('aria-label',endLabel);$('#text-input').value='';const empty=el('div',undefined,'empty'),symbol=icon('comments');empty.id='empty-caption';symbol.classList.add('speech-symbol');empty.append(symbol,el('h2','話したことばが、ここに。'));$('#captions').replaceChildren(empty);if(mode==='face'){showFacePreparation();return;}mountConversation('interpreter');$('#panel-interpreter').hidden=false;$('#live').hidden=false;$('#face-controls').hidden=true;$('#participants').hidden=true;$('#invite').hidden=true;document.body.classList.add('mode-active');document.body.dataset.activeMode='interpreter';const n=$('#call-invite');n.hidden=false;n.replaceChildren();delete n.dataset.room;const preparing=el('div','接続を準備しています','invite-preparing');preparing.setAttribute('role','status');n.append(preparing);$('#text-input').placeholder='ことばを入力して送る';for(const selector of ['#text-input','#text-form button','#microphone'])$(selector).disabled=true;}
@@ -233,7 +233,7 @@ void ready.then(()=>refreshCatalog());
 async function token(){await ready;if(!user)await initAuth();if(!user)throw Error('接続を確認してください。');return user.getIdToken();}
 let lastSocketReceive=0;
 let serviceBlockedUntil=0;
-async function api(path,data,{signal}={}){if(Date.now()<serviceBlockedUntil&&['/rooms','/lessons/join'].includes(path))throw Object.assign(Error('サーバーの本日の利用上限に達しています。日本時間の翌朝9時以降に再度お試しください。'),{resourceFailure:{reason:'quota',retryable:false}});let auth;try{auth=await token();}catch(error){const failure=connectionFailure({code:'auth_unavailable'},{stage:'auth',endpoint:'https://identitytoolkit.googleapis.com',operation:'token'});connections.add({...failure.connection,online:navigator.onLine});failure.failureRecorded=true;throw failure;}if(signal?.aborted)throw signal.reason||new DOMException('Aborted','AbortError');if(path==='/translate')recordResource('translationRequest');if(path==='/rooms')recordResource('roomCreate');if(path==='/lessons/join')recordResource('lessonJoin');const operation=({'/translate':'translation','/rooms':'room_create','/lessons/join':'lesson_join','/catalog':'catalog','/dictionary/translate':'dictionary_translate','/dictionary/candidate':'dictionary_candidate'})[path]||'other';return requestJson(config.api+path,{method:data?'POST':'GET',headers:{Authorization:'Bearer '+auth,...(data?{'Content-Type':'application/json'}:{})},...(data?{body:JSON.stringify(data)}:{}),signal:signal?AbortSignal.any([signal,AbortSignal.timeout(25000)]):AbortSignal.timeout(25000),referrerPolicy:'no-referrer'},{operation,onFailure:record=>{if(!signal?.aborted)connections.add({...record,online:navigator.onLine});}}).then(result=>{if(path==='/translate')recordResource('translationComplete');return result;}).catch(error=>{if(error.resourceFailure?.reason==='quota')serviceBlockedUntil=Math.floor(Date.now()/86400000)*86400000+86400000;throw error;});}
+async function api(path,data,{signal}={}){if(Date.now()<serviceBlockedUntil&&['/rooms','/lessons/join'].includes(path))throw Object.assign(Error('サーバーの本日の利用上限に達しています。日本時間の翌朝9時以降に再度お試しください。'),{resourceFailure:{reason:'quota',retryable:false}});let auth;try{auth=await token();}catch(error){const failure=connectionFailure({code:'auth_unavailable'},{stage:'auth',endpoint:'https://identitytoolkit.googleapis.com',operation:'token'});connections.add({...failure.connection,online:navigator.onLine});failure.failureRecorded=true;throw failure;}if(signal?.aborted)throw signal.reason||new DOMException('Aborted','AbortError');if(path==='/translate')recordResource('translationRequest');if(path==='/rooms')recordResource('roomCreate');if(path==='/lessons/join')recordResource('lessonJoin');const operation=({'/live-summary':'live_summary','/translate':'translation','/rooms':'room_create','/lessons/join':'lesson_join','/catalog':'catalog','/dictionary/translate':'dictionary_translate','/dictionary/candidate':'dictionary_candidate'})[path]||'other';return requestJson(config.api+path,{method:data?'POST':'GET',headers:{Authorization:'Bearer '+auth,...(data?{'Content-Type':'application/json'}:{})},...(data?{body:JSON.stringify(data)}:{}),signal:signal?AbortSignal.any([signal,AbortSignal.timeout(25000)]):AbortSignal.timeout(25000),referrerPolicy:'no-referrer'},{operation,onFailure:record=>{if(!signal?.aborted)connections.add({...record,online:navigator.onLine});}}).then(result=>{if(path==='/translate')recordResource('translationComplete');return result;}).catch(error=>{if(error.resourceFailure?.reason==='quota')serviceBlockedUntil=Math.floor(Date.now()/86400000)*86400000+86400000;throw error;});}
 function showConnectionError(error){if($('#microphone').getAttribute('aria-busy')==='true')paintButton($('#microphone'),'接続できません','microphone-slash');const preparation=$('#call-invite .invite-preparing');if(preparation)preparation.textContent=error.resourceFailure?.reason==='quota'?'本日の利用上限':'接続できませんでした';if(error.resourceFailure?.reason==='quota'){status('本日の利用上限');if(['face','interpreter'].includes(tab)){paintButton($('#microphone'),'本日の利用上限','microphone-slash');$('#microphone').disabled=true;}}message(error.resourceFailure?.reason==='quota'?'本日の利用上限に達しました。時間をおいてお試しください。':'接続できませんでした。通信環境を確認して、もう一度お試しください。');}
 function pauseNoisyRecognition(){if(!mic||!room)return;mic=false;microphoneActivation++;speechInputGate?.cancel();idleWatch.stop();stopRecognition();localStream?.getAudioTracks().forEach(t=>t.enabled=false);ledger.microphone(false);ledger.event('recognition_noise_pause');recordPause('noise',undefined,{mode:room.mode,scope:'microphone'});paintButton($('#microphone'),'マイクをONにする','microphone');$('#microphone').setAttribute('aria-pressed','false');message('認識できない音が続いたため、マイクを止めました。周囲の声や雑音も拾うことがあります。マイクを口元に近づけ、話すときにONにしてください。');clearTimeout(messageTimer);}
 function showSpeechConnectionFailure(){message('音声認識APIへの接続を確認できないため、マイクを止めています。学校の管理者へ接続診断の結果をお伝えください。');clearTimeout(messageTimer);const button=el('button','接続を確認');button.type='button';button.onclick=showNetworkDiagnostics;$('#message').append(button);}

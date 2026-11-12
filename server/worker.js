@@ -19,7 +19,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261112-live-summary-1';
+const BUILD_ID='20261112-live-summary-2';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -166,7 +166,9 @@ export default {async fetch(request,env,ctx){
         const result=await runAi(env,'@cf/google/gemma-4-26b-a4b-it',{messages,temperature:0,max_completion_tokens:400,store:false,chat_template_kwargs:{enable_thinking:false}});
         const summary=result.response||result.choices?.[0]?.message?.content;
         if(typeof summary!=='string'||!summary.trim())return cors(error('要約を取得できませんでした。',502));
-        return cors(json({summary:summary.trim().slice(0,2000)}));
+        const inputTokens=result.usage?.prompt_tokens,outputTokens=result.usage?.completion_tokens;
+        const usage=Number.isInteger(inputTokens)&&Number.isInteger(outputTokens)&&inputTokens>=0&&outputTokens>=0?{inputTokens,outputTokens}:null;
+        return cors(json({summary:summary.trim().slice(0,2000),usage}));
       }catch(e){
         const failure=aiFailure(e);
         return cors(json({error:failure.message,aiFailure:failure},failure.reason==='quota'?429:502));
