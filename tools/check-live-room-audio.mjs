@@ -108,6 +108,11 @@ try {
       await setOptions(listener, ['Live要約']);
       await setOptions(speaker, ['GPT Live翻訳（試験）']);
       await speaker.bringToFront();
+      if (mode === 'lesson') {
+        await speaker.locator('#lesson-single-speech').evaluate(control => {
+          if (control.checked) control.click();
+        });
+      }
       const summaryRequest = listener.waitForRequest(request =>
         new URL(request.url()).pathname === '/live-summary' && request.method() === 'POST',
       { timeout: 100000 });
@@ -133,6 +138,8 @@ try {
       const original = await caption.locator('.caption-line-source > p').innerText();
       const translated = await caption.locator('.caption-line-primary > p').innerText();
       assert.notEqual(original.trim(), translated.trim());
+      assert.ok(await caption.locator('.caption-line').first().evaluate(line =>
+        line.classList.contains('caption-line-primary')), 'The translation must precede the original');
       await listener.getByRole('button', { name: /要約を表示/ }).click();
       const request = await summaryRequest;
       const { transcript, language } = request.postDataJSON();
