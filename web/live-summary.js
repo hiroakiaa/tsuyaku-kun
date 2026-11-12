@@ -14,7 +14,7 @@ export function createLiveSummarySetting(el){
 
 export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  const pending=new Map(),seen=new Map(),history=[];
- let checkpoint=null,pendingSince=null,bufferNotice,bufferDiscarded=false;
+ let checkpoint=null,pendingSince=null,retryAfter=0,bufferNotice,bufferDiscarded=false;
  const wide=matchMedia('(min-width:900px), (min-width:480px) and (max-height:620px)');
  let timer,request,panel,output,status,button,badge,dialog,wiki,wikiRequest,translationButton,translationStatus,translationRequest,summaryLanguage,historyPanel,finalizeButton,retryButton,finalSummaryTime,finalizing=false,isFinal=false,summary='';
  function notifySummary(label){
@@ -118,7 +118,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   if(request){request.abort();record('cancelled',{operation:request.operation});}request=null;
   if(translationRequest){translationRequest.abort();translationRequest=null;record('cancelled',{operation:'translation'});}
   checkpoint=null;
-  pendingSince=null;
+  pendingSince=null;retryAfter=0;
   bufferNotice=null;bufferDiscarded=false;
   pending.clear();seen.clear();history.length=0;finalizing=false;isFinal=false;summary='';
   wikiRequest?.abort();wiki?.remove();wiki=null;
@@ -128,7 +128,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  }
  stop=reset;
  function schedule(){
-  if(enabled&&pending.size&&!timer&&!request)timer=setTimeout(update,Math.max(0,60000-(performance.now()-(pendingSince??performance.now()))));
+  if(enabled&&pending.size&&!timer&&!request)timer=setTimeout(update,Math.max(0,(pendingSince??performance.now())+60000-performance.now(),retryAfter-performance.now()));
  }
  function noteDiscard(details){
   record('bufferDiscarded',details);
@@ -166,7 +166,9 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   const batch=new Map(pending);
   const transcript=[...batch.values()].join('\n');
   const started=performance.now(),captionCount=pending.size;
-  const queueMs=pendingSince===null?null:Math.round(started-pendingSince);
+  const batchSince=pendingSince;
+  const queueMs=batchSince===null?null:Math.round(started-batchSince);
+  retryAfter=0;
   pending.clear();
   pendingSince=null;
   try{
@@ -188,6 +190,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
     if(controller.signal.aborted)return;
     record('succeeded',{operation:controller.operation,elapsedMs:Math.round(performance.now()-startedAt),usage:result.usage});
     if(language()!==target){
+     pendingSince=batchSince??pendingSince;
      restorePending(batch);
      languageChanged=true;
      return;
@@ -220,7 +223,8 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   }catch{
    if(!controller.signal.aborted){
     record('failed',{operation:controller.operation,elapsedMs:Math.round(performance.now()-started)});
-    pendingSince=performance.now();
+    pendingSince=batchSince??pendingSince;
+    retryAfter=performance.now()+60000;
     restorePending(batch);
     status.textContent=final?'全体要約を作成できませんでした。':'要約を更新できませんでした。';
     retryButton.onclick=()=>{if(!request)void update(final);};
