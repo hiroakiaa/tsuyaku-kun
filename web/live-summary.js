@@ -15,7 +15,7 @@ export function createLiveSummarySetting(el){
 export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  const pending=new Map(),seen=new Map();
  const wide=matchMedia('(min-width:900px), (min-width:480px) and (max-height:620px)');
- let timer,request,panel,output,status,button,badge,dialog,wiki,wikiRequest,summary='';
+ let timer,request,panel,output,status,button,badge,dialog,wiki,wikiRequest,translationButton,translationRequest,summaryLanguage,readingLanguage,summary='';
  function read(){badge.hidden=true;button.setAttribute('aria-label','要約を表示');}
  function place(){
   if(!panel)return;
@@ -41,7 +41,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   const controller=new AbortController();
   wikiRequest=controller;
   const node=wiki=makeDialog(term+' — Wikipedia'),extract=el('p','読み込み中…');
-  const code=language().split('-')[0];
+  const code=(readingLanguage||language()).split('-')[0];
   const origin='https://'+(/^[a-z]{2,3}$/.test(code)?code:'ja')+'.wikipedia.org';
   const link=el('a','Wikipediaで記事を開く');
   link.target='_blank';
@@ -61,8 +61,9 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    if(!controller.signal.aborted)extract.textContent='記事の概要を取得できませんでした。';
   }
  }
- function renderSummary(){
-  const lines=summary.split(/\r?\n/).map(line=>line.trim()).filter(Boolean);
+ function renderSummary(text=summary,target=summaryLanguage){
+  readingLanguage=target;
+  const lines=text.split(/\r?\n/).map(line=>line.trim()).filter(Boolean);
   output.replaceChildren();
   let list;
   for(const line of lines){
@@ -91,6 +92,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  function reset(){
   clearTimeout(timer);timer=null;
   if(request){request.abort();record('cancelled');}request=null;
+  if(translationRequest){translationRequest.abort();translationRequest=null;record('cancelled');}
   pending.clear();seen.clear();summary='';
   wikiRequest?.abort();wiki?.remove();wiki=null;
   dialog?.remove();dialog=null;
@@ -110,9 +112,16 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   pending.clear();
   record('requested',{captionCount,characters:transcript.length});
   try{
-   const result=await api('/live-summary',{transcript,previous:summary,language:language()},{signal:controller.signal});
+   const target=language();
+   const result=await api('/live-summary',{transcript,previous:summary,language:target},{signal:controller.signal});
    if(controller.signal.aborted)return;
+   translationRequest?.abort();translationRequest=null;
    summary=result.summary;
+   summaryLanguage=target;
+   translationButton.hidden=/^ja(?:-|$)/.test(summaryLanguage);
+   translationButton.disabled=false;
+   translationButton.textContent='日本語に翻訳';
+   translationButton.onclick=translateSummary;
    renderSummary();
    badge.hidden=false;
    button.setAttribute('aria-label','要約を表示・更新あり');
@@ -127,10 +136,34 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    if(request===controller){request=null;schedule();}
   }
  }
- function add(id,text){
+ async function translateSummary(){
+  const controller=new AbortController();
+  translationRequest=controller;
+  translationButton.disabled=true;
+  const started=performance.now();
+  record('requested',{characters:summary.length});
+  try{
+   const result=await api('/live-summary',{transcript:summary,previous:'',language:'ja',translate:true},{signal:controller.signal});
+   if(controller.signal.aborted)return;
+   record('succeeded',{elapsedMs:Math.round(performance.now()-started),usage:result.usage});
+   const toggle=showJapanese=>{
+    renderSummary(showJapanese?result.summary:summary,showJapanese?'ja':summaryLanguage);
+    translationButton.textContent=showJapanese?'要約の原文を表示':'日本語訳を表示';
+    translationButton.onclick=()=>toggle(!showJapanese);
+   };
+   toggle(true);
+  }catch{
+   if(controller.signal.aborted)return;
+   record('failed',{elapsedMs:Math.round(performance.now()-started)});
+   status.textContent='要約の日本語訳を取得できませんでした。';
+  }finally{
+   if(translationRequest===controller){translationRequest=null;translationButton.disabled=false;}
+  }
+ }
+ function add(id,text,append=false){
   if(!enabled||typeof text!=='string'||!text.trim())return;
-  const value=text.trim().slice(0,1200);
-  if(seen.get(id)===value)return;
+  const value=append?((pending.get(id)||'')+text).slice(-6000):text.trim().slice(0,1200);
+  if(!append&&seen.get(id)===value)return;
   seen.set(id,value);
   if(seen.size>256)seen.delete(seen.keys().next().value);
   pending.set(id,value);
@@ -144,7 +177,10 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    output.setAttribute('aria-label','Live要約の本文');
    status=el('small','最初の要約は約1分後に表示します。');
    status.setAttribute('role','status');
-   panel.append(output,status);
+   translationButton=el('button','日本語に翻訳');
+   translationButton.type='button';
+   translationButton.hidden=true;
+   panel.append(translationButton,output,status);
    dialog=makeDialog('Live要約');
    button=el('button','要約を表示');
    button.type='button';
