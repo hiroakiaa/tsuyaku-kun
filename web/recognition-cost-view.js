@@ -1,10 +1,42 @@
-import {RECOGNITION_PRICE,AI_LIMITS} from './cost-policy.js';
+import {RECOGNITION_PRICE,TRANSLATION_PRICE,LIVE_TRANSLATION_USD_PER_MINUTE} from './cost-policy.js';
 export function recognitionComparison(rate=150){return {realtime:10*RECOGNITION_PRICE.streamPerMinute*rate,batch:10*RECOGNITION_PRICE.whisperPerMinute*rate,translation: .0001599/53*600*rate,previous:(16.8*RECOGNITION_PRICE.whisperPerMinute/60+.0002188)/73.845*600*rate};}
+
 export function createRecognitionCostView({el,exchange}){
  const box=el('section',undefined,'admin-recognition-cost');
- function render(){const expanded=box.querySelector('details')?.open||false;const rate=exchange(),c=recognitionComparison(rate),yen=n=>'約'+n.toFixed(2)+'円';box.replaceChildren(el('h3','音声認識10分の費用目安'),el('strong','リアルタイム認識 '+yen(c.realtime)),el('p','区間認識（節約） '+yen(c.batch),'admin-caption'),el('p','無料枠前・音声10分送信の比較。翻訳などは別。','admin-caption'));
- const details=el('details',undefined,'admin-detail');details.open=expanded;details.append(el('summary','比較の条件・従来方式へ戻すには'));
- const table=el('table',undefined,'admin-cost-table'),body=el('tbody');for(const row of [['音声認識だけ：10分送信','リアルタイム '+yen(c.realtime)+' ／ 従来 '+yen(c.batch)],['現在の節約版の翻訳','Azure F0接続中・対象言語・無料枠内なら0円。接続状態は今月の費用で確認。'],['従来AI翻訳の参考分',yen(c.translation)+'（以前の5文から換算）'],['以前の会話ペース', '従来 '+yen(c.previous)+'／マイクON 10分']]){const tr=el('tr'),th=el('th',row[0]);th.scope='row';tr.append(th,el('td',row[1]));body.append(tr);}table.append(body);details.append(table,el('p','1ドル='+rate+'円。無料枠適用前の変動費推定です。固定費・写真・読み上げ・他端末・追加の音声再確認・再試行は含みません。実請求額ではありません。'),el('p','速度トグルがONでも、選択言語や接続状態により高速な区間認識を使う場合があります。その音声単価は節約と同じです。上の金額は実際の認識方式別で、トグルだけでは決まりません。'),el('p','同じ音声10分の認識単価は約'+(RECOGNITION_PRICE.streamPerMinute/RECOGNITION_PRICE.whisperPerMinute).toFixed(1)+'倍です。リアルタイムは接続中に無音も送ります。従来方式は発話区間を送るため、マイクON時間と処理音声量が異なります。'),el('p','翻訳の参考：2026年10月30日の5文・音声送信53秒・翻訳$0.0001599を10分へ換算。以前の会話ペース：10月29日のマイク73.845秒に対し音声送信16.8秒、翻訳$0.0002188を10分へ換算。小標本の参考値で、会話量・言語数・辞書の再利用で変わります。'),el('p','速度の参考：発話末尾から表示の中央値は今回1.87秒、以前4.71秒。別の会話・少数の計測で、同条件の性能比較ではありません。'),el('p','戻す場合：管理者画面の「設定・説明」→「音声認識の設定」でトグルを「節約」にします。自動の言語判定は維持し、従来の区間認識へ戻ります。'),el('p','速度優先は全言語で選べます。日英・日本語とポルトガル語／スペイン語／ドイツ語などはリアルタイム認識、韓国語・中国語・ベトナム語・タガログ語／フィリピノ語・インドネシア語・ネパール語を含む組合せはWhisperの高速認識です。後者の音声単価は節約と同じですが、区間数・処理時間・精度は異なります。全言語が同じ速さになる保証はありません。'),el('p','日次上限は利用者ごとに約'+(AI_LIMITS.userUSD*rate).toFixed(2)+'円、アプリ全体で約'+(AI_LIMITS.globalUSD*rate).toFixed(2)+'円。速度から節約へ切り替えても残量は戻りません。毎日日本時間9時に更新します。10分の比較額は上限内で使える時間を保証しません。'),el('p','単価確認日：'+RECOGNITION_PRICE.checkedAt));for(const [label,url]of [['リアルタイムの料金表','https://developers.cloudflare.com/workers-ai/models/nova-3/'],['従来方式の料金表','https://developers.cloudflare.com/workers-ai/models/whisper-large-v3-turbo/']]){const a=el('a',label);a.href=url;a.target='_blank';a.rel='noopener';details.append(a,el('br'));}const savings=el('details',undefined,'admin-detail');savings.append(el('summary','節約の工夫・無料枠の候補'),el('p','起動・再読込時は節約です。速度への切替にはパスワードが必要です。つうやくでは選んだ言語だけを翻訳し、挨拶8種類は11言語、学校の定型文36種類は日英で固定訳を再利用します。完全一致した文だけが対象です。音声認識の費用は別にかかります。新しい節約効果はまだ実測していません。'),el('p','上の認識額は送信音声10分と設定単価からの試算です。従来AI翻訳・以前の会話ペースは小標本の参考値で、Azure F0導入前です。現在の節約版の総費用を1.04円と固定しません。'),el('p','現在：Cloudflare Workers AIはアカウント全体で1日10,000 neuronsの無料枠があります。翻訳・音声認識などで共有するため、利用者ごとに増える枠ではありません。日次予算は無料枠を差し引く前の推定額で管理します。'),el('p','Azure Translator F0は節約モードの通常の言語間翻訳に利用します。接続状態と残量は「今月の費用」の詳細で確認できます。やさしい日本語への言い換えは従来AIを使います。速度モードの翻訳・音声認識も従来の費用が残ります。無料試用終了後の有料契約へは自動移行しません。未接続の候補：Azure Speech F0は月5時間。Google Cloud Translation NMTは月50万文字相当のクレジット。管理者による契約・キー・利用条件・上限の設定が必要です。翻訳は対象言語数により消費量が増えます。'),el('p','学校の会話を、条件未確認の無料サービスへ自動転送しません。Gemini無料版は入力・出力の利用条件や年齢条件があるため、このアプリには接続していません。'));
-for(const [label,url]of [['Cloudflareの無料枠','https://developers.cloudflare.com/workers-ai/platform/pricing/'],['Microsoft Translator','https://azure.microsoft.com/en-us/pricing/details/translator/'],['Azure Speech','https://azure.microsoft.com/en-us/pricing/details/speech/'],['Google Cloud Translation','https://cloud.google.com/products/translate/pricing'],['Geminiの利用条件','https://ai.google.dev/gemini-api/terms']]){const a=el('a',label);a.href=url;a.target='_blank';a.rel='noopener';savings.append(a,el('br'));}box.append(details,savings);}
- render();return {box,render};
+ const choices=el('div',undefined,'admin-tabs');
+ choices.setAttribute('role','group');
+ choices.setAttribute('aria-label','試算する翻訳方式');
+ const content=el('div');
+ const translationPerMinute=4*(250*TRANSLATION_PRICE.inputPerMillion+25*TRANSLATION_PRICE.outputPerMillion)/1e6;
+ const segmented=RECOGNITION_PRICE.whisperPerMinute/2;
+ const modes=[
+  ['通常',segmented,segmented+translationPerMinute,'発話区間を送信。翻訳はAzure F0・辞書利用時の追加費用0円から、AI翻訳を使う場合まで。'],
+  ['速さ優先',RECOGNITION_PRICE.streamPerMinute,RECOGNITION_PRICE.streamPerMinute+translationPerMinute,'リアルタイム認識では無音を含む接続時間で計算。高速区間認識に切り替わる言語では、音声認識の単価は通常と同じです。'],
+  ['OpenAI Live',LIVE_TRANSLATION_USD_PER_MINUTE,LIVE_TRANSLATION_USD_PER_MINUTE*2,'1言語への翻訳から、対面の日英双方向（2接続）までの幅です。45分は接続時間の合計で試算しています。'],
+ ];
+ let selected=0;
+ const buttons=modes.map(([label],index)=>{
+  const button=el('button',label);
+  button.type='button';
+  button.onclick=()=>{selected=index;render();};
+  return button;
+ });
+ choices.append(...buttons);
+ box.append(el('h3','モード別の料金目安'),choices,content);
+ function render(){
+  buttons.forEach((button,index)=>button.setAttribute('aria-pressed',String(selected===index)));
+  const [,low,high,description]=modes[selected],rate=exchange();
+  const format=(a,b,digits)=>[a,b].map(n=>n.toFixed(digits)).filter((n,i,all)=>i===0||n!==all[0]).join('〜');
+  const table=el('table',undefined,'admin-cost-table'),body=el('tbody');
+  for(const [label,minutes] of [['1会話（5分）',5],['1分',1],['45分',45]]){
+   const row=el('tr'),title=el('th',label);
+   title.scope='row';
+   row.append(title,el('td','$'+format(low*minutes,high*minutes,6)+' ／ 約'+format(low*minutes*rate,high*minutes*rate,2)+'円'));
+   body.append(row);
+  }
+  table.append(body);
+  content.replaceChildren(table,el('p',description,'admin-caption'),el('p','マイクON時間で比較。通常は発話が半分、AI翻訳は1分4回（各入力250・出力25トークン）を仮定。1ドル＝'+rate+'円。変動費の試算で、固定費・再試行・写真・読み上げは含みません。','admin-caption'));
+ }
+ render();
+ return {box,render};
 }
