@@ -1,10 +1,10 @@
 import { captureLiveTranslationPcm } from './live-translation-capture.js?v=live-tail-1';
-import { connectLiveTranslation } from './live-translation-client.js?v=20261112-live-voice-tail-2';
+import { connectLiveTranslation } from './live-translation-client.js?v=20261112-live-es-1';
 
 export function startFaceLiveTranslation(options) {
   const { languages } = options;
-  if (languages.length !== 2 || !languages.includes('ja') || !languages.includes('en')) {
-    throw new Error('Live translation pilot requires Japanese and English');
+  if (languages.length !== 2 || !languages.includes('ja') || !languages.some(language=>language==='en'||language==='es')) {
+    throw new Error('Live translation pilot requires Japanese and English or Spanish');
   }
   return startLiveTranslation(options);
 }
@@ -14,7 +14,7 @@ export async function startLiveTranslation({
   connect = connectLiveTranslation, capture = captureLiveTranslationPcm,
 }) {
   if (!languages.length || new Set(languages).size !== languages.length ||
-      languages.some(language => !['ja', 'en'].includes(language))) {
+      languages.some(language => !['ja', 'en', 'es'].includes(language))) {
     throw new Error('Live translation requires distinct supported target languages');
   }
 

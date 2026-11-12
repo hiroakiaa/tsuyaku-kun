@@ -2,7 +2,7 @@ export const LIVE_TRANSLATION_MODEL = 'gpt-realtime-translate';
 export const LIVE_TRANSLATION_PCM_BYTES_PER_SECOND = 48000;
 
 export function liveTranslationConfiguration(language) {
-  if (!['ja', 'en'].includes(language)) {
+  if (!['ja', 'en', 'es'].includes(language)) {
     throw new RangeError('Unsupported pilot translation language');
   }
 
