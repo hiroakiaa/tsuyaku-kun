@@ -17,6 +17,11 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  let checkpoint=null;
  const wide=matchMedia('(min-width:900px), (min-width:480px) and (max-height:620px)');
  let timer,request,panel,output,status,button,badge,dialog,wiki,wikiRequest,translationButton,translationRequest,summaryLanguage,historyPanel,finalizeButton,retryButton,finalSummaryTime,finalizing=false,isFinal=false,summary='';
+ function notifySummary(label){
+  badge.textContent=' '+label;
+  badge.hidden=false;
+  button.setAttribute('aria-label','要約を表示・'+label);
+ }
  function read(){badge.hidden=true;button.setAttribute('aria-label','要約を表示');}
  function place(){
   if(!panel)return;
@@ -157,8 +162,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    translationButton.onclick=translateSummary;
    renderSummary();
    if(!final)appendHistory(history.at(-1));
-   badge.hidden=false;
-   button.setAttribute('aria-label','要約を表示・更新あり');
+   notifySummary('更新あり');
    status.textContent='';
   }catch{
    if(!controller.signal.aborted){
@@ -171,6 +175,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
     status.textContent=final?'全体要約を作成できませんでした。':'要約を更新できませんでした。';
     retryButton.onclick=()=>{if(!request)void update(final);};
     retryButton.hidden=false;
+    notifySummary('要約に失敗');
    }
   }finally{
    if(request===controller){
