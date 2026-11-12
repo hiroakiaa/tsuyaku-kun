@@ -29,7 +29,7 @@ body.phone-home #modal-body .admin-summary strong{display:block;font-size:16px;}
 body.phone-home #modal-body .admin-summary p{margin:4px 0;font-size:13px;color:#bbb;}
 @media(max-width:540px){body.phone-home #modal-body .admin-monthly-grid{grid-template-columns:minmax(0,1fr);gap:10px;}body.phone-home #modal-body .admin-metric>strong{font-size:13px;}}
 @media(max-height:420px) and (min-width:541px){body.phone-home #modal-body .admin-panel>button:last-child{margin-top:0!important;min-height:44px;}body.phone-home #modal-body .admin-monthly-grid{gap:12px;}}
-body.phone-home #modal-body .admin-panel>.admin-tabs{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px!important;overflow:visible;padding:3px!important;}
+body.phone-home #modal-body .admin-panel>.admin-tabs{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px!important;overflow:visible;padding:3px!important;}
 body.phone-home #modal-body .admin-panel>.admin-tabs>button{padding:7px 2px!important;font-size:12px!important;white-space:normal!important;min-height:44px!important;line-height:1.4;}
 body.phone-home #modal-body .admin-tabs .ui-copy{min-width:0;max-width:100%;}
 body.phone-home #modal-body .admin-tabs .ui-en{overflow-wrap:anywhere;white-space:normal;}

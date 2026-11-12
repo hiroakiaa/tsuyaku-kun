@@ -24,7 +24,7 @@ export function createBudgetView({el,api,rows,exchange,getScenario=()=>null}){
  refresh.setAttribute('aria-label','AI残量を更新');header.append(el('h3','今日のAI予算'),refresh);box.append(header,content);
  function render(){
   if(!latest)return;expanded=content.querySelector('details')?.open??expanded;const s=latest,fx=exchange(),yen=v=>'約'+(v*fx).toFixed(2)+'円',amount=v=>yen(v)+'（$'+v.toFixed(5)+'）';
-  content.replaceChildren(el('strong',yen(s.availableUSD),'admin-budget-remaining'),el('p','アプリ設定の残額・無料枠の残高ではありません。','admin-caption'));
+  content.replaceChildren(el('strong',amount(s.availableUSD),'admin-budget-remaining'),el('p','本日のアプリ予算の残り','admin-caption'),metric(el,'今日の利用額（全端末）',amount(s.global.usedUSD)));
   const warning=s.blocked?'AIサービス側の制限で停止中です。':s.user.callsRemaining===0?'本日のAI呼び出し回数の上限です。':s.availableUSD<=0?'本日のAI予算の上限です。':'';
   if(warning){const n=el('p',warning,'admin-alert');n.setAttribute('role','status');content.append(n);}
   const liveSeconds=Math.max(0,Math.floor(s.availableUSD/LIVE_TRANSLATION_USD_PER_MINUTE*60));
@@ -36,7 +36,7 @@ export function createBudgetView({el,api,rows,exchange,getScenario=()=>null}){
    const duration=seconds=>Math.floor(seconds/60)+'分'+seconds%60+'秒';
    live.append(el('p','翻訳先1つ 約'+duration(liveSeconds)+' ／ 翻訳先2つ 約'+(s.user.callsRemaining>=2&&liveSeconds>=30?duration(Math.floor(liveSeconds/2)):'開始不可')));
   }
-  live.append(el('p','本日のアプリ共通予算から換算。OpenAIアカウントのクレジット残高とは別です。','admin-caption'));
+  const openAIBilling=el('a','OpenAIの実残高を確認');openAIBilling.href='https://platform.openai.com/settings/organization/billing/overview';openAIBilling.target='_blank';openAIBilling.rel='noopener';live.append(el('p','アプリ予算からの換算です。OpenAIのクレジット残高は未取得です。','admin-caption'),openAIBilling);
   content.append(live);
   const meter=el('progress');meter.max=1;meter.value=Math.max(0,Math.min(1,s.availableUSD/Math.min(s.global.limitUSD,s.user.limitUSD)));meter.setAttribute('aria-label','今日のAI予算の残り');content.append(meter);
   const estimates=budgetEstimates(typeof rows==='function'?rows():rows,s,getScenario()),list=el('div',undefined,'admin-estimates');list.setAttribute('aria-label','AI翻訳の残り回数の目安');
