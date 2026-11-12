@@ -16,7 +16,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  const pending=new Map(),seen=new Map(),history=[];
  let checkpoint=null,pendingSince=null,retryAfter=0,bufferNotice,bufferDiscarded=false;
  const wide=matchMedia('(min-width:900px), (min-width:480px) and (max-height:620px)');
- let timer,request,panel,output,status,button,badge,dialog,wiki,wikiRequest,translationButton,translationStatus,translationRequest,summaryLanguage,historyPanel,finalizeButton,retryButton,finalSummaryTime,finalizing=false,isFinal=false,summary='';
+ let timer,request,panel,output,status,button,badge,dialog,wiki,wikiRequest,translationButton,translationStatus,copyButton,copyStatus,translationRequest,summaryLanguage,historyPanel,finalizeButton,retryButton,finalSummaryTime,finalizing=false,isFinal=false,summary='';
  function notifySummary(label){
   badge.textContent=' '+label;
   badge.hidden=false;
@@ -111,6 +111,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   }
   if(restoreFocus)(matchingTerm||container).focus({preventScroll:true});
   container.scrollTop=scrollTop;
+  if(container===output){copyButton.hidden=false;copyStatus.textContent='';}
  }
 
  function reset(){
@@ -328,7 +329,21 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    bufferNotice.setAttribute('role','status');
    translationStatus=el('small');
    translationStatus.setAttribute('role','status');
-   panel.append(finalizeButton,translationButton,bufferNotice,output,status,retryButton,translationStatus,historyPanel);
+   copyButton=el('button','要約をコピー');
+   copyButton.type='button';
+   copyButton.hidden=true;
+   copyStatus=el('small');
+   copyStatus.setAttribute('role','status');
+   copyButton.onclick=async()=>{
+    const feedback=copyStatus;
+    try{
+     await navigator.clipboard.writeText(output.innerText.trim());
+     feedback.textContent='要約をコピーしました。';
+    }catch{
+     feedback.textContent='コピーできませんでした。要約本文を選択してコピーしてください。';
+    }
+   };
+   panel.append(finalizeButton,translationButton,copyButton,copyStatus,bufferNotice,output,status,retryButton,translationStatus,historyPanel);
    dialog=makeDialog('Live要約');
    button=el('button','要約を表示');
    button.type='button';
