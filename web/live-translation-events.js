@@ -14,7 +14,7 @@ export function readLiveTranslationEvent(payload) {
 
   const field = transcriptFields.get(event?.type);
   if (field && typeof event.delta === 'string' && event.delta.length) {
-    return { type: 'transcript', field, delta: event.delta };
+    return { type: 'transcript', field, delta: event.delta, ...(Number.isFinite(event.elapsed_ms) && event.elapsed_ms >= 0 ? { elapsedMs: event.elapsed_ms } : {}) };
   }
   if (event?.type === 'session.closed') return { type: 'closed' };
   if (event?.type === 'error') return { type: 'error' };

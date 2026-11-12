@@ -98,7 +98,7 @@ export async function upgradeLiveTranslation(request, env, ctx) {
           return stop();
         }
         if (['session.input_transcript.delta', 'session.output_transcript.delta'].includes(event.type)
-          && typeof event.delta === 'string') relay.send(JSON.stringify({ type: event.type, delta: event.delta }));
+          && typeof event.delta === 'string') relay.send(JSON.stringify({ type: event.type, delta: event.delta, elapsed_ms: event.elapsed_ms }));
       } catch {
         stop(1011, 'upstream response failed');
       }
