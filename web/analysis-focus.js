@@ -4,6 +4,38 @@ import {analysisReport,costOf,PRICES,percentile} from './usage.js?v=20261103-sto
 import {safeConnectionRecord} from './network.js?v=20261103-request-lifecycle-1';
 const count=v=>Number.isFinite(v)&&v>=0?v:0;
 const summary=(rows,key)=>{const v=rows.map(r=>r[key]).filter(x=>Number.isFinite(x)&&x>=0);return {samples:v.length,p50Ms:percentile(v,.5),p95Ms:percentile(v,.95)};};
+export function liveAttemptTimings(events){
+ const attempts=new Map();
+ for(const event of events){
+  if(!Number.isSafeInteger(event.liveAttempt))continue;
+  if(event.type==='live_translation_start')attempts.set(event.liveAttempt,[]);
+  attempts.get(event.liveAttempt)?.push(event);
+ }
+ const difference=(end,start)=>Number.isFinite(end)&&Number.isFinite(start)?end-start:null;
+ return [...attempts].map(([attempt,rows])=>{
+  const time=(stage,language)=>rows.find(event=>event.type==='live_translation_'+stage&&(!language||event.liveLanguage===language))?.elapsedMs??null;
+  const firstAudio=time('first_audio'),finish=time('finish_requested');
+  const languages=[...new Set(rows.map(event=>event.liveLanguage).filter(Boolean))];
+  return {
+   attempt,
+   readyMs:time('ready'),
+   firstAudioToSubtitleMs:difference(time('first_subtitle'),firstAudio),
+   finishToClosedMs:difference(time('finished')??time('incomplete'),finish),
+   languages:languages.map(language=>{
+    const lastSubtitle=rows.find(event=>event.type==='live_translation_language_closed'&&event.liveLanguage===language)?.liveLastSubtitleMs;
+    const confirmed=time('language_confirmed',language),unconfirmed=time('language_unconfirmed',language);
+    return {
+     language,
+     firstAudioToSubtitleMs:difference(time('language_first_subtitle',language),firstAudio),
+     lastSubtitleRelativeToFinishMs:difference(lastSubtitle,finish),
+     finishConfirmed:confirmed!==null?true:unconfirmed!==null?false:null,
+     finishResponseMs:difference(confirmed,finish),
+    };
+   }),
+  };
+ });
+}
+
 export function improvementReport(sessions,{exchange=150,transcripts=[],diagnostics=[],delivery=null,connection=null,fullHistory=false}={}){
  const ordered=[...sessions].sort((a,b)=>count(b.startedAt)-count(a.startedAt)),selected=fullHistory?ordered:ordered.slice(0,1),latest=selected[0],inWindow=r=>!!latest&&Number.isFinite(r.at)&&r.at>=latest.startedAt&&r.at<=latest.updatedAt;
  const all=diagnostics.map(safeConnectionRecord),window=all.filter(inWindow),requests=window.filter(r=>r.operation==='transcribe'&&['ok','http_error','timeout','network_or_cors','invalid_response','auth_unavailable'].includes(r.code)),measured=requests.filter(r=>Number.isFinite(r.clientRequestMs));
@@ -16,10 +48,11 @@ export function improvementReport(sessions,{exchange=150,transcripts=[],diagnost
  const liveEstimateUSD=liveAudioSeconds===null?null:liveAudioSeconds/60*LIVE_TRANSLATION_USD_PER_MINUTE;
  report.liveTranslation={
   events:liveEvents,
+  attempts:liveAttemptTimings(liveEvents),
   recordedLanguageAudioSeconds:liveAudioSeconds,
   estimatedAudioCostUSD:liveEstimateUSD,
   estimatedAudioCostJPY:liveEstimateUSD===null?null:liveEstimateUSD*exchange,
-  note:'最新の利用に残ったLiveのイベント。elapsedMsはLive開始処理からの経過。字幕更新回数は受信した翻訳の断片数。音声バイト数は言語別の端末送信量で、音声費用は終了記録のある接続の送信量とアプリ設定単価からの試算。実請求額・発話時間・画面描画時間は未計測。発言・訳文は含みません。'
+  note:'最新の利用に残ったLiveのイベント。elapsedMsはLive開始処理からの経過。終了操作に対する最後の字幕時刻は負なら終了前、正なら終了後。字幕更新回数は受信した翻訳の断片数。音声バイト数は言語別の端末送信量で、音声費用は終了記録のある接続の送信量とアプリ設定単価からの試算。実請求額・発話時間・画面描画時間は未計測。発言・訳文は含みません。'
  };
  const recoveryTiming=type=>summary(recoveryEvents.filter(event=>event.type===type&&Number.isFinite(event.recoverySeconds)&&event.recoverySeconds>=0).map(event=>({delayMs:event.recoverySeconds*1000})),'delayMs');
  report.connectionRecovery={
