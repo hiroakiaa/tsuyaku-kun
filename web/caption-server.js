@@ -1,9 +1,9 @@
 import {recognitionLanguage,speechTextAllowed} from './two-language.js?v=20261029-communication50-1';
-import {nonSpeechReason} from './speech-filter.js?v=20261112-summary-scroll-1';
+import {nonSpeechReason} from './speech-filter.js?v=20261112-recap-history-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261103-audio-offset-1';
 import {recognitionMetrics} from './recognition-metrics.js?v=20261103-budget-cleanup-1';
 import {trimmedAudioLength} from './audio-trim.js?v=20261029-communication50-1';
-import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish,japaneseSpeechTail,japaneseNumericCompletion} from './speech-continuity.js?v=20261112-summary-scroll-1';
+import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish,japaneseSpeechTail,japaneseNumericCompletion} from './speech-continuity.js?v=20261112-recap-history-1';
 export const capturePauseMs=profile=>profile==='fast'||profile==='responsive'?300:profile==='balanced'?400:500;
 // Browser-independent recognition using the call's existing microphone stream.
 export function encodeWav(samples,minimumSamples=0) {
@@ -49,7 +49,7 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', o
       try {
         await resumed;
         if (!this.active) return;
-        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261112-summary-scroll-1', import.meta.url));
+        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261112-recap-history-1', import.meta.url));
         if (!this.active) return;
         this.source = this.context.createMediaStreamSource(stream);
         this.node = new Worklet(this.context, 'caption-pcm',{processorOptions:{pauseMs:capturePauseMs(captureProfile),oneUtterance,manualRelease}});

@@ -146,7 +146,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    if(controller.signal.aborted)return;
    if(translationRequest){translationRequest.abort();translationRequest=null;record('cancelled',{operation:'translation'});}
    if(final&&transcript)history.push({text:transcript,language:target,time:new Date()});
-   if(isFinal&&!final)appendHistory({text:summary,language:summaryLanguage,time:finalSummaryTime,final:true});
+   if(isFinal)appendHistory({text:summary,language:summaryLanguage,time:finalSummaryTime,final:true});
    summary=result.summary;
    isFinal=final;
    if(final)finalSummaryTime=new Date();
