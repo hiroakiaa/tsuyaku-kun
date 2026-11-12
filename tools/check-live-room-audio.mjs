@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { access } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { createRequire } from 'node:module';
 
@@ -8,13 +8,11 @@ const { chromium } = require(process.env.PLAYWRIGHT_PACKAGE || 'playwright');
 const [wav, base = 'https://hiroakiaa.github.io/tsuyaku-kun/'] = process.argv.slice(2);
 assert.ok(wav, 'Pass a Japanese speech WAV file as the first argument');
 const audio = resolve(wav);
-await access(audio);
+const wavBase64 = (await readFile(audio)).toString('base64');
 
 const browser = await chromium.launch({
   channel: 'chrome',
   headless: true,
-  args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream',
-    '--use-file-for-fake-audio-capture=' + audio + '%noloop'],
 });
 const failures = [];
 try {
@@ -22,17 +20,70 @@ try {
     const options = { permissions: ['microphone'], viewport: { width: 390, height: 844 } };
     const [sender, receiver] = await Promise.all([browser.newContext(options), browser.newContext(options)]);
     try {
+      await sender.addInitScript(base64 => {
+        navigator.mediaDevices.getUserMedia = async () => {
+          const context = new AudioContext();
+          await context.resume();
+          const bytes = Uint8Array.from(atob(base64), char => char.charCodeAt(0));
+          const source = context.createBufferSource();
+          source.buffer = await context.decodeAudioData(bytes.buffer);
+          const microphone = context.createMediaStreamDestination();
+          source.connect(microphone);
+          window.playTestSpeech = () => new Promise(done => {
+            source.onended = done;
+            source.start();
+          });
+          return microphone.stream;
+        };
+      }, wavBase64);
       const [speaker, listener] = await Promise.all([sender.newPage(), receiver.newPage()]);
+      speaker.on('websocket', socket => {
+        if (!new URL(socket.url()).pathname.endsWith('/socket')) return;
+        socket.on('framesent', ({payload}) => {
+          if (typeof payload !== 'string') return;
+          const frame = JSON.parse(payload);
+          if (frame.type === 'live_caption' && frame.final) {
+            console.log(mode + ': final Live caption sent', {
+              source: frame.source, target: frame.language, originalCharacters: frame.original?.length ?? 0,
+            });
+          }
+        });
+      });
       for (const page of [speaker, listener]) page.setDefaultTimeout(25000);
+      await speaker.bringToFront();
+      speaker.on('pageerror', error => console.error(mode + ' browser: ' + error.name));
+      const audioSent = new Promise(resolveAudio => {
+        speaker.on('websocket', socket => {
+          if (!new URL(socket.url()).pathname.endsWith('/live-translation')) return;
+          socket.on('framesent', ({payload}) => {
+            if (Buffer.isBuffer(payload)) resolveAudio();
+          });
+        });
+      });
+      speaker.on('websocket', socket => {
+        if (!new URL(socket.url()).pathname.includes('live')) return;
+        socket.on('framereceived', ({payload}) => {
+          if (typeof payload !== 'string') return;
+          try {
+            const {type} = JSON.parse(payload);
+            if (['ready', 'error', 'closed'].includes(type)) console.log(mode + ' Live: ' + type);
+          } catch {}
+        });
+      });
       const setOptions = async (page, labels) => {
         await page.locator('#admin').click();
+        await page.locator('#modal input[type=password]').fill(process.env.TSUYAKU_TEST_ADMIN_PIN || '1111');
+        await page.locator('#modal button[type=submit]').click();
         await page.locator('#modal').getByRole('tab', { name: '設定・説明' }).click();
         for (const label of labels) await page.locator('#modal').getByLabel(label, { exact: true }).check();
         await page.locator('#modal-close').click();
       };
       await speaker.goto(base);
+      const app = await speaker.locator('script[src*="web/app.js?v="]').getAttribute('src');
+      console.log(mode + ': ' + app.split('?v=')[1]);
       await speaker.locator('#microphone:not([disabled])').waitFor();
       await speaker.locator('#tab-' + mode).click();
+      if (mode === 'interpreter') await speaker.locator('#chat-self-language').selectOption('ja');
       if (mode === 'lesson') {
         await speaker.locator('#lesson-role-teacher').click();
         const code = speaker.locator('#lesson-room-code').filter({ hasText: /\d{4}/ });
@@ -56,11 +107,21 @@ try {
       await listener.locator('#live:not([hidden])').waitFor();
       await setOptions(listener, ['Live要約']);
       await setOptions(speaker, ['GPT Live翻訳（試験）']);
+      await speaker.bringToFront();
       const summaryRequest = listener.waitForRequest(request =>
         new URL(request.url()).pathname === '/live-summary' && request.method() === 'POST',
       { timeout: 100000 });
       void summaryRequest.catch(() => {});
       await speaker.locator('#microphone').click();
+      let audioDeadline;
+      try {
+        await Promise.race([audioSent, new Promise((_, reject) => {
+          audioDeadline = setTimeout(() => reject(new Error('Live connection did not send microphone audio')), 15000);
+        })]);
+      } finally {
+        clearTimeout(audioDeadline);
+      }
+      await speaker.evaluate(() => window.playTestSpeech());
       const preview = speaker.locator('[aria-label="Live翻訳の試験字幕"]');
       await preview.locator('.live-caption-card p').filter({ hasText: /[a-z]{2}/i }).waitFor();
       await speaker.locator('#microphone').click();
