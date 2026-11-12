@@ -1,5 +1,5 @@
 import { captureLiveTranslationPcm } from './live-translation-capture.js?v=live-tail-1';
-import { connectLiveTranslation } from './live-translation-client.js?v=20261112-live-turns-1';
+import { connectLiveTranslation } from './live-translation-client.js?v=20261112-live-voice-tail-1';
 
 export function startFaceLiveTranslation(options) {
   const { languages } = options;
@@ -65,11 +65,11 @@ export async function startLiveTranslation({
     captureDeadline = setTimeout(() => disconnected('capture timeout'), 5000);
     const recentAudio=[];
     let audioSamples=0,lastVoice=-Infinity,queuedVoice=-Infinity;
-    let pendingRecovery=Promise.resolve();
+    let pendingRecovery=Promise.resolve(),lastVoiceAudio=[];
     function recoverVoice(){
       if(!onFinalAudio||!Number.isFinite(lastVoice)||lastVoice===queuedVoice)return;
       queuedVoice=lastVoice;
-      const chunks=recentAudio.slice(),voiceEndMs=lastVoice/24;
+      const chunks=lastVoiceAudio,voiceEndMs=lastVoice/24;
       pendingRecovery=pendingRecovery.then(()=>{
         if(!controller.signal.aborted)return onFinalAudio(chunks,voiceEndMs);
       }).catch(()=>{});
@@ -79,8 +79,11 @@ export async function startLiveTranslation({
           const samples=new Int16Array(pcm);
           recentAudio.push(samples);
           audioSamples+=samples.length;
-          if(samples.some(sample=>Math.abs(sample)>=450))lastVoice=audioSamples;
-          if(recentAudio.length>18)recentAudio.shift();
+          if(recentAudio.length>12)recentAudio.shift();
+          if(samples.some(sample=>Math.abs(sample)>=240)){
+            lastVoice=audioSamples;
+            lastVoiceAudio=recentAudio.slice();
+          }
           if(audioSamples-lastVoice>=28800)recoverVoice();
         }
         if (controller.signal.aborted || draining) return;
@@ -125,7 +128,7 @@ export async function startLiveTranslation({
         onLanguageState?.(language, complete ? 'confirmed' : 'unconfirmed');
         return complete;
       }));
-      if(onFinalAudio&&!controller.signal.aborted&&audioSamples-lastVoice<=24000){
+      if(onFinalAudio&&!controller.signal.aborted&&audioSamples-lastVoice<=28800){
         recoverVoice();
       }
       await pendingRecovery;
