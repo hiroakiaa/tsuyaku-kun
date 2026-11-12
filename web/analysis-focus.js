@@ -1,3 +1,4 @@
+import {LIVE_TRANSLATION_USD_PER_MINUTE} from './cost-policy.js';
 import {recognitionAnalysis} from './recognition-analysis.js?v=20261103-analysis-stages-1';
 import {analysisReport,costOf,PRICES,percentile} from './usage.js?v=20261103-storage-latency-1';
 import {safeConnectionRecord} from './network.js?v=20261103-request-lifecycle-1';
@@ -8,6 +9,18 @@ export function improvementReport(sessions,{exchange=150,transcripts=[],diagnost
  const all=diagnostics.map(safeConnectionRecord),window=all.filter(inWindow),requests=window.filter(r=>r.operation==='transcribe'&&['ok','http_error','timeout','network_or_cors','invalid_response','auth_unavailable'].includes(r.code)),measured=requests.filter(r=>Number.isFinite(r.clientRequestMs));
  const report=JSON.parse(analysisReport(selected,{exchange,transcripts}));
  const recoveryEvents=latest?.events||[];
+ const liveEvents=recoveryEvents.filter(event=>event.type.startsWith('live_translation_'));
+ report.billing+=' Live翻訳の音声費用は liveTranslation の試算欄を参照。';
+ const liveClosed=liveEvents.filter(event=>event.type==='live_translation_language_closed');
+ const liveAudioSeconds=liveClosed.length?liveClosed.reduce((total,event)=>total+count(event.liveAudioBytes),0)/48000:null;
+ const liveEstimateUSD=liveAudioSeconds===null?null:liveAudioSeconds/60*LIVE_TRANSLATION_USD_PER_MINUTE;
+ report.liveTranslation={
+  events:liveEvents,
+  recordedLanguageAudioSeconds:liveAudioSeconds,
+  estimatedAudioCostUSD:liveEstimateUSD,
+  estimatedAudioCostJPY:liveEstimateUSD===null?null:liveEstimateUSD*exchange,
+  note:'最新の利用に残ったLiveのイベント。elapsedMsはLive開始処理からの経過。字幕更新回数は受信した翻訳の断片数。音声バイト数は言語別の端末送信量で、音声費用は終了記録のある接続の送信量とアプリ設定単価からの試算。実請求額・発話時間・画面描画時間は未計測。発言・訳文は含みません。'
+ };
  const recoveryTiming=type=>summary(recoveryEvents.filter(event=>event.type===type&&Number.isFinite(event.recoverySeconds)&&event.recoverySeconds>=0).map(event=>({delayMs:event.recoverySeconds*1000})),'delayMs');
  report.connectionRecovery={
   room:recoveryTiming('connection_restored'),
@@ -37,7 +50,7 @@ export function improvementReport(sessions,{exchange=150,transcripts=[],diagnost
  report.recognitionDiagnostics.httpFailures=requests.filter(r=>r.code==='http_error').length;
  report.recognitionDiagnostics.timeouts=requests.filter(r=>r.code==='timeout').length;
  report.recognitionDiagnostics.networkFailures=requests.filter(r=>r.code==='network_or_cors').length;
- report.sessionOutcome={successfulCaptions,recognitionRequestErrors:requestErrors,status:!latest?'not_measured':successfulCaptions>0?(requestErrors?'partial_with_recognition_errors':'captions_produced'):requestErrors?'recognition_failed_without_captions':'no_captions',note:'字幕生成の観測結果です。発話の有無・取りこぼし率・翻訳の正確さは判定しません。要求失敗にはタイムアウト等を含みます。'};
+ report.sessionOutcome={successfulCaptions,recognitionRequestErrors:requestErrors,status:!latest?'not_measured':successfulCaptions>0?(requestErrors?'partial_with_recognition_errors':'captions_produced'):requestErrors?'recognition_failed_without_captions':liveEvents.some(event=>event.type==='live_translation_first_subtitle')?'live_subtitles_observed':'no_captions',note:'字幕生成の観測結果です。発話の有無・取りこぼし率・翻訳の正確さは判定しません。要求失敗にはタイムアウト等を含みます。'};
  const cost=latest?costOf(latest,latest.priceSnapshot||PRICES):null,mic=Number.isFinite(latest?.micSeconds)?count(latest.micSeconds):null;
  const extrapolationUnavailableReason=!latest?'not_measured':successfulCaptions===0?'no_successful_captions':requestErrors?'recognition_request_errors':latest.unmeasuredCalls>0?'unmeasured_calls':latest.mode!=='face'?'shared_or_unknown_session_scope':!(mic>0)?'no_microphone_time':null;
  report.latestSessionCost={extrapolationUnavailableReason,observedJPY:cost?cost.total*exchange:null,translationJPY:cost?cost.translation*exchange:null,recognitionJPY:cost?cost.recognition*exchange:null,microphoneSeconds:latest?mic:null,azureAttempts:latest?.azureFree?.attempts??null,azureCharacters:latest?.azureFree?.characters??null,extrapolated10MicMinutesJPY:cost&&extrapolationUnavailableReason===null?cost.total*exchange*600/mic:null,note:'字幕成功がなく、認識要求失敗または費用未計測がある利用は10分換算しません。10分換算は対面モードのみ。チャット・授業の翻訳費用はルーム観測分なので、この端末のマイク時間で換算しません。対面も小標本の参考値です。無料枠前の認識試算とF0内翻訳を含む端末観測分。総額・実請求・利用可能時間ではありません。Azure記録がないことを利用0件とは断定しません。'};

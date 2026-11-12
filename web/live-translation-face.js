@@ -1,5 +1,5 @@
 import { captureLiveTranslationPcm } from './live-translation-capture.js';
-import { connectLiveTranslation } from './live-translation-client.js?v=20261112-mode-cost-1';
+import { connectLiveTranslation } from './live-translation-client.js?v=20261112-live-analysis-1';
 
 export function startFaceLiveTranslation(options) {
   const { languages } = options;
@@ -10,7 +10,7 @@ export function startFaceLiveTranslation(options) {
 }
 
 export async function startLiveTranslation({
-  apiOrigin, languages, stream, getToken, signal, onTranscript, onFallback, onFirstAudio,
+  apiOrigin, languages, stream, getToken, signal, onTranscript, onFallback, onFirstAudio, onLanguageState,
   connect = connectLiveTranslation, capture = captureLiveTranslationPcm,
 }) {
   if (!languages.length || new Set(languages).size !== languages.length ||
@@ -20,6 +20,7 @@ export async function startLiveTranslation({
 
   const controller = new AbortController();
   const connections = [];
+  const sentBytes = new Map();
   let active = false, draining = false, receivedSubtitle = false, audioDeadline, captureDeadline, sentAudio = false;
   function stop() {
     if (controller.signal.aborted) return;
@@ -27,7 +28,10 @@ export async function startLiveTranslation({
     clearTimeout(audioDeadline);
     clearTimeout(captureDeadline);
     controller.abort();
-    for (const connection of connections) connection.stop();
+    for (const { language, connection } of connections) {
+      connection.stop();
+      onLanguageState?.(language, 'closed', sentBytes.get(language) || 0);
+    }
   }
   function disconnected(reason) {
     if (controller.signal.aborted) return;
@@ -54,7 +58,8 @@ export async function startLiveTranslation({
         connection.stop();
         controller.signal.throwIfAborted();
       }
-      connections.push(connection);
+      connections.push({ language, connection });
+      onLanguageState?.(language, 'ready');
     }));
 
     captureDeadline = setTimeout(() => disconnected('capture timeout'), 5000);
@@ -67,7 +72,11 @@ export async function startLiveTranslation({
           audioDeadline = setTimeout(() => disconnected('subtitle timeout'), 8000);
         }
         try {
-          if (!connections.every(connection => connection.send(pcm))) {
+          if (!connections.every(({ language, connection }) => {
+            if (!connection.send(pcm)) return false;
+            sentBytes.set(language, (sentBytes.get(language) || 0) + pcm.byteLength);
+            return true;
+          })) {
             disconnected('audio unavailable');
             return;
           }
@@ -85,7 +94,11 @@ export async function startLiveTranslation({
     stop.finish = async () => {
       draining = true;
       clearTimeout(audioDeadline);
-      const results = await Promise.all(connections.map(connection => connection.finish()));
+      const results = await Promise.all(connections.map(async ({ language, connection }) => {
+        const complete = await connection.finish().catch(() => false);
+        onLanguageState?.(language, complete ? 'confirmed' : 'unconfirmed');
+        return complete;
+      }));
       stop();
       return results.every(Boolean);
     };
