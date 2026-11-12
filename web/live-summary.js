@@ -208,8 +208,8 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   if(!request)void update(true);
  }
  function add(id,text,append=false){
-  if(!enabled||typeof text!=='string'||!text.trim())return;
-  const value=append?(pending.get(id)||'')+text:text.trim().slice(0,1200);
+  if(!enabled||typeof text!=='string'||(!text.trim()&&!(append&&pending.has(id))))return;
+  const value=append?((pending.get(id)||'')+text).slice(-6000):text.trim().slice(0,1200);
   if(!append&&seen.get(id)===value)return;
   seen.set(id,value);
   if(seen.size>256)seen.delete(seen.keys().next().value);
