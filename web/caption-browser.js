@@ -1,6 +1,6 @@
 import {splitRecognizedText} from './session-reliability.js?v=20261022-reliability-20-1';
-import {createServerRecognition} from './caption-server.js?v=20261112-live-audio-clock-1';
-import {nonSpeechReason} from './speech-filter.js?v=20261112-live-audio-clock-1';
+import {createServerRecognition} from './caption-server.js?v=20261112-live-duplex-1';
+import {nonSpeechReason} from './speech-filter.js?v=20261112-live-duplex-1';
 
 // The browser may use its vendor's speech service. This is not an offline guarantee.
 // Reuse the bounded fragment assembler so dates and their following sentence stay together.
