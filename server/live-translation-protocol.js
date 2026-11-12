@@ -8,7 +8,7 @@ export function liveTranslationConfiguration(language) {
 
   return JSON.stringify({
     type: 'session.update',
-    session: { audio: { output: { language } } },
+    session: { audio: { input: { transcription: { model: "gpt-realtime-whisper" } }, output: { language } } },
   });
 }
 
