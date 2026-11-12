@@ -1,7 +1,7 @@
 import {FreshAudioWindow} from './realtime-recovery.js?v=20261103-audio-offset-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261103-audio-offset-1';
 import {realtimePair} from './realtime-protocol.js?v=20261030-realtime-1';
-import {tokenWithAbort} from './caption-server.js?v=20261112-admin-usage-1';
+import {tokenWithAbort} from './caption-server.js?v=20261112-live-diagnostics-1';
 const errors={quota:'本日の音声認識の利用上限です。文字で入力できます。',session_limit:'連続認識の時間上限です。マイクをONにし直してください。','audio-capture':'マイクの入力を確認してください。'};
 export function createRealtimeRecognition({endpoint,candidates,getStream,getToken,acquireSlot=async()=>()=>{},onUsage=()=>{},onDiagnostic=()=>{},onUnmeasured=()=>{},recoverAudio=null,Context=globalThis.AudioContext||globalThis.webkitAudioContext,Worklet=globalThis.AudioWorkletNode,Socket=globalThis.WebSocket}){
  const pair=realtimePair(candidates);if(!pair)return null;

@@ -36,7 +36,9 @@ export async function upgradeLiveTranslation(request, env, ctx) {
     if (lifecycle.signal.aborted) return;
     if (awaitingAuth) {
       awaitingAuth = false;
-      ctx.waitUntil(authenticate(data).catch(() => stop(1008, 'live translation unavailable')));
+      ctx.waitUntil(authenticate(data).catch(error => {
+        if (!lifecycle.signal.aborted) stop(1008, liveFailureReason(error));
+      }));
       return;
     }
     if (!upstream) return stop(1008, 'connection pending');
@@ -65,6 +67,13 @@ export async function upgradeLiveTranslation(request, env, ctx) {
       stop(1011, 'audio relay failed');
     }
   });
+
+  function liveFailureReason(error) {
+    if (error?.appBudget) return error.aiReason === 'busy' ? 'live busy' : 'live budget';
+    if (!env.OPENAI_API_KEY) return 'live key missing';
+    const status = /^OpenAI translation connection failed: HTTP (401|403|404|429)$/.exec(error?.message)?.[1];
+    return status ? 'live upstream ' + status : 'live translation unavailable';
+  }
 
   async function authenticate(data) {
     if (typeof data !== 'string' || data.length > 10000) throw new Error('Invalid authentication');

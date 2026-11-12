@@ -33,7 +33,7 @@ export async function connectLiveTranslation({
     signal?.addEventListener('abort', abort, { once: true });
     socket.onopen = () => socket.send(JSON.stringify({ token }));
     socket.onerror = () => finish('connection failed');
-    socket.onclose = () => finish('connection closed');
+    socket.onclose = ({reason} = {}) => finish(/^live (?:busy|budget|key missing|upstream (?:401|403|404|429)|translation unavailable)$/.test(reason) ? reason : 'connection closed');
     socket.onmessage = ({ data }) => {
       if (stopped) return;
       if (!ready) {
