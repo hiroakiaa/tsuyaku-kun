@@ -1,4 +1,4 @@
-import {RECOGNITION_PRICE,TRANSLATION_PRICE,LIVE_TRANSLATION_USD_PER_MINUTE} from './cost-policy.js';
+import {RECOGNITION_PRICE,TRANSLATION_PRICE,AZURE_F0_POLICY,LIVE_TRANSLATION_USD_PER_MINUTE} from './cost-policy.js';
 export function recognitionComparison(rate=150){return {realtime:10*RECOGNITION_PRICE.streamPerMinute*rate,batch:10*RECOGNITION_PRICE.whisperPerMinute*rate,translation: .0001599/53*600*rate,previous:(16.8*RECOGNITION_PRICE.whisperPerMinute/60+.0002188)/73.845*600*rate};}
 
 export function createRecognitionCostView({el,exchange}){
@@ -35,7 +35,34 @@ export function createRecognitionCostView({el,exchange}){
    body.append(row);
   }
   table.append(body);
-  content.replaceChildren(table,el('p',description,'admin-caption'),el('p','マイクON時間で比較。通常は発話が半分、AI翻訳は1分4回（各入力250・出力25トークン）を仮定。1ドル＝'+rate+'円。変動費の試算で、固定費・再試行・写真・読み上げは含みません。','admin-caption'));
+  const detail=el('details',undefined,'admin-detail');
+  detail.open=content.querySelector('details')?.open??false;
+  const perMinute=usd=>usd.toFixed(6)+' USD／約'+(usd*rate).toFixed(3)+'円';
+  detail.append(el('summary','費用の内訳と無料枠'));
+  if(selected===2){
+   detail.append(el('p','音声認識・翻訳・字幕生成はOpenAIの音声時間単価に含まれます。音声1分・1接続 '+perMinute(LIVE_TRANSLATION_USD_PER_MINUTE)+'。日英双方向の対面モードは同じ音声を2接続に送ります。'),
+    el('p','マイクから送信される無音も試算に含みます。対象組織にAPIクレジットがあれば利用額に充当されます。実残高と請求額はOpenAIで確認できます。'));
+  }else{
+   detail.append(el('p','短区間の音声認識（Cloudflare Whisper） 音声1分 '+perMinute(RECOGNITION_PRICE.whisperPerMinute)+'。発話を半分としたマイクON1分では '+perMinute(segmented)+'。'));
+   if(selected===1)detail.append(el('p','連続音声認識（Cloudflare Nova-3 WebSocket） 無音を含む音声1分 '+perMinute(RECOGNITION_PRICE.streamPerMinute)+'。高速区間認識を使う場合の45分は '+perMinute(segmented*45)+'（音声認識のみ）。'));
+   detail.append(el('p','翻訳は辞書・保存済み訳を再利用できれば追加のモデル費用は0円。通常モードのAzure Translator F0は接続済み・対象言語・無料枠内で0円（提供元は月'+AZURE_F0_POLICY.providerMonthCharacters.toLocaleString('ja-JP')+'文字。アプリ内の上限は別途表示）。'),
+    el('p','Cloudflare Gemmaを使う翻訳は100万トークンあたり入力 '+TRANSLATION_PRICE.inputPerMillion+' USD、出力 '+TRANSLATION_PRICE.outputPerMillion+' USD。この試算条件で1分に約 '+perMinute(translationPerMinute)+'を加算します。文章量や訳先で変動します。'),
+    el('p','Cloudflare Workers AIの無料枠はアカウント内で共有されます。表の認識・Gemma費用は無料枠適用前です。'));
+  }
+  detail.append(el('p','別計上の項目はWorkers・Durable Objectsの通信や保存、Firebase、写真の文字読取、クラウド読み上げ、他の端末で個別に開始した音声処理です。管理者画面の今月の費用・請求データで取得できた分を確認できます。'));
+  const sources=selected===2
+   ? [['OpenAI Live翻訳の単価','https://developers.openai.com/api/docs/models/gpt-realtime-translate']]
+   : [['Cloudflare Workers AI料金','https://developers.cloudflare.com/workers-ai/platform/pricing/'],['Azure Translator料金','https://azure.microsoft.com/en-us/pricing/details/translator/']];
+  for(const [label,url]of sources){
+   const link=el('a',label);
+   link.href=url;
+   link.target='_blank';
+   link.rel='noopener';
+   const paragraph=el('p');
+   paragraph.append(link);
+   detail.append(paragraph);
+  }
+  content.replaceChildren(table,detail,el('p',description,'admin-caption'),el('p','マイクON時間で比較。通常は発話が半分、AI翻訳は1分4回（各入力250・出力25トークン）を仮定。1ドル＝'+rate+'円。変動費の試算で、固定費・再試行・写真・読み上げは含みません。','admin-caption'));
  }
  render();
  return {box,render};
