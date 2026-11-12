@@ -84,6 +84,8 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   const restoreFocus=focusedTerm!==undefined&&container.contains(active);
   let matchingTerm;
   container.replaceChildren();
+  container.lang=target||'';
+  container.dir='auto';
   if(container===output&&isFinal)container.append(el('h3','全体要約'));
   let list;
   for(const line of lines){
