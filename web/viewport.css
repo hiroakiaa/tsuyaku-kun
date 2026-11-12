@@ -374,3 +374,5 @@ body.phone-home .caption-stage>.captions:has(.caption){border-left-color:transpa
  min-width:0;
  max-width:100%;
 }
+
+.live-caption-card p[data-pending]::before{content:attr(data-pending);opacity:.65;}
