@@ -41,7 +41,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   document.body.append(node);
   return node;
  }
- async function showTerm(term,target){
+ async function showTerm(term,target,trigger,container){
   wikiRequest?.abort();
   wiki?.remove();
   const controller=new AbortController();
@@ -54,7 +54,16 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   link.rel='noopener noreferrer';
   link.href=origin+'/wiki/Special:Search?search='+encodeURIComponent(term);
   node.append(extract,link);
-  node.addEventListener('close',()=>{controller.abort();node.remove();},{once:true});
+  node.addEventListener('close',()=>{
+   controller.abort();
+   node.remove();
+   if(wiki!==node)return;
+   wiki=null;
+   wikiRequest=null;
+   if(!container.isConnected)return;
+   const replacement=[...container.querySelectorAll('[data-summary-term]')].find(button=>button.dataset.summaryTerm===term);
+   (trigger.isConnected?trigger:replacement||container).focus({preventScroll:true});
+  },{once:true});
   node.showModal();
   try{
    const params=new URLSearchParams({action:'query',generator:'search',gsrsearch:term,gsrnamespace:'0',gsrlimit:'1',prop:'extracts|info',inprop:'url',exintro:'1',explaintext:'1',exsentences:'4',format:'json',formatversion:'2',origin:'*'});
@@ -91,7 +100,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
      link.dataset.summaryTerm=term;
      if(restoreFocus&&term===focusedTerm)matchingTerm??=link;
      Object.assign(link.style,{display:'inline',minHeight:'0',padding:'0 .2em',textDecoration:'underline',font:'inherit'});
-     link.onclick=()=>void showTerm(term,target);
+     link.onclick=()=>void showTerm(term,target,link,container);
      node.append(link);
     }else if(part)node.append(part);
    }
@@ -223,6 +232,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   const time=entry.time.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
   const heading=el('summary',entry.final?'全体要約 · '+time:time);
   const body=el('div');
+  body.tabIndex=-1;
   renderSummary(entry.text,entry.language,body);
   section.append(heading,body);
   historyPanel.append(section);
