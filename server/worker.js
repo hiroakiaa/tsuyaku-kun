@@ -20,7 +20,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261112-school-auto-1';
+const BUILD_ID='20261112-usage-all-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -99,10 +99,10 @@ export default {async fetch(request,env,ctx){
       const data=await body(request,100000);
       const admin=url.pathname.startsWith('/billing/');
       if(admin&&!await isBillingAdministrator(auth,env.BILLING_ADMIN_EMAIL_HASH))return cors(error('集計管理者のGoogle認証が必要です。',403));
-      if(!(admin?['create','report']:['check','submit']).includes(data?.action))return cors(error('操作を確認してください。',400));
+      if(!(admin?['report']:['submit']).includes(data?.action))return cors(error('操作を確認してください。',400));
       const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(auth.uid));
       const device=Array.from(new Uint8Array(digest).slice(0,16),value=>value.toString(16).padStart(2,'0')).join('').replace(/^(........)(....)(....)(....)/,'$1-$2-$3-$4-');
-      const school=env.ROOMS.get(env.ROOMS.idFromName('__school_usage_v1__'));
+      const school=env.ROOMS.get(env.ROOMS.idFromName('__monthly_usage_v2__'));
       return cors(await school.fetch(new Request('https://school/school-usage',{method:'POST',body:JSON.stringify({...data,device})})));
     }
     if(url.pathname.startsWith('/billing/')){
