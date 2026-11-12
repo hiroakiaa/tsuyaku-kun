@@ -275,6 +275,14 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    if(translationRequest===controller){translationRequest=null;translationButton.disabled=false;}
   }
  }
+ async function copySummary(body,feedback){
+  try{
+   await navigator.clipboard.writeText(body.innerText.trim());
+   feedback.textContent='要約をコピーしました。';
+  }catch{
+   feedback.textContent='コピーできませんでした。要約本文を選択してコピーしてください。';
+  }
+ }
  function appendHistory(entry){
   const section=el('details');
   const time=entry.time.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
@@ -282,7 +290,11 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   const body=el('div');
   body.tabIndex=-1;
   renderSummary(entry.text,entry.language,body);
-  section.append(heading,body);
+  const copy=el('button','この要約をコピー'),feedback=el('small');
+  copy.type='button';
+  feedback.setAttribute('role','status');
+  copy.onclick=()=>copySummary(body,feedback);
+  section.append(heading,body,copy,feedback);
   historyPanel.append(section);
  }
  function finalize(){
@@ -334,15 +346,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    copyButton.hidden=true;
    copyStatus=el('small');
    copyStatus.setAttribute('role','status');
-   copyButton.onclick=async()=>{
-    const feedback=copyStatus;
-    try{
-     await navigator.clipboard.writeText(output.innerText.trim());
-     feedback.textContent='要約をコピーしました。';
-    }catch{
-     feedback.textContent='コピーできませんでした。要約本文を選択してコピーしてください。';
-    }
-   };
+   copyButton.onclick=()=>copySummary(output,copyStatus);
    panel.append(finalizeButton,translationButton,copyButton,copyStatus,bufferNotice,output,status,retryButton,translationStatus,historyPanel);
    dialog=makeDialog('Live要約');
    button=el('button','要約を表示');
