@@ -111,27 +111,24 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   const transcript=[...batch.values()].join('\n');
   const started=performance.now(),captionCount=pending.size;
   pending.clear();
-  if(!final)record('requested',{captionCount,characters:Math.min(6000,transcript.length)});
   try{
    const target=language();
-   let result;
-   if(final){
-    const material=history.map(entry=>entry.text).concat(transcript).filter(Boolean).join('\n\n');
-    let previous='';
-    for(let offset=0;offset<material.length;offset+=6000){
-     const section=material.slice(offset,offset+6000);
-     record('requested',{captionCount:offset===0?captionCount:0,characters:section.length});
-     const startedAt=performance.now();
-     result=await api('/live-summary',{transcript:section,previous,language:target,final:true},{signal:controller.signal});
-     if(controller.signal.aborted)return;
-     record('succeeded',{elapsedMs:Math.round(performance.now()-startedAt),usage:result.usage});
-     previous=result.summary;
-    }
-   }else{
-    result=await api('/live-summary',{transcript:transcript.slice(-6000),previous:'',language:target},{signal:controller.signal});
+   const material=final?history.map(entry=>entry.text).concat(transcript).filter(Boolean).join('\n\n'):transcript;
+   const characters=Array.from(material);
+   let previous='',result;
+   for(let offset=0;offset<characters.length;){
+    let end=offset,length=0;
+    while(end<characters.length&&length+characters[end].length<=6000)length+=characters[end++].length;
+    const section=characters.slice(offset,end).join('');
+    record('requested',{captionCount:offset===0?captionCount:0,characters:section.length});
+    const startedAt=performance.now();
+    result=await api('/live-summary',{transcript:section,previous,language:target,final},{signal:controller.signal});
     if(controller.signal.aborted)return;
-    history.push({text:result.summary,language:target,time:new Date()});
+    record('succeeded',{elapsedMs:Math.round(performance.now()-startedAt),usage:result.usage});
+    previous=result.summary;
+    offset=end;
    }
+   if(!final)history.push({text:result.summary,language:target,time:new Date()});
    if(controller.signal.aborted)return;
    if(translationRequest){translationRequest.abort();translationRequest=null;record('cancelled');}
    if(final&&transcript)history.push({text:transcript,language:target,time:new Date()});
@@ -147,14 +144,14 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    badge.hidden=false;
    button.setAttribute('aria-label','要約を表示・更新あり');
    status.textContent='';
-   if(!final)record('succeeded',{elapsedMs:Math.round(performance.now()-started),usage:result.usage});
   }catch{
    if(!controller.signal.aborted){
     record('failed',{elapsedMs:Math.round(performance.now()-started)});
     const newer=[...pending];
     pending.clear();
     for(const [id,text] of batch)pending.set(id,text);
-    for(const [id,text] of newer)pending.set(id,id.endsWith?.(':live')?((pending.get(id)||'')+text).slice(-6000):text);
+    for(const [id,text] of newer)pending.set(id,typeof id==='string'&&id.endsWith(':live')?((pending.get(id)||'')+text).slice(-6000):text);
+    while(pending.size>80)pending.delete(pending.keys().next().value);
     status.textContent=final?'全体要約を作成できませんでした。もう一度お試しください。':'要約を更新できませんでした。';
    }
   }finally{
@@ -208,7 +205,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  }
  function add(id,text,append=false){
   if(!enabled||typeof text!=='string'||!text.trim())return;
-  const value=append?((pending.get(id)||'')+text).slice(-6000):text.trim().slice(0,1200);
+  const value=append?(pending.get(id)||'')+text:text.trim().slice(0,1200);
   if(!append&&seen.get(id)===value)return;
   seen.set(id,value);
   if(seen.size>256)seen.delete(seen.keys().next().value);
