@@ -1,12 +1,12 @@
-import {createLiveCaptionBuffer} from './live-caption-buffer.js?v=20261112-live-sentence-1';
-import {startLiveTranslation} from './live-translation-face.js?v=20261112-live-sentence-1';
-import {liveTranslationEnabled,disableLiveTranslation} from './live-translation-setting.js?v=20261112-live-sentence-1';
-import {RecognitionNoiseGuard} from './recognition-noise-guard.js?v=20261112-live-sentence-1';
+import {createLiveCaptionBuffer} from './live-caption-buffer.js?v=20261112-live-audio-clock-1';
+import {startLiveTranslation} from './live-translation-face.js?v=20261112-live-audio-clock-1';
+import {liveTranslationEnabled,disableLiveTranslation} from './live-translation-setting.js?v=20261112-live-audio-clock-1';
+import {RecognitionNoiseGuard} from './recognition-noise-guard.js?v=20261112-live-audio-clock-1';
 import {isRecognitionLanguage} from './language-registry.js?v=20261103-analysis-stages-1';
 import {fillLanguageOptions,installLanguageSearch} from './language-picker.js?v=20261103-analysis-stages-1';
 import {faceTranslationTargets,speedPasswordMatches} from './economy-policy.js?v=20261103-pipeline-latency-1';
-import {createRealtimeRecovery} from './realtime-recovery.js?v=20261112-live-sentence-1';
-import {createRealtimeRecognition} from './realtime-recognition.js?v=20261112-live-sentence-1';
+import {createRealtimeRecovery} from './realtime-recovery.js?v=20261112-live-audio-clock-1';
+import {createRealtimeRecognition} from './realtime-recognition.js?v=20261112-live-audio-clock-1';
 import {createAiGate} from './ai-gate.js?v=20261029-faithful-pipeline-1';
 import {localIcon,installLocalIcons} from './icons.js?v=20261029-communication50-1';
 installLocalIcons(document);
@@ -21,13 +21,13 @@ import {safeSocketSend,microphoneHelp,participantLabel} from './session-reliabil
 import {singleFlight,installLazyAction} from './async-ui.js?v=20261103-analysis-stages-1';
 import {lessonCode,installModalFeedback,backdropClick,updateMode,searchBounds,resilientPreferences} from './entry-feedback.js?v=20261022-language-storage-1';
 import {deviceCheckPanel,microphoneUnavailable} from './device-check.js?v=20261021-text-chat-1';
-import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261112-live-sentence-1';
+import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261112-live-audio-clock-1';
 import {installPhotoTranslate} from './photo-translate.js?v=20261024-usability20-3';
 import {refreshEnglishGuides,applyEnglishLabels} from './ui-english.js?v=20261029-two-language-1';
 import {SharedWordUsage} from './shared-word-usage.js?v=20261104-student-simple-2';
 import {installConversationUI,createWaitingBubble} from './conversation-ui.js?v=20261103-pipeline-latency-1';
 import {guardCaptionTranslation,hasInternalMarker,needsTranslationReview} from './translation-safety.js?v=20261029-faithful-pipeline-1';
-import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261112-live-sentence-1';
+import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261112-live-audio-clock-1';
 import {IdleWatch} from './idle-watch.js?v=20261008-safety-1';
 import {recordResource,recordPause,recordResume} from './resource-usage.js?v=20261104-student-simple-2';
 import {mayReconnect} from './resource-policy.js';
@@ -42,15 +42,15 @@ import {UsageLedger,WordUsage} from './usage.js?v=20261104-student-simple-2';
 import {CloudSpeechPlayer,createSpeechCache} from './cloud-speech-player.js?v=20261103-pipeline-latency-1';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261103-speech-activity-1';
 import {config} from './config.js';
-import {ConnectionDiary,speechConnectionNeedsCheck,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261112-live-sentence-1';
+import {ConnectionDiary,speechConnectionNeedsCheck,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261112-live-audio-clock-1';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
 import {translationField,translationOf,spokenLanguage,withEasyJapanese,supplementCatalog} from './core.js?v=20261029-communication50-1';
 import {speakerCaption,speakerInfo} from './face-mode.js?v=20261006-school-1';
 import {callCaptionLanguages,chatCaptionLanguages,isDisplayableCaption} from './call-mode.js?v=20261021-chat-bubbles-1';
 import {listHistory as storedHistory} from './history.js?v=20261006-school-1';
 const listHistory=()=>localStorage.getItem('tsuyaku-device-mode')==='personal'?storedHistory():Promise.resolve([]);
-import {createServerRecognition} from './caption-server.js?v=20261112-live-sentence-1';
-import {createBrowserRecognition} from './caption-browser.js?v=20261112-live-sentence-1';
+import {createServerRecognition} from './caption-server.js?v=20261112-live-audio-clock-1';
+import {createBrowserRecognition} from './caption-browser.js?v=20261112-live-audio-clock-1';
 const browserSpeechUnavailable=new Set();let recognitionKind=null,conversationUI,realtimeUnavailable=false;
 let speedAuthorized=false;localStorage.setItem('tsuyaku-recognition-speed-v1','economy');
 const preferRealtime=()=>speedAuthorized;
@@ -66,7 +66,7 @@ const sharedWords=new SharedWordUsage(localStorage,{api,catalog:()=>seed});
 const wordUsage=new WordUsage(localStorage);const ledger=new UsageLedger(localStorage,()=>Date.now(),sessionStorage),connections=new ConnectionDiary(localStorage);
 const showModalFeedback=installModalFeedback({dialog:$('#modal'),message:$('#message'),close:$('#modal-close'),resolveFocus:referenceReturnFocus});
 let messageTimer;const message=text=>{clearTimeout(messageTimer);const n=$('#message');n.textContent=text;n.hidden=!text;if(text)messageTimer=setTimeout(()=>{n.replaceChildren();n.hidden=true;},6000);};
-installLazyAction($('#admin'),async attempt=>{const {installAdmin}=await import('./admin.js?v=20261112-live-sentence-1'+(attempt>1?'&retry='+attempt:''));installAdmin({wordUsage,sharedWords,api,createRecognitionSettings,showFrequentSources:()=>frequentButton.onclick(),getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});},{onError:()=>message('管理画面を読み込めませんでした。接続を確認して、もう一度ひらいてください。')});
+installLazyAction($('#admin'),async attempt=>{const {installAdmin}=await import('./admin.js?v=20261112-live-audio-clock-1'+(attempt>1?'&retry='+attempt:''));installAdmin({wordUsage,sharedWords,api,createRecognitionSettings,showFrequentSources:()=>frequentButton.onclick(),getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});},{onError:()=>message('管理画面を読み込めませんでした。接続を確認して、もう一度ひらいてください。')});
 const lessonCaptionWaiting='再接続しました。次の字幕を待っています。';
 const status=text=>{$('#connection').textContent=text;connectionHint(text);};
 function connectionHint(text){let box=$('#connection-hint');const show=room&&!room.local&&/再接続|切れ|停止|接続でき|別のタブ/.test(text);if(!box&&show){box=el('div',undefined,'connection-hint');box.id='connection-hint';box.setAttribute('role','status');const note=el('span'),retry=el('button','再接続','secondary');retry.onclick=retryConnection;box.append(note,retry);$('#live .live-tools').prepend(box);}if(box){box.hidden=!show;box.firstChild.textContent=text;const retry=box.querySelector('button');retry.hidden=text===lessonCaptionWaiting;retry.disabled=!navigator.onLine||room?.joinBlocked===true;}}
@@ -547,9 +547,12 @@ function beginLiveTranslation(retrying=false){
   }else return;
   if(group.text.trim())state.firstTranslationMs??=elapsed();
  }
+ function liveSourceMatches(rows,times){
+  return rows.filter(row=>Number.isFinite(row.start)&&times.some(time=>time>=row.start-200&&time<=row.end+400));
+ }
  function alignLiveTranslation(state){
   state.pending=state.pending.filter(group=>{
-   const candidates=state.rows.filter(row=>Number.isFinite(row.start)&&group.times.some(time=>time>=row.start-200&&time<=row.end+400));
+   const candidates=liveSourceMatches(state.rows,group.times);
    if(candidates.length!==1)return true;
    group.row=candidates[0];
    paintLiveTranslation(state,group);
@@ -559,7 +562,8 @@ function beginLiveTranslation(retrying=false){
  function receiveLiveTranslation(state,language,event){
   const now=performance.now();
   let group=state.translationGroup;
-  if(!group||now-group.updatedAt>1800||/[。！？.!?]$/u.test(group.text.trim())){
+  const gap=Number.isFinite(event.elapsedMs)&&Number.isFinite(group?.lastAudioMs)?event.elapsedMs-group.lastAudioMs:now-(group?.updatedAt??now);
+  if(!group||gap>1800||/[。！？.!?]$/u.test(group.text.trim())){
    if(!event.delta.trim()||/^[。！？.!?]+$/u.test(event.delta.trim()))return;
    group={sequence:++state.sequence,text:'',times:[],updatedAt:now};
    state.translationGroup=group;
@@ -567,6 +571,8 @@ function beginLiveTranslation(retrying=false){
    if(state.pending.length>40)state.pending.shift();
    setTimeout(()=>{
     if(group.row||!preview.isConnected)return;
+    const opposite=liveBubbles.get(languages.find(code=>code!==language));
+    if(!liveSourceMatches(state.rows,group.times).length&&liveSourceMatches(opposite?.rows??[],group.times).length)return;
     const follow=captionList.scrollHeight-captionList.scrollTop-captionList.clientHeight<48;
     const card=el('article',undefined,'caption live-caption-card');
     const line=el('p',undefined,'caption-line caption-line-primary');
@@ -581,6 +587,7 @@ function beginLiveTranslation(retrying=false){
    },450);
   }
   group.updatedAt=now;
+  group.lastAudioMs=event.elapsedMs;
   group.text=(group.text+event.delta).slice(-1000);
   if(!group.row&&Number.isFinite(event.elapsedMs)){
    group.times.push(event.elapsedMs);
@@ -599,6 +606,12 @@ function beginLiveTranslation(retrying=false){
   }
   if(event.delta.trim())sourceUpdates.set(language,(sourceUpdates.get(language)||0)+1);
   for(const part of event.delta.match(/[^。！？.!?\n]+|[。！？.!?\n]/gu)||[]){
+   if(Number.isFinite(event.elapsedMs)&&Number.isFinite(state.lastSourceAudioMs)&&event.elapsedMs-state.lastSourceAudioMs>1200){
+    state.sourceDraft='';
+    state.bubble=null;
+    state.start=null;
+   }
+   if(Number.isFinite(event.elapsedMs))state.lastSourceAudioMs=event.elapsedMs;
    if(!state.sourceDraft.trim()&&part.trim())state.start=event.elapsedMs;
    state.sourceDraft=(state.sourceDraft+part).slice(-1000);
    const originalText=state.sourceDraft.trim();
