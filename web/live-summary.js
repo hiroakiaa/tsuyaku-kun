@@ -64,6 +64,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  }
  function renderSummary(text=summary,target=summaryLanguage,container=output){
   const lines=text.split(/\r?\n/).map(line=>line.trim()).filter(Boolean);
+  const scrollTop=container.scrollTop;
   container.replaceChildren();
   if(container===output&&isFinal)container.append(el('h3','全体要約'));
   let list;
@@ -88,6 +89,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
     list.append(node);
    }else container.append(node);
   }
+  container.scrollTop=scrollTop;
  }
 
  function reset(){
