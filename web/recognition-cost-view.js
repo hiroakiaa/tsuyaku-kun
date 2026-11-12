@@ -1,6 +1,40 @@
 import {RECOGNITION_PRICE,TRANSLATION_PRICE,AZURE_F0_POLICY,LIVE_TRANSLATION_USD_PER_MINUTE} from './cost-policy.js';
 export function recognitionComparison(rate=150){return {realtime:10*RECOGNITION_PRICE.streamPerMinute*rate,batch:10*RECOGNITION_PRICE.whisperPerMinute*rate,translation: .0001599/53*600*rate,previous:(16.8*RECOGNITION_PRICE.whisperPerMinute/60+.0002188)/73.845*600*rate};}
 
+// Public build 20261112-classroom-cost-1, measured with tools/measure-translation-display.mjs.
+const displayMeasurements = [
+ ['通常','5.64秒（3件）','3.33秒','3／3回'],
+ ['速度','5.99秒（2件）','3.67秒','2／3回'],
+ ['リアルタイム翻訳','1.77秒（6件）','2.28秒','3／6回'],
+];
+
+function createDisplayComparison(el) {
+ const section=el('section');
+ const table=el('table',undefined,'admin-cost-table');
+ const head=el('thead'),heading=el('tr'),body=el('tbody');
+ for(const title of ['モード','発話開始 → 最初の訳文','発話終了 → 内容がそろう','内容がそろった回数']){
+  const cell=el('th',title);
+  cell.scope='col';
+  heading.append(cell);
+ }
+ head.append(heading);
+ for(const [mode,first,complete,coverage] of displayMeasurements){
+  const row=el('tr'),label=el('th',mode);
+  label.scope='row';
+  row.append(label,...[first,complete,coverage].map(value=>el('td',value)));
+  body.append(row);
+ }
+ table.append(head,body);
+ const scroll=el('div');
+ scroll.style.overflowX='auto';
+ scroll.append(table);
+ section.append(el('h4','3モードの訳文表示速度（実測）'),scroll,
+  el('p','公開版の対面モードで、日本語から英語へ同じ約2.3秒の録音を翻訳。同じPCのChrome・同じ回線で測定した中央値です。','admin-caption'),
+  el('p','最初の訳文は画面に出た最初の英語（途中の断片を含む）。内容がそろう時刻は、受付が午後3時15分までという内容が画面にそろった時点です。発話の始まりと終わりは録音波形から推定しています。','admin-caption'),
+  el('p','表示時間の中央値は、各時刻を観測できた回だけで計算しています。速度は1回で英訳を観測できず、リアルタイムは2回で意味が異なり、1回は観測終了時点で時刻表記が途中でした。測定した公開版は20261112-classroom-cost-1です。','admin-caption'));
+ return section;
+}
+
 export function createRecognitionCostView({el,exchange}){
  const box=el('section',undefined,'admin-recognition-cost');
  const choices=el('div',undefined,'admin-tabs');
@@ -172,7 +206,7 @@ export function createRecognitionCostView({el,exchange}){
    el('p','Live要約は毎分1回、入力1,500・出力300トークンと仮定します。認識・要約は共有無料枠適用前です。複数の端末で要約を生成すると、その回数に応じて費用が増えます。固定費は含みません。','admin-caption'));
   const individual=el('section');
   individual.append(el('h4','マイク利用時間別の費用'),choices,table,detail,el('p',description,'admin-caption'),el('p','マイクON時間で比較。通常は発話が半分、AI翻訳は1分4回（各入力250・出力25トークン）を仮定。1ドル＝'+rate+'円。変動費の試算で、固定費・再試行・写真・読み上げは含みません。','admin-caption'));
-  content.replaceChildren(classroom,lesson,individual,market);
+  content.replaceChildren(classroom,lesson,createDisplayComparison(el),individual,market);
  }
  render();
  return {box,render};
