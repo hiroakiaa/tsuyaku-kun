@@ -1,3 +1,4 @@
+import {schoolUsage} from './school-usage.js';
 import {upgradeLiveTranslation} from './live-translation-relay.js';
 import {speechLanguageCandidates} from '../web/language-discovery.js';
 import {isRecognitionLanguage} from '../web/language-registry.js';
@@ -19,7 +20,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261112-school-city-monthly-1';
+const BUILD_ID='20261112-school-auto-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -94,6 +95,16 @@ export default {async fetch(request,env,ctx){
     if(url.pathname==='/live-translation')return upgradeLiveTranslation(request,env,ctx);
     if(url.pathname==='/transcribe-stream')return realtimeUpgrade(request,env,{verifyToken,aiFailure,ctx});
     const token=(request.headers.get('Authorization')||'').replace(/^Bearer /,'');const authStarted=Date.now(),auth=await verifyToken(token,env.FIREBASE_PROJECT,url.pathname.startsWith('/billing/'));env={...env,...(ctx?.waitUntil?{backgroundBudgetCleanup:task=>ctx.waitUntil(task)}:{}),authMs:Date.now()-authStarted,budgetUid:auth.uid,executionValid:()=>requestExecutionValid(request,requestStarted)};if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'user:'+auth.uid})).success))return cors(error('少し待ってから再試行してください。',429));
+    if(request.method==='POST'&&['/school-usage','/billing/school-usage'].includes(url.pathname)){
+      const data=await body(request,100000);
+      const admin=url.pathname.startsWith('/billing/');
+      if(admin&&!await isBillingAdministrator(auth,env.BILLING_ADMIN_EMAIL_HASH))return cors(error('集計管理者のGoogle認証が必要です。',403));
+      if(!(admin?['create','report']:['check','submit']).includes(data?.action))return cors(error('操作を確認してください。',400));
+      const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(auth.uid));
+      const device=Array.from(new Uint8Array(digest).slice(0,16),value=>value.toString(16).padStart(2,'0')).join('').replace(/^(........)(....)(....)(....)/,'$1-$2-$3-$4-');
+      const school=env.ROOMS.get(env.ROOMS.idFromName('__school_usage_v1__'));
+      return cors(await school.fetch(new Request('https://school/school-usage',{method:'POST',body:JSON.stringify({...data,device})})));
+    }
     if(url.pathname.startsWith('/billing/')){
       if(!await isBillingAdministrator(auth,env.BILLING_ADMIN_EMAIL_HASH))return cors(error('請求データは管理者本人のGoogle認証が必要です。',403));
       if(url.pathname==='/billing/budget-limit'&&request.method==='POST'){
@@ -242,7 +253,7 @@ export class TranslationRoom {
 
   roster(){this.broadcast({type:'participants',participants:this.participants().map(({a})=>({id:a.id,name:a.name,language:a.language,viewLanguage:a.viewLanguage,role:a.role}))});this.requests();}
   async fetch(request){
-    const path=new URL(request.url).pathname;if(path==='/azure-budget'){try{return json(await azureBudget(this.ctx.storage,await body(request,2048)));}catch(e){return json({error:e.message,reason:e.azureFailure?.reason||'service'},e.status||503);}}if(path==='/photo-budget'){try{return json(await photoBudget(this.ctx.storage,await body(request,4096)));}catch(e){return error(e.message,e.status||400);}}if(path==='/speech-budget'){try{return json(await speechBudget(this.ctx.storage,await body(request,2048)));}catch(e){return error(e.message,e.status||400);}}if(path==='/word-stats'){try{return json(await wordStats(this.ctx.storage,request.method==='POST'?(await body(request,12000)).events:null));}catch(e){return error(e.message,400);}}if(path==='/budget'){try{return json(await budgetOperation(this.ctx.storage,await body(request,2048)));}catch(e){return json({reason:e.aiReason||'budget'},429);}}
+    const path=new URL(request.url).pathname;if(path==='/school-usage'&&request.method==='POST')return schoolUsage(this.ctx.storage,await body(request,100000));if(path==='/azure-budget'){try{return json(await azureBudget(this.ctx.storage,await body(request,2048)));}catch(e){return json({error:e.message,reason:e.azureFailure?.reason||'service'},e.status||503);}}if(path==='/photo-budget'){try{return json(await photoBudget(this.ctx.storage,await body(request,4096)));}catch(e){return error(e.message,e.status||400);}}if(path==='/speech-budget'){try{return json(await speechBudget(this.ctx.storage,await body(request,2048)));}catch(e){return error(e.message,e.status||400);}}if(path==='/word-stats'){try{return json(await wordStats(this.ctx.storage,request.method==='POST'?(await body(request,12000)).events:null));}catch(e){return error(e.message,400);}}if(path==='/budget'){try{return json(await budgetOperation(this.ctx.storage,await body(request,2048)));}catch(e){return json({reason:e.aiReason||'budget'},429);}}
     if(path.startsWith('/codes/')){try{const codes=new LessonCodes(this.ctx.storage),data=await body(request);if(path==='/codes/allocate')return json(await codes.allocate(data));if(path==='/codes/find')return json(await codes.lookup(data.code));if(path==='/codes/release'){await codes.release(data.code,data.id);return json({ok:true});}return error('操作を確認してください。');}catch(e){return json({error:e.message,...(e.errorCode?{errorCode:e.errorCode}:{})},400);}}
     if(path==='/init'){if(await this.info())return error('ルームは作成済みです。',409);const data=await body(request);await this.ctx.storage.put('room',data);await this.ctx.storage.setAlarm(data.expires);return json({ok:true});}
     const room=await this.info();if(!room||room.expires<=Date.now())return error('このルームは終了しました。',410);

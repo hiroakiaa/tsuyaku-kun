@@ -1,3 +1,5 @@
+import {config} from './config.js';
+import {connectOwner} from './billing-view.js';
 import {LIVE_TRANSLATION_USD_PER_MINUTE, TRANSLATION_PRICE} from './cost-policy.js';
 
 const MODES = [
@@ -11,7 +13,7 @@ function totals(rows) {
   return Object.fromEntries(METRICS.map(key => [key, rows.reduce((sum, row) => sum + row[key], 0)]));
 }
 
-function usage(row, costOf) {
+export function schoolUsageMetrics(row, costOf) {
   const events = row.events || [];
   const recordings = new Map(events.filter(event => Number.isFinite(event.liveAudioBytes))
     .map(event => [event.liveAttempt + ':' + event.liveLanguage, event]));
@@ -30,7 +32,7 @@ function usage(row, costOf) {
   };
 }
 
-export function createAdoptionReport(el, sessions, { costOf, exchange, download }) {
+export function createAdoptionReport(el, sessions, { costOf, exchange, download, api }) {
   const panel = el('section', undefined, 'admin-detail');
   let scope = 'この端末の保存履歴（最大200件）。';
   const definition = '字幕またはLive字幕の記録がある利用と、マイクを使った利用を集計します。利用回数・字幕件数・利用時間は端末単位です。同じ会話に複数端末が参加すると、受信字幕や利用時間が各端末に計上されます。';
@@ -68,6 +70,91 @@ export function createAdoptionReport(el, sessions, { costOf, exchange, download 
     '各端末で月を選び、集計ファイルを書き出します。集計担当の端末で学校名を指定して取り込んでください。再取り込みは同じ端末・月の集計を更新します。'),
     exportButton, schoolLabel, fileLabel, importButton, status);
 
+  const codeKey = 'tsuyaku-school-code-v1';
+  const auto = el('details');
+  const codeLabel = el('label', '学校コード');
+  const code = el('input');
+  code.type = 'password';
+  code.autocomplete = 'off';
+  code.value = localStorage.getItem(codeKey) || '';
+  codeLabel.append(code);
+  const setup = el('button', '学校コードを保存');
+  const stop = el('button', '自動送信を停止');
+  const login = el('button', 'Googleで集計を管理');
+  const create = el('button', '学校コードを発行');
+  const load = el('button', '自動集計を表示');
+  const monthInput = el('input');
+  monthInput.type = 'month';
+  monthInput.value = calendar.format(now).replace('/', '-');
+  const monthLabel = el('label', '自動集計の月');
+  monthLabel.append(monthInput);
+  const nameLabel = el('label', '発行する学校名');
+  const nameInput = el('input');
+  nameInput.maxLength = 100;
+  nameLabel.append(nameInput);
+  const autoStatus = el('p');
+  autoStatus.setAttribute('role', 'status');
+  const issued = el('input');
+  issued.readOnly = true;
+  issued.hidden = true;
+  issued.setAttribute('aria-label','発行した学校コード');
+  auto.append(el('summary','学校コードと自動集計'), codeLabel, setup, stop, login, nameLabel, create, issued, monthLabel, load, autoStatus);
+  let owner;
+  const automatic = new Map();
+  for (const button of [setup,stop,login,create,load]) button.type = 'button';
+  function run(button, action) {
+    button.onclick = async () => {
+      button.disabled = true;
+      try { await action(); } catch (error) { autoStatus.textContent = error.message || '操作を完了できませんでした。'; }
+      finally { button.disabled = false; }
+    };
+  }
+  async function admin(data) {
+    if (!owner) throw Error('Googleで集計を管理するアカウントにログインしてください。');
+    const response = await fetch(config.api + '/billing/school-usage', {
+      method:'POST', headers:{Authorization:'Bearer ' + await owner.token(),'Content-Type':'application/json'},
+      body:JSON.stringify(data),
+    });
+    const result = await response.json();
+    if (!response.ok) throw Error(result.error || '自動集計を取得できませんでした。');
+    return result;
+  }
+  run(setup, async () => {
+    const value = code.value.trim().toLowerCase();
+    await api('/school-usage',{action:'check',code:value});
+    if (localStorage.getItem(codeKey) !== value) {
+      localStorage.setItem('tsuyaku-school-since-v1', String(Date.now()));
+      localStorage.setItem(codeKey, value);
+    }
+    autoStatus.textContent = '学校コードを保存しました。これからの利用を自動送信します。';
+  });
+  run(stop, async () => {
+    localStorage.removeItem(codeKey);
+    code.value = '';
+    autoStatus.textContent = '自動送信を停止しました。';
+  });
+  run(login, async () => {
+    owner = await connectOwner('school-usage-admin');
+    autoStatus.textContent = 'Googleでログインしました。';
+  });
+  run(create, async () => {
+    const result = await admin({action:'create',name:nameInput.value});
+    issued.value = result.code;
+    issued.hidden = false;
+    autoStatus.textContent = '学校コードを発行しました。';
+  });
+  run(load, async () => {
+    const month = monthInput.value.replace('-', '/');
+    const result = await admin({action:'report',month});
+    automatic.set(month, result.schools);
+    refreshMonths();
+    period.value = month;
+    refreshGroups();
+    group.value = 'auto:city';
+    render();
+    autoStatus.textContent = '自動集計を取得しました。';
+  });
+
   function fill(select, options, fallback) {
     const previous = select.value;
     select.replaceChildren(...options.map(([value, name]) => {
@@ -79,14 +166,14 @@ export function createAdoptionReport(el, sessions, { costOf, exchange, download 
   }
   function refreshMonths() {
     const months = [...new Set([calendar.format(now), ...active.map(row => calendar.format(row.startedAt)),
-      ...Object.values(imports).map(entry => entry.month)])].sort().reverse();
+      ...Object.values(imports).map(entry => entry.month), ...automatic.keys()])].sort().reverse();
     fill(period, months.map(month => [month, month.replace('/', '年') + '月']), months[0]);
   }
   function refreshGroups() {
     const schools = [...new Set(Object.values(imports).filter(entry => entry.month === period.value)
       .map(entry => entry.school))].sort();
     fill(group, [['local', 'この端末'], ['city', '市全体（取り込み分）'],
-      ...schools.map(name => ['school:' + name, name])], 'local');
+      ...schools.map(name => ['school:' + name, name]), ...(automatic.has(period.value) ? [['auto:city','市全体（自動集計）'], ...automatic.get(period.value).map((entry,index)=>['auto:'+index,entry.school+'（自動集計）'])] : [])], 'local');
   }
   exportButton.onclick = () => {
     try {
@@ -95,7 +182,7 @@ export function createAdoptionReport(el, sessions, { costOf, exchange, download 
       localStorage.setItem(key, id);
       const rows = active.filter(row => calendar.format(row.startedAt) === period.value);
       const modes = Object.fromEntries(MODES.map(([mode]) =>
-        [mode, totals(rows.filter(row => row.mode === mode).map(row => usage(row, costOf)))]));
+        [mode, totals(rows.filter(row => row.mode === mode).map(row => schoolUsageMetrics(row, costOf)))]));
       download('通訳君_端末集計_' + period.value.replace('/', '-') + '.json',
         JSON.stringify({ schema: 'tsuyaku-monthly-v1', month: period.value, id, modes }), 'application/json');
     } catch { status.textContent = '端末の集計ファイルを書き出せませんでした。'; }
@@ -149,7 +236,7 @@ export function createAdoptionReport(el, sessions, { costOf, exchange, download 
   save.type = 'button';
   save.onclick = () => download('通訳君_利用実績_' + period.value.replace('/', '-') + '.txt', report.value, 'text/plain;charset=utf-8');
   share.append(el('summary', '共有用テキスト'), shareLabel, save);
-  panel.append(el('h3', '学校導入向けの利用実績'), label, groupLabel, transfer, output, el('p', definition), share);
+  panel.append(el('h3', '学校導入向けの利用実績'), label, groupLabel, auto, transfer, output, el('p', definition), share);
 
   const date = new Intl.DateTimeFormat('ja-JP', { dateStyle: 'medium' });
   const headers = ['モード', '利用回数', '字幕件数', '利用時間（分）', 'マイク時間（分）', '利用料目安（円）', 'うちLive翻訳（円）', 'うちLive要約（円）'];
@@ -159,11 +246,12 @@ export function createAdoptionReport(el, sessions, { costOf, exchange, download 
     const selected = group.value;
     const imported = Object.values(imports).filter(entry => entry.month === period.value &&
       (selected === 'city' || selected === 'school:' + entry.school));
-    scope = selected === 'local' ? 'この端末の保存履歴（最大200件）。' :
+    const autoRows = selected === 'auto:city' ? automatic.get(period.value) : selected.startsWith('auto:') ? [automatic.get(period.value)[Number(selected.slice(5))]] : null;
+    scope = autoRows ? group.selectedOptions[0].textContent : selected === 'local' ? 'この端末の保存履歴（最大200件）。' :
       group.selectedOptions[0].textContent + 'の集計ファイル ' + imported.length + '件。';
     const values = MODES.map(([mode]) => totals(selected === 'local' ?
-      rows.filter(row => row.mode === mode).map(row => usage(row, costOf)) :
-      imported.map(entry => entry.modes[mode])));
+      rows.filter(row => row.mode === mode).map(row => schoolUsageMetrics(row, costOf)) :
+      (autoRows || imported).map(entry => entry.modes[mode])));
     function summarize(name, value) {
       const usd = value.base + value.live + value.summary;
       const cost = value.partial && usd === 0 ? '未計測' : (usd * rate).toFixed(2) + (value.partial ? '（一部）' : '');
@@ -192,7 +280,7 @@ export function createAdoptionReport(el, sessions, { costOf, exchange, download 
     }
     table.append(caption, head, body);
     const range = period.selectedOptions[0].textContent + '（集計日 ' + date.format(now) + '）';
-    const observed = selected !== 'local' ? '提出された端末分の合計です。' : rows.length ? '記録上の利用日数 ' + new Set(rows.map(row => date.format(row.startedAt))).size + '日' :
+    const observed = selected !== 'local' ? (autoRows ? '学校コードで登録された端末の利用実績です。' : '提出された端末分の合計です。') : rows.length ? '記録上の利用日数 ' + new Set(rows.map(row => date.format(row.startedAt))).size + '日' :
       'この期間の利用記録はありません。';
     const tableScroll = el('div');
     tableScroll.style.overflowX = 'auto';

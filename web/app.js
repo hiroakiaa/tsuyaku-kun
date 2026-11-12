@@ -1,13 +1,15 @@
-import {createLiveSummary} from './live-summary.js?v=20261112-school-city-monthly-1';
-import {createLiveCaptionBuffer} from './live-caption-buffer.js?v=20261112-school-city-monthly-1';
-import {startLiveTranslation} from './live-translation-face.js?v=20261112-school-city-monthly-1';
-import {liveTranslationEnabled,disableLiveTranslation} from './live-translation-setting.js?v=20261112-school-city-monthly-1';
-import {RecognitionNoiseGuard} from './recognition-noise-guard.js?v=20261112-school-city-monthly-1';
+import {costOf} from './usage.js?v=20261112-school-auto-1';
+import {schoolUsageMetrics} from './admin-adoption-report.js?v=20261112-school-auto-1';
+import {createLiveSummary} from './live-summary.js?v=20261112-school-auto-1';
+import {createLiveCaptionBuffer} from './live-caption-buffer.js?v=20261112-school-auto-1';
+import {startLiveTranslation} from './live-translation-face.js?v=20261112-school-auto-1';
+import {liveTranslationEnabled,disableLiveTranslation} from './live-translation-setting.js?v=20261112-school-auto-1';
+import {RecognitionNoiseGuard} from './recognition-noise-guard.js?v=20261112-school-auto-1';
 import {isRecognitionLanguage} from './language-registry.js?v=20261103-analysis-stages-1';
 import {fillLanguageOptions,installLanguageSearch} from './language-picker.js?v=20261103-analysis-stages-1';
 import {faceTranslationTargets,speedPasswordMatches} from './economy-policy.js?v=20261103-pipeline-latency-1';
-import {createRealtimeRecovery} from './realtime-recovery.js?v=20261112-school-city-monthly-1';
-import {createRealtimeRecognition} from './realtime-recognition.js?v=20261112-school-city-monthly-1';
+import {createRealtimeRecovery} from './realtime-recovery.js?v=20261112-school-auto-1';
+import {createRealtimeRecognition} from './realtime-recognition.js?v=20261112-school-auto-1';
 import {createAiGate} from './ai-gate.js?v=20261029-faithful-pipeline-1';
 import {localIcon,installLocalIcons} from './icons.js?v=20261029-communication50-1';
 installLocalIcons(document);
@@ -22,13 +24,13 @@ import {safeSocketSend,microphoneHelp,participantLabel} from './session-reliabil
 import {singleFlight,installLazyAction} from './async-ui.js?v=20261103-analysis-stages-1';
 import {lessonCode,installModalFeedback,backdropClick,updateMode,searchBounds,resilientPreferences} from './entry-feedback.js?v=20261022-language-storage-1';
 import {deviceCheckPanel,microphoneUnavailable} from './device-check.js?v=20261021-text-chat-1';
-import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261112-school-city-monthly-1';
+import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261112-school-auto-1';
 import {installPhotoTranslate} from './photo-translate.js?v=20261024-usability20-3';
 import {refreshEnglishGuides,applyEnglishLabels} from './ui-english.js?v=20261029-two-language-1';
 import {SharedWordUsage} from './shared-word-usage.js?v=20261104-student-simple-2';
 import {installConversationUI,createWaitingBubble} from './conversation-ui.js?v=20261103-pipeline-latency-1';
 import {guardCaptionTranslation,hasInternalMarker,needsTranslationReview} from './translation-safety.js?v=20261029-faithful-pipeline-1';
-import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261112-school-city-monthly-1';
+import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261112-school-auto-1';
 import {IdleWatch} from './idle-watch.js?v=20261008-safety-1';
 import {recordResource,recordPause,recordResume} from './resource-usage.js?v=20261104-student-simple-2';
 import {mayReconnect} from './resource-policy.js';
@@ -43,15 +45,15 @@ import {UsageLedger,WordUsage} from './usage.js?v=20261104-student-simple-2';
 import {CloudSpeechPlayer,createSpeechCache} from './cloud-speech-player.js?v=20261103-pipeline-latency-1';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261103-speech-activity-1';
 import {config} from './config.js';
-import {ConnectionDiary,speechConnectionNeedsCheck,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261112-school-city-monthly-1';
+import {ConnectionDiary,speechConnectionNeedsCheck,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261112-school-auto-1';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
 import {translationField,translationOf,spokenLanguage,withEasyJapanese,supplementCatalog} from './core.js?v=20261029-communication50-1';
 import {speakerCaption,speakerInfo} from './face-mode.js?v=20261006-school-1';
 import {callCaptionLanguages,chatCaptionLanguages,isDisplayableCaption} from './call-mode.js?v=20261021-chat-bubbles-1';
 import {listHistory as storedHistory} from './history.js?v=20261006-school-1';
 const listHistory=()=>localStorage.getItem('tsuyaku-device-mode')==='personal'?storedHistory():Promise.resolve([]);
-import {createServerRecognition,encodeWav} from './caption-server.js?v=20261112-school-city-monthly-1';
-import {createBrowserRecognition} from './caption-browser.js?v=20261112-school-city-monthly-1';
+import {createServerRecognition,encodeWav} from './caption-server.js?v=20261112-school-auto-1';
+import {createBrowserRecognition} from './caption-browser.js?v=20261112-school-auto-1';
 const browserSpeechUnavailable=new Set();let recognitionKind=null,conversationUI,realtimeUnavailable=false;
 let speedAuthorized=false;localStorage.setItem('tsuyaku-recognition-speed-v1','economy');
 const preferRealtime=()=>speedAuthorized;
@@ -64,10 +66,34 @@ const faceDrafts=new Map();let roomExpiryTimer;let faceSide='self';let reconnect
 const captionDelivery=new CaptionDelivery();
 const records=new Map(),elements=new Map(),pending=new Map();
 const sharedWords=new SharedWordUsage(localStorage,{api,catalog:()=>seed});
+let schoolSyncRunning=false;
+const schoolSyncSent=new Map();
+const schoolCalendar=new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit'});
+async function syncSchoolUsage(){
+ if(schoolSyncRunning)return;
+ const code=localStorage.getItem('tsuyaku-school-code-v1');
+ const since=Number(localStorage.getItem('tsuyaku-school-since-v1'));
+ if(!code||!since||!navigator.onLine)return;
+ schoolSyncRunning=true;
+ try{
+  const rows=ledger.list().filter(row=>row.startedAt>=since&&(row.captionCount>0||row.micSeconds>0))
+   .map(row=>({id:row.id,mode:row.mode,month:schoolCalendar.format(row.startedAt),...schoolUsageMetrics({
+     ...row,inputTokens:row.schoolInputTokens||0,outputTokens:row.schoolOutputTokens||0
+   },costOf)}));
+  const pending=rows.filter(row=>schoolSyncSent.get(code+row.id)!==JSON.stringify(row));
+  if(!pending.length)return;
+  await api('/school-usage',{action:'submit',code,rows:pending});
+  for(const row of pending)schoolSyncSent.set(code+row.id,JSON.stringify(row));
+  if(schoolSyncSent.size>400)schoolSyncSent.clear();
+ }catch{}finally{schoolSyncRunning=false;}
+}
+setInterval(syncSchoolUsage,60000);
+window.addEventListener('online',syncSchoolUsage);
+window.addEventListener('pageshow',syncSchoolUsage);
 const wordUsage=new WordUsage(localStorage);const ledger=new UsageLedger(localStorage,()=>Date.now(),sessionStorage),connections=new ConnectionDiary(localStorage);
 const showModalFeedback=installModalFeedback({dialog:$('#modal'),message:$('#message'),close:$('#modal-close'),resolveFocus:referenceReturnFocus});
 let messageTimer;const message=text=>{clearTimeout(messageTimer);const n=$('#message');n.textContent=text;n.hidden=!text;if(text)messageTimer=setTimeout(()=>{n.replaceChildren();n.hidden=true;},6000);};
-installLazyAction($('#admin'),async attempt=>{const {installAdmin}=await import('./admin.js?v=20261112-school-city-monthly-1'+(attempt>1?'&retry='+attempt:''));installAdmin({wordUsage,sharedWords,api,createRecognitionSettings,showFrequentSources:()=>frequentButton.onclick(),getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});},{onError:()=>message('管理画面を読み込めませんでした。接続を確認して、もう一度ひらいてください。')});
+installLazyAction($('#admin'),async attempt=>{const {installAdmin}=await import('./admin.js?v=20261112-school-auto-1'+(attempt>1?'&retry='+attempt:''));installAdmin({wordUsage,sharedWords,api,createRecognitionSettings,showFrequentSources:()=>frequentButton.onclick(),getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});},{onError:()=>message('管理画面を読み込めませんでした。接続を確認して、もう一度ひらいてください。')});
 const lessonCaptionWaiting='再接続しました。次の字幕を待っています。';
 const status=text=>{$('#connection').textContent=text;connectionHint(text);};
 function connectionHint(text){let box=$('#connection-hint');const show=room&&!room.local&&/再接続|切れ|停止|接続でき|別のタブ/.test(text);if(!box&&show){box=el('div',undefined,'connection-hint');box.id='connection-hint';box.setAttribute('role','status');const note=el('span'),retry=el('button','再接続','secondary');retry.onclick=retryConnection;box.append(note,retry);$('#live .live-tools').prepend(box);}if(box){box.hidden=!show;box.firstChild.textContent=text;const retry=box.querySelector('button');retry.hidden=text===lessonCaptionWaiting;retry.disabled=!navigator.onLine||room?.joinBlocked===true;}}
@@ -940,7 +966,7 @@ function stopMicrophoneForConnection(){if(!mic)return;++microphoneActivation;mic
 
 
 
-async function leave(show=true,preserveLedger=false){clearLessonSpeechReview();chatWaiting=false;chatRequests=[];if(['chat-group','chat-group-invite'].includes($('#modal').dataset.kind))$('#modal').close();if(!pageClosing)try{sessionStorage.removeItem('tsuyaku-call-resume');}catch{}idleWatch.stop();backgroundCallPaused=false;cancelLocalTranslations();const previousMode=room?.mode;intentionalClose=true;sessionEpoch++;captionDelivery.clear();if(socket?.readyState===1)send({type:'leave'});stopRecognition();localStream?.getAudioTracks().forEach(t=>t.enabled=false);speechPlayer.stop();ledger.save();if(!preserveLedger)ledger.end();clearTimeout(roomExpiryTimer);intentionalClose=true;clearTimeout(reconnectTimer);clearTimeout(authTimer);reconnectAttempts=0;recoveryStartedAt=null;lessonCaptionRecoveryAt=null;connectedAt=null;localTimings.clear();clearInterval(refreshTimer);clearInterval(heartbeat);stopRecognition();mic=false;socket?.close();socket=null;localStream?.getTracks().forEach(t=>t.stop());localStream=null;pending.clear();participants=[];$('#participants').replaceChildren();if($('#modal').dataset.kind==='invite')$('#modal').close();room=null;$('#panel-lesson').prepend($('#lesson-toolbar'));callStarted=false;$('#leave').hidden=true;resetConversationContents();records.clear();elements.clear();$('#call-invite').hidden=true;$('#call-invite').replaceChildren();delete $('#call-invite').dataset.room;$('#panel-interpreter>.entry-card').hidden=false;$('#panel-face').append($('#live'));updateFace();updateLessonCode();paintButton($('#microphone'),'マイクをONにする','microphone');$('#microphone').setAttribute('aria-pressed','false');$('#microphone').disabled=false;if(show){enableConversationControls();if(tab==='lesson')chooseLessonRole(null);await exitModeFullscreen();lastJoinCode='';$('#live').hidden=true;$$('[data-tab]').forEach(b=>b.disabled=false);setTab(tab);history.replaceState(null,'',location.pathname);status('退室しました');if(['face','interpreter'].includes(tab))void activateTab(tab);}}
+async function leave(show=true,preserveLedger=false){clearLessonSpeechReview();chatWaiting=false;chatRequests=[];if(['chat-group','chat-group-invite'].includes($('#modal').dataset.kind))$('#modal').close();if(!pageClosing)try{sessionStorage.removeItem('tsuyaku-call-resume');}catch{}idleWatch.stop();backgroundCallPaused=false;cancelLocalTranslations();const previousMode=room?.mode;intentionalClose=true;sessionEpoch++;captionDelivery.clear();if(socket?.readyState===1)send({type:'leave'});stopRecognition();localStream?.getAudioTracks().forEach(t=>t.enabled=false);speechPlayer.stop();ledger.save();if(!preserveLedger){ledger.end();void syncSchoolUsage();}clearTimeout(roomExpiryTimer);intentionalClose=true;clearTimeout(reconnectTimer);clearTimeout(authTimer);reconnectAttempts=0;recoveryStartedAt=null;lessonCaptionRecoveryAt=null;connectedAt=null;localTimings.clear();clearInterval(refreshTimer);clearInterval(heartbeat);stopRecognition();mic=false;socket?.close();socket=null;localStream?.getTracks().forEach(t=>t.stop());localStream=null;pending.clear();participants=[];$('#participants').replaceChildren();if($('#modal').dataset.kind==='invite')$('#modal').close();room=null;$('#panel-lesson').prepend($('#lesson-toolbar'));callStarted=false;$('#leave').hidden=true;resetConversationContents();records.clear();elements.clear();$('#call-invite').hidden=true;$('#call-invite').replaceChildren();delete $('#call-invite').dataset.room;$('#panel-interpreter>.entry-card').hidden=false;$('#panel-face').append($('#live'));updateFace();updateLessonCode();paintButton($('#microphone'),'マイクをONにする','microphone');$('#microphone').setAttribute('aria-pressed','false');$('#microphone').disabled=false;if(show){enableConversationControls();if(tab==='lesson')chooseLessonRole(null);await exitModeFullscreen();lastJoinCode='';$('#live').hidden=true;$$('[data-tab]').forEach(b=>b.disabled=false);setTab(tab);history.replaceState(null,'',location.pathname);status('退室しました');if(['face','interpreter'].includes(tab))void activateTab(tab);}}
 function requestLeave(){if(role==='teacher'&&room?.mode==='lesson'){const n=el('div');n.append(el('p','授業をおわると、生徒にことばが届かなくなります。'));const end=el('button','授業をおわる');end.onclick=()=>{send({type:'end'});$('#modal').close();setTimeout(()=>void leave(),200);};const exit=el('button','じぶんだけホームにもどる');exit.onclick=()=>{$('#modal').close();void leave();};n.append(end,exit);modal('授業をおわりますか？',n);}else void leave();}
 $('#leave').onclick=requestLeave;
 window.addEventListener('pagehide',event=>{pageClosing=true;if(event.persisted){suspendBackgroundInterpretation();if(room?.mode==='lesson'){++microphoneActivation;mic=false;idleWatch.stop();stopRecognition();localStream?.getTracks().forEach(t=>t.stop());localStream=null;ledger.microphone(false);paintButton($('#microphone'),'マイクをONにする','microphone');$('#microphone').setAttribute('aria-pressed','false');}return;}for(const entry of preparedConversations.values()){entry.controller?.abort();disposePreparation(entry.prepared); }preparedConversations.clear();rememberCall();ledger.end();void leave(false,true);});
