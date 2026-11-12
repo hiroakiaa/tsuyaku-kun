@@ -88,7 +88,6 @@ async function syncSchoolUsage(){
  }catch{}finally{schoolSyncRunning=false;}
 }
 setInterval(syncSchoolUsage,60000);
-window.addEventListener('online',syncSchoolUsage);
 window.addEventListener('pageshow',syncSchoolUsage);
 const wordUsage=new WordUsage(localStorage);const ledger=new UsageLedger(localStorage,()=>Date.now(),sessionStorage),connections=new ConnectionDiary(localStorage);
 const showModalFeedback=installModalFeedback({dialog:$('#modal'),message:$('#message'),close:$('#modal-close'),resolveFocus:referenceReturnFocus});
@@ -301,6 +300,7 @@ async function reconnectAfterInterruption(activeRoom=room,epoch=sessionEpoch){
  }finally{if(pendingReconnect===attemptContext)pendingReconnect=null;}
 }
 window.addEventListener('online',()=>{if(!intentionalClose&&room){if(socket?.readyState===1){status('通信を確認しています');send({type:'ping'});}else if(socket?.readyState===3){clearTimeout(reconnectTimer);void reconnectAfterInterruption();}}});
+window.addEventListener('online',syncSchoolUsage);
 window.addEventListener('offline',()=>{if(room&&!room.local){ledger.event('network_offline');status('通信が切れました・再接続待ち');}});
 navigator.mediaDevices?.addEventListener?.('devicechange',async()=>{void refreshLessonMicrophones();if(mic&&room){ledger.event('audio_device_changed');stopRecognition();await $('#microphone').onclick();localStream?.getTracks().forEach(t=>t.stop());localStream=null;message('音声機器が変わったためマイクを止めました。接続機器を確認して、マイクをONにしてください。');}});
 
