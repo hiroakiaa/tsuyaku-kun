@@ -79,7 +79,7 @@ export function createRecognitionCostView({el,exchange}){
   }
   market.append(volumes);
   const minutes=monthlyCharacters/300;
-  const summaryPerMinute=(1500*TRANSLATION_PRICE.inputPerMillion+300*TRANSLATION_PRICE.outputPerMillion)/2e6;
+  const summaryPerMinute=(1500*TRANSLATION_PRICE.inputPerMillion+300*TRANSLATION_PRICE.outputPerMillion)/1e6;
   const monthlyPrice=(min,max)=>[...new Set([yen(min*minutes),yen(max*minutes)])].join('〜');
 
   const volume=monthlyCharacters/1e6;
@@ -119,7 +119,7 @@ export function createRecognitionCostView({el,exchange}){
   scroll.style.overflowX='auto';
   scroll.append(marketTable);
   market.append(scroll,
-   el('p','Live要約込みは無料枠適用前の運用変動費です。2分ごとに入力1,500・出力300トークンを使う想定で、実際の字幕量と更新回数により変わります。','admin-caption'),
+   el('p','Live要約込みは無料枠適用前の運用変動費です。1分ごとに入力1,500・出力300トークンを使う想定で、実際の字幕量と更新回数により変わります。','admin-caption'),
    el('p','2026年11月12日確認。外部の定額プランは契約料金、APIは訳先1言語の無料枠適用前。Google NMTは月50万文字相当、Amazonは対象アカウントで最初の12か月、月200万文字まで。枠を全量使える前提です。','admin-caption'),
    el('p','通訳君はマイクON1分あたり原文300文字、文字数÷300でマイクON時間を換算した運用変動費。通常・速度優先の0円はCloudflareの共有無料枠やAzure F0などで処理全量を賄える場合です。残枠や実際に無料で使える時間はアカウントの利用状況に依存します。Liveは1〜2接続。話す速度、無音、言語、接続数で変動します。為替は管理者画面の設定を使用します。','admin-caption'));
   content.replaceChildren(table,detail,market,el('p',description,'admin-caption'),el('p','マイクON時間で比較。通常は発話が半分、AI翻訳は1分4回（各入力250・出力25トークン）を仮定。1ドル＝'+rate+'円。変動費の試算で、固定費・再試行・写真・読み上げは含みません。','admin-caption'));
