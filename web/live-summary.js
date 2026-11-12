@@ -123,7 +123,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    let previous=resume?checkpoint.result.summary:'';
    let result=resume?checkpoint.result:null;
    let offset=resume?checkpoint.offset:0;
-   checkpoint=null;
+   if(!resume)checkpoint=null;
    while(offset<characters.length){
     let end=offset,length=0;
     while(end<characters.length&&length+characters[end].length<=6000)length+=characters[end++].length;
