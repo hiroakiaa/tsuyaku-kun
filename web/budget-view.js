@@ -1,3 +1,5 @@
+import {config} from './config.js';
+import {connectOwner} from './billing-view.js?v=20261022-billing-auto-1';
 import {LIVE_TRANSLATION_USD_PER_MINUTE} from './cost-policy.js';
 import {costOf,PRICES} from './usage.js?v=20261029-catalog-pipeline-1';
 import {AI_LIMITS,SPEECH_POLICY,PHOTO_POLICY,COST_SOURCES,scenarioKey} from './cost-policy.js?v=20261022-cost-accounting-1';
@@ -24,14 +26,41 @@ export function createBudgetView({el,api,rows,exchange,getScenario=()=>null}){
  refresh.setAttribute('aria-label','AI残量を更新');header.append(el('h3','今日のAI予算'),refresh);box.append(header,content);
  function render(){
   if(!latest)return;expanded=content.querySelector('details')?.open??expanded;const s=latest,fx=exchange(),yen=v=>'約'+(v*fx).toFixed(2)+'円',amount=v=>yen(v)+'（$'+v.toFixed(5)+'）';
-  content.replaceChildren(el('strong',amount(s.availableUSD),'admin-budget-remaining'),el('p','本日のアプリ予算の残り','admin-caption'),metric(el,'今日の利用額（全端末）',amount(s.global.usedUSD)));
-  const warning=s.blocked?'AIサービス側の制限で停止中です。':s.user.callsRemaining===0?'本日のAI呼び出し回数の上限です。':s.availableUSD<=0?'本日のAI予算の上限です。':'';
+  content.replaceChildren(el('strong',amount(s.availableUSD),'admin-budget-remaining'),el('p',s.limitEnabled?'本日のアプリ予算の残り':'日次の目安までの残り（停止制限OFF）','admin-caption'),metric(el,'今日の利用額（全端末）',amount(s.global.usedUSD)));
+  const limit=el('input'),label=el('label','日次AI予算で利用を停止する','admin-check'),feedback=el('p','','admin-caption');
+  limit.type='checkbox';
+  limit.checked=s.limitEnabled===true;
+  label.prepend(limit);
+  feedback.setAttribute('role','status');
+  content.append(label,feedback);
+  limit.onchange=async()=>{
+   const enabled=limit.checked;
+   limit.disabled=true;
+   feedback.textContent='管理者のGoogle認証を確認しています。';
+   let owner;
+   try{
+    owner=await connectOwner('budget-admin');
+    const response=await fetch(config.api+'/billing/budget-limit',{
+     method:'POST',headers:{Authorization:'Bearer '+await owner.token(),'Content-Type':'application/json'},
+     body:JSON.stringify({enabled}),
+    });
+    if(!response.ok)throw Error('Budget setting unavailable');
+    await refresh.onclick();
+   }catch{
+    limit.checked=s.limitEnabled===true;
+    feedback.textContent='設定を保存できませんでした。管理者のGoogleアカウントを確認してください。';
+   }finally{
+    limit.disabled=false;
+    await owner?.close().catch(()=>{});
+   }
+  };
+  const warning=s.blocked?'AIサービス側の制限で停止中です。':s.limitEnabled&&s.user.callsRemaining===0?'本日のAI呼び出し回数の上限です。':s.limitEnabled&&s.availableUSD<=0?'本日のAI予算の上限です。':'';
   if(warning){const n=el('p',warning,'admin-alert');n.setAttribute('role','status');content.append(n);}
   const liveSeconds=Math.max(0,Math.floor(s.availableUSD/LIVE_TRANSLATION_USD_PER_MINUTE*60));
   const live=el('div',undefined,'admin-estimates');
   live.append(el('h4','OpenAI Live翻訳の残り目安'));
   if(s.blocked||s.user.callsRemaining===0||liveSeconds<15){
-   live.append(el('strong','現在の予算では開始できません'));
+   live.append(el('strong',s.limitEnabled||s.blocked?'現在の予算では開始できません':'日次予算の目安に到達しました'));
   }else{
    const duration=seconds=>Math.floor(seconds/60)+'分'+seconds%60+'秒';
    live.append(el('p','翻訳先1つ 約'+duration(liveSeconds)+' ／ 翻訳先2つ 約'+(s.user.callsRemaining>=2&&liveSeconds>=30?duration(Math.floor(liveSeconds/2)):'開始不可')));
@@ -40,7 +69,7 @@ export function createBudgetView({el,api,rows,exchange,getScenario=()=>null}){
   content.append(live);
   const meter=el('progress');meter.max=1;meter.value=Math.max(0,Math.min(1,s.availableUSD/Math.min(s.global.limitUSD,s.user.limitUSD)));meter.setAttribute('aria-label','今日のAI予算の残り');content.append(meter);
   const estimates=budgetEstimates(typeof rows==='function'?rows():rows,s,getScenario()),list=el('div',undefined,'admin-estimates');list.setAttribute('aria-label','AI翻訳の残り回数の目安');
-  const preview=estimates.filter(e=>e.current);if(!preview.length)preview.push(estimates.find(e=>e.samples)||estimates[0]);for(const e of preview){const row=metric(el,e.label+(e.current?'（現在）':''),e.samples?'あと約'+e.remaining+'回':'実績待ち');if(e.current)row.classList.add('is-current');list.append(row);}content.append(list,el('p','AI翻訳のみの目安です。自動判定の音声認識費用は含みません。','admin-caption'));
+  const preview=estimates.filter(e=>e.current);if(!preview.length)preview.push(estimates.find(e=>e.samples)||estimates[0]);for(const e of preview){const row=metric(el,e.label+(e.current?'（現在）':''),e.samples?'目安まで約'+e.remaining+'回':'実績待ち');if(e.current)row.classList.add('is-current');list.append(row);}content.append(list,el('p','AI翻訳のみの目安です。自動判定の音声認識費用は含みません。','admin-caption'));
   const detail=disclosure(el,'内訳・試算条件');detail.open=expanded;
   detail.append(el('p','この認証IDの本日の利用：'+amount(s.user.usedUSD)),el('p','この認証IDの1日の設定上限：'+amount(s.user.limitUSD)),el('p','この認証IDの残り：'+amount(s.user.remainingUSD)+'・AI呼び出し残り '+s.user.callsRemaining+'回'),el('p','全端末共通：本日の利用 '+amount(s.global.usedUSD)+' / 上限 '+amount(s.global.limitUSD)+' / 残り '+amount(s.global.remainingUSD)),el('p','残り使える額は、全端末共通とこの認証IDの残額の少ない方です。'),el('p','次のリセット：'+new Date(s.resetsAt).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'})+'（日本時間）'));
   for(const e of estimates)detail.append(el('p',e.samples?e.label+'：あなたが10発言する会話なら約'+e.ten+'回、50発言なら約'+e.fifty+'回。原文 '+e.source+' → '+e.targets.join('・')+'（'+e.targets.length+'訳）、平均'+e.characters+'文字・1回 '+amount(e.perAttempt)+'。最近'+e.samples+'回の実測平均。':e.label+'：'+(e.current?'現在の言語構成に合う':'対応する')+'AI実績がまだありません。古い履歴から回数を推測しません。'));

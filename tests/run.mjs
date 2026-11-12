@@ -319,9 +319,14 @@ await test('無音と認識されない雑音は期限内に停止する',async(
  const {idleState}=await import('../web/idle-watch.js');const state={started:1000,lastSpeech:0,lastVoice:0};assert.equal(idleState(state,105999),'active');assert.equal(idleState(state,106000),'warn');assert.equal(idleState(state,121000),'stop');assert.equal(idleState({...state,lastVoice:180999},181000),'stop');assert.equal(idleState({...state,lastSpeech:120000},121000),'active');
 });
 await test('予算はAI実行前に確保し未計測結果も消費として残す',async()=>{
- const {budgetOperation}=await import('../server/ai-budget.js');let data;const storage={transaction:async fn=>fn({get:async()=>structuredClone(data),put:async(k,v)=>{data=structuredClone(v);}})};const now=100000000;
- const first=await budgetOperation(storage,{action:'reserve',uid:'a',cost:10000},now);await budgetOperation(storage,{action:'settle',...first},now);assert.equal(data.total,10000);
- const second=await budgetOperation(storage,{action:'reserve',uid:'a',cost:10000},now);await assert.rejects(budgetOperation(storage,{action:'reserve',uid:'a',cost:1},now));await budgetOperation(storage,{action:'settle',...second,actual:100},now);assert.equal(data.total,10100);await budgetOperation(storage,{action:'block'},now);await assert.rejects(budgetOperation(storage,{action:'reserve',uid:'b',cost:1},now));await budgetOperation(storage,{action:'reserve',uid:'a',cost:1},now+86400000);assert.equal(data.total,1);
+ const {budgetOperation}=await import('../server/ai-budget.js');const values=new Map();const storage={transaction:async fn=>fn({get:async k=>structuredClone(values.get(k)),put:async(k,v)=>{values.set(k,structuredClone(v));}})};const now=100000000;
+ await budgetOperation(storage,{action:'set-limit',enabled:true},now);
+ const first=await budgetOperation(storage,{action:'reserve',uid:'a',cost:10000},now);await budgetOperation(storage,{action:'settle',...first},now);assert.equal(values.get('budget').total,10000);
+ const second=await budgetOperation(storage,{action:'reserve',uid:'a',cost:10000},now);await assert.rejects(budgetOperation(storage,{action:'reserve',uid:'a',cost:1},now));await budgetOperation(storage,{action:'settle',...second,actual:100},now);assert.equal(values.get('budget').total,10100);await budgetOperation(storage,{action:'block'},now);await assert.rejects(budgetOperation(storage,{action:'reserve',uid:'b',cost:1},now));await budgetOperation(storage,{action:'reserve',uid:'a',cost:1},now+86400000);assert.equal(values.get('budget').total,1);
+ await budgetOperation(storage,{action:'set-limit',enabled:false},now+86400000);
+ for(let i=0;i<3;i++){const call=await budgetOperation(storage,{action:'reserve',uid:'a',cost:10000},now+86400000);await budgetOperation(storage,{action:'settle',...call},now+86400000);}
+ const status=await budgetOperation(storage,{action:'status',uid:'a'},now+86400000);
+ assert.equal(status.limitEnabled,false);assert.equal(status.user.usedUSD,0.030001);
 });
 await test('利用者ごとのAI同時実行を2件に制限する',async()=>{
  const {budgetOperation}=await import('../server/ai-budget.js');let data;const storage={transaction:async fn=>fn({get:async()=>structuredClone(data),put:async(k,v)=>{data=structuredClone(v);}})};const a=await budgetOperation(storage,{action:'reserve',uid:'a',cost:10});await budgetOperation(storage,{action:'reserve',uid:'a',cost:10});await assert.rejects(budgetOperation(storage,{action:'reserve',uid:'a',cost:10}),e=>e.aiReason==='busy');await budgetOperation(storage,{action:'settle',...a,actual:10});await budgetOperation(storage,{action:'reserve',uid:'a',cost:10});

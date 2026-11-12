@@ -19,7 +19,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261112-live-stay-1';
+const BUILD_ID='20261112-budget-control-1';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -96,6 +96,13 @@ export default {async fetch(request,env,ctx){
     const token=(request.headers.get('Authorization')||'').replace(/^Bearer /,'');const authStarted=Date.now(),auth=await verifyToken(token,env.FIREBASE_PROJECT,url.pathname.startsWith('/billing/'));env={...env,...(ctx?.waitUntil?{backgroundBudgetCleanup:task=>ctx.waitUntil(task)}:{}),authMs:Date.now()-authStarted,budgetUid:auth.uid,executionValid:()=>requestExecutionValid(request,requestStarted)};if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'user:'+auth.uid})).success))return cors(error('少し待ってから再試行してください。',429));
     if(url.pathname.startsWith('/billing/')){
       if(!await isBillingAdministrator(auth,env.BILLING_ADMIN_EMAIL_HASH))return cors(error('請求データは管理者本人のGoogle認証が必要です。',403));
+      if(url.pathname==='/billing/budget-limit'&&request.method==='POST'){
+        const {enabled}=await body(request,2048);
+        if(typeof enabled!=='boolean')return cors(error('制限の設定を確認してください。',400));
+        const budget=env.ROOMS.get(env.ROOMS.idFromName('__ai_budget_v1__'));
+        const response=await budget.fetch(new Request('https://budget/budget',{method:'POST',body:JSON.stringify({action:'set-limit',enabled})}));
+        return cors(json(await response.json(),response.status));
+      }
       if(request.method!=='GET')return cors(error('読取だけ利用できます。',405));
       if(url.pathname==='/billing/openai-connection'){
         if(!env.OPENAI_API_KEY)return cors(json({connected:false,reason:'missing_secret'}));
