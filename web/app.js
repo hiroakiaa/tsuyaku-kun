@@ -1,12 +1,12 @@
-import {createLiveCaptionBuffer} from './live-caption-buffer.js?v=20261112-live-es-1';
-import {startLiveTranslation} from './live-translation-face.js?v=20261112-live-es-1';
-import {liveTranslationEnabled,disableLiveTranslation} from './live-translation-setting.js?v=20261112-live-es-1';
-import {RecognitionNoiseGuard} from './recognition-noise-guard.js?v=20261112-live-es-1';
+import {createLiveCaptionBuffer} from './live-caption-buffer.js?v=20261112-live-es-2';
+import {startLiveTranslation} from './live-translation-face.js?v=20261112-live-es-2';
+import {liveTranslationEnabled,disableLiveTranslation} from './live-translation-setting.js?v=20261112-live-es-2';
+import {RecognitionNoiseGuard} from './recognition-noise-guard.js?v=20261112-live-es-2';
 import {isRecognitionLanguage} from './language-registry.js?v=20261103-analysis-stages-1';
 import {fillLanguageOptions,installLanguageSearch} from './language-picker.js?v=20261103-analysis-stages-1';
 import {faceTranslationTargets,speedPasswordMatches} from './economy-policy.js?v=20261103-pipeline-latency-1';
-import {createRealtimeRecovery} from './realtime-recovery.js?v=20261112-live-es-1';
-import {createRealtimeRecognition} from './realtime-recognition.js?v=20261112-live-es-1';
+import {createRealtimeRecovery} from './realtime-recovery.js?v=20261112-live-es-2';
+import {createRealtimeRecognition} from './realtime-recognition.js?v=20261112-live-es-2';
 import {createAiGate} from './ai-gate.js?v=20261029-faithful-pipeline-1';
 import {localIcon,installLocalIcons} from './icons.js?v=20261029-communication50-1';
 installLocalIcons(document);
@@ -21,13 +21,13 @@ import {safeSocketSend,microphoneHelp,participantLabel} from './session-reliabil
 import {singleFlight,installLazyAction} from './async-ui.js?v=20261103-analysis-stages-1';
 import {lessonCode,installModalFeedback,backdropClick,updateMode,searchBounds,resilientPreferences} from './entry-feedback.js?v=20261022-language-storage-1';
 import {deviceCheckPanel,microphoneUnavailable} from './device-check.js?v=20261021-text-chat-1';
-import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261112-live-es-1';
+import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261112-live-es-2';
 import {installPhotoTranslate} from './photo-translate.js?v=20261024-usability20-3';
 import {refreshEnglishGuides,applyEnglishLabels} from './ui-english.js?v=20261029-two-language-1';
 import {SharedWordUsage} from './shared-word-usage.js?v=20261104-student-simple-2';
 import {installConversationUI,createWaitingBubble} from './conversation-ui.js?v=20261103-pipeline-latency-1';
 import {guardCaptionTranslation,hasInternalMarker,needsTranslationReview} from './translation-safety.js?v=20261029-faithful-pipeline-1';
-import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261112-live-es-1';
+import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261112-live-es-2';
 import {IdleWatch} from './idle-watch.js?v=20261008-safety-1';
 import {recordResource,recordPause,recordResume} from './resource-usage.js?v=20261104-student-simple-2';
 import {mayReconnect} from './resource-policy.js';
@@ -42,15 +42,15 @@ import {UsageLedger,WordUsage} from './usage.js?v=20261104-student-simple-2';
 import {CloudSpeechPlayer,createSpeechCache} from './cloud-speech-player.js?v=20261103-pipeline-latency-1';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261103-speech-activity-1';
 import {config} from './config.js';
-import {ConnectionDiary,speechConnectionNeedsCheck,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261112-live-es-1';
+import {ConnectionDiary,speechConnectionNeedsCheck,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261112-live-es-2';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
 import {translationField,translationOf,spokenLanguage,withEasyJapanese,supplementCatalog} from './core.js?v=20261029-communication50-1';
 import {speakerCaption,speakerInfo} from './face-mode.js?v=20261006-school-1';
 import {callCaptionLanguages,chatCaptionLanguages,isDisplayableCaption} from './call-mode.js?v=20261021-chat-bubbles-1';
 import {listHistory as storedHistory} from './history.js?v=20261006-school-1';
 const listHistory=()=>localStorage.getItem('tsuyaku-device-mode')==='personal'?storedHistory():Promise.resolve([]);
-import {createServerRecognition,encodeWav} from './caption-server.js?v=20261112-live-es-1';
-import {createBrowserRecognition} from './caption-browser.js?v=20261112-live-es-1';
+import {createServerRecognition,encodeWav} from './caption-server.js?v=20261112-live-es-2';
+import {createBrowserRecognition} from './caption-browser.js?v=20261112-live-es-2';
 const browserSpeechUnavailable=new Set();let recognitionKind=null,conversationUI,realtimeUnavailable=false;
 let speedAuthorized=false;localStorage.setItem('tsuyaku-recognition-speed-v1','economy');
 const preferRealtime=()=>speedAuthorized;
@@ -66,7 +66,7 @@ const sharedWords=new SharedWordUsage(localStorage,{api,catalog:()=>seed});
 const wordUsage=new WordUsage(localStorage);const ledger=new UsageLedger(localStorage,()=>Date.now(),sessionStorage),connections=new ConnectionDiary(localStorage);
 const showModalFeedback=installModalFeedback({dialog:$('#modal'),message:$('#message'),close:$('#modal-close'),resolveFocus:referenceReturnFocus});
 let messageTimer;const message=text=>{clearTimeout(messageTimer);const n=$('#message');n.textContent=text;n.hidden=!text;if(text)messageTimer=setTimeout(()=>{n.replaceChildren();n.hidden=true;},6000);};
-installLazyAction($('#admin'),async attempt=>{const {installAdmin}=await import('./admin.js?v=20261112-live-es-1'+(attempt>1?'&retry='+attempt:''));installAdmin({wordUsage,sharedWords,api,createRecognitionSettings,showFrequentSources:()=>frequentButton.onclick(),getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});},{onError:()=>message('管理画面を読み込めませんでした。接続を確認して、もう一度ひらいてください。')});
+installLazyAction($('#admin'),async attempt=>{const {installAdmin}=await import('./admin.js?v=20261112-live-es-2'+(attempt>1?'&retry='+attempt:''));installAdmin({wordUsage,sharedWords,api,createRecognitionSettings,showFrequentSources:()=>frequentButton.onclick(),getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});},{onError:()=>message('管理画面を読み込めませんでした。接続を確認して、もう一度ひらいてください。')});
 const lessonCaptionWaiting='再接続しました。次の字幕を待っています。';
 const status=text=>{$('#connection').textContent=text;connectionHint(text);};
 function connectionHint(text){let box=$('#connection-hint');const show=room&&!room.local&&/再接続|切れ|停止|接続でき|別のタブ/.test(text);if(!box&&show){box=el('div',undefined,'connection-hint');box.id='connection-hint';box.setAttribute('role','status');const note=el('span'),retry=el('button','再接続','secondary');retry.onclick=retryConnection;box.append(note,retry);$('#live .live-tools').prepend(box);}if(box){box.hidden=!show;box.firstChild.textContent=text;const retry=box.querySelector('button');retry.hidden=text===lessonCaptionWaiting;retry.disabled=!navigator.onLine||room?.joinBlocked===true;}}
@@ -559,8 +559,18 @@ function beginLiveTranslation(retrying=false){
  });
  const sourceUpdates=new Map(), sourceDisplays=new Map();
  function shortLiveReply(text,source){
-  if(!languages.includes('en'))return;
   const key=text.trim().toLowerCase().replace(/[\s\p{P}]/gu,'');
+  if(languages.includes('es')){
+   if(source==='ja'){
+    if(key==='こんにちは')return 'Hola.';
+    if(key==='おはよう'||key==='おはようございます')return 'Buenos días.';
+   }
+   if(source==='es'){
+    if(key==='hola')return 'こんにちは。';
+    if(key==='buenosdías'||key==='buenosdias')return 'おはようございます。';
+   }
+   return;
+  }
   if(source==='ja')return key==='はい'?'Yes.':key==='いいえ'?'No.':undefined;
   return key==='yes'?'はい。':key==='no'?'いいえ。':undefined;
  }
@@ -672,7 +682,8 @@ function beginLiveTranslation(retrying=false){
    const originalText=state.sourceDraft.trim();
    const boundary=/^[。！？.!?\n]$/u.test(part);
    const japanese=/[ぁ-ゖァ-ヺ一-龯]/u.test(originalText);
-   if(manualSource?/[\p{L}\p{N}]/u.test(originalText):source==='ja'?japanese:!japanese&&/\p{Script=Latin}/u.test(originalText)){
+   const latin=/\p{Script=Latin}/u.test(originalText);
+   if((source==='ja'?japanese:!japanese&&latin)||(manualSource&&!japanese&&!latin&&/\p{N}/u.test(originalText))){
     if(!state.bubble){
      const card=el('article',undefined,'caption live-caption-card');
      const original=el('p'),translation=el('p');
@@ -687,7 +698,7 @@ function beginLiveTranslation(retrying=false){
      card.append(meta,sourceRow,translationRow);
      compactFaceCaption(card,{speaker:language===languages[0]?'自分':'相手'},{el,icon,modal});
      card.append(translationRow,sourceRow);
-     state.bubble={source:original,translation,fragments:new Map(),start:state.start,end:event.elapsedMs};
+     state.bubble={card,source:original,translation,fragments:new Map(),start:state.start,end:event.elapsedMs};
      setTimeout(()=>{
       if(!translation.textContent)translation.dataset.pending='訳文なし';
      },6000);
