@@ -1,5 +1,5 @@
 import { captureLiveTranslationPcm } from './live-translation-capture.js?v=live-tail-1';
-import { connectLiveTranslation } from './live-translation-client.js?v=20261112-live-reply-1';
+import { connectLiveTranslation } from './live-translation-client.js?v=20261112-live-turns-1';
 
 export function startFaceLiveTranslation(options) {
   const { languages } = options;
@@ -64,7 +64,16 @@ export async function startLiveTranslation({
 
     captureDeadline = setTimeout(() => disconnected('capture timeout'), 5000);
     const recentAudio=[];
-    let audioSamples=0,lastVoice=-Infinity;
+    let audioSamples=0,lastVoice=-Infinity,queuedVoice=-Infinity;
+    let pendingRecovery=Promise.resolve();
+    function recoverVoice(){
+      if(!onFinalAudio||!Number.isFinite(lastVoice)||lastVoice===queuedVoice)return;
+      queuedVoice=lastVoice;
+      const chunks=recentAudio.slice(),voiceEndMs=lastVoice/24;
+      pendingRecovery=pendingRecovery.then(()=>{
+        if(!controller.signal.aborted)return onFinalAudio(chunks,voiceEndMs);
+      }).catch(()=>{});
+    }
     function sendAudio(pcm, padding=false) {
         if(onFinalAudio&&!padding&&!controller.signal.aborted&&!draining){
           const samples=new Int16Array(pcm);
@@ -72,6 +81,7 @@ export async function startLiveTranslation({
           audioSamples+=samples.length;
           if(samples.some(sample=>Math.abs(sample)>=450))lastVoice=audioSamples;
           if(recentAudio.length>18)recentAudio.shift();
+          if(audioSamples-lastVoice>=28800)recoverVoice();
         }
         if (controller.signal.aborted || draining) return;
         clearTimeout(captureDeadline);
@@ -116,8 +126,9 @@ export async function startLiveTranslation({
         return complete;
       }));
       if(onFinalAudio&&!controller.signal.aborted&&audioSamples-lastVoice<=24000){
-        await onFinalAudio(recentAudio, lastVoice/24);
+        recoverVoice();
       }
+      await pendingRecovery;
       stop();
       return results.every(Boolean);
     };
