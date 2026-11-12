@@ -1,5 +1,5 @@
 import { captureLiveTranslationPcm } from './live-translation-capture.js?v=live-tail-1';
-import { connectLiveTranslation } from './live-translation-client.js?v=20261112-room-live-paired-1';
+import { connectLiveTranslation } from './live-translation-client.js?v=20261112-adoption-report-1';
 
 export function startFaceLiveTranslation(options) {
   const { languages } = options;

@@ -3,7 +3,7 @@ import {percentile} from './statistics.js?v=20261029-faithful-pipeline-1';
 export {percentile};
 import {TRANSLATION_PRICE,translationScenario,RECOGNITION_PRICE} from './cost-policy.js?v=20261030-realtime-1';
 import {resourceSnapshot} from './resource-usage.js?v=20261103-analysis-stages-1';
-export const BUILD_ID='20261112-room-live-paired-1';
+export const BUILD_ID='20261112-adoption-report-1';
 // Device-local operational history. No names, room keys, tokens or speech are stored here.
 export const PRICES={checkedAt:TRANSLATION_PRICE.checkedAt,inputPerMillion:TRANSLATION_PRICE.inputPerMillion,outputPerMillion:TRANSLATION_PRICE.outputPerMillion,streamPerMinute:RECOGNITION_PRICE.streamPerMinute,whisperPerMinute:RECOGNITION_PRICE.whisperPerMinute,turnPerGB:.05};
 export function costOf(s,p=PRICES){const translation=(s.inputTokens||0)/1e6*p.inputPerMillion+(s.outputTokens||0)/1e6*p.outputPerMillion,recognition=(s.streamSeconds||0)/60*p.streamPerMinute+(s.whisperSeconds||0)/60*p.whisperPerMinute,turn=(s.relayBytes||0)/1e9*p.turnPerGB;return {translation,recognition,turn,total:translation+recognition+turn};}
@@ -76,7 +76,7 @@ export function translationTimingSummary(sessions){
 }
 
 // Unknown provider charges must remain visible even when the observed estimate is zero.
-export function keepUsage(s){return costOf(s,s.priceSnapshot||PRICES).total>0||(s.unmeasuredCalls||0)>0||(s.estimatedTokenCalls||0)>0;}
+export function keepUsage(s){return (s.captionCount||0)>0||(s.micSeconds||0)>0||s.events?.some(event=>event.type==='live_translation_first_subtitle')===true||costOf(s,s.priceSnapshot||PRICES).total>0||(s.unmeasuredCalls||0)>0||(s.estimatedTokenCalls||0)>0;}
 export class WordUsage{
  constructor(storage,now=()=>Date.now()){this.storage=storage;this.now=now;this.seen=new Set();try{this.seen=new Set(JSON.parse(storage.getItem('tsuyaku-word-seen-v1')||'[]').slice(-2000));}catch{}this.error=false;try{this.decisions=JSON.parse(storage.getItem('tsuyaku-word-decisions-v1')||'{}');}catch{this.decisions={};}}
  read(){try{const a=JSON.parse(this.storage.getItem('tsuyaku-word-usage-v1')||'[]');return Array.isArray(a)?a.filter(r=>r&&typeof r.word==='string'&&r.day>=new Date(this.now()-90*86400000).toISOString().slice(0,10)):[];}catch{return [];}}
