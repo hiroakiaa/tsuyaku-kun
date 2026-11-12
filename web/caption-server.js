@@ -1,9 +1,9 @@
 import {recognitionLanguage,speechTextAllowed} from './two-language.js?v=20261029-communication50-1';
-import {nonSpeechReason} from './speech-filter.js?v=20261112-live-budget-1';
+import {nonSpeechReason} from './speech-filter.js?v=20261112-normal-recovery-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261103-audio-offset-1';
 import {recognitionMetrics} from './recognition-metrics.js?v=20261103-budget-cleanup-1';
 import {trimmedAudioLength} from './audio-trim.js?v=20261029-communication50-1';
-import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish,japaneseSpeechTail,japaneseNumericCompletion} from './speech-continuity.js?v=20261112-live-budget-1';
+import {speechGapAllowsJoin,joinSpeechText,incompleteEnglish,japaneseSpeechTail,japaneseNumericCompletion} from './speech-continuity.js?v=20261112-normal-recovery-1';
 export const capturePauseMs=profile=>profile==='fast'||profile==='responsive'?300:profile==='balanced'?400:500;
 // Browser-independent recognition using the call's existing microphone stream.
 export function encodeWav(samples,minimumSamples=0) {
@@ -49,7 +49,7 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', o
       try {
         await resumed;
         if (!this.active) return;
-        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261112-live-budget-1', import.meta.url));
+        await this.context.audioWorklet.addModule(new URL('./caption-pcm.js?v=20261112-normal-recovery-1', import.meta.url));
         if (!this.active) return;
         this.source = this.context.createMediaStreamSource(stream);
         this.node = new Worklet(this.context, 'caption-pcm',{processorOptions:{pauseMs:capturePauseMs(captureProfile),oneUtterance,manualRelease}});
@@ -165,7 +165,7 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', o
         if(response.ok){job.networkDone=true;void this.drain();}
         if(!await ordered())return;
         requestMetrics.orderWaitMs=Math.max(0,Date.now()-responseReadyAt);if(requestMetrics.orderWaitMs>0)segmentDiagnostic({code:'recognition_order',orderWaitMs:requestMetrics.orderWaitMs});
-        if (!response.ok) { const error=failure?.reason|| (response.status === 429 ? 'quota' : [401,403].includes(response.status) ? 'auth' : 'network'); if (['network','service','timeout','overloaded'].includes(error) && (response.status>=500||error==='overloaded')) { this.transientFailure(); return; } this.fail(error,failure?.message); return; }
+        if (!response.ok) { const error=failure?.reason|| (response.status === 429 ? 'quota' : [401,403].includes(response.status) ? 'auth' : 'network'); if (['network','service','timeout','overloaded'].includes(error) && (response.status>=500||error==='overloaded')) { this.transientFailure(error); return; } this.fail(error,failure?.message); return; }
         this.failures=0;
         if (!this.active || controller.signal.aborted) return;
         if(stale()){this.breakContinuity=true;segmentDiagnostic({code:'stale_result',queueMs,orderWaitMs:requestMetrics.orderWaitMs});this.onrecovering?.({reason:'stale_result',attempt:1});return;}
@@ -179,7 +179,7 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', o
           // No cumulative transcript list is retained by the recognizer.
           this.acceptText(text,{recognitionRun:this.recognitionRun,segmentSequence:chunk.sequence,speechStartedAt:chunk.speechStartedAt,speechEndedAt:chunk.speechEndedAt,recognitionReadyAt:Date.now(),boundary:chunk.boundary,...(data.language?{language:data.language}:{})});
         }
-      } catch (_) {job.cancelDiagnostic=null;releaseSlot?.();releaseSlot=null;clearTimeout(timeout);if(this.active&&this.jobs.has(job)){const code=controller.signal.aborted?'timeout':phase==='parse'?'invalid_response':phase==='auth'?'auth_unavailable':'network_or_cors';segmentDiagnostic({code,queueMs,clientAuthMs,...(httpStarted?{clientRequestMs:Date.now()-httpStarted}:{})});}await job.previous;if(this.active&&this.jobs.has(job)){if(phase==='auth'&&!controller.signal.aborted)this.fail('auth');else this.transientFailure(phase==='request'||phase==='parse');} }
+      } catch (_) {job.cancelDiagnostic=null;releaseSlot?.();releaseSlot=null;clearTimeout(timeout);const code=controller.signal.aborted?'timeout':phase==='parse'?'invalid_response':phase==='auth'?'auth_unavailable':'network_or_cors';if(this.active&&this.jobs.has(job)){segmentDiagnostic({code,queueMs,clientAuthMs,...(httpStarted?{clientRequestMs:Date.now()-httpStarted}:{})});}await job.previous;if(this.active&&this.jobs.has(job)){if(phase==='auth'&&!controller.signal.aborted)this.fail('auth');else this.transientFailure(code,code==='network_or_cors'&&phase==='request');} }
       finally {
         releaseSlot?.();chunk.samples.fill(0);if(body)new Uint8Array(body).fill(0);clearTimeout(timeout);this.jobs.delete(job);job.release();this.sending=this.jobs.size>0;this.progress();
         if (this.active) void this.drain();
@@ -233,10 +233,10 @@ export function createServerRecognition({ endpoint, captureProfile='baseline', o
         this.fragmentTimer=setTimeout(flush,timing.boundary==='limit'?8000:2500);
       }
     }
-    transientFailure(connectionIssue=false) {
+    transientFailure(reason='network',connectionIssue=false) {
       // Keep capturing after a brief service/network failure. A later utterance retries; never replay stale speech.
       this.failures++;this.breakContinuity=true;
-      this.onrecovering?.({attempt:this.failures});
+      this.onrecovering?.({reason,attempt:this.failures});
       if(this.failures>=3)this.fail('network',undefined,connectionIssue);
     }
     fail(error,message,connectionIssue=false) { const notify = this.onerror; this.abort(); notify?.({ error, message,...(connectionIssue?{connectionIssue:true}:{}) }); }
