@@ -1,4 +1,4 @@
-import { readLiveTranslationEvent } from './live-translation-events.js?v=20261112-live-duplex-1';
+import { readLiveTranslationEvent } from './live-translation-events.js?v=20261112-live-tail-1';
 
 export async function connectLiveTranslation({
   apiOrigin, language, getToken, signal, onTranscript, onDisconnected,
@@ -56,7 +56,7 @@ export async function connectLiveTranslation({
             if (stopped || drain) return Promise.resolve(false);
             return new Promise(resolve => {
               drain = resolve;
-              drainTimeout = setTimeout(() => finish('finalization timeout'), 6000);
+              drainTimeout = setTimeout(() => finish('finalization timeout'), 9500);
               try { socket.send('finish'); } catch { finish('send failed'); }
             });
           },

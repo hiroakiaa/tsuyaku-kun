@@ -47,7 +47,7 @@ export async function upgradeLiveTranslation(request, env, ctx) {
       draining = true;
       try {
         upstream.send(JSON.stringify({ type: 'session.close' }));
-        drainTimeout = setTimeout(() => stop(1011, 'finalization timeout'), 5000);
+        drainTimeout = setTimeout(() => stop(1011, 'finalization timeout'), 8500);
       } catch {
         stop(1011, 'finalization failed');
       }

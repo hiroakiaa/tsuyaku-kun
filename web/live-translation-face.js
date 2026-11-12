@@ -1,5 +1,5 @@
-import { captureLiveTranslationPcm } from './live-translation-capture.js';
-import { connectLiveTranslation } from './live-translation-client.js?v=20261112-live-duplex-1';
+import { captureLiveTranslationPcm } from './live-translation-capture.js?v=live-tail-1';
+import { connectLiveTranslation } from './live-translation-client.js?v=20261112-live-tail-1';
 
 export function startFaceLiveTranslation(options) {
   const { languages } = options;
@@ -63,7 +63,7 @@ export async function startLiveTranslation({
     }));
 
     captureDeadline = setTimeout(() => disconnected('capture timeout'), 5000);
-    await capture(stream, {
+    const captureStop = await capture(stream, {
       signal: controller.signal,
       onAudio: pcm => {
         if (controller.signal.aborted || draining) return;
@@ -92,6 +92,7 @@ export async function startLiveTranslation({
     controller.signal.throwIfAborted();
     active = true;
     stop.finish = async () => {
+      await captureStop?.flush?.();
       draining = true;
       for (const {language} of connections) onLanguageState?.(language, 'finishing', sentBytes.get(language) || 0);
       clearTimeout(audioDeadline);

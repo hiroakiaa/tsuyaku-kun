@@ -10,11 +10,12 @@ export class StreamingPcm {
       if(this.length===this.buffer.length){this.emit(this.buffer.slice());this.buffer.fill(0);this.length=0;}
     }
   }
+  flush(){if(this.length)this.emit(this.buffer.slice(0,this.length));this.clear();}
   clear(){this.buffer.fill(0);this.length=0;this.phase=0;this.sum=0;this.count=0;}
 }
 if(typeof AudioWorkletProcessor!=='undefined') {
   class StreamProcessor extends AudioWorkletProcessor {
-    constructor(options){super();this.active=true;const rate=options.processorOptions?.outputRate===24000?24000:16000;this.pcm=new StreamingPcm(sampleRate,samples=>this.port.postMessage(samples,[samples.buffer]),rate);this.port.onmessage=()=>{this.active=false;this.pcm.clear()};}
+    constructor(options){super();this.active=true;const rate=options.processorOptions?.outputRate===24000?24000:16000;this.pcm=new StreamingPcm(sampleRate,samples=>this.port.postMessage(samples,[samples.buffer]),rate);this.port.onmessage=({data})=>{this.active=false;if(data==='flush'){this.pcm.flush();this.port.postMessage('flushed');}else this.pcm.clear();};}
     process(inputs){if(!this.active)return false;if(inputs[0]?.[0])this.pcm.push(inputs[0][0]);return true;}
   }
   registerProcessor('caption-stream-pcm',StreamProcessor);
