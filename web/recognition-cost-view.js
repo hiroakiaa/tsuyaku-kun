@@ -62,7 +62,46 @@ export function createRecognitionCostView({el,exchange}){
    paragraph.append(link);
    detail.append(paragraph);
   }
-  content.replaceChildren(table,detail,el('p',description,'admin-caption'),el('p','マイクON時間で比較。通常は発話が半分、AI翻訳は1分4回（各入力250・出力25トークン）を仮定。1ドル＝'+rate+'円。変動費の試算で、固定費・再試行・写真・読み上げは含みません。','admin-caption'));
+  const market=el('details',undefined,'admin-detail');
+  market.open=content.querySelector('[data-market]')?.open??true;
+  market.dataset.market='';
+  market.append(el('summary','有料翻訳サービスとの月額比較'));
+  const yen=usd=>Math.round(usd*rate).toLocaleString('ja-JP')+'円';
+  const minutes=100000/300;
+  const rows=[
+   ['DeepL Pro Individual','年払いの月額換算 $8.74／30万文字まで',yen(8.74),'https://www.deepl.com/ja/pro'],
+   ['DeepL Pro Team','年払いの月額換算 $28.74／100万文字まで（1人）',yen(28.74),'https://www.deepl.com/ja/pro'],
+   ['iTranslate PRO','月額2,000〜2,100円／文字枠の掲載なし','2,000〜2,100円','https://apps.apple.com/jp/app/id288113403'],
+   ['Google Cloud Translation NMT','$20／100万入力文字',yen(2),'https://cloud.google.com/products/translate/pricing'],
+   ['Amazon Translate 標準テキスト','$15／100万入力文字',yen(1.5),'https://aws.amazon.com/translate/pricing/'],
+   ...modes.map(([label,min,max],i)=>['通訳君 '+label,
+    i===2?'$'+LIVE_TRANSLATION_USD_PER_MINUTE+'／送信音声1分・1接続':'音声時間＋必要に応じて翻訳トークン',
+    [...new Set([yen(min*minutes),yen(max*minutes)])].join('〜')])
+  ];
+  const marketTable=el('table',undefined,'admin-cost-table');
+  const head=el('thead'),heading=el('tr'),marketBody=el('tbody');
+  for(const label of ['サービス','料金と対象量','月10万文字の目安']){
+   const cell=el('th',label);
+   cell.scope='col';
+   heading.append(cell);
+  }
+  head.append(heading);
+  for(const [label,unit,total,url] of rows){
+   const row=el('tr'),name=el('th',url?undefined:label);
+   name.scope='row';
+   if(url){
+    const link=el('a',label);
+    link.href=url;
+    name.append(link);
+   }
+   row.append(name,el('td',unit),el('td',total));
+   marketBody.append(row);
+  }
+  marketTable.append(head,marketBody);
+  market.append(marketTable,
+   el('p','2026年11月12日確認。外部の定額プランは契約料金、APIは訳先1言語の無料枠適用前。Google NMTとAmazonには条件付きの無料枠があります。','admin-caption'),
+   el('p','通訳君はマイクON1分あたり原文300文字、月10万文字で約333分と仮定した運用変動費。Liveは1〜2接続。話す速度、無音、言語、接続数で変動します。為替は管理者画面の設定を使用します。','admin-caption'));
+  content.replaceChildren(table,detail,market,el('p',description,'admin-caption'),el('p','マイクON時間で比較。通常は発話が半分、AI翻訳は1分4回（各入力250・出力25トークン）を仮定。1ドル＝'+rate+'円。変動費の試算で、固定費・再試行・写真・読み上げは含みません。','admin-caption'));
  }
  render();
  return {box,render};
