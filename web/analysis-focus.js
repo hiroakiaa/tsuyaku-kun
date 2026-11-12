@@ -22,10 +22,15 @@ export function liveAttemptTimings(events){
    firstAudioToSubtitleMs:difference(time('first_subtitle'),firstAudio),
    finishToClosedMs:difference(time('finished')??time('incomplete'),finish),
    languages:languages.map(language=>{
-    const lastSubtitle=rows.find(event=>event.type==='live_translation_language_closed'&&event.liveLanguage===language)?.liveLastSubtitleMs;
+    const snapshot=rows.findLast(event=>event.liveLanguage===language&&Number.isFinite(event.liveAudioBytes));
+    const lastSubtitle=snapshot?.liveLastSubtitleMs;
     const confirmed=time('language_confirmed',language),unconfirmed=time('language_unconfirmed',language);
     return {
      language,
+     sourceBubbles:snapshot?.liveSourceDisplays??null,
+     pairedBubbles:snapshot?.livePairedCaptions??null,
+     firstAudioToSourceDisplayMs:difference(snapshot?.liveFirstSourceDisplayMs??null,firstAudio),
+     firstAudioToTranslationDisplayMs:difference(snapshot?.liveFirstTranslationDisplayMs??null,firstAudio),
      firstAudioToSubtitleMs:difference(time('language_first_subtitle',language),firstAudio),
      lastSubtitleRelativeToFinishMs:difference(lastSubtitle,finish),
      finishConfirmed:confirmed!==null?true:unconfirmed!==null?false:null,
@@ -43,7 +48,7 @@ export function improvementReport(sessions,{exchange=150,transcripts=[],diagnost
  const recoveryEvents=latest?.events||[];
  const liveEvents=recoveryEvents.filter(event=>event.type.startsWith('live_translation_'));
  report.billing+=' Live翻訳の音声費用は liveTranslation の試算欄を参照。';
- const liveClosed=liveEvents.filter(event=>event.type==='live_translation_language_closed');
+ const liveClosed=[...new Map(liveEvents.filter(event=>Number.isFinite(event.liveAudioBytes)).map(event=>[event.liveAttempt+':'+event.liveLanguage,event])).values()];
  const liveAudioSeconds=liveClosed.length?liveClosed.reduce((total,event)=>total+count(event.liveAudioBytes),0)/48000:null;
  const liveEstimateUSD=liveAudioSeconds===null?null:liveAudioSeconds/60*LIVE_TRANSLATION_USD_PER_MINUTE;
  report.liveTranslation={
@@ -52,7 +57,7 @@ export function improvementReport(sessions,{exchange=150,transcripts=[],diagnost
   recordedLanguageAudioSeconds:liveAudioSeconds,
   estimatedAudioCostUSD:liveEstimateUSD,
   estimatedAudioCostJPY:liveEstimateUSD===null?null:liveEstimateUSD*exchange,
-  note:'最新の利用に残ったLiveのイベント。elapsedMsはLive開始処理からの経過。終了操作に対する最後の字幕時刻は負なら終了前、正なら終了後。字幕更新回数は受信した翻訳の断片数。音声バイト数は言語別の端末送信量で、音声費用は終了記録のある接続の送信量とアプリ設定単価からの試算。実請求額・発話時間・画面描画時間は未計測。発言・訳文は含みません。'
+  note:'最新の利用に残ったLiveのイベント。elapsedMsはLive開始処理からの経過。終了操作に対する最後の字幕時刻は負なら終了前、正なら終了後。字幕更新回数は受信した翻訳の断片数。音声バイト数は言語別の端末送信量で、音声費用はマイク停止時または接続終了時に記録した送信量とアプリ設定単価からの試算。表示時刻は画面の要素を更新した時刻。実請求額・発話時間は未計測。発言・訳文は含みません。'
  };
  const recoveryTiming=type=>summary(recoveryEvents.filter(event=>event.type===type&&Number.isFinite(event.recoverySeconds)&&event.recoverySeconds>=0).map(event=>({delayMs:event.recoverySeconds*1000})),'delayMs');
  report.connectionRecovery={

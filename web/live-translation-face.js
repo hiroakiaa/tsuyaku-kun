@@ -1,5 +1,5 @@
 import { captureLiveTranslationPcm } from './live-translation-capture.js';
-import { connectLiveTranslation } from './live-translation-client.js?v=20261112-live-merge-1';
+import { connectLiveTranslation } from './live-translation-client.js?v=20261112-live-metrics-1';
 
 export function startFaceLiveTranslation(options) {
   const { languages } = options;
@@ -93,6 +93,7 @@ export async function startLiveTranslation({
     active = true;
     stop.finish = async () => {
       draining = true;
+      for (const {language} of connections) onLanguageState?.(language, 'finishing', sentBytes.get(language) || 0);
       clearTimeout(audioDeadline);
       const results = await Promise.all(connections.map(async ({ language, connection }) => {
         const complete = await connection.finish().catch(() => false);
