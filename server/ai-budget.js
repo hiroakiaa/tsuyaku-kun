@@ -1,6 +1,6 @@
 import {completeBudgetCleanup} from './budget-cleanup.js';
 import {monthlyAiState,monthlyReserve,monthlySettle,monthlyAiReport,monthlyExtend} from './monthly-ai-cost.js';
-import {AI_LIMITS,TRANSLATION_PRICE,RECOGNITION_PRICE} from '../web/cost-policy.js';
+import {AI_LIMITS,TRANSLATION_PRICE,RECOGNITION_PRICE,LIVE_TRANSLATION_USD_PER_MINUTE} from '../web/cost-policy.js';
 // Conservative app-local variable-cost budget, not Cloudflare account billing.
 const DAY=86400000;
 export function budgetError(reason='budget'){
@@ -11,7 +11,7 @@ export function reserveCost(model,input){
  if(model==='gpt-realtime-translate'){
   // A 15-second slice fits within the existing per-reservation limit.
   if(!Number.isFinite(input.seconds)||input.seconds<=0||input.seconds>15)throw budgetError();
-  return Math.ceil(input.seconds*34000/60);
+  return Math.ceil(input.seconds*LIVE_TRANSLATION_USD_PER_MINUTE*1e6/60);
  }
  if(model==='@cf/google/gemma-4-26b-a4b-it')return Math.ceil((new TextEncoder().encode(JSON.stringify(input.messages||[])).length*TRANSLATION_PRICE.inputPerMillion+Math.min(4096,input.max_completion_tokens||4096)*TRANSLATION_PRICE.outputPerMillion)*1.1);
  if(model===RECOGNITION_PRICE.streamModel){if(!Number.isFinite(input.seconds)||input.seconds<=0||input.seconds>30)throw budgetError();return Math.ceil(input.seconds/60*RECOGNITION_PRICE.streamPerMinute*1e6*1.1);}

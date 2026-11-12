@@ -1,3 +1,4 @@
+import {LIVE_TRANSLATION_USD_PER_MINUTE} from './cost-policy.js';
 import {costOf,PRICES} from './usage.js?v=20261029-catalog-pipeline-1';
 import {AI_LIMITS,SPEECH_POLICY,PHOTO_POLICY,COST_SOURCES,scenarioKey} from './cost-policy.js?v=20261022-cost-accounting-1';
 // Forecast only measured, self-originated AI calls with the same source/targets.
@@ -26,6 +27,17 @@ export function createBudgetView({el,api,rows,exchange,getScenario=()=>null}){
   content.replaceChildren(el('strong',yen(s.availableUSD),'admin-budget-remaining'),el('p','アプリ設定の残額・無料枠の残高ではありません。','admin-caption'));
   const warning=s.blocked?'AIサービス側の制限で停止中です。':s.user.callsRemaining===0?'本日のAI呼び出し回数の上限です。':s.availableUSD<=0?'本日のAI予算の上限です。':'';
   if(warning){const n=el('p',warning,'admin-alert');n.setAttribute('role','status');content.append(n);}
+  const liveSeconds=Math.max(0,Math.floor(s.availableUSD/LIVE_TRANSLATION_USD_PER_MINUTE*60));
+  const live=el('div',undefined,'admin-estimates');
+  live.append(el('h4','OpenAI Live翻訳の残り目安'));
+  if(s.blocked||s.user.callsRemaining===0||liveSeconds<15){
+   live.append(el('strong','現在の予算では開始できません'));
+  }else{
+   const duration=seconds=>Math.floor(seconds/60)+'分'+seconds%60+'秒';
+   live.append(el('p','翻訳先1つ 約'+duration(liveSeconds)+' ／ 翻訳先2つ 約'+(s.user.callsRemaining>=2&&liveSeconds>=30?duration(Math.floor(liveSeconds/2)):'開始不可')));
+  }
+  live.append(el('p','本日のアプリ共通予算から換算。OpenAIアカウントのクレジット残高とは別です。','admin-caption'));
+  content.append(live);
   const meter=el('progress');meter.max=1;meter.value=Math.max(0,Math.min(1,s.availableUSD/Math.min(s.global.limitUSD,s.user.limitUSD)));meter.setAttribute('aria-label','今日のAI予算の残り');content.append(meter);
   const estimates=budgetEstimates(typeof rows==='function'?rows():rows,s,getScenario()),list=el('div',undefined,'admin-estimates');list.setAttribute('aria-label','AI翻訳の残り回数の目安');
   const preview=estimates.filter(e=>e.current);if(!preview.length)preview.push(estimates.find(e=>e.samples)||estimates[0]);for(const e of preview){const row=metric(el,e.label+(e.current?'（現在）':''),e.samples?'あと約'+e.remaining+'回':'実績待ち');if(e.current)row.classList.add('is-current');list.append(row);}content.append(list,el('p','AI翻訳のみの目安です。自動判定の音声認識費用は含みません。','admin-caption'));
