@@ -158,6 +158,8 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   let languageChanged=false;
   clearTimeout(timer);timer=null;
   retryButton.hidden=true;
+  status.textContent=final?'全体要約を作成中…':'要約を更新中…';
+  output.setAttribute('aria-busy','true');
   const controller=new AbortController();
   controller.operation=final?'final':'interval';
   request=controller;
@@ -230,6 +232,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
     if(finalizing&&!final){void update(true);return;}
     finalizing=false;
     finalizeButton.disabled=false;
+    output.setAttribute('aria-busy','false');
     schedule();
    }
   }
