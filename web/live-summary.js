@@ -16,7 +16,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  const pending=new Map(),seen=new Map(),history=[];
  let checkpoint=null;
  const wide=matchMedia('(min-width:900px), (min-width:480px) and (max-height:620px)');
- let timer,request,panel,output,status,button,badge,dialog,wiki,wikiRequest,translationButton,translationRequest,summaryLanguage,historyPanel,finalizeButton,retryButton,finalizing=false,isFinal=false,summary='';
+ let timer,request,panel,output,status,button,badge,dialog,wiki,wikiRequest,translationButton,translationRequest,summaryLanguage,historyPanel,finalizeButton,retryButton,finalSummaryTime,finalizing=false,isFinal=false,summary='';
  function read(){badge.hidden=true;button.setAttribute('aria-label','要約を表示');}
  function place(){
   if(!panel)return;
@@ -144,8 +144,10 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    if(controller.signal.aborted)return;
    if(translationRequest){translationRequest.abort();translationRequest=null;record('cancelled',{operation:'translation'});}
    if(final&&transcript)history.push({text:transcript,language:target,time:new Date()});
+   if(isFinal&&!final)appendHistory({text:summary,language:summaryLanguage,time:finalSummaryTime,final:true});
    summary=result.summary;
    isFinal=final;
+   if(final)finalSummaryTime=new Date();
    summaryLanguage=target;
    translationButton.hidden=/^ja(?:-|$)/.test(summaryLanguage);
    translationButton.disabled=false;
@@ -203,7 +205,9 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   }
  }
  function appendHistory(entry){
-  const section=el('details'),heading=el('summary',entry.time.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+  const section=el('details');
+  const time=entry.time.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const heading=el('summary',entry.final?'全体要約 · '+time:time);
   const body=el('div');
   renderSummary(entry.text,entry.language,body);
   section.append(heading,body);
