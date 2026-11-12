@@ -1,4 +1,4 @@
-import { readLiveTranslationEvent } from './live-translation-events.js?v=20261112-price-comparison-2';
+import { readLiveTranslationEvent } from './live-translation-events.js?v=20261112-live-summary-1';
 
 export async function connectLiveTranslation({
   apiOrigin, language, getToken, signal, onTranscript, onDisconnected,
