@@ -13,9 +13,9 @@ export function createLiveSummarySetting(el){
 }
 
 export function createLiveSummary({el,api,captions,language,record=()=>{}}){
- const pending=new Map(),seen=new Map();
+ const pending=new Map(),seen=new Map(),history=[];
  const wide=matchMedia('(min-width:900px), (min-width:480px) and (max-height:620px)');
- let timer,request,panel,output,status,button,badge,dialog,wiki,wikiRequest,translationButton,translationRequest,summaryLanguage,readingLanguage,summary='';
+ let timer,request,panel,output,status,button,badge,dialog,wiki,wikiRequest,translationButton,translationRequest,summaryLanguage,historyPanel,finalizeButton,finalizing=false,isFinal=false,summary='';
  function read(){badge.hidden=true;button.setAttribute('aria-label','要約を表示');}
  function place(){
   if(!panel)return;
@@ -35,13 +35,13 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   document.body.append(node);
   return node;
  }
- async function showTerm(term){
+ async function showTerm(term,target){
   wikiRequest?.abort();
   wiki?.remove();
   const controller=new AbortController();
   wikiRequest=controller;
   const node=wiki=makeDialog(term+' — Wikipedia'),extract=el('p','読み込み中…');
-  const code=(readingLanguage||language()).split('-')[0];
+  const code=(target||language()).split('-')[0];
   const origin='https://'+(/^[a-z]{2,3}$/.test(code)?code:'ja')+'.wikipedia.org';
   const link=el('a','Wikipediaで記事を開く');
   link.target='_blank';
@@ -61,10 +61,10 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    if(!controller.signal.aborted)extract.textContent='記事の概要を取得できませんでした。';
   }
  }
- function renderSummary(text=summary,target=summaryLanguage){
-  readingLanguage=target;
+ function renderSummary(text=summary,target=summaryLanguage,container=output){
   const lines=text.split(/\r?\n/).map(line=>line.trim()).filter(Boolean);
-  output.replaceChildren();
+  container.replaceChildren();
+  if(container===output&&isFinal)container.append(el('h3','全体要約'));
   let list;
   for(const line of lines){
    const heading=line.match(/^#{1,3}\s+(.+)$/);
@@ -78,14 +78,14 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
      const term=part.slice(2,-2),link=el('button',term);
      link.type='button';
      Object.assign(link.style,{display:'inline',minHeight:'0',padding:'0 .2em',textDecoration:'underline',font:'inherit'});
-     link.onclick=()=>void showTerm(term);
+     link.onclick=()=>void showTerm(term,target);
      node.append(link);
     }else if(part)node.append(part);
    }
    if(bullet){
-    if(!list){list=el('ul');output.append(list);}
+    if(!list){list=el('ul');container.append(list);}
     list.append(node);
-   }else output.append(node);
+   }else container.append(node);
   }
  }
 
@@ -93,7 +93,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   clearTimeout(timer);timer=null;
   if(request){request.abort();record('cancelled');}request=null;
   if(translationRequest){translationRequest.abort();translationRequest=null;record('cancelled');}
-  pending.clear();seen.clear();summary='';
+  pending.clear();seen.clear();history.length=0;finalizing=false;isFinal=false;summary='';
   wikiRequest?.abort();wiki?.remove();wiki=null;
   dialog?.remove();dialog=null;
   button?.remove();button=null;
@@ -103,37 +103,68 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  function schedule(){
   if(enabled&&pending.size&&!timer&&!request)timer=setTimeout(update,60000);
  }
- async function update(){
+ async function update(final=false){
   timer=null;
   const controller=new AbortController();
   request=controller;
-  const transcript=[...pending.values()].join('\n').slice(-6000);
+  const batch=new Map(pending);
+  const transcript=[...batch.values()].join('\n');
   const started=performance.now(),captionCount=pending.size;
   pending.clear();
-  record('requested',{captionCount,characters:transcript.length});
+  if(!final)record('requested',{captionCount,characters:Math.min(6000,transcript.length)});
   try{
    const target=language();
-   const result=await api('/live-summary',{transcript,previous:summary,language:target},{signal:controller.signal});
+   let result;
+   if(final){
+    const material=history.map(entry=>entry.text).concat(transcript).filter(Boolean).join('\n\n');
+    let previous='';
+    for(let offset=0;offset<material.length;offset+=6000){
+     const section=material.slice(offset,offset+6000);
+     record('requested',{captionCount:offset===0?captionCount:0,characters:section.length});
+     const startedAt=performance.now();
+     result=await api('/live-summary',{transcript:section,previous,language:target,final:true},{signal:controller.signal});
+     if(controller.signal.aborted)return;
+     record('succeeded',{elapsedMs:Math.round(performance.now()-startedAt),usage:result.usage});
+     previous=result.summary;
+    }
+   }else{
+    result=await api('/live-summary',{transcript:transcript.slice(-6000),previous:'',language:target},{signal:controller.signal});
+    if(controller.signal.aborted)return;
+    history.push({text:result.summary,language:target,time:new Date()});
+   }
    if(controller.signal.aborted)return;
-   translationRequest?.abort();translationRequest=null;
+   if(translationRequest){translationRequest.abort();translationRequest=null;record('cancelled');}
+   if(final&&transcript)history.push({text:transcript,language:target,time:new Date()});
    summary=result.summary;
+   isFinal=final;
    summaryLanguage=target;
    translationButton.hidden=/^ja(?:-|$)/.test(summaryLanguage);
    translationButton.disabled=false;
    translationButton.textContent='日本語に翻訳';
    translationButton.onclick=translateSummary;
    renderSummary();
+   if(!final)appendHistory(history.at(-1));
    badge.hidden=false;
    button.setAttribute('aria-label','要約を表示・更新あり');
    status.textContent='';
-   record('succeeded',{elapsedMs:Math.round(performance.now()-started),usage:result.usage});
+   if(!final)record('succeeded',{elapsedMs:Math.round(performance.now()-started),usage:result.usage});
   }catch{
    if(!controller.signal.aborted){
     record('failed',{elapsedMs:Math.round(performance.now()-started)});
-    status.textContent='要約を更新できませんでした。';
+    const newer=[...pending];
+    pending.clear();
+    for(const [id,text] of batch)pending.set(id,text);
+    for(const [id,text] of newer)pending.set(id,id.endsWith?.(':live')?((pending.get(id)||'')+text).slice(-6000):text);
+    status.textContent=final?'全体要約を作成できませんでした。もう一度お試しください。':'要約を更新できませんでした。';
    }
   }finally{
-   if(request===controller){request=null;schedule();}
+   if(request===controller){
+    request=null;
+    if(finalizing&&!final){void update(true);return;}
+    finalizing=false;
+    finalizeButton.disabled=false;
+    schedule();
+   }
   }
  }
  async function translateSummary(){
@@ -160,6 +191,21 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    if(translationRequest===controller){translationRequest=null;translationButton.disabled=false;}
   }
  }
+ function appendHistory(entry){
+  const section=el('details'),heading=el('summary',entry.time.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+  const body=el('div');
+  renderSummary(entry.text,entry.language,body);
+  section.append(heading,body);
+  historyPanel.append(section);
+ }
+ function finalize(){
+  if(finalizing||(isFinal&&!pending.size&&!request)||(!pending.size&&!history.length&&!request))return;
+  finalizing=true;
+  finalizeButton.disabled=true;
+  status.textContent='全体要約を作成中…';
+  clearTimeout(timer);timer=null;
+  if(!request)void update(true);
+ }
  function add(id,text,append=false){
   if(!enabled||typeof text!=='string'||!text.trim())return;
   const value=append?((pending.get(id)||'')+text).slice(-6000):text.trim().slice(0,1200);
@@ -180,7 +226,14 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    translationButton=el('button','日本語に翻訳');
    translationButton.type='button';
    translationButton.hidden=true;
-   panel.append(translationButton,output,status);
+   finalizeButton=el('button','全体を要約');
+   finalizeButton.type='button';
+   finalizeButton.onclick=finalize;
+   historyPanel=el('section');
+   Object.assign(historyPanel.style,{maxBlockSize:'min(32dvh, 16rem)',overflowY:'auto',overscrollBehaviorY:'contain'});
+   historyPanel.tabIndex=0;
+   historyPanel.append(el('h3','時系列の要約'));
+   panel.append(finalizeButton,translationButton,output,status,historyPanel);
    dialog=makeDialog('Live要約');
    button=el('button','要約を表示');
    button.type='button';
