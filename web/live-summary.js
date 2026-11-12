@@ -129,7 +129,15 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  function schedule(){
   if(enabled&&pending.size&&!timer&&!request)timer=setTimeout(update,Math.max(0,60000-(performance.now()-(pendingSince??performance.now()))));
  }
+ function restorePending(batch){
+  const newer=[...pending];
+  pending.clear();
+  for(const [id,text] of batch)pending.set(id,text);
+  for(const [id,text] of newer)pending.set(id,typeof id==='string'&&id.endsWith(':live')?((pending.get(id)||'')+text).slice(-6000):text);
+  while(pending.size>80)pending.delete(pending.keys().next().value);
+ }
  async function update(final=false){
+  let languageChanged=false;
   clearTimeout(timer);timer=null;
   retryButton.hidden=true;
   const controller=new AbortController();
@@ -158,6 +166,11 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
     result=await api('/live-summary',{transcript:section,previous,language:target,final},{signal:controller.signal});
     if(controller.signal.aborted)return;
     record('succeeded',{operation:controller.operation,elapsedMs:Math.round(performance.now()-startedAt),usage:result.usage});
+    if(language()!==target){
+     restorePending(batch);
+     languageChanged=true;
+     return;
+    }
     previous=result.summary;
     offset=end;
     if(material.length<=96000&&offset<characters.length){
@@ -186,11 +199,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    if(!controller.signal.aborted){
     record('failed',{operation:controller.operation,elapsedMs:Math.round(performance.now()-started)});
     pendingSince=performance.now();
-    const newer=[...pending];
-    pending.clear();
-    for(const [id,text] of batch)pending.set(id,text);
-    for(const [id,text] of newer)pending.set(id,typeof id==='string'&&id.endsWith(':live')?((pending.get(id)||'')+text).slice(-6000):text);
-    while(pending.size>80)pending.delete(pending.keys().next().value);
+    restorePending(batch);
     status.textContent=final?'全体要約を作成できませんでした。':'要約を更新できませんでした。';
     retryButton.onclick=()=>{if(!request)void update(final);};
     retryButton.hidden=false;
@@ -199,6 +208,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   }finally{
    if(request===controller){
     request=null;
+    if(languageChanged){void update(final);return;}
     if(finalizing&&!final){void update(true);return;}
     finalizing=false;
     finalizeButton.disabled=false;
