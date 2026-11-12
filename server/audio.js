@@ -9,7 +9,7 @@ export function validWav(bytes) {
     view.getUint16(32,true) === 2 && view.getUint16(34,true) === 16 && view.getUint32(40,true) === bytes.length - 44;
 }
 
-export function hasSpeechEnergy(wav) {
+export function hasSpeechEnergy(wav,{shortReply=false}={}) {
   const view = new DataView(wav.buffer, wav.byteOffset, wav.byteLength);
   const levels = []; let active = 0,run=0,longest=0;
   // 20ms frames, removing DC: clicks, a steady fan or mic offset are not speech.
@@ -19,6 +19,7 @@ export function hasSpeechEnergy(wav) {
     const rms = Math.sqrt(Math.max(0, squares / 320 - (sum / 320) ** 2));
     levels.push(rms); if (rms >= 0.004){active++;run++;longest=Math.max(longest,run);}else run=0;
   }
+  if(shortReply&&wav.length<=38444)return active>=4&&longest>=3&&Math.max(...levels)>levels.slice().sort((a,b)=>a-b)[Math.floor(levels.length*.2)]*1.5;
   if (active < 6||longest<3) return false;
   levels.sort((a,b) => a-b);
   const low = levels[Math.floor(levels.length * .2)], high = levels[Math.floor(levels.length * .9)];

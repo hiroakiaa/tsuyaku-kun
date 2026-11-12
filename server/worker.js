@@ -19,7 +19,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261112-live-voice-tail-1';
+const BUILD_ID='20261112-live-voice-tail-2';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -148,7 +148,7 @@ export default {async fetch(request,env,ctx){
       const reader=request.body.getReader(),chunks=[];let size=0;try{for(;;){const r=await reader.read();if(r.done)break;size+=r.value.length;if(size>512044){await reader.cancel();return cors(error('音声が長すぎます。',413));}chunks.push(r.value);}}finally{reader.releaseLock();}
       recognitionTiming.uploadMs=Date.now()-uploadStarted;const preprocessStarted=Date.now();
       const bytes=new Uint8Array(size);let offset=0;for(const c of chunks){bytes.set(c,offset);offset+=c.length;c.fill(0);}
-      try{if(!validWav(bytes))return cors(error('音声形式を確認してください。',415));if(!hasSpeechEnergy(bytes)){recognitionTiming.preprocessMs=Date.now()-preprocessStarted;return cors(json(timed({text:''})));}
+      try{if(!validWav(bytes))return cors(error('音声形式を確認してください。',415));if(!hasSpeechEnergy(bytes,{shortReply:automatic&&url.searchParams.get('context')==='live-tail'})){recognitionTiming.preprocessMs=Date.now()-preprocessStarted;return cors(json(timed({text:''})));}
         recognitionTiming.preprocessMs=Date.now()-preprocessStarted;recognitionTiming.aiCalled=true;
         const result=await recognizeAudio({...env,recognitionProfile,translationTiming:recognitionTiming},bytes,automatic?candidates[0]:language,safeRecognitionHints(request.headers.get('X-Term-Hints')),candidates);
         Object.assign(recognitionTiming,recognitionEvidence(result));const detected=automatic?resolveSpeechLanguage(result,candidates):language;const schoolContext=url.searchParams.get('context')==='school',stockOutroRejected=schoolContext&&suspectedSchoolOutro(result);recognitionTiming.stockOutroRejected=stockOutroRejected;const decision=recognitionDecision(result,detected||'',{schoolContext}),text=decision.text;if(text===null)return cors(error('音声を認識できませんでした。',502));return cors(json(timed({text,...(decision.reason&&decision.reason!=='empty'?{recognitionRejected:decision.reason}:{}),...(automatic?{language:detected,languageUncertain:!!text&&!detected,...(!detected&&text?{languageCandidates:speechLanguageCandidates(result,candidates)}:{})}:{})})));
