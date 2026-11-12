@@ -1,12 +1,12 @@
-import {createLiveCaptionBuffer} from './live-caption-buffer.js?v=20261112-startup-reopen-1';
-import {startLiveTranslation} from './live-translation-face.js?v=20261112-startup-reopen-1';
-import {liveTranslationEnabled} from './live-translation-setting.js?v=20261112-startup-reopen-1';
-import {RecognitionNoiseGuard} from './recognition-noise-guard.js?v=20261112-startup-reopen-1';
+import {createLiveCaptionBuffer} from './live-caption-buffer.js?v=20261112-live-badge-reopen-1';
+import {startLiveTranslation} from './live-translation-face.js?v=20261112-live-badge-reopen-1';
+import {liveTranslationEnabled} from './live-translation-setting.js?v=20261112-live-badge-reopen-1';
+import {RecognitionNoiseGuard} from './recognition-noise-guard.js?v=20261112-live-badge-reopen-1';
 import {isRecognitionLanguage} from './language-registry.js?v=20261103-analysis-stages-1';
 import {fillLanguageOptions,installLanguageSearch} from './language-picker.js?v=20261103-analysis-stages-1';
 import {faceTranslationTargets,speedPasswordMatches} from './economy-policy.js?v=20261103-pipeline-latency-1';
-import {createRealtimeRecovery} from './realtime-recovery.js?v=20261112-startup-reopen-1';
-import {createRealtimeRecognition} from './realtime-recognition.js?v=20261112-startup-reopen-1';
+import {createRealtimeRecovery} from './realtime-recovery.js?v=20261112-live-badge-reopen-1';
+import {createRealtimeRecognition} from './realtime-recognition.js?v=20261112-live-badge-reopen-1';
 import {createAiGate} from './ai-gate.js?v=20261029-faithful-pipeline-1';
 import {localIcon,installLocalIcons} from './icons.js?v=20261029-communication50-1';
 installLocalIcons(document);
@@ -21,13 +21,13 @@ import {safeSocketSend,microphoneHelp,participantLabel} from './session-reliabil
 import {singleFlight,installLazyAction} from './async-ui.js?v=20261103-analysis-stages-1';
 import {lessonCode,installModalFeedback,backdropClick,updateMode,searchBounds,resilientPreferences} from './entry-feedback.js?v=20261022-language-storage-1';
 import {deviceCheckPanel,microphoneUnavailable} from './device-check.js?v=20261021-text-chat-1';
-import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261112-startup-reopen-1';
+import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261112-live-badge-reopen-1';
 import {installPhotoTranslate} from './photo-translate.js?v=20261024-usability20-3';
 import {refreshEnglishGuides,applyEnglishLabels} from './ui-english.js?v=20261029-two-language-1';
 import {SharedWordUsage} from './shared-word-usage.js?v=20261104-student-simple-2';
 import {installConversationUI,createWaitingBubble} from './conversation-ui.js?v=20261103-pipeline-latency-1';
 import {guardCaptionTranslation,hasInternalMarker,needsTranslationReview} from './translation-safety.js?v=20261029-faithful-pipeline-1';
-import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261112-startup-reopen-1';
+import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261112-live-badge-reopen-1';
 import {IdleWatch} from './idle-watch.js?v=20261008-safety-1';
 import {recordResource,recordPause,recordResume} from './resource-usage.js?v=20261104-student-simple-2';
 import {mayReconnect} from './resource-policy.js';
@@ -42,15 +42,15 @@ import {UsageLedger,WordUsage} from './usage.js?v=20261104-student-simple-2';
 import {CloudSpeechPlayer,createSpeechCache} from './cloud-speech-player.js?v=20261103-pipeline-latency-1';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261103-speech-activity-1';
 import {config} from './config.js';
-import {ConnectionDiary,speechConnectionNeedsCheck,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261112-startup-reopen-1';
+import {ConnectionDiary,speechConnectionNeedsCheck,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261112-live-badge-reopen-1';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
 import {translationField,translationOf,spokenLanguage,withEasyJapanese,supplementCatalog} from './core.js?v=20261029-communication50-1';
 import {speakerCaption,speakerInfo} from './face-mode.js?v=20261006-school-1';
 import {callCaptionLanguages,chatCaptionLanguages,isDisplayableCaption} from './call-mode.js?v=20261021-chat-bubbles-1';
 import {listHistory as storedHistory} from './history.js?v=20261006-school-1';
 const listHistory=()=>localStorage.getItem('tsuyaku-device-mode')==='personal'?storedHistory():Promise.resolve([]);
-import {createServerRecognition} from './caption-server.js?v=20261112-startup-reopen-1';
-import {createBrowserRecognition} from './caption-browser.js?v=20261112-startup-reopen-1';
+import {createServerRecognition} from './caption-server.js?v=20261112-live-badge-reopen-1';
+import {createBrowserRecognition} from './caption-browser.js?v=20261112-live-badge-reopen-1';
 const browserSpeechUnavailable=new Set();let recognitionKind=null,conversationUI,realtimeUnavailable=false;
 let speedAuthorized=false;localStorage.setItem('tsuyaku-recognition-speed-v1','economy');
 const preferRealtime=()=>speedAuthorized;
@@ -66,7 +66,7 @@ const sharedWords=new SharedWordUsage(localStorage,{api,catalog:()=>seed});
 const wordUsage=new WordUsage(localStorage);const ledger=new UsageLedger(localStorage,()=>Date.now(),sessionStorage),connections=new ConnectionDiary(localStorage);
 const showModalFeedback=installModalFeedback({dialog:$('#modal'),message:$('#message'),close:$('#modal-close'),resolveFocus:referenceReturnFocus});
 let messageTimer;const message=text=>{clearTimeout(messageTimer);const n=$('#message');n.textContent=text;n.hidden=!text;if(text)messageTimer=setTimeout(()=>{n.replaceChildren();n.hidden=true;},6000);};
-installLazyAction($('#admin'),async attempt=>{const {installAdmin}=await import('./admin.js?v=20261112-startup-reopen-1'+(attempt>1?'&retry='+attempt:''));installAdmin({wordUsage,sharedWords,api,createRecognitionSettings,showFrequentSources:()=>frequentButton.onclick(),getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});},{onError:()=>message('管理画面を読み込めませんでした。接続を確認して、もう一度ひらいてください。')});
+installLazyAction($('#admin'),async attempt=>{const {installAdmin}=await import('./admin.js?v=20261112-live-badge-reopen-1'+(attempt>1?'&retry='+attempt:''));installAdmin({wordUsage,sharedWords,api,createRecognitionSettings,showFrequentSources:()=>frequentButton.onclick(),getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});},{onError:()=>message('管理画面を読み込めませんでした。接続を確認して、もう一度ひらいてください。')});
 const lessonCaptionWaiting='再接続しました。次の字幕を待っています。';
 const status=text=>{$('#connection').textContent=text;connectionHint(text);};
 function connectionHint(text){let box=$('#connection-hint');const show=room&&!room.local&&/再接続|切れ|停止|接続でき|別のタブ/.test(text);if(!box&&show){box=el('div',undefined,'connection-hint');box.id='connection-hint';box.setAttribute('role','status');const note=el('span'),retry=el('button','再接続','secondary');retry.onclick=retryConnection;box.append(note,retry);$('#live .live-tools').prepend(box);}if(box){box.hidden=!show;box.firstChild.textContent=text;const retry=box.querySelector('button');retry.hidden=text===lessonCaptionWaiting;retry.disabled=!navigator.onLine||room?.joinBlocked===true;}}
@@ -339,18 +339,44 @@ async function handle(data){
 }
 async function ensureMicrophone(fresh=false){const epoch=sessionEpoch,activation=microphoneActivation;const lessonTeacher=room?.mode==='lesson'&&role==='teacher';const deviceId=lessonTeacher?$('#lesson-microphone-device').value:'';const voiceIsolation=lessonTeacher&&$('#lesson-voice-isolation').checked&&navigator.mediaDevices?.getSupportedConstraints?.().voiceIsolation===true;if(localStream&&(fresh||deviceId&&localStream.getAudioTracks()[0]?.getSettings?.().deviceId!==deviceId||microphoneUnavailable(localStream)||localStream.getAudioTracks().some(t=>t.muted))){const previous=localStream;localStream=null;previous.getTracks().forEach(t=>t.stop());}if(!localStream)localStream=await acquireMicrophone(()=>navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true,...(voiceIsolation?{voiceIsolation:{ideal:true}}:{}),...(deviceId?{deviceId:{exact:deviceId}}:{})},video:false}),()=>!!room&&epoch===sessionEpoch&&activation===microphoneActivation&&document.visibilityState==='visible');const stream=localStream;if(voiceIsolation&&stream.getAudioTracks()[0]?.getSettings?.().voiceIsolation!==true)message('このマイクでは端末の音声分離を確認できませんでした。');if(room?.mode==='lesson'&&role==='teacher')void refreshLessonMicrophones();for(const track of stream.getAudioTracks())track.onended=()=>{if(localStream!==stream||!mic)return;mic=false;ledger.microphone(false);ledger.event('microphone_device_ended');idleWatch.stop();stopRecognition();paintButton($('#microphone'),'マイクをONにする','microphone');$('#microphone').setAttribute('aria-pressed','false');message('マイクとの接続が切れました。イヤホンなどを確認し、マイクをONにし直してください。');};return localStream;}
 let speechInputGate;let microphoneStarting=false,microphoneActivation=0,backgroundCallPaused=false;
-$('#microphone').onclick=async()=>{if(!room||chatWaiting||microphoneStarting)return;if(!mic&&room.mode==='lesson'&&!$('#lesson-review-form').hidden){message('直前の字幕を送るか、取り消してください。');return;}if(!mic&&room.mode==='lesson'&&role==='teacher'&&$('#lesson-microphone-device').dataset.unavailable==='true'){message('選んだマイクが外れました。入力マイクを確認してください。');return;}if(!mic&&room.mode==='lesson'&&recognition?.finishingCapture){message('直前の発話を字幕にしています。少し待ってください。');return;}if(!mic&&typeof navigator!=='undefined'&&navigator.onLine===false){message('オフラインです。接続後にマイクをONにしてください。');return;}if(!mic&&!isRecognitionLanguage(currentSource())){setTextComposer(true);message('この言語は文字入力で利用できます。音声入力はまだ対応していません。');return;}const epoch=sessionEpoch,activation=++microphoneActivation,button=$('#microphone');microphoneStarting=true;button.disabled=true;try{if(!mic){speechPlayer.stop();paintButton(button,'マイクを準備しています','microphone');if(typeof speechConnectionNeedsCheck==='function'&&speechConnectionNeedsCheck(connections.list(),config.api)){paintButton(button,'接続を確認しています','microphone');const checks=await probeNetwork(config.api);if(!room||sessionEpoch!==epoch||activation!==microphoneActivation||document.visibilityState!=='visible')return;checks.forEach(check=>connections.add({...check,online:navigator.onLine}));if(!checks.every(check=>check.code==='ok')){paintButton(button,'マイクをONにする','microphone');showSpeechConnectionFailure();return;}}if(backgroundCallPaused){backgroundCallPaused=false;intentionalClose=false;await connect();if(sessionEpoch!==epoch||activation!==microphoneActivation)return;startConnectionTimers();}await ensureMicrophone(room.mode!=='lesson'||heldMicrophone===null);if(!room||sessionEpoch!==epoch||activation!==microphoneActivation||(document.visibilityState!=='visible'))return;mic=true;recordResume();if(speechPlayer.key&&!speechPlayer.paused){speechInputGate.begin();return;}void idleWatch.start(localStream);localStream.getAudioTracks().forEach(t=>t.enabled=true);startRecognition(false,{immediate:true});}else{mic=false;recordPause('manual',undefined,{mode:room.mode,scope:'microphone'});idleWatch.stop();if(!finishLiveCapture()&&(room.mode!=='lesson'||role!=='teacher'||!recognition?.finishCapture?.()))stopRecognition(true);localStream?.getAudioTracks().forEach(t=>t.enabled=false);}ledger.microphone(mic);ledger.event(mic?'mic_on':'mic_off');const stopLabel=room.mode==='lesson'&&role==='teacher'&&$('#lesson-single-speech').checked?'ここまでを字幕にする':'マイクをとめる';const finishing=!mic&&room.mode==='lesson'&&recognition?.finishingCapture;paintButton(button,finishing?'字幕を作成中':mic&&stopLabel==='ここまでを字幕にする'?'マイクを準備しています':mic?stopLabel:'マイクをONにする',finishing?'spinner':mic?'microphone':'microphone-slash');button.setAttribute('aria-pressed',mic);}catch(e){if(sessionEpoch!==epoch||activation!==microphoneActivation)return;mic=false;idleWatch.stop();stopRecognition();localStream?.getAudioTracks().forEach(t=>t.enabled=false);button.setAttribute('aria-pressed','false');paintButton(button,'マイクをONにする','microphone');ledger.microphone(false);ledger.event('microphone_error');message(microphoneHelp(e));}finally{microphoneStarting=false;button.disabled=false;if(room?.mode==='lesson')updateLiveActions();}};
+document.addEventListener('pointerdown',event=>{
+ if(!liveBadgePopup.hidden&&!liveBadge.parentElement.contains(event.target))setLiveBadgePopup(false);
+});
+document.addEventListener('keydown',event=>{
+ if(event.key==='Escape'&&!liveBadgePopup.hidden){
+  setLiveBadgePopup(false);
+  liveBadge.focus();
+ }
+});
+liveBadge.onclick=()=>setLiveBadgePopup(liveBadgePopup.hidden);
+$('#end-live-translation').onclick=async()=>{
+ setLiveBadgePopup(false);
+ if(!mic||!faceLiveAttempt?.finish)return;
+ await $('#microphone').onclick();
+ $('#microphone').focus();
+};
+$('#microphone').onclick=async event=>{if(!room||chatWaiting||microphoneStarting)return;if(event&&mic&&faceLiveAttempt?.finish){setLiveBadgePopup(true);$('#end-live-translation').focus();return;}if(!mic&&room.mode==='lesson'&&!$('#lesson-review-form').hidden){message('直前の字幕を送るか、取り消してください。');return;}if(!mic&&room.mode==='lesson'&&role==='teacher'&&$('#lesson-microphone-device').dataset.unavailable==='true'){message('選んだマイクが外れました。入力マイクを確認してください。');return;}if(!mic&&room.mode==='lesson'&&recognition?.finishingCapture){message('直前の発話を字幕にしています。少し待ってください。');return;}if(!mic&&typeof navigator!=='undefined'&&navigator.onLine===false){message('オフラインです。接続後にマイクをONにしてください。');return;}if(!mic&&!isRecognitionLanguage(currentSource())){setTextComposer(true);message('この言語は文字入力で利用できます。音声入力はまだ対応していません。');return;}const epoch=sessionEpoch,activation=++microphoneActivation,button=$('#microphone');microphoneStarting=true;button.disabled=true;try{if(!mic){speechPlayer.stop();paintButton(button,'マイクを準備しています','microphone');if(typeof speechConnectionNeedsCheck==='function'&&speechConnectionNeedsCheck(connections.list(),config.api)){paintButton(button,'接続を確認しています','microphone');const checks=await probeNetwork(config.api);if(!room||sessionEpoch!==epoch||activation!==microphoneActivation||document.visibilityState!=='visible')return;checks.forEach(check=>connections.add({...check,online:navigator.onLine}));if(!checks.every(check=>check.code==='ok')){paintButton(button,'マイクをONにする','microphone');showSpeechConnectionFailure();return;}}if(backgroundCallPaused){backgroundCallPaused=false;intentionalClose=false;await connect();if(sessionEpoch!==epoch||activation!==microphoneActivation)return;startConnectionTimers();}await ensureMicrophone(room.mode!=='lesson'||heldMicrophone===null);if(!room||sessionEpoch!==epoch||activation!==microphoneActivation||(document.visibilityState!=='visible'))return;mic=true;recordResume();if(speechPlayer.key&&!speechPlayer.paused){speechInputGate.begin();return;}void idleWatch.start(localStream);localStream.getAudioTracks().forEach(t=>t.enabled=true);startRecognition(false,{immediate:true});}else{mic=false;recordPause('manual',undefined,{mode:room.mode,scope:'microphone'});idleWatch.stop();if(!finishLiveCapture()&&(room.mode!=='lesson'||role!=='teacher'||!recognition?.finishCapture?.()))stopRecognition(true);localStream?.getAudioTracks().forEach(t=>t.enabled=false);}ledger.microphone(mic);ledger.event(mic?'mic_on':'mic_off');const stopLabel=room.mode==='lesson'&&role==='teacher'&&$('#lesson-single-speech').checked?'ここまでを字幕にする':'マイクをとめる';const finishing=!mic&&room.mode==='lesson'&&recognition?.finishingCapture;paintButton(button,finishing?'字幕を作成中':mic&&stopLabel==='ここまでを字幕にする'?'マイクを準備しています':mic?stopLabel:'マイクをONにする',finishing?'spinner':mic?'microphone':'microphone-slash');button.setAttribute('aria-pressed',mic);}catch(e){if(sessionEpoch!==epoch||activation!==microphoneActivation)return;mic=false;idleWatch.stop();stopRecognition();localStream?.getAudioTracks().forEach(t=>t.enabled=false);button.setAttribute('aria-pressed','false');paintButton(button,'マイクをONにする','microphone');ledger.microphone(false);ledger.event('microphone_error');message(microphoneHelp(e));}finally{microphoneStarting=false;button.disabled=false;if(room?.mode==='lesson')updateLiveActions();}};
 let recognitionStartTimer,speechPending=false,speechPhase='waiting',recognitionRequestAt=null,recognitionRecovering=false;
 let faceLiveAttempt;
+const liveBadge=$('#header-live-badge'),liveBadgePopup=$('#live-badge-popup');
+function setLiveBadgePopup(open){
+ liveBadgePopup.hidden=!open;
+ liveBadge.setAttribute('aria-expanded',String(open));
+}
+function hideLiveBadge(){
+ setLiveBadgePopup(false);
+ liveBadge.hidden=true;
+}
+
 function stopFaceLiveTranslation(){
  const previous=faceLiveAttempt;
  faceLiveAttempt=null;
- $('#header-live-badge').hidden=true;
+ hideLiveBadge();
  previous?.controller.abort();
  previous?.preview.remove();
 }
 function liveCaptureEnded(attempt,complete){
- $('#header-live-badge').hidden=true;
+ hideLiveBadge();
  ledger.event(complete?'live_translation_finished':'live_translation_incomplete');
  const status=attempt.preview.querySelector('[role="status"]');
  if(status)status.textContent=complete?'Live翻訳を終了しました。':'Live字幕の末尾を確認できませんでした。';
