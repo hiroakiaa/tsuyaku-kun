@@ -14,7 +14,7 @@ export function createRecognitionCostView({el,exchange}){
   ['速さ優先',RECOGNITION_PRICE.streamPerMinute,RECOGNITION_PRICE.streamPerMinute+translationPerMinute,'リアルタイム認識では無音を含む接続時間で計算。高速区間認識に切り替わる言語では、音声認識の単価は通常と同じです。'],
   ['OpenAI Live',LIVE_TRANSLATION_USD_PER_MINUTE,LIVE_TRANSLATION_USD_PER_MINUTE*2,'1言語への翻訳から、対面の日英双方向（2接続）までの幅です。45分は接続時間の合計で試算しています。'],
  ];
- let selected=0;
+ let selected=0,monthlyCharacters=100000;
  const buttons=modes.map(([label],index)=>{
   const button=el('button',label);
   button.type='button';
@@ -67,26 +67,40 @@ export function createRecognitionCostView({el,exchange}){
   market.dataset.market='';
   market.append(el('summary','有料翻訳サービスとの月額比較'));
   const yen=usd=>Math.round(usd*rate).toLocaleString('ja-JP')+'円';
-  const minutes=100000/300;
+  const volumes=el('div',undefined,'admin-tabs');
+  volumes.setAttribute('role','group');
+  volumes.setAttribute('aria-label','月間の原文文字数');
+  for(const amount of [100000,300000,1000000]){
+   const button=el('button',amount.toLocaleString('ja-JP')+'文字');
+   button.type='button';
+   button.setAttribute('aria-pressed',String(amount===monthlyCharacters));
+   button.onclick=()=>{monthlyCharacters=amount;render();content.querySelector('[data-market] button[aria-pressed="true"]').focus();};
+   volumes.append(button);
+  }
+  market.append(volumes);
+  const minutes=monthlyCharacters/300;
+  const volume=monthlyCharacters/1e6;
+  const time='約'+Math.round(minutes).toLocaleString('ja-JP')+'分';
   const rows=[
-   ['DeepL Pro Individual','年払いの月額換算 $8.74／30万文字まで',yen(8.74),'https://www.deepl.com/ja/pro'],
-   ['DeepL Pro Team','年払いの月額換算 $28.74／100万文字まで（1人）',yen(28.74),'https://www.deepl.com/ja/pro'],
-   ['iTranslate PRO','月額2,000〜2,100円／文字枠の掲載なし','2,000〜2,100円','https://apps.apple.com/jp/app/id288113403'],
-   ['Google Cloud Translation NMT','$20／100万入力文字',yen(2),'https://cloud.google.com/products/translate/pricing'],
-   ['Amazon Translate 標準テキスト','$15／100万入力文字',yen(1.5),'https://aws.amazon.com/translate/pricing/'],
+   ['DeepL Pro Individual','年払いの月額換算 $8.74／30万文字まで',monthlyCharacters<=300000?yen(8.74):'文字枠超過','—','https://www.deepl.com/ja/pro'],
+   ['DeepL Pro Team','年払いの月額換算 $28.74／100万文字まで（1人）',yen(28.74),'—','https://www.deepl.com/ja/pro'],
+   ['iTranslate PRO','月額2,000〜2,100円／文字枠の掲載なし','2,000〜2,100円','—','https://apps.apple.com/jp/app/id288113403'],
+   ['Google Cloud Translation NMT','$20／100万入力文字',yen(20*volume),yen(20*Math.max(0,volume-.5)),'https://cloud.google.com/products/translate/pricing'],
+   ['Amazon Translate 標準テキスト','$15／100万入力文字',yen(15*volume),'0円（対象期間内）','https://aws.amazon.com/translate/pricing/'],
    ...modes.map(([label,min,max],i)=>['通訳君 '+label,
-    i===2?'$'+LIVE_TRANSLATION_USD_PER_MINUTE+'／送信音声1分・1接続':'音声時間＋必要に応じて翻訳トークン',
-    [...new Set([yen(min*minutes),yen(max*minutes)])].join('〜')])
+    '$'+min.toFixed(6)+'〜'+max.toFixed(6)+'／マイクON 1分',
+    [...new Set([yen(min*minutes),yen(max*minutes)])].join('〜'),
+    i===2?'左記と同額（クレジット別）':'0円（全量が無料枠内の場合）',null,time])
   ];
   const marketTable=el('table',undefined,'admin-cost-table');
   const head=el('thead'),heading=el('tr'),marketBody=el('tbody');
-  for(const label of ['サービス','料金と対象量','月10万文字の目安']){
+  for(const label of ['サービス','料金と対象量','月額・変動費','無料枠適用時','マイクON換算']){
    const cell=el('th',label);
    cell.scope='col';
    heading.append(cell);
   }
   head.append(heading);
-  for(const [label,unit,total,url] of rows){
+  for(const [label,unit,total,free,url,duration] of rows){
    const row=el('tr'),name=el('th',url?undefined:label);
    name.scope='row';
    if(url){
@@ -94,13 +108,16 @@ export function createRecognitionCostView({el,exchange}){
     link.href=url;
     name.append(link);
    }
-   row.append(name,el('td',unit),el('td',total));
+   row.append(name,el('td',unit),el('td',total),el('td',free),el('td',duration??'—'));
    marketBody.append(row);
   }
   marketTable.append(head,marketBody);
-  market.append(marketTable,
-   el('p','2026年11月12日確認。外部の定額プランは契約料金、APIは訳先1言語の無料枠適用前。Google NMTとAmazonには条件付きの無料枠があります。','admin-caption'),
-   el('p','通訳君はマイクON1分あたり原文300文字、月10万文字で約333分と仮定した運用変動費。Liveは1〜2接続。話す速度、無音、言語、接続数で変動します。為替は管理者画面の設定を使用します。','admin-caption'));
+  const scroll=el('div');
+  scroll.style.overflowX='auto';
+  scroll.append(marketTable);
+  market.append(scroll,
+   el('p','2026年11月12日確認。外部の定額プランは契約料金、APIは訳先1言語の無料枠適用前。Google NMTは月50万文字相当、Amazonは対象アカウントで最初の12か月、月200万文字まで。枠を全量使える前提です。','admin-caption'),
+   el('p','通訳君はマイクON1分あたり原文300文字、文字数÷300でマイクON時間を換算した運用変動費。通常・速度優先の0円はCloudflareの共有無料枠やAzure F0などで処理全量を賄える場合です。残枠や実際に無料で使える時間はアカウントの利用状況に依存します。Liveは1〜2接続。話す速度、無音、言語、接続数で変動します。為替は管理者画面の設定を使用します。','admin-caption'));
   content.replaceChildren(table,detail,market,el('p',description,'admin-caption'),el('p','マイクON時間で比較。通常は発話が半分、AI翻訳は1分4回（各入力250・出力25トークン）を仮定。1ドル＝'+rate+'円。変動費の試算で、固定費・再試行・写真・読み上げは含みません。','admin-caption'));
  }
  render();
