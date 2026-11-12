@@ -34,6 +34,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  function makeDialog(title){
   const node=el('dialog'),heading=el('h2',title),close=el('button','閉じる');
   node.setAttribute('aria-label',title);
+  node.tabIndex=-1;
   Object.assign(node.style,{width:'min(90vw, 38rem)',maxHeight:'85dvh',overflow:'auto'});
   close.type='button';
   close.onclick=()=>node.close();
@@ -65,6 +66,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    (trigger.isConnected?trigger:replacement||container).focus({preventScroll:true});
   },{once:true});
   node.showModal();
+  node.focus({preventScroll:true});
   try{
    const params=new URLSearchParams({action:'query',generator:'search',gsrsearch:term,gsrnamespace:'0',gsrlimit:'1',prop:'extracts|info',inprop:'url',exintro:'1',explaintext:'1',exsentences:'4',format:'json',formatversion:'2',origin:'*'});
    const response=await fetch(origin+'/w/api.php?'+params,{signal:AbortSignal.any([controller.signal,AbortSignal.timeout(8000)]),credentials:'omit',referrerPolicy:'no-referrer'});
@@ -360,7 +362,10 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    button.onclick=()=>{
     read();
     if(wide.matches){output.scrollIntoView({block:'nearest'});output.focus();}
-    else if(!dialog.open)dialog.showModal();
+    else if(!dialog.open){
+     dialog.showModal();
+     dialog.focus({preventScroll:true});
+    }
    };
    captions().closest('#live').querySelector('.live-tools').append(button);
    place();

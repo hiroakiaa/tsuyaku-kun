@@ -962,3 +962,4 @@ body.phone-home #call-invite>.invite-check{grid-column:1;grid-row:2;justify-self
 body.phone-home #call-invite>.invite-check .ui-en{font-size:10px;}
 body.phone-home #call-invite>.invite-preparing{grid-column:1 / -1;grid-row:1 / span 2;min-height:88px;}
 @media(max-width:359px){body.phone-home #call-invite:not([hidden]){grid-template-columns:minmax(0,1fr) 84px;gap:6px 8px;padding:10px;}body.phone-home #call-invite>.qr{width:84px;height:84px;}}
+dialog[tabindex="-1"]:focus{outline:none;}

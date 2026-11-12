@@ -17,8 +17,8 @@ assert.equal(backdropClick({target:{},clientX:15,clientY:35},dialogTarget),false
 for(const value of ['face','interpreter','lesson','words','invalid']){const data=new Map([['tsuyaku-update-tab',value]]);assert.equal(updateMode({getItem:k=>data.get(k),removeItem:k=>data.delete(k)}),value==='invalid'?'face':value);assert.equal(data.size,0);}
 assert.equal(updateMode({getItem(){throw Error('storage denied');}}),'face');
 for(const viewport of [{width:390,height:844},{width:240,height:120,offsetLeft:40,offsetTop:20},{width:280,height:80}]){const bounds=searchBounds({right:370,bottom:75},viewport);assert.ok(bounds.left>=(viewport.offsetLeft||0));assert.ok(bounds.left+bounds.width<=(viewport.offsetLeft||0)+viewport.width);assert.ok(bounds.top+bounds.maxHeight<=(viewport.offsetTop||0)+viewport.height);assert.ok(bounds.maxHeight>=0);}
-const events={},moves=[],parent={append:n=>moves.push(['home',n])},message={parentNode:parent,nextSibling:null},close={setAttribute:()=>{},focus:o=>moves.push(['focus',o.preventScroll])},dialog={addEventListener:(t,f)=>events[t]=f,append:n=>moves.push(['dialog',n])};
-const opened=installModalFeedback({dialog,message,close});opened();events.close();opened();events.close();
+const events={},moves=[],parent={append:n=>moves.push(['home',n])},message={parentNode:parent,nextSibling:null},dialog={focus:o=>moves.push(['focus',o.preventScroll]),addEventListener:(t,f)=>events[t]=f,append:n=>moves.push(['dialog',n])};
+const opened=installModalFeedback({dialog,message});opened();events.close();opened();events.close();
 assert.deepEqual(moves.map(x=>x[0]),['dialog','focus','home','dialog','focus','home']);
 assert.equal(moves[1][1],true);
 dialog.open=true;const before=moves.length;events.close();assert.equal(moves.length,before,'late close from previous modal must not remove feedback from reopened modal');

@@ -1,15 +1,15 @@
-import {costOf} from './usage.js?v=20261112-usage-all-1';
-import {schoolUsageMetrics} from './admin-adoption-report.js?v=20261112-usage-all-1';
-import {createLiveSummary} from './live-summary.js?v=20261112-usage-all-1';
-import {createLiveCaptionBuffer} from './live-caption-buffer.js?v=20261112-usage-all-1';
-import {startLiveTranslation} from './live-translation-face.js?v=20261112-usage-all-1';
-import {liveTranslationEnabled,disableLiveTranslation} from './live-translation-setting.js?v=20261112-usage-all-1';
-import {RecognitionNoiseGuard} from './recognition-noise-guard.js?v=20261112-usage-all-1';
+import {costOf} from './usage.js?v=20261112-modal-focus-1';
+import {schoolUsageMetrics} from './admin-adoption-report.js?v=20261112-modal-focus-1';
+import {createLiveSummary} from './live-summary.js?v=20261112-modal-focus-1';
+import {createLiveCaptionBuffer} from './live-caption-buffer.js?v=20261112-modal-focus-1';
+import {startLiveTranslation} from './live-translation-face.js?v=20261112-modal-focus-1';
+import {liveTranslationEnabled,disableLiveTranslation} from './live-translation-setting.js?v=20261112-modal-focus-1';
+import {RecognitionNoiseGuard} from './recognition-noise-guard.js?v=20261112-modal-focus-1';
 import {isRecognitionLanguage} from './language-registry.js?v=20261103-analysis-stages-1';
 import {fillLanguageOptions,installLanguageSearch} from './language-picker.js?v=20261103-analysis-stages-1';
 import {faceTranslationTargets,speedPasswordMatches} from './economy-policy.js?v=20261103-pipeline-latency-1';
-import {createRealtimeRecovery} from './realtime-recovery.js?v=20261112-usage-all-1';
-import {createRealtimeRecognition} from './realtime-recognition.js?v=20261112-usage-all-1';
+import {createRealtimeRecovery} from './realtime-recovery.js?v=20261112-modal-focus-1';
+import {createRealtimeRecognition} from './realtime-recognition.js?v=20261112-modal-focus-1';
 import {createAiGate} from './ai-gate.js?v=20261029-faithful-pipeline-1';
 import {localIcon,installLocalIcons} from './icons.js?v=20261029-communication50-1';
 installLocalIcons(document);
@@ -22,15 +22,15 @@ const sessionStorage=guardedStorage(()=>globalThis.sessionStorage);
 import {installFormTask} from './form-task.js?v=20261024-usability20-3';
 import {safeSocketSend,microphoneHelp,participantLabel} from './session-reliability.js?v=20261022-billing-auto-1';
 import {singleFlight,installLazyAction} from './async-ui.js?v=20261103-analysis-stages-1';
-import {lessonCode,installModalFeedback,backdropClick,updateMode,searchBounds,resilientPreferences} from './entry-feedback.js?v=20261022-language-storage-1';
+import {lessonCode,installModalFeedback,backdropClick,updateMode,searchBounds,resilientPreferences} from './entry-feedback.js?v=20261112-modal-focus-1';
 import {deviceCheckPanel,microphoneUnavailable} from './device-check.js?v=20261021-text-chat-1';
-import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261112-usage-all-1';
+import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261112-modal-focus-1';
 import {installPhotoTranslate} from './photo-translate.js?v=20261024-usability20-3';
 import {refreshEnglishGuides,applyEnglishLabels} from './ui-english.js?v=20261029-two-language-1';
 import {SharedWordUsage} from './shared-word-usage.js?v=20261104-student-simple-2';
 import {installConversationUI,createWaitingBubble} from './conversation-ui.js?v=20261103-pipeline-latency-1';
 import {guardCaptionTranslation,hasInternalMarker,needsTranslationReview} from './translation-safety.js?v=20261029-faithful-pipeline-1';
-import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261112-usage-all-1';
+import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261112-modal-focus-1';
 import {IdleWatch} from './idle-watch.js?v=20261008-safety-1';
 import {recordResource,recordPause,recordResume} from './resource-usage.js?v=20261104-student-simple-2';
 import {mayReconnect} from './resource-policy.js';
@@ -45,15 +45,15 @@ import {UsageLedger,WordUsage} from './usage.js?v=20261104-student-simple-2';
 import {CloudSpeechPlayer,createSpeechCache} from './cloud-speech-player.js?v=20261103-pipeline-latency-1';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261103-speech-activity-1';
 import {config} from './config.js';
-import {ConnectionDiary,speechConnectionNeedsCheck,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261112-usage-all-1';
+import {ConnectionDiary,speechConnectionNeedsCheck,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261112-modal-focus-1';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
 import {translationField,translationOf,spokenLanguage,withEasyJapanese,supplementCatalog} from './core.js?v=20261029-communication50-1';
 import {speakerCaption,speakerInfo} from './face-mode.js?v=20261006-school-1';
 import {callCaptionLanguages,chatCaptionLanguages,isDisplayableCaption} from './call-mode.js?v=20261021-chat-bubbles-1';
 import {listHistory as storedHistory} from './history.js?v=20261006-school-1';
 const listHistory=()=>localStorage.getItem('tsuyaku-device-mode')==='personal'?storedHistory():Promise.resolve([]);
-import {createServerRecognition,encodeWav} from './caption-server.js?v=20261112-usage-all-1';
-import {createBrowserRecognition} from './caption-browser.js?v=20261112-usage-all-1';
+import {createServerRecognition,encodeWav} from './caption-server.js?v=20261112-modal-focus-1';
+import {createBrowserRecognition} from './caption-browser.js?v=20261112-modal-focus-1';
 const browserSpeechUnavailable=new Set();let recognitionKind=null,conversationUI,realtimeUnavailable=false;
 let speedAuthorized=false;localStorage.setItem('tsuyaku-recognition-speed-v1','economy');
 const preferRealtime=()=>speedAuthorized;
@@ -88,9 +88,9 @@ async function syncSchoolUsage(){
 setInterval(syncSchoolUsage,60000);
 window.addEventListener('pageshow',syncSchoolUsage);
 const wordUsage=new WordUsage(localStorage);const ledger=new UsageLedger(localStorage,()=>Date.now(),sessionStorage),connections=new ConnectionDiary(localStorage);
-const showModalFeedback=installModalFeedback({dialog:$('#modal'),message:$('#message'),close:$('#modal-close'),resolveFocus:referenceReturnFocus});
+const showModalFeedback=installModalFeedback({dialog:$('#modal'),message:$('#message'),resolveFocus:referenceReturnFocus});
 let messageTimer;const message=text=>{clearTimeout(messageTimer);const n=$('#message');n.textContent=text;n.hidden=!text;if(text)messageTimer=setTimeout(()=>{n.replaceChildren();n.hidden=true;},6000);};
-installLazyAction($('#admin'),async attempt=>{const {installAdmin}=await import('./admin.js?v=20261112-usage-all-1'+(attempt>1?'&retry='+attempt:''));installAdmin({wordUsage,sharedWords,api,createRecognitionSettings,showFrequentSources:()=>frequentButton.onclick(),getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});},{onError:()=>message('管理画面を読み込めませんでした。接続を確認して、もう一度ひらいてください。')});
+installLazyAction($('#admin'),async attempt=>{const {installAdmin}=await import('./admin.js?v=20261112-modal-focus-1'+(attempt>1?'&retry='+attempt:''));installAdmin({wordUsage,sharedWords,api,createRecognitionSettings,showFrequentSources:()=>frequentButton.onclick(),getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});},{onError:()=>message('管理画面を読み込めませんでした。接続を確認して、もう一度ひらいてください。')});
 const lessonCaptionWaiting='再接続しました。次の字幕を待っています。';
 const status=text=>{$('#connection').textContent=text;connectionHint(text);};
 function connectionHint(text){let box=$('#connection-hint');const show=room&&!room.local&&/再接続|切れ|停止|接続でき|別のタブ/.test(text);if(!box&&show){box=el('div',undefined,'connection-hint');box.id='connection-hint';box.setAttribute('role','status');const note=el('span'),retry=el('button','再接続','secondary');retry.onclick=retryConnection;box.append(note,retry);$('#live .live-tools').prepend(box);}if(box){box.hidden=!show;box.firstChild.textContent=text;const retry=box.querySelector('button');retry.hidden=text===lessonCaptionWaiting;retry.disabled=!navigator.onLine||room?.joinBlocked===true;}}
@@ -167,7 +167,7 @@ function createRecognitionSettings(){const content=el('section');content.append(
 function showLanguageOptions(suggestions=[],candidateValid=null){const content=el('div',undefined,'language-panel'),spoken=el('select'),display=el('select');options(spoken,speakingLanguage());options(display,sharedLanguage());spoken.onchange=()=>{if(room?.mode==='face'){speechPlayer.stop();stopRecognition(true);}setSpeakingLanguage(spoken.value);if(room?.mode==='face'){updateFace();if(mic)startRecognition();}};display.onchange=()=>{if(room?.mode==='face'){speechPlayer.stop();stopRecognition(true);}setSharedLanguage(display.value);if(room?.mode==='face'){updateFace();if(mic)startRecognition();}for(const record of [...records.values()])renderCaption(record);};if(room?.mode==='interpreter'){nativeLanguageOptions(spoken,speakingLanguage());content.append(label('じぶんが話すことば / Your language',spoken),el('p','相手の言語ではなく、あなたが話す言語を選んでください。','small'));}else if(room?.mode==='lesson'&&role!=='teacher'){nativeLanguageOptions(display,sharedLanguage());content.append(label('じぶんのことば / Your language',display),el('p','先生のことばをこの言語で読み、文字入力もこの言語で送ります。','small'));}else if(room?.mode==='face'||tab==='face'){content.append(label('自分の言語',spoken),label('相手の言語',display));}else content.append(label('自分の言語',spoken),label('相手の言語',display));if(Array.isArray(suggestions)&&suggestions.length&&(room?.mode==='face'||tab==='face')){const proposed=el('div',undefined,'language-suggestions');proposed.append(el('p','聞こえた言語の候補です。話す人の言語を選び、もう一度話してください。','small'));for(const code of suggestions){const found=catalog.languages.find(l=>l.code===code);if(!found)continue;for(const [select,side] of [[spoken,'自分'],[display,'相手']]){const button=el('button',side+'の言語を'+found.labelJa+'にする');button.type='button';button.onclick=()=>{if(typeof candidateValid==='function'&&!candidateValid()){$('#modal').close();message('古い言語候補です。もう一度話すか、右上から言語を選んでください。');return;}select.value=code;select.onchange();$('#modal').close();message(isRecognitionLanguage(code)?'言語を変更しました。もう一度話してください。':'この言語は文字入力で利用できます。');};proposed.append(button);}}content.prepend(proposed);}modal('言語を選ぶ',content);}
 function paintRecognitionSpeed(){const b=recognitionSpeedButton;const fast=preferRealtime();b.setAttribute('aria-checked',String(fast));b.setAttribute('aria-label','速度重視');b.title=fast?'速度重視：音声入力の対応言語で利用できます。言語に合わせてリアルタイム認識・短区間の高速認識を使います。':'節約：発話を区切って認識し、選んだ2言語だけを翻訳します';}
 function applySpeedMode(fast){speedAuthorized=fast;localStorage.setItem('tsuyaku-recognition-speed-v1',fast?'fast':'economy');localStorage.setItem('tsuyaku-face-auto-language','on');realtimeUnavailable=false;paintRecognitionSpeed();if(room?.mode==='face'){speechPlayer.stop();stopRecognition(true);updateFace();if(mic)startRecognition();}}
-function requestSpeedMode(fast){if(!fast){applySpeedMode(false);return;}const form=el('form'),input=el('input'),error=el('p'),submit=el('button','速度モードにする'),cancel=el('button','キャンセル');input.type='password';input.id='speed-password';input.autocomplete='off';input.inputMode='numeric';input.required=true;error.setAttribute('role','alert');submit.type='submit';cancel.type='button';form.append(label('パスワード',input),submit,cancel,error);cancel.onclick=()=>$('#modal').close();form.onsubmit=e=>{e.preventDefault();if(!speedPasswordMatches(input.value)){input.value='';input.setAttribute('aria-invalid','true');error.textContent='パスワードを確認してください。';input.focus();return;}input.value='';applySpeedMode(true);$('#modal').close();};modal('速度モード',form);$('#modal').dataset.kind='speed-password';$('#modal').addEventListener('close',()=>{input.value='';(recognitionSpeedButton.isConnected?recognitionSpeedButton:$('#admin')).focus({preventScroll:true});},{once:true});input.focus({preventScroll:true});}
+function requestSpeedMode(fast){if(!fast){applySpeedMode(false);return;}const form=el('form'),input=el('input'),error=el('p'),submit=el('button','速度モードにする'),cancel=el('button','キャンセル');input.type='password';input.id='speed-password';input.autocomplete='off';input.inputMode='numeric';input.required=true;error.setAttribute('role','alert');submit.type='submit';cancel.type='button';form.append(label('パスワード',input),submit,cancel,error);cancel.onclick=()=>$('#modal').close();form.onsubmit=e=>{e.preventDefault();if(!speedPasswordMatches(input.value)){input.value='';input.setAttribute('aria-invalid','true');error.textContent='パスワードを確認してください。';input.focus();return;}input.value='';applySpeedMode(true);$('#modal').close();};modal('速度モード',form);$('#modal').dataset.kind='speed-password';$('#modal').addEventListener('close',()=>{input.value='';(recognitionSpeedButton.isConnected?recognitionSpeedButton:$('#admin')).focus({preventScroll:true});},{once:true});}
 recognitionSpeedButton.onclick=()=>requestSpeedMode(!preferRealtime());
 paintRecognitionSpeed();
 $('#language-options').onclick=showLanguageOptions;
@@ -1055,7 +1055,7 @@ const invite=new URLSearchParams(location.hash.slice(1));if(/^[a-f0-9]{32}$/.tes
  const nameLabel=el('label');nameLabel.append(bilingual('Name (optional)','表示名（任意）'),displayName);displayName.placeholder='e.g. Alex';displayName.autocomplete='nickname';displayName.autocapitalize='words';displayName.spellcheck=false;displayName.setAttribute('aria-label','Name (optional)');
  const hint=el('p',undefined,'small guest-hint');hint.append(bilingual('Choose the language you speak.','あなたが話す言語を選んでください。'));
  guestFeedback=el('p',undefined,'guest-feedback');guestFeedback.setAttribute('role','status');guestFeedback.hidden=true;paintGuestJoin=busy=>{b.setAttribute('aria-busy',String(busy));b.replaceChildren(icon(busy?'spinner':'right-to-bracket'),bilingual(busy?'Joining…':'Join chat',busy?'参加しています…':'チャットに参加'));};paintGuestJoin(false);const form=el('form',undefined,'guest-join-form');b.type='submit';b.onclick=null;form.onsubmit=e=>{e.preventDefault();void joinInvite();};form.append(languageLabel,hint,nameLabel,guestFeedback,b);n.append(form);
- modal('You are invited',n);const dialog=$('#modal'),title=$('#modal-title'),close=$('#modal-close'),toggle=el('button','日本語','guest-japanese-toggle');dialog.classList.add('guest-invitation');dialog.addEventListener('close',()=>{if(joiningInvite){inviteCancelled=true;if(room?.id===invite.get('room'))void leave();}},{once:true});title.setAttribute('data-ui-ignore','');title.replaceChildren(bilingual('You are invited','招待が届いています'));close.setAttribute('aria-label','Close');toggle.id='guest-japanese-toggle';toggle.type='button';toggle.lang='ja';toggle.setAttribute('data-ui-ignore','');toggle.setAttribute('aria-label','Show Japanese / 日本語を表示');toggle.setAttribute('aria-pressed','false');n.id='guest-invitation-content';toggle.setAttribute('aria-controls',n.id);const announcement=el('span',undefined,'guest-display-announcement');announcement.setAttribute('role','status');announcement.setAttribute('aria-live','polite');n.append(announcement);close.before(toggle);queueMicrotask(()=>{if(n.isConnected&&dialog.open)lang.focus({preventScroll:true});});
+ modal('You are invited',n);const dialog=$('#modal'),title=$('#modal-title'),close=$('#modal-close'),toggle=el('button','日本語','guest-japanese-toggle');dialog.classList.add('guest-invitation');dialog.addEventListener('close',()=>{if(joiningInvite){inviteCancelled=true;if(room?.id===invite.get('room'))void leave();}},{once:true});title.setAttribute('data-ui-ignore','');title.replaceChildren(bilingual('You are invited','招待が届いています'));close.setAttribute('aria-label','Close');toggle.id='guest-japanese-toggle';toggle.type='button';toggle.lang='ja';toggle.setAttribute('data-ui-ignore','');toggle.setAttribute('aria-label','Show Japanese / 日本語を表示');toggle.setAttribute('aria-pressed','false');n.id='guest-invitation-content';toggle.setAttribute('aria-controls',n.id);const announcement=el('span',undefined,'guest-display-announcement');announcement.setAttribute('role','status');announcement.setAttribute('aria-live','polite');n.append(announcement);close.before(toggle);
  toggle.onclick=()=>{const show=toggle.getAttribute('aria-pressed')!=='true';japaneseVisible=show;announcement.textContent=show?'Japanese shown / 日本語を表示しました':'Japanese hidden';toggle.setAttribute('aria-pressed',String(show));toggle.setAttribute('aria-label',show?'Hide Japanese / 日本語を非表示':'Show Japanese / 日本語を表示');for(const text of dialog.querySelectorAll('.guest-japanese'))text.hidden=!show;displayName.placeholder=show?'例：Alex':'e.g. Alex';lang.setAttribute('aria-label',show?'Your language / 話す言語':'Your language');displayName.setAttribute('aria-label',show?'Name (optional) / 表示名（任意）':'Name (optional)');};
 }}
 

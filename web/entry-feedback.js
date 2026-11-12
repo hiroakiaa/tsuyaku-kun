@@ -22,9 +22,8 @@ export function searchBounds(anchor,viewport){
 }
 
 // Keep feedback in the modal top layer and restore a replaced opener after closing.
-export function installModalFeedback({dialog,message,close,resolveFocus=target=>target?.isConnected?target:null}){
+export function installModalFeedback({dialog,message,resolveFocus=target=>target?.isConnected?target:null}){
  const parent=message.parentNode,next=message.nextSibling;let returnTo,epoch=0;
- close.setAttribute('autofocus','');
  dialog.addEventListener('close',()=>{
   if(dialog.open)return;
   if(next?.parentNode===parent)parent.insertBefore(message,next);else parent.append(message);
@@ -32,7 +31,7 @@ export function installModalFeedback({dialog,message,close,resolveFocus=target=>
   const restore=()=>{if(!dialog.open&&epoch===closedEpoch&&doc&&(doc.activeElement===doc.body||dialog.contains(doc.activeElement)))resolveFocus(target)?.focus({preventScroll:true});};
   if(doc?.defaultView?.requestAnimationFrame)doc.defaultView.requestAnimationFrame(restore);else restore();
  });
- return trigger=>{epoch++;returnTo=trigger;dialog.append(message);close.focus({preventScroll:true});};
+ return trigger=>{epoch++;returnTo=trigger;dialog.append(message);dialog.focus?.({preventScroll:true});};
 }
 
 // A full or unavailable preference store must not interrupt language selection.
