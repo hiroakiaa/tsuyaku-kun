@@ -1,5 +1,5 @@
 import { captureLiveTranslationPcm } from './live-translation-capture.js';
-import { connectLiveTranslation } from './live-translation-client.js?v=20261112-live-follow-1';
+import { connectLiveTranslation } from './live-translation-client.js?v=20261112-live-paired-1';
 
 export function startFaceLiveTranslation(options) {
   const { languages } = options;
@@ -10,7 +10,7 @@ export function startFaceLiveTranslation(options) {
 }
 
 export async function startLiveTranslation({
-  apiOrigin, languages, stream, getToken, signal, onTranscript, onFallback, onFirstAudio, onLanguageState,
+  apiOrigin, languages, stream, getToken, signal, onTranscript, onFallback, onFirstAudio, onLanguageState, onSubtitleDelay,
   connect = connectLiveTranslation, capture = captureLiveTranslationPcm,
 }) {
   if (!languages.length || new Set(languages).size !== languages.length ||
@@ -69,7 +69,7 @@ export async function startLiveTranslation({
         if (controller.signal.aborted || draining) return;
         clearTimeout(captureDeadline);
         if (!receivedSubtitle && !audioDeadline && new Int16Array(pcm).some(sample => Math.abs(sample) >= 600)) {
-          audioDeadline = setTimeout(() => disconnected('subtitle timeout'), 8000);
+          audioDeadline = setTimeout(() => onSubtitleDelay?.(), 8000);
         }
         try {
           if (!connections.every(({ language, connection }) => {

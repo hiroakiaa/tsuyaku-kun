@@ -1,12 +1,12 @@
-import {createLiveCaptionBuffer} from './live-caption-buffer.js?v=20261112-live-follow-1';
-import {startLiveTranslation} from './live-translation-face.js?v=20261112-live-follow-1';
-import {liveTranslationEnabled,disableLiveTranslation} from './live-translation-setting.js?v=20261112-live-follow-1';
-import {RecognitionNoiseGuard} from './recognition-noise-guard.js?v=20261112-live-follow-1';
+import {createLiveCaptionBuffer} from './live-caption-buffer.js?v=20261112-live-paired-1';
+import {startLiveTranslation} from './live-translation-face.js?v=20261112-live-paired-1';
+import {liveTranslationEnabled,disableLiveTranslation} from './live-translation-setting.js?v=20261112-live-paired-1';
+import {RecognitionNoiseGuard} from './recognition-noise-guard.js?v=20261112-live-paired-1';
 import {isRecognitionLanguage} from './language-registry.js?v=20261103-analysis-stages-1';
 import {fillLanguageOptions,installLanguageSearch} from './language-picker.js?v=20261103-analysis-stages-1';
 import {faceTranslationTargets,speedPasswordMatches} from './economy-policy.js?v=20261103-pipeline-latency-1';
-import {createRealtimeRecovery} from './realtime-recovery.js?v=20261112-live-follow-1';
-import {createRealtimeRecognition} from './realtime-recognition.js?v=20261112-live-follow-1';
+import {createRealtimeRecovery} from './realtime-recovery.js?v=20261112-live-paired-1';
+import {createRealtimeRecognition} from './realtime-recognition.js?v=20261112-live-paired-1';
 import {createAiGate} from './ai-gate.js?v=20261029-faithful-pipeline-1';
 import {localIcon,installLocalIcons} from './icons.js?v=20261029-communication50-1';
 installLocalIcons(document);
@@ -21,13 +21,13 @@ import {safeSocketSend,microphoneHelp,participantLabel} from './session-reliabil
 import {singleFlight,installLazyAction} from './async-ui.js?v=20261103-analysis-stages-1';
 import {lessonCode,installModalFeedback,backdropClick,updateMode,searchBounds,resilientPreferences} from './entry-feedback.js?v=20261022-language-storage-1';
 import {deviceCheckPanel,microphoneUnavailable} from './device-check.js?v=20261021-text-chat-1';
-import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261112-live-follow-1';
+import {CaptionDelivery,deliveryLabel} from './caption-delivery.js?v=20261112-live-paired-1';
 import {installPhotoTranslate} from './photo-translate.js?v=20261024-usability20-3';
 import {refreshEnglishGuides,applyEnglishLabels} from './ui-english.js?v=20261029-two-language-1';
 import {SharedWordUsage} from './shared-word-usage.js?v=20261104-student-simple-2';
 import {installConversationUI,createWaitingBubble} from './conversation-ui.js?v=20261103-pipeline-latency-1';
 import {guardCaptionTranslation,hasInternalMarker,needsTranslationReview} from './translation-safety.js?v=20261029-faithful-pipeline-1';
-import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261112-live-follow-1';
+import {inspectTranslations,qualityMessage} from './translation-quality.js?v=20261112-live-paired-1';
 import {IdleWatch} from './idle-watch.js?v=20261008-safety-1';
 import {recordResource,recordPause,recordResume} from './resource-usage.js?v=20261104-student-simple-2';
 import {mayReconnect} from './resource-policy.js';
@@ -42,15 +42,15 @@ import {UsageLedger,WordUsage} from './usage.js?v=20261104-student-simple-2';
 import {CloudSpeechPlayer,createSpeechCache} from './cloud-speech-player.js?v=20261103-pipeline-latency-1';
 import {latencyFromTiming,retryDelay} from './diagnostics.js?v=20261103-speech-activity-1';
 import {config} from './config.js';
-import {ConnectionDiary,speechConnectionNeedsCheck,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261112-live-follow-1';
+import {ConnectionDiary,speechConnectionNeedsCheck,connectionFailure,requestJson,probeNetwork,isTransportFailure,translationFailureSummary,explainConnection as explainRecentConnection} from './network.js?v=20261112-live-paired-1';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
 import {translationField,translationOf,spokenLanguage,withEasyJapanese,supplementCatalog} from './core.js?v=20261029-communication50-1';
 import {speakerCaption,speakerInfo} from './face-mode.js?v=20261006-school-1';
 import {callCaptionLanguages,chatCaptionLanguages,isDisplayableCaption} from './call-mode.js?v=20261021-chat-bubbles-1';
 import {listHistory as storedHistory} from './history.js?v=20261006-school-1';
 const listHistory=()=>localStorage.getItem('tsuyaku-device-mode')==='personal'?storedHistory():Promise.resolve([]);
-import {createServerRecognition} from './caption-server.js?v=20261112-live-follow-1';
-import {createBrowserRecognition} from './caption-browser.js?v=20261112-live-follow-1';
+import {createServerRecognition} from './caption-server.js?v=20261112-live-paired-1';
+import {createBrowserRecognition} from './caption-browser.js?v=20261112-live-paired-1';
 const browserSpeechUnavailable=new Set();let recognitionKind=null,conversationUI,realtimeUnavailable=false;
 let speedAuthorized=false;localStorage.setItem('tsuyaku-recognition-speed-v1','economy');
 const preferRealtime=()=>speedAuthorized;
@@ -66,7 +66,7 @@ const sharedWords=new SharedWordUsage(localStorage,{api,catalog:()=>seed});
 const wordUsage=new WordUsage(localStorage);const ledger=new UsageLedger(localStorage,()=>Date.now(),sessionStorage),connections=new ConnectionDiary(localStorage);
 const showModalFeedback=installModalFeedback({dialog:$('#modal'),message:$('#message'),close:$('#modal-close'),resolveFocus:referenceReturnFocus});
 let messageTimer;const message=text=>{clearTimeout(messageTimer);const n=$('#message');n.textContent=text;n.hidden=!text;if(text)messageTimer=setTimeout(()=>{n.replaceChildren();n.hidden=true;},6000);};
-installLazyAction($('#admin'),async attempt=>{const {installAdmin}=await import('./admin.js?v=20261112-live-follow-1'+(attempt>1?'&retry='+attempt:''));installAdmin({wordUsage,sharedWords,api,createRecognitionSettings,showFrequentSources:()=>frequentButton.onclick(),getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});},{onError:()=>message('管理画面を読み込めませんでした。接続を確認して、もう一度ひらいてください。')});
+installLazyAction($('#admin'),async attempt=>{const {installAdmin}=await import('./admin.js?v=20261112-live-paired-1'+(attempt>1?'&retry='+attempt:''));installAdmin({wordUsage,sharedWords,api,createRecognitionSettings,showFrequentSources:()=>frequentButton.onclick(),getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});},{onError:()=>message('管理画面を読み込めませんでした。接続を確認して、もう一度ひらいてください。')});
 const lessonCaptionWaiting='再接続しました。次の字幕を待っています。';
 const status=text=>{$('#connection').textContent=text;connectionHint(text);};
 function connectionHint(text){let box=$('#connection-hint');const show=room&&!room.local&&/再接続|切れ|停止|接続でき|別のタブ/.test(text);if(!box&&show){box=el('div',undefined,'connection-hint');box.id='connection-hint';box.setAttribute('role','status');const note=el('span'),retry=el('button','再接続','secondary');retry.onclick=retryConnection;box.append(note,retry);$('#live .live-tools').prepend(box);}if(box){box.hidden=!show;box.firstChild.textContent=text;const retry=box.querySelector('button');retry.hidden=text===lessonCaptionWaiting;retry.disabled=!navigator.onLine||room?.joinBlocked===true;}}
@@ -358,7 +358,7 @@ $('#end-live-translation').onclick=async()=>{
  await $('#microphone').onclick();
  $('#microphone').focus();
 };
-$('#microphone').onclick=async event=>{if(!room||chatWaiting||microphoneStarting)return;if(event&&mic&&liveTranslationEnabled()){setLiveBadgePopup(true);$('#end-live-translation').focus();return;}if(!mic&&room.mode==='lesson'&&!$('#lesson-review-form').hidden){message('直前の字幕を送るか、取り消してください。');return;}if(!mic&&room.mode==='lesson'&&role==='teacher'&&$('#lesson-microphone-device').dataset.unavailable==='true'){message('選んだマイクが外れました。入力マイクを確認してください。');return;}if(!mic&&room.mode==='lesson'&&recognition?.finishingCapture){message('直前の発話を字幕にしています。少し待ってください。');return;}if(!mic&&typeof navigator!=='undefined'&&navigator.onLine===false){message('オフラインです。接続後にマイクをONにしてください。');return;}if(!mic&&!isRecognitionLanguage(currentSource())){setTextComposer(true);message('この言語は文字入力で利用できます。音声入力はまだ対応していません。');return;}const epoch=sessionEpoch,activation=++microphoneActivation,button=$('#microphone');microphoneStarting=true;button.disabled=true;try{if(!mic){speechPlayer.stop();paintButton(button,'マイクを準備しています','microphone');if(typeof speechConnectionNeedsCheck==='function'&&speechConnectionNeedsCheck(connections.list(),config.api)){paintButton(button,'接続を確認しています','microphone');const checks=await probeNetwork(config.api);if(!room||sessionEpoch!==epoch||activation!==microphoneActivation||document.visibilityState!=='visible')return;checks.forEach(check=>connections.add({...check,online:navigator.onLine}));if(!checks.every(check=>check.code==='ok')){paintButton(button,'マイクをONにする','microphone');showSpeechConnectionFailure();return;}}if(backgroundCallPaused){backgroundCallPaused=false;intentionalClose=false;await connect();if(sessionEpoch!==epoch||activation!==microphoneActivation)return;startConnectionTimers();}await ensureMicrophone(room.mode!=='lesson'||heldMicrophone===null);if(!room||sessionEpoch!==epoch||activation!==microphoneActivation||(document.visibilityState!=='visible'))return;mic=true;recordResume();if(speechPlayer.key&&!speechPlayer.paused){speechInputGate.begin();return;}void idleWatch.start(localStream);localStream.getAudioTracks().forEach(t=>t.enabled=true);startRecognition(false,{immediate:true});}else{mic=false;recordPause('manual',undefined,{mode:room.mode,scope:'microphone'});idleWatch.stop();if(!finishLiveCapture()&&(room.mode!=='lesson'||role!=='teacher'||!recognition?.finishCapture?.()))stopRecognition(true);localStream?.getAudioTracks().forEach(t=>t.enabled=false);}ledger.microphone(mic);ledger.event(mic?'mic_on':'mic_off');const stopLabel=room.mode==='lesson'&&role==='teacher'&&$('#lesson-single-speech').checked?'ここまでを字幕にする':'マイクをとめる';const finishing=!mic&&room.mode==='lesson'&&recognition?.finishingCapture;paintButton(button,finishing?'字幕を作成中':mic&&stopLabel==='ここまでを字幕にする'?'マイクを準備しています':mic?stopLabel:'マイクをONにする',finishing?'spinner':mic?'microphone':'microphone-slash');button.setAttribute('aria-pressed',mic);}catch(e){if(sessionEpoch!==epoch||activation!==microphoneActivation)return;mic=false;idleWatch.stop();stopRecognition();localStream?.getAudioTracks().forEach(t=>t.enabled=false);button.setAttribute('aria-pressed','false');paintButton(button,'マイクをONにする','microphone');ledger.microphone(false);ledger.event('microphone_error');message(microphoneHelp(e));}finally{microphoneStarting=false;button.disabled=false;if(room?.mode==='lesson')updateLiveActions();}};
+$('#microphone').onclick=async event=>{if(!room||chatWaiting||microphoneStarting)return;if(!mic&&room.mode==='lesson'&&!$('#lesson-review-form').hidden){message('直前の字幕を送るか、取り消してください。');return;}if(!mic&&room.mode==='lesson'&&role==='teacher'&&$('#lesson-microphone-device').dataset.unavailable==='true'){message('選んだマイクが外れました。入力マイクを確認してください。');return;}if(!mic&&room.mode==='lesson'&&recognition?.finishingCapture){message('直前の発話を字幕にしています。少し待ってください。');return;}if(!mic&&typeof navigator!=='undefined'&&navigator.onLine===false){message('オフラインです。接続後にマイクをONにしてください。');return;}if(!mic&&!isRecognitionLanguage(currentSource())){setTextComposer(true);message('この言語は文字入力で利用できます。音声入力はまだ対応していません。');return;}const epoch=sessionEpoch,activation=++microphoneActivation,button=$('#microphone');microphoneStarting=true;button.disabled=true;try{if(!mic){speechPlayer.stop();paintButton(button,'マイクを準備しています','microphone');if(typeof speechConnectionNeedsCheck==='function'&&speechConnectionNeedsCheck(connections.list(),config.api)){paintButton(button,'接続を確認しています','microphone');const checks=await probeNetwork(config.api);if(!room||sessionEpoch!==epoch||activation!==microphoneActivation||document.visibilityState!=='visible')return;checks.forEach(check=>connections.add({...check,online:navigator.onLine}));if(!checks.every(check=>check.code==='ok')){paintButton(button,'マイクをONにする','microphone');showSpeechConnectionFailure();return;}}if(backgroundCallPaused){backgroundCallPaused=false;intentionalClose=false;await connect();if(sessionEpoch!==epoch||activation!==microphoneActivation)return;startConnectionTimers();}await ensureMicrophone(room.mode!=='lesson'||heldMicrophone===null);if(!room||sessionEpoch!==epoch||activation!==microphoneActivation||(document.visibilityState!=='visible'))return;mic=true;recordResume();if(speechPlayer.key&&!speechPlayer.paused){speechInputGate.begin();return;}void idleWatch.start(localStream);localStream.getAudioTracks().forEach(t=>t.enabled=true);startRecognition(false,{immediate:true});}else{mic=false;recordPause('manual',undefined,{mode:room.mode,scope:'microphone'});idleWatch.stop();if(!finishLiveCapture()&&(room.mode!=='lesson'||role!=='teacher'||!recognition?.finishCapture?.()))stopRecognition(true);localStream?.getAudioTracks().forEach(t=>t.enabled=false);}ledger.microphone(mic);ledger.event(mic?'mic_on':'mic_off');const stopLabel=room.mode==='lesson'&&role==='teacher'&&$('#lesson-single-speech').checked?'ここまでを字幕にする':'マイクをとめる';const finishing=!mic&&room.mode==='lesson'&&recognition?.finishingCapture;paintButton(button,finishing?'字幕を作成中':mic&&stopLabel==='ここまでを字幕にする'?'マイクを準備しています':mic?stopLabel:'マイクをONにする',finishing?'spinner':mic?'microphone':'microphone-slash');button.setAttribute('aria-pressed',mic);}catch(e){if(sessionEpoch!==epoch||activation!==microphoneActivation)return;mic=false;idleWatch.stop();stopRecognition();localStream?.getAudioTracks().forEach(t=>t.enabled=false);button.setAttribute('aria-pressed','false');paintButton(button,'マイクをONにする','microphone');ledger.microphone(false);ledger.event('microphone_error');message(microphoneHelp(e));}finally{microphoneStarting=false;button.disabled=false;if(room?.mode==='lesson')updateLiveActions();}};
 let recognitionStartTimer,speechPending=false,speechPhase='waiting',recognitionRequestAt=null,recognitionRecovering=false;
 let faceLiveAttempt,liveAttemptNumber=0;
 function setLiveBadgePopup(open){
@@ -375,17 +375,20 @@ function stopFaceLiveTranslation(){
  faceLiveAttempt=null;
  hideLiveBadge();
  previous?.controller.abort();
- previous?.preview.remove();
+ if(!previous?.paused)previous?.preview.remove();
 }
 function liveCaptureEnded(attempt,complete){
- hideLiveBadge();
+ if(liveTranslationEnabled())liveBadge.hidden=false;
+ else hideLiveBadge();
  attempt.record(complete?'finished':'incomplete');
  const status=attempt.preview.querySelector('[role="status"]');
- if(status)status.textContent=complete?'Live翻訳を終了しました。':'Live字幕の末尾を確認できませんでした。';
+ if(status)status.textContent=liveTranslationEnabled()?'':complete?'Live翻訳を終了しました。':'Live字幕の末尾を確認できませんでした。';
 }
 function finishLiveCapture(){
  const attempt=faceLiveAttempt;
  if(!attempt?.finish)return false;
+ attempt.paused=room?.mode==='face'&&liveTranslationEnabled();
+ if(attempt.paused)attempt.record('mic_paused');
  attempt.record('finish_requested');
  const status=attempt.preview.querySelector('[role="status"]');
  if(status)status.textContent='最後の字幕を受信中…';
@@ -405,7 +408,6 @@ function pauseLiveTranslation(explanation){
  stopMicrophoneForConnection();
  liveBadge.hidden=false;
  message(explanation+' Liveモードで再試行するには、マイクをONにしてください。');
- clearTimeout(messageTimer);
 }
 function beginLiveTranslation(){
  if(!localStream||!liveTranslationEnabled())return false;
@@ -424,7 +426,7 @@ function beginLiveTranslation(){
  let firstSubtitle=false;
  const captions=createLiveCaptionBuffer(languages);
  const captionGrid=el('div',undefined,face?'live-caption-grid live-caption-grid-face':'live-caption-grid');
- const liveBubbles=new Map();
+ const liveBubbles=new Map(languages.map(language=>[language,{source:0,translation:0,rows:new Map()}]));
  const outputs=new Map((face?[]:languages).map((language,index)=>{
   const card=el('div',undefined,'live-caption-card');
   if(face)card.dataset.faceSide=index===0?'other':'self';
@@ -526,11 +528,42 @@ function beginLiveTranslation(){
   });
   return token;
  });
+ function renderLiveBubble(language,event){
+  const follow=captionList.scrollHeight-captionList.scrollTop-captionList.clientHeight<48;
+  const state=liveBubbles.get(language);
+  const field=event.field;
+  for(const part of event.delta.match(/[^。！？.!?\n]+|[。！？.!?\n]/gu)||[]){
+   const index=state[field];
+   let bubble=state.rows.get(index);
+   if(!bubble){
+    if(!part.trim())continue;
+    const card=el('div',undefined,'live-caption-card');
+    const side=language===languages[0]?'other':'self';
+    card.dataset.faceSide=side;
+    const original=el('p',undefined,'live-caption-source'),translation=el('p');
+    original.lang=language==='ja'?'en':'ja';
+    translation.lang=language;
+    card.append(el('h3',side==='other'?'相手':'自分'),original,translation);
+    bubble={card,source:original,translation};
+    state.rows.set(index,bubble);
+   }
+   const line=bubble[field];
+   line.textContent=(line.textContent+part).slice(-1000);
+   if(field==='translation'&&!bubble.card.isConnected){
+    captionList.querySelector('#empty-caption')?.remove();
+    captionGrid.append(bubble.card);
+    if(captionGrid.childElementCount>80)captionGrid.firstElementChild.remove();
+   }
+   if(/^[。！？.!?\n]$/u.test(part))state[field]++;
+   for(const key of state.rows.keys())if(key<Math.max(state.source,state.translation)-80)state.rows.delete(key);
+  }
+  if(follow)captionList.scrollTop=captionList.scrollHeight;
+ }
  void startLiveTranslation({
   apiOrigin:config.api,languages,stream:localStream,getToken,signal:controller.signal,
   onTranscript:(language,event)=>{
    const caption=captions.append(language,event);
-   if(caption===null)return;
+   if(caption===null){if(face&&event.field==='source')renderLiveBubble(language,event);return;}
    if(event.field==='translation'&&event.delta.trim()){
     const updates=(subtitleUpdates.get(language)||0)+1;
     subtitleUpdates.set(language,updates);
@@ -542,38 +575,12 @@ function beginLiveTranslation(){
     attempt.record('first_subtitle');
     liveStatus.textContent='マイク開始処理から最初のLive字幕まで '+((performance.now()-startedAt)/1000).toFixed(2)+'秒';
    }
-   if(face){
-    const follow=captionList.scrollHeight-captionList.scrollTop-captionList.clientHeight<48;
-    captionList.querySelector('#empty-caption')?.remove();
-    let bubble=liveBubbles.get(language);
-    for(const part of event.delta.match(/[^。！？.!?\n]+|[。！？.!?\n]/gu)||[]){
-     if(!bubble?.isConnected){
-      if(!part.trim())continue;
-      const card=el('div',undefined,'live-caption-card');
-      const side=language===languages[0]?'other':'self';
-      card.dataset.faceSide=side;
-      card.classList.add('live-caption-in-progress');
-      bubble=el('p');
-      bubble.lang=language;
-      card.append(el('h3',side==='other'?'相手':'自分'),bubble);
-      captionGrid.append(card);
-      liveBubbles.set(language,bubble);
-      if(captionGrid.childElementCount>80)captionGrid.firstElementChild.remove();
-     }
-     bubble.textContent=(bubble.textContent+part).slice(-1000);
-     if(/^[。！？.!?\n]$/u.test(part)){
-      bubble.parentElement.classList.remove('live-caption-in-progress');
-      liveBubbles.delete(language);
-      bubble=null;
-     }
-    }
-    if(follow)captionList.scrollTop=captionList.scrollHeight;
-    return;
-   }
+   if(face){renderLiveBubble(language,event);return;}
    const output=outputs.get(language);
    output.textContent=caption;
    publishSnapshot(language,output);
   },
+  onSubtitleDelay:()=>{attempt.record('subtitle_delayed',{liveReason:'subtitle timeout'});message('Live字幕を待っています。');},
   onFirstAudio:()=>attempt.record('first_audio'),
   onLanguageState:(language,stage,bytes)=>attempt.record('language_'+stage,{
    liveLanguage:language,
