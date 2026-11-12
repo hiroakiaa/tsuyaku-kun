@@ -166,6 +166,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   const batch=new Map(pending);
   const transcript=[...batch.values()].join('\n');
   const started=performance.now(),captionCount=pending.size;
+  const queueMs=pendingSince===null?null:Math.round(started-pendingSince);
   pending.clear();
   pendingSince=null;
   try{
@@ -181,7 +182,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
     let end=offset,length=0;
     while(end<characters.length&&length+characters[end].length<=6000)length+=characters[end++].length;
     const section=characters.slice(offset,end).join('');
-    record('requested',{operation:controller.operation,captionCount:offset===0?captionCount:0,characters:section.length});
+    record('requested',{operation:controller.operation,captionCount:offset===0?captionCount:0,characters:section.length,queueMs:offset===0?queueMs:null});
     const startedAt=performance.now();
     result=await api('/live-summary',{transcript:section,previous,language:target,final},{signal:controller.signal});
     if(controller.signal.aborted)return;
