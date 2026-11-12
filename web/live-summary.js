@@ -137,8 +137,13 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  }
  function boundedText(text,limit,fromEnd=false){
   if(text.length<=limit)return text;
-  noteDiscard({characters:text.length-limit});
-  return fromEnd?text.slice(-limit):text.slice(0,limit);
+  const boundary=fromEnd?text.length-limit:limit;
+  const left=text.charCodeAt(boundary-1),right=text.charCodeAt(boundary);
+  const splitPair=left>=0xd800&&left<=0xdbff&&right>=0xdc00&&right<=0xdfff;
+  const cut=boundary+(splitPair?(fromEnd?1:-1):0);
+  const retained=fromEnd?text.slice(cut):text.slice(0,cut);
+  noteDiscard({characters:text.length-retained.length});
+  return retained;
  }
  function trimPending(){
   while(pending.size>80){
