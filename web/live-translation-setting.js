@@ -1,6 +1,7 @@
 let enabled = false;
 
 export function liveTranslationEnabled() { return enabled; }
+export function disableLiveTranslation() { enabled = false; }
 
 export function createLiveTranslationSetting(el) {
   const label = el('label', 'GPT Live翻訳（試験）', 'admin-check');
