@@ -14,6 +14,7 @@ export function createLiveSummarySetting(el){
 
 export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  const pending=new Map(),seen=new Map(),history=[];
+ let checkpoint=null;
  const wide=matchMedia('(min-width:900px), (min-width:480px) and (max-height:620px)');
  let timer,request,panel,output,status,button,badge,dialog,wiki,wikiRequest,translationButton,translationRequest,summaryLanguage,historyPanel,finalizeButton,retryButton,finalizing=false,isFinal=false,summary='';
  function read(){badge.hidden=true;button.setAttribute('aria-label','要約を表示');}
@@ -93,6 +94,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   clearTimeout(timer);timer=null;
   if(request){request.abort();record('cancelled',{operation:request.operation});}request=null;
   if(translationRequest){translationRequest.abort();translationRequest=null;record('cancelled',{operation:'translation'});}
+  checkpoint=null;
   pending.clear();seen.clear();history.length=0;finalizing=false;isFinal=false;summary='';
   wikiRequest?.abort();wiki?.remove();wiki=null;
   dialog?.remove();dialog=null;
@@ -117,8 +119,12 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    const target=language();
    const material=final?history.map(entry=>entry.text).concat(transcript).filter(Boolean).join('\n\n'):transcript;
    const characters=Array.from(material);
-   let previous='',result;
-   for(let offset=0;offset<characters.length;){
+   const resume=checkpoint?.target===target&&checkpoint.final===final&&material.startsWith(checkpoint.prefix);
+   let previous=resume?checkpoint.result.summary:'';
+   let result=resume?checkpoint.result:null;
+   let offset=resume?checkpoint.offset:0;
+   checkpoint=null;
+   while(offset<characters.length){
     let end=offset,length=0;
     while(end<characters.length&&length+characters[end].length<=6000)length+=characters[end++].length;
     const section=characters.slice(offset,end).join('');
@@ -129,7 +135,11 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
     record('succeeded',{operation:controller.operation,elapsedMs:Math.round(performance.now()-startedAt),usage:result.usage});
     previous=result.summary;
     offset=end;
+    if(material.length<=96000&&offset<characters.length){
+     checkpoint={target,final,offset,prefix:characters.slice(0,offset).join(''),result};
+    }
    }
+   checkpoint=null;
    if(!final)history.push({text:result.summary,language:target,time:new Date()});
    if(controller.signal.aborted)return;
    if(translationRequest){translationRequest.abort();translationRequest=null;record('cancelled',{operation:'translation'});}
