@@ -14,7 +14,7 @@ export function createLiveSummarySetting(el){
 
 export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  const pending=new Map(),seen=new Map(),history=[];
- let checkpoint=null,pendingSince=null;
+ let checkpoint=null,pendingSince=null,bufferNotice,bufferDiscarded=false;
  const wide=matchMedia('(min-width:900px), (min-width:480px) and (max-height:620px)');
  let timer,request,panel,output,status,button,badge,dialog,wiki,wikiRequest,translationButton,translationRequest,summaryLanguage,historyPanel,finalizeButton,retryButton,finalSummaryTime,finalizing=false,isFinal=false,summary='';
  function notifySummary(label){
@@ -119,6 +119,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   if(translationRequest){translationRequest.abort();translationRequest=null;record('cancelled',{operation:'translation'});}
   checkpoint=null;
   pendingSince=null;
+  bufferNotice=null;bufferDiscarded=false;
   pending.clear();seen.clear();history.length=0;finalizing=false;isFinal=false;summary='';
   wikiRequest?.abort();wiki?.remove();wiki=null;
   dialog?.remove();dialog=null;
@@ -129,15 +130,20 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  function schedule(){
   if(enabled&&pending.size&&!timer&&!request)timer=setTimeout(update,Math.max(0,60000-(performance.now()-(pendingSince??performance.now()))));
  }
+ function noteDiscard(details){
+  record('bufferDiscarded',details);
+  bufferDiscarded=true;
+  if(bufferNotice)bufferNotice.hidden=false;
+ }
  function boundedText(text,limit,fromEnd=false){
   if(text.length<=limit)return text;
-  record('bufferDiscarded',{characters:text.length-limit});
+  noteDiscard({characters:text.length-limit});
   return fromEnd?text.slice(-limit):text.slice(0,limit);
  }
  function trimPending(){
   while(pending.size>80){
    const oldest=pending.keys().next().value;
-   record('bufferDiscarded',{captionCount:1,characters:pending.get(oldest).length});
+   noteDiscard({captionCount:1,characters:pending.get(oldest).length});
    pending.delete(oldest);
   }
  }
@@ -301,7 +307,10 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    retryButton=el('button','要約を再試行');
    retryButton.type='button';
    retryButton.hidden=true;
-   panel.append(finalizeButton,translationButton,output,status,retryButton,historyPanel);
+   bufferNotice=el('p','保持上限に達したため、要約に含まれない字幕があります。','admin-caption');
+   bufferNotice.hidden=!bufferDiscarded;
+   bufferNotice.setAttribute('role','status');
+   panel.append(finalizeButton,translationButton,bufferNotice,output,status,retryButton,historyPanel);
    dialog=makeDialog('Live要約');
    button=el('button','要約を表示');
    button.type='button';
