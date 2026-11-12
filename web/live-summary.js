@@ -14,7 +14,7 @@ export function createLiveSummarySetting(el){
 
 export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  const pending=new Map(),seen=new Map(),history=[];
- let checkpoint=null;
+ let checkpoint=null,pendingSince=null;
  const wide=matchMedia('(min-width:900px), (min-width:480px) and (max-height:620px)');
  let timer,request,panel,output,status,button,badge,dialog,wiki,wikiRequest,translationButton,translationRequest,summaryLanguage,historyPanel,finalizeButton,retryButton,finalSummaryTime,finalizing=false,isFinal=false,summary='';
  function notifySummary(label){
@@ -118,6 +118,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   if(request){request.abort();record('cancelled',{operation:request.operation});}request=null;
   if(translationRequest){translationRequest.abort();translationRequest=null;record('cancelled',{operation:'translation'});}
   checkpoint=null;
+  pendingSince=null;
   pending.clear();seen.clear();history.length=0;finalizing=false;isFinal=false;summary='';
   wikiRequest?.abort();wiki?.remove();wiki=null;
   dialog?.remove();dialog=null;
@@ -126,7 +127,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  }
  stop=reset;
  function schedule(){
-  if(enabled&&pending.size&&!timer&&!request)timer=setTimeout(update,60000);
+  if(enabled&&pending.size&&!timer&&!request)timer=setTimeout(update,Math.max(0,60000-(performance.now()-(pendingSince??performance.now()))));
  }
  async function update(final=false){
   clearTimeout(timer);timer=null;
@@ -138,6 +139,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   const transcript=[...batch.values()].join('\n');
   const started=performance.now(),captionCount=pending.size;
   pending.clear();
+  pendingSince=null;
   try{
    const target=language();
    const material=final?history.map(entry=>entry.text).concat(transcript).filter(Boolean).join('\n\n'):transcript;
@@ -183,6 +185,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   }catch{
    if(!controller.signal.aborted){
     record('failed',{operation:controller.operation,elapsedMs:Math.round(performance.now()-started)});
+    pendingSince=performance.now();
     const newer=[...pending];
     pending.clear();
     for(const [id,text] of batch)pending.set(id,text);
@@ -251,6 +254,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   if(!append&&seen.get(id)===value)return;
   seen.set(id,value);
   if(seen.size>256)seen.delete(seen.keys().next().value);
+  pendingSince??=performance.now();
   pending.set(id,value);
   if(pending.size>80)pending.delete(pending.keys().next().value);
   if(!panel){
