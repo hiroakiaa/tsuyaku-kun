@@ -1,7 +1,7 @@
-import {encodeWav,tokenWithAbort} from './caption-server.js?v=20261112-summary-reading-language-1';
+import {encodeWav,tokenWithAbort} from './caption-server.js?v=20261112-room-live-paired-1';
 import {firstVoicedAt,lastVoicedAt} from './diagnostics.js?v=20261103-audio-offset-1';
 import {speechTextAllowed} from './two-language.js?v=20261029-communication50-1';
-import {nonSpeechReason} from './speech-filter.js?v=20261112-summary-reading-language-1';
+import {nonSpeechReason} from './speech-filter.js?v=20261112-room-live-paired-1';
 import {recognitionMetrics} from './recognition-metrics.js?v=20261029-communication50-1';
 export class FreshAudioWindow{
  constructor(){this.frames=[];this.length=0;}
