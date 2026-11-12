@@ -276,9 +276,9 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   clearTimeout(timer);timer=null;
   if(!request)void update(true);
  }
- function add(id,text,append=false){
+ function add(id,text,append=false,limit=append?6000:1200){
   if(!enabled||typeof text!=='string'||(!text.trim()&&!(append&&pending.has(id))))return;
-  const value=append?((pending.get(id)||'')+text).slice(-6000):boundedText(text.trim(),1200);
+  const value=boundedText(append?(pending.get(id)||'')+text:text.trim(),limit,append);
   if(!append&&seen.get(id)===value)return;
   seen.set(id,value);
   if(seen.size>256)seen.delete(seen.keys().next().value);
