@@ -122,7 +122,36 @@ export function createRecognitionCostView({el,exchange}){
    el('p','Live要約込みは無料枠適用前の運用変動費です。1分ごとに入力1,500・出力300トークンを使う想定で、実際の字幕量と更新回数により変わります。','admin-caption'),
    el('p','2026年11月12日確認。外部の定額プランは契約料金、APIは訳先1言語の無料枠適用前。Google NMTは月50万文字相当、Amazonは対象アカウントで最初の12か月、月200万文字まで。枠を全量使える前提です。','admin-caption'),
    el('p','通訳君はマイクON1分あたり原文300文字、文字数÷300でマイクON時間を換算した運用変動費。通常・速度優先の0円はCloudflareの共有無料枠やAzure F0などで処理全量を賄える場合です。残枠や実際に無料で使える時間はアカウントの利用状況に依存します。Liveは1〜2接続。話す速度、無音、言語、接続数で変動します。為替は管理者画面の設定を使用します。','admin-caption'));
-  content.replaceChildren(table,detail,market,el('p',description,'admin-caption'),el('p','マイクON時間で比較。通常は発話が半分、AI翻訳は1分4回（各入力250・出力25トークン）を仮定。1ドル＝'+rate+'円。変動費の試算で、固定費・再試行・写真・読み上げは含みません。','admin-caption'));
+  const lesson=el('section');
+  const lessonTable=el('table',undefined,'admin-cost-table');
+  const lessonHead=el('thead'),lessonHeading=el('tr'),lessonBody=el('tbody');
+  for(const title of ['授業モード','字幕・翻訳／1回','Live要約／1回','合計／45分1回','合計／月20回']){
+   const cell=el('th',title);
+   cell.scope='col';
+   lessonHeading.append(cell);
+  }
+  lessonHead.append(lessonHeading);
+  const lessonYen=usd=>(usd*rate).toLocaleString('ja-JP',{minimumFractionDigits:2,maximumFractionDigits:2})+'円';
+  const summaryCost=summaryPerMinute*45;
+  for(const [name,perMinute] of [
+   ['通常',segmented],['速度',RECOGNITION_PRICE.streamPerMinute],['リアルタイム',LIVE_TRANSLATION_USD_PER_MINUTE],
+  ]){
+   const row=el('tr'),label=el('th',name);
+   label.scope='row';
+   const captionCost=perMinute*45;
+   const total=captionCost+summaryCost;
+   row.append(label,...[captionCost,summaryCost,total,total*20].map(cost=>el('td',lessonYen(cost))));
+   lessonBody.append(row);
+  }
+  lessonTable.append(lessonHead,lessonBody);
+  const lessonScroll=el('div');
+  lessonScroll.style.overflowX='auto';
+  lessonScroll.append(lessonTable);
+  lesson.append(el('h4','学校の授業 45分×月20回'),lessonScroll,
+   el('p','先生1人・訳先1言語・要約1端末の試算です。通常は45分のうち半分を音声送信、速度とリアルタイムは45分送信と仮定します。','admin-caption'),
+   el('p','通常・速度の字幕翻訳はAzure F0の対応言語・無料枠内で0円とします。授業モードは有料のテキスト翻訳へ自動で切り替えません。リアルタイムは1接続の音声料金に翻訳が含まれます。','admin-caption'),
+   el('p','Live要約は毎分1回、入力1,500・出力300トークンと仮定します。認識・要約は共有無料枠適用前です。複数の端末で要約を生成すると、その回数に応じて費用が増えます。固定費は含みません。','admin-caption'));
+  content.replaceChildren(table,detail,lesson,market,el('p',description,'admin-caption'),el('p','マイクON時間で比較。通常は発話が半分、AI翻訳は1分4回（各入力250・出力25トークン）を仮定。1ドル＝'+rate+'円。変動費の試算で、固定費・再試行・写真・読み上げは含みません。','admin-caption'));
  }
  render();
  return {box,render};
