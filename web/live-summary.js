@@ -15,7 +15,7 @@ export function createLiveSummarySetting(el){
 export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  const pending=new Map(),seen=new Map(),history=[];
  const wide=matchMedia('(min-width:900px), (min-width:480px) and (max-height:620px)');
- let timer,request,panel,output,status,button,badge,dialog,wiki,wikiRequest,translationButton,translationRequest,summaryLanguage,historyPanel,finalizeButton,finalizing=false,isFinal=false,summary='';
+ let timer,request,panel,output,status,button,badge,dialog,wiki,wikiRequest,translationButton,translationRequest,summaryLanguage,historyPanel,finalizeButton,retryButton,finalizing=false,isFinal=false,summary='';
  function read(){badge.hidden=true;button.setAttribute('aria-label','要約を表示');}
  function place(){
   if(!panel)return;
@@ -104,7 +104,8 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   if(enabled&&pending.size&&!timer&&!request)timer=setTimeout(update,60000);
  }
  async function update(final=false){
-  timer=null;
+  clearTimeout(timer);timer=null;
+  retryButton.hidden=true;
   const controller=new AbortController();
   request=controller;
   const batch=new Map(pending);
@@ -152,7 +153,9 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
     for(const [id,text] of batch)pending.set(id,text);
     for(const [id,text] of newer)pending.set(id,typeof id==='string'&&id.endsWith(':live')?((pending.get(id)||'')+text).slice(-6000):text);
     while(pending.size>80)pending.delete(pending.keys().next().value);
-    status.textContent=final?'全体要約を作成できませんでした。もう一度お試しください。':'要約を更新できませんでした。';
+    status.textContent=final?'全体要約を作成できませんでした。':'要約を更新できませんでした。';
+    retryButton.onclick=()=>{if(!request)void update(final);};
+    retryButton.hidden=false;
    }
   }finally{
    if(request===controller){
@@ -230,7 +233,10 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    Object.assign(historyPanel.style,{maxBlockSize:'min(32dvh, 16rem)',overflowY:'auto',overscrollBehaviorY:'contain'});
    historyPanel.tabIndex=0;
    historyPanel.append(el('h3','時系列の要約'));
-   panel.append(finalizeButton,translationButton,output,status,historyPanel);
+   retryButton=el('button','要約を再試行');
+   retryButton.type='button';
+   retryButton.hidden=true;
+   panel.append(finalizeButton,translationButton,output,status,retryButton,historyPanel);
    dialog=makeDialog('Live要約');
    button=el('button','要約を表示');
    button.type='button';
