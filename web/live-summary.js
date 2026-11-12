@@ -70,6 +70,10 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  function renderSummary(text=summary,target=summaryLanguage,container=output){
   const lines=text.split(/\r?\n/).map(line=>line.trim()).filter(Boolean);
   const scrollTop=container.scrollTop;
+  const active=document.activeElement;
+  const focusedTerm=active?.dataset?.summaryTerm;
+  const restoreFocus=focusedTerm!==undefined&&container.contains(active);
+  let matchingTerm;
   container.replaceChildren();
   if(container===output&&isFinal)container.append(el('h3','全体要約'));
   let list;
@@ -84,6 +88,8 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
     if(part.startsWith('[[')&&part.endsWith(']]')){
      const term=part.slice(2,-2),link=el('button',term);
      link.type='button';
+     link.dataset.summaryTerm=term;
+     if(restoreFocus&&term===focusedTerm)matchingTerm??=link;
      Object.assign(link.style,{display:'inline',minHeight:'0',padding:'0 .2em',textDecoration:'underline',font:'inherit'});
      link.onclick=()=>void showTerm(term,target);
      node.append(link);
@@ -94,6 +100,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
     list.append(node);
    }else container.append(node);
   }
+  if(restoreFocus)(matchingTerm||container).focus({preventScroll:true});
   container.scrollTop=scrollTop;
  }
 
