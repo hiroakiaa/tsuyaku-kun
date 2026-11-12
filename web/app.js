@@ -529,7 +529,7 @@ function beginLiveTranslation(){
  const sourceUpdates=new Map(), sourceDisplays=new Map();
  function alignLiveTranslation(state){
   state.pending=state.pending.filter(event=>{
-   const candidates=state.rows.filter(row=>Number.isFinite(row.start)&&event.elapsedMs>=row.start-200&&event.elapsedMs<=row.end+200);
+   const candidates=state.rows.filter(row=>Number.isFinite(row.start)&&event.elapsedMs>=row.start-200&&event.elapsedMs<=row.end+(/^[。！？.!?]+$/.test(event.delta.trim())?600:200));
    if(candidates.length!==1)return true;
    const {translation}=candidates[0];
    translation.textContent=(translation.textContent+event.delta).slice(-1000);
