@@ -91,8 +91,8 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
 
  function reset(){
   clearTimeout(timer);timer=null;
-  if(request){request.abort();record('cancelled');}request=null;
-  if(translationRequest){translationRequest.abort();translationRequest=null;record('cancelled');}
+  if(request){request.abort();record('cancelled',{operation:request.operation});}request=null;
+  if(translationRequest){translationRequest.abort();translationRequest=null;record('cancelled',{operation:'translation'});}
   pending.clear();seen.clear();history.length=0;finalizing=false;isFinal=false;summary='';
   wikiRequest?.abort();wiki?.remove();wiki=null;
   dialog?.remove();dialog=null;
@@ -107,6 +107,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   clearTimeout(timer);timer=null;
   retryButton.hidden=true;
   const controller=new AbortController();
+  controller.operation=final?'final':'interval';
   request=controller;
   const batch=new Map(pending);
   const transcript=[...batch.values()].join('\n');
@@ -121,17 +122,17 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
     let end=offset,length=0;
     while(end<characters.length&&length+characters[end].length<=6000)length+=characters[end++].length;
     const section=characters.slice(offset,end).join('');
-    record('requested',{captionCount:offset===0?captionCount:0,characters:section.length});
+    record('requested',{operation:controller.operation,captionCount:offset===0?captionCount:0,characters:section.length});
     const startedAt=performance.now();
     result=await api('/live-summary',{transcript:section,previous,language:target,final},{signal:controller.signal});
     if(controller.signal.aborted)return;
-    record('succeeded',{elapsedMs:Math.round(performance.now()-startedAt),usage:result.usage});
+    record('succeeded',{operation:controller.operation,elapsedMs:Math.round(performance.now()-startedAt),usage:result.usage});
     previous=result.summary;
     offset=end;
    }
    if(!final)history.push({text:result.summary,language:target,time:new Date()});
    if(controller.signal.aborted)return;
-   if(translationRequest){translationRequest.abort();translationRequest=null;record('cancelled');}
+   if(translationRequest){translationRequest.abort();translationRequest=null;record('cancelled',{operation:'translation'});}
    if(final&&transcript)history.push({text:transcript,language:target,time:new Date()});
    summary=result.summary;
    isFinal=final;
@@ -147,7 +148,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    status.textContent='';
   }catch{
    if(!controller.signal.aborted){
-    record('failed',{elapsedMs:Math.round(performance.now()-started)});
+    record('failed',{operation:controller.operation,elapsedMs:Math.round(performance.now()-started)});
     const newer=[...pending];
     pending.clear();
     for(const [id,text] of batch)pending.set(id,text);
@@ -172,11 +173,11 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   translationRequest=controller;
   translationButton.disabled=true;
   const started=performance.now();
-  record('requested',{characters:summary.length});
+  record('requested',{operation:'translation',characters:summary.length});
   try{
    const result=await api('/live-summary',{transcript:summary,previous:'',language:'ja',translate:true},{signal:controller.signal});
    if(controller.signal.aborted)return;
-   record('succeeded',{elapsedMs:Math.round(performance.now()-started),usage:result.usage});
+   record('succeeded',{operation:'translation',elapsedMs:Math.round(performance.now()-started),usage:result.usage});
    const toggle=showJapanese=>{
     renderSummary(showJapanese?result.summary:summary,showJapanese?'ja':summaryLanguage);
     translationButton.textContent=showJapanese?'要約の原文を表示':'日本語訳を表示';
@@ -185,7 +186,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    toggle(true);
   }catch{
    if(controller.signal.aborted)return;
-   record('failed',{elapsedMs:Math.round(performance.now()-started)});
+   record('failed',{operation:'translation',elapsedMs:Math.round(performance.now()-started)});
    status.textContent='要約の日本語訳を取得できませんでした。';
   }finally{
    if(translationRequest===controller){translationRequest=null;translationButton.disabled=false;}
