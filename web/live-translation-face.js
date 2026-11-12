@@ -1,5 +1,5 @@
 import { captureLiveTranslationPcm } from './live-translation-capture.js?v=live-tail-1';
-import { connectLiveTranslation } from './live-translation-client.js?v=20261112-live-restart-1';
+import { connectLiveTranslation } from './live-translation-client.js?v=20261112-live-short-1';
 
 export function startFaceLiveTranslation(options) {
   const { languages } = options;
@@ -93,7 +93,7 @@ export async function startLiveTranslation({
       await captureStop?.flush?.();
       if(captureStop?.flush && sentAudio){
         const silence=new ArrayBuffer(4800);
-        for(let i=0;i<8&&!controller.signal.aborted;i++){
+        for(let i=0;i<15&&!controller.signal.aborted;i++){
           await new Promise(resolve=>setTimeout(resolve,100));
           sendAudio(silence);
         }
