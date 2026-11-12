@@ -1,5 +1,5 @@
 import { captureLiveTranslationPcm } from './live-translation-capture.js?v=live-tail-1';
-import { connectLiveTranslation } from './live-translation-client.js?v=20261112-live-short-1';
+import { connectLiveTranslation } from './live-translation-client.js?v=20261112-live-reply-1';
 
 export function startFaceLiveTranslation(options) {
   const { languages } = options;
@@ -10,7 +10,7 @@ export function startFaceLiveTranslation(options) {
 }
 
 export async function startLiveTranslation({
-  apiOrigin, languages, stream, getToken, signal, onTranscript, onFallback, onFirstAudio, onLanguageState, onSubtitleDelay,
+  apiOrigin, languages, stream, getToken, signal, onTranscript, onFallback, onFirstAudio, onLanguageState, onSubtitleDelay, onFinalAudio,
   connect = connectLiveTranslation, capture = captureLiveTranslationPcm,
 }) {
   if (!languages.length || new Set(languages).size !== languages.length ||
@@ -63,7 +63,16 @@ export async function startLiveTranslation({
     }));
 
     captureDeadline = setTimeout(() => disconnected('capture timeout'), 5000);
-    function sendAudio(pcm) {
+    const recentAudio=[];
+    let audioSamples=0,lastVoice=-Infinity;
+    function sendAudio(pcm, padding=false) {
+        if(onFinalAudio&&!padding&&!controller.signal.aborted&&!draining){
+          const samples=new Int16Array(pcm);
+          recentAudio.push(samples);
+          audioSamples+=samples.length;
+          if(samples.some(sample=>Math.abs(sample)>=450))lastVoice=audioSamples;
+          if(recentAudio.length>18)recentAudio.shift();
+        }
         if (controller.signal.aborted || draining) return;
         clearTimeout(captureDeadline);
         if (!receivedSubtitle && !audioDeadline && new Int16Array(pcm).some(sample => Math.abs(sample) >= 600)) {
@@ -95,7 +104,7 @@ export async function startLiveTranslation({
         const silence=new ArrayBuffer(4800);
         for(let i=0;i<15&&!controller.signal.aborted;i++){
           await new Promise(resolve=>setTimeout(resolve,100));
-          sendAudio(silence);
+          sendAudio(silence,true);
         }
       }
       draining = true;
@@ -106,6 +115,9 @@ export async function startLiveTranslation({
         onLanguageState?.(language, complete ? 'confirmed' : 'unconfirmed');
         return complete;
       }));
+      if(onFinalAudio&&!controller.signal.aborted&&audioSamples-lastVoice<=24000){
+        await onFinalAudio(recentAudio, lastVoice/24);
+      }
       stop();
       return results.every(Boolean);
     };
