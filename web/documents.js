@@ -130,7 +130,11 @@ function teacher() {
     $('#result').hidden = true;
     status.textContent = 'PDFを開いています…';
     try {
-      data.set('pages',JSON.stringify(await extract(file,status)));
+      if (/\.pdf$/i.test(file.name)) data.set('pages',JSON.stringify(await extract(file,status)));
+      if (/\.(docx|xlsx)$/i.test(file.name)) {
+        const {officePages} = await import('./document-office.js');
+        data.set('pages',JSON.stringify(await officePages(file)));
+      }
       status.textContent = '案内ページを作っています…';
       const {id,expires} = await request('/documents',{method:'POST',body:data});
       const url = '?id=' + id;
@@ -190,6 +194,12 @@ async function reader() {
     tabs[0].focus();
   });
   $('#reopen-pdf').addEventListener('click',()=>void showPdf(selectedPage || 1));
+  const sourceType = doc.sourceType ?? 'pdf';
+  if (sourceType!=='pdf') {
+    $('#doc-caption').textContent = '資料データ · '+sourceType.toUpperCase();
+    $('#tab-original').textContent = '資料データ';
+    $('#reopen-pdf').textContent = '資料データを表示';
+  }
   let opened,originalUrl;
   let selectedPage = 0;
   let activeRender;
@@ -209,6 +219,22 @@ async function reader() {
     $('#pdf-file').href = api + '/pdf#page=' + n;
     $('#pdf-status').textContent = 'PDFを表示しています…';
     $('#pdf-heading').focus();
+    if (sourceType!=='pdf') {
+      $('#pdf-heading').textContent = '資料データ';
+      $('#pdf-file').textContent = '資料データをダウンロード';
+      $('#pdf-file').removeAttribute('href');
+      for (const node of ['#pdf-prev','#pdf-next','#pdf-page','#pdf-canvas']) $(node).hidden=true;
+      try {
+        const response=await fetch(config.api+api+'/pdf',{headers:await authHeaders()});
+        if (!response.ok) throw Error('資料データを取得できませんでした。');
+        if (originalUrl) URL.revokeObjectURL(originalUrl);
+        originalUrl=URL.createObjectURL(await response.blob());
+        $('#pdf-file').href=originalUrl;
+        $('#pdf-file').download='source.'+sourceType;
+        $('#pdf-status').textContent='';
+      } catch(error) { $('#pdf-status').textContent=error.message; }
+      return;
+    }
     if (activeRender) activeRender.cancel();
     try {
       opened ??= fetch(config.api + api + '/pdf',{headers:await authHeaders()}).then(async response=>{
@@ -246,7 +272,7 @@ async function reader() {
       append(parent,'p',material.name+' · '+(n-material.start+1)+' '+material.unit,'ref');
       return;
     }
-    const link = append(parent,'a','元のPDF ' + n + 'ページ →','ref');
+    const link = append(parent,'a',sourceType==='pdf' ? '元のPDF ' + n + 'ページ →' : '資料データ'+(sourceType==='xlsx' ? ' · シート '+n : '')+' →','ref');
     link.href = '#original';
     link.addEventListener('click',event=>{event.preventDefault(); void showPdf(n);});
   }

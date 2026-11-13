@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1d1d1d">
 <title>資料QA君</title>
-<link rel="stylesheet" href="web/documents.css?v=10">
-<script type="module" src="web/documents.js?v=9"></script>
+<link rel="stylesheet" href="web/documents.css?v=11">
+<script type="module" src="web/documents.js?v=11"></script>
 </head>
 <body><div class="shell">
 
@@ -14,15 +14,15 @@
 </div>
 <template id="teacher">
 <section class="intro">
-<h1>PDFから案内を作る</h1>
-<p>資料を登録すると、要点と質問欄のあるページができます。</p>
+<h1>資料QAを作る</h1>
+<p>資料を登録すると、要点を示し、資料専用のチャットボットを作ります。</p>
 </section>
 <section class="panel document-panel">
 <form class="stack" id="upload">
 <label>案内のタイトル<input name="title" maxlength="100" placeholder="例：新1年生の入学案内" required></label>
-<label>元のPDF<input type="file" name="pdf" accept="application/pdf,.pdf" required></label>
-<p class="fine">文字を選べるPDFを使ってください。5 MB、40ページまで。</p>
-<button class="primary">案内を作る</button><p class="fine">URLを知っている人がPDFを読めます。個人情報のない資料を使ってください。</p>
+<label>資料データ<input type="file" name="pdf" accept=".pdf,.png,.jpg,.jpeg,.webp,.docx,.xlsx" required></label>
+<p class="fine">PDF、5 MB、40ページまで。画像（PNG・JPEG・WebP）、Excel（.xlsx）、Word（.docx）にも対応。</p>
+<button class="primary create-guide">作成する</button>
 </form>
 <p id="upload-status" role="status"></p>
 <div id="result" hidden>
