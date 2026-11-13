@@ -325,7 +325,8 @@ async function reader() {
         }
         return box;
       }
-      function showItem(item) {
+      async function showItem(item) {
+        if (box) await new Promise(resolve=>setTimeout(resolve,220));
         const first = !box;
         const answer = answerBox();
           const section = append(answer,'section','','answer-item');
@@ -343,7 +344,10 @@ async function reader() {
       }
       if (!response.headers.get('Content-Type')?.includes('application/x-ndjson')) {
         const result = await response.json();
-        for (const item of result.items ?? []) showItem(item);
+        for (const item of result.items ?? []) {
+          status.textContent = '確認できた回答を表示しています…';
+          await showItem(item);
+        }
         if (!box) append(answerBox(),'p',result.answer);
       } else {
         const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
@@ -360,7 +364,7 @@ async function reader() {
               if (event.error) throw Error(event.error);
               if (event.status) status.textContent=event.status;
               if (event.item) {
-                showItem(event.item);
+                await showItem(event.item);
                 status.textContent='続きの回答を確認しています…';
               }
               if (event.done) {

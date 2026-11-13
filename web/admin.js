@@ -67,7 +67,7 @@ documentsButton.onclick=()=>{
   heading.append(el('h2','資料QA'),actions);
   const frame=el('iframe');
   frame.title='資料QA';
-  frame.src='documents.html?embedded=1&v=8';
+  frame.src='documents.html?embedded=1&v=9';
   library.onclick=()=>{
    const archive=el('dialog',undefined,'documents-dialog');
    archive.setAttribute('aria-label','資料QAの保管庫');
@@ -77,7 +77,7 @@ documentsButton.onclick=()=>{
    bar.append(el('h2','資料QAの保管庫'),dismiss);
    const listFrame=el('iframe');
    listFrame.title='資料QAの保管庫';
-   listFrame.src='documents.html?embedded=1&library=1&v=8';
+   listFrame.src='documents.html?embedded=1&library=1&v=9';
    archive.append(bar,listFrame);
    document.body.append(archive);
    archive.addEventListener('close',()=>archive.remove(),{once:true});
