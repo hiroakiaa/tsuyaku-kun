@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1d1d1d">
 <title>資料QA君</title>
-<link rel="stylesheet" href="web/documents.css?v=3">
-<script type="module" src="web/documents.js?v=3"></script>
+<link rel="stylesheet" href="web/documents.css?v=4">
+<script type="module" src="web/documents.js?v=4"></script>
 </head>
 <body><div class="shell">
 
@@ -36,7 +36,7 @@
 </template>
 <template id="reader">
 <section class="intro">
-<a class="register-link" href="documents.html?embedded=1">資料を登録</a><h1 id="doc-title"></h1><p id="doc-caption"></p><button id="remove-guide" hidden>共有を終了</button><p id="remove-status" role="status"></p>
+<a class="register-link" href="documents.html?embedded=1">資料を登録</a><h1 id="doc-title"></h1><p id="doc-caption"></p><button id="remove-guide" hidden>共有を終了</button><form id="add-material" hidden><label>追加資料 <input name="file" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.docx,.xlsx" required></label><button>追加する</button><p id="material-status" role="status"></p></form><ul id="materials"></ul><p id="remove-status" role="status"></p>
 </section>
 <div class="doc-tabs" role="tablist" aria-label="資料の案内"><button id="tab-points" role="tab" aria-controls="points" aria-selected="true">要点</button><button id="tab-ask" role="tab" aria-controls="ask" aria-selected="false" tabindex="-1">質問する</button><button id="tab-original" role="tab" aria-controls="original" aria-selected="false" tabindex="-1">元のPDF</button></div>
 <section class="panel" id="points" role="tabpanel" aria-labelledby="tab-points"><h2 id="points-title">まず確認すること</h2><div id="cards" class="cards"></div></section>
@@ -50,6 +50,7 @@
 <dialog id="pdf-dialog" aria-labelledby="pdf-heading">
 <div class="pdf-bar"><form method="dialog"><button aria-label="PDFを閉じる">×</button></form><h2 id="pdf-heading" tabindex="-1">元のPDF</h2><a id="pdf-file" target="_blank" rel="noopener" class="ref">PDFを別のタブで開く ↗</a></div>
 <p id="pdf-status" role="status"></p>
+<div class="pdf-navigation"><button id="pdf-prev">前のページ</button><label>ページ <select id="pdf-page"></select></label><button id="pdf-next">次のページ</button></div>
 <canvas id="pdf-canvas" aria-label="PDFの該当ページ"></canvas>
 </dialog>
 </template>

@@ -72,3 +72,11 @@ button:disabled,input:disabled{opacity:.55;cursor:default}
 #pdf-canvas{max-width:100%;height:auto}
 .answer-item + .answer-item{border-top:1px solid #8885;margin-top:1rem;padding-top:1rem}
 .answer-item blockquote{margin:.6rem 0;padding:.4rem .8rem;border-inline-start:3px solid #72b8ff;white-space:pre-wrap}
+.pdf-navigation{display:flex;align-items:center;justify-content:center;gap:.5rem;position:sticky;top:0;background:#202020;padding:.5rem;z-index:1}
+#ask:not([hidden]){display:flex;flex-direction:column;height:clamp(20rem,70dvh,52rem)}
+#messages{flex:1;min-height:0;max-height:none;overflow:auto;padding:.5rem;overscroll-behavior:contain}
+#ask-form{flex:none;margin-top:auto;padding:.55rem;border:1px solid #888;border-radius:1.25rem}
+#ask-form input{border:0;background:transparent}
+#ask-form button{border-radius:1rem;white-space:nowrap}
+#messages .bubble{width:fit-content;max-width:94%;padding:.7rem 1rem;border-radius:1rem 1rem 1rem .25rem}
+#messages .user{margin-inline-start:auto;border-radius:1rem 1rem .25rem 1rem;background:#30465c;color:white}

@@ -135,8 +135,17 @@ async function reader() {
   let opened,originalUrl;
   let selectedPage = 0;
   let activeRender;
+  const pagePicker = $('#pdf-page');
+  for (let page=1;page<=doc.pageCount;page++) pagePicker.add(new Option(page+' / '+doc.pageCount,page));
+  pagePicker.onchange = ()=>void showPdf(Number(pagePicker.value));
+  $('#pdf-prev').onclick = ()=>void showPdf(selectedPage-1);
+  $('#pdf-next').onclick = ()=>void showPdf(selectedPage+1);
   async function showPdf(n) {
+    if (n<1 || n>doc.pageCount) return;
     selectedPage = n;
+    pagePicker.value = n;
+    $('#pdf-prev').disabled = n===1;
+    $('#pdf-next').disabled = n===doc.pageCount;
     if (!dialog.open) dialog.showModal();
     $('#pdf-heading').textContent = '元のPDF · ' + n + 'ページ';
     $('#pdf-file').href = api + '/pdf#page=' + n;
@@ -172,7 +181,13 @@ async function reader() {
       $('#pdf-status').textContent = '画面内で表示できません。「PDFを開く」から確認してください。';
     }
   }
+  const materials = doc.materials ?? [];
   function sourceLink(parent,n) {
+    const material = materials.find(item=>n>=item.start && n<item.start+item.count);
+    if (material) {
+      append(parent,'p',material.name+' · '+(n-material.start+1)+' '+material.unit,'ref');
+      return;
+    }
     const link = append(parent,'a','元のPDF ' + n + 'ページ →','ref');
     link.href = '#original';
     link.addEventListener('click',event=>{event.preventDefault(); void showPdf(n);});
@@ -183,6 +198,34 @@ async function reader() {
     append(card,'p',item.text);
     sourceLink(card,item.source.page);
   }
+  const listMaterial = material=>append($('#materials'),'li',material.name);
+  materials.forEach(listMaterial);
+  const addForm = $('#add-material');
+  addForm.hidden = !doc.canRemove;
+  addForm.onsubmit = async event=>{
+    event.preventDefault();
+    const button = event.submitter;
+    const status = $('#material-status');
+    const file = new FormData(addForm).get('file');
+    button.disabled = true;
+    status.textContent = '追加資料を読み込んでいます…';
+    try {
+      if (file.size>5000000) throw Error('追加資料は5 MBまでです。');
+      const form = new FormData();
+      form.set('file',file);
+      if (/\.pdf$/i.test(file.name)) form.set('pages',JSON.stringify(await extract(file,status)));
+      if (/\.(docx|xlsx)$/i.test(file.name)) {
+        const {officePages} = await import('./document-office.js');
+        form.set('pages',JSON.stringify(await officePages(file)));
+      }
+      const material = await request(api+'/material',{method:'POST',body:form});
+      materials.push(material);
+      listMaterial(material);
+      addForm.reset();
+      status.textContent = '追加しました。質問に使用できます。';
+    } catch(error) { status.textContent = error.message; }
+    finally { button.disabled = false; }
+  };
   const status = $('#answer-status');
   const remove = document.querySelector('#remove-guide');
   remove.hidden = !doc.canRemove;
