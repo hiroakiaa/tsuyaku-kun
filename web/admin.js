@@ -1,7 +1,7 @@
 import {createAdoptionReport} from './admin-adoption-report.js?v=20261112-display-benchmark-1';
 import {createLiveSummarySetting} from './live-summary.js?v=20261113-summary-dialog-1';
 import {createLiveTranslationSetting} from './live-translation-setting.js?v=20261112-display-benchmark-1';
-import {improvementReport} from './analysis-focus.js?v=20261113-scale-readiness-1';
+import {improvementReport} from './analysis-focus.js?v=20261113-documents-1';
 import {createRecognitionCostView} from './recognition-cost-view.js?v=20261112-display-benchmark-1';
 import {guardedStorage} from './storage-access.js?v=20261024-usability20-4';
 const localStorage=guardedStorage(()=>globalThis.localStorage);

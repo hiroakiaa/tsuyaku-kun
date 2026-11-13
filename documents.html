@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1d1d1d">
+<title>資料QA君</title>
+<link rel="stylesheet" href="web/documents.css?v=1">
+<script type="module" src="web/documents.js?v=1"></script>
+</head>
+<body><div class="shell">
+<header><a href="./" class="brand"><span class="mark" aria-hidden="true">▤</span><strong>資料QA君</strong></a><a class="ref" href="documents.html">資料を登録</a></header>
+<main id="content"><p role="status">読み込んでいます…</p></main>
+</div>
+<template id="teacher">
+<section class="intro">
+<p class="eyebrow">先生用</p><h1>PDFから案内を作る</h1>
+<p>資料を登録すると、要点と質問欄のあるページができます。</p>
+</section>
+<section class="panel document-panel">
+<form class="stack" id="upload">
+<label>案内のタイトル<input name="title" maxlength="100" placeholder="例：新1年生の入学案内" required></label>
+<label>元のPDF<input type="file" name="pdf" accept="application/pdf,.pdf" required></label>
+<p class="fine">文字を選べるPDFを使ってください。5 MB、40ページまで。</p>
+<button class="primary">案内を作る</button><p class="fine">URLを知っている人がPDFを読めます。個人情報のない資料を使ってください。</p>
+</form>
+<p id="upload-status" role="status"></p>
+<div id="result" hidden>
+<h2>案内ページができました</h2>
+<a id="open-guide" class="ref">案内ページを開く →</a>
+<label>共有URL<input id="guide-url" readonly></label>
+<button id="copy" type="button">URLをコピー</button>
+<p class="fine">共有期間は作成から30日間です。</p>
+</div>
+</section>
+</template>
+<template id="reader">
+<section class="intro">
+<p class="eyebrow">資料の案内</p><h1 id="doc-title"></h1><p id="doc-caption"></p><button id="remove-guide" hidden>共有を終了</button><p id="remove-status" role="status"></p>
+</section>
+<nav aria-label="資料の案内"><a href="#points">要点</a><a href="#ask">質問する</a><a id="original-top" href="#original">元のPDF</a></nav>
+<section class="panel" id="points"><h2 id="points-title">まず確認すること</h2><div id="cards" class="cards"></div></section>
+<section class="panel" id="ask">
+<h2>資料に質問する</h2><p class="sub">短いことばや、ひらがなで聞けます。</p>
+<div id="messages" role="log" aria-live="polite"></div>
+<form id="ask-form"><label for="question" class="sr">資料への質問</label><input id="question" maxlength="300" placeholder="例：いつまでに だしますか？" required><button class="primary">送る</button></form>
+<p id="answer-status" class="fine" role="status"></p>
+</section>
+<section class="panel" id="original" hidden>
+<div class="pdf-bar"><h2 id="pdf-heading" tabindex="-1">元のPDF</h2><a id="pdf-file" target="_blank" rel="noopener" class="ref">PDFを別のタブで開く ↗</a></div>
+<p id="pdf-status" role="status"></p>
+<canvas id="pdf-canvas" aria-label="PDFの該当ページ"></canvas>
+</section>
+</template>
+</body>
+</html>

@@ -7,7 +7,7 @@ if(normalize(html)!==normalize(local))throw Error('Published HTML differs from t
 const assets=[expected,...[...local.matchAll(/href="(web\/[^"#]+\.css[^"#]*)"/g)].map(m=>m[1])];
 const moduleMap=JSON.parse(/<script type="importmap" id="tsuyaku-module-map">([\s\S]*?)<\/script>/.exec(local)[1]);for(const path of Object.values(moduleMap.imports)){if(typeof path!=='string'||!/^\.\/(?:web|server)\/[A-Za-z0-9./_-]+\.js\?v=[A-Za-z0-9-]+$/.test(path)||path.includes('/../'))throw Error('Unexpected shared module path');assets.push(path.slice(2));}
 const releaseRoot=new URL('../',import.meta.url);
-const paths=new Set(assets);
+const paths=new Set([...assets,'documents.html','web/documents.js?v=1','web/documents.css?v=1','web/pdf.min.mjs','web/pdf.worker.min.mjs']);
 const references=/(?:\bfrom\s+|\bimport\s*(?:\(\s*)?|\bnew\s+URL\(\s*)(['"])(\.{1,2}\/[\w./-]+\.js(?:\?[\w=&.-]+)?)\1/g;
 for(const path of paths){
   const sourceURL=new URL(path,releaseRoot);

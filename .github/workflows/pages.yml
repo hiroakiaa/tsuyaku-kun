@@ -24,7 +24,7 @@ jobs:
       - run: npm test
       - run: |
           mkdir -p site/web site/server
-          cp index.html site/
+          cp index.html documents.html site/
           cp web/* site/web/
           cp server/catalog.js site/server/
       - uses: actions/configure-pages@v5
