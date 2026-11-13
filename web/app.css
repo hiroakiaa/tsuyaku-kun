@@ -968,3 +968,10 @@ body.phone-home #call-invite>.invite-preparing{grid-column:1 / -1;grid-row:1 / s
 @media(max-width:359px){body.phone-home #call-invite:not([hidden]){grid-template-columns:minmax(0,1fr) 84px;gap:6px 8px;padding:10px;}body.phone-home #call-invite>.qr{width:84px;height:84px;}}
 dialog[tabindex="-1"]:focus{outline:none;}
 .document-entry{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;border:1px solid #777;border-radius:14px;text-decoration:none;white-space:nowrap}
+/* Dialog containers and static opening focus targets have no visual focus ring. */
+dialog:focus,
+dialog [tabindex="-1"][autofocus]:focus {
+  outline: 0 solid transparent !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}

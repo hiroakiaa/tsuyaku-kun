@@ -120,3 +120,11 @@ body:has(#upload) .document-panel,.document-library{background:#18181a;border-co
 #pdf-status:not(:empty){position:absolute;top:.5rem;left:.6rem;background:#202020;padding:.3rem}
 .pdf-zoom{position:absolute;right:.65rem;bottom:.65rem;display:flex;gap:.25rem}
 #pdf-dialog .pdf-navigation{position:static;margin:0;border-top:1px solid #3a3a3e}
+.document-entry{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;border:1px solid #777;border-radius:14px;text-decoration:none;white-space:nowrap}
+/* Dialog containers and static opening focus targets have no visual focus ring. */
+dialog:focus,
+dialog [tabindex="-1"][autofocus]:focus {
+  outline: 0 solid transparent !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}
