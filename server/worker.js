@@ -96,7 +96,7 @@ export default {async fetch(request,env,ctx){
     if(url.pathname==='/live-translation')return upgradeLiveTranslation(request,env,ctx);
     if(url.pathname==='/transcribe-stream')return realtimeUpgrade(request,env,{verifyToken,aiFailure,ctx});
     const token=(request.headers.get('Authorization')||'').replace(/^Bearer /,'');const authStarted=Date.now(),auth=await verifyToken(token,env.FIREBASE_PROJECT,url.pathname.startsWith('/billing/'));env={...env,...(ctx?.waitUntil?{backgroundBudgetCleanup:task=>ctx.waitUntil(task)}:{}),authMs:Date.now()-authStarted,budgetUid:auth.uid,executionValid:()=>requestExecutionValid(request,requestStarted)};if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'user:'+auth.uid})).success))return cors(error('少し待ってから再試行してください。',429));
-    if(url.pathname==='/documents'||url.pathname.startsWith('/documents/'))return cors(await documents(request,env,auth,(model,input)=>runAi(env,model,input)));
+    if(url.pathname==='/documents'||url.pathname.startsWith('/documents/'))return cors(await documents(request,env,auth));
     if(request.method==='POST'&&['/school-usage','/billing/school-usage'].includes(url.pathname)){
       const data=await body(request,100000);
       const admin=url.pathname.startsWith('/billing/');
