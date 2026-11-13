@@ -107,6 +107,23 @@ export default {async fetch(request,env,ctx){
       const school=env.ROOMS.get(env.ROOMS.idFromName('__monthly_usage_v2__'));
       return cors(await school.fetch(new Request('https://school/school-usage',{method:'POST',body:JSON.stringify({...data,device})})));
     }
+    if(url.pathname==='/exchange-rate' && request.method==='GET'){
+      try {
+        const key=new Request(new URL('/exchange-rate',request.url));
+        const cached=await caches.default.match(key);
+        if(cached)return cors(cached);
+        const response=await fetch('https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml',{signal:AbortSignal.timeout(5000)});
+        if(!response.ok)throw Error();
+        const xml=await response.text();
+        const rates=Object.fromEntries(Array.from(xml.matchAll(/currency=.(JPY|USD).\s+rate=.([0-9.]+)/g), match=>[match[1],Number(match[2])]));
+        const jpy=rates.JPY/rates.USD;
+        const date=/time=['"]([0-9-]{10})/.exec(xml)?.[1];
+        if(!Number.isFinite(jpy)||jpy<=0||!date)throw Error();
+        const result=Response.json({jpy,date},{headers:{'Cache-Control':'public, max-age=21600'}});
+        await caches.default.put(key,result.clone()).catch(()=>{});
+        return cors(result);
+      }catch{return cors(error('為替レートを取得できませんでした。',502));}
+    }
     if(url.pathname.startsWith('/billing/')){
       if(!await isBillingAdministrator(auth,env.BILLING_ADMIN_EMAIL_HASH))return cors(error('請求データは管理者本人のGoogle認証が必要です。',403));
       if(url.pathname==='/billing/budget-limit'&&request.method==='POST'){

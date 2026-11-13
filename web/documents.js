@@ -218,7 +218,7 @@ async function reader() {
     $('#pdf-heading').textContent = '元のPDF · ' + n + 'ページ';
     $('#pdf-file').href = api + '/pdf#page=' + n;
     $('#pdf-status').textContent = 'PDFを表示しています…';
-    $('#pdf-heading').focus();
+
     if (sourceType!=='pdf') {
       $('#pdf-heading').textContent = '資料データ';
       $('#pdf-file').textContent = '資料データをダウンロード';

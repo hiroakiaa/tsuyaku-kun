@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#1d1d1d">
 <title>資料QA君</title>
 <link rel="stylesheet" href="web/documents.css?v=11">
-<script type="module" src="web/documents.js?v=11"></script>
+<script type="module" src="web/documents.js?v=12"></script>
 </head>
 <body><div class="shell">
 
@@ -49,7 +49,7 @@
 <div class="doc-tabs" role="tablist" aria-label="資料の案内"><button id="tab-points" role="tab" aria-controls="points" aria-selected="true">要点</button><button id="tab-ask" role="tab" aria-controls="ask" aria-selected="false" tabindex="-1">質問する</button><button id="tab-original" role="tab" aria-controls="original" aria-selected="false" tabindex="-1">元のPDF</button></div>
 <section class="panel" id="points" role="tabpanel" aria-labelledby="tab-points"><h2 id="points-title">まず確認すること</h2><div id="cards" class="cards"></div></section>
 <section class="panel" id="ask" role="tabpanel" aria-labelledby="tab-ask" hidden>
-<dialog id="ask-dialog" aria-labelledby="ask-heading"><div class="ask-layout"><div class="ask-heading"><h2 id="ask-heading" tabindex="-1">資料に質問する</h2><form method="dialog"><button aria-label="質問画面を閉じる">×</button></form></div>
+<dialog id="ask-dialog" aria-labelledby="ask-heading"><div class="ask-layout"><div class="ask-heading"><h2 id="ask-heading" tabindex="-1" autofocus>資料に質問する</h2><form method="dialog"><button aria-label="質問画面を閉じる">×</button></form></div>
 <div id="messages" role="log" aria-live="polite"></div>
 <form id="ask-form"><label for="question" class="sr">資料への質問</label><input id="question" maxlength="300" placeholder="例：いつまでに だしますか？" required><button class="primary">送る</button></form>
 <p id="answer-status" class="fine" role="status"></p>
@@ -57,7 +57,7 @@
 </section>
 <section class="panel" id="original" role="tabpanel" aria-labelledby="tab-original" hidden><button id="reopen-pdf">PDFを表示</button></section>
 <dialog id="pdf-dialog" aria-labelledby="pdf-heading">
-<div class="pdf-bar"><form method="dialog"><button aria-label="PDFを閉じる">×</button></form><h2 id="pdf-heading" tabindex="-1">元のPDF</h2><a id="pdf-file" target="_blank" rel="noopener" class="ref">PDFを別のタブで開く ↗</a></div>
+<div class="pdf-bar"><form method="dialog"><button aria-label="PDFを閉じる">×</button></form><h2 id="pdf-heading" tabindex="-1" autofocus>元のPDF</h2><a id="pdf-file" target="_blank" rel="noopener" class="ref">PDFを別のタブで開く ↗</a></div>
 <p id="pdf-status" role="status"></p>
 <div class="pdf-navigation"><button id="pdf-prev">前のページ</button><label>ページ <select id="pdf-page"></select></label><button id="pdf-next">次のページ</button></div>
 <canvas id="pdf-canvas" aria-label="PDFの該当ページ"></canvas>

@@ -52,8 +52,7 @@ export function createBillingView({el,connect=connectOwner,fetcher=fetch,now=()=
   content.append(el('p',projectCost?.status==='ready'
     ? '通訳君のOpenAIプロジェクト当月使用料：'+amount(projectCost.usd,'USD')
     : '通訳君のOpenAIプロジェクト当月使用料：未取得'));
-  content.append(el('p','200ドル特典の確認時残高：$196.76（2026年11月13日確認）'));
-  content.append(el('p','確認した特典枠の有効期限：2026年12月5日。最新の残高・期限はOpenAIで確認できます。'));
+
   const billing=el('a','OpenAIの利用額・クレジット残高を確認');
   billing.href='https://platform.openai.com/settings/organization/billing/overview';
   billing.target='_blank';
