@@ -46,3 +46,24 @@ body.phone-home #modal-body .admin-cost-table td small{display:block;color:#aaa;
 body.phone-home #modal-body .admin-billing{padding:4px 0 12px;margin-bottom:10px;border-bottom:1px solid #343438;}body.phone-home #modal-body .admin-billing>button{font-size:13px;min-height:44px;margin-top:8px;}body.phone-home #modal-body .admin-billing h4{font-size:14px;margin:14px 0 6px;}
 
 .admin-recognition-cost [aria-pressed="true"]{background:#43434a;color:#fff;font-weight:700;}
+
+body.phone-home dialog.documents-dialog {
+ position:fixed;
+ inset:0;
+ margin:0;
+ width:100%;
+ max-width:none;
+ height:100dvh;
+ max-height:none;
+ box-sizing:border-box;
+ border-radius:0!important;
+}
+body.phone-home dialog.documents-dialog[open] {
+ display:grid;
+ grid-template-rows:auto minmax(0,1fr);
+}
+.documents-dialog iframe {
+ width:100%;
+ height:100%;
+ border:0;
+}

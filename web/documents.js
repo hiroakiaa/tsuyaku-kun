@@ -1,3 +1,4 @@
+if(new URLSearchParams(location.search).get('embedded')==='1')document.body.querySelector('header').hidden=true;
 import {config} from './config.js';
 const $ = (selector) => document.querySelector(selector);
 const content = $('#content');
