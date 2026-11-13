@@ -16,6 +16,15 @@ function supported(source,pages) {
   return typeof page === 'string' && quote.length >= 5 && normalized(page).includes(quote);
 }
 
+async function recordUsage(env,usage) {
+  const input = usage?.prompt_tokens;
+  const output = usage?.completion_tokens;
+  const cached = usage?.prompt_tokens_details?.cached_tokens ?? 0;
+  if (![input,output,cached].every(Number.isSafeInteger) || cached<0 || cached>input || output<0) return;
+  const ledger = env.ROOMS.get(env.ROOMS.idFromName('__document_qa_cost__'));
+  await ledger.fetch('https://room/document/usage',{method:'POST',body:JSON.stringify({input,output,cached})});
+}
+
 async function generate(env,pages,question,materials=[]) {
   if (!env.OPENAI_API_KEY) throw Error('資料QAのOpenAI接続が設定されていません。');
   const response = await fetch('https://api.openai.com/v1/chat/completions',{
@@ -36,6 +45,7 @@ async function generate(env,pages,question,materials=[]) {
   }).catch(()=>null);
   if (!response?.ok) throw Error('資料QAのOpenAI接続に失敗しました'+(response ? '（HTTP '+response.status+'）' : '')+'。');
   const result = await response.json();
+  await recordUsage(env,result.usage).catch(()=>{});
   const choice = result.choices?.[0];
   if (choice?.finish_reason!=='stop' || !choice.message?.content) throw Error('資料QAの回答を取得できませんでした。');
   return JSON.parse(choice.message.content);
@@ -124,7 +134,9 @@ export async function documents(request,env,auth) {
         ]}),
       }).catch(()=>null);
       if (!response?.ok) return fail('画像の文字を読み取れませんでした。',502);
-      const choice = (await response.json()).choices?.[0];
+      const result = await response.json();
+      await recordUsage(env,result.usage).catch(()=>{});
+      const choice = result.choices?.[0];
       if (choice?.finish_reason!=='stop') return fail('画像の文字を最後まで読み取れませんでした。',422);
       pages = [choice.message.content];
     } else if (['pdf','docx','xlsx'].includes(ext)) {
@@ -161,6 +173,19 @@ export async function documents(request,env,auth) {
 
 export async function documentStorage(request,storage) {
   const path = new URL(request.url).pathname;
+  if (path==='/document/usage') {
+    const month = new Date().toISOString().slice(0,7);
+    const key = 'usage:'+month;
+    if (request.method==='GET') return reply({month,...await storage.get(key)});
+    const usage = await request.json();
+    return storage.transaction(async tx=>{
+      const total = await tx.get(key) ?? {calls:0,input:0,output:0,cached:0};
+      for (const field of ['input','output','cached']) total[field]+=usage[field];
+      total.calls++;
+      await tx.put(key,total);
+      return reply({ok:true});
+    });
+  }
   if (path==='/document/init' && request.method==='POST') {
     const form = await request.formData();
     const record = JSON.parse(form.get('record'));

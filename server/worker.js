@@ -117,6 +117,30 @@ export default {async fetch(request,env,ctx){
         return cors(json(await response.json(),response.status));
       }
       if(request.method!=='GET')return cors(error('読取だけ利用できます。',405));
+      if(url.pathname==='/billing/openai-cost'){
+        if(!env.OPENAI_ADMIN_KEY || !env.OPENAI_BILLING_PROJECT_ID)return cors(json({status:'unconfigured'}));
+        const now=new Date();
+        const start=Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),1)/1000;
+        const params=new URLSearchParams({start_time:String(start),limit:'31'});
+        params.append('project_ids',env.OPENAI_BILLING_PROJECT_ID);
+        try{
+          const response=await fetch('https://api.openai.com/v1/organization/costs?'+params,{
+            headers:{Authorization:'Bearer '+env.OPENAI_ADMIN_KEY},signal:AbortSignal.timeout(7000),
+          });
+          if(!response.ok)return cors(json({status:'unavailable'}));
+          const page=await response.json();
+          if(page.has_more||!Array.isArray(page.data))return cors(json({status:'unavailable'}));
+          const amounts=page.data.flatMap(bucket=>bucket.results.map(row=>row.amount));
+          if(amounts.some(amount=>amount?.currency?.toLowerCase()!=='usd'||!Number.isFinite(amount.value)))return cors(json({status:'unavailable'}));
+          return cors(json({status:'ready',usd:amounts.reduce((sum,amount)=>sum+amount.value,0)}));
+        }catch{return cors(json({status:'unavailable'}));}
+      }
+      if(url.pathname==='/billing/document-qa'){
+        const ledger=env.ROOMS.get(env.ROOMS.idFromName('__document_qa_cost__'));
+        const usage=await (await ledger.fetch('https://room/document/usage')).json();
+        const estimatedUSD=usage.calls ? ((usage.input-usage.cached)*.4+usage.cached*.1+usage.output*1.6)/1e6 : null;
+        return cors(json({...usage,estimatedUSD}));
+      }
       if(url.pathname==='/billing/openai-connection'){
         if(!env.OPENAI_API_KEY)return cors(json({connected:false,reason:'missing_secret'}));
         try{

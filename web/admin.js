@@ -5,7 +5,7 @@ import {improvementReport} from './analysis-focus.js?v=20261113-documents-1';
 import {createRecognitionCostView} from './recognition-cost-view.js?v=20261112-display-benchmark-1';
 import {guardedStorage} from './storage-access.js?v=20261024-usability20-4';
 const localStorage=guardedStorage(()=>globalThis.localStorage);
-import {createBillingView} from './billing-view.js?v=20261022-billing-auto-1';
+import {createBillingView} from './billing-view.js?v=20261113-document-cost';
 import {createServiceMonthView} from './service-month-view.js?v=20261102-recognition-outcome-1';
 function adminDisclosure(el,title,nodes){const d=el('details',undefined,'admin-detail');d.append(el('summary',title),...nodes.filter(Boolean));return d;}
 import {englishPrompt} from './ui-english.js?v=20261029-two-language-1';
