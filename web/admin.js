@@ -52,19 +52,17 @@ documentsButton.onclick=()=>{
   closeIcon.setAttribute('aria-hidden','true');
   close.append(closeIcon);
   close.onclick=()=>dialog.close();
-  const actions=el('div');
-  actions.style.display='flex';
-  actions.style.alignItems='center';
   const library=el('button');
   library.type='button';
   library.title='資料QAの保管庫';
   library.setAttribute('aria-label',library.title);
   Object.assign(library.style,{background:'none',border:'0',boxShadow:'none'});
-  const libraryIcon=el('i',undefined,'fa-solid fa-box-archive');
+  const libraryIcon=el('i',undefined,'fa-solid fa-folder');
   libraryIcon.setAttribute('aria-hidden','true');
   library.append(libraryIcon);
-  actions.append(library,close);
-  heading.append(el('h2','資料QA'),actions);
+
+  library.style.marginInlineStart='auto';
+  heading.append(el('h2','資料QA'),library,close);
   const frame=el('iframe');
   frame.title='資料QA';
   frame.src='documents.html?embedded=1&v=9';
