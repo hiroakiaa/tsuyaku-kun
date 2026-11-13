@@ -1,3 +1,4 @@
+const SUMMARY_INTERVAL_MS=30000;
 let enabled=false;
 let stop=()=>{};
 
@@ -8,7 +9,7 @@ export function createLiveSummarySetting(el){
  input.onchange=()=>{enabled=input.checked;if(!enabled)stop();};
  label.prepend(input);
  const section=el('section');
- section.append(label,el('p','オンにすると、会話の字幕をAIに送信して約1分ごとに要約します。','admin-caption'));
+ section.append(label,el('p','オンにすると、会話の字幕をAIに送信して約30秒ごとに要約します。','admin-caption'));
  return section;
 }
 
@@ -139,7 +140,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  }
  stop=reset;
  function schedule(){
-  if(enabled&&pending.size&&!timer&&!request)timer=setTimeout(update,Math.max(0,(pendingSince??performance.now())+60000-performance.now(),retryAfter-performance.now()));
+  if(enabled&&pending.size&&!timer&&!request)timer=setTimeout(update,Math.max(0,(pendingSince??performance.now())+SUMMARY_INTERVAL_MS-performance.now(),retryAfter-performance.now()));
  }
  function noteDiscard(details){
   record('bufferDiscarded',details);
@@ -341,7 +342,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    Object.assign(output.style,{whiteSpace:'pre-wrap',overflowWrap:'anywhere',maxBlockSize:'min(50dvh, 24rem)',overflowY:'auto',overscrollBehaviorY:'contain',touchAction:'pan-y'});
    output.tabIndex=0;
    output.setAttribute('aria-label','Live要約の本文');
-   status=el('small','最初の要約は約1分後に表示します。');
+   status=el('small','最初の要約は約30秒後に表示します。');
    status.setAttribute('role','status');
    translationButton=el('button','日本語に翻訳');
    translationButton.type='button';
