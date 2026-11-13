@@ -67,3 +67,27 @@ body.phone-home dialog.documents-dialog[open] {
  height:100%;
  border:0;
 }
+
+#documents-dialog .modal-heading > .documents-library-button {
+  display: grid;
+  place-items: center;
+  margin-inline-start: auto;
+  width: 50px;
+  height: 50px;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: #ededed;
+  font-size: 19px;
+}
+
+body.phone-home #documents-dialog > .modal-heading {
+  padding-inline-end: 108px;
+}
+
+body.phone-home #documents-dialog > .modal-heading > .documents-library-button {
+  position: absolute;
+  top: 0;
+  right: 54px;
+}
