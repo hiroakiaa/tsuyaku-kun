@@ -430,3 +430,20 @@ body.phone-home .caption-stage>.captions:has(.caption){border-left-color:transpa
   max-block-size:none!important;overflow:visible!important;
  }
 }
+
+body.phone-home #live .call-controls{position:relative;}
+body.phone-home #live .call-controls>.live-summary-toggle:not([hidden]){
+ display:flex;flex:0 0 50%;flex-direction:column;align-items:center;justify-content:center;
+ gap:2px;min-height:44px;margin-inline-end:50%;border:0;border-radius:16px;
+ background:#303034;color:#fff;font-size:12px;
+}
+body.phone-home #live .live-summary-toggle [role=status]{font-size:10px;}
+body.phone-home[data-active-mode="lesson"] #live:has(.live-summary-toggle:not([hidden]))>.live-actions{display:grid!important;}
+@media(min-width:900px), (min-width:480px) and (max-height:620px){
+ @supports (top:anchor(--footer-tab top)){
+  body.phone-home #live .call-controls:has(#microphone:not([hidden]))>.live-summary-toggle:not([hidden]){
+   position:absolute;bottom:calc(100% + 6px);left:0;width:50%;margin:0;
+  }
+  body.phone-home #live:has(.live-summary-toggle:not([hidden]))>.live-summary-dialog{bottom:50px;}
+ }
+}

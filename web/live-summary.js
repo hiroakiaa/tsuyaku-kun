@@ -18,6 +18,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  const wide=matchMedia('(min-width:900px), (min-width:480px) and (max-height:620px)');
  let timer,request,panel,output,status,button,badge,dialog,wiki,wikiRequest,translationButton,translationStatus,copyButton,copyStatus,translationRequest,summaryLanguage,historyPanel,finalizeButton,retryButton,finalSummaryTime,finalizing=false,isFinal=false,summary='';
  function notifySummary(label){
+  button.hidden=false;
   badge.textContent=' '+label;
   badge.hidden=false;
   button.setAttribute('aria-label','要約を表示・'+label);
@@ -370,7 +371,12 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    dialog=makeDialog('Live要約');
    dialog.classList.add('live-summary-dialog');
    dialog.append(panel);
-   button=el('button','要約を表示');
+   button=el('button',undefined,'live-summary-toggle');
+   button.hidden=true;
+   button.setAttribute('aria-label','要約を表示');
+   const summaryIcon=el('i',undefined,'fa-solid fa-list');
+   summaryIcon.setAttribute('aria-hidden','true');
+   button.append(summaryIcon,el('span','要約を表示'));
    button.type='button';
    badge=el('span',' 更新');
    badge.hidden=true;
@@ -380,7 +386,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
     read();
     if(!dialog.open)openSummary();
    };
-   captions().closest('#live').querySelector('.live-tools').append(button);
+   captions().closest('#live').querySelector('.call-controls').prepend(button);
    place();
   }
   schedule();
