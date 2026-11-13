@@ -88,7 +88,7 @@ reportSummary.replaceChildren(...liveSummary,el('p',current&&liveEvents.length?'
   heading.append(el('h2','資料QA'),library,close);
   const frame=el('iframe');
   frame.title='資料QA';
-  frame.src='documents.html?embedded=1&v=9';
+  frame.src='documents.html?embedded=1&v=16';
   library.onclick=()=>{
    const archive=el('dialog',undefined,'documents-dialog');
    archive.setAttribute('aria-label','資料QAの保管庫');
@@ -100,7 +100,7 @@ reportSummary.replaceChildren(...liveSummary,el('p',current&&liveEvents.length?'
    bar.append(el('h2','資料QAの保管庫'),dismiss);
    const listFrame=el('iframe');
    listFrame.title='資料QAの保管庫';
-   listFrame.src='documents.html?embedded=1&library=1&v=9';
+   listFrame.src='documents.html?embedded=1&library=1&v=16';
    archive.append(bar,listFrame);
    document.body.append(archive);
    archive.addEventListener('close',()=>archive.remove(),{once:true});

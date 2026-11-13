@@ -213,7 +213,7 @@ async function reader() {
   const imageType = /^(png|jpe?g|webp)$/.test(sourceType);
   const zoomable = sourceType==='pdf' || imageType;
   let zoom=1, fitWidth=0;
-  let pinch;
+  let pinch, drag;
   function setZoom(value, from, to=from) {
     const bounds=preview.getBoundingClientRect();
     from ??= {x:bounds.width/2,y:bounds.height/2};
@@ -245,18 +245,27 @@ async function reader() {
       distance:Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)};
   }
   preview.addEventListener('touchstart',event=>{
-    if (event.touches.length!==2 || !zoomable) return;
+    if (!zoomable) return;
+    if (event.touches.length===1) drag=event.touches[0];
+    if (event.touches.length!==2) return;
+    drag=undefined;
     event.preventDefault();
     pinch=measurePinch(event);
   },{passive:false});
   preview.addEventListener('touchmove',event=>{
+    if (drag && event.touches.length===1) {
+      const next=event.touches[0];
+      preview.scrollLeft+=drag.clientX-next.clientX;
+      preview.scrollTop+=drag.clientY-next.clientY;
+      drag=next;
+    }
     if (!pinch || !pinch.distance || event.touches.length!==2) return;
     event.preventDefault();
     const next=measurePinch(event);
     setZoom(zoom*next.distance/pinch.distance,pinch,next);
     pinch=next;
   },{passive:false});
-  for (const event of ['touchend','touchcancel']) preview.addEventListener(event,()=>{pinch=undefined;});
+  for (const event of ['touchend','touchcancel']) preview.addEventListener(event,()=>{pinch=undefined;drag=undefined;});
   async function showPdf(n) {
     if (n<1 || n>doc.pageCount) return;
     selectedPage = n;

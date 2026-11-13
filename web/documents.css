@@ -115,7 +115,7 @@ body:has(#upload) .document-panel,.document-library{background:#18181a;border-co
 #pdf-dialog .pdf-bar button{width:50px;border-radius:0 0 0 14px}
 #pdf-file:not([href]){visibility:hidden}
 .pdf-stage{position:relative;min-height:0}
-#pdf-scroll{height:100%;overflow:auto;overscroll-behavior:contain;touch-action:pan-x pan-y}
+#pdf-scroll{height:100%;overflow:auto;overscroll-behavior:contain;touch-action:none}
 #pdf-scroll #pdf-canvas,#source-image{display:block;max-width:none;height:auto;margin-inline:auto;border-radius:0}
 #pdf-status:not(:empty){position:absolute;top:.5rem;left:.6rem;background:#202020;padding:.3rem}
 .pdf-zoom{position:absolute;right:.65rem;bottom:.65rem;display:flex;gap:.25rem}
