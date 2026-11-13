@@ -398,7 +398,28 @@ body.phone-home .caption-stage>.captions:has(.caption){border-left-color:transpa
   left:anchor(--caption-column left,35%);right:anchor(--caption-column right,0px);width:auto;
   padding-inline:8px!important;
  }
- body.phone-home:has(#live:not([hidden])) .app-shell{anchor-scope:--caption-column;}
+ body.phone-home:has(#live:not([hidden])) .app-shell{anchor-scope:--caption-column, --footer-tab, --control-column;}
+ @supports (top:anchor(--footer-tab top)){
+ body.phone-home main.phone-home-card>.bottom-nav button:first-child{anchor-name:--footer-tab;}
+ body.phone-home #live>.live-tools{anchor-name:--control-column;}
+ body.phone-home #live>.live-actions:has(#microphone:not([hidden]))>.call-controls{
+  position:fixed;
+  z-index:20;
+  top:anchor(--footer-tab top);
+  bottom:anchor(--footer-tab bottom,calc(6px + env(safe-area-inset-bottom)));
+  left:anchor(--control-column left);
+  right:anchor(--control-column right);
+  width:auto;
+  margin:0;
+  padding:0;
+  align-items:stretch;
+ }
+ body.phone-home #live>.live-actions:has(#microphone:not([hidden]))>.call-controls>#microphone{
+  min-height:0;
+  height:100%;
+  margin-block:0;
+ }
+ }
  body.phone-home #live>.live-summary-dialog{
   position:absolute;grid-area:1 / 1 / 2 / 2;inset:0;margin:0;box-sizing:border-box;
   width:auto!important;height:auto;min-height:0;max-width:none;max-height:none!important;
