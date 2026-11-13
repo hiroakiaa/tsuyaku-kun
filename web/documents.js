@@ -208,29 +208,70 @@ async function reader() {
   pagePicker.onchange = ()=>void showPdf(Number(pagePicker.value));
   $('#pdf-prev').onclick = ()=>void showPdf(selectedPage-1);
   $('#pdf-next').onclick = ()=>void showPdf(selectedPage+1);
+  const preview = $('#pdf-scroll');
+  const previewImage = $('#source-image');
+  const imageType = /^(png|jpe?g|webp)$/.test(sourceType);
+  const zoomable = sourceType==='pdf' || imageType;
+  let zoom=1, fitWidth=0;
+  const fingers=new Map();
+  let pinchDistance=0;
+  function setZoom(value) {
+    zoom=Math.min(4,Math.max(.5,value));
+    const surface=imageType ? previewImage : $('#pdf-canvas');
+    if (fitWidth) surface.style.width=fitWidth*zoom+'px';
+  }
+  $('.pdf-zoom').hidden=!zoomable;
+  $('.pdf-navigation').hidden=sourceType!=='pdf';
+  $('#zoom-in').onclick=()=>setZoom(zoom*1.25);
+  $('#zoom-out').onclick=()=>setZoom(zoom/1.25);
+  preview.addEventListener('wheel',event=>{
+    if (!zoomable) return;
+    event.preventDefault();
+    setZoom(zoom*Math.exp(-event.deltaY*.002));
+  },{passive:false});
+  preview.addEventListener('touchstart',event=>{
+    if (event.touches.length!==2 || !zoomable) return;
+    for(const touch of event.touches) fingers.set(touch.identifier,touch);
+    const [a,b]=fingers.values();
+    pinchDistance=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
+  },{passive:true});
+  preview.addEventListener('touchmove',event=>{
+    if (!pinchDistance || event.touches.length!==2) return;
+    event.preventDefault();
+    const [a,b]=event.touches;
+    const distance=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
+    if(distance>0){setZoom(zoom*distance/pinchDistance);pinchDistance=distance;}
+  },{passive:false});
+  for (const event of ['touchend','touchcancel']) preview.addEventListener(event,()=>{fingers.clear();pinchDistance=0;});
   async function showPdf(n) {
     if (n<1 || n>doc.pageCount) return;
     selectedPage = n;
     pagePicker.value = n;
     $('#pdf-prev').disabled = n===1;
     $('#pdf-next').disabled = n===doc.pageCount;
+    $('#pdf-heading').textContent = doc.title;
     if (!dialog.open) dialog.showModal();
-    $('#pdf-heading').textContent = '元のPDF · ' + n + 'ページ';
-    $('#pdf-file').href = api + '/pdf#page=' + n;
+    $('#pdf-file').removeAttribute('href');
     $('#pdf-status').textContent = 'PDFを表示しています…';
 
     if (sourceType!=='pdf') {
-      $('#pdf-heading').textContent = '資料データ';
-      $('#pdf-file').textContent = '資料データをダウンロード';
+      if (!imageType) $('#pdf-file').textContent = 'ダウンロード';
       $('#pdf-file').removeAttribute('href');
       for (const node of ['#pdf-prev','#pdf-next','#pdf-page','#pdf-canvas']) $(node).hidden=true;
       try {
         const response=await fetch(config.api+api+'/pdf',{headers:await authHeaders()});
         if (!response.ok) throw Error('資料データを取得できませんでした。');
         if (originalUrl) URL.revokeObjectURL(originalUrl);
-        originalUrl=URL.createObjectURL(await response.blob());
+        const blob=await response.blob();
+        originalUrl=URL.createObjectURL(imageType ? new Blob([blob],{type:'image/'+(sourceType==='jpg'?'jpeg':sourceType)}) : blob);
         $('#pdf-file').href=originalUrl;
-        $('#pdf-file').download='source.'+sourceType;
+        if(imageType){
+          fitWidth=preview.clientWidth;
+          previewImage.src=originalUrl;
+          previewImage.alt=doc.title;
+          previewImage.hidden=false;
+          setZoom(zoom);
+        }else $('#pdf-file').download='source.'+sourceType;
         $('#pdf-status').textContent='';
       } catch(error) { $('#pdf-status').textContent=error.message; }
       return;
@@ -250,7 +291,8 @@ async function reader() {
       const canvas = document.createElement('canvas');
       canvas.id = 'pdf-canvas';
       canvas.setAttribute('aria-label','元のPDFの' + n + 'ページ');
-      const scale = Math.min(2, dialog.clientWidth / page.getViewport({scale:1}).width * devicePixelRatio);
+      const width=preview.clientWidth;
+      const scale = Math.min(4, width / page.getViewport({scale:1}).width * Math.max(2,devicePixelRatio));
       const viewport = page.getViewport({scale});
       canvas.width = Math.ceil(viewport.width);
       canvas.height = Math.ceil(viewport.height);
@@ -258,6 +300,8 @@ async function reader() {
       await activeRender.promise;
       if (selectedPage === n) {
         $('#pdf-canvas').replaceWith(canvas);
+        fitWidth=width;
+        setZoom(zoom);
         $('#pdf-status').textContent = '';
       }
     } catch (error) {

@@ -108,3 +108,15 @@ body:has(#upload) .document-panel,.document-library{background:#18181a;border-co
 .document-panel input::file-selector-button{background:#303033;color:#ededed;border:0;border-radius:8px;padding:.45rem .65rem;margin-inline-end:.65rem}
 .library-card .library-remove{background:none;border:0;box-shadow:none}
 #upload .create-guide{justify-self:end}
+#pdf-dialog{padding:0;height:min(92dvh,100%);overflow:hidden;background:#1c1c1f}
+#pdf-dialog[open]{display:grid;grid-template-rows:auto minmax(0,1fr) auto}
+#pdf-dialog .pdf-bar{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:.65rem;margin:0;padding:0 0 0 1rem;border-bottom:1px solid #3a3a3e}
+#pdf-heading{font-size:1.1rem;margin:0;overflow-wrap:anywhere}
+#pdf-dialog .pdf-bar button{width:50px;border-radius:0 0 0 14px}
+#pdf-file:not([href]){visibility:hidden}
+.pdf-stage{position:relative;min-height:0}
+#pdf-scroll{height:100%;overflow:auto;overscroll-behavior:contain;touch-action:pan-x pan-y}
+#pdf-scroll #pdf-canvas,#source-image{display:block;max-width:none;height:auto;margin-inline:auto;border-radius:0}
+#pdf-status:not(:empty){position:absolute;top:.5rem;left:.6rem;background:#202020;padding:.3rem}
+.pdf-zoom{position:absolute;right:.65rem;bottom:.65rem;display:flex;gap:.25rem}
+#pdf-dialog .pdf-navigation{position:static;margin:0;border-top:1px solid #3a3a3e}

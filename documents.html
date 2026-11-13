@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1d1d1d">
 <title>資料QA君</title>
-<link rel="stylesheet" href="web/documents.css?v=11">
-<script type="module" src="web/documents.js?v=12"></script>
+<link rel="stylesheet" href="web/documents.css?v=13">
+<script type="module" src="web/documents.js?v=13"></script>
 </head>
 <body><div class="shell">
 
@@ -57,10 +57,17 @@
 </section>
 <section class="panel" id="original" role="tabpanel" aria-labelledby="tab-original" hidden><button id="reopen-pdf">PDFを表示</button></section>
 <dialog id="pdf-dialog" aria-labelledby="pdf-heading">
-<div class="pdf-bar"><form method="dialog"><button aria-label="PDFを閉じる">×</button></form><h2 id="pdf-heading" tabindex="-1" autofocus>元のPDF</h2><a id="pdf-file" target="_blank" rel="noopener" class="ref">PDFを別のタブで開く ↗</a></div>
+<header class="pdf-bar">
+<h2 id="pdf-heading" tabindex="-1" autofocus></h2>
+<a id="pdf-file" target="_blank" rel="noopener" class="ref">別タブで開く ↗</a>
+<form method="dialog"><button aria-label="資料を閉じる">×</button></form>
+</header>
+<div class="pdf-stage">
+<div id="pdf-scroll"><canvas id="pdf-canvas" aria-label="PDFの該当ページ"></canvas><img id="source-image" hidden alt=""></div>
 <p id="pdf-status" role="status"></p>
-<div class="pdf-navigation"><button id="pdf-prev">前のページ</button><label>ページ <select id="pdf-page"></select></label><button id="pdf-next">次のページ</button></div>
-<canvas id="pdf-canvas" aria-label="PDFの該当ページ"></canvas>
+<div class="pdf-zoom"><button id="zoom-out" aria-label="縮小">−</button><button id="zoom-in" aria-label="拡大">＋</button></div>
+</div>
+<nav class="pdf-navigation" aria-label="ページ送り"><button id="pdf-prev" aria-label="前のページ">←</button><select id="pdf-page" aria-label="ページ番号"></select><button id="pdf-next" aria-label="次のページ">→</button></nav>
 </dialog>
 </template>
 </body>
