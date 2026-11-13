@@ -91,7 +91,7 @@ export default {async fetch(request,env,ctx){
   try{
 
     const match=url.pathname.match(/^\/rooms\/([a-f0-9]{32})(\/socket)?$/);
-    if(match){if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'socket:'+(request.headers.get('CF-Connecting-IP')||'local')})).success))return cors(error('少し待ってから再試行してください。',429));const room=env.ROOMS.get(env.ROOMS.idFromName(match[1]));const r=await room.fetch(request);return r.status===101?r:cors(r);}
+    if(match){const room=env.ROOMS.get(env.ROOMS.idFromName(match[1]));const r=await room.fetch(request);return r.status===101?r:cors(r);}
     if(url.pathname==='/live-translation')return upgradeLiveTranslation(request,env,ctx);
     if(url.pathname==='/transcribe-stream')return realtimeUpgrade(request,env,{verifyToken,aiFailure,ctx});
     const token=(request.headers.get('Authorization')||'').replace(/^Bearer /,'');const authStarted=Date.now(),auth=await verifyToken(token,env.FIREBASE_PROJECT,url.pathname.startsWith('/billing/'));env={...env,...(ctx?.waitUntil?{backgroundBudgetCleanup:task=>ctx.waitUntil(task)}:{}),authMs:Date.now()-authStarted,budgetUid:auth.uid,executionValid:()=>requestExecutionValid(request,requestStarted)};if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'user:'+auth.uid})).success))return cors(error('少し待ってから再試行してください。',429));
@@ -261,7 +261,11 @@ export class TranslationRoom {
     if(path==='/status')return json({unit:room.unit,ended:!!room.ended});
     if(!path.endsWith('/socket')||request.headers.get('Upgrade')?.toLowerCase()!=='websocket')return error('接続方法を確認してください。',426);
     // Unauthenticated sockets occupy a bounded slot and must authenticate within 10 seconds.
-    if(this.ctx.getWebSockets().length>=100)return error('ルームが満員です。',429);
+    const lesson=room.mode==='lesson';
+    const limiter=lesson?this.env.LESSON_SOCKET_LIMIT:this.env.REQUEST_LIMIT;
+    const ip=request.headers.get('CF-Connecting-IP')||'local';
+    if(limiter&&!(await limiter.limit({key:lesson?room.id+':'+ip:'socket:'+ip})).success)return error('少し待ってから再試行してください。',429);
+    if(this.ctx.getWebSockets().length>=(lesson?600:100))return error('ルームが満員です。',429);
     const pair=new WebSocketPair();this.ctx.acceptWebSocket(pair[1]);pair[1].serializeAttachment({opened:Date.now(),id:crypto.randomUUID(),window:Date.now(),count:0});
     const alarm=await this.ctx.storage.getAlarm();if(!alarm||alarm>Date.now()+10000)await this.ctx.storage.setAlarm(Date.now()+10000);
     return new Response(null,{status:101,webSocket:pair[0]});
