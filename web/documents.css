@@ -60,3 +60,15 @@ header .brand{text-decoration:none;color:var(--ink)}
 button:disabled,input:disabled{opacity:.55;cursor:default}
 .pdf-bar{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px}
 #pdf-canvas{display:block;max-width:100%;height:auto;background:#fff;border-radius:8px}
+
+[hidden]{display:none!important}
+.intro:has(.register-link){position:relative;padding-top:3.5rem}
+.register-link{position:absolute;right:1rem;top:1rem;color:inherit;border:1px solid currentColor;border-radius:.6rem;padding:.4rem .8rem;text-decoration:none}
+.doc-tabs{display:flex;gap:.25rem;border-bottom:1px solid #888;margin-bottom:1rem}
+.doc-tabs button{flex:1;border-radius:.6rem .6rem 0 0;border-bottom:3px solid transparent}
+.doc-tabs button[aria-selected=true]{border-bottom-color:#72b8ff;font-weight:bold;background:#333;color:white}
+#pdf-dialog{box-sizing:border-box;width:min(96vw,900px);max-height:92dvh;overflow:auto;border:1px solid #777;border-radius:1rem;background:#202020;color:white}
+#pdf-dialog::backdrop{background:#000a}
+#pdf-canvas{max-width:100%;height:auto}
+.answer-item + .answer-item{border-top:1px solid #8885;margin-top:1rem;padding-top:1rem}
+.answer-item blockquote{margin:.6rem 0;padding:.4rem .8rem;border-inline-start:3px solid #72b8ff;white-space:pre-wrap}

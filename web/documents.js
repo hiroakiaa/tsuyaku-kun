@@ -1,4 +1,3 @@
-if(new URLSearchParams(location.search).get('embedded')==='1')document.body.querySelector('header').hidden=true;
 import {config} from './config.js';
 const $ = (selector) => document.querySelector(selector);
 const content = $('#content');
@@ -111,12 +110,34 @@ async function reader() {
   $('#doc-title').textContent = doc.title;
   $('#doc-caption').textContent = '元のPDF · 全' + doc.pageCount + 'ページ';
   if (!doc.items.length) $('#points-title').textContent = '資料から抜き出した要点';
+  const dialog = $('#pdf-dialog');
+  const tabs = [...document.querySelectorAll('.doc-tabs [role=tab]')];
+  function selectTab(tab) {
+    for (const t of tabs) {
+      t.setAttribute('aria-selected',String(t===tab));
+      t.tabIndex = t===tab ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden = t!==tab;
+    }
+  }
+  tabs.forEach((tab,i)=>{
+    tab.addEventListener('click',()=>{
+      selectTab(tab);
+      if (tab.id==='tab-original') void showPdf(1);
+    });
+    tab.addEventListener('keydown',event=>{
+      const index = {ArrowRight:(i+1)%tabs.length,ArrowLeft:(i+tabs.length-1)%tabs.length,Home:0,End:tabs.length-1}[event.key];
+      if (index===undefined) return;
+      event.preventDefault();
+      tabs[index].focus();
+    });
+  });
+  $('#reopen-pdf').addEventListener('click',()=>void showPdf(selectedPage || 1));
   let opened,originalUrl;
   let selectedPage = 0;
   let activeRender;
   async function showPdf(n) {
     selectedPage = n;
-    $('#original').hidden = false;
+    if (!dialog.open) dialog.showModal();
     $('#pdf-heading').textContent = '元のPDF · ' + n + 'ページ';
     $('#pdf-file').href = api + '/pdf#page=' + n;
     $('#pdf-status').textContent = 'PDFを表示しています…';
@@ -136,7 +157,7 @@ async function reader() {
       const canvas = document.createElement('canvas');
       canvas.id = 'pdf-canvas';
       canvas.setAttribute('aria-label','元のPDFの' + n + 'ページ');
-      const scale = Math.min(2, $('#original').clientWidth / page.getViewport({scale:1}).width * devicePixelRatio);
+      const scale = Math.min(2, dialog.clientWidth / page.getViewport({scale:1}).width * devicePixelRatio);
       const viewport = page.getViewport({scale});
       canvas.width = Math.ceil(viewport.width);
       canvas.height = Math.ceil(viewport.height);
@@ -162,7 +183,6 @@ async function reader() {
     append(card,'p',item.text);
     sourceLink(card,item.source.page);
   }
-  $('#original-top').addEventListener('click',event=>{event.preventDefault(); void showPdf(1);});
   const status = $('#answer-status');
   const remove = document.querySelector('#remove-guide');
   remove.hidden = !doc.canRemove;
@@ -185,7 +205,9 @@ async function reader() {
     const question = field.value.trim();
     if (!question) return;
     const log = $('#messages');
+    if (button.disabled) return;
     button.disabled = true;
+    field.value = '';
     append(log,'div',question,'bubble user');
     status.textContent = '資料から答えを探しています…';
     log.scrollTop = log.scrollHeight;
@@ -193,21 +215,24 @@ async function reader() {
       const result = await request(api + '/ask',{method:'POST',
         headers:{'Content-Type':'application/json'},body:JSON.stringify({question})});
       const box = append(log,'div','','bubble');
-      append(box,'p',result.answer);
-      if (result.evidence?.length) {
-        const details = append(box,'details','');
-        append(details,'summary','根拠の原文を表示');
-        for (const {page,quote} of result.evidence) {
-          append(details,'blockquote',quote);
-          sourceLink(details,page);
+      if (result.items?.length) {
+        for (const item of result.items) {
+          const section = append(box,'section','','answer-item');
+          append(section,'h3',item.label);
+          append(section,'p',item.answer ?? 'この項目の根拠は資料内で確認できませんでした。');
+          for (const {page,quote} of item.evidence) {
+            append(section,'blockquote',quote);
+            sourceLink(section,page);
+          }
         }
       } else {
-        for (const n of result.pages) sourceLink(box,n);
+        append(box,'p',result.answer);
+        for (const n of result.pages ?? []) sourceLink(box,n);
       }
-      if (field.value.trim() === question) field.value = '';
+      box.scrollIntoView({behavior:'smooth',block:'start'});
       status.textContent = '';
     } catch (error) { status.textContent = error.message; }
-    finally { button.disabled = false; log.scrollTop = log.scrollHeight; }
+    finally { button.disabled = false; }
   });
 }
 
