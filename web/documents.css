@@ -100,3 +100,10 @@ button:disabled,input:disabled{opacity:.55;cursor:default}
 .answer-evidence h5{font-size:1em;margin:0}
 
 .library-card .library-remove{background:none;border:0;box-shadow:none;color:inherit;font-size:1.3rem}
+body:has(#upload),body:has(.document-library){background:#111;color:#ededed;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+body:has(#upload) .intro{background:transparent;border:0;box-shadow:none;padding:0 0 1rem}
+body:has(#upload) h1{font-size:clamp(1.25rem,4vw,1.65rem)}
+body:has(#upload) .document-panel,.document-library{background:#18181a;border-color:#353538;border-radius:16px;box-shadow:none}
+.document-panel .primary{background:#ededed;color:#18181a;border-color:transparent}
+.document-panel input::file-selector-button{background:#303033;color:#ededed;border:0;border-radius:8px;padding:.45rem .65rem;margin-inline-end:.65rem}
+.library-card .library-remove{background:none;border:0;box-shadow:none}
