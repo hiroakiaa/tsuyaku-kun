@@ -71,8 +71,68 @@ async function extract(file, status) {
   } finally { if (pdf) await pdf.destroy(); }
 }
 
+function documentLibrary() {
+  const key = 'tsuyaku-document-library';
+  const list = $('#library-list');
+  const status = $('#library-status');
+  let entries = [];
+  try {
+    const stored = JSON.parse(localStorage.getItem(key) ?? '[]');
+    if (Array.isArray(stored)) entries = stored.filter(entry=>typeof entry?.title==='string' && /^[a-f0-9-]{36}$/.test(entry.id));
+  } catch { status.textContent = '保存済みの資料を読み込めませんでした。'; }
+  function save(next) {
+    try { localStorage.setItem(key,JSON.stringify(next)); }
+    catch { status.textContent = 'ブラウザーに保存できませんでした。'; return false; }
+    entries = next;
+    render();
+    return true;
+  }
+  function render() {
+    list.replaceChildren();
+    if (!entries.length) append(list,'li','保管した資料はまだありません。','fine');
+    for (const entry of entries) {
+      const card = append(list,'li','','library-card');
+      const icon = append(card,'span','▤','library-icon');
+      icon.setAttribute('aria-hidden','true');
+      const body = append(card,'div','','library-card-body');
+      const link = append(body,'a',entry.title);
+      link.href = '?id='+entry.id;
+      if (entry.expires) {
+        const expired = Date.now()>=entry.expires;
+        append(body,'small',expired ? '共有期限を過ぎました' : '共有期限 '+new Date(entry.expires).toLocaleDateString('ja-JP'));
+      }
+      const remove = append(card,'button','一覧から外す');
+      remove.type = 'button';
+      remove.setAttribute('aria-label',entry.title+'を保管庫から外す');
+      remove.onclick = ()=>{ if (save(entries.filter(item=>item.id!==entry.id))) status.textContent = '保管庫から外しました。'; };
+    }
+  }
+  function add(entry) {
+    const previous = entries.find(item=>item.id===entry.id);
+    return save([{...previous,...entry},...entries.filter(item=>item.id!==entry.id)]);
+  }
+  $('#library-add').onsubmit = event=>{
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const title = data.get('title').trim();
+    const url = new URL(data.get('url'));
+    const id = url.searchParams.get('id');
+    if (!title || url.origin!==location.origin || url.pathname!==location.pathname || !/^[a-f0-9-]{36}$/.test(id ?? '')) {
+      status.textContent = '資料名と、このアプリの資料QA共有URLを入力してください。';
+      return;
+    }
+    if (add({id,title})) {
+      event.currentTarget.reset();
+      status.textContent = '保管庫に追加しました。';
+    }
+  };
+  render();
+  return add;
+}
+
 function teacher() {
   show('#teacher');
+  const saveGuide = documentLibrary();
   const status = $('#upload-status');
   $('#upload').addEventListener('submit',async event=>{
     event.preventDefault();
@@ -86,11 +146,12 @@ function teacher() {
     try {
       data.set('pages',JSON.stringify(await extract(file,status)));
       status.textContent = '案内ページを作っています…';
-      const {id} = await request('/documents',{method:'POST',body:data});
+      const {id,expires} = await request('/documents',{method:'POST',body:data});
       const url = '?id=' + id;
       $('#open-guide').href = url;
       $('#guide-url').value = new URL(url,location.href).href;
       $('#result').hidden = false;
+      saveGuide({id,title:String(data.get('title')).trim(),expires});
       status.textContent = '';
     } catch (error) { status.textContent = error.message; }
     finally { button.disabled = false; }
