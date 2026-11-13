@@ -751,6 +751,10 @@ body.phone-home #microphone[aria-busy=true] i{animation:mic-preparing 1s linear 
 
 /* Lesson roster: one participant per row, language aligned right. */
 body.phone-home #participants.lesson-participants{display:flex;flex-direction:column;gap:8px;max-height:40vh;overflow:auto;width:100%}body.phone-home #participants.lesson-participants .participant{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,55%);align-items:center;gap:12px;width:100%;padding:6px 0;background:transparent;border:0;box-shadow:none;border-radius:0}body.phone-home .lesson-participants .participant-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}body.phone-home .lesson-participants select{min-width:0;width:100%;font-size:13px;padding:9px 10px;border:0;box-shadow:none}body.phone-home .lesson-participants select:disabled{opacity:.7}
+.lesson-participant-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:1;padding:8px 0;background:var(--paper);border-bottom:1px solid var(--line)}
+.lesson-language-counts{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px}.lesson-language-counts span{padding:2px 8px;border-radius:999px;background:var(--mint);font-size:11px;white-space:nowrap}
+body.phone-home .participant-list-toggle{width:100%;min-height:40px;margin-top:2px;border:0;border-top:1px solid var(--line);border-radius:0;background:transparent;font-weight:700}
+@media(max-width:650px){.lesson-participant-summary{align-items:flex-start;flex-direction:column}.lesson-language-counts{justify-content:flex-start}}
 
 /* Mobile interpreter: current speaker belongs to the header; controls share one row. */
 body.phone-home .header-face-speaker{display:none;}

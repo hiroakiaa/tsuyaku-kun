@@ -6,7 +6,8 @@
   "scripts": {
     "test": "node --experimental-vm-modules tests/run.mjs && node tests/lesson-economy.mjs && node tests/group-chat.mjs && node tests/chat-recovery.mjs && node tests/reliability20.mjs && node --test tests/live-translation.mjs",
     "serve": "node tools/serve.mjs",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "publish:verified": "node tools/publish-verified.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.35.0"

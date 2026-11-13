@@ -3,4 +3,3 @@ export function faceTranslationTargets(source,self,other,{economy=false}={}){
 }
 export function speedPreferred(storage){return storage.getItem('tsuyaku-recognition-speed-v1')==='fast';}
 
-export function speedPasswordMatches(value){return typeof value==='string'&&value.replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xfee0)).trim()==='1111';}
