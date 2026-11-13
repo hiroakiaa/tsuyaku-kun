@@ -25,10 +25,15 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  function read(){badge.hidden=true;button.setAttribute('aria-label','要約を表示');}
  function place(){
   if(!panel)return;
-  if(wide.matches){
-   if(dialog.open)dialog.close();
-   button.after(panel);
-  }else dialog.append(panel);
+  const wasOpen=dialog.open;
+  if(wasOpen)dialog.close();
+  (wide.matches?captions().closest('#live'):document.body).append(dialog);
+  if(wasOpen)openSummary();
+ }
+ function openSummary(){
+  if(wide.matches)dialog.show();
+  else dialog.showModal();
+  dialog.focus({preventScroll:true});
  }
  wide.addEventListener('change',place);
  function makeDialog(title){
@@ -287,6 +292,16 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    feedback.textContent='コピーできませんでした。要約本文を選択してコピーしてください。';
   }
  }
+ function makeCopyButton(label){
+  const button=el('button',undefined,'summary-copy-icon');
+  const icon=el('i',undefined,'fa-solid fa-copy');
+  icon.setAttribute('aria-hidden','true');
+  button.append(icon);
+  button.type='button';
+  button.setAttribute('aria-label',label);
+  button.title=label;
+  return button;
+ }
  function appendHistory(entry){
   const section=el('details');
   const time=entry.time.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
@@ -294,7 +309,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   const body=el('div');
   body.tabIndex=-1;
   renderSummary(entry.text,entry.language,body);
-  const copy=el('button','この要約をコピー'),feedback=el('small');
+  const copy=makeCopyButton('この要約をコピー'),feedback=el('small');
   copy.type='button';
   feedback.setAttribute('role','status');
   copy.onclick=()=>copySummary(body,feedback);
@@ -345,7 +360,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    bufferNotice.setAttribute('role','status');
    translationStatus=el('small');
    translationStatus.setAttribute('role','status');
-   copyButton=el('button','要約をコピー');
+   copyButton=makeCopyButton('要約をコピー');
    copyButton.type='button';
    copyButton.hidden=true;
    copyStatus=el('small');
@@ -353,6 +368,8 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    copyButton.onclick=()=>copySummary(output,copyStatus);
    panel.append(finalizeButton,translationButton,copyButton,copyStatus,bufferNotice,output,status,retryButton,translationStatus,historyPanel);
    dialog=makeDialog('Live要約');
+   dialog.classList.add('live-summary-dialog');
+   dialog.append(panel);
    button=el('button','要約を表示');
    button.type='button';
    badge=el('span',' 更新');
@@ -361,11 +378,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    button.append(badge);
    button.onclick=()=>{
     read();
-    if(wide.matches){output.scrollIntoView({block:'nearest'});output.focus();}
-    else if(!dialog.open){
-     dialog.showModal();
-     dialog.focus({preventScroll:true});
-    }
+    if(!dialog.open)openSummary();
    };
    captions().closest('#live').querySelector('.live-tools').append(button);
    place();
