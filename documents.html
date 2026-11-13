@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1d1d1d">
 <title>資料QA君</title>
-<link rel="stylesheet" href="web/documents.css?v=6">
-<script type="module" src="web/documents.js?v=7"></script>
+<link rel="stylesheet" href="web/documents.css?v=8">
+<script type="module" src="web/documents.js?v=8"></script>
 </head>
 <body><div class="shell">
 
@@ -33,14 +33,11 @@
 <p class="fine">共有期間は作成から30日間です。</p>
 </div>
 </section>
-<section class="panel document-library">
+</template>
+<template id="library"><section class="panel document-library">
 <h2>資料QAの保管庫</h2>
 <p class="fine">このブラウザーに共有URLを保存します。資料は作成から30日間開けます。</p>
-<form id="library-add">
-<label>資料名<input name="title" maxlength="100" required></label>
-<label>共有URL<input name="url" type="url" required></label>
-<button>保管庫に追加</button>
-</form>
+
 <p id="library-status" role="status"></p>
 <ul id="library-list"></ul>
 </section>

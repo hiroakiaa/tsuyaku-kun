@@ -98,3 +98,5 @@ button:disabled,input:disabled{opacity:.55;cursor:default}
 .answer-item h4{margin:.5rem 0}
 .answer-evidence{font-size:.84em;margin-top:.75rem;color:#ccc}
 .answer-evidence h5{font-size:1em;margin:0}
+
+.library-card .library-remove{background:none;border:0;box-shadow:none;color:inherit;font-size:1.3rem}

@@ -79,12 +79,12 @@ function documentLibrary() {
   try {
     const stored = JSON.parse(localStorage.getItem(key) ?? '[]');
     if (Array.isArray(stored)) entries = stored.filter(entry=>typeof entry?.title==='string' && /^[a-f0-9-]{36}$/.test(entry.id));
-  } catch { status.textContent = '保存済みの資料を読み込めませんでした。'; }
+  } catch { if (status) status.textContent = '保存済みの資料を読み込めませんでした。'; }
   function save(next) {
     try { localStorage.setItem(key,JSON.stringify(next)); }
-    catch { status.textContent = 'ブラウザーに保存できませんでした。'; return false; }
+    catch { if (status) status.textContent = 'ブラウザーに保存できませんでした。'; return false; }
     entries = next;
-    render();
+    if (list) render();
     return true;
   }
   function render() {
@@ -101,7 +101,8 @@ function documentLibrary() {
         const expired = Date.now()>=entry.expires;
         append(body,'small',expired ? '共有期限を過ぎました' : '共有期限 '+new Date(entry.expires).toLocaleDateString('ja-JP'));
       }
-      const remove = append(card,'button','一覧から外す');
+      const remove = append(card,'button','🗑︎','library-remove');
+      remove.title = '一覧から外す';
       remove.type = 'button';
       remove.setAttribute('aria-label',entry.title+'を保管庫から外す');
       remove.onclick = ()=>{ if (save(entries.filter(item=>item.id!==entry.id))) status.textContent = '保管庫から外しました。'; };
@@ -111,22 +112,7 @@ function documentLibrary() {
     const previous = entries.find(item=>item.id===entry.id);
     return save([{...previous,...entry},...entries.filter(item=>item.id!==entry.id)]);
   }
-  $('#library-add').onsubmit = event=>{
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const title = data.get('title').trim();
-    const url = new URL(data.get('url'));
-    const id = url.searchParams.get('id');
-    if (!title || url.origin!==location.origin || url.pathname!==location.pathname || !/^[a-f0-9-]{36}$/.test(id ?? '')) {
-      status.textContent = '資料名と、このアプリの資料QA共有URLを入力してください。';
-      return;
-    }
-    if (add({id,title})) {
-      event.currentTarget.reset();
-      status.textContent = '保管庫に追加しました。';
-    }
-  };
-  render();
+  if (list) render();
   return add;
 }
 
@@ -151,7 +137,10 @@ function teacher() {
       $('#open-guide').href = url;
       $('#guide-url').value = new URL(url,location.href).href;
       $('#result').hidden = false;
-      saveGuide({id,title:String(data.get('title')).trim(),expires});
+      if (!saveGuide({id,title:String(data.get('title')).trim(),expires})) {
+        status.textContent = '資料を作成しましたが、保管庫には保存できませんでした。';
+        return;
+      }
       status.textContent = '';
     } catch (error) { status.textContent = error.message; }
     finally { button.disabled = false; }
@@ -390,7 +379,8 @@ async function reader() {
 }
 
 try {
-  if (!id) teacher();
+  if (!id && new URLSearchParams(location.search).has('library')) { show('#library'); documentLibrary(); }
+  else if (!id) teacher();
   else await reader();
 } catch (error) {
   content.replaceChildren();
