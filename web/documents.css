@@ -128,3 +128,6 @@ dialog [tabindex="-1"][autofocus]:focus {
   outline-offset: 0 !important;
   box-shadow: none !important;
 }
+#pdf-dialog[open]{grid-template-columns:minmax(0,1fr)}
+.pdf-stage{min-width:0;overflow:hidden}
+#pdf-scroll{position:absolute;inset:0}

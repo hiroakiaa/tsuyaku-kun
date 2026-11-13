@@ -213,12 +213,20 @@ async function reader() {
   const imageType = /^(png|jpe?g|webp)$/.test(sourceType);
   const zoomable = sourceType==='pdf' || imageType;
   let zoom=1, fitWidth=0;
-  const fingers=new Map();
-  let pinchDistance=0;
-  function setZoom(value) {
-    zoom=Math.min(4,Math.max(.5,value));
+  let pinch;
+  function setZoom(value, from, to=from) {
+    const bounds=preview.getBoundingClientRect();
+    from ??= {x:bounds.width/2,y:bounds.height/2};
+    to ??= from;
     const surface=imageType ? previewImage : $('#pdf-canvas');
-    if (fitWidth) surface.style.width=fitWidth*zoom+'px';
+    const before=surface.getBoundingClientRect();
+    const previous=zoom;
+    zoom=Math.min(4,Math.max(.5,value));
+    if (!fitWidth) return;
+    surface.style.width=fitWidth*zoom+'px';
+    const after=surface.getBoundingClientRect();
+    preview.scrollLeft+=after.left-bounds.left+(bounds.left+from.x-before.left)*zoom/previous-to.x;
+    preview.scrollTop+=after.top-bounds.top+(bounds.top+from.y-before.top)*zoom/previous-to.y;
   }
   $('.pdf-zoom').hidden=!zoomable;
   $('.pdf-navigation').hidden=sourceType!=='pdf';
@@ -227,22 +235,28 @@ async function reader() {
   preview.addEventListener('wheel',event=>{
     if (!zoomable) return;
     event.preventDefault();
-    setZoom(zoom*Math.exp(-event.deltaY*.002));
+    const bounds=preview.getBoundingClientRect();
+    setZoom(zoom*Math.exp(-event.deltaY*.002),{x:event.clientX-bounds.left,y:event.clientY-bounds.top});
   },{passive:false});
+  function measurePinch(event){
+    const [a,b]=event.touches;
+    const bounds=preview.getBoundingClientRect();
+    return {x:(a.clientX+b.clientX)/2-bounds.left,y:(a.clientY+b.clientY)/2-bounds.top,
+      distance:Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)};
+  }
   preview.addEventListener('touchstart',event=>{
     if (event.touches.length!==2 || !zoomable) return;
-    for(const touch of event.touches) fingers.set(touch.identifier,touch);
-    const [a,b]=fingers.values();
-    pinchDistance=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
-  },{passive:true});
-  preview.addEventListener('touchmove',event=>{
-    if (!pinchDistance || event.touches.length!==2) return;
     event.preventDefault();
-    const [a,b]=event.touches;
-    const distance=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
-    if(distance>0){setZoom(zoom*distance/pinchDistance);pinchDistance=distance;}
+    pinch=measurePinch(event);
   },{passive:false});
-  for (const event of ['touchend','touchcancel']) preview.addEventListener(event,()=>{fingers.clear();pinchDistance=0;});
+  preview.addEventListener('touchmove',event=>{
+    if (!pinch || !pinch.distance || event.touches.length!==2) return;
+    event.preventDefault();
+    const next=measurePinch(event);
+    setZoom(zoom*next.distance/pinch.distance,pinch,next);
+    pinch=next;
+  },{passive:false});
+  for (const event of ['touchend','touchcancel']) preview.addEventListener(event,()=>{pinch=undefined;});
   async function showPdf(n) {
     if (n<1 || n>doc.pageCount) return;
     selectedPage = n;
