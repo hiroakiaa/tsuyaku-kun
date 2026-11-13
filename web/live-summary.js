@@ -1,12 +1,18 @@
 const SUMMARY_INTERVAL_MS=30000;
+const SUMMARY_SETTING_KEY='tsuyaku-live-summary-enabled';
 let enabled=false;
+try{enabled=localStorage.getItem(SUMMARY_SETTING_KEY)==='on';}catch{}
 let stop=()=>{};
 
 export function createLiveSummarySetting(el){
  const label=el('label','Live要約','admin-check'),input=el('input');
  input.type='checkbox';
  input.checked=enabled;
- input.onchange=()=>{enabled=input.checked;if(!enabled)stop();};
+ input.onchange=()=>{
+  enabled=input.checked;
+  try{localStorage.setItem(SUMMARY_SETTING_KEY,enabled?'on':'off');}catch{}
+  if(!enabled)stop();
+ };
  label.prepend(input);
  const section=el('section');
  section.append(label,el('p','オンにすると、会話の字幕をAIに送信して約30秒ごとに要約します。','admin-caption'));
