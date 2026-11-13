@@ -183,6 +183,10 @@ async function reader() {
   tabs.forEach((tab,i)=>{
     tab.addEventListener('click',()=>{
       selectTab(tab);
+      if (tab.id==='tab-ask') {
+        $('#ask-dialog').showModal();
+        $('#ask-heading').focus();
+      }
       if (tab.id==='tab-original') void showPdf(1);
     });
     tab.addEventListener('keydown',event=>{
@@ -191,6 +195,10 @@ async function reader() {
       event.preventDefault();
       tabs[index].focus();
     });
+  });
+  $('#ask-dialog').addEventListener('close',()=>{
+    selectTab(tabs[0]);
+    tabs[0].focus();
   });
   $('#reopen-pdf').addEventListener('click',()=>void showPdf(selectedPage || 1));
   let opened,originalUrl;
@@ -319,14 +327,19 @@ async function reader() {
       const result = await request(api + '/ask',{method:'POST',
         headers:{'Content-Type':'application/json'},body:JSON.stringify({question})});
       const box = append(log,'div','','bubble');
+      append(box,'h3','質問回答','answer-heading');
       if (result.items?.length) {
         for (const item of result.items) {
           const section = append(box,'section','','answer-item');
-          append(section,'h3',item.label);
+          append(section,'h4',item.label);
           append(section,'p',item.answer ?? 'この項目の根拠は資料内で確認できませんでした。');
-          for (const {page,quote} of item.evidence) {
-            append(section,'blockquote',quote);
-            sourceLink(section,page);
+          if (item.evidence.length) {
+            const evidence = append(section,'div','','answer-evidence');
+            append(evidence,'h5','資料内表記');
+            for (const {page,quote} of item.evidence) {
+              append(evidence,'blockquote',quote);
+              sourceLink(evidence,page);
+            }
           }
         }
       } else {
