@@ -250,7 +250,7 @@ export async function documentStorage(request,storage) {
   const path = new URL(request.url).pathname;
   if (path==='/document/usage') {
     const month = new Date().toISOString().slice(0,7);
-    const key = 'usage:'+month;
+    const key = 'dedicated-usage:'+month;
     if (request.method==='GET') return reply({month,...await storage.get(key)});
     const usage = await request.json();
     return storage.transaction(async tx=>{
