@@ -21,7 +21,7 @@ export function createLiveSummarySetting(el){
 
 export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  const pending=new Map(),seen=new Map(),history=[];
- let checkpoint=null,pendingSince=null,retryAfter=0,bufferNotice,bufferDiscarded=false;
+ let checkpoint=null,pendingSince=null,retryAfter=0,retryCount=0,bufferNotice,bufferDiscarded=false;
  const wide=matchMedia('(min-width:900px), (min-width:480px) and (max-height:620px)');
  let timer,request,panel,output,status,button,badge,dialog,wiki,wikiRequest,translationButton,translationStatus,copyButton,copyStatus,translationRequest,summaryLanguage,historyPanel,finalizeButton,retryButton,finalSummaryTime,finalizing=false,isFinal=false,summary='';
  function notifySummary(label){
@@ -136,7 +136,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
   if(request){request.abort();record('cancelled',{operation:request.operation});}request=null;
   if(translationRequest){translationRequest.abort();translationRequest=null;record('cancelled',{operation:'translation'});}
   checkpoint=null;
-  pendingSince=null;retryAfter=0;
+  pendingSince=null;retryAfter=0;retryCount=0;
   bufferNotice=null;bufferDiscarded=false;
   pending.clear();seen.clear();history.length=0;finalizing=false;isFinal=false;summary='';
   wikiRequest?.abort();wiki?.remove();wiki=null;
@@ -209,7 +209,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
     const section=characters.slice(offset,end).join('');
     record('requested',{operation:controller.operation,captionCount:offset===0?captionCount:0,characters:section.length,queueMs:offset===0?queueMs:null});
     const startedAt=performance.now();
-    result=await api('/live-summary',{transcript:section,previous,language:target,final},{signal:controller.signal});
+    result=await api('/live-summary',{transcript:section,previous,language:target,final},{signal:AbortSignal.any([controller.signal,AbortSignal.timeout(12000)])});
     if(controller.signal.aborted)return;
     record('succeeded',{operation:controller.operation,elapsedMs:Math.round(performance.now()-startedAt),usage:result.usage});
     if(language()!==target){
@@ -241,15 +241,17 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    translationButton.onclick=translateSummary;
    renderSummary();
    if(!final)appendHistory(history.at(-1));
+   retryCount=0;
    notifySummary('更新あり');
    status.textContent='';
   }catch{
    if(!controller.signal.aborted){
     record('failed',{operation:controller.operation,elapsedMs:Math.round(performance.now()-started)});
     pendingSince=batchSince??pendingSince;
-    retryAfter=performance.now()+60000;
+    const retryDelay=Math.min(30,5*2**Math.min(retryCount++,3));
+    retryAfter=performance.now()+retryDelay*1000;
     restorePending(batch);
-    status.textContent=final?'全体要約を作成できませんでした。':'要約を更新できませんでした。';
+    status.textContent=final?'全体要約を作成できませんでした。':'要約を更新できませんでした。約'+retryDelay+'秒後に再試行します。';
     retryButton.onclick=()=>{if(!request)void update(final);};
     retryButton.hidden=false;
     notifySummary('要約に失敗');
@@ -392,6 +394,7 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
    button.onclick=()=>{
     read();
     if(!dialog.open)openSummary();
+    if(!summary&&pending.size&&!request)void update();
    };
    captions().closest('#live').querySelector('.call-controls').prepend(button);
    place();
