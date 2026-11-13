@@ -68,11 +68,10 @@ reportSummary.replaceChildren(...liveSummary,el('p',current&&liveEvents.length?'
   library.type='button';
   library.title='資料QAの保管庫';
   library.setAttribute('aria-label',library.title);
-  Object.assign(library.style,{background:'none',border:'0',boxShadow:'none'});
+  Object.assign(library.style,{background:'none',border:'0',boxShadow:'none',color:'#ededed',display:'grid',placeItems:'center'});
   const libraryIcon=el('i',undefined,'fa-solid fa-folder');
   libraryIcon.setAttribute('aria-hidden','true');
   library.append(libraryIcon);
-
   library.style.marginInlineStart='auto';
   heading.append(el('h2','資料QA'),library,close);
   const frame=el('iframe');
