@@ -194,7 +194,16 @@ async function reader() {
         headers:{'Content-Type':'application/json'},body:JSON.stringify({question})});
       const box = append(log,'div','','bubble');
       append(box,'p',result.answer);
-      for (const n of result.pages) sourceLink(box,n);
+      if (result.evidence?.length) {
+        const details = append(box,'details','');
+        append(details,'summary','根拠の原文を表示');
+        for (const {page,quote} of result.evidence) {
+          append(details,'blockquote',quote);
+          sourceLink(details,page);
+        }
+      } else {
+        for (const n of result.pages) sourceLink(box,n);
+      }
       if (field.value.trim() === question) field.value = '';
       status.textContent = '';
     } catch (error) { status.textContent = error.message; }
