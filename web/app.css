@@ -368,7 +368,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .modal-heading{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;}
 .modal-heading h2{min-width:0;overflow-wrap:anywhere;}
 .modal-reading{font-size:var(--read-label);font-weight:500;color:#c2c2c2;line-height:1.5;}
-.modal-heading #modal-close{margin-left:auto;flex:none;}
+.modal-heading :is(#modal-close,.modal-close){margin-left:auto;flex:none;}
 .reference-language-heading{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:10px;}
 .reference-language-heading h3{flex-basis:auto;padding-top:10px;}
 .reference-language-heading .speech-controls{display:flex;flex-direction:row;justify-content:flex-end;gap:2px;width:auto;min-width:44px;}
@@ -680,7 +680,7 @@ body.phone-home #lesson-role-picker button i{font-size:38px;color:#dddde1}
 body.phone-home dialog{background:#1c1c1f!important;border:1px solid #3a3a3e!important;border-radius:26px!important;padding:24px;box-shadow:0 32px 96px rgba(0,0,0,.55)}
 body.phone-home .modal-heading{background:transparent!important;margin-bottom:24px;gap:20px}
 body.phone-home .modal-heading h2{font-family:inherit;font-size:21px;font-weight:650;letter-spacing:-.025em}
-body.phone-home #modal-close{width:36px;height:36px;min-height:36px;padding:0!important;border:0!important;border-radius:50%!important;background:#343438!important;color:#c5c5cb!important}
+body.phone-home :is(#modal-close,.modal-close){width:36px;height:36px;min-height:36px;padding:0!important;border:0!important;border-radius:50%!important;background:#343438!important;color:#c5c5cb!important}
 body.phone-home .caption{background:#1c1c1f;border-color:#303034;border-radius:18px;padding:18px;box-shadow:none}
 @media(min-width:900px){body.phone-home #live:not([hidden]),body.phone-home.mode-active #live:not([hidden]){gap:24px;grid-template-columns:minmax(280px,29%) minmax(0,1fr)}body.phone-home .captions{padding:28px}}
 @media(max-width:599px){body.phone-home{--shell-gap:16px}body.phone-home .app-shell>header{margin-bottom:10px;min-height:52px;padding-block:4px}body.phone-home .face-controls,body.phone-home .call-invite{padding:14px;border-radius:18px!important}body.phone-home .captions{padding:18px;border-radius:20px!important}body.phone-home .empty h2{font-size:21px}body.phone-home dialog{padding:20px;border-radius:24px!important}body.phone-home #lesson-role-picker{gap:12px}body.phone-home #lesson-role-picker button{min-height:145px;font-size:22px}body.phone-home main.phone-home-card>.bottom-nav{padding-inline:12px!important}}
@@ -694,13 +694,13 @@ body.phone-home dialog .admin-panel>.admin-tabs>button[aria-selected=true],body.
 body.phone-home dialog .admin-panel>.admin-tabs>button:hover,body.phone-home #panel-words>.reference-tabs>button:hover{color:#fff!important}
 body.phone-home dialog{position:relative}
 body.phone-home dialog>.modal-heading{padding-right:40px;min-height:32px}
-body.phone-home dialog>#modal-close,body.phone-home dialog>.modal-heading>#modal-close{position:absolute;top:0;right:0;width:50px;height:50px;min-width:50px;min-height:50px;margin:0;padding:0!important;border-top:0!important;border-right:0!important;border-left:1px solid #3a3a3e!important;border-bottom:1px solid #3a3a3e!important;border-radius:0 24px 0 14px!important;background:#1c1c1f!important;color:#d5d5da!important;box-shadow:none!important;font-size:19px}
-body.phone-home dialog>.modal-heading>#modal-close:hover{color:#fff!important;border-left-color:#77777d!important;border-bottom-color:#77777d!important}
+body.phone-home dialog>:is(#modal-close,.modal-close),body.phone-home dialog>.modal-heading>:is(#modal-close,.modal-close){position:absolute;top:0;right:0;width:50px;height:50px;min-width:50px;min-height:50px;margin:0;padding:0!important;border-top:0!important;border-right:0!important;border-left:1px solid #3a3a3e!important;border-bottom:1px solid #3a3a3e!important;border-radius:0 24px 0 14px!important;background:#1c1c1f!important;color:#d5d5da!important;box-shadow:none!important;font-size:19px}
+body.phone-home dialog>.modal-heading>:is(#modal-close,.modal-close):hover{color:#fff!important;border-left-color:#77777d!important;border-bottom-color:#77777d!important}
 body.phone-home dialog .admin-tab-panel details{border:0!important;border-bottom:1px solid #343438!important;border-radius:0;padding:16px 0!important;background:transparent!important}
 body.phone-home .caption-meta button.secondary{background:transparent!important;border:0!important;border-radius:10px!important;color:#a1a1a6!important}
 body.phone-home .caption-meta button.secondary:hover{background:#303034!important;color:#fff!important}
 body.phone-home .reference-card{border-top:0!important;border-left:0!important;border-right:0!important;border-bottom:1px solid #343438!important;box-shadow:none!important}
-@media(max-width:480px){body.phone-home dialog .admin-panel>.admin-tabs>button{padding:10px 12px!important;font-size:13px!important}body.phone-home dialog>.modal-heading>#modal-close{width:48px;height:48px;min-width:48px;min-height:48px}}
+@media(max-width:480px){body.phone-home dialog .admin-panel>.admin-tabs>button{padding:10px 12px!important;font-size:13px!important}body.phone-home dialog>.modal-heading>:is(#modal-close,.modal-close){width:48px;height:48px;min-width:48px;min-height:48px}}
 
 /* Open-edge controls outside dialogs share the same visual language. */
 body.phone-home .header-tools #language-options,body.phone-home .reference-group button.reference-more,body.phone-home .reference-group button.reference-less{background:transparent!important;border-top:0!important;border-right:0!important;border-left:1px solid #3a3a3e!important;border-bottom:1px solid #3a3a3e!important;border-radius:0 0 0 14px!important;box-shadow:none!important;color:#d5d5da!important}

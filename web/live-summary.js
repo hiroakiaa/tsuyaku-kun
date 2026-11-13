@@ -45,13 +45,18 @@ export function createLiveSummary({el,api,captions,language,record=()=>{}}){
  }
  wide.addEventListener('change',place);
  function makeDialog(title){
-  const node=el('dialog'),heading=el('h2',title),close=el('button','閉じる');
+  const node=el('dialog'),header=el('div',undefined,'modal-heading'),close=el('button',undefined,'modal-close');
+  const icon=el('i',undefined,'fa-solid fa-xmark');
+  icon.setAttribute('aria-hidden','true');
+  close.setAttribute('aria-label','閉じる');
+  close.append(icon);
+  header.append(el('h2',title),close);
   node.setAttribute('aria-label',title);
   node.tabIndex=-1;
   Object.assign(node.style,{width:'min(90vw, 38rem)',maxHeight:'85dvh',overflow:'auto'});
   close.type='button';
   close.onclick=()=>node.close();
-  node.append(heading,close);
+  node.append(header);
   document.body.append(node);
   return node;
  }
