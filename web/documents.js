@@ -324,13 +324,22 @@ async function reader() {
     status.textContent = '資料から答えを探しています…';
     log.scrollTop = log.scrollHeight;
     try {
-      const result = await request(api + '/ask',{method:'POST',
-        headers:{'Content-Type':'application/json'},body:JSON.stringify({question})});
-      const box = append(log,'div','','bubble');
-      append(box,'h3','質問回答','answer-heading');
-      if (result.items?.length) {
-        for (const item of result.items) {
-          const section = append(box,'section','','answer-item');
+      const response = await fetch(config.api+api+'/ask',{method:'POST',
+        headers:await authHeaders({'Content-Type':'application/json',Accept:'application/x-ndjson'}),
+        body:JSON.stringify({question})});
+      if (!response.ok) throw Error((await response.json().catch(()=>null))?.error || '回答を取得できませんでした。');
+      let box;
+      function answerBox() {
+        if (!box) {
+          box = append(log,'div','','bubble');
+          append(box,'h3','質問回答','answer-heading');
+        }
+        return box;
+      }
+      function showItem(item) {
+        const first = !box;
+        const answer = answerBox();
+          const section = append(answer,'section','','answer-item');
           append(section,'h4',item.label);
           append(section,'p',item.answer ?? 'この項目の根拠は資料内で確認できませんでした。');
           if (item.evidence.length) {
@@ -341,12 +350,39 @@ async function reader() {
               sourceLink(evidence,page);
             }
           }
-        }
-      } else {
-        append(box,'p',result.answer);
-        for (const n of result.pages ?? []) sourceLink(box,n);
+        if (first) answer.scrollIntoView({behavior:'smooth',block:'start'});
       }
-      box.scrollIntoView({behavior:'smooth',block:'start'});
+      if (!response.headers.get('Content-Type')?.includes('application/x-ndjson')) {
+        const result = await response.json();
+        for (const item of result.items ?? []) showItem(item);
+        if (!box) append(answerBox(),'p',result.answer);
+      } else {
+        const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+        let pending='', finished=false;
+        try {
+          for (;;) {
+            const {value,done} = await reader.read();
+            if (done) break;
+            pending+=value;
+            const lines=pending.split('\n');
+            pending=lines.pop();
+            for (const line of lines) {
+              const event=JSON.parse(line);
+              if (event.error) throw Error(event.error);
+              if (event.status) status.textContent=event.status;
+              if (event.item) {
+                showItem(event.item);
+                status.textContent='続きの回答を確認しています…';
+              }
+              if (event.done) {
+                finished=true;
+                if (event.answer) append(answerBox(),'p',event.answer);
+              }
+            }
+          }
+          if (!finished) throw Error('回答の受信が途中で止まりました。');
+        } finally { await reader.cancel().catch(()=>{}); }
+      }
       status.textContent = '';
     } catch (error) { status.textContent = error.message; }
     finally { button.disabled = false; }
