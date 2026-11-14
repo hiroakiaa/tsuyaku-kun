@@ -60,15 +60,27 @@ function selectPassages(pages, question, index) {
     const text = normalize(pages[page].slice(start,end));
     let score = 0;
     for (const term of terms) if (text.includes(term)) score += Math.min(12,term.length**2);
-    return {page,start,end,position,score};
+    return {page,start,end,position,score,text};
   }).sort((a,b)=>b.score-a.score);
   if (!scored[0]?.score || pages.join('').length<=4200) return null;
   const chosen = new Set();
+  const clauses = query.split(/(?:[、,;；?？\n]|および|並びに|それから|\band\b|(?<=[一-龯々ァ-ヶー])と(?=[一-龯々ァ-ヶー]))/u)
+    .map(clause=>clause.match(/[a-z0-9]+|[一-龯々ァ-ヶー]{2,}/g) ?? [])
+    .filter(words=>words.length)
+    .slice(0,8);
+  if (clauses.length>1) {
+    for (const words of clauses) {
+      const bestWord = words.toSorted((a,b)=>b.length-a.length)
+        .find(word=>scored.some(item=>item.text.includes(word)));
+      const best = bestWord && scored.find(item=>item.text.includes(bestWord));
+      if (best) chosen.add(best.position);
+    }
+  }
   for (const term of terms) {
-    if (term.length<3 && !/[一-龯]{2}/.test(term)) continue;
-    const match = scored.find(item=>normalize(pages[item.page].slice(item.start,item.end)).includes(term));
-    if (match) chosen.add(match.position);
     if (chosen.size>=8) break;
+    if (term.length<3 && !/[一-龯]{2}/.test(term)) continue;
+    const match = scored.find(item=>item.text.includes(term));
+    if (match) chosen.add(match.position);
   }
   const strongest = scored.filter(item=>item.score>0).slice(0,4);
   for (const item of strongest) chosen.add(item.position);
