@@ -31,3 +31,12 @@ const followup = await documents(new Request('https://test/documents/10000000-00
 const clarified = await followup.json();
 assert.equal(clarified.answer,'400円');
 assert.deepEqual(clarified.items.flatMap(item=>item.evidence.map(e=>[e.sheet,e.cell,e.page])),['A3','B4','C1','D2','D4'].map(cell=>['R8料金表',cell,5]));
+
+const threeYearPages = [...pages, pages[4].replace('R8料金表','R7料金表').replace('400円','350円')];
+const threeYearEnv = {ROOMS:{idFromName:x=>x,get:()=>({fetch:async()=>Response.json({pages:threeYearPages,sourceType:'xlsx'})})}};
+const ambiguous = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+  method:'POST', body:JSON.stringify({question:'会議室の子どもの休日料金は？'}),
+}),threeYearEnv,{uid:'test'});
+const threeYears = await ambiguous.json();
+assert.equal(threeYears.answer,'令和7年度・令和8年度・令和9年度のうち、どの年度ですか？');
+assert.deepEqual(threeYears.items.flatMap(item=>item.evidence),[]);
