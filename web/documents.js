@@ -1,4 +1,4 @@
-import {layoutPdfText} from './document-table.js';
+import {layoutPdfText} from './document-table.js?v=77';
 import {installLocalIcons,localIcon} from './icons.js?v=library';
 import {config} from './config.js';
 const $ = (selector) => document.querySelector(selector);
@@ -52,7 +52,7 @@ function append(parent, tag, text, className) {
 }
 
 async function extract(file, status) {
-  let pdf;
+  let pdf, ocr;
   try {
     pdf = await openPdf({data:new Uint8Array(await file.arrayBuffer())});
     if (pdf.numPages > 40) throw new Error('40ページ以内のPDFを選んでください。');
@@ -74,7 +74,14 @@ async function extract(file, status) {
       } finally {
         reader.releaseLock();
       }
-      pages.push(layoutPdfText(parts));
+      let text = layoutPdfText(parts);
+      if (!text.trim()) {
+        status.textContent = 'スキャンページを端末で読んでいます… ' + n + ' / ' + pdf.numPages;
+        const {createPdfOcr} = await import('./document-ocr.js');
+        ocr ??= await createPdfOcr();
+        text = await ocr.read(page);
+      }
+      pages.push(text);
     }
     if (!pages.some(page=>page.length >= 8)) throw new Error('文字を取り出せませんでした。文字を選べるPDFを使ってください。');
     if (pages.join('').length > 22000) throw new Error('文字数が多すぎます。資料を分けてください。');
@@ -83,7 +90,9 @@ async function extract(file, status) {
     if (error.name === 'PasswordException') throw new Error('パスワードのないPDFを使ってください。');
     if (error.name === 'InvalidPDFException') throw new Error('PDFを開けませんでした。ファイルを確認してください。');
     throw error;
-  } finally { if (pdf) await pdf.destroy(); }
+  } finally {
+    try { await ocr?.close(); } finally { await pdf?.destroy(); }
+  }
 }
 
 function readingPosition(id, update) {

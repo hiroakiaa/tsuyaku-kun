@@ -5,6 +5,19 @@ const browser = await chromium.launch();
 try {
   const page = await browser.newPage();
   await page.setContent('<p>The library closes at 3 PM.</p>');
+  const scan = await page.evaluate(()=>{
+    const canvas = document.createElement('canvas');
+    canvas.width = 1100;
+    canvas.height = 220;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0,0,1100,220);
+    ctx.fillStyle = 'black';
+    ctx.font = '42px Arial';
+    ctx.fillText('The swimming pool opens at 8 AM.',30,100);
+    return canvas.toDataURL();
+  });
+  await page.setContent(`<p>The library closes at 3 PM.</p><div style="break-before:page"><img width="550" src="${scan}"></div>`);
   const pdf = await page.pdf();
   await page.goto('https://hiroakiaa.github.io/tsuyaku-kun/documents.html');
   await page.getByRole('heading',{name:'資料QAの保管庫'}).waitFor();
@@ -24,6 +37,11 @@ try {
     await page.locator('#ask-form button').click();
     await page.locator('#messages .answer-source').first().waitFor();
     assert.match(await page.locator('#messages').textContent(),/3\s*(?::00)?\s*PM/i);
+    await page.locator('#question').fill('When does the swimming pool open?');
+    await page.locator('#ask-form button').click();
+    const citation = page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 2ページ'});
+    await citation.waitFor();
+    assert.match(await page.locator('#messages .bubble').last().textContent(),/8\s*(?::00)?\s*AM/i);
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
       const {config} = await import('./web/config.js');
