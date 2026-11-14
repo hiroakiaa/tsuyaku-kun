@@ -113,3 +113,5 @@ R7要項の給食費を本番の全文・検索方式で各3回、順序を交�
 再試験に使用した合成Wordは tests/fixtures/document-qa-page-break.docx に保存。登録後に Blue group の開始時刻を質問し、回答本文の時刻、PDF 2ページへのリンク、引用原文の14:00を照合する。
 
 5fb2dae の [公開後試験 43624648486](https://github.com/hiroakiaa/tsuyaku-kun/actions/runs/43624648486) は成功。Wordの改ページ試験は node tools/smoke-document-qa-word.mjs で再実行できる。2ページへの変換、回答本文の開始時刻、2ページ目だけの根拠リンク、引用原文の14:00、試験資料削除後の取得不可を照合する。
+
+公開版Chromeで合成Wordの計測付き試験を1回実行。作成操作から登録URL表示まで3,210ms、質問送信から完了まで1,446ms。回答本文、PDF 2ページの根拠、引用原文と、削除後の資料・PDFの404を照合した。

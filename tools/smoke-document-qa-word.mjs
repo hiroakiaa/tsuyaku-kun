@@ -57,12 +57,15 @@ try {
     await page.locator('#tab-ask').click();
     assert.equal(await page.locator('#pdf-page option').count(),2);
     await page.locator('#question').fill('What is the start time for the Blue group?');
+    const questionStarted = performance.now();
     await page.locator('#ask-form button').click();
     await page.locator('#ask-form button:enabled').waitFor();
+    const answerMs = Math.round(performance.now()-questionStarted);
     const bubble=page.locator('#messages .bubble').last();
     assert.match(await bubble.locator('.answer-text').textContent(),/14:00|2\s*(?::00)?\s*p\.?m\.?/i);
     assert.deepEqual(await bubble.locator('.answer-source a').allTextContents(),['元のPDF 2ページ']);
     assert.match(await bubble.locator('.answer-quote').textContent(),/Blue group[\s\S]*14:00/);
+    console.log(JSON.stringify({fixture:'word-page-break',registrationMs,answerMs}));
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
       const {config} = await import('./web/config.js');
