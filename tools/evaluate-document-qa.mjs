@@ -24,19 +24,21 @@ const saved = process.argv[2] ? JSON.parse(await readFile(process.argv[2],'utf8'
 if (!saved) assert.ok(key,'検証用の OPENAI_DOCUMENT_QA_KEY を環境変数に設定してください。');
 const normalize = text=>text.normalize('NFKC').replace(/[,\s]/g,'');
 const rows = [];
-const selectedCases = process.argv.includes('--two-fees') ? cases.slice(0,2) : cases;
+const selectedCases = process.argv.includes('--two-fees') ? cases.slice(0,2)
+  : process.argv.includes('--baseline-five') ? cases.slice(2) : cases;
 for (const [question,expected] of selectedCases) {
   for (const mode of ['full','search']) {
     const started = performance.now();
     const recorded = saved?.find(row=>row.question===question && row.mode===mode);
     if (saved && !recorded) continue;
-    const {items,usage} = recorded ?? await evaluateDocumentQuestion({OPENAI_DOCUMENT_QA_KEY:key},pages,question,mode);
+    const {items,usage,candidatePages,timing} = recorded ?? await evaluateDocumentQuestion({OPENAI_DOCUMENT_QA_KEY:key},pages,question,mode);
     const elapsedMs = recorded ? recorded.elapsedMs ?? null : Math.round(performance.now()-started);
     const correct = expected.length ? expected.every(([value,page,sourceLabel])=>items.some(item=>
       item.answer && normalize(item.answer).includes(normalize(value)) &&
       item.evidence.some(source=>source.page===page && normalize(source.quote).includes(normalize(value)) && (!sourceLabel || normalize(source.quote).includes(normalize(sourceLabel))))
     )) : !items.some(item=>item.answer);
     const expectedPages = new Set(expected.map(([,page])=>page));
+    const missingCandidatePages = Array.isArray(candidatePages) ? [...expectedPages].filter(page=>!candidatePages.includes(page)) : null;
     const unexpectedPages = [...new Set(items.flatMap(item=>item.evidence.map(source=>source.page)))].filter(page=>!expectedPages.has(page));
     const input = usage?.prompt_tokens ?? null;
     const output = usage?.completion_tokens ?? null;
@@ -44,17 +46,39 @@ for (const [question,expected] of selectedCases) {
     const estimatedUSD = [input,output,cached].every(Number.isFinite)
       ? ((input-cached)*0.4+cached*0.1+output*1.6)/1e6 : null;
     const evidencePages = [...new Set(items.flatMap(item=>item.evidence.map(source=>source.page)))];
-    rows.push({question,mode,correct:correct && !unexpectedPages.length,unexpectedPages,pages:evidencePages.join(', '),input,output,cached,estimatedUSD,elapsedMs});
+    const matchedPages = evidencePages.filter(page=>expectedPages.has(page)).length;
+    rows.push({question,mode,candidatePages:candidatePages ?? null,missingCandidatePages,matchedPages,expectedPageCount:expectedPages.size,returnedPageCount:evidencePages.length,correct:correct && !unexpectedPages.length,unexpectedPages,pages:evidencePages.join(', '),input,output,cached,estimatedUSD,elapsedMs,retrievalMs:timing?.retrievalMs ?? null,generationMs:timing?.generationMs ?? null});
   }
 }
 console.table(rows);
 const summary = ['full','search'].map(mode=>{
   const samples = rows.filter(row=>row.mode===mode);
   const durations = samples.map(row=>row.elapsedMs).filter(Number.isFinite).sort((a,b)=>a-b);
-  return {mode, expectedCases:selectedCases.length, unmeasuredCases:selectedCases.length-samples.length, cases:samples.length, passed:samples.filter(row=>row.correct).length,
-    medianMs:durations[Math.ceil(durations.length/2)-1] ?? null, maxMs:durations.at(-1) ?? null,
+  const middle = Math.floor(durations.length/2);
+  const medianMs = durations.length
+    ? (durations[Math.floor((durations.length-1)/2)] + durations[middle])/2
+    : null;
+  const passed = samples.filter(row=>row.correct).length;
+  const complete = samples.length===selectedCases.length;
+  const retrievalSamples = samples.filter(row=>row.expectedPageCount && row.missingCandidatePages!==null);
+  const expectedCandidates = retrievalSamples.reduce((sum,row)=>sum+row.expectedPageCount,0);
+  const missedCandidates = retrievalSamples.reduce((sum,row)=>sum+row.missingCandidatePages.length,0);
+  return {mode, expectedCases:selectedCases.length, unmeasuredCases:selectedCases.length-samples.length, cases:samples.length, passed,
+    accuracy:complete && samples.length ? passed/samples.length : null,
+    retrieval: {
+      measuredCases:retrievalSamples.length,
+      expectedPages:expectedCandidates,
+      missedPages:missedCandidates,
+      recall:expectedCandidates ? 1-missedCandidates/expectedCandidates : null,
+    },
+    citationPages: {
+      matched:samples.reduce((sum,row)=>sum+row.matchedPages,0),
+      expected:samples.reduce((sum,row)=>sum+row.expectedPageCount,0),
+      returned:samples.reduce((sum,row)=>sum+row.returnedPageCount,0),
+    },
+    measuredLatencyCases:durations.length, medianMs, maxMs:durations.at(-1) ?? null,
     measuredCostCases:samples.filter(row=>row.estimatedUSD!==null).length,
-    estimatedUSD:samples.length===selectedCases.length && samples.every(row=>row.estimatedUSD!==null)
+    estimatedUSD:complete && samples.every(row=>row.estimatedUSD!==null)
       ? samples.reduce((sum,row)=>sum+row.estimatedUSD,0) : null};
 });
 console.log(JSON.stringify({summary,rows},null,2));

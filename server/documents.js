@@ -1032,8 +1032,11 @@ export async function documentStorage(request,storage) {
 
 export async function evaluateDocumentQuestion(env,pages,question,mode,materials=[],target) {
   let usage;
+  const retrievalStarted = performance.now();
   const passages = mode==='full' ? null : await retrievalPassages(env,pages,question,searchIndex(pages),target);
+  const generationStarted = performance.now();
   const result = await generate(env,pages,question,materials,undefined,passages,value=>{usage=value;});
+  const timing = {retrievalMs:mode==='full' ? null : Math.round(generationStarted-retrievalStarted),generationMs:Math.round(performance.now()-generationStarted)};
   if (target) await recordUsage(env,usage,"benchmark").catch(()=>{});
-  return {items:(result.items ?? []).map(item=>checkedAnswer(item,pages,question)).filter(Boolean),usage};
+  return {items:(result.items ?? []).map(item=>checkedAnswer(item,pages,question)).filter(Boolean),usage,timing,candidatePages:passages ? [...new Set(passages.map(({page})=>page))] : pages.map((_,index)=>index+1)};
 }

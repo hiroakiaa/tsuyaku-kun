@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {documents,documentStorage} from '../server/documents.js';
+import {documents,documentStorage,evaluateDocumentQuestion} from '../server/documents.js';
 
 const pages = Array.from({length:20},()=> '校舎の案内です。'.repeat(32));
 pages[15] = '冷房は午後2時から運転します。';
@@ -43,6 +43,10 @@ try {
     assert.deepEqual(result.pages,[16]);
   }
   assert.deepEqual(inputs,[pages.length+1,1]);
+  const evaluation = await evaluateDocumentQuestion(env,pages,'When does cooling start?','search');
+  assert.ok(evaluation.candidatePages.includes(16));
+  assert.ok(evaluation.candidatePages.length < pages.length);
+  assert.equal(new Set(evaluation.candidatePages).size,evaluation.candidatePages.length);
 } finally {
   globalThis.fetch = originalFetch;
 }
