@@ -949,17 +949,19 @@ async function reader() {
     if (!item.evidence?.length) return;
     const evidence = append(section,'div','','answer-evidence');
     const byPage = new Map();
-    for (const {page,quote} of item.evidence) {
-      if (!byPage.has(page)) byPage.set(page,new Set());
-      byPage.get(page).add(quote);
+    for (const {page,quote,sheet,cell} of item.evidence) {
+      if (!byPage.has(page)) byPage.set(page,new Map());
+      byPage.get(page).set(quote,sheet && cell ? sheet+' · '+cell : null);
     }
     for (const [page,quotes] of byPage) {
       const source = append(evidence,'div','','answer-source');
-      sourceLink(source,page,quotes.values().next().value);
+      sourceLink(source,page,quotes.keys().next().value);
+      const addresses = [...new Set([...quotes.values()].filter(Boolean))];
+      if (addresses.length) append(source,'div',addresses.join('、'));
       const disclosure = append(source,'details','','answer-quote');
       append(disclosure,'summary','資料内表記');
       const content = append(disclosure,'div');
-      for (const quote of quotes) {
+      for (const quote of quotes.keys()) {
         const block = append(content,'blockquote');
         for (const paragraph of formatQuote(quote)) append(block,'p',paragraph);
       }

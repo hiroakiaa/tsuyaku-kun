@@ -226,20 +226,143 @@ function monthlyDismissal(evidence) {
   return null;
 }
 
+function lookupWorksheetCell(pages, question) {
+  const query = normalized(question);
+  const year = /(?:令和|R)(\d+)年度?/iu.exec(query)?.[1];
+  const sheets = new Map();
+  for (const [index,text] of pages.entries()) {
+    const [sheet,...lines] = text.split('\n');
+    if (!sheets.has(sheet)) sheets.set(sheet,{cells:new Map(),ranges:new Set()});
+    const {cells,ranges} = sheets.get(sheet);
+    for (const line of lines) {
+      if (line.startsWith('結合セル範囲: ')) {
+        for (const range of line.slice('結合セル範囲: '.length).split(/,\s*/u)) ranges.add(range);
+        continue;
+      }
+      for (const quote of line.split(' | ')) {
+        const match = /^(([A-Z]+)(\d+))\s+(.+)$/u.exec(quote);
+        if (match) cells.set(match[1],{sheet,cell:match[1],column:match[2],row:Number(match[3]),value:match[4],quote,page:index+1});
+      }
+    }
+  }
+  const matches = [];
+  for (const [sheet,{cells,ranges}] of sheets) {
+    const sheetYear = /^R(\d+)/iu.exec(normalized(sheet))?.[1];
+    if (year && sheetYear!==year) continue;
+    for (const range of ranges) {
+      const heading = /^([A-Z])(\d+):([A-Z])\2$/u.exec(range);
+      if (!heading) continue;
+      const parent = cells.get(heading[1]+heading[2]);
+      if (!parent || !query.includes(normalized(parent.value))) continue;
+      for (const child of cells.values()) {
+        if (child.row!==Number(heading[2])+1 || child.column<heading[1] || child.column>heading[3] ||
+            !query.includes(normalized(child.value))) continue;
+        for (const rowRange of ranges) {
+          const group = /^([A-Z]+)(\d+):\1(\d+)$/u.exec(rowRange);
+          if (!group) continue;
+          const owner = cells.get(group[1]+group[2]);
+          if (!owner || !query.includes(normalized(owner.value))) continue;
+          for (const value of cells.values()) {
+            if (value.column!==child.column || value.row<Number(group[2]) || value.row>Number(group[3])) continue;
+            const labels = [...cells.values()].filter(cell=>cell.row===value.row && cell.column<heading[1] &&
+              cell.cell!==owner.cell && query.includes(normalized(cell.value)));
+            if (labels.length) matches.push({year:sheetYear,value,evidence:[owner,...labels,parent,child,value]});
+          }
+        }
+      }
+    }
+  }
+  const unique = [...new Map(matches.map(match=>[match.value.sheet+'!'+match.value.cell,match])).values()];
+  if (unique.length===1) return {label:'該当するセル',answer:unique[0].value.value,evidence:unique[0].evidence};
+  const years = [...new Set(unique.map(match=>match.year).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
+  if (!year && years.length>1) return {label:'年度の確認',clarificationYears:years,answer:years.map(year=>'令和'+year+'年度').join('と')+'のどちらですか？',evidence:[]};
+  return null;
+}
+
 function lookupAdmissionCell(pages, question) {
-  const request = /^(?:令和|R)(\d{1,2})年度?の([^|、。]{2,30}?)の一般入試の?基準(?:は)?[?。]?$/iu.exec(normalized(question));
-  if (!request) return null;
-  const [,year,school] = request;
+  const request = /^(?:令和|R)(\d{1,2})年度?の([^|、。]{2,30}?)(?:の([^|、。]{2,30}?)コース)?の一般入試の?基準(?:は)?[?。]?$/iu.exec(normalized(question));
+  const recommendation = /^(?:令和|R)(\d{1,2})年度?の([^|、。]{2,30}?)の([^|、。]{2,30}?)コースの推薦入試で([359](?:科[・、][359])*科)の基準は[?。]?$/iu.exec(normalized(question));
+  if (!request && !recommendation) return null;
+  const [,year,school,course,subjects] = request ?? recommendation;
   const schoolName = school.replace(/(?:高等学校|高校)$/u,'');
   const columns = new Map();
   for (const page of pages) {
     const sheet = page.split('\n',1)[0];
     if (!new RegExp('^R'+Number(year)+'(?!\\d)','iu').test(normalized(sheet))) continue;
-    const header = /(?:^|[\n|])\s*([A-Z]+)\d+\s+一般入試[^|\n]*/u.exec(page);
+    const headerRow = page.split('\n').find(line=>/^A\d+[ \t]+校名(?:[ \t]*\|)/u.test(line));
+    const header = headerRow?.match(/\|[ \t]*([A-Z]+)\d+[ \t]+一般入試(?:[（(]目安[）)])?[ \t]*(?:\||$)/u);
     if (header) {
       const existing = columns.get(sheet);
       columns.set(sheet, existing!==undefined && existing!==header[1] ? null : header[1]);
     }
+  }
+  if (course) {
+    const matches = [];
+    for (const [index,page] of pages.entries()) {
+      const sheet = page.split('\n',1)[0];
+      const column = columns.get(sheet);
+      if (!columns.has(sheet) || (!column && !subjects)) continue;
+      const cells = new Map();
+      const merges = new Set();
+      for (const [sourceIndex,source] of pages.entries()) {
+        if (!source.startsWith(sheet+'\n')) continue;
+        for (const line of source.split('\n').slice(1)) {
+          if (line.startsWith('結合セル範囲: ')) {
+            for (const range of line.slice('結合セル範囲: '.length).split(', ')) merges.add(range);
+            continue;
+          }
+          for (const quote of line.split(' | ')) {
+            const match = /^([A-Z]+\d+)\s+(.+)$/u.exec(quote);
+            if (match) cells.set(match[1],{page:sourceIndex+1,quote,value:match[2]});
+          }
+        }
+      }
+      const resolve = (col,row)=>{
+        const direct = cells.get(col+row);
+        if (direct) return direct;
+        for (const range of merges) {
+          const match = /^([A-Z]+)(\d+):([A-Z]+)(\d+)$/u.exec(range);
+          if (match && match[1]===col && match[3]===col && row>=Number(match[2]) && row<=Number(match[4])) {
+            return cells.get(col+match[2]);
+          }
+        }
+      };
+      for (const [address,entry] of cells) {
+        if (entry.page!==index+1 || !/^B\d+$/.test(address) || normalized(entry.value)!==course) continue;
+        const row = Number(address.slice(1));
+        const owner = resolve('A',row);
+        if (subjects && owner && normalized(owner.value).replace(/(?:高等学校|高校)$/u,'')===schoolName) {
+          const headers = [...cells.entries()].filter(([,cell])=>normalized(cell.value)==='推薦入試');
+          if (headers.length!==1) continue;
+          const [address,header] = headers[0];
+          const range = [...merges].find(value=>value.startsWith(address+':'));
+          const bounds = /^([A-Z])(\d+):([A-Z])\2$/u.exec(range ?? '');
+          if (!bounds) continue;
+          const entries = subjects.split(/[・、]/u).map(subject=>{
+            const subheading = [...cells.entries()].find(([key,cell])=>{
+              const col=key[0];
+              return col>=bounds[1] && col<=bounds[3] && key===col+(Number(bounds[2])+1) &&
+                normalized(cell.value).replace(/科$/u,'')===subject.replace(/科$/u,'');
+            });
+            if (!subheading) return null;
+            const value=resolve(subheading[0][0],row);
+            return {subject,heading:subheading[1],value};
+          });
+          if (entries.some(value=>!value)) continue;
+          matches.push({label:school+' '+course+'の推薦入試基準',
+            answer:entries.map(({subject,value})=>subject+'：'+(value?.value ?? '該当セルは空欄')).join('\n'),
+            evidence:[owner,entry,header,...entries.flatMap(({heading,value})=>value?[heading,value]:[heading])]
+              .map(({page,quote})=>({page,quote}))});
+          continue;
+        }
+        const value = resolve(column,row);
+        if (owner && value && normalized(owner.value).replace(/(?:高等学校|高校)$/u,'')===schoolName) {
+          matches.push({label:school+' '+course+'の一般入試基準',answer:value.value,
+            evidence:[owner,entry,value].map(({page,quote})=>({page,quote}))});
+        }
+      }
+    }
+    return matches.length===1 ? matches[0] : null;
   }
   const matches = [];
   for (const [index,page] of pages.entries()) {
@@ -581,18 +704,23 @@ export async function documents(request,env,auth) {
           headers:{'Content-Type':'application/x-ndjson','Cache-Control':'no-store'},
         });
       }
-      return reply({items:[item],answer:item.answer,pages:[item.evidence[0].page]});
+      return reply({items:[item],answer:item.answer,pages:[...new Set(item.evidence.map(source=>source.page))]});
     }
   }
   if (record.sourceType==='pdf' || record.sourceType==='xlsx') {
-    const item = lookupAdmissionCell(record.pages,currentQuestion);
+    const yearReply = /^(?:令和|R)(\d+)年度?(?:です)?[。.]?$/iu.exec(normalized(currentQuestion));
+    const previous = yearReply && typeof previousQuestion==='string' && previousQuestion.length<=300
+      ? lookupWorksheetCell(record.pages,previousQuestion) : null;
+    const worksheetQuestion = previous?.clarificationYears?.includes(yearReply?.[1])
+      ? '令和'+yearReply[1]+'年度の'+previousQuestion : currentQuestion;
+    const item = lookupWorksheetCell(record.pages,worksheetQuestion) ?? lookupAdmissionCell(record.pages,currentQuestion);
     if (item) {
       if (request.headers.get('Accept')==='application/x-ndjson') {
         return new Response(JSON.stringify({item})+'\n'+JSON.stringify({done:true})+'\n',{
           headers:{'Content-Type':'application/x-ndjson','Cache-Control':'no-store'},
         });
       }
-      return reply({items:[item],answer:item.answer,pages:[item.evidence[0].page]});
+      return reply({items:[item],answer:item.answer,pages:[...new Set(item.evidence.map(source=>source.page))]});
     }
   }
   const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([15,record.pages,record.materials ?? [],question.trim()])));
