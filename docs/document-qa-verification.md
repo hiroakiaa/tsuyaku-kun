@@ -139,3 +139,5 @@ R7要項の給食費を本番の全文・検索方式で各3回、順序を交�
 日本語PNGを含む [公開後試験 43626710239](https://github.com/hiroakiaa/tsuyaku-kun/actions/runs/43626710239) は成功。再実行は node tools/smoke-document-qa-image.mjs png ja。Windows Chromeで同じコマンドの試験を実行した際は、登録5366ms、回答完了1459ms。手書き、低解像度、全文一致はこの試験の範囲外。
 
 公開版 Windows Chrome で、青組の画像資料に緑組の予定表PNGを追加し、送信直前にPDFのみと抽出テキストを照合した。緑組の開始時刻16:30、追加資料の1ページ、引用原文が一致し、削除後に資料とPDFが404になった。再試験は node tools/smoke-document-qa-image.mjs png en --append。チャット内の資料追加ボタンを選び、背後の同名ボタンへのクリックを避ける。
+
+公開版 Windows Chrome の合成Excel試験を6問に拡張。年度を確認して令和8年度の400円を表示した直後、令和9年度を明示すると450円に戻り、R9料金表 D4とPDF 2ページだけを引用した。既存5問と削除確認も通過。再実行は node tools/smoke-document-qa-tables.mjs。
