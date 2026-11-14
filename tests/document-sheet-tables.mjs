@@ -38,6 +38,13 @@ for (const reply of ['令和8年度です','令和8年度','R8','Ｒ８']) {
   assert.equal(adult.answer,'800円');
   assert.deepEqual(adult.items[0].evidence.map(e=>[e.sheet,e.cell,e.page]),
     ['A3','B3','C1','D2','D3'].map(cell=>['R8料金表',cell,5]));
+  const back = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+    method:'POST', body:JSON.stringify({question:'子どもは？',previousQuestion:adult.items[0].worksheetContext}),
+  }),env,{uid:'test'});
+  const child = await back.json();
+  assert.equal(child.answer,'400円');
+  assert.deepEqual(child.items[0].evidence.map(e=>[e.sheet,e.cell,e.page]),
+    ['A3','B4','C1','D2','D4'].map(cell=>['R8料金表',cell,5]));
   assert.deepEqual(clarified.items.flatMap(item=>item.evidence.map(e=>[e.sheet,e.cell,e.page])),['A3','B4','C1','D2','D4'].map(cell=>['R8料金表',cell,5]));
 }
 
