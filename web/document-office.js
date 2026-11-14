@@ -56,14 +56,27 @@ export async function officePages(file,{includeMerges=false}={}){
     const blocks=Array.from(body.children).flatMap(block=>{
       if (block.localName==='p') return [strings(block)];
       if (block.localName!=='tbl') return tags(block,'p').map(strings);
-      return Array.from(block.children).filter(row=>row.localName==='tr').map(row=>
-        Array.from(row.children).filter(cell=>cell.localName==='tc').flatMap(cell=>{
-          const span=Number(tags(cell,'gridSpan')[0]?.getAttributeNS(cell.namespaceURI,'val'));
-          const text=tags(cell,'p').map(strings).filter(Boolean).join(' ');
+      let previousMerges=new Map();
+      return Array.from(block.children).filter(row=>row.localName==='tr').map(row=>{
+        const merges=new Map();
+        let column=0;
+        const values=Array.from(row.children).filter(cell=>cell.localName==='tc').flatMap(cell=>{
+          const properties=Array.from(cell.children).find(child=>child.localName==='tcPr');
+          const span=Number(tags(properties,'gridSpan')[0]?.getAttributeNS(cell.namespaceURI,'val'));
           const columns=Number.isInteger(span) && span>1 && span<=63 ? span : 1;
+          const merge=tags(properties,'vMerge')[0];
+          let text=tags(cell,'p').map(strings).filter(Boolean).join(' ');
+          const key=column+':'+columns;
+          if (merge && (merge.getAttributeNS(cell.namespaceURI,'val') ?? 'continue')==='continue') {
+            text ||= previousMerges.get(key) ?? '';
+          }
+          if (merge) merges.set(key,text);
+          column+=columns;
           return [text,...Array(columns-1).fill('')];
-        }).join(' | ')
-      );
+        });
+        previousMerges=merges;
+        return values.join(' | ');
+      });
     });
     return [blocks.join('\n')];
   }
