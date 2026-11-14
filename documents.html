@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1d1d1d">
 <title>資料QA君</title>
-<link rel="stylesheet" href="web/documents.css?v=38">
-<script type="module" src="web/documents.js?v=37"></script>
+<link rel="stylesheet" href="web/documents.css?v=39">
+<script type="module" src="web/documents.js?v=39"></script>
 </head>
 <body><div class="shell">
 
@@ -15,7 +15,7 @@
 <template id="teacher">
 <section class="intro">
 <h1>資料QAを作る</h1>
-<a class="register-link" href="?v=37">保管庫を開く</a>
+<a class="register-link" href="?v=39">保管庫を開く</a>
 <p>資料を登録すると、要点を示し、資料専用のチャットボットを作ります。</p>
 </section>
 <section class="panel document-panel">
@@ -37,7 +37,8 @@
 </section>
 </template>
 <template id="library"><section class="panel document-library">
-<header class="library-heading"><h1>資料QAの保管庫</h1><a class="document-entry" href="?create=1&amp;v=37">資料チャット作成</a></header>
+<header class="library-heading"><h1>資料QAの保管庫</h1><a class="document-entry" href="?create=1&amp;v=39">資料チャット作成</a></header>
+<div class="library-filters"><label>資料名<input id="library-search" type="search"></label><label>並べ替え<select id="library-sort"><option value="recent">最近開いた順</option><option value="new">登録日の新しい順</option><option value="title">資料名順</option><option value="expiry">期限が近い順</option></select></label></div>
 <h2>このブラウザーの保管庫</h2>
 <p class="fine">このブラウザーに共有URLを保存します。資料は作成から30日間開けます。</p>
 

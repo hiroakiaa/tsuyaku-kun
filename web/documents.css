@@ -190,3 +190,7 @@ dialog [tabindex="-1"][autofocus]:focus {
 .document-library h2 {font-size:1.05rem;margin-top:1.5rem}
 #shared-list {list-style:none;padding:0;display:grid;gap:.65rem}
 .qa-actions {flex-wrap:nowrap;flex-shrink:0}
+
+.library-filters {display:flex;flex-wrap:wrap;align-items:end;gap:.75rem}
+.library-filters label:first-child {flex:1 1 12rem}
+.library-filters input {width:100%;box-sizing:border-box}

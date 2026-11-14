@@ -84,6 +84,30 @@ async function extract(file, status) {
   } finally { if (pdf) await pdf.destroy(); }
 }
 
+function readingPosition(id, update) {
+  const key = 'tsuyaku-reading:'+id;
+  try {
+    const previous = JSON.parse(localStorage.getItem(key) || '{}');
+    if (update) localStorage.setItem(key,JSON.stringify({...previous,...update}));
+    return previous;
+  } catch { return {}; }
+}
+
+function filterLibrary(entries) {
+  const normalize = value => value.normalize('NFKC').toLowerCase();
+  const term = normalize($('#library-search').value.trim());
+  const sort = $('#library-sort').value;
+  return entries.filter(entry=>normalize(entry.title).includes(term)).sort((a,b)=>{
+    if (sort==='title') return a.title.localeCompare(b.title,'ja');
+    if (sort==='expiry') return (a.expires ?? Infinity)-(b.expires ?? Infinity);
+    if (sort==='recent') {
+      const difference = (readingPosition(b.id).opened ?? 0)-(readingPosition(a.id).opened ?? 0);
+      if (difference) return difference;
+    }
+    return (b.expires ?? 0)-(a.expires ?? 0);
+  });
+}
+
 function documentLibrary() {
   const key = 'tsuyaku-document-library';
   const list = $('#library-list');
@@ -102,8 +126,9 @@ function documentLibrary() {
   }
   function render() {
     list.replaceChildren();
-    if (!entries.length) append(list,'li','保管した資料はまだありません。','fine');
-    for (const entry of entries) {
+    const matches = filterLibrary(entries);
+    if (!matches.length) append(list,'li',entries.length ? '一致する資料がありません。' : '保管した資料はまだありません。','fine');
+    for (const entry of matches) {
       const card = append(list,'li','','library-card');
       const icon = append(card,'span','▤','library-icon');
       icon.setAttribute('aria-hidden','true');
@@ -112,7 +137,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '37');
+      guide.searchParams.set('v', '39');
       link.href = guide.href;
       if (entry.expires) {
         const expired = Date.now()>=entry.expires;
@@ -129,7 +154,11 @@ function documentLibrary() {
     const previous = entries.find(item=>item.id===entry.id);
     return save([{...previous,...entry},...entries.filter(item=>item.id!==entry.id)]);
   }
-  if (list) render();
+  if (list) {
+    $('#library-search').addEventListener('input',render);
+    $('#library-sort').addEventListener('change',render);
+    render();
+  }
   return add;
 }
 
@@ -232,7 +261,8 @@ async function reader() {
     $('#reopen-pdf').textContent = '資料データを表示';
   }
   let opened,originalUrl;
-  let selectedPage = 0;
+  const previousPage = readingPosition(id,{opened:Date.now()}).page;
+  let selectedPage = Number.isInteger(previousPage) && previousPage>=1 && previousPage<=doc.pageCount ? previousPage : 0;
   const tocButton = $('#pdf-toc-toggle');
   const toc = $('#pdf-toc');
   function syncContentsPage() {
@@ -471,6 +501,7 @@ async function reader() {
       const index = pageViews.findIndex(slot => slot.getBoundingClientRect().bottom > top+1);
       if (index < 0) return;
       selectedPage = index+1;
+      readingPosition(id,{page:selectedPage});
       syncContentsPage();
       pagePicker.value = selectedPage;
       $('#pdf-prev').disabled = selectedPage===1;
@@ -481,6 +512,7 @@ async function reader() {
   async function showPdf(n) {
     if (n<1 || n>doc.pageCount) return;
     selectedPage = n;
+    readingPosition(id,{page:n});
     syncContentsPage();
     pagePicker.value = n;
     $('#pdf-prev').disabled = n===1;
@@ -723,12 +755,21 @@ try {
     try {
       const entries = await request('/documents/library');
       $('#shared-status').textContent = entries.length ? '' : '公開されている資料はありません。';
-      for (const entry of entries) {
-        const card = append($('#shared-list'),'li','','library-card');
+      const renderShared = () => {
+        const list = $('#shared-list');
+        list.replaceChildren();
+        const matches = filterLibrary(entries);
+        $('#shared-status').textContent = matches.length ? '' : entries.length ? '一致する資料がありません。' : '公開されている資料はありません。';
+        for (const entry of matches) {
+        const card = append(list,'li','','library-card');
         const link = append(card,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=37';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=39';
         append(card,'small','公開期限 '+new Date(entry.expires).toLocaleDateString('ja-JP'));
-      }
+        }
+      };
+      $('#library-search').addEventListener('input',renderShared);
+      $('#library-sort').addEventListener('change',renderShared);
+      renderShared();
     } catch (error) {
       $('#shared-status').textContent = error.message;
     }
