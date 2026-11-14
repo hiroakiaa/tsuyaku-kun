@@ -71,3 +71,18 @@ const emptyCell = await blank.json();
 assert.equal(emptyCell.answer,'該当セルは空欄です。');
 assert.deepEqual(emptyCell.pages,[]);
 assert.deepEqual(emptyCell.items[0].evidence,[]);
+
+const mixedPages = [...pages, pages[2].replace('R9料金表','R7料金表').replace('B4 子ども | D4 450円','B4 子ども')];
+const mixedEnv = {ROOMS:{idFromName:x=>x,get:()=>({fetch:async()=>Response.json({pages:mixedPages,sourceType:'xlsx'})})}};
+const mixed = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+  method:'POST',body:JSON.stringify({question:'会議室の子どもの休日料金は？'}),
+}),mixedEnv,{uid:'test'});
+const mixedResult = await mixed.json();
+assert.equal(mixedResult.answer,'令和7年度・令和8年度・令和9年度のうち、どの年度ですか？');
+assert.deepEqual(mixedResult.pages,[]);
+const emptyYear = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+  method:'POST',body:JSON.stringify({question:'R7',previousQuestion:'会議室の子どもの休日料金は？'}),
+}),mixedEnv,{uid:'test'});
+const emptyYearResult = await emptyYear.json();
+assert.equal(emptyYearResult.answer,'該当セルは空欄です。');
+assert.deepEqual(emptyYearResult.items[0].evidence,[]);
