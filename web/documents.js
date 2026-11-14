@@ -112,7 +112,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '26');
+      guide.searchParams.set('v', '28');
       link.href = guide.href;
       if (entry.expires) {
         const expired = Date.now()>=entry.expires;
@@ -233,6 +233,27 @@ async function reader() {
   }
   let opened,originalUrl;
   let selectedPage = 0;
+  const tocButton = $('#pdf-toc-toggle');
+  const toc = $('#pdf-toc');
+  function showContents(open) {
+    toc.hidden = !open;
+    tocButton.setAttribute('aria-expanded',String(open));
+  }
+  if (sourceType==='pdf') {
+    const entries = doc.toc?.length ? doc.toc : Array.from({length:doc.pageCount},(_,index)=>({page:index+1,title:(index+1)+'ページ'}));
+    tocButton.hidden = !entries.length;
+    tocButton.onclick = () => showContents(toc.hidden);
+    dialog.addEventListener('close',()=>showContents(false));
+    for (const {title,page} of entries) {
+      const button = append(toc,'button',title+' · '+page+'ページ');
+      button.type = 'button';
+      button.onclick = () => {
+        showContents(false);
+        tocButton.focus();
+        void showPdf(page);
+      };
+    }
+  }
   let pageViews;
   const pageList = $('#pdf-pages');
   const visiblePages = new IntersectionObserver(entries => {
@@ -614,7 +635,7 @@ try {
       for (const entry of entries) {
         const card = append($('#shared-list'),'li','','library-card');
         const link = append(card,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=26';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=28';
         append(card,'small','公開期限 '+new Date(entry.expires).toLocaleDateString('ja-JP'));
       }
     } catch (error) {
