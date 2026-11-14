@@ -468,6 +468,7 @@ async function reader() {
   const previewImage = $('#source-image');
   const imageType = /^(png|jpe?g|webp)$/.test(sourceType);
   const zoomable = sourceType==='pdf' || imageType;
+  preview.classList.toggle('is-zoomable', zoomable);
   let zoom=1, fitWidth=0;
   let pinch, drag, coastFrame;
   let velocityX = 0, velocityY = 0, lastMove = 0;
