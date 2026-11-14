@@ -52,3 +52,5 @@ jobs:
         run: node tools/smoke-document-qa.mjs
       - name: Verify worksheet answers and citations in the published app
         run: node tools/smoke-document-qa-tables.mjs
+      - name: Verify Word pagination and citations in the published app
+        run: node tools/smoke-document-qa-word.mjs
