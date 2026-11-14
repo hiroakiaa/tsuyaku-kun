@@ -25,7 +25,7 @@ try {
     ctx.fillText('The swimming pool opens at 8 AM.',30,100);
     return canvas.toDataURL();
   });
-  await page.setContent(`<p>The library closes at 3 PM.</p><div style="break-before:page"><img width="550" src="${scan}"></div>`);
+  await page.setContent(`<table style="width:600px;text-align:left"><tr><th rowspan="2">Facility</th><th colspan="2">Hours</th></tr><tr><th>Opening</th><th>Closing</th></tr></table><table style="break-before:page;width:600px"><tr><td>Library</td><td>9 AM</td><td>3 PM</td></tr><tr><td>Museum</td><td>10 AM</td><td>5 PM</td></tr></table><div style="break-before:page"><img width="550" src="${scan}"></div>`);
   const pdf = await page.pdf();
   await page.goto('https://hiroakiaa.github.io/tsuyaku-kun/documents.html');
   await page.getByRole('heading',{name:'資料QAの保管庫'}).waitFor();
@@ -46,21 +46,21 @@ try {
     await page.locator('#tab-ask').click();
     await page.locator('#question').fill('When does the library close?');
     await page.locator('#ask-form button').click();
-    await page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 1ページ'}).waitFor();
+    await page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 2ページ'}).waitFor();
     assert.match(await page.locator('#messages').textContent(),/3\s*(?::00)?\s*PM/i);
     await page.locator('#question').fill('When does the swimming pool open?');
     await page.locator('#ask-form button').click();
-    const citation = page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 2ページ'});
+    const citation = page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 3ページ'});
     await citation.click({timeout:60_000});
-    await page.waitForFunction(()=>document.querySelector('#pdf-page')?.value==='2');
+    await page.waitForFunction(()=>document.querySelector('#pdf-page')?.value==='3');
     assert.match(await page.locator('#messages .bubble').last().textContent(),/8\s*(?::00)?\s*AM/i);
     await page.locator('#question').fill('When does the library close and when does the swimming pool open? Give both facts separately.');
     await page.locator('#ask-form button').click();
     const combined = page.locator('#messages .bubble').last();
     const librarySource = combined.locator('.answer-item').filter({hasText:/3\s*(?::00)?\s*PM/i});
     const poolSource = combined.locator('.answer-item').filter({hasText:/8\s*(?::00)?\s*AM/i});
-    await librarySource.getByRole('link',{name:'元のPDF 1ページ'}).waitFor();
-    await poolSource.getByRole('link',{name:'元のPDF 2ページ'}).waitFor();
+    await librarySource.getByRole('link',{name:'元のPDF 2ページ'}).waitFor();
+    await poolSource.getByRole('link',{name:'元のPDF 3ページ'}).waitFor();
     assert.deepEqual(externalWrites,[]);
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
