@@ -275,7 +275,7 @@ function lookupWorksheetCell(pages, question) {
   const unique = [...new Map(matches.map(match=>[match.value.sheet+'!'+match.value.cell,match])).values()];
   if (unique.length===1) return {label:'該当するセル',answer:unique[0].value.value,evidence:unique[0].evidence};
   const years = [...new Set(unique.map(match=>match.year).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
-  if (!year && years.length>1) return {label:'年度の確認',clarificationYears:years,answer:years.map(year=>'令和'+year+'年度').join('と')+'のどちらですか？',evidence:[]};
+  if (!year && years.length>1) return {label:'年度の確認',clarificationYears:years,answer:years.map(year=>'令和'+year+'年度').join('・')+'のうち、どの年度ですか？',evidence:[]};
   return null;
 }
 

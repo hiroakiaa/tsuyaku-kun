@@ -18,7 +18,11 @@ for(const [question,value,sheet,cell,page,context] of [
   const result=await (await documents(request,env,{uid:'test'})).json();
   assert.ok(result.answer.includes(value),question);
   if(sheet) assert.deepEqual(result.items.flatMap(item=>item.evidence.map(e=>[e.sheet,e.cell,e.page])),[...context,[cell,page]].map(([address,sourcePage])=>[sheet,address,sourcePage]),question);
-  else assert.deepEqual(result.pages,[]);
+  else {
+    assert.equal(result.answer,'令和8年度・令和9年度のうち、どの年度ですか？');
+    assert.deepEqual(result.pages,[]);
+    assert.deepEqual(result.items.flatMap(item=>item.evidence),[]);
+  }
 }
 
 const followup = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
