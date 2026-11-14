@@ -979,12 +979,12 @@ async function reader() {
     status.textContent = '資料から答えを探しています…';
     log.scrollTop = log.scrollHeight;
     try {
-      if (sourceType==='pdf' && /の\s*一般入試/.test(question)) {
+      if (sourceType==='pdf' && /の/.test(question)) {
         let item;
         try {
-          const {admissionsCell}=await import('./admissions-table.js?v=75');
+          const {lookupTableCell}=await import('./document-table-lookup.js');
           const pdf=await (opened ?? openPdf({url:config.api+api+'/pdf',httpHeaders:await authHeaders()}));
-          item=await admissionsCell(pdf,question);
+          item=await lookupTableCell(pdf,question);
         } catch {}
         if (item) {
           renderAnswerItem(append(log,'div','','bubble'),item);
