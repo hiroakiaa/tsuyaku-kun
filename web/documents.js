@@ -979,10 +979,10 @@ async function reader() {
     status.textContent = '資料から答えを探しています…';
     log.scrollTop = log.scrollHeight;
     try {
-      if (sourceType==='pdf' && /高校の一般入試|高等学校の一般入試/.test(question)) {
+      if (sourceType==='pdf' && /の\s*一般入試/.test(question)) {
         let item;
         try {
-          const {admissionsCell}=await import('./admissions-table.js?v=74');
+          const {admissionsCell}=await import('./admissions-table.js?v=75');
           const pdf=await (opened ?? openPdf({url:config.api+api+'/pdf',httpHeaders:await authHeaders()}));
           item=await admissionsCell(pdf,question);
         } catch {}

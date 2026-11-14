@@ -1,7 +1,7 @@
 const compact = text => text.normalize('NFKC').replace(/\s/g,'');
 
 export async function admissionsCell(pdf, question) {
-  const name = /^([\p{L}・]+?)(?:高等学校|高校)の一般入試/u.exec(question)?.[1];
+  const name = /^([\p{L}・]{2,30}?)(?:高等学校|高校)?の一般入試/u.exec(compact(question))?.[1];
   if (!name) return null;
   for (let number=1; number<=pdf.numPages; number++) {
     const page=await pdf.getPage(number);
@@ -66,7 +66,7 @@ export async function admissionsCell(pdf, question) {
       if(label!==name) continue;
       const values=row.filter(cell=>cell.x>left && cell.x<right).sort((a,b)=>Math.abs(a.y-b.y)<2 ? a.x-b.x : a.y-b.y);
       const quote=values.map(cell=>cell.text.trim()).filter(Boolean).join('\n');
-      if(quote) return {label:name+'高校の一般入試（目安）',answer:quote,evidence:[{page:number,quote}]};
+      if(quote) return {label:name+'の一般入試（目安）',answer:quote,evidence:[{page:number,quote}]};
     }
   }
   return null;
