@@ -82,6 +82,12 @@ try {
     const combinedMs = Math.round(performance.now()-combinedStarted);
     assert.deepEqual(await citationNames(poolSource),['元のPDF 3ページ']);
     assert.deepEqual(externalWrites,[]);
+    await page.locator('#question').fill('What is the annual parking permit fee?');
+    await page.locator('#ask-form button').click();
+    const unanswered = page.locator('#messages .bubble').last();
+    await unanswered.getByText('この項目の根拠は資料内で確認できませんでした。',{exact:true}).waitFor({timeout:60_000});
+    await page.locator('#ask-form button:enabled').waitFor();
+    assert.equal(await unanswered.locator('.answer-source').count(),0);
     console.log(JSON.stringify({fixture:'mixed-text-and-scan-pdf',preflightMs,registrationMs,libraryMs,poolMs,combinedMs}));
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
