@@ -167,6 +167,25 @@ function teacher() {
   show('#teacher');
   const saveGuide = documentLibrary();
   const status = $('#upload-status');
+  const fileInput = $('#upload [name="pdf"]');
+  let preflight;
+  function preparePdf(file) {
+    return extract(file,status).then(pages=>({pages}),error=>({error}));
+  }
+  fileInput.addEventListener('change', async () => {
+    const file = fileInput.files[0];
+    preflight = undefined;
+    status.textContent = '';
+    if (!file || !/\.pdf$/i.test(file.name) || file.size>5000000) return;
+    const progress = document.createElement('span');
+    const pending = extract(file,progress).then(pages=>({pages}),error=>({error}));
+    preflight = {file,pending};
+    status.textContent = 'PDFの文字を確認しています…';
+    const {error} = await pending;
+    if (preflight?.pending===pending && !$('#upload button').disabled) {
+      status.textContent = error?.message || 'PDFの文字を確認しました。';
+    }
+  });
   $('#upload').addEventListener('submit',async event=>{
     event.preventDefault();
     const button = event.submitter;
@@ -177,7 +196,11 @@ function teacher() {
     $('#result').hidden = true;
     status.textContent = 'PDFを開いています…';
     try {
-      if (/\.pdf$/i.test(file.name)) data.set('pages',JSON.stringify(await extract(file,status)));
+      if (/\.pdf$/i.test(file.name)) {
+        const {pages,error} = await (preflight?.file===file ? preflight.pending : preparePdf(file));
+        if (error) throw error;
+        data.set('pages',JSON.stringify(pages));
+      }
       if (/\.(docx|xlsx)$/i.test(file.name)) {
         const {officePages} = await import('./document-office.js');
         data.set('pages',JSON.stringify(await officePages(file)));
