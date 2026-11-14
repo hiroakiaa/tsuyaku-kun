@@ -235,6 +235,14 @@ async function reader() {
   let selectedPage = 0;
   const tocButton = $('#pdf-toc-toggle');
   const toc = $('#pdf-toc');
+  function syncContentsPage() {
+    const rows = [...toc.querySelectorAll('.pdf-toc-entry')];
+    const start = Math.max(0,...rows.map(row=>Number(row.dataset.page)).filter(page=>page<=selectedPage));
+    for (const row of rows) {
+      if (Number(row.dataset.page)===start) row.setAttribute('aria-current','page');
+      else row.removeAttribute('aria-current');
+    }
+  }
   function showContents(open) {
     toc.inert = !open;
     toc.setAttribute('aria-hidden',String(!open));
@@ -246,14 +254,12 @@ async function reader() {
     let loading = false;
     function renderContents() {
       toc.replaceChildren();
-      for (const [index,{title,page}] of entries.entries()) {
-        const nextPage = entries[index+1]?.page;
-        const endPage = nextPage > page ? nextPage-1 : page;
+      for (const {title,page} of entries) {
         const button = append(toc,'button','','pdf-toc-entry');
         button.title = title;
+        button.dataset.page = page;
+        append(button,'span',String(page),'pdf-toc-page');
         append(button,'span',title,'pdf-toc-title');
-        append(button,'span',endPage>page ? page+'〜'+endPage : String(page),'pdf-toc-page');
-        if (selectedPage>=page && selectedPage<=endPage) button.setAttribute('aria-current','page');
         button.type = 'button';
         button.onclick = () => {
           showContents(false);
@@ -261,6 +267,7 @@ async function reader() {
           void showPdf(page);
         };
       }
+      syncContentsPage();
     }
     tocButton.hidden = false;
     tocButton.onclick = async () => {
@@ -286,7 +293,7 @@ async function reader() {
     };
     document.addEventListener('pointerdown',event=>{
       if (tocButton.getAttribute('aria-expanded')==='true' &&
-          !toc.contains(event.target) && !tocButton.contains(event.target)) showContents(false);
+          !toc.contains(event.target) && !tocButton.contains(event.target) && !event.target.closest('.pdf-navigation')) showContents(false);
     });
     dialog.addEventListener('close',()=>showContents(false));
   }
@@ -464,6 +471,7 @@ async function reader() {
       const index = pageViews.findIndex(slot => slot.getBoundingClientRect().bottom > top+1);
       if (index < 0) return;
       selectedPage = index+1;
+      syncContentsPage();
       pagePicker.value = selectedPage;
       $('#pdf-prev').disabled = selectedPage===1;
       $('#pdf-next').disabled = selectedPage===doc.pageCount;
@@ -473,6 +481,7 @@ async function reader() {
   async function showPdf(n) {
     if (n<1 || n>doc.pageCount) return;
     selectedPage = n;
+    syncContentsPage();
     pagePicker.value = n;
     $('#pdf-prev').disabled = n===1;
     $('#pdf-next').disabled = n===doc.pageCount;
