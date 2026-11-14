@@ -10,8 +10,8 @@ const releaseRoot=new URL('../',import.meta.url);
 const documentsHTML=await fs.readFile(new URL('documents.html',releaseRoot),'utf8');
 const documentAssets=[...documentsHTML.matchAll(/(?:src|href)="(web\/documents\.(?:js|css)\?v=[^"]+)"/g)].map(match=>match[1]);
 if(documentAssets.length!==2)throw Error('Local document QA asset versions missing');
-const paths=new Set([...assets,'documents.html',...documentAssets,'web/pdf.min.mjs','web/pdf.worker.min.mjs']);
-const references=/(?:\bfrom\s+|\bimport\s*(?:\(\s*)?|\bnew\s+URL\(\s*)(['"])(\.{1,2}\/[\w./-]+\.js(?:\?[\w=&.-]+)?)\1/g;
+const paths=new Set([...assets,'documents.html',...documentAssets]);
+const references=/(?:\bfrom\s+|\bimport\s*(?:\(\s*)?|\bnew\s+URL\(\s*)(['"])(\.{1,2}\/[\w./-]+\.m?js(?:\?[\w=&.-]+)?)\1/g;
 for(const path of paths){
   const sourceURL=new URL(path,releaseRoot);
   const source=await fs.readFile(new URL(path.split('?')[0],releaseRoot),'utf8');
