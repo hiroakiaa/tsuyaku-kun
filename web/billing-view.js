@@ -1,13 +1,6 @@
 import {config} from './config.js';
 import {billingTotals,billingRefreshInterval} from './billing-data.js?v=20261022-billing-auto-1';
-export async function connectOwner(appName='billing-admin'){
- const [appSdk,authSdk]=await Promise.all([import('https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js')]);
- const app=appSdk.getApps().find(a=>a.name===appName)||appSdk.initializeApp(config.firebase,appName),auth=authSdk.getAuth(app);await authSdk.setPersistence(auth,authSdk.inMemoryPersistence);
- const provider=new authSdk.GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});
- const result=await authSdk.signInWithPopup(auth,provider);
- return {token:()=>result.user.getIdToken(),close:()=>authSdk.signOut(auth)};
-}
-export function createBillingView({el,connect=connectOwner,fetcher=fetch,now=()=>Date.now(),setTimer=setTimeout,clearTimer=clearTimeout}){
+export function createBillingView({el,connect,fetcher=fetch,now=()=>Date.now(),setTimer=setTimeout,clearTimer=clearTimeout}){
  const box=el('section',undefined,'admin-billing'),head=el('div',undefined,'admin-card-heading'),content=el('div'),login=el('button','Googleで請求額を確認'),refresh=el('button','更新','admin-refresh'),logout=el('button','確認を終了');
  head.append(el('h3','今月の請求データ'),refresh);box.append(head,content,login,logout);for(const button of [login,refresh,logout])button.type='button';logout.hidden=true;refresh.hidden=true;
  let documentUsage=null,projectCost=null;

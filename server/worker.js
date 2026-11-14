@@ -10,7 +10,6 @@ import {recognitionDecoding} from './recognition-policy.js';
 import {createCatalogCache,exposeCatalog} from './catalog-cache.js';
 import {translationInstructions} from './translation-instructions.js';
 import {resolveSpeechLanguage,recognitionLanguage} from '../web/two-language.js';
-import {isBillingAdministrator,cloudflareBillingReport,googleBillingReport} from './billing-report.js';
 import {translatePhotoBlocks} from './photo-translation.js';
 import {photoBudget,photoOperation,photoUid,recognizePhoto} from './photo-ocr.js';
 import {speechBudget,speechOperation,synthesizeFilipino} from './cloud-speech.js';
@@ -21,7 +20,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261113-documents-1';
+const BUILD_ID='20261114-admin-no-google';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -97,11 +96,9 @@ export default {async fetch(request,env,ctx){
     if(url.pathname==='/transcribe-stream')return realtimeUpgrade(request,env,{verifyToken,aiFailure,ctx});
     const token=(request.headers.get('Authorization')||'').replace(/^Bearer /,'');const authStarted=Date.now(),auth=await verifyToken(token,env.FIREBASE_PROJECT,url.pathname.startsWith('/billing/'));env={...env,...(ctx?.waitUntil?{backgroundBudgetCleanup:task=>ctx.waitUntil(task)}:{}),authMs:Date.now()-authStarted,budgetUid:auth.uid,executionValid:()=>requestExecutionValid(request,requestStarted)};if(env.REQUEST_LIMIT&&!((await env.REQUEST_LIMIT.limit({key:'user:'+auth.uid})).success))return cors(error('少し待ってから再試行してください。',429));
     if(url.pathname==='/documents'||url.pathname.startsWith('/documents/'))return cors(await documents(request,env,auth));
-    if(request.method==='POST'&&['/school-usage','/billing/school-usage'].includes(url.pathname)){
+    if(request.method==='POST'&&url.pathname==='/school-usage'){
       const data=await body(request,100000);
-      const admin=url.pathname.startsWith('/billing/');
-      if(admin&&!await isBillingAdministrator(auth,env.BILLING_ADMIN_EMAIL_HASH))return cors(error('集計管理者のGoogle認証が必要です。',403));
-      if(!(admin?['report']:['submit']).includes(data?.action))return cors(error('操作を確認してください。',400));
+      if(data?.action!=='submit')return cors(error('操作を確認してください。',400));
       const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(auth.uid));
       const device=Array.from(new Uint8Array(digest).slice(0,16),value=>value.toString(16).padStart(2,'0')).join('').replace(/^(........)(....)(....)(....)/,'$1-$2-$3-$4-');
       const school=env.ROOMS.get(env.ROOMS.idFromName('__monthly_usage_v2__'));
@@ -124,66 +121,7 @@ export default {async fetch(request,env,ctx){
         return cors(result);
       }catch{return cors(error('為替レートを取得できませんでした。',502));}
     }
-    if(url.pathname.startsWith('/billing/')){
-      if(!await isBillingAdministrator(auth,env.BILLING_ADMIN_EMAIL_HASH))return cors(error('請求データは管理者本人のGoogle認証が必要です。',403));
-      if(url.pathname==='/billing/budget-limit'&&request.method==='POST'){
-        const {enabled}=await body(request,2048);
-        if(typeof enabled!=='boolean')return cors(error('制限の設定を確認してください。',400));
-        const budget=env.ROOMS.get(env.ROOMS.idFromName('__ai_budget_v1__'));
-        const response=await budget.fetch(new Request('https://budget/budget',{method:'POST',body:JSON.stringify({action:'set-limit',enabled})}));
-        return cors(json(await response.json(),response.status));
-      }
-      if(request.method!=='GET')return cors(error('読取だけ利用できます。',405));
-      if(url.pathname==='/billing/openai-cost'){
-        if(!env.OPENAI_ADMIN_KEY || !env.OPENAI_BILLING_PROJECT_ID)return cors(json({status:'unconfigured'}));
-        const now=new Date();
-        const start=Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),1)/1000;
-        const params=new URLSearchParams({start_time:String(start),limit:'31'});
-        params.append('project_ids',env.OPENAI_BILLING_PROJECT_ID);
-        try{
-          const response=await fetch('https://api.openai.com/v1/organization/costs?'+params,{
-            headers:{Authorization:'Bearer '+env.OPENAI_ADMIN_KEY},signal:AbortSignal.timeout(7000),
-          });
-          if(!response.ok)return cors(json({status:'unavailable'}));
-          const page=await response.json();
-          if(page.has_more||!Array.isArray(page.data))return cors(json({status:'unavailable'}));
-          const amounts=page.data.flatMap(bucket=>bucket.results.map(row=>row.amount));
-          if(amounts.some(amount=>amount?.currency?.toLowerCase()!=='usd'||!Number.isFinite(amount.value)))return cors(json({status:'unavailable'}));
-          return cors(json({status:'ready',usd:amounts.reduce((sum,amount)=>sum+amount.value,0)}));
-        }catch{return cors(json({status:'unavailable'}));}
-      }
-      if(url.pathname==='/billing/document-qa'){
-        const ledger=env.ROOMS.get(env.ROOMS.idFromName('__document_qa_cost__'));
-        const usage=await (await ledger.fetch('https://room/document/usage')).json();
-        const estimate=(row)=>{
-          if(!row.calls)return {...row,estimatedUSD:null};
-          const costUSD={input:(row.input-row.cached)*.4/1e6,cached:row.cached*.1/1e6,output:row.output*1.6/1e6};
-          return {...row,costUSD,estimatedUSD:costUSD.input+costUSD.cached+costUSD.output};
-        };
-        const byOperation=row=>({
-          ...estimate(row),
-          operations:Object.fromEntries(Object.entries(row.operations ?? {}).map(([name,data])=>[name,estimate(data)])),
-        });
-        return cors(json({...byOperation(usage),history:usage.history?.map(byOperation)}));
-      }
-      if(url.pathname==='/billing/openai-connection'){
-        if(!env.OPENAI_API_KEY)return cors(json({connected:false,reason:'missing_secret'}));
-        try{
-          const upstream=await fetch('https://api.openai.com/v1/models/gpt-realtime-translate',{
-            headers:{Authorization:'Bearer '+env.OPENAI_API_KEY},
-            signal:AbortSignal.timeout(7000),
-          });
-          const model=upstream.ok?await upstream.json():null;
-          return cors(json({connected:upstream.ok,upstreamStatus:upstream.status,modelAvailable:model?.id==='gpt-realtime-translate'}));
-        }catch{
-          return cors(json({connected:false,reason:'upstream_unreachable'}));
-        }
-      }
-      if(url.pathname==='/billing/access')return cors(json({readMethod:'tabledata.list',paidQueries:false}));
-      if(url.pathname==='/billing/google')return cors(json(await googleBillingReport(env)));
-      if(url.pathname==='/billing/cloudflare')return cors(json(await cloudflareBillingReport(env)));
-      return cors(error('請求の操作を確認してください。',404));
-    }
+
     if(url.pathname.startsWith('/photo/')){try{
       if(url.pathname==='/photo/status'&&request.method==='GET')return cors(json({enabled:!!env.GOOGLE_VISION_API_KEY,...await photoOperation(env,{action:'status',uid:await photoUid(auth.uid)})}));
       if(url.pathname==='/photo/recognize'&&request.method==='POST')return cors(json(await recognizePhoto(env,await body(request,2810000))));

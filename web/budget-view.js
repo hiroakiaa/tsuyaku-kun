@@ -1,5 +1,3 @@
-import {config} from './config.js';
-import {connectOwner} from './billing-view.js?v=20261022-billing-auto-1';
 import {LIVE_TRANSLATION_USD_PER_MINUTE} from './cost-policy.js';
 import {costOf,PRICES} from './usage.js?v=20261029-catalog-pipeline-1';
 import {AI_LIMITS,SPEECH_POLICY,PHOTO_POLICY,COST_SOURCES,scenarioKey} from './cost-policy.js?v=20261022-cost-accounting-1';
@@ -27,33 +25,7 @@ export function createBudgetView({el,api,rows,exchange,getScenario=()=>null}){
  function render(){
   if(!latest)return;expanded=content.querySelector('details')?.open??expanded;const s=latest,fx=exchange(),yen=v=>'約'+(v*fx).toFixed(2)+'円',amount=v=>yen(v)+'（$'+v.toFixed(5)+'）';
   content.replaceChildren(el('strong',amount(s.availableUSD),'admin-budget-remaining'),el('p',s.limitEnabled?'本日のアプリ予算の残り':'日次の目安までの残り（停止制限OFF）','admin-caption'),metric(el,'今日の利用額（全端末）',amount(s.global.usedUSD)));
-  const limit=el('input'),label=el('label','日次AI予算で利用を停止する','admin-check'),feedback=el('p','','admin-caption');
-  limit.type='checkbox';
-  limit.checked=s.limitEnabled===true;
-  label.prepend(limit);
-  feedback.setAttribute('role','status');
-  content.append(label,feedback);
-  limit.onchange=async()=>{
-   const enabled=limit.checked;
-   limit.disabled=true;
-   feedback.textContent='管理者のGoogle認証を確認しています。';
-   let owner;
-   try{
-    owner=await connectOwner('budget-admin');
-    const response=await fetch(config.api+'/billing/budget-limit',{
-     method:'POST',headers:{Authorization:'Bearer '+await owner.token(),'Content-Type':'application/json'},
-     body:JSON.stringify({enabled}),
-    });
-    if(!response.ok)throw Error('Budget setting unavailable');
-    await refresh.onclick();
-   }catch{
-    limit.checked=s.limitEnabled===true;
-    feedback.textContent='設定を保存できませんでした。管理者のGoogleアカウントを確認してください。';
-   }finally{
-    limit.disabled=false;
-    await owner?.close().catch(()=>{});
-   }
-  };
+  content.append(metric(el,'日次AI予算による停止',s.limitEnabled?'有効':'無効'));
   const warning=s.blocked?'AIサービス側の制限で停止中です。':s.limitEnabled&&s.user.callsRemaining===0?'本日のAI呼び出し回数の上限です。':s.limitEnabled&&s.availableUSD<=0?'本日のAI予算の上限です。':'';
   if(warning){const n=el('p',warning,'admin-alert');n.setAttribute('role','status');content.append(n);}
   const liveSeconds=Math.max(0,Math.floor(s.availableUSD/LIVE_TRANSLATION_USD_PER_MINUTE*60));

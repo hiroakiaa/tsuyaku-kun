@@ -1,5 +1,4 @@
 import {config} from './config.js';
-import {connectOwner} from './billing-view.js';
 import {LIVE_TRANSLATION_USD_PER_MINUTE, TRANSLATION_PRICE} from './cost-policy.js';
 
 const MODES = [
@@ -35,7 +34,7 @@ export function schoolUsageMetrics(row, costOf) {
   };
 }
 
-export function createAdoptionReport(el, { exchange, download, connect = connectOwner, fetcher = fetch }) {
+export function createAdoptionReport(el, { exchange, download, connect, fetcher = fetch }) {
   const panel = el('section', undefined, 'admin-detail');
   const scope = '自動集計の対象になった全ユーザーの端末の合計です。';
   const definition = '利用回数と字幕件数は端末単位です。同じ会話に複数端末が参加すると、各端末の利用として数えます。';
