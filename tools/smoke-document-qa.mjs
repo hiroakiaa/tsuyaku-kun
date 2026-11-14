@@ -81,6 +81,10 @@ try {
     assert.deepEqual(await citationNames(librarySource),['元のPDF 1ページ','元のPDF 2ページ']);
     const combinedMs = Math.round(performance.now()-combinedStarted);
     assert.deepEqual(await citationNames(poolSource),['元のPDF 3ページ']);
+    for (const [item,number] of [[librarySource,1],[librarySource,2],[poolSource,3]]) {
+      await item.getByRole('link',{name:'元のPDF '+number+'ページ',exact:true}).click();
+      await page.waitForFunction(expected=>document.querySelector('#pdf-page')?.value===String(expected),number);
+    }
     assert.deepEqual(externalWrites,[]);
     await page.locator('#question').fill('What is the annual parking permit fee?');
     await page.locator('#ask-form button').click();
