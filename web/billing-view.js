@@ -57,6 +57,16 @@ export function createBillingView({el,connect=connectOwner,fetcher=fetch,now=()=
         ['キャッシュ入力',row.cached,row.costUSD?.cached],
         ['出力',row.output,row.costUSD?.output],
       ].map(([label,tokens,cost])=>label+' '+tokens.toLocaleString('ja-JP')+' トークン'+(Number.isFinite(cost)?'（$'+cost.toFixed(4)+'）':'')).join(' ／ ')));
+      const operations=el('ul');
+      let measuredCalls=0;
+      for(const [key,label] of Object.entries({create:'資料作成・差し替え',toc:'目次生成',answer:'質問回答',extract:'画像の文字抽出',benchmark:'比較試験',other:'その他'})){
+        const usage=row.operations?.[key];
+        if(!Number.isFinite(usage?.estimatedUSD))continue;
+        measuredCalls+=usage.calls;
+        operations.append(el('li',label+' '+amount(usage.estimatedUSD,'USD')+'（'+usage.calls+'回）'));
+      }
+      if(measuredCalls<row.calls)operations.append(el('li','処理別の記録なし（'+(row.calls-measuredCalls)+'回）'));
+      entry.append(operations);
       list.append(entry);
     }
     history.append(list);

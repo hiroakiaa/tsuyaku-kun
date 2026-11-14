@@ -160,7 +160,11 @@ export default {async fetch(request,env,ctx){
           const costUSD={input:(row.input-row.cached)*.4/1e6,cached:row.cached*.1/1e6,output:row.output*1.6/1e6};
           return {...row,costUSD,estimatedUSD:costUSD.input+costUSD.cached+costUSD.output};
         };
-        return cors(json({...estimate(usage),history:usage.history?.map(estimate)}));
+        const byOperation=row=>({
+          ...estimate(row),
+          operations:Object.fromEntries(Object.entries(row.operations ?? {}).map(([name,data])=>[name,estimate(data)])),
+        });
+        return cors(json({...byOperation(usage),history:usage.history?.map(byOperation)}));
       }
       if(url.pathname==='/billing/openai-connection'){
         if(!env.OPENAI_API_KEY)return cors(json({connected:false,reason:'missing_secret'}));

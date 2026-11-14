@@ -16,13 +16,13 @@ function supported(source,pages) {
   return typeof page === 'string' && quote.length >= 5 && normalized(page).includes(quote);
 }
 
-async function recordUsage(env,usage) {
+async function recordUsage(env,usage,operation) {
   const input = usage?.prompt_tokens;
   const output = usage?.completion_tokens;
   const cached = usage?.prompt_tokens_details?.cached_tokens ?? 0;
   if (![input,output,cached].every(Number.isSafeInteger) || cached<0 || cached>input || output<0) return;
   const ledger = env.ROOMS.get(env.ROOMS.idFromName('__document_qa_cost__'));
-  await ledger.fetch('https://room/document/usage',{method:'POST',body:JSON.stringify({input,output,cached})});
+  await ledger.fetch('https://room/document/usage',{method:'POST',body:JSON.stringify({input,output,cached,operation})});
 }
 
 function searchIndex(pages) {
@@ -155,7 +155,7 @@ async function retrievalPassages(env,pages,question,index,target,onSemantic) {
   }
 }
 
-async function generate(env,pages,question,materials=[],emit,selectedPassages,measure) {
+async function generate(env,pages,question,materials=[],emit,selectedPassages,measure,operation=question ? "answer" : "create") {
   const passages = selectedPassages ?? pages.map((text,i)=>({page:i+1,text}));
   const apiKey = env.OPENAI_DOCUMENT_QA_KEY;
   if (!apiKey) throw Error('資料QAのOpenAI接続が設定されていません。');
@@ -177,10 +177,10 @@ async function generate(env,pages,question,materials=[],emit,selectedPassages,me
     }),
   }).catch(()=>null);
   if (!response?.ok) throw Error('資料QAのOpenAI接続に失敗しました'+(response ? '（HTTP '+response.status+'）' : '')+'。');
-  if (emit) return streamAnswers(response,emit,env);
+  if (emit) return streamAnswers(response,emit,env,operation);
   const result = await response.json();
   if (measure) measure(result.usage);
-  else await recordUsage(env,result.usage).catch(()=>{});
+  else await recordUsage(env,result.usage,operation).catch(()=>{});
   const choice = result.choices?.[0];
   if (choice?.finish_reason!=='stop' || !choice.message?.content) throw Error('資料QAの回答を取得できませんでした。');
   return JSON.parse(choice.message.content);
@@ -195,7 +195,7 @@ function checkedAnswer(item,pages) {
       return {label:item.label.slice(0,100),answer:found ? item.answer.slice(0,600) : null,evidence:found ? evidence : []};
 }
 
-async function streamAnswers(response,emit,env) {
+async function streamAnswers(response,emit,env,operation) {
   const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
   let pending='', json='', delivered=0, finished=false;
   try {
@@ -210,7 +210,7 @@ async function streamAnswers(response,emit,env) {
         const data=line.slice(5).trim();
         if (data==='[DONE]') continue;
         const event=JSON.parse(data);
-        if (event.usage) await recordUsage(env,event.usage).catch(()=>{});
+        if (event.usage) await recordUsage(env,event.usage,operation).catch(()=>{});
         const choice=event.choices?.[0];
         if (choice?.finish_reason==='stop') finished=true;
         json+=choice?.delta?.content ?? '';
@@ -253,7 +253,7 @@ async function readMaterial(env,file,form,ext) {
       }).catch(()=>null);
       if (!response?.ok) return fail('画像の文字を読み取れませんでした。',502);
       const result = await response.json();
-      await recordUsage(env,result.usage).catch(()=>{});
+      await recordUsage(env,result.usage,"extract").catch(()=>{});
       const choice = result.choices?.[0];
       if (choice?.finish_reason!=='stop') return fail('画像の文字を最後まで読み取れませんでした。',422);
       pages = [choice.message.content];
@@ -403,7 +403,7 @@ export async function documents(request,env,auth) {
     const pages = record.pages.slice(0,record.originalPageCount ?? record.pages.length);
     const existing = validatedToc(record,pages);
     if (existing.length) return reply(existing);
-    const toc = validatedToc(await generate(env,pages),pages);
+    const toc = validatedToc(await generate(env,pages,undefined,[],undefined,undefined,undefined,"toc"),pages);
     if (!toc.length) return fail('本文から目次を作れませんでした。',502);
     return target.fetch('https://room/document/toc',{method:'POST',body:JSON.stringify(toc)});
   }
@@ -527,6 +527,11 @@ export async function documentStorage(request,storage) {
       const total = await tx.get(key) ?? {calls:0,input:0,output:0,cached:0};
       for (const field of ['input','output','cached']) total[field]+=usage[field];
       total.calls++;
+      const operation = ['create','toc','answer','extract','benchmark'].includes(usage.operation) ? usage.operation : 'other';
+      total.operations ??= {};
+      const subtotal = total.operations[operation] ??= {calls:0,input:0,output:0,cached:0};
+      for (const field of ['input','output','cached']) subtotal[field]+=usage[field];
+      subtotal.calls++;
       await tx.put(key,total);
       return reply({ok:true});
     });
@@ -650,6 +655,6 @@ export async function evaluateDocumentQuestion(env,pages,question,mode,materials
   let usage;
   const passages = mode==='full' ? null : await retrievalPassages(env,pages,question,searchIndex(pages),target);
   const result = await generate(env,pages,question,materials,undefined,passages,value=>{usage=value;});
-  if (target) await recordUsage(env,usage).catch(()=>{});
+  if (target) await recordUsage(env,usage,"benchmark").catch(()=>{});
   return {items:(result.items ?? []).map(item=>checkedAnswer(item,pages)).filter(Boolean),usage};
 }
