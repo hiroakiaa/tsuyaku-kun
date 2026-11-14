@@ -10,6 +10,7 @@ export async function connectOwner(appName='billing-admin'){
 export function createBillingView({el,connect=connectOwner,fetcher=fetch,now=()=>Date.now(),setTimer=setTimeout,clearTimer=clearTimeout}){
  const box=el('section',undefined,'admin-billing'),head=el('div',undefined,'admin-card-heading'),content=el('div'),login=el('button','Googleで請求額を確認'),refresh=el('button','更新','admin-refresh'),logout=el('button','確認を終了');
  head.append(el('h3','今月の請求データ'),refresh);box.append(head,content,login,logout);for(const button of [login,refresh,logout])button.type='button';logout.hidden=true;refresh.hidden=true;
+ let documentUsage=null,projectCost=null;
  let owner=null,reports=[],epoch=0,busy=false,lastRead=null,lastMonth=null,expanded=false,timer=null;
  const googleReport=()=>reports.find(r=>r.provider==='google'&&r.month===new Date(now()).toISOString().slice(0,7));
  function stopTimer(){if(timer!==null)clearTimer(timer);timer=null;}
@@ -36,16 +37,11 @@ export function createBillingView({el,connect=connectOwner,fetcher=fetch,now=()=
    if(report?.exportedAt)details.append(el('p','Googleのデータ更新：'+new Date(report.exportedAt).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'})));
   }
   details.append(el('p','UTCの今月分です。Googleは対象プロジェクト、Cloudflareはアカウント共通の従量料金です。固定費・税・他アプリとの配分やGitHub・Workspace等は未取得です。'),el('p','無料のデータ閲覧だけを使用します。SQL照会や有料APIへの切替は行いません。Googleは最大5,000行・2MBを超えたら停止。Googleのデータ準備中だけ15分ごとに自動確認し、取得後は原則24時間再利用します。画面を閉じるか非表示にすると自動確認を止めます。閉じると認証と表示データを破棄します。'));
-  content.append(details);login.hidden=!!owner;refresh.hidden=!owner;logout.hidden=!owner;
+  content.append(details);
+  if(owner)renderDocumentCosts();
+  login.hidden=!!owner;refresh.hidden=!owner;logout.hidden=!owner;
  }
- async function api(path){const token=await owner.token();const r=await fetcher(config.api+path,{method:'GET',headers:{Authorization:'Bearer '+token},signal:AbortSignal.timeout(15000),cache:'no-store'});const data=await r.json();if(!r.ok)throw Error(r.status===403?'このGoogleアカウントは請求管理者として登録されていません。':'請求接続を確認できませんでした。');return data;}
- async function load(){
-  const month=new Date(now()).toISOString().slice(0,7);if(lastRead!==null&&lastMonth===month&&now()-lastRead<billingRefreshInterval(googleReport())){render('表示済みの取得結果を使用しています。');return;}
-  lastRead=now();lastMonth=month;const serial=epoch;render('無料の読取APIで確認しています…');
-  const access=await api('/billing/access');if(serial!==epoch)return;if(access.paidQueries!==false||access.readMethod!=='tabledata.list')throw Error('無料閲覧の設定を確認できないため停止しました。');
-  const settled=await Promise.allSettled([api('/billing/google'),api('/billing/cloudflare')]);if(serial!==epoch)return;
-  const [documentUsage,projectCost]=await Promise.all([api('/billing/document-qa').catch(()=>null),api('/billing/openai-cost').catch(()=>null)]);
-  const openai=await api('/billing/openai-connection').catch(()=>null);if(serial!==epoch)return;reports=settled.map((r,i)=>r.status==='fulfilled'?r.value:{provider:i?'cloudflare':'google',month,status:'error',message:r.reason?.message||'未取得'});render(openai?.connected&&openai.modelAvailable?'OpenAI接続成功（HTTP '+openai.upstreamStatus+'）':'OpenAI接続を確認できませんでした（'+(openai?.upstreamStatus??openai?.reason??'診断取得失敗')+'）');
+ function renderDocumentCosts(){
   const cost=documentUsage?.estimatedUSD;
   content.append(el('p',cost==null?'資料QA専用キーの当月推定額：未計測':'資料QA専用キーの当月推定額：$'+cost.toFixed(4)+'（'+documentUsage.calls+'回）'));
   content.append(el('p','資料QAは計測開始後のOpenAI使用量から推定。請求データの小計には含みません。'));
@@ -76,8 +72,18 @@ export function createBillingView({el,connect=connectOwner,fetcher=fetch,now=()=
   billing.rel='noopener noreferrer';
   content.append(billing);
  }
+ async function api(path){const token=await owner.token();const r=await fetcher(config.api+path,{method:'GET',headers:{Authorization:'Bearer '+token},signal:AbortSignal.timeout(15000),cache:'no-store'});const data=await r.json();if(!r.ok)throw Error(r.status===403?'このGoogleアカウントは請求管理者として登録されていません。':'請求接続を確認できませんでした。');return data;}
+ async function load(){
+  const month=new Date(now()).toISOString().slice(0,7);if(lastRead!==null&&lastMonth===month&&now()-lastRead<billingRefreshInterval(googleReport())){render('表示済みの取得結果を使用しています。');return;}
+  lastRead=now();lastMonth=month;const serial=epoch;render('無料の読取APIで確認しています…');
+  const access=await api('/billing/access');if(serial!==epoch)return;if(access.paidQueries!==false||access.readMethod!=='tabledata.list')throw Error('無料閲覧の設定を確認できないため停止しました。');
+  const settled=await Promise.allSettled([api('/billing/google'),api('/billing/cloudflare')]);if(serial!==epoch)return;
+  const [nextDocumentUsage,nextProjectCost]=await Promise.all([api('/billing/document-qa').catch(()=>null),api('/billing/openai-cost').catch(()=>null)]);
+  const openai=await api('/billing/openai-connection').catch(()=>null);if(serial!==epoch)return;documentUsage=nextDocumentUsage;projectCost=nextProjectCost;reports=settled.map((r,i)=>r.status==='fulfilled'?r.value:{provider:i?'cloudflare':'google',month,status:'error',message:r.reason?.message||'未取得'});render(openai?.connected&&openai.modelAvailable?'OpenAI接続成功（HTTP '+openai.upstreamStatus+'）':'OpenAI接続を確認できませんでした（'+(openai?.upstreamStatus??openai?.reason??'診断取得失敗')+'）');
+
+ }
  login.onclick=async()=>{if(busy)return;busy=true;login.disabled=true;const serial=++epoch;render('管理者本人を確認しています…');try{const connection=await connect();if(serial!==epoch){await connection.close();return;}owner=connection;await load();}catch(e){render(e?.code==='auth/popup-closed-by-user'?'確認を取り消しました。':e?.message||'確認できませんでした。');}finally{busy=false;login.disabled=false;schedule();}};
  refresh.onclick=update;
- function close(){stopTimer();epoch++;reports=[];lastRead=null;lastMonth=null;const previous=owner;owner=null;if(previous)void previous.close();render();}
+ function close(){stopTimer();epoch++;reports=[];documentUsage=null;projectCost=null;lastRead=null;lastMonth=null;const previous=owner;owner=null;if(previous)void previous.close();render();}
  logout.onclick=close;queueMicrotask(()=>document.querySelector('#modal')?.addEventListener('close',()=>{close();document.removeEventListener('visibilitychange',visibility);},{once:true}));render();return {box,close};
 }
