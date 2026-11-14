@@ -4,6 +4,15 @@ import {chromium} from 'playwright';
 const browser = await chromium.launch();
 try {
   const page = await browser.newPage();
+  const externalWrites = [];
+  let uploadedPages;
+  page.on('request',request=>{
+    const url = new URL(request.url());
+    const body = request.postDataBuffer();
+    if (!body?.length) return;
+    if (url.hostname==='cdn.jsdelivr.net') externalWrites.push('OCR asset host');
+    if (url.pathname==='/documents' && request.method()==='POST') uploadedPages = body.toString();
+  });
   await page.setContent('<p>The library closes at 3 PM.</p>');
   const scan = await page.evaluate(()=>{
     const canvas = document.createElement('canvas');
@@ -33,6 +42,9 @@ try {
   await page.waitForFunction(()=>Boolean(document.querySelector('#guide-url')?.value));
   const guide = await url.inputValue();
   try {
+    assert.deepEqual(externalWrites,[]);
+    assert.match(uploadedPages ?? '',/swimming pool opens at 8 AM/i);
+    console.log('Scan OCR text reached the document index without an upload to the OCR asset host');
     await page.goto(guide);
     await page.locator('#tab-ask').click();
     await page.locator('#question').fill('When does the library close?');
