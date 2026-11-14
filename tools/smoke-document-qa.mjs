@@ -63,6 +63,11 @@ try {
     await librarySource.getByRole('link',{name:'元のPDF 2ページ'}).waitFor();
     await librarySource.getByRole('link',{name:'元のPDF 1ページ'}).waitFor();
     await poolSource.getByRole('link',{name:'元のPDF 3ページ'}).waitFor();
+    await page.locator('#ask-form button:enabled').waitFor();
+    const citationNames = async item => (await item.locator('.answer-source a').allTextContents())
+      .map(label=>label.trim()).sort();
+    assert.deepEqual(await citationNames(librarySource),['元のPDF 1ページ','元のPDF 2ページ']);
+    assert.deepEqual(await citationNames(poolSource),['元のPDF 3ページ']);
     assert.deepEqual(externalWrites,[]);
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
