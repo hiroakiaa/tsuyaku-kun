@@ -72,3 +72,6 @@ R7要項の給食費を本番の全文・検索方式で各3回、順序を交�
 複数項目の引用混入の再試験は、既存の Pages ワークフローの公開後工程で node tools/smoke-document-qa.mjs を実行する。WindowsではCodex同梱Playwrightとインストール済みChromeで起動できたが、公開URLへの遷移は ERR_NETWORK_ACCESS_DENIED で停止。試験資料の登録前に停止した。
 
 公開コミット 51b3fff のChrome再試験。合成PDFで図書館の閉館は1・2ページ、プールの開館は3ページだけを引用。合成Excelは4シートで入試定員20・休日料金450円・開始時刻14:00を該当セルとPDFページで確認。年度の省略では『令和8年度・令和9年度のうち、どの年度ですか？』と聞き返し、令和8年度の指定後に400円と該当セル・ページを表示した。Excelの5問は949・135・135・137・137ms。両試験資料の削除はHTTP 200。再実行には作業コピーの親にある smoke-public-tables.mjs と qa-tables.xlsx を使い、作業コピーから node ../smoke-public-tables.mjs を実行する。文言の完全一致で再試験も通過し、5問の表示時間は947・134・118・138・137ms。削除はHTTP 200。
+
+年度略記の再試験。GitHub Pages の公開とビルド文字列の照合だけでは Worker のコード更新は確認できず、R8 への応答は初回の Chrome 試験でタイムアウトした。384f3b1 の公開用コピーで既存 Wrangler CLI の deploy を実行し、Worker 版 d0073768-38bc-44e0-9b90-668a550a21ff を公開。再試験は5問すべて通過し、R8 は400円、R8料金表 D4、PDF 4ページを122msで表示。初回・再試験の資料はともに削除確認済み。
+再開時は公開用コピーの HEAD と GitHub main のコミットを照合する。サーバー変更がある場合は同じコミットから Wrangler でデプロイし、表示された Worker Version ID を記録する。その後、作業コピーから node ../smoke-public-tables.mjs を実行する。現在の試験は聞き返しへの R8 の返答と削除まで含む。
