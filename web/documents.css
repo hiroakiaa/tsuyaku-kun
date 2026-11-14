@@ -93,8 +93,7 @@ button:disabled,input:disabled{opacity:.55;cursor:default}
 .ask-layout{display:flex;flex-direction:column;height:100%;box-sizing:border-box;max-width:56rem;margin:auto;padding:clamp(.75rem,3vw,1.5rem)}
 .ask-heading{display:flex;align-items:center;justify-content:space-between;gap:1rem;border-bottom:1px solid #8886;padding-bottom:.6rem}
 .ask-heading h2{margin:0}
-.answer-heading,.answer-evidence{border-top:1px solid #8887;padding-top:.55rem}
-.answer-heading{border-top:0;border-bottom:1px solid #8887;padding-bottom:.55rem;margin:0 0 .65rem}
+.answer-evidence{border-top:1px solid #8887;padding-top:.55rem}
 .answer-item h4{margin:.5rem 0}
 .answer-evidence{font-size:.84em;margin-top:.75rem;color:#ccc}
 .answer-evidence h5{font-size:1em;margin:0}
@@ -203,3 +202,14 @@ dialog [tabindex="-1"][autofocus]:focus {
 
 .answer-source {margin-block:.75rem}
 .answer-source blockquote {margin-block:.35rem .65rem}
+
+.answer-text{white-space:pre-wrap;line-height:1.75}
+#messages #answer-status{width:fit-content;margin:.6rem 0;padding:.5rem .75rem}
+#answer-status:empty{display:none}
+.answer-quote summary{cursor:pointer;margin-block:.4rem}
+@supports (interpolate-size:allow-keywords){
+  .answer-quote{interpolate-size:allow-keywords}
+  .answer-quote::details-content{overflow:hidden;height:0;transition:height .22s ease,content-visibility .22s allow-discrete}
+  .answer-quote[open]::details-content{height:auto}
+  @media(prefers-reduced-motion:reduce){.answer-quote::details-content{transition:none}}
+}

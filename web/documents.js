@@ -706,7 +706,7 @@ async function reader() {
       append(parent,'p',material.name+' · '+(n-material.start+1)+' '+material.unit,'ref');
       return;
     }
-    const link = append(parent,'a',sourceType==='pdf' ? '元のPDF ' + n + 'ページ →' : '資料データ'+(sourceType==='xlsx' ? ' · シート '+n : '')+' →','ref');
+    const link = append(parent,'a',sourceType==='pdf' ? '元のPDF ' + n + 'ページ' : '資料データ'+(sourceType==='xlsx' ? ' · シート '+n : '')+' →','ref');
     link.href = '#tab-ask';
     link.addEventListener('click',async event=>{
       event.preventDefault();
@@ -808,10 +808,9 @@ async function reader() {
   function renderAnswerItem(answer,item) {
     const section = append(answer,'section','','answer-item');
     append(section,'h4',item.label);
-    append(section,'p',item.answer ?? 'この項目の根拠は資料内で確認できませんでした。');
+    append(section,'p',item.answer ?? 'この項目の根拠は資料内で確認できませんでした。','answer-text');
     if (!item.evidence?.length) return;
     const evidence = append(section,'div','','answer-evidence');
-    append(evidence,'h5','資料内表記');
     const byPage = new Map();
     for (const {page,quote} of item.evidence) {
       if (!byPage.has(page)) byPage.set(page,new Set());
@@ -820,14 +819,16 @@ async function reader() {
     for (const [page,quotes] of byPage) {
       const source = append(evidence,'div','','answer-source');
       sourceLink(source,page,quotes.values().next().value);
-      for (const quote of quotes) append(source,'blockquote',quote);
+      const disclosure = append(source,'details','','answer-quote');
+      append(disclosure,'summary','資料内表記');
+      const content = append(disclosure,'div');
+      for (const quote of quotes) append(content,'blockquote',quote);
     }
   }
   for (const entry of history) {
     const log = $('#messages');
     append(log,'div',entry.question,'bubble user');
     const answer = append(log,'div','','bubble');
-    append(answer,'h3','質問回答','answer-heading');
     for (const item of entry.items) renderAnswerItem(answer,item);
     if (entry.fallback) append(answer,'p',entry.fallback);
     lastQuestion = entry.question;
@@ -838,6 +839,7 @@ async function reader() {
     button.disabled = true;
     if (!retrying) append(log,'div',question,'bubble user');
     let box;
+    log.append(status);
     const entry = {question,items:[]};
     let stage = '接続';
     let httpStatus;
@@ -853,12 +855,11 @@ async function reader() {
       function answerBox() {
         if (!box) {
           box = append(log,'div','','bubble');
-          append(box,'h3','質問回答','answer-heading');
+          log.append(status);
         }
         return box;
       }
       async function showItem(item) {
-        if (box) await new Promise(resolve=>setTimeout(resolve,220));
         const first = !box;
         const answer = answerBox();
         renderAnswerItem(answer,item);
@@ -871,7 +872,7 @@ async function reader() {
           status.textContent = '確認できた回答を表示しています…';
           await showItem(item);
         }
-        if (!box) append(answerBox(),'p',entry.fallback=result.answer);
+        if (!entry.items.length) append(answerBox(),'p',entry.fallback=result.answer);
       } else {
         if (!response.body) throw Error('回答の受信を開始できませんでした。');
         const reader = response.body.getReader();
@@ -889,6 +890,11 @@ async function reader() {
               const event=JSON.parse(line);
               if (event.error) throw Error(event.error);
               if (event.status) status.textContent=event.status;
+              if (event.replaceItems) {
+                answerBox().replaceChildren();
+                entry.items = [];
+                for (const item of event.replaceItems) await showItem(item);
+              }
               if (event.item) {
                 await showItem(event.item);
                 status.textContent='続きの回答を確認しています…';
