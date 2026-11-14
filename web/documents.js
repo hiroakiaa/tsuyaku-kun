@@ -817,13 +817,17 @@ async function reader() {
     if (!retrying) append(log,'div',question,'bubble user');
     let box;
     const entry = {question,items:[]};
+    let stage = '接続';
+    let httpStatus;
     status.textContent = '資料から答えを探しています…';
     log.scrollTop = log.scrollHeight;
     try {
       const response = await fetch(config.api+api+'/ask',{method:'POST',
         headers:await authHeaders({'Content-Type':'application/json',Accept:'application/x-ndjson'}),
         body:JSON.stringify({question,previousQuestion})});
+      httpStatus = response.status;
       if (!response.ok) throw Error((await response.json().catch(()=>null))?.error || '回答を取得できませんでした。');
+      stage = '回答受信';
       function answerBox() {
         if (!box) {
           box = append(log,'div','','bubble');
@@ -883,7 +887,7 @@ async function reader() {
       status.textContent = '';
     } catch (error) {
       box?.remove();
-      status.textContent = error.message+' ';
+      status.textContent = error.message+'（'+stage+(httpStatus && httpStatus!==200?' / HTTP '+httpStatus:'')+'） ';
       const retry = append(status,'button','再試行');
       retry.type = 'button';
       retry.onclick = () => void sendQuestion(question,previousQuestion,true);
