@@ -47,6 +47,7 @@ try {
     await page.locator('#question').fill('When does the library close?');
     await page.locator('#ask-form button').click();
     await page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 2ページ'}).waitFor();
+    await page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 1ページ'}).waitFor();
     assert.match(await page.locator('#messages').textContent(),/3\s*(?::00)?\s*PM/i);
     await page.locator('#question').fill('When does the swimming pool open?');
     await page.locator('#ask-form button').click();
@@ -60,6 +61,7 @@ try {
     const librarySource = combined.locator('.answer-item').filter({hasText:/3\s*(?::00)?\s*PM/i});
     const poolSource = combined.locator('.answer-item').filter({hasText:/8\s*(?::00)?\s*AM/i});
     await librarySource.getByRole('link',{name:'元のPDF 2ページ'}).waitFor();
+    await librarySource.getByRole('link',{name:'元のPDF 1ページ'}).waitFor();
     await poolSource.getByRole('link',{name:'元のPDF 3ページ'}).waitFor();
     assert.deepEqual(externalWrites,[]);
   } finally {

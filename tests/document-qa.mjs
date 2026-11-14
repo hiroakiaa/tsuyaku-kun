@@ -97,9 +97,10 @@ try {
 }
 console.log('PASS rejects another school on the same PDF page');
 const tablePages = ['Facility | Opening | Closing','Library | 9 AM | 3 PM'];
+let tableQuote = tablePages[1];
 try {
   globalThis.fetch = async ()=>Response.json({choices:[{finish_reason:'stop',message:{
-    content:JSON.stringify({items:[{label:'Library',answer:'3 PM',sources:[{page:2,quote:tablePages[1]}]}]}),
+    content:JSON.stringify({items:[{label:'Library',answer:'3 PM',sources:[{page:2,quote:tableQuote}]}]}),
   }}]});
   const env = {OPENAI_DOCUMENT_QA_KEY:'test',ROOMS:{idFromName:name=>name,get:()=>({
     fetch:async url=>Response.json(url.endsWith('/data') ? {pages:tablePages,owner:'author'} : null),
@@ -110,6 +111,9 @@ try {
   assert.deepEqual((await ask('When does the library close?')).pages,[2,1]);
   assert.deepEqual((await ask('What is the Library capacity?')).pages,[2]);
   tablePages[0] = 'Facility | Hours\nOpening | Closing';
+  assert.deepEqual((await ask('When does the library close?')).pages,[2,1]);
+  tablePages[0] = 'Hours\nFacility\nOpening | Closing';
+  tableQuote = '3 PM';
   assert.deepEqual((await ask('When does the library close?')).pages,[2,1]);
 } finally {
   globalThis.fetch = originalFetch;

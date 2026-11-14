@@ -205,31 +205,47 @@ function checkedAnswer(item,pages,question='') {
   const admission = /入試|入学|出願|受験/.test(question);
 
   if (typeof item?.label!=='string' || !item.label.trim()) return null;
+      const terms = normalized(question).toLowerCase();
       const evidence = (Array.isArray(item.sources) ? item.sources : [])
+        .map(source=>{
+          if (!Number.isInteger(source?.page) || typeof source.quote!=='string') return source;
+          const page = pages[source.page-1];
+          const quote = normalized(source.quote);
+          if (!page || quote.length<3 || quote.length>=5) return source;
+          const rows = page.split('\n').filter(line=>{
+            const [label,...cells] = line.split(' | ');
+            return cells.length>=2 && normalized(label).length>=2 &&
+              terms.includes(normalized(label).toLowerCase()) &&
+              cells.some(cell=>normalized(cell)===quote);
+          });
+          return rows.length===1 ? {...source,quote:rows[0]} : source;
+        })
         .filter(source=>supported(source,pages) && source.quote.length<=500)
         .slice(0,4).map(({page,quote})=>({page,quote}));
       for (const source of [...evidence]) {
         if (source.page<2 || evidence.length>=4) continue;
-        const values = source.quote.split(' | ');
-        if (values.length<3 || !values.slice(1).every(value=>/\d/.test(value))) continue;
         const page = pages[source.page-1];
+        const row = source.quote;
+        const values = row.split(' | ');
+        if (values.length<3 || !values.slice(1).every(value=>/\d/.test(value))) continue;
         const matchesShape = line=>line.split(' | ').length===values.length;
         const isHeader = line=>matchesShape(line) && !/\d/.test(line);
         if (page.split('\n').some(isHeader)) continue;
         const previous = pages[source.page-2].split('\n');
         const headings = previous.filter(isHeader);
-        if (!headings.length && page.split('\n').includes(source.quote)) {
+        if (!headings.length && page.split('\n').includes(row)) {
           for (let i=1;i<previous.length;i++) {
             const upper = previous[i-1].split(' | ');
             const lower = previous[i].split(' | ');
-            if (upper.length<2 || lower.length!==values.length-1 ||
-                /\d/.test(previous[i-1]+previous[i])) continue;
-            headings.push(previous[i-1]+'\n'+previous[i]);
+            if (lower.length!==values.length-1 || /\d/.test(previous[i-1]+previous[i])) continue;
+            const start = upper.length>=2 ? i-1 : i-2;
+            if (start<0 || (start===i-2 &&
+                (!previous[start].trim() || /[\d|]/.test(previous[start])))) continue;
+            headings.push(previous.slice(start,i+1).join('\n'));
           }
         }
         if (headings.length!==1) continue;
         const quote = headings[0];
-        const terms = normalized(question).toLowerCase();
         if (!quote.split(/ \| |\n/).some(cell=>normalized(cell).length>=2 &&
           (terms.includes(normalized(cell).toLowerCase()) || (normalized(cell).toLowerCase()==='closing' && /clos(?:e|es|ed)/.test(terms)) || (normalized(cell).toLowerCase()==='opening' && /open/.test(terms))))) continue;
         if (!evidence.some(item=>item.page===source.page-1 && item.quote===quote)) {
