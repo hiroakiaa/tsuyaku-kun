@@ -115,3 +115,15 @@ const wide = await documents(new Request('https://test/documents/10000000-0000-0
 const wideResult = await wide.json();
 assert.equal(wideResult.answer,'450円');
 assert.deepEqual(wideResult.items[0].evidence.map(e=>e.cell),['A3','B4','Z1','AA2','AA4']);
+
+const mixedSubjects = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+  method:'POST',
+  headers:{Accept:'application/x-ndjson'},
+  body:JSON.stringify({question:'令和9年度の青空高校と青空星雲高校について、それぞれ特進の入試定員は？'}),
+}),env,{uid:'test'});
+const events = (await mixedSubjects.text()).trim().split('\n').map(JSON.parse);
+assert.deepEqual(events.slice(0,-1).map(({item})=>[item.label,item.answer,item.evidence.at(-1)?.cell]),[
+  ['青空高校','20','C4'],
+  ['青空星雲高校',null,undefined],
+]);
+assert.deepEqual(events.at(-1),{done:true});

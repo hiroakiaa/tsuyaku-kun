@@ -782,17 +782,37 @@ export async function documents(request,env,auth) {
             })) worksheetQuestion = candidate;
       }
     }
-    const worksheetItem = lookupWorksheetCell(record.pages,worksheetQuestion);
-    const item = worksheetItem
-      ? {...worksheetItem,worksheetContext:worksheetQuestion}
-      : lookupAdmissionCell(record.pages,worksheetQuestion);
-    if (item) {
+    const lookup = text => {
+      const worksheetItem = lookupWorksheetCell(record.pages,text);
+      return worksheetItem
+        ? {...worksheetItem,worksheetContext:text}
+        : lookupAdmissionCell(record.pages,text);
+    };
+    const sharedQuestion = /^(.+?)について[、,]?\s*それぞれ(?:の|[、,])?\s*(.+)$/u.exec(normalized(worksheetQuestion));
+    const items = [];
+    if (sharedQuestion) {
+      const [, subjects, predicate] = sharedQuestion;
+      const [, year = '', names] = /^(?:(令和\d+年度?の|R\d+年度?の))?(.+)$/iu.exec(subjects);
+      const labels = names.split(/と|、|および|及び/u).map(name=>name.trim());
+      if (labels.length > 1 && labels.length <= 12 && labels.every(Boolean)) {
+        const matches = labels.map(label=>({label,result:lookup(year+label+'の'+predicate)}));
+        if (matches.some(({result})=>result)) {
+          items.push(...matches.map(({label,result})=>result
+            ? {...result,label,worksheetContext:worksheetQuestion}
+            : {label,answer:null,evidence:[],worksheetContext:worksheetQuestion}));
+        }
+      }
+    } else {
+      const item = lookup(worksheetQuestion);
+      if (item) items.push(item);
+    }
+    if (items.length) {
       if (request.headers.get('Accept')==='application/x-ndjson') {
-        return new Response(JSON.stringify({item})+'\n'+JSON.stringify({done:true})+'\n',{
+        return new Response([...items.map(item=>JSON.stringify({item})),JSON.stringify({done:true})].join('\n')+'\n',{
           headers:{'Content-Type':'application/x-ndjson','Cache-Control':'no-store'},
         });
       }
-      return reply({items:[item],answer:item.answer,pages:[...new Set(item.evidence.map(source=>source.page))]});
+      return reply({items,answer:items[0].answer,pages:[...new Set(items.flatMap(item=>item.evidence.map(source=>source.page)))]});
     }
   }
   const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([16,record.pages,record.materials ?? [],question.trim()])));
