@@ -51,7 +51,17 @@ export async function officePages(file,{includeMerges=false}={}){
   const zip=await entries(file);
   if(/\.docx$/i.test(file.name)){
     const doc=await zip.read('word/document.xml');
-    return [tags(doc,'p').map(strings).join('\n')];
+    const body=tags(doc,'body')[0];
+    if (!body) return [''];
+    const blocks=Array.from(body.children).flatMap(block=>{
+      if (block.localName!=='tbl') return tags(block,'p').map(strings).concat(block.localName==='p' ? [strings(block)] : []);
+      return Array.from(block.children).filter(row=>row.localName==='tr').map(row=>
+        Array.from(row.children).filter(cell=>cell.localName==='tc').map(cell=>
+          tags(cell,'p').map(strings).filter(Boolean).join(' ')
+        ).join(' | ')
+      );
+    });
+    return [blocks.join('\n')];
   }
   const shared=tags(await zip.read('xl/sharedStrings.xml'),'si').map(strings);
   const book=await zip.read('xl/workbook.xml');

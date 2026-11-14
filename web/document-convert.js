@@ -1,5 +1,5 @@
 import {PDFDocument} from './document-pdf-lib.mjs';
-import {officePages} from './document-office.js?v=87';
+import {officePages} from './document-office.js?v=88';
 
 export async function convertDocument(file){
   const pdf=await PDFDocument.create();
