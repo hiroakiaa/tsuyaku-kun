@@ -165,6 +165,13 @@ async function reader() {
   $('#doc-caption').textContent = '元のPDF · 全' + doc.pageCount + 'ページ';
   if (!doc.items.length) $('#points-title').textContent = '資料から抜き出した要点';
   const dialog = $('#pdf-dialog');
+  const askDialog=$('#ask-dialog');
+  if(window.parent!==window){
+    const syncFullscreen=()=>window.parent.postMessage({type:'document-fullscreen',open:dialog.open||askDialog.open},location.origin);
+    const observer=new MutationObserver(syncFullscreen);
+    for(const panel of [dialog,askDialog])observer.observe(panel,{attributes:true,attributeFilter:['open']});
+    window.addEventListener('pagehide',()=>window.parent.postMessage({type:'document-fullscreen',open:false},location.origin));
+  }
   const tabs = [...document.querySelectorAll('.doc-tabs [role=tab]')];
   function selectTab(tab) {
     for (const t of tabs) {

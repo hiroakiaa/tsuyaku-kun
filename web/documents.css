@@ -131,3 +131,4 @@ dialog [tabindex="-1"][autofocus]:focus {
 #pdf-dialog[open]{grid-template-columns:minmax(0,1fr)}
 .pdf-stage{min-width:0;overflow:hidden}
 #pdf-scroll{position:absolute;inset:0}
+#pdf-dialog[open]{position:fixed;inset:0;margin:0;width:100%;height:100dvh;max-width:none;max-height:none;border:0;border-radius:0}
