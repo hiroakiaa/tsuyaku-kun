@@ -178,6 +178,7 @@ function teacher() {
     return extract(file,status).then(pages=>({pages}),error=>({error}));
   }
   fileInput.addEventListener('change', async () => {
+    if ($('#upload button').disabled) return;
     const file = fileInput.files[0];
     preflight = undefined;
     if (!$('#upload button').disabled) meter.hidden = true;
@@ -186,9 +187,12 @@ function teacher() {
     const progress = document.createElement('span');
     const pending = extract(file,progress).then(pages=>({pages}),error=>({error}));
     preflight = {file,pending};
+    meter.removeAttribute('value');
+    meter.hidden = false;
     status.textContent = 'PDFの文字を確認しています…';
     const {error} = await pending;
     if (preflight?.pending===pending && !$('#upload button').disabled) {
+      meter.hidden = true;
       status.textContent = error?.message || 'PDFの文字を確認しました。';
     }
   });

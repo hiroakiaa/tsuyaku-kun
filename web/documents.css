@@ -247,3 +247,6 @@ dialog [tabindex="-1"][autofocus]:focus {
 #upload-progress{display:block;width:100%;height:.65rem;margin-top:1rem;accent-color:#d7e8b1}
 #upload-progress[hidden]{display:none}
 #upload-status{margin:.4rem 0 .8rem}
+
+.upload-feedback:has(progress:not([hidden])){position:sticky;top:0;z-index:2;background:#18181a;padding:.5rem .75rem;margin-bottom:.75rem;border:1px solid #ffffff30;border-radius:.65rem}
+.upload-feedback #upload-progress{height:1rem;margin:0}
