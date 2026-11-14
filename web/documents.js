@@ -879,7 +879,7 @@ async function reader() {
     const body = append(section,'p','','answer-text');
     const answer = item.answer ?? 'この項目の根拠は資料内で確認できませんでした。';
     const keyFacts = /(?:[0-9０-９]+(?:[.,．][0-9０-９]+)*\s*(?:時(?:[0-9０-９]+分)?|分|円|月(?:[0-9０-９]+日)?|日|年|回|人|％|%))/gu;
-    const match = item.answer && (keyFacts.exec(answer) ?? /^[^。！？\n]{1,55}[。！？]/u.exec(answer));
+    const match = item.answer && (keyFacts.exec(answer) ?? /^[^。！？\n]{1,55}(?:[。！？]|$)/u.exec(answer));
     if (!match) {
       body.textContent = answer;
       return;
