@@ -1,3 +1,4 @@
+import {writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 
@@ -86,6 +87,9 @@ try {
       await page.waitForFunction(expected=>document.querySelector('#pdf-page')?.value===String(expected),number);
     }
     assert.deepEqual(externalWrites,[]);
+    const combinedEvidence =await Promise.all([librarySource,poolSource].map(async item=>({
+        answer:await item.locator('.answer-text').textContent(), citations:await citationNames(item),
+      })));
     await page.locator('#question').fill('What is the annual parking permit fee?');
     await page.locator('#ask-form button').click();
     const unanswered = page.locator('#messages .bubble').last();
@@ -110,7 +114,13 @@ try {
     assert.deepEqual(await citationNames(closing),['元のPDF 1ページ','元のPDF 2ページ']);
     assert.equal(await missingFee.count(),1);
     assert.deepEqual(await citationNames(missingFee),[]);
-    console.log(JSON.stringify({fixture:'mixed-text-and-scan-pdf',preflightMs,registrationMs,libraryMs,poolMs,combinedMs}));
+    const result = {
+      fixture:'mixed-text-and-scan-pdf',preflightMs,registrationMs,libraryMs,poolMs,combinedMs,
+      measuredAt:new Date().toISOString(), platform:process.platform,browserVersion:browser.version(),
+      combinedEvidence,
+    };
+    console.log(JSON.stringify(result));
+    if (process.env.DOCUMENT_QA_REPORT) await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify(result,null,2));
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
       const {config} = await import('./web/config.js');

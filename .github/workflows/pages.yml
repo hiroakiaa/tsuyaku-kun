@@ -49,6 +49,8 @@ jobs:
           npm install --no-save --package-lock=false playwright@1.61.0
           npx playwright install --with-deps chromium
       - name: Verify document QA in the published app
+        env:
+          DOCUMENT_QA_REPORT: document-qa-pdf-report.json
         run: node tools/smoke-document-qa.mjs
       - name: Verify worksheet answers and citations in the published app
         env:
@@ -66,11 +68,12 @@ jobs:
         env:
           DOCUMENT_QA_REPORT: document-qa-wide-report.json
         run: node tools/smoke-document-qa-tables.mjs --wide
-      - name: Save worksheet verification results
+      - name: Save document verification results
         uses: actions/upload-artifact@v4
         with:
           name: document-qa-tables-report
           path: |
+            document-qa-pdf-report.json
             document-qa-tables-report.json
             document-qa-merged-report.json
             document-qa-zero-report.json
