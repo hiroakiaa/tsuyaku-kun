@@ -2,7 +2,10 @@ import {readFile,appendFile,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 
-const merged = process.argv.includes('--merged');
+const zero = process.argv.includes('--zero');
+const merged = zero || process.argv.includes('--merged');
+const fixture = zero ? 'document-qa-zero.xlsx' : merged ? 'document-qa-merged.xlsx' : 'document-qa-tables.xlsx';
+const expectedR9Fee = zero ? '0' : merged ? '900円' : '450円';
 const browser = await chromium.launch();
 try {
   const page = await browser.newPage();
@@ -19,7 +22,7 @@ try {
   await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
   assert.equal(await page.getByRole('link',{name:'資料チャット作成',exact:true}).count(),0);
   await page.locator('#upload input[name=title]').fill('自動公開確認');
-  await page.locator('#upload input[type=file]').setInputFiles({name:'document-qa-tables.xlsx',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',buffer:await readFile(new URL(merged ? '../tests/fixtures/document-qa-merged.xlsx' : '../tests/fixtures/document-qa-tables.xlsx',import.meta.url))});
+  await page.locator('#upload input[type=file]').setInputFiles({name:'document-qa-tables.xlsx',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',buffer:await readFile(new URL('../tests/fixtures/'+fixture,import.meta.url))});
   const sheets=await page.evaluate(async()=>{
     const {officePages}=await import('./web/document-office.js');
     return officePages(document.querySelector('#upload input[type=file]').files[0],{includeMerges:true});
@@ -60,13 +63,13 @@ try {
     const measurements=[];
     for(const [question,value,source] of [
       ['令和9年度の青空高校の特進の入試定員は？','20','R9入試表 · C4'],
-      ['令和9年度の会議室の子どもの休日料金は？',merged ? '900円' : '450円',merged ? 'R9料金表 · D3' : 'R9料金表 · D4'],
+      ['令和9年度の会議室の子どもの休日料金は？',expectedR9Fee,merged ? 'R9料金表 · D3' : 'R9料金表 · D4'],
       ['説明会の午後組の開始時刻は？','14:00','R9予定表 · C4'],
       ['会議室の子どもの休日料金は？','令和8年度・令和9年度のうち、どの年度ですか？',null],
       ['R8','400円','R8料金表 · D4'],
       ['大人は？','800円','R8料金表 · D3'],
       ['子どもは？','400円','R8料金表 · D4'],
-      ['R9',merged ? '900円' : '450円',merged ? 'R9料金表 · D3' : 'R9料金表 · D4'],
+      ['R9',expectedR9Fee,merged ? 'R9料金表 · D3' : 'R9料金表 · D4'],
       ['説明会の午後組の開始時刻は？','14:00','R9予定表 · C4'],
       ['午前組は？','10:00','R9予定表 · C3'],
     ]){
@@ -123,7 +126,7 @@ try {
     const result = {
       commit:release.commit, measuredAt:new Date().toISOString(),
       platform:process.platform, browserVersion:browser.version(),
-      registrationMs, questions:measurements,
+      fixture, registrationMs, questions:measurements,
     };
     console.log(JSON.stringify(result));
     if (process.env.DOCUMENT_QA_REPORT) await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify(result,null,2));
