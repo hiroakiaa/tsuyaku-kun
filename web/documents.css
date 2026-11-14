@@ -152,7 +152,8 @@ dialog [tabindex="-1"][autofocus]:focus {
 }
 
 #pdf-pages { width:100%; margin-inline:auto; }
-.pdf-page-view { background:#fff; color:#222; margin-bottom: .5rem; }
+.pdf-page-view { position:relative; background:#fff; color:#222; margin-bottom: .5rem; }
+.pdf-citation-mark { position:absolute; background:rgba(255,204,0,.38); pointer-events:none; }
 .pdf-page-view canvas { display:block; width:100%; height:auto; }
 
 

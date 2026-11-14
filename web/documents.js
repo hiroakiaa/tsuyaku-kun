@@ -410,6 +410,33 @@ async function reader() {
       void renderPage(entry.target);
     }
   }, {root:$('#pdf-scroll'),rootMargin:'500px 0px'});
+  let citation;
+  async function highlightCitation(slot,page,viewport) {
+    const selected = citation;
+    if (!selected || selected.page!==Number(slot.dataset.page)) return;
+    const normalize = text=>text.normalize('NFKC').replace(/\s+/g,'');
+    const {items} = await page.getTextContent();
+    if (citation!==selected) return;
+    const runs = items.filter(item=>item.str).map(item=>({item,text:normalize(item.str)}));
+    const text = runs.map(run=>run.text).join('');
+    const quote = normalize(selected.quote);
+    const start = text.indexOf(quote);
+    if (!quote || start<0) return;
+    let offset = 0;
+    for (const run of runs) {
+      const end = offset+run.text.length;
+      if (end>start && offset<start+quote.length) {
+        const {item} = run;
+        const [x,y] = viewport.convertToViewportPoint(item.transform[4],item.transform[5]);
+        const mark = append(slot,'span','','pdf-citation-mark');
+        mark.style.left = x/viewport.width*100+'%';
+        mark.style.top = (y-item.height*viewport.scale)/viewport.height*100+'%';
+        mark.style.width = item.width*viewport.scale/viewport.width*100+'%';
+        mark.style.height = item.height*viewport.scale/viewport.height*100+'%';
+      }
+      offset = end;
+    }
+  }
   async function renderPage(slot) {
     try {
       const page = await (await opened).getPage(Number(slot.dataset.page));
@@ -420,6 +447,7 @@ async function reader() {
       canvas.height = Math.ceil(viewport.height);
       await page.render({canvas,viewport}).promise;
       slot.replaceChildren(canvas);
+      void highlightCitation(slot,page,viewport).catch(()=>{});
     } catch {
       const retry = document.createElement('button');
       retry.type = 'button';
@@ -673,7 +701,7 @@ async function reader() {
     }
   }
   const materials = doc.materials ?? [];
-  function sourceLink(parent,n) {
+  function sourceLink(parent,n,quote) {
     const material = materials.find(item=>n>=item.start && n<item.start+item.count);
     if (material) {
       append(parent,'p',material.name+' · '+(n-material.start+1)+' '+material.unit,'ref');
@@ -681,7 +709,14 @@ async function reader() {
     }
     const link = append(parent,'a',sourceType==='pdf' ? '元のPDF ' + n + 'ページ →' : '資料データ'+(sourceType==='xlsx' ? ' · シート '+n : '')+' →','ref');
     link.href = '#tab-ask';
-    link.addEventListener('click',event=>{event.preventDefault(); void showPdf(n);});
+    link.addEventListener('click',async event=>{
+      event.preventDefault();
+      citation = quote ? {page:n,quote} : undefined;
+      for (const mark of preview.querySelectorAll('.pdf-citation-mark')) mark.remove();
+      await showPdf(n);
+      const slot = preview.querySelector('[data-page="'+n+'"]');
+      if (citation?.page===n && slot?.querySelector('canvas') && !slot.querySelector('.pdf-citation-mark')) await renderPage(slot);
+    });
   }
   for (const item of doc.items) {
     const card = append($('#cards'),'div','','card');
@@ -762,7 +797,7 @@ async function reader() {
     }
     for (const [page,quotes] of byPage) {
       const source = append(evidence,'div','','answer-source');
-      sourceLink(source,page);
+      sourceLink(source,page,quotes.values().next().value);
       for (const quote of quotes) append(source,'blockquote',quote);
     }
   }
