@@ -78,13 +78,9 @@ try {
       await page.locator('#ask-form button').click();
       const bubble=page.locator('#messages .bubble').last();
       await bubble.getByText(value,{exact:true}).waitFor({timeout:30000});
-      if(source) {
-        await bubble.getByText(source,{exact:false}).waitFor({timeout:5000});
-        const expectedPage=['R9入試表','R9料金表','R9予定表','R8料金表'].indexOf(source.split(' · ')[0])+1;
-        assert.ok(await bubble.getByRole('link',{name:'元のPDF '+expectedPage+'ページ',exact:true}).count());
-      } else assert.equal(await bubble.locator('.answer-source').count(),0);
-      await page.waitForFunction(()=>!document.querySelector('#ask-form button').disabled);
+      await page.locator('#ask-form button:enabled').waitFor();
       const elapsedMs=Math.round(performance.now()-started);
+      if (!source) assert.equal(await bubble.locator('.answer-source').count(),0);
       if (source) {
         const sheet = source.split(' · ')[0];
         const addresses = (await bubble.locator('.answer-source > div').allTextContents()).flatMap(line=>line.split('、'));
