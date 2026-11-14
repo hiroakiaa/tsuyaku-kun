@@ -96,3 +96,12 @@ const merged = await documents(new Request('https://test/documents/10000000-0000
 const mergedResult = await merged.json();
 assert.equal(mergedResult.answer,'900円');
 assert.deepEqual(mergedResult.items[0].evidence.map(e=>e.cell),['A3','B4','C1','D2','D3']);
+
+const freePages = mergedPages.map(text=>text.startsWith('R9料金表') ? text.replace('D3 900円','D3 0') : text);
+const freeEnv = {ROOMS:{idFromName:x=>x,get:()=>({fetch:async()=>Response.json({pages:freePages,sourceType:'xlsx'})})}};
+const free = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+  method:'POST',body:JSON.stringify({question:'令和9年度の会議室の子どもの休日料金は？'}),
+}),freeEnv,{uid:'test'});
+const freeResult = await free.json();
+assert.equal(freeResult.answer,'0');
+assert.deepEqual(freeResult.items[0].evidence.map(e=>e.cell),['A3','B4','C1','D2','D3']);
