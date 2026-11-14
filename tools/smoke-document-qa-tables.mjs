@@ -1,4 +1,4 @@
-import {readFile} from 'node:fs/promises';
+import {readFile,appendFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 
@@ -69,7 +69,21 @@ try {
       }
       measurements.push({question,value,source,elapsedMs:Math.round(performance.now()-started)});
     }
-    console.log(JSON.stringify({registrationMs,questions:measurements}));
+    const result = {registrationMs,questions:measurements};
+    console.log(JSON.stringify(result));
+    if (process.env.GITHUB_STEP_SUMMARY) {
+      const rows = measurements.map(({question,elapsedMs})=>`| ${question} | ${elapsedMs} |`);
+      await appendFile(process.env.GITHUB_STEP_SUMMARY,[
+        '## 資料QAの速度（合成Excel、1回）',
+        '',
+        '作成操作から登録URLの表示まで '+registrationMs+' ms',
+        '',
+        '| 質問 | 表示完了までの時間 (ms) |',
+        '| --- | ---: |',
+        ...rows,
+        '',
+      ].join('\n'));
+    }
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
       const {config} = await import('./web/config.js');
