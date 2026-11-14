@@ -121,12 +121,19 @@ try {
     await page.locator('#tab-ask').click();
     assert.deepEqual(await citationNames(librarySource),['元のPDF 1ページ','元のPDF 2ページ']);
     assert.deepEqual(await citationNames(poolSource),[scanCitation]);
-    await page.locator('#question').fill('What is the annual parking permit fee?');
+    const missingQuestion = 'What is the annual parking permit fee?';
+    await page.locator('#question').fill(missingQuestion);
+    const missingStarted = performance.now();
     await page.locator('#ask-form button').click();
     const unanswered = page.locator('#messages .bubble').last();
     await unanswered.getByText('この項目の根拠は資料内で確認できませんでした。',{exact:true}).waitFor({timeout:60_000});
     await page.locator('#ask-form button:enabled').waitFor();
+    const missingMs = Math.round(performance.now()-missingStarted);
     assert.equal(await unanswered.locator('.answer-source').count(),0);
+    const missingEvidence = {
+      question:missingQuestion, answer:await unanswered.locator('.answer-text').textContent(),
+      sources:await citationNames(unanswered), elapsedMs:missingMs,
+    };
     await page.locator('#question').fill('When does the library close, and what is the annual parking permit fee? Answer each separately.');
     await page.locator('#ask-form button').click();
     await page.locator('#ask-form button:enabled').waitFor();
@@ -156,7 +163,7 @@ try {
       commit,pageCount,
       fixture:dense ? '28-page-dense-mixed-pdf' : long ? '28-page-mixed-pdf' : 'mixed-text-and-scan-pdf',preflightMs,registrationMs,libraryMs,poolMs,combinedMs,
       measuredAt:new Date().toISOString(), platform:process.platform,browserVersion:browser.version(),
-      combinedEvidence,
+      combinedEvidence,missingEvidence,
     };
     console.log(JSON.stringify(result));
     if (process.env.DOCUMENT_QA_REPORT) await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify(result,null,2));
