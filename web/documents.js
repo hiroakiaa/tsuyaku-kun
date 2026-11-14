@@ -210,7 +210,7 @@ function teacher() {
         data.set('pages',JSON.stringify(pages));
       }
       if (/\.(docx|xlsx)$/i.test(file.name)) {
-        const {officePages} = await import('./document-office.js');
+        const {officePages} = await import('./document-office.js?v=65');
         data.set('pages',JSON.stringify(await officePages(file)));
       }
       const {id,expires} = await request('/documents',{method:'POST',body:data});
@@ -806,7 +806,7 @@ async function reader() {
       form.set('file',file);
       if (/\.pdf$/i.test(file.name)) form.set('pages',JSON.stringify(await extract(file,status)));
       if (/\.(docx|xlsx)$/i.test(file.name)) {
-        const {officePages} = await import('./document-office.js');
+        const {officePages} = await import('./document-office.js?v=65');
         form.set('pages',JSON.stringify(await officePages(file)));
       }
       const material = await request(api+'/material',{method:'POST',body:form});

@@ -58,7 +58,7 @@ export async function officePages(file){
   const relationships=tags(await zip.read('xl/_rels/workbook.xml.rels'),'Relationship');
   const sheets=tags(book,'sheet');
   if(sheets.length>40) throw Error('Excelは40シートまでです。');
-  return Promise.all(sheets.map(async sheet=>{
+  const pages=await Promise.all(sheets.map(async sheet=>{
     const id=sheet.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','id');
     const target=relationships.find(rel=>rel.getAttribute('Id')===id)?.getAttribute('Target');
     if(!target) return '';
@@ -68,7 +68,12 @@ export async function officePages(file){
     return sheet.getAttribute('name')+'\n'+tags(xml,'row').map(row=>tags(row,'c').map(cell=>{
       const value=tags(cell,'v')[0]?.textContent;
       const type=cell.getAttribute('t');
-      return cell.getAttribute('r')+' '+(type==='s' ? shared[Number(value)] ?? '' : type==='inlineStr' ? strings(cell) : value ?? '');
-    }).join(' | ')).join('\n');
+      const content=type==='s' ? shared[Number(value)] ?? '' : type==='inlineStr' ? strings(cell) : value ?? '';
+      return content.trim() ? cell.getAttribute('r')+' '+content : '';
+    }).filter(Boolean).join(' | ')).filter(Boolean).join('\n');
   }));
+  if(pages.reduce((total,page)=>total+page.length,0)>22_000) {
+    throw Error('Excelの本文が22,000文字を超えています。必要なシートや行だけを別のExcelに保存して登録してください。');
+  }
+  return pages;
 }
