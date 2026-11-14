@@ -228,6 +228,7 @@ function monthlyDismissal(evidence) {
 
 function lookupWorksheetCell(pages, question) {
   const query = normalized(question);
+  const compareColumns = (a,b)=>a.length-b.length || (a===b ? 0 : a<b ? -1 : 1);
   const year = /(?:令和|R)(\d+)年度?/iu.exec(query)?.[1];
   const sheets = new Map();
   for (const [index,text] of pages.entries()) {
@@ -250,12 +251,12 @@ function lookupWorksheetCell(pages, question) {
     const sheetYear = /^R(\d+)/iu.exec(normalized(sheet))?.[1];
     if (year && sheetYear!==year) continue;
     for (const range of ranges) {
-      const heading = /^([A-Z])(\d+):([A-Z])\2$/u.exec(range);
+      const heading = /^([A-Z]+)(\d+):([A-Z]+)\2$/u.exec(range);
       if (!heading) continue;
       const parent = cells.get(heading[1]+heading[2]);
       if (!parent || !query.includes(normalized(parent.value))) continue;
       for (const child of cells.values()) {
-        if (child.row!==Number(heading[2])+1 || child.column<heading[1] || child.column>heading[3] ||
+        if (child.row!==Number(heading[2])+1 || compareColumns(child.column,heading[1])<0 || compareColumns(child.column,heading[3])>0 ||
             !query.includes(normalized(child.value))) continue;
         for (const rowRange of ranges) {
           const group = /^([A-Z]+)(\d+):\1(\d+)$/u.exec(rowRange);
@@ -263,7 +264,7 @@ function lookupWorksheetCell(pages, question) {
           const owner = cells.get(group[1]+group[2]);
           if (!owner || !query.includes(normalized(owner.value))) continue;
           const rowLabels = [...cells.values()].filter(cell=>cell.row>=Number(group[2]) && cell.row<=Number(group[3]) &&
-            cell.column<heading[1] && cell.cell!==owner.cell && query.includes(normalized(cell.value)));
+            compareColumns(cell.column,heading[1])<0 && cell.cell!==owner.cell && query.includes(normalized(cell.value)));
           for (const row of new Set(rowLabels.map(cell=>cell.row))) {
             const address = child.column+row;
             let value = cells.get(address);
@@ -271,9 +272,7 @@ function lookupWorksheetCell(pages, question) {
               const mergedRange = [...ranges].find(range=>{
                 const bounds = /^([A-Z]+)(\d+):([A-Z]+)(\d+)$/u.exec(range);
                 return bounds && row>=Number(bounds[2]) && row<=Number(bounds[4]) &&
-                  child.column.length>=bounds[1].length && child.column.length<=bounds[3].length &&
-                  (child.column.length>bounds[1].length || child.column>=bounds[1]) &&
-                  (child.column.length<bounds[3].length || child.column<=bounds[3]);
+                  compareColumns(child.column,bounds[1])>=0 && compareColumns(child.column,bounds[3])<=0;
               });
               if (mergedRange) {
                 value = cells.get(mergedRange.split(':')[0]);

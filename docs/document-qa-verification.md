@@ -215,3 +215,7 @@ Worker 377bf95f-8974-4317-9d4b-910366b9c42e を公開。合成ExcelのR9料金�
 公開版e04a794と公開後試験43635286593の成功を確認。標準資料と縦結合資料を各11問で検査し、JSON成果物の掲載を確認。Windows Chromeでの縦結合試験も成功。再実行は node tools/smoke-document-qa-tables.mjs --merged。
 
 公開版 e04a794 のWindows Chromeで、合成Excelの縦結合 D3:D4 の値を数値0にした資料を試験。直接質問と年度の追質問ともに0・R9料金表 D3・PDF 2ページを表示（各129ms）。全11問と試験資料の削除を確認。ローカルのゼロ値回帰試験も通過。
+
+公開版e09f7f7の配信と公開後試験43635757967の成功を確認。標準・縦結合・縦結合の数値0の3資料を各11問で検査し、結果のJSON成果物が掲載された。ゼロ値の再実行は node tools/smoke-document-qa-tables.mjs --zero。
+
+Worker 1febb805-0e4c-4c15-bb08-36f403df80b3でZ・AA列をまたぐ合成Excelを公開版で検証。直接質問とR9の追質問で450円、AA4と見出しZ1・AA2、PDF 2ページが一致（144ms、73ms）。全11問と試験資料削除を確認。

@@ -105,3 +105,13 @@ const free = await documents(new Request('https://test/documents/10000000-0000-0
 const freeResult = await free.json();
 assert.equal(freeResult.answer,'0');
 assert.deepEqual(freeResult.items[0].evidence.map(e=>e.cell),['A3','B4','C1','D2','D3']);
+
+const widePages = pages.map(text=>text.startsWith('R9料金表')
+  ? text.replace(/\b([CD])(\d+)/g,(_,col,row)=>(col==='C' ? 'Z' : 'AA')+row) : text);
+const wideEnv = {ROOMS:{idFromName:x=>x,get:()=>({fetch:async()=>Response.json({pages:widePages,sourceType:'xlsx'})})}};
+const wide = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+  method:'POST',body:JSON.stringify({question:'令和9年度の会議室の子どもの休日料金は？'}),
+}),wideEnv,{uid:'test'});
+const wideResult = await wide.json();
+assert.equal(wideResult.answer,'450円');
+assert.deepEqual(wideResult.items[0].evidence.map(e=>e.cell),['A3','B4','Z1','AA2','AA4']);
