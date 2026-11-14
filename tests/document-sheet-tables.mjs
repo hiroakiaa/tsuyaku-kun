@@ -63,3 +63,11 @@ const ambiguous = await documents(new Request('https://test/documents/10000000-0
 const threeYears = await ambiguous.json();
 assert.equal(threeYears.answer,'令和7年度・令和8年度・令和9年度のうち、どの年度ですか？');
 assert.deepEqual(threeYears.items.flatMap(item=>item.evidence),[]);
+
+const blank = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+  method:'POST', body:JSON.stringify({question:'令和9年度の青空高校の特進の入試日程は？'}),
+}),env,{uid:'test'});
+const emptyCell = await blank.json();
+assert.equal(emptyCell.answer,'該当セルは空欄です。');
+assert.deepEqual(emptyCell.pages,[]);
+assert.deepEqual(emptyCell.items[0].evidence,[]);

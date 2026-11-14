@@ -262,18 +262,32 @@ function lookupWorksheetCell(pages, question) {
           if (!group) continue;
           const owner = cells.get(group[1]+group[2]);
           if (!owner || !query.includes(normalized(owner.value))) continue;
-          for (const value of cells.values()) {
-            if (value.column!==child.column || value.row<Number(group[2]) || value.row>Number(group[3])) continue;
-            const labels = [...cells.values()].filter(cell=>cell.row===value.row && cell.column<heading[1] &&
-              cell.cell!==owner.cell && query.includes(normalized(cell.value)));
-            if (labels.length) matches.push({year:sheetYear,value,evidence:[owner,...labels,parent,child,value]});
+          const rowLabels = [...cells.values()].filter(cell=>cell.row>=Number(group[2]) && cell.row<=Number(group[3]) &&
+            cell.column<heading[1] && cell.cell!==owner.cell && query.includes(normalized(cell.value)));
+          for (const row of new Set(rowLabels.map(cell=>cell.row))) {
+            const address = child.column+row;
+            const value = cells.get(address);
+            if (!value && [...ranges].some(range=>{
+              const bounds = /^([A-Z]+)(\d+):([A-Z]+)(\d+)$/u.exec(range);
+              return bounds && row>=Number(bounds[2]) && row<=Number(bounds[4]) &&
+                child.column.length>=bounds[1].length && child.column.length<=bounds[3].length &&
+                (child.column.length>bounds[1].length || child.column>=bounds[1]) &&
+                (child.column.length<bounds[3].length || child.column<=bounds[3]);
+            })) continue;
+            const labels = rowLabels.filter(cell=>cell.row===row);
+            matches.push({year:sheetYear,key:sheet+'!'+address,value,evidence:[owner,...labels,parent,child,value]});
           }
         }
       }
     }
   }
-  const unique = [...new Map(matches.map(match=>[match.value.sheet+'!'+match.value.cell,match])).values()];
-  if (unique.length===1) return {label:'該当するセル',answer:unique[0].value.value,evidence:unique[0].evidence};
+  const unique = [...new Map(matches.map(match=>[match.key,match])).values()];
+  if (unique.length===1) {
+    const match = unique[0];
+    return match.value
+      ? {label:'該当するセル',answer:match.value.value,evidence:match.evidence}
+      : {label:'該当するセル',answer:'該当セルは空欄です。',evidence:[]};
+  }
   const years = [...new Set(unique.map(match=>match.year).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
   if (!year && years.length>1) return {label:'年度の確認',clarificationYears:years,answer:years.map(year=>'令和'+year+'年度').join('・')+'のうち、どの年度ですか？',evidence:[]};
   return null;
