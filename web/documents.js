@@ -922,6 +922,9 @@ async function reader() {
   } catch {}
   let lastQuestion;
   function formatQuote(quote) {
+    const lines = quote.trim().split(/\r?\n/);
+    // Keep extracted table rows separate so adjacent values do not run together.
+    if (lines.filter(line=>line.includes(' | ')).length>=2) return lines.map(line=>line.trim()).filter(Boolean);
     return quote.trim().split(/\n[ \t]*\n/).flatMap(paragraph=>{
       const joined = paragraph.replace(/([^\x00-\x7f])[ \t]*\n[ \t]*(?=[^\x00-\x7f])/g,'$1')
         .replace(/[ \t]*\n[ \t]*/g,' ');
