@@ -112,7 +112,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '23');
+      guide.searchParams.set('v', '24');
       link.href = guide.href;
       if (entry.expires) {
         const expired = Date.now()>=entry.expires;
@@ -208,9 +208,8 @@ async function reader() {
       selectTab(tab);
       if (tab.id==='tab-ask') {
         $('#ask-dialog').showModal();
-        $('#ask-heading').focus();
+        syncWorkspace();
       }
-      if (tab.id==='tab-original') void showPdf(1);
     });
     tab.addEventListener('keydown',event=>{
       const index = {ArrowRight:(i+1)%tabs.length,ArrowLeft:(i+tabs.length-1)%tabs.length,Home:0,End:tabs.length-1}[event.key];
@@ -220,14 +219,14 @@ async function reader() {
     });
   });
   $('#ask-dialog').addEventListener('close',()=>{
+    if (dialog.open) dialog.close();
     selectTab(tabs[0]);
     tabs[0].focus();
   });
-  $('#reopen-pdf').addEventListener('click',()=>void showPdf(selectedPage || 1));
+  $('#qa-source').addEventListener('click',()=>void showPdf(selectedPage || 1));
   const sourceType = doc.sourceType ?? 'pdf';
   if (sourceType!=='pdf') {
     $('#doc-caption').textContent = '資料データ · '+sourceType.toUpperCase();
-    $('#tab-original').textContent = '資料データ';
     $('#reopen-pdf').textContent = '資料データを表示';
   }
   let opened,originalUrl;
@@ -244,6 +243,44 @@ async function reader() {
   const zoomable = sourceType==='pdf' || imageType;
   let zoom=1, fitWidth=0;
   let pinch, drag;
+  const workspace = $('.qa-workspace');
+  const divider = $('#qa-divider');
+  const wide = matchMedia('(min-width: 800px)');
+  let reversed = false;
+  let split = 50;
+  function setSplit(value) {
+    split = Math.max(25, Math.min(75, value));
+    workspace.style.setProperty('--pdf-share', split + '%');
+    divider.setAttribute('aria-valuenow', String(Math.round(split)));
+  }
+  $('#qa-swap').onclick = () => {
+    reversed = !reversed;
+    workspace.classList.toggle('pdf-right', reversed);
+  };
+  divider.onpointerdown = event => divider.setPointerCapture(event.pointerId);
+  divider.onpointermove = event => {
+    if (!divider.hasPointerCapture(event.pointerId)) return;
+    const {left,width} = workspace.getBoundingClientRect();
+    const percent = (event.clientX-left)/width*100;
+    setSplit(reversed ? 100-percent : percent);
+  };
+  divider.onkeydown = event => {
+    if (!['ArrowLeft','ArrowRight'].includes(event.key)) return;
+    event.preventDefault();
+    setSplit(split + (event.key==='ArrowRight' ? 2 : -2)*(reversed ? -1 : 1));
+  };
+  function syncWorkspace() {
+    if (!askDialog.open) return;
+    if (wide.matches && dialog.parentElement === workspace) return;
+    if (dialog.open) dialog.close();
+    if (wide.matches) void showPdf(selectedPage || 1);
+  }
+  wide.addEventListener('change',syncWorkspace);
+  new ResizeObserver(() => {
+    if (!fitWidth || !preview.clientWidth || fitWidth===preview.clientWidth) return;
+    fitWidth = preview.clientWidth;
+    setZoom(zoom);
+  }).observe(preview);
   function setZoom(value, from, to=from) {
     const bounds=preview.getBoundingClientRect();
     from ??= {x:bounds.width/2,y:bounds.height/2};
@@ -303,7 +340,20 @@ async function reader() {
     $('#pdf-prev').disabled = n===1;
     $('#pdf-next').disabled = n===doc.pageCount;
     $('#pdf-heading').textContent = doc.title;
-    if (!dialog.open) dialog.showModal();
+    if (!askDialog.open) {
+      selectTab($('#tab-ask'));
+      askDialog.showModal();
+    }
+    const inline = wide.matches;
+    if (!dialog.open) {
+      if (inline) {
+        workspace.prepend(dialog);
+        dialog.show();
+      } else {
+        askDialog.after(dialog);
+        dialog.showModal();
+      }
+    }
     $('#pdf-file').removeAttribute('href');
     $('#pdf-status').textContent = 'PDFを表示しています…';
 
@@ -370,7 +420,7 @@ async function reader() {
       return;
     }
     const link = append(parent,'a',sourceType==='pdf' ? '元のPDF ' + n + 'ページ →' : '資料データ'+(sourceType==='xlsx' ? ' · シート '+n : '')+' →','ref');
-    link.href = '#original';
+    link.href = '#tab-ask';
     link.addEventListener('click',event=>{event.preventDefault(); void showPdf(n);});
   }
   for (const item of doc.items) {

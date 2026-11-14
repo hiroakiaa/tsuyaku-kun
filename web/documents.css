@@ -132,3 +132,21 @@ dialog [tabindex="-1"][autofocus]:focus {
 .pdf-stage{min-width:0;overflow:hidden}
 #pdf-scroll{position:absolute;inset:0}
 #pdf-dialog[open]{position:fixed;inset:0;margin:0;width:100%;height:100dvh;max-width:none;max-height:none;border:0;border-radius:0}
+
+.qa-workspace { height: 100%; }
+.qa-actions { display: flex; align-items: center; gap: .5rem; }
+#qa-divider, #qa-swap { display: none; }
+@media (min-width: 800px) {
+  .qa-workspace {
+    display: grid;
+    grid-template-columns: minmax(0,var(--pdf-share,50%)) 10px minmax(0,1fr);
+  }
+  .qa-workspace.pdf-right { grid-template-columns: minmax(0,1fr) 10px minmax(0,var(--pdf-share,50%)); }
+  .qa-workspace .ask-layout { grid-area: 1 / 3; width: 100%; min-width: 0; }
+  .qa-workspace.pdf-right .ask-layout { grid-column: 1; }
+  #qa-divider { display: block; grid-area: 1 / 2; cursor: col-resize; touch-action: none; background: #8885; }
+  #qa-swap { display: inline-block; }
+  #qa-source, .qa-workspace .pdf-bar form { display: none; }
+  .qa-workspace #pdf-dialog[open] { position: relative; grid-area: 1 / 1; inset: auto; height: 100%; min-width: 0; }
+  .qa-workspace.pdf-right #pdf-dialog[open] { grid-column: 3; }
+}
