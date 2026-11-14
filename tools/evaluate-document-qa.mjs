@@ -39,10 +39,14 @@ for (const [question,expected] of selectedCases) {
     if (saved && !recorded) continue;
     const {items,usage,candidatePages,timing} = recorded ?? await evaluateDocumentQuestion({OPENAI_DOCUMENT_QA_KEY:key},pages,question,mode);
     const elapsedMs = recorded ? recorded.elapsedMs ?? null : Math.round(performance.now()-started);
-    const correct = expected.length ? expected.every(([value,page,sourceLabel])=>items.some(item=>
+    const matches = (item,[value,page,sourceLabel]) =>
       item.answer && normalize(item.answer).includes(normalize(value)) &&
-      item.evidence.some(source=>source.page===page && normalize(source.quote).includes(normalize(value)) && (!sourceLabel || normalize(source.quote).includes(normalize(sourceLabel))))
-    )) : items.length>0 && items.every(item=>item.answer===null && item.evidence.length===0);
+      item.evidence.some(source=>source.page===page && normalize(source.quote).includes(normalize(value)) &&
+        (!sourceLabel || normalize(source.quote).includes(normalize(sourceLabel))));
+    const correct = expected.length
+      ? expected.every(expectation=>items.some(item=>matches(item,expectation))) &&
+        items.every(item=>!item.answer || expected.some(expectation=>matches(item,expectation)))
+      : items.length>0 && items.every(item=>item.answer===null && item.evidence.length===0);
     const expectedPages = new Set(expected.map(([,page])=>page));
     const missingCandidatePages = Array.isArray(candidatePages) ? [...expectedPages].filter(page=>!candidatePages.includes(page)) : null;
     const unexpectedPages = [...new Set(items.flatMap(item=>item.evidence.map(source=>source.page)))].filter(page=>!expectedPages.has(page));
