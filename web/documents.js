@@ -776,7 +776,7 @@ async function reader() {
   });
   const askForm = $('#ask-form');
   const button = askForm.querySelector('button');
-  const historyKey = 'document-qa-questions:'+id;
+  const historyKey = 'document-qa-questions:'+id+(doc.revision ? ':'+doc.revision : '');
   const replaceForm = $('#replace-pdf');
   replaceForm.hidden = !doc.canRemove || sourceType!=='pdf';
   replaceForm.onsubmit = async event=>{

@@ -369,7 +369,7 @@ export async function documents(request,env,auth) {
     if (!toc.length) return fail('本文から目次を作れませんでした。',502);
     return target.fetch('https://room/document/toc',{method:'POST',body:JSON.stringify(toc)});
   }
-  if (!action) return reply({title:record.title,items:record.items,toc:validatedToc(record,record.pages.slice(0,record.originalPageCount ?? record.pages.length)),materials:record.materials ?? [],sourceType:record.sourceType ?? 'pdf',pageCount:record.originalPageCount ?? record.pages.length,expires:record.expires,canRemove:record.owner===auth.uid});
+  if (!action) return reply({title:record.title,items:record.items,toc:validatedToc(record,record.pages.slice(0,record.originalPageCount ?? record.pages.length)),materials:record.materials ?? [],sourceType:record.sourceType ?? 'pdf',revision:record.revision ?? 0,pageCount:record.originalPageCount ?? record.pages.length,expires:record.expires,canRemove:record.owner===auth.uid});
   if (Number(request.headers.get('content-length')) > 4096) return fail('質問は300文字までです。',413);
   const input = await request.text();
   if (input.length > 4096) return fail('質問は300文字までです。',413);
@@ -511,7 +511,7 @@ export async function documentStorage(request,storage) {
         return fail('差し替え後の資料が本文の上限を超えています。',413);
       }
       const materials = (current.materials ?? []).map(material=>({...material,start:material.start+shift}));
-      const values = {document:{...current,pages,materials,index:searchIndex(pages),items:input.items,toc:input.toc,sourceType:'pdf',originalPageCount:input.pages.length}};
+      const values = {document:{...current,pages,materials,index:searchIndex(pages),items:input.items,toc:input.toc,sourceType:'pdf',originalPageCount:input.pages.length,revision:(current.revision ?? 0)+1}};
       for (let offset=0;offset<pdf.length;offset+=CHUNK) values['pdf:'+offset]=pdf.slice(offset,offset+CHUNK);
       const previous = await tx.list({prefix:'pdf:'});
       const obsolete = [...previous.keys()].filter(key=>!(key in values));
