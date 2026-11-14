@@ -795,7 +795,15 @@ export async function documents(request,env,auth) {
       const [, year = '', names] = /^(?:(令和\d+年度?の|R\d+年度?の))?(.+)$/iu.exec(subjects);
       const labels = names.split(/と|、|および|及び/u).map(name=>name.trim());
       if (labels.length > 1 && labels.length <= 12 && labels.every(Boolean)) {
-        const matches = labels.map(label=>({label,result:lookup(year+label+'の'+predicate)}));
+        const first = lookup(year+labels[0]+'の'+predicate);
+        const group = first?.evidence?.[0];
+        const sharedGroup = group?.sheet && labels[0].startsWith(normalized(group.value)+'の');
+        const matches = [{label:labels[0],result:first},...labels.slice(1).map(label=>{
+          if (!sharedGroup || label.includes('の')) return {label,result:lookup(year+label+'の'+predicate)};
+          const result = lookup(year+group.value+'の'+label+'の'+predicate);
+          const source = result?.evidence?.[0];
+          return {label,result:source?.sheet===group.sheet && source.cell===group.cell ? result : null};
+        })];
         if (matches.some(({result})=>result)) {
           items.push(...matches.map(({label,result})=>result
             ? {...result,label,worksheetContext:worksheetQuestion}

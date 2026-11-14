@@ -127,3 +127,13 @@ assert.deepEqual(events.slice(0,-1).map(({item})=>[item.label,item.answer,item.e
   ['青空星雲高校',null,undefined],
 ]);
 assert.deepEqual(events.at(-1),{done:true});
+
+const groupedSchedule = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+  method:'POST',
+  body:JSON.stringify({question:'説明会の午前組と午後組について、それぞれ開始時刻は？'}),
+}),env,{uid:'test'});
+const scheduleResult = await groupedSchedule.json();
+assert.deepEqual(scheduleResult.items.map(item=>[item.answer,item.evidence.at(-1)?.cell,item.evidence.at(-1)?.page]),[
+  ['10:00','C3',4],
+  ['14:00','C4',4],
+]);
