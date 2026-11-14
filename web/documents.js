@@ -741,7 +741,8 @@ async function reader() {
   });
   const askForm = $('#ask-form');
   const button = askForm.querySelector('button');
-  async function sendQuestion(question, retrying=false) {
+  let lastQuestion;
+  async function sendQuestion(question,previousQuestion,retrying=false) {
     const log = $('#messages');
     if (button.disabled) return;
     button.disabled = true;
@@ -752,7 +753,7 @@ async function reader() {
     try {
       const response = await fetch(config.api+api+'/ask',{method:'POST',
         headers:await authHeaders({'Content-Type':'application/json',Accept:'application/x-ndjson'}),
-        body:JSON.stringify({question})});
+        body:JSON.stringify({question,previousQuestion})});
       if (!response.ok) throw Error((await response.json().catch(()=>null))?.error || '回答を取得できませんでした。');
       function answerBox() {
         if (!box) {
@@ -818,13 +819,14 @@ async function reader() {
           if (!finished) throw Error('回答の受信が途中で止まりました。');
         } finally { await reader.cancel().catch(()=>{}); }
       }
+      lastQuestion = question;
       status.textContent = '';
     } catch (error) {
       box?.remove();
       status.textContent = error.message+' ';
       const retry = append(status,'button','再試行');
       retry.type = 'button';
-      retry.onclick = () => void sendQuestion(question,true);
+      retry.onclick = () => void sendQuestion(question,previousQuestion,true);
     }
     finally { button.disabled = false; }
   }
@@ -834,7 +836,7 @@ async function reader() {
     const question = field.value.trim();
     if (!question || button.disabled) return;
     field.value = '';
-    void sendQuestion(question);
+    void sendQuestion(question,lastQuestion);
   });
 }
 
