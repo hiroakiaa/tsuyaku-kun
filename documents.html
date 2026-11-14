@@ -5,11 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1d1d1d">
 <title>資料QA君</title>
-<link rel="stylesheet" href="web/documents.css?v=34">
+<link rel="stylesheet" href="web/documents.css?v=35">
 <script type="module" src="web/documents.js?v=34"></script>
 </head>
 <body><div class="shell">
 
+<nav class="create-chat-bar" aria-label="資料チャット"><a class="document-entry create-chat" href="documents.html?v=35">資料チャット作成</a></nav>
 <main id="content"><p role="status">読み込んでいます…</p></main>
 </div>
 <template id="teacher">
@@ -56,7 +57,7 @@
 <div class="doc-tabs" role="tablist" aria-label="資料の案内"><button id="tab-points" role="tab" aria-controls="points" aria-selected="true">要点</button><button id="tab-ask" role="tab" aria-controls="ask" aria-selected="false" tabindex="-1">質問する</button></div>
 <section class="panel" id="points" role="tabpanel" aria-labelledby="tab-points"><h2 id="points-title">まず確認すること</h2><div id="cards" class="cards"></div></section>
 <section class="panel" id="ask" role="tabpanel" aria-labelledby="tab-ask" hidden>
-<dialog id="ask-dialog" aria-labelledby="ask-heading"><div class="qa-workspace"><div id="qa-divider" role="separator" aria-label="列幅" aria-orientation="vertical" aria-valuemin="25" aria-valuemax="75" aria-valuenow="50" tabindex="0"></div><div class="ask-layout"><div class="ask-heading"><h2 id="ask-heading" tabindex="-1" autofocus></h2><div class="qa-actions"><button id="qa-source" type="button">元のPDF</button><button id="qa-swap" type="button">左右入れ替え</button><button class="open-material" type="button" hidden>資料追加</button><form method="dialog"><button aria-label="質問画面を閉じる">×</button></form></div></div>
+<dialog id="ask-dialog" aria-labelledby="ask-heading"><div class="qa-workspace"><div id="qa-divider" role="separator" aria-label="列幅" aria-orientation="vertical" aria-valuemin="25" aria-valuemax="75" aria-valuenow="50" tabindex="0"></div><div class="ask-layout"><div class="ask-heading"><h2 id="ask-heading" tabindex="-1" autofocus></h2><div class="qa-actions"><a class="document-entry create-chat" href="documents.html?v=35">資料チャット作成</a><button id="qa-source" type="button">元のPDF</button><button id="qa-swap" type="button">左右入れ替え</button><button class="open-material" type="button" hidden>資料追加</button><form method="dialog"><button aria-label="質問画面を閉じる">×</button></form></div></div>
 <div id="messages" role="log" aria-live="polite"></div>
 <form id="ask-form"><label for="question" class="sr">資料への質問</label><input id="question" maxlength="300" placeholder="例：いつまでに だしますか？" required><button class="primary">送る</button></form>
 <p id="answer-status" class="fine" role="status"></p>

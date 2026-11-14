@@ -182,3 +182,7 @@ dialog [tabindex="-1"][autofocus]:focus {
 #pdf-toc .pdf-toc-title {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media(prefers-reduced-motion:reduce) {#pdf-toc {transition:none}}
 #pdf-toc .pdf-toc-page {white-space:nowrap;color:#ccc;font-size:.8em;font-variant-numeric:tabular-nums}
+
+.create-chat-bar {display:flex;justify-content:flex-end;margin-bottom:.65rem}
+.qa-actions {flex-wrap:wrap;justify-content:flex-end;flex-shrink:1}
+.qa-actions .create-chat {box-sizing:border-box;padding-inline:.55rem}
