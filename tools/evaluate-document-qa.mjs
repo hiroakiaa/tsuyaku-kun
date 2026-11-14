@@ -42,7 +42,7 @@ for (const [question,expected] of selectedCases) {
     const correct = expected.length ? expected.every(([value,page,sourceLabel])=>items.some(item=>
       item.answer && normalize(item.answer).includes(normalize(value)) &&
       item.evidence.some(source=>source.page===page && normalize(source.quote).includes(normalize(value)) && (!sourceLabel || normalize(source.quote).includes(normalize(sourceLabel))))
-    )) : !items.some(item=>item.answer);
+    )) : items.length>0 && items.every(item=>item.answer===null && item.evidence.length===0);
     const expectedPages = new Set(expected.map(([,page])=>page));
     const missingCandidatePages = Array.isArray(candidatePages) ? [...expectedPages].filter(page=>!candidatePages.includes(page)) : null;
     const unexpectedPages = [...new Set(items.flatMap(item=>item.evidence.map(source=>source.page)))].filter(page=>!expectedPages.has(page));
