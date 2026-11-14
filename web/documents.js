@@ -389,8 +389,8 @@ async function reader() {
       try {
         entries = await request(api+'/toc',{method:'POST'});
         renderContents();
-      } catch (error) {
-        status.textContent = error.message+'。「目次」を開き直して再試行できます。';
+      } catch {
+        status.textContent = '目次生成に失敗しました。「目次」を開き直して再試行できます。';
       } finally {
         loading = false;
       }
@@ -451,7 +451,7 @@ async function reader() {
     } catch {
       const retry = document.createElement('button');
       retry.type = 'button';
-      retry.textContent = 'このページを再読み込み';
+      retry.textContent = 'PDF描画に失敗しました。このページを再読み込み';
       retry.onclick = () => {
         retry.remove();
         void renderPage(slot);
@@ -661,12 +661,16 @@ async function reader() {
     }
 
     try {
-      opened ??= fetch(config.api + api + '/pdf',{headers:await authHeaders()}).then(async response=>{
-        if (!response.ok) throw new Error('PDFを取得できませんでした。');
-        const blob = await response.blob();
+      opened ??= (async()=>{
+        const blob = await fetch(config.api + api + '/pdf',{headers:await authHeaders()}).then(response=>{
+          if (!response.ok) throw Error();
+          return response.blob();
+        }).catch(()=>{throw Error('PDF取得に失敗しました。');});
+        const pdf = await openPdf({data:new Uint8Array(await blob.arrayBuffer())})
+          .catch(()=>{throw Error('PDFの解析に失敗しました。');});
         originalUrl = URL.createObjectURL(blob);
-        return openPdf({data:new Uint8Array(await blob.arrayBuffer())});
-      }).catch(error=>{opened=undefined;throw error;});
+        return pdf;
+      })().catch(error=>{opened=undefined;throw error;});
       const pdf = await opened;
       if (selectedPage === n) document.querySelector('#pdf-file').href = originalUrl + '#page=' + n;
       if (selectedPage !== n || !dialog.open) return;
@@ -694,7 +698,8 @@ async function reader() {
       $('#pdf-status').textContent = '';
     } catch (error) {
       if (error.name === 'RenderingCancelledException' || selectedPage !== n) return;
-      $('#pdf-status').textContent = 'PDFを読み込めませんでした。';
+      $('#pdf-status').textContent = ['PDF取得に失敗しました。','PDFの解析に失敗しました。'].includes(error.message)
+        ? error.message : 'PDFのページ表示に失敗しました。';
       const retry = append($('#pdf-status'),'button','再読み込み');
       retry.type = 'button';
       retry.onclick = () => void showPdf(n);
