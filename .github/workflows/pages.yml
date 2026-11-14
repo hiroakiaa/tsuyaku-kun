@@ -52,6 +52,10 @@ jobs:
         env:
           DOCUMENT_QA_REPORT: document-qa-pdf-report.json
         run: node tools/smoke-document-qa.mjs
+      - name: Verify long PDF citations in the published app
+        env:
+          DOCUMENT_QA_REPORT: document-qa-long-pdf-report.json
+        run: node tools/smoke-document-qa.mjs --long
       - name: Verify worksheet answers and citations in the published app
         env:
           DOCUMENT_QA_REPORT: document-qa-tables-report.json
@@ -74,6 +78,7 @@ jobs:
           name: document-qa-tables-report
           path: |
             document-qa-pdf-report.json
+            document-qa-long-pdf-report.json
             document-qa-tables-report.json
             document-qa-merged-report.json
             document-qa-zero-report.json
