@@ -96,7 +96,17 @@ try {
       await page.waitForFunction(expected=>document.querySelector('#pdf-page')?.value===String(expected),number);
     }
     assert.deepEqual(externalWrites,[]);
-    const combinedEvidence =await Promise.all([librarySource,poolSource].map(async item=>({
+    for (const item of [librarySource,poolSource]) {
+      for (const disclosure of await item.locator('.answer-quote').all()) {
+        const quote = disclosure.locator('blockquote').first();
+        await quote.waitFor({state:'hidden'});
+        await disclosure.locator('summary').click();
+        await quote.waitFor({state:'visible'});
+        await disclosure.locator('summary').click();
+        await quote.waitFor({state:'hidden'});
+      }
+    }
+    const combinedEvidence = await Promise.all([librarySource,poolSource].map(async item=>({
         answer:await item.locator('.answer-text').textContent(), citations:await citationNames(item), quotes:await item.locator('.answer-quote blockquote').allTextContents(),
       })));
     assert.match(combinedEvidence[0].quotes.join(' '),/Library[\s\S]*3\s*(?::00)?\s*PM/i);
