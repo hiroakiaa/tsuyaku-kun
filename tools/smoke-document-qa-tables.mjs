@@ -24,9 +24,11 @@ try {
     return officePages(document.querySelector('#upload input[type=file]').files[0],{includeMerges:true});
   });
   assert.equal(sheets.length,4);
+  const registrationStarted = performance.now();
   await page.locator('#upload button').click();
   const url = page.locator('#guide-url');
   await page.waitForFunction(()=>Boolean(document.querySelector('#guide-url')?.value),null,{timeout:120000}).catch(async e=>{throw Error(await page.locator('#upload-status').textContent(),{cause:e});});
+  const registrationMs = Math.round(performance.now()-registrationStarted);
   const guide = await url.inputValue();
   try {
     assert.deepEqual(externalWrites,[]);
@@ -67,7 +69,7 @@ try {
       }
       measurements.push({question,value,source,elapsedMs:Math.round(performance.now()-started)});
     }
-    console.log(JSON.stringify(measurements));
+    console.log(JSON.stringify({registrationMs,questions:measurements}));
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
       const {config} = await import('./web/config.js');
