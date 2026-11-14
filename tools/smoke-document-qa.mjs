@@ -2,12 +2,14 @@ import {writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 
+const atSizeLimit = process.argv.includes('--size-limit');
 const dense = process.argv.includes('--dense');
-const long = dense || process.argv.includes('--long');
+const atPageLimit = process.argv.includes('--page-limit');
+const long = atPageLimit || dense || process.argv.includes('--long');
 const gardenNotes = dense ? 'Planting beds are watered in the early morning. Seed packets are stored in labelled drawers. Volunteers record rainfall and rotate the crops. '.repeat(5) : '';
-const padding = long ? Array.from({length:25},(_,i)=>
+const padding = long ? Array.from({length:atPageLimit ? 37 : 25},(_,i)=>
   '<p style="break-before:page">School garden notices and planting instructions. Section '+(i+1)+'. '+gardenNotes+'</p>').join('') : '';
-const scanPage = long ? 28 : 3;
+const scanPage = atPageLimit ? 40 : long ? 28 : 3;
 const scanCitation = '元のPDF '+scanPage+'ページ';
 const browser = await chromium.launch();
 try {
@@ -34,7 +36,14 @@ try {
     return canvas.toDataURL();
   });
   await page.setContent(`<table style="width:600px;text-align:left"><tr><th rowspan="2">Facility</th><th colspan="2">Hours</th></tr><tr><th>Opening</th><th>Closing</th></tr></table><table style="break-before:page;width:600px"><tr><td>Library</td><td>9 AM</td><td>3 PM</td></tr><tr><td>Museum</td><td>10 AM</td><td>5 PM</td></tr></table>${padding}<div style="break-before:page"><img width="550" src="${scan}"></div>`);
-  const pdf = await page.pdf();
+  let pdf = await page.pdf();
+  if (atSizeLimit) {
+    // Preserve PDF offsets and keep the end-of-file marker at the end.
+    const marker = pdf.lastIndexOf(Buffer.from('%%EOF'));
+    assert.ok(marker > 0);
+    pdf = Buffer.concat([pdf.subarray(0,marker),Buffer.alloc(5_000_000-pdf.length,10),pdf.subarray(marker)]);
+    assert.equal(pdf.length,5_000_000);
+  }
   await page.goto('https://hiroakiaa.github.io/tsuyaku-kun/documents.html');
   await page.getByRole('heading',{name:'資料QAの保管庫'}).waitFor();
   await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
@@ -160,8 +169,8 @@ try {
     assert.match(commit,/^[0-9a-f]{40}$/);
     if (process.env.GITHUB_SHA) assert.equal(commit,process.env.GITHUB_SHA);
     const result = {
-      commit,pageCount,
-      fixture:dense ? '28-page-dense-mixed-pdf' : long ? '28-page-mixed-pdf' : 'mixed-text-and-scan-pdf',preflightMs,registrationMs,libraryMs,poolMs,combinedMs,
+      commit,pageCount,fileBytes:pdf.length,
+      fixture:atPageLimit ? '40-page-mixed-pdf' : dense ? '28-page-dense-mixed-pdf' : long ? '28-page-mixed-pdf' : 'mixed-text-and-scan-pdf',preflightMs,registrationMs,libraryMs,poolMs,combinedMs,
       measuredAt:new Date().toISOString(), platform:process.platform,browserVersion:browser.version(),
       combinedEvidence,missingEvidence,
     };

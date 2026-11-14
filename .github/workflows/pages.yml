@@ -78,6 +78,12 @@ jobs:
         run: node tools/smoke-document-qa-tables.mjs --wide
       - name: Verify ambiguous admission years in the published app
         run: node tools/smoke-document-qa-admission-years.mjs
+      - name: Verify PDF upload boundaries in the published app
+        run: node tools/smoke-document-qa-pdf-limits.mjs
+      - name: Verify a PDF at both upload limits in the published app
+        env:
+          DOCUMENT_QA_REPORT: document-qa-pdf-limits-report.json
+        run: node tools/smoke-document-qa.mjs --page-limit --size-limit
       - name: Save document verification results
         uses: actions/upload-artifact@v4
         with:
@@ -86,6 +92,7 @@ jobs:
             document-qa-pdf-report.json
             document-qa-long-pdf-report.json
             document-qa-dense-pdf-report.json
+            document-qa-pdf-limits-report.json
             document-qa-tables-report.json
             document-qa-merged-report.json
             document-qa-zero-report.json
