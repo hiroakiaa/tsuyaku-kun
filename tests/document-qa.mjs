@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {documents} from '../server/documents.js';
+import {documents,documentStorage} from '../server/documents.js';
 
 const pages = Array.from({length:20},()=> '校舎の案内です。'.repeat(32));
 pages[15] = '冷房は午後2時から運転します。';
@@ -175,4 +175,15 @@ try {
   }
 } finally {
   globalThis.fetch = originalFetch;
+}
+
+const privateRecord = {owner:'author', visibility:'device', expires:Date.now()+60_000};
+for (const path of ['data','pdf']) {
+  const response = await documentStorage(new Request('https://room/document/'+path,{
+    headers:{'X-Document-Viewer':'another-user'},
+  }),{get:async key=>{
+    assert.equal(key,'document');
+    return privateRecord;
+  }});
+  assert.equal(response.status,404,path);
 }

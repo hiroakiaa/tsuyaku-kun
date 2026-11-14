@@ -32,6 +32,27 @@ try {
   const guide = await url.inputValue();
   try {
     assert.deepEqual(externalWrites,[]);
+    const viewer = await browser.newPage();
+    try {
+      await viewer.goto('https://hiroakiaa.github.io/tsuyaku-kun/documents.html');
+      const access = await viewer.evaluate(async documentUrl=>{
+        const {config} = await import('./web/config.js');
+        const {initializeApp} = await import('https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js');
+        const {getAuth,signInAnonymously} = await import('https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js');
+        const auth = getAuth(initializeApp(config.firebase));
+        await auth.authStateReady();
+        const user = auth.currentUser ?? (await signInAnonymously(auth)).user;
+        const id = new URL(documentUrl).searchParams.get('id');
+        const headers = {Authorization:'Bearer '+await user.getIdToken()};
+        return Promise.all(['','/pdf'].map(async suffix=>{
+          const response = await fetch(config.api+'/documents/'+id+suffix,{headers,cache:'no-store'});
+          return response.status;
+        }));
+      },guide);
+      assert.deepEqual(access,[404,404]);
+    } finally {
+      await viewer.close();
+    }
     await page.goto(guide);
     await page.locator('#tab-ask').click();
     assert.equal(await page.locator('#pdf-page option').count(),sheets.length);

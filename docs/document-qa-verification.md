@@ -89,3 +89,5 @@ R7要項の給食費を本番の全文・検索方式で各3回、順序を交�
 公開版Chromeの3ページ混在PDF（本文とスキャン画像）の単一試行。選択から事前確認2,377ms、作成操作から登録3,448ms、質問送信から完了は図書館1,449ms・プール864ms・まとめ1,409ms。各回答の根拠を確認し試験資料を削除。再実行は node tools/smoke-document-qa.mjs。
 
 公開版Chromeで、3ページの混在PDFと4シートの合成Excelを使い、削除直後に資料情報とPDF取得の両方がHTTP 404になることを確認。試験は 39be141。実行は node tools/smoke-document-qa.mjs と node tools/smoke-document-qa-tables.mjs。今回の確認範囲は認証済み作成者からの再取得。
+
+端末限定の合成Excelを公開版Chromeで登録。独立した認証セッションから資料情報とPDFを取得し、両方HTTP 404。作成者側は5問の回答・根拠・聞き返しが通過し、削除後の資料情報とPDFも404。再現は node tools/smoke-document-qa-tables.mjs。
