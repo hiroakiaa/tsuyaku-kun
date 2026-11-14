@@ -465,18 +465,23 @@ export async function documents(request,env,auth) {
           const item = checkedAnswer(raw,record.pages);
           if (!item) return;
           answers.push(item);
-          writes.push(send({item}).catch(()=>{}));
+          if (item.answer) writes.push(send({item}).catch(()=>{}));
         },passages);
         await Promise.all(writes);
         if (!answers.length) {
           answers = checkedItems(result);
-          for (const item of answers) await send({item});
+          for (const item of answers) if (item.answer) await send({item});
         }
         if (usesPassages && needsFullDocument(answers)) {
           await send({status:'資料全体を確認しています…'});
           const reviewed = await readFullDocument(answers);
           if (reviewed !== answers) await send({replaceItems:reviewed});
+          if (reviewed === answers) {
+            for (const item of answers) if (!item.answer) await send({item});
+          }
           answers = reviewed;
+        } else {
+          for (const item of answers) if (!item.answer) await send({item});
         }
         if (answers.length && answers.every(item=>item.answer)) await saveAnswer(answers);
         await send({done:true,answer:answers.length ? undefined : noAnswer});
