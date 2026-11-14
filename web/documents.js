@@ -17,8 +17,8 @@ async function authHeaders(headers={}) {
 
 async function pdfLibrary() {
   if (!pdfModule) {
-    pdfModule = import('./pdf.min.mjs').then(lib=>{
-      lib.GlobalWorkerOptions.workerSrc = new URL('./pdf.worker.min.mjs',import.meta.url).href;
+    pdfModule = import('./pdf.min.mjs?v=legacy-5.6.205').then(lib=>{
+      lib.GlobalWorkerOptions.workerSrc = new URL('./pdf.worker.min.mjs?v=legacy-5.6.205',import.meta.url).href;
       return lib;
     });
   }
@@ -99,7 +99,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '20');
+      guide.searchParams.set('v', '21');
       link.href = guide.href;
       if (entry.expires) {
         const expired = Date.now()>=entry.expires;
