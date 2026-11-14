@@ -97,7 +97,7 @@ export function translationTimingSummary(sessions){
 }
 
 // Unknown provider charges must remain visible even when the observed estimate is zero.
-export function keepUsage(s){return (s.captionCount||0)>0||(s.micSeconds||0)>0||s.events?.some(event=>event.type==='live_translation_first_subtitle')===true||costOf(s,s.priceSnapshot||PRICES).total>0||(s.unmeasuredCalls||0)>0||(s.estimatedTokenCalls||0)>0;}
+export function keepUsage(s){return (s.lessonDisplayedCaptions||0)>0||(s.lessonRecovery?.reconnects||0)>0||(s.lessonRecovery?.captionRecoveries||0)>0||(s.captionCount||0)>0||(s.micSeconds||0)>0||s.events?.some(event=>event.type==='live_translation_first_subtitle')===true||costOf(s,s.priceSnapshot||PRICES).total>0||(s.unmeasuredCalls||0)>0||(s.estimatedTokenCalls||0)>0;}
 export class WordUsage{
  constructor(storage,now=()=>Date.now()){this.storage=storage;this.now=now;this.seen=new Set();try{this.seen=new Set(JSON.parse(storage.getItem('tsuyaku-word-seen-v1')||'[]').slice(-2000));}catch{}this.error=false;try{this.decisions=JSON.parse(storage.getItem('tsuyaku-word-decisions-v1')||'{}');}catch{this.decisions={};}}
  read(){try{const a=JSON.parse(this.storage.getItem('tsuyaku-word-usage-v1')||'[]');return Array.isArray(a)?a.filter(r=>r&&typeof r.word==='string'&&r.day>=new Date(this.now()-90*86400000).toISOString().slice(0,10)):[];}catch{return [];}}

@@ -8,4 +8,14 @@ const external=JSON.parse(raw);external.push({id:'other-tab',whisperSeconds:2,ca
 fail=true;const last=raw;ledger.audio(1,'whisper');ledger.save();assert.equal(ledger.storageError,true);assert.equal(raw,last);assert.equal(JSON.parse(checkpoint.get('tsuyaku-ledger-checkpoint')).current.whisperSeconds,2);fail=false;ledger.save();assert.equal(ledger.storageError,false);assert.equal(ledger.list().find(s=>s.id===id).whisperSeconds,2);assert(ledger.list().some(s=>s.id==='other-tab'));
 ledger.end();assert.equal(ledger.list().find(s=>s.id===id).ended,true);ledger.begin('face',['ja']);ledger.audio(1,'whisper');ledger.save();assert.equal(ledger.list().find(s=>s.id===id).ended,true);assert.equal(ledger.list().length,4);
 raw=JSON.stringify(Array.from({length:250},(_,i)=>({id:'saved-'+i,whisperSeconds:1,ended:true})));ledger.save();assert.equal(ledger.savedRowsCache.length,200);assert.equal(ledger.list().length,200);
-console.log('PASS usage archive reuse preserves external writes, detached reads, current totals, checkpoints, ended sessions, quota recovery and 200-row bound');
+ledger.begin('lesson',['ja','en']);
+ledger.lessonCaptionDisplayed('caption-one');
+ledger.lessonCaptionDisplayed('caption-one');
+ledger.event('reconnect');
+ledger.event('lesson_caption_restored',{recoverySeconds:3});
+for(let i=0;i<105;i++)ledger.event('mic_on');
+const lesson=ledger.list().find(row=>row.id===ledger.current.id);
+assert.equal(lesson.lessonDisplayedCaptions,1);
+assert.equal(lesson.events.some(event=>event.type==='reconnect'),false);
+assert.deepEqual(lesson.lessonRecovery,{reconnects:1,captionRecoveries:1,recoverySeconds:3});
+console.log('PASS usage archive preservation, bounds and lesson delivery metrics');
