@@ -91,12 +91,15 @@ try {
       const auth = firebase.getAuth(app.initializeApp(config.firebase));
       await auth.authStateReady();
       const id = new URL(documentUrl).searchParams.get('id');
-      const response = await fetch(config.api+'/documents/'+id+'/remove',{
-        method:'POST',headers:{Authorization:'Bearer '+await auth.currentUser.getIdToken()},
+      const endpoint = config.api+'/documents/'+id;
+      const headers = {Authorization:'Bearer '+await auth.currentUser.getIdToken()};
+      const response = await fetch(endpoint+'/remove',{
+        method:'POST',headers,
       });
-      return response.status;
+      const reopened = await fetch(endpoint,{headers,cache:'no-store'});
+      return {removeStatus:response.status,reopenStatus:reopened.status};
     },guide);
-    assert.equal(removed,200);
+    assert.deepEqual(removed,{removeStatus:200,reopenStatus:404});
   }
 } finally {
   await browser.close();
