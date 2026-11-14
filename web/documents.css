@@ -163,3 +163,5 @@ dialog [tabindex="-1"][autofocus]:focus {
 #material-dialog {box-sizing:border-box;width:min(94vw,34rem);max-height:90dvh;overflow:auto;background:#202020;color:white;padding:1rem;border:1px solid #777;border-radius:1rem}
 #material-dialog::backdrop {background:#000a}
 #add-material {display:grid;gap:.65rem}
+.qa-actions > form {display:flex;margin:0}
+.qa-actions > form > button {margin:0}
