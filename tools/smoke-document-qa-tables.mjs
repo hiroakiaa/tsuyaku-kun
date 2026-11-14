@@ -104,7 +104,18 @@ try {
     assert.match(blankAnswer,/空欄|記載(?:が)?(?:ありません|されていません)|根拠(?:を|は資料内で)確認できません/);
     assert.doesNotMatch(blankAnswer,/\b(?:20|40)\b/,'A capacity value must not be reused as the admission date');
     measurements.push({question:blankQuestion,value:blankAnswer,source:null,citationLinks:[],citationCells:[],elapsedMs:Math.round(performance.now()-blankStarted)});
-    const result = {registrationMs,questions:measurements};
+    const releaseResponse = await page.request.get(new URL('./web/release-checks.json',guide).href,{
+      headers:{'Cache-Control':'no-cache'},
+    });
+    assert.ok(releaseResponse.ok(),'Published release metadata is unavailable');
+    const release = await releaseResponse.json();
+    assert.match(release.commit,/^[0-9a-f]{40}$/);
+    if (process.env.GITHUB_SHA) assert.equal(release.commit,process.env.GITHUB_SHA);
+    const result = {
+      commit:release.commit, measuredAt:new Date().toISOString(),
+      platform:process.platform, browserVersion:browser.version(),
+      registrationMs, questions:measurements,
+    };
     console.log(JSON.stringify(result));
     if (process.env.DOCUMENT_QA_REPORT) await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify(result,null,2));
     if (process.env.GITHUB_STEP_SUMMARY) {
