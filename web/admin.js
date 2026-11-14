@@ -96,7 +96,7 @@ const openDocuments=()=>{
   heading.append(el('h2','資料QA'),library,close);
   const frame=el('iframe');
   frame.title='資料QA';
-  frame.src='documents.html?embedded=1&v=39';
+  frame.src='documents.html?embedded=1&v=40';
   library.onclick=()=>{
    const archive=el('dialog',undefined,'documents-dialog');
    archive.setAttribute('aria-label','資料QAの保管庫');
@@ -108,7 +108,7 @@ const openDocuments=()=>{
    bar.append(el('h2','資料QAの保管庫'),dismiss);
    const listFrame=el('iframe');
    listFrame.title='資料QAの保管庫';
-   listFrame.src='documents.html?embedded=1&library=1&v=39';
+   listFrame.src='documents.html?embedded=1&library=1&v=40';
    expandDocumentFrame(listFrame,archive);
    archive.append(bar,listFrame);
    document.body.append(archive);

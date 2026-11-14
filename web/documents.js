@@ -139,6 +139,7 @@ function documentLibrary() {
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
       guide.searchParams.set('v', '39');
       link.href = guide.href;
+      if (typeof entry.shared==='boolean') append(body,'small',entry.shared?'共通保管庫に公開':'作成したブラウザーで閲覧');
       if (entry.expires) {
         const expired = Date.now()>=entry.expires;
         append(body,'small',expired ? '共有期限を過ぎました' : '共有期限 '+new Date(entry.expires).toLocaleDateString('ja-JP'));
@@ -190,7 +191,7 @@ function teacher() {
       const shared = data.get('visibility')==='shared';
       $('#guide-url').closest('label').hidden = !shared;
       $('#copy').hidden = !shared;
-      if (!saveGuide({id,title:String(data.get('title')).trim(),expires})) {
+      if (!saveGuide({id,title:String(data.get('title')).trim(),expires,shared})) {
         status.textContent = '資料を作成しましたが、保管庫には保存できませんでした。';
         return;
       }
@@ -665,17 +666,14 @@ async function reader() {
       remove.disabled = false;
     }
   });
-  $('#ask-form').addEventListener('submit',async event=>{
-    event.preventDefault();
-    const button = event.submitter;
-    const field = $('#question');
-    const question = field.value.trim();
-    if (!question) return;
+  const askForm = $('#ask-form');
+  const button = askForm.querySelector('button');
+  async function sendQuestion(question, retrying=false) {
     const log = $('#messages');
     if (button.disabled) return;
     button.disabled = true;
-    field.value = '';
-    append(log,'div',question,'bubble user');
+    if (!retrying) append(log,'div',question,'bubble user');
+    let box;
     status.textContent = '資料から答えを探しています…';
     log.scrollTop = log.scrollHeight;
     try {
@@ -683,7 +681,6 @@ async function reader() {
         headers:await authHeaders({'Content-Type':'application/json',Accept:'application/x-ndjson'}),
         body:JSON.stringify({question})});
       if (!response.ok) throw Error((await response.json().catch(()=>null))?.error || '回答を取得できませんでした。');
-      let box;
       function answerBox() {
         if (!box) {
           box = append(log,'div','','bubble');
@@ -743,8 +740,22 @@ async function reader() {
         } finally { await reader.cancel().catch(()=>{}); }
       }
       status.textContent = '';
-    } catch (error) { status.textContent = error.message; }
+    } catch (error) {
+      box?.remove();
+      status.textContent = error.message+' ';
+      const retry = append(status,'button','再試行');
+      retry.type = 'button';
+      retry.onclick = () => void sendQuestion(question,true);
+    }
     finally { button.disabled = false; }
+  }
+  askForm.addEventListener('submit',event=>{
+    event.preventDefault();
+    const field = $('#question');
+    const question = field.value.trim();
+    if (!question || button.disabled) return;
+    field.value = '';
+    void sendQuestion(question);
   });
 }
 
@@ -764,7 +775,7 @@ try {
         const card = append(list,'li','','library-card');
         const link = append(card,'a',entry.title);
         link.href = '?id='+encodeURIComponent(entry.id)+'&v=39';
-        append(card,'small','公開期限 '+new Date(entry.expires).toLocaleDateString('ja-JP'));
+        append(card,'small','共通保管庫に公開 · 期限 '+new Date(entry.expires).toLocaleDateString('ja-JP'));
         }
       };
       $('#library-search').addEventListener('input',renderShared);
