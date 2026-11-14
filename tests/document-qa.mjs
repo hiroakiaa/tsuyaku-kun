@@ -307,18 +307,27 @@ for (const [question,label,answer] of [
 console.log('PASS localized dismissal reads completion column and preserves source');
 
 {
-  const pages=['Facility | Opening | Closing','Library | 9 AM | 3 PM','Library | 9 AM | 1 PM'];
-  const sources=pages.map((quote,index)=>({page:index+1,quote}));
+  const scheduleCases = [
+    ['When does the library close?','15:00',['Library | 9 AM | 3 PM','Library | 9 AM | 1 PM'],[1,2]],
+    ['When does the library close?','3 PM and 1 PM',['Library | 9 AM | 3 PM','Library | 9 AM | 1 PM'],[]],
+    ['When is the last admission for the library?','3 PM and 1 PM',['Library | 9 AM | 3 PM','Library | 9 AM | 1 PM'],[]],
+    ['When does the library close?','Weekdays at 3 PM and Saturdays at 1 PM',
+      ['Library | Weekdays | 3 PM','Library | Saturdays | 1 PM'],[1,2,3]],
+  ];
   const fetchBefore=globalThis.fetch;
   try {
-    for (const [answer,expected] of [['15:00',[1,2]],['3 PM and 1 PM',[]]]) {
+    for (const [question,answer,rows,expected] of scheduleCases) {
+      const pages=['Facility | Opening or day | Closing',...rows];
+      const sources=pages.map((quote,index)=>({page:index+1,quote}));
       globalThis.fetch=async()=>Response.json({choices:[{finish_reason:'stop',message:{
         content:JSON.stringify({items:[{label:'Library',answer,sources}]}),
       }}]});
-      const result=await evaluateDocumentQuestion({OPENAI_DOCUMENT_QA_KEY:'test'},pages,'When does the library close?','full');
+      const result=await evaluateDocumentQuestion({OPENAI_DOCUMENT_QA_KEY:'test'},pages,question,'full');
+      assert.equal(result.items[0].answer,expected.length ? answer : null);
       assert.deepEqual(result.items[0].evidence.map(source=>source.page),expected);
     }
   } finally {
     globalThis.fetch=fetchBefore;
   }
+  console.log('PASS timetable citations distinguish unsupported conflicts and labeled schedules');
 }
