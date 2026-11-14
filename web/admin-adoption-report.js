@@ -35,7 +35,7 @@ export function schoolUsageMetrics(row, costOf) {
   };
 }
 
-export function createAdoptionReport(el, { exchange, download }) {
+export function createAdoptionReport(el, { exchange, download, connect = connectOwner, fetcher = fetch }) {
   const panel = el('section', undefined, 'admin-detail');
   const scope = '自動集計の対象になった全ユーザーの端末の合計です。';
   const definition = '利用回数と字幕件数は端末単位です。同じ会話に複数端末が参加すると、各端末の利用として数えます。';
@@ -60,7 +60,7 @@ export function createAdoptionReport(el, { exchange, download }) {
     refresh.disabled = true;
     status.textContent = '集計を取得しています。';
     try {
-      const response = await fetch(config.api + '/billing/school-usage', {
+      const response = await fetcher(config.api + '/billing/school-usage', {
         method:'POST', headers:{Authorization:'Bearer ' + await owner.token(),'Content-Type':'application/json'},
         body:JSON.stringify({action:'report',month:month.replace('-', '/')}),
       });
@@ -79,7 +79,7 @@ export function createAdoptionReport(el, { exchange, download }) {
   login.onclick = async () => {
     login.disabled = true;
     try {
-      owner = await connectOwner('school-usage-admin');
+      owner = await connect('school-usage-admin');
       refresh.hidden = false;
       await load();
     } catch {

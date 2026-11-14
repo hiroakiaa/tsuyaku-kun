@@ -512,9 +512,8 @@ async function reader() {
   function syncWorkspace() {
     if (!askDialog.open) return;
     if (wide.matches && dialog.parentElement === workspace) return;
-    const wasOpen = dialog.open;
-    if (wasOpen) dialog.close();
-    if (wide.matches || wasOpen) void showPdf(selectedPage || 1);
+    if (dialog.open) dialog.close();
+    if (wide.matches) void showPdf(selectedPage || 1);
   }
   wide.addEventListener('change',syncWorkspace);
   new ResizeObserver(() => {
