@@ -35,12 +35,13 @@ try {
     await page.locator('#tab-ask').click();
     await page.locator('#question').fill('When does the library close?');
     await page.locator('#ask-form button').click();
-    await page.locator('#messages .answer-source').first().waitFor();
+    await page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 1ページ'}).waitFor();
     assert.match(await page.locator('#messages').textContent(),/3\s*(?::00)?\s*PM/i);
     await page.locator('#question').fill('When does the swimming pool open?');
     await page.locator('#ask-form button').click();
     const citation = page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 2ページ'});
-    await citation.waitFor();
+    await citation.click();
+    await page.waitForFunction(()=>document.querySelector('#pdf-page')?.value==='2');
     assert.match(await page.locator('#messages .bubble').last().textContent(),/8\s*(?::00)?\s*AM/i);
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
