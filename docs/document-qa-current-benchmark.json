@@ -1,0 +1,362 @@
+[
+  {
+    "question": "給食費は1年でいくら？",
+    "mode": "full",
+    "correct": true,
+    "items": [
+      {
+        "label": "給食費",
+        "answer": "年間の給食費は40,000円です。",
+        "evidence": [
+          {
+            "page": 1,
+            "quote": "年間の給食費は40,000円です。"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5263,
+      "completion_tokens": 49,
+      "total_tokens": 5312,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "usd": 0.0021836000000000004
+  },
+  {
+    "question": "給食費は1年でいくら？",
+    "mode": "search",
+    "correct": true,
+    "items": [
+      {
+        "label": "給食費",
+        "answer": "年間の給食費は40,000円です。",
+        "evidence": [
+          {
+            "page": 1,
+            "quote": "年間の給食費は40,000円です。"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1756,
+      "completion_tokens": 49,
+      "total_tokens": 1805,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "usd": 0.0007808000000000001
+  },
+  {
+    "question": "給食費は1年間でいくら？",
+    "mode": "full",
+    "correct": true,
+    "items": [
+      {
+        "label": "給食費",
+        "answer": "年間の給食費は40,000円です。",
+        "evidence": [
+          {
+            "page": 1,
+            "quote": "年間の給食費は40,000円です。"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5263,
+      "completion_tokens": 49,
+      "total_tokens": 5312,
+      "prompt_tokens_details": {
+        "cached_tokens": 5120,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "usd": 0.0006476
+  },
+  {
+    "question": "給食費は1年間でいくら？",
+    "mode": "search",
+    "correct": true,
+    "items": [
+      {
+        "label": "給食費",
+        "answer": "年間の給食費は40,000円です。",
+        "evidence": [
+          {
+            "page": 1,
+            "quote": "年間の給食費は40,000円です。"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1756,
+      "completion_tokens": 49,
+      "total_tokens": 1805,
+      "prompt_tokens_details": {
+        "cached_tokens": 1536,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "usd": 0.00032
+  },
+  {
+    "question": "給食費の月額と、生徒会費・PTA会費の年額をそれぞれ教えて",
+    "mode": "full",
+    "correct": true,
+    "items": [
+      {
+        "label": "給食費の月額",
+        "answer": "月額4,000円です。",
+        "evidence": [
+          {
+            "page": 1,
+            "quote": "給食費は月額4,000円です。"
+          }
+        ]
+      },
+      {
+        "label": "生徒会費の年額",
+        "answer": "年間600円です。",
+        "evidence": [
+          {
+            "page": 2,
+            "quote": "生徒会費は年間600円です。"
+          }
+        ]
+      },
+      {
+        "label": "PTA会費の年額",
+        "answer": "年間2,400円です。",
+        "evidence": [
+          {
+            "page": 3,
+            "quote": "PTA会費は年間2,400円です。"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5278,
+      "completion_tokens": 200,
+      "total_tokens": 5478,
+      "prompt_tokens_details": {
+        "cached_tokens": 5120,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "usd": 0.0008952000000000001
+  },
+  {
+    "question": "給食費の月額と、生徒会費・PTA会費の年額をそれぞれ教えて",
+    "mode": "search",
+    "correct": true,
+    "items": [
+      {
+        "label": "給食費の月額",
+        "answer": "給食費は月額4,000円です。",
+        "evidence": [
+          {
+            "page": 1,
+            "quote": "給食費は月額4,000円です。"
+          }
+        ]
+      },
+      {
+        "label": "生徒会費の年額",
+        "answer": "生徒会費は年間600円です。",
+        "evidence": [
+          {
+            "page": 2,
+            "quote": "生徒会費は年間600円です。"
+          }
+        ]
+      },
+      {
+        "label": "PTA会費の年額",
+        "answer": "PTA会費は年間2,400円です。",
+        "evidence": [
+          {
+            "page": 3,
+            "quote": "PTA会費は年間2,400円です。"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1234,
+      "completion_tokens": 214,
+      "total_tokens": 1448,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "usd": 0.000836
+  },
+  {
+    "question": "下校の時刻は？",
+    "mode": "full",
+    "correct": true,
+    "items": [
+      {
+        "label": "下校の時刻",
+        "answer": "下校完了は、4月から9月は17時30分、10月から3月は16時45分です。",
+        "evidence": [
+          {
+            "page": 13,
+            "quote": "下校完了は、4月から9月は17時30分、10月から3月は16時45分です。"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5260,
+      "completion_tokens": 85,
+      "total_tokens": 5345,
+      "prompt_tokens_details": {
+        "cached_tokens": 5120,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "usd": 0.000704
+  },
+  {
+    "question": "下校の時刻は？",
+    "mode": "search",
+    "correct": true,
+    "items": [
+      {
+        "label": "下校の時刻",
+        "answer": "4月から9月は17時30分、10月から3月は16時45分です。",
+        "evidence": [
+          {
+            "page": 13,
+            "quote": "下校完了は、4月から9月は17時30分、10月から3月は16時45分です。"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1696,
+      "completion_tokens": 79,
+      "total_tokens": 1775,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "usd": 0.0008048
+  },
+  {
+    "question": "学校指定の靴の販売店はどこ？",
+    "mode": "full",
+    "correct": true,
+    "items": [
+      {
+        "label": "学校指定の靴の販売店",
+        "answer": null,
+        "evidence": []
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5265,
+      "completion_tokens": 29,
+      "total_tokens": 5294,
+      "prompt_tokens_details": {
+        "cached_tokens": 5120,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "usd": 0.0006164
+  },
+  {
+    "question": "学校指定の靴の販売店はどこ？",
+    "mode": "search",
+    "correct": true,
+    "items": [
+      {
+        "label": "学校指定の靴の販売店",
+        "answer": null,
+        "evidence": []
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 718,
+      "completion_tokens": 29,
+      "total_tokens": 747,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "usd": 0.00033360000000000003
+  }
+]
