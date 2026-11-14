@@ -295,7 +295,6 @@ export async function documents(request,env,auth) {
     const items = (Array.isArray(result?.items) ? result.items : [])
       .filter(item=>typeof item?.label==='string' && typeof item.text==='string' && supported(item.source,pages))
       .slice(0,6).map(({label,text,source})=>({label:label.slice(0,45),text:text.slice(0,350),source:{page:source.page}}));
-    if (!items.length) return fail('根拠を確認できる要点を作れませんでした。資料を確認して再試行してください。',502);
     const toc = validatedToc(result,pages);
     const id = crypto.randomUUID();
     const expires = Date.now()+TTL;
