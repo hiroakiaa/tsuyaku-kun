@@ -116,9 +116,45 @@ function validatedToc(result,pages) {
       .sort((a,b)=>a.page-b.page);
 }
 
-async function generate(env,pages,question,materials=[],emit,index,measure) {
-  const passages = (question && selectPassages(pages,question,index ?? searchIndex(pages))) ||
-    pages.map((text,i)=>({page:i+1,text}));
+async function retrievalPassages(env,pages,question,index,target) {
+  const lexical = selectPassages(pages,question,index);
+  if (!env.AI || !index.length || pages.join('').length<=4200) return lexical;
+  const chunks = index.map(([page,start,end])=>({page:page+1,text:pages[page].slice(start,end)}));
+  try {
+    const model = '@cf/baai/bge-m3';
+    const bytes = new TextEncoder().encode(JSON.stringify([model,chunks]));
+    const digest = new Uint8Array(await crypto.subtle.digest('SHA-256',bytes));
+    const key = Array.from(digest,value=>value.toString(16).padStart(2,'0')).join('');
+    const url = 'https://room/document/vectors/'+key;
+    let vectors = target ? await (await target.fetch(url)).json().catch(()=>null) : null;
+    let query;
+    if (vectors?.length===chunks.length) {
+      [query] = (await env.AI.run(model,{text:[question]}))?.data ?? [];
+    } else {
+      [query,...vectors] = (await env.AI.run(model,{text:[question,...chunks.map(chunk=>chunk.text)]}))?.data ?? [];
+      if (query?.length && vectors.length===chunks.length && target) {
+        await target.fetch(url,{method:'POST',body:JSON.stringify(vectors)}).catch(()=>{});
+      }
+    }
+    if (!query?.length || vectors.length!==chunks.length) return lexical;
+    const magnitude = vector=>Math.sqrt(vector.reduce((sum,value)=>sum+value*value,0));
+    const queryMagnitude = magnitude(query);
+    const best = vectors.map((vector,position)=>({
+      position,
+      score:vector.length===query.length
+        ? vector.reduce((sum,value,i)=>sum+value*query[i],0)/(queryMagnitude*magnitude(vector))
+        : NaN,
+    })).filter(row=>Number.isFinite(row.score)).sort((a,b)=>b.score-a.score).slice(0,3);
+    if (!best.length) return lexical;
+    const selected = new Set([...(lexical ?? []).map(chunk=>chunks.findIndex(item=>item.page===chunk.page && item.text===chunk.text)),...best.map(item=>item.position)]);
+    return chunks.filter((_,position)=>selected.has(position));
+  } catch {
+    return lexical;
+  }
+}
+
+async function generate(env,pages,question,materials=[],emit,selectedPassages,measure) {
+  const passages = selectedPassages ?? pages.map((text,i)=>({page:i+1,text}));
   const apiKey = env.OPENAI_DOCUMENT_QA_KEY;
   if (!apiKey) throw Error('資料QAのOpenAI接続が設定されていません。');
   const response = await fetch('https://api.openai.com/v1/chat/completions',{
@@ -384,14 +420,15 @@ export async function documents(request,env,auth) {
   const cached = await (await target.fetch(cacheUrl)).json();
   const saveAnswer = items => target.fetch(cacheUrl,{method:'POST',body:JSON.stringify(items)}).catch(()=>{});
   const index = record.index ?? searchIndex(record.pages);
-  const usesPassages = Boolean(selectPassages(record.pages,question,index));
+  const passages = cached ? null : await retrievalPassages(env,record.pages,question,index,target);
+  const usesPassages = Boolean(passages);
   const checkedItems = result => (Array.isArray(result?.items) ? result.items : [])
     .slice(0,12).map(item=>checkedAnswer(item,record.pages)).filter(Boolean);
   const needsFullDocument = items => usesPassages && (!items.length || items.some(item=>!item.answer));
   const readFullDocument = async (partial) => {
     let full;
     try {
-      full = checkedItems(await generate(env,record.pages,question,record.materials,undefined,[]));
+      full = checkedItems(await generate(env,record.pages,question,record.materials));
     } catch (error) {
       if (partial.some(item=>item.answer)) return partial;
       throw error;
@@ -419,7 +456,7 @@ export async function documents(request,env,auth) {
           if (!item) return;
           answers.push(item);
           if (!usesPassages) writes.push(send({item}).catch(()=>{}));
-        },index);
+        },passages);
         await Promise.all(writes);
         if (!answers.length) {
           answers = checkedItems(result);
@@ -440,7 +477,7 @@ export async function documents(request,env,auth) {
   }
   let items = cached;
   if (!items) {
-    const result = await generate(env,record.pages,question,record.materials,undefined,record.index);
+    const result = await generate(env,record.pages,question,record.materials,undefined,passages);
     items = checkedItems(result);
     if (needsFullDocument(items)) items = await readFullDocument(items);
     if (items.length && items.every(item=>item.answer)) await saveAnswer(items);
@@ -496,6 +533,25 @@ export async function documentStorage(request,storage) {
   }
   const record = await storage.get('document');
   if (!record || record.expires<=Date.now()) return fail('資料が見つからないか、共有が終了しました。',404);
+  if (/^\/document\/vectors\/[a-f0-9]{64}$/.test(path)) {
+    if (request.method==='GET') {
+      const rows = await storage.list({prefix:'semantic-index:'});
+      if (rows.get('semantic-index:manifest')!==path) return reply(null);
+      const vectors = [];
+      for (let i=0;i<rows.size-1;i++) vectors.push(...rows.get('semantic-index:'+i));
+      return reply(vectors);
+    }
+    const vectors = await request.json();
+    await storage.transaction(async tx=>{
+      if (!await tx.get('document')) return;
+      const previous = await tx.list({prefix:'semantic-index:'});
+      if (previous.size) await tx.delete([...previous.keys()]);
+      const entries = {'semantic-index:manifest':path};
+      for (let i=0;i<vectors.length;i+=2) entries['semantic-index:'+i/2]=vectors.slice(i,i+2);
+      await tx.put(entries);
+    });
+    return reply({ok:true});
+  }
   if (path==='/document/replace' && request.method==='POST') {
     const form = await request.formData();
     const input = JSON.parse(form.get('record'));
@@ -580,7 +636,7 @@ export async function documentStorage(request,storage) {
 
 export async function evaluateDocumentQuestion(env,pages,question,mode) {
   let usage;
-  const index = mode==='full' ? [] : searchIndex(pages);
-  const result = await generate(env,pages,question,[],undefined,index,value=>{usage=value;});
+  const passages = mode==='full' ? null : await retrievalPassages(env,pages,question,searchIndex(pages));
+  const result = await generate(env,pages,question,[],undefined,passages,value=>{usage=value;});
   return {items:(result.items ?? []).map(item=>checkedAnswer(item,pages)).filter(Boolean),usage};
 }
