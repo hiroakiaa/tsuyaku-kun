@@ -423,11 +423,10 @@ export async function documents(request,env,auth) {
   const saveAnswer = items => target.fetch(cacheUrl,{method:'POST',body:JSON.stringify(items)}).catch(()=>{});
   const index = record.index ?? searchIndex(record.pages);
   let semanticIndex;
-  const passages = cached ? null : await retrievalPassages(env,record.pages,question,index,target,value=>{semanticIndex=value;});
-  const usesPassages = Boolean(passages);
+  const findPassages = () => retrievalPassages(env,record.pages,question,index,target,value=>{semanticIndex=value;});
   const checkedItems = result => (Array.isArray(result?.items) ? result.items : [])
     .slice(0,12).map(item=>checkedAnswer(item,record.pages)).filter(Boolean);
-  const needsFullDocument = items => usesPassages && (!items.length || items.some(item=>!item.answer));
+  const needsFullDocument = items => !items.length || items.some(item=>!item.answer);
   const readFullDocument = async (partial) => {
     let full;
     try {
@@ -446,12 +445,15 @@ export async function documents(request,env,auth) {
     const send = event=>writer.write(encoder.encode(JSON.stringify(event)+'\n'));
     void (async()=>{
       try {
-        await send({status:'資料を参照して回答を作成しています…'});
+        await send({status:'資料から質問に関係する箇所を探しています…'});
         if (cached) {
           for (const item of cached) await send({item});
           await send({done:true});
           return;
         }
+        const passages = await findPassages();
+        const usesPassages = Boolean(passages);
+        await send({status:'資料を参照して回答を作成しています…'});
         let answers = [];
         const writes = [];
         const result = await generate(env,record.pages,question,record.materials,raw=>{
@@ -465,7 +467,7 @@ export async function documents(request,env,auth) {
           answers = checkedItems(result);
           if (!usesPassages) for (const item of answers) await send({item});
         }
-        if (needsFullDocument(answers)) {
+        if (usesPassages && needsFullDocument(answers)) {
           await send({status:'資料全体を確認しています…'});
           answers = await readFullDocument(answers);
         }
@@ -480,9 +482,10 @@ export async function documents(request,env,auth) {
   }
   let items = cached;
   if (!items) {
+    const passages = await findPassages();
     const result = await generate(env,record.pages,question,record.materials,undefined,passages);
     items = checkedItems(result);
-    if (needsFullDocument(items)) items = await readFullDocument(items);
+    if (passages && needsFullDocument(items)) items = await readFullDocument(items);
     if (items.length && items.every(item=>item.answer)) await saveAnswer(items);
   }
   return reply({items,answer:items.map(item=>item.answer ?? noAnswer).join('\n') || noAnswer,
