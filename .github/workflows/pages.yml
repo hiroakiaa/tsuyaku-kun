@@ -27,6 +27,7 @@ jobs:
           cp index.html documents.html site/
           cp web/* site/web/
           cp server/catalog.js site/server/
+          node --input-type=module -e 'import fs from "node:fs"; fs.writeFileSync("site/web/release-checks.json", JSON.stringify({commit:process.env.GITHUB_SHA,run:process.env.GITHUB_RUN_ID,preparedAt:new Date().toISOString(),checks:["npm test"]}));'
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -43,3 +44,9 @@ jobs:
             sleep 10
           done
           exit 1
+      - name: Install browser for document QA
+        run: |
+          npm install --no-save --package-lock=false playwright@1.61.0
+          npx playwright install --with-deps chromium
+      - name: Verify document QA in the published app
+        run: node tools/smoke-document-qa.mjs
