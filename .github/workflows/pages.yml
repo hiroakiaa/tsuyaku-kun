@@ -60,3 +60,7 @@ jobs:
         run: |
           node tools/smoke-document-qa-image.mjs jpeg
           node tools/smoke-document-qa-image.mjs webp
+      - name: Verify Japanese image OCR in the published app
+        run: |
+          sudo apt-get install -y fonts-noto-cjk
+          node tools/smoke-document-qa-image.mjs png ja
