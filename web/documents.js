@@ -979,6 +979,25 @@ async function reader() {
     status.textContent = '資料から答えを探しています…';
     log.scrollTop = log.scrollHeight;
     try {
+      if (sourceType==='pdf' && /高校の一般入試|高等学校の一般入試/.test(question)) {
+        let item;
+        try {
+          const {admissionsCell}=await import('./admissions-table.js');
+          const pdf=await (opened ?? openPdf({url:config.api+api+'/pdf',httpHeaders:await authHeaders()}));
+          item=await admissionsCell(pdf,question);
+        } catch {}
+        if (item) {
+          renderAnswerItem(append(log,'div','','bubble'),item);
+          entry.items.push(item);
+          lastQuestion = question;
+          history = [...history,entry].slice(-10);
+          try { sessionStorage.setItem(historyKey,JSON.stringify(history)); } catch {}
+          status.textContent = '';
+          citation=item.evidence[0];
+          if (wide.matches || dialog.open) void showPdf(citation.page);
+          return;
+        }
+      }
       const response = await fetch(config.api+api+'/ask',{method:'POST',
         headers:await authHeaders({'Content-Type':'application/json',Accept:'application/x-ndjson'}),
         body:JSON.stringify({question,previousQuestion})});
