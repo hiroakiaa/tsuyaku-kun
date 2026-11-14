@@ -600,8 +600,11 @@ async function reader() {
     remove.disabled = true;
     try {
       await request(api+'/remove',{method:'POST'});
-      content.replaceChildren();
-      append(content,'p','資料の共有を終了しました。','panel');
+      const createUrl = new URL(location.href);
+      createUrl.searchParams.delete('id');
+      createUrl.searchParams.delete('library');
+      createUrl.searchParams.set('v','31');
+      location.replace(createUrl);
     } catch (error) {
       document.querySelector('#remove-status').textContent = error.message;
       remove.disabled = false;
