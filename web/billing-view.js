@@ -54,7 +54,14 @@ export function createBillingView({el,connect=connectOwner,fetcher=fetch,now=()=
     history.append(el('summary','資料QAの月別利用額（UTC）'));
     const list=el('ul');
     for(const row of documentUsage.history){
-      list.append(el('li',row.month+'　$'+row.estimatedUSD.toFixed(4)+'（'+row.calls+'回）'));
+      if(!Number.isFinite(row.estimatedUSD))continue;
+      const entry=el('li',row.month+'　$'+row.estimatedUSD.toFixed(4)+'（'+row.calls+'回）');
+      entry.append(el('p',[
+        ['通常入力',row.input-row.cached,row.costUSD?.input],
+        ['キャッシュ入力',row.cached,row.costUSD?.cached],
+        ['出力',row.output,row.costUSD?.output],
+      ].map(([label,tokens,cost])=>label+' '+tokens.toLocaleString('ja-JP')+' トークン'+(Number.isFinite(cost)?'（$'+cost.toFixed(4)+'）':'')).join(' ／ ')));
+      list.append(entry);
     }
     history.append(list);
     content.append(history);

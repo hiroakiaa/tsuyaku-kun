@@ -155,8 +155,12 @@ export default {async fetch(request,env,ctx){
       if(url.pathname==='/billing/document-qa'){
         const ledger=env.ROOMS.get(env.ROOMS.idFromName('__document_qa_cost__'));
         const usage=await (await ledger.fetch('https://room/document/usage')).json();
-        const estimate=({calls,input,cached,output})=>calls ? ((input-cached)*.4+cached*.1+output*1.6)/1e6 : null;
-        return cors(json({...usage,estimatedUSD:estimate(usage),history:usage.history?.map(row=>({...row,estimatedUSD:estimate(row)}))}));
+        const estimate=(row)=>{
+          if(!row.calls)return {...row,estimatedUSD:null};
+          const costUSD={input:(row.input-row.cached)*.4/1e6,cached:row.cached*.1/1e6,output:row.output*1.6/1e6};
+          return {...row,costUSD,estimatedUSD:costUSD.input+costUSD.cached+costUSD.output};
+        };
+        return cors(json({...estimate(usage),history:usage.history?.map(estimate)}));
       }
       if(url.pathname==='/billing/openai-connection'){
         if(!env.OPENAI_API_KEY)return cors(json({connected:false,reason:'missing_secret'}));
