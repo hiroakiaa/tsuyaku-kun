@@ -208,6 +208,24 @@ function checkedAnswer(item,pages,question='') {
       const evidence = (Array.isArray(item.sources) ? item.sources : [])
         .filter(source=>supported(source,pages) && source.quote.length<=500)
         .slice(0,4).map(({page,quote})=>({page,quote}));
+      for (const source of [...evidence]) {
+        if (source.page<2 || evidence.length>=4) continue;
+        const values = source.quote.split(' | ');
+        if (values.length<3 || !values.slice(1).every(value=>/\d/.test(value))) continue;
+        const page = pages[source.page-1];
+        const matchesShape = line=>line.split(' | ').length===values.length;
+        const isHeader = line=>matchesShape(line) && !/\d/.test(line);
+        if (page.split('\n').some(isHeader)) continue;
+        const headings = pages[source.page-2].split('\n').filter(isHeader);
+        if (headings.length!==1) continue;
+        const quote = headings[0];
+        const terms = normalized(question).toLowerCase();
+        if (!quote.split(' | ').some(cell=>normalized(cell).length>=2 &&
+          (terms.includes(normalized(cell).toLowerCase()) || (normalized(cell).toLowerCase()==='closing' && /clos(?:e|es|ed)/.test(terms)) || (normalized(cell).toLowerCase()==='opening' && /open/.test(terms))))) continue;
+        if (!evidence.some(item=>item.page===source.page-1 && item.quote===quote)) {
+          evidence.push({page:source.page-1,quote});
+        }
+      }
       const schoolEvidence = !school || !admission || evidence.some(({quote})=>{
         const text = normalized(quote);
         const name = normalized(school);
@@ -448,7 +466,7 @@ export async function documents(request,env,auth) {
     if (benchmarkMode!=='full' && benchmarkMode!=='search') return fail('比較方式を確認してください。');
     return reply(await evaluateDocumentQuestion(env,record.pages,question,benchmarkMode,record.materials,target));
   }
-  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([11,record.pages,record.materials ?? [],question.trim()])));
+  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([12,record.pages,record.materials ?? [],question.trim()])));
   const cacheKey = Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
   const cacheUrl = 'https://room/document/answer/'+cacheKey;
   const cached = await (await target.fetch(cacheUrl)).json();

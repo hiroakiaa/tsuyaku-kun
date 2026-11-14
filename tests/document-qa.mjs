@@ -96,3 +96,19 @@ try {
   globalThis.fetch = originalFetch;
 }
 console.log('PASS rejects another school on the same PDF page');
+const tablePages = ['Facility | Opening | Closing','Library | 9 AM | 3 PM'];
+try {
+  globalThis.fetch = async ()=>Response.json({choices:[{finish_reason:'stop',message:{
+    content:JSON.stringify({items:[{label:'Library',answer:'3 PM',sources:[{page:2,quote:tablePages[1]}]}]}),
+  }}]});
+  const env = {OPENAI_DOCUMENT_QA_KEY:'test',ROOMS:{idFromName:name=>name,get:()=>({
+    fetch:async url=>Response.json(url.endsWith('/data') ? {pages:tablePages,owner:'author'} : null),
+  })}};
+  const ask = async question=>(await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+    method:'POST',body:JSON.stringify({question}),
+  }),env,{uid:'author'})).json();
+  assert.deepEqual((await ask('When does the library close?')).pages,[2,1]);
+  assert.deepEqual((await ask('What is the Library capacity?')).pages,[2]);
+} finally {
+  globalThis.fetch = originalFetch;
+}
