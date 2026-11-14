@@ -2,9 +2,11 @@ import {writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 
-const long = process.argv.includes('--long');
+const dense = process.argv.includes('--dense');
+const long = dense || process.argv.includes('--long');
+const gardenNotes = dense ? 'Planting beds are watered in the early morning. Seed packets are stored in labelled drawers. Volunteers record rainfall and rotate the crops. '.repeat(5) : '';
 const padding = long ? Array.from({length:25},(_,i)=>
-  '<p style="break-before:page">School garden notices and planting instructions. Section '+(i+1)+'.</p>').join('') : '';
+  '<p style="break-before:page">School garden notices and planting instructions. Section '+(i+1)+'. '+gardenNotes+'</p>').join('') : '';
 const scanPage = long ? 28 : 3;
 const scanCitation = '元のPDF '+scanPage+'ページ';
 const browser = await chromium.launch();
@@ -128,7 +130,7 @@ try {
     if (process.env.GITHUB_SHA) assert.equal(commit,process.env.GITHUB_SHA);
     const result = {
       commit,
-      fixture:long ? '28-page-mixed-pdf' : 'mixed-text-and-scan-pdf',preflightMs,registrationMs,libraryMs,poolMs,combinedMs,
+      fixture:dense ? '28-page-dense-mixed-pdf' : long ? '28-page-mixed-pdf' : 'mixed-text-and-scan-pdf',preflightMs,registrationMs,libraryMs,poolMs,combinedMs,
       measuredAt:new Date().toISOString(), platform:process.platform,browserVersion:browser.version(),
       combinedEvidence,
     };
