@@ -72,8 +72,8 @@ export async function officePages(file){
       return content.trim() ? cell.getAttribute('r')+' '+content : '';
     }).filter(Boolean).join(' | ')).filter(Boolean).join('\n');
   }));
-  if(pages.reduce((total,page)=>total+page.length,0)>22_000) {
-    throw Error('Excelの本文が22,000文字を超えています。必要なシートや行だけを別のExcelに保存して登録してください。');
+  if(pages.reduce((total,page)=>total+page.length,0)>150_000) {
+    throw Error('Excelの本文が150,000文字を超えています。必要なシートや行だけを別のExcelに保存して登録してください。');
   }
   return pages;
 }

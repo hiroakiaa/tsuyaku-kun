@@ -3,6 +3,7 @@ const DOCUMENT_MODEL = 'gpt-4.1-mini';
 const MAX_PDF = 5_000_000;
 const MAX_PAGES = 40;
 const MAX_TEXT = 22_000;
+const MAX_EXCEL_TEXT = 150_000;
 const CHUNK = 64_000;
 const TTL = 30 * 86400000;
 const noAnswer = 'この資料では答えを確認できません。学校に聞いてください。';
@@ -118,7 +119,7 @@ function validatedToc(result,pages) {
 
 async function retrievalPassages(env,pages,question,index,target,onSemantic) {
   const lexical = selectPassages(pages,question,index);
-  if (!env.AI || !index.length || pages.join('').length<=4200) return lexical;
+  if (!env.AI || !index.length || pages.join('').length<=4200 || pages.join('').length>MAX_TEXT) return lexical;
   const chunks = index.map(([page,start,end])=>({page:page+1,text:pages[page].slice(start,end)}));
   try {
     const model = '@cf/baai/bge-m3';
@@ -277,7 +278,7 @@ export async function documents(request,env,auth) {
         const {done,value} = await reader.read();
         if (done) break;
         size += value.byteLength;
-        if (size > MAX_PDF + 100_000) { await reader.cancel(); return fail('PDFは5 MBまでです。',413); }
+        if (size > MAX_PDF + 1_000_000) { await reader.cancel(); return fail('PDFは5 MBまでです。',413); }
         chunks.push(value);
       }
     } finally { reader.releaseLock(); }
@@ -290,8 +291,10 @@ export async function documents(request,env,auth) {
     const pages = await readMaterial(env,pdf,form,ext);
     if (pages instanceof Response) return pages;
     if (!Array.isArray(pages) || pages.length>MAX_PAGES || pages.some(page=>typeof page!=='string') ||
-        pages.join('').length>MAX_TEXT || !pages.some(page=>page.trim().length>=5)) return fail('資料の文字を読み取れませんでした。');
-    const result = await generate(env,pages);
+        pages.join('').length>(ext==='xlsx' ? MAX_EXCEL_TEXT : MAX_TEXT) || !pages.some(page=>page.trim().length>=5)) return fail('資料の文字を読み取れませんでした。');
+    const largeExcel = ext==='xlsx' && pages.join('').length>MAX_TEXT;
+    const overview = largeExcel ? pages.map((text,i)=>({page:i+1,text:text.slice(0,500)})) : undefined;
+    const result = await generate(env,pages,undefined,[],undefined,overview);
     const items = (Array.isArray(result?.items) ? result.items : [])
       .filter(item=>typeof item?.label==='string' && typeof item.text==='string' && supported(item.source,pages))
       .slice(0,6).map(({label,text,source})=>({label:label.slice(0,45),text:text.slice(0,350),source:{page:source.page}}));
@@ -301,7 +304,7 @@ export async function documents(request,env,auth) {
     const target = env.ROOMS.get(env.ROOMS.idFromName('document:'+id));
     const data = new FormData();
     data.set('pdf',pdf);
-    data.set('record',JSON.stringify({title,pages,items,toc,index:searchIndex(pages),owner:auth.uid,expires,sourceType:ext,visibility:form.get('visibility')==='shared'?'shared':'device'}));
+    data.set('record',JSON.stringify({title,pages,items,toc,index:ext==='xlsx' && pages.join('').length>MAX_TEXT ? undefined : searchIndex(pages),owner:auth.uid,expires,sourceType:ext,visibility:form.get('visibility')==='shared'?'shared':'device'}));
     const saved = await target.fetch('https://room/document/init',{method:'POST',body:data});
     if (!saved.ok) return fail('資料を保存できませんでした。',502);
     if (form.get('visibility')==='shared') {
@@ -547,6 +550,12 @@ export async function documentStorage(request,storage) {
     const pdf = new Uint8Array(await form.get('pdf').arrayBuffer());
     await storage.transaction(async tx=>{
       const values = {document:record};
+      if (record.sourceType==='xlsx' && record.pages.join('').length>MAX_TEXT) {
+        const serialized = JSON.stringify(record.pages);
+        const {pages,...metadata} = record;
+        values.document = {...metadata,pageCount:pages.length,textParts:Math.ceil(serialized.length/20_000)};
+        for (let i=0;i<values.document.textParts;i++) values['document-text:'+i]=serialized.slice(i*20_000,(i+1)*20_000);
+      }
       for (let offset=0;offset<pdf.length;offset+=CHUNK) values['pdf:'+offset]=pdf.slice(offset,offset+CHUNK);
       await tx.setAlarm(record.expires);
       await tx.put(values);
@@ -575,6 +584,7 @@ export async function documentStorage(request,storage) {
     return reply({ok:true});
   }
   if (path==='/document/replace' && request.method==='POST') {
+    if (record.textParts) return fail('Excelの差し替えは新規作成から行ってください。',409);
     const form = await request.formData();
     const input = JSON.parse(form.get('record'));
     const pdf = new Uint8Array(await form.get('pdf').arrayBuffer());
@@ -611,6 +621,7 @@ export async function documentStorage(request,storage) {
   }
   if (path==='/document/owner') return record.owner===await request.text() ? reply({ok:true}) : fail('作成者だけが資料を追加できます。',403);
   if (path==='/document/material' && request.method==='POST') {
+    if (record.textParts) return fail('大きなExcelには資料を追加できません。別の資料として登録してください。',413);
     const input = await request.json();
     return storage.transaction(async tx=>{
       const current = await tx.get('document');
@@ -632,13 +643,18 @@ export async function documentStorage(request,storage) {
     return storage.transaction(async tx=>{
       const current = await tx.get('document');
       if (!current || current.expires<=Date.now()) return fail('資料の共有が終了しました。',404);
-      const existing = validatedToc(current,current.pages);
+      const existing = validatedToc(current,current.pages ?? Array(current.pageCount).fill(""));
       if (existing.length) return reply(existing);
       await tx.put('document',{...current,toc});
       return reply(toc);
     });
   }
-  if (path==='/document/data') return reply(record);
+  if (path==='/document/data') {
+    if (!record.textParts) return reply(record);
+    const keys = Array.from({length:record.textParts},(_,i)=>'document-text:'+i);
+    const chunks = await storage.get(keys);
+    return reply({...record,pages:JSON.parse(keys.map(key=>chunks.get(key)).join(''))});
+  }
   if (path==='/document/remove' && request.method==='POST') {
     if (record.owner!==await request.text()) return fail('作成者だけが共有を終了できます。',403);
     await storage.deleteAll();
