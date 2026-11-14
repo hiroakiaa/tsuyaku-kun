@@ -438,6 +438,37 @@ function checkedAnswer(item,pages,question='') {
           return !requestedYear || !sourceYear || Number(requestedYear)===Number(sourceYear);
         })
         .slice(0,4).map(({page,quote})=>({page,quote}));
+      if (typeof item.answer==='string' &&
+          /時刻|何時|\b(?:when|what time)\b/iu.test(question)) {
+        const times = text=>[...text.normalize('NFKC').matchAll(
+          /(?<![\d:])(?:(1[0-2]|0?[1-9])(?::([0-5]\d))?\s*([ap])\.?m\.?|(2[0-3]|[01]?\d):([0-5]\d)(?!\d)|(?:(午前|午後)\s*)?(2[0-3]|[01]?\d)\s*時(?:\s*([0-5]?\d)\s*分)?)/giu,
+        )].map(([,hour,minute,half,h24,m24,period,localHour,localMinute])=>
+          hour ? (Number(hour)%12+(half.toLowerCase()==='p'?12:0))*60+Number(minute??0)
+            : h24 ? Number(h24)*60+Number(m24)
+              : (period ? Number(localHour)%12+(period==='午後'?12:0) : Number(localHour))*60+Number(localMinute??0));
+        const answerTimes = [...new Set(times(item.answer))];
+        const tableRows = evidence.flatMap(source=>{
+          const [label,...cells]=source.quote.split(' | ');
+          const values=cells.length>=2 ? times(cells.join(' | ')) : [];
+          const onlyTimes = cells.every(cell=>/^(?:(?:午前|午後)?\s*\d{1,2}\s*時(?:\s*\d{1,2}\s*分)?|\d{1,2}(?::\d{2})?\s*[ap]\.?m\.?|\d{1,2}:\d{2})$/iu.test(cell.normalize('NFKC').trim()));
+          return values.length ? [{source,label:normalized(label).toLowerCase(),values,onlyTimes}] : [];
+        });
+        const singularTimeQuestion = /^when does [^?]+ (?:open|close)\??$/iu.test(question.trim())
+          || /^when is the [^?]+ for [^?]+\??$/iu.test(question.trim())
+          || /^[^、？?]+の(?:開館|閉館|開店|閉店|最終入館)時刻は[？?。]?$/u.test(question.trim());
+        if (singularTimeQuestion && answerTimes.length>1 && tableRows.some((row,index)=>
+          tableRows.slice(index+1).some(other=>row.onlyTimes && other.onlyTimes && row.label===other.label && row.source.page!==other.source.page &&
+            answerTimes.some(time=>row.values.includes(time) && !other.values.includes(time)) &&
+            answerTimes.some(time=>other.values.includes(time) && !row.values.includes(time))))) {
+          return {label:item.label.slice(0,100),answer:null,evidence:[]};
+        }
+        if (answerTimes.length===1) {
+          const supportingLabels = new Set(tableRows.filter(row=>row.values.includes(answerTimes[0])).map(row=>row.label));
+          for (const row of tableRows) {
+            if (supportingLabels.has(row.label) && !row.values.includes(answerTimes[0])) evidence.splice(evidence.indexOf(row.source),1);
+          }
+        }
+      }
       for (const source of [...evidence]) {
         if (source.page<2 || evidence.length>=4) continue;
         const page = pages[source.page-1];
@@ -842,7 +873,7 @@ export async function documents(request,env,auth) {
       return reply({items,answer:items[0].answer,pages:[...new Set(items.flatMap(item=>item.evidence.map(source=>source.page)))]});
     }
   }
-  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([16,record.pages,record.materials ?? [],question.trim()])));
+  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([19,record.pages,record.materials ?? [],question.trim()])));
   const cacheKey = Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
   const cacheUrl = 'https://room/document/answer/'+cacheKey;
   const cached = await (await target.fetch(cacheUrl)).json();
