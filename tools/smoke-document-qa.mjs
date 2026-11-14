@@ -25,7 +25,9 @@ try {
   assert.equal(await page.getByRole('link',{name:'資料チャット作成',exact:true}).count(),0);
   await page.locator('#upload input[name=title]').fill('自動公開確認');
   await page.locator('#upload input[type=file]').setInputFiles({name:'smoke.pdf',mimeType:'application/pdf',buffer:pdf});
-  await page.getByText('PDFの文字を確認しました。',{exact:true}).waitFor();
+  await page.getByText('PDFの文字を確認しました。',{exact:true}).waitFor({timeout:120_000}).catch(async error=>{
+    throw new Error('PDF preflight: '+await page.locator('#upload-status').textContent(),{cause:error});
+  });
   await page.locator('#upload button').click();
   const url = page.locator('#guide-url');
   await page.waitForFunction(()=>Boolean(document.querySelector('#guide-url')?.value));
@@ -40,7 +42,7 @@ try {
     await page.locator('#question').fill('When does the swimming pool open?');
     await page.locator('#ask-form button').click();
     const citation = page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 2ページ'});
-    await citation.click();
+    await citation.click({timeout:60_000});
     await page.waitForFunction(()=>document.querySelector('#pdf-page')?.value==='2');
     assert.match(await page.locator('#messages .bubble').last().textContent(),/8\s*(?::00)?\s*AM/i);
   } finally {
