@@ -83,7 +83,7 @@ async function extract(file, status) {
       }
       pages.push(text);
     }
-    if (!pages.some(page=>page.length >= 8)) throw new Error('文字を取り出せませんでした。文字を選べるPDFを使ってください。');
+    if (!pages.some(page=>page.length >= 8)) throw new Error('PDFから検索できる文字を読み取れませんでした。文字が鮮明なPDFをお試しください。');
     if (pages.join('').length > 22000) throw new Error('文字数が多すぎます。資料を分けてください。');
     return pages;
   } catch (error) {
@@ -215,7 +215,7 @@ function teacher() {
     $('#create-estimate').hidden = false;
     try {
       if (/\.pdf$/i.test(file.name)) {
-        const {pages,error} = await (preflight?.file===file ? preflight.pending : preparePdf(file));
+        const {pages,error} = await (preflight?.file===fileInput.files[0] ? preflight.pending : preparePdf(file));
         if (error) throw error;
         data.set('pages',JSON.stringify(pages));
       }
