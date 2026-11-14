@@ -116,7 +116,7 @@ function validatedToc(result,pages) {
       .sort((a,b)=>a.page-b.page);
 }
 
-async function retrievalPassages(env,pages,question,index,target) {
+async function retrievalPassages(env,pages,question,index,target,onSemantic) {
   const lexical = selectPassages(pages,question,index);
   if (!env.AI || !index.length || pages.join('').length<=4200) return lexical;
   const chunks = index.map(([page,start,end])=>({page:page+1,text:pages[page].slice(start,end)}));
@@ -128,7 +128,8 @@ async function retrievalPassages(env,pages,question,index,target) {
     const url = 'https://room/document/vectors/'+key;
     let vectors = target ? await (await target.fetch(url)).json().catch(()=>null) : null;
     let query;
-    if (vectors?.length===chunks.length) {
+    const reused = vectors?.length===chunks.length;
+    if (reused) {
       [query] = (await env.AI.run(model,{text:[question]}))?.data ?? [];
     } else {
       [query,...vectors] = (await env.AI.run(model,{text:[question,...chunks.map(chunk=>chunk.text)]}))?.data ?? [];
@@ -146,6 +147,7 @@ async function retrievalPassages(env,pages,question,index,target) {
         : NaN,
     })).filter(row=>Number.isFinite(row.score)).sort((a,b)=>b.score-a.score).slice(0,3);
     if (!best.length) return lexical;
+    onSemantic?.(reused ? 'reused' : 'computed');
     const selected = new Set([...(lexical ?? []).map(chunk=>chunks.findIndex(item=>item.page===chunk.page && item.text===chunk.text)),...best.map(item=>item.position)]);
     return chunks.filter((_,position)=>selected.has(position));
   } catch {
@@ -420,7 +422,8 @@ export async function documents(request,env,auth) {
   const cached = await (await target.fetch(cacheUrl)).json();
   const saveAnswer = items => target.fetch(cacheUrl,{method:'POST',body:JSON.stringify(items)}).catch(()=>{});
   const index = record.index ?? searchIndex(record.pages);
-  const passages = cached ? null : await retrievalPassages(env,record.pages,question,index,target);
+  let semanticIndex;
+  const passages = cached ? null : await retrievalPassages(env,record.pages,question,index,target,value=>{semanticIndex=value;});
   const usesPassages = Boolean(passages);
   const checkedItems = result => (Array.isArray(result?.items) ? result.items : [])
     .slice(0,12).map(item=>checkedAnswer(item,record.pages)).filter(Boolean);
@@ -483,6 +486,7 @@ export async function documents(request,env,auth) {
     if (items.length && items.every(item=>item.answer)) await saveAnswer(items);
   }
   return reply({items,answer:items.map(item=>item.answer ?? noAnswer).join('\n') || noAnswer,
+    ...(record.owner===auth.uid && semanticIndex ? {semanticIndex} : {}),
     pages:[...new Set(items.flatMap(item=>item.evidence.map(source=>source.page)))]});
 }
 
