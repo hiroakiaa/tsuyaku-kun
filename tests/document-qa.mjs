@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import {documents,documentStorage,evaluateDocumentQuestion} from '../server/documents.js';
 
+import {TranslationRoom} from '../server/worker.js';
+
 const pages = Array.from({length:20},()=> '校舎の案内です。'.repeat(32));
 pages[15] = '冷房は午後2時から運転します。';
 let vectors;
@@ -205,6 +207,52 @@ for (const path of ['data','pdf']) {
   assert.equal(response.status,404,path);
 }
 
+const expiredRecord = {...privateRecord, visibility:'shared', expires:Date.now()-1};
+for (const viewer of ['author','another-user']) {
+  for (const path of ['data','pdf']) {
+    const response = await documentStorage(new Request('https://room/document/'+path,{
+      headers:{'X-Document-Viewer':viewer},
+    }),{get:async key=>{
+      assert.equal(key,'document');
+      return expiredRecord;
+    }});
+    assert.equal(response.status,404,path);
+  }
+}
+const activeEntry = {id:'active',expires:privateRecord.expires};
+const expiredEntry = {id:'expired',expires:expiredRecord.expires};
+const libraryResponse = await documentStorage(new Request('https://room/document/library'),{
+  list:async ()=>new Map([['entry:expired',expiredEntry],['entry:active',activeEntry]]),
+});
+assert.equal(libraryResponse.status,200);
+assert.deepEqual(await libraryResponse.json(),[activeEntry]);
+console.log('PASS expired shared document metadata and PDF are unavailable');
+const expiredStorage = new Map();
+let scheduledExpiration;
+const documentStore = {
+  get:async key=>expiredStorage.get(key),
+  deleteAll:async ()=>expiredStorage.clear(),
+  transaction:async callback=>callback({
+    setAlarm:async time=>{scheduledExpiration=time;},
+    put:async entries=>Object.entries(entries).forEach(([key,value])=>expiredStorage.set(key,value)),
+  }),
+};
+const expiredUpload = new FormData();
+expiredUpload.set('record',JSON.stringify({...expiredRecord,pages:['試験資料']}));
+expiredUpload.set('pdf',new Blob(['pdf data']),'fixture.pdf');
+const initialized = await documentStorage(new Request('https://room/document/init',{method:'POST',body:expiredUpload}),documentStore);
+assert.equal(initialized.status,201);
+assert.equal(scheduledExpiration,expiredRecord.expires);
+assert.ok(expiredStorage.has('pdf:0'));
+expiredStorage.set('semantic-index:0','vectors');
+expiredStorage.set('answer:test','cached answer');
+const expiredRoom = new TranslationRoom({
+  storage:documentStore,
+  getWebSockets:()=>[],
+},{});
+await expiredRoom.alarm();
+assert.equal(expiredStorage.size,0);
+console.log('PASS document expiration alarm clears stored PDF, vectors and answers');
 const yearlyAdmissionPages = [
   'R8入試表\nA1 校名 | J1 一般入試\nA2 青空高校 | J2 9科14以上',
   'R9入試表\nA1 校名 | J1 一般入試\nA2 青空高校 | J2 9科16以上',
