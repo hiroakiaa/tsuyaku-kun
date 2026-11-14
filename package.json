@@ -10,6 +10,6 @@
     "publish:verified": "node tools/publish-verified.mjs"
   },
   "devDependencies": {
-    "wrangler": "^4.35.0"
+    "wrangler": "^4.92.0"
   }
 }
