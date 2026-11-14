@@ -221,7 +221,7 @@ function monthlyDismissal(evidence) {
     months.sort(([a],[b])=>(Number(a)+8)%12-(Number(b)+8)%12);
     const answer = months.map(([month,end,leave])=>`${month}月：部活終了${end}、下校完了${leave}`).join('\n');
     const rowCount = months.length / (width / 3);
-    return {answer,quote:rawLines.slice(header,header+1+rowCount).join('\n')};
+    return {answer,months,quote:rawLines.slice(header,header+1+rowCount).join('\n')};
   }
   return null;
 }
@@ -719,11 +719,25 @@ export async function documents(request,env,auth) {
     if (benchmarkMode!=='full' && benchmarkMode!=='search') return fail('比較方式を確認してください。');
     return reply(await evaluateDocumentQuestion(env,record.pages,question,benchmarkMode,record.materials,target));
   }
-  if (/^下校の?(?:時刻|時間)は何時(?:ですか)?[？?。]?$/u.test(normalized(currentQuestion))) {
+  const dismissalQuestion = currentQuestion.normalize('NFKC').toLowerCase();
+  const chineseDismissal = /完成离校|离校完毕|全部离校/u.test(dismissalQuestion) && /时间|几点/u.test(dismissalQuestion);
+  const portugueseDismissal = /a que horas|horário/u.test(dismissalQuestion) && /saído da escola|saída completa/u.test(dismissalQuestion);
+  const portugueseMonths = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  const requestedMonths = chineseDismissal
+    ? new Set(Array.from(dismissalQuestion.matchAll(/(?<!\d)(1[0-2]|[1-9])月/gu),match=>match[1]))
+    : new Set(portugueseMonths.flatMap((month,index)=>new RegExp('\\b'+month+'\\b','u').test(dismissalQuestion) ? [String(index+1)] : []));
+  const localizedDismissal = requestedMonths.size>0 && (chineseDismissal || portugueseDismissal);
+  if (localizedDismissal || /^下校の?(?:時刻|時間)は何時(?:ですか)?[？?。]?$/u.test(normalized(currentQuestion))) {
     const matches = record.pages.flatMap((quote,index)=>{
       const evidence = [{page:index+1,quote}];
       const schedule = monthlyDismissal(evidence);
-      return schedule ? [{label:'下校の時刻',answer:schedule.answer,evidence:[{page:index+1,quote:schedule.quote}]}] : [];
+      if (!schedule) return [];
+      const label = localizedDismissal ? chineseDismissal ? '离校完成时间' : 'Horário limite de saída' : '下校の時刻';
+      const answer = localizedDismissal
+        ? schedule.months.filter(([month])=>requestedMonths.has(month)).map(([month,,leave])=>
+          chineseDismissal ? `${month}月：${leave}` : `${portugueseMonths[Number(month)-1]}: ${leave}`).join('\n')
+        : schedule.answer;
+      return [{label,answer,evidence:[{page:index+1,quote:schedule.quote}]}];
     });
     if (matches.length===1) {
       const item = matches[0];

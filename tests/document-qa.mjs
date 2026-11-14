@@ -279,3 +279,29 @@ for (const [year,answer,page] of [['R8','9科14以上',1],['R9','9科16以上',2
   assert.deepEqual(resolved.pages,[page]);
 }
 console.log('PASS admissions clarification and both year-only replies');
+
+const dismissalTable = [
+  '月 | 部活終了 | 下校完了 | 月 | 部活終了 | 下校完了',
+  '4 | 16:45 | 17:00 | 10 | 16:30 | 16:45',
+  '5 | 16:45 | 17:00 | 11 | 16:10 | 16:25',
+  '6 | 16:45 | 17:00 | 12 | 16:10 | 16:25',
+  '7 | 16:45 | 17:00 | 1 | 16:30 | 16:45',
+  '8 | 16:30 | 16:45 | 2 | 16:30 | 16:45',
+  '9 | 16:30 | 16:45 | 3 | 16:30 | 16:45',
+].join('\n');
+const dismissalEnv = {ROOMS:{idFromName:name=>name,get:()=>({
+  fetch:async url=>Response.json(url.endsWith('/data')
+    ? {pages:['学校案内',dismissalTable],owner:'author',sourceType:'pdf'} : null),
+})}};
+for (const [question,label,answer] of [
+  ['请用中文说明4月和11月全体学生完成离校的时间。','离校完成时间','4月：17:00\n11月：16:25'],
+  ['Em português, a que horas todos os alunos devem ter saído da escola em abril e novembro?','Horário limite de saída','abril: 17:00\nnovembro: 16:25'],
+]) {
+  const response = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+    method:'POST',headers:{Accept:'application/x-ndjson'},body:JSON.stringify({question}),
+  }),dismissalEnv,{uid:'author'});
+  assert.equal(response.status,200);
+  const events = (await response.text()).trim().split('\n').map(JSON.parse);
+  assert.deepEqual(events,[{item:{label,answer,evidence:[{page:2,quote:dismissalTable}]}},{done:true}]);
+}
+console.log('PASS localized dismissal reads completion column and preserves source');
