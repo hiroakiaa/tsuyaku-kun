@@ -1,0 +1,134 @@
+[
+  {
+    "question": "せいとかいひは年間いくら？",
+    "status": 200,
+    "items": [
+      {
+        "label": "生徒会費",
+        "answer": "生徒会費は年間600円です。",
+        "evidence": [
+          {
+            "page": 1,
+            "quote": "生徒会費は年間600円です。"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 7729,
+      "completion_tokens": 46,
+      "total_tokens": 7775,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "mode": "full",
+    "elapsedMs": 1338
+  },
+  {
+    "question": "せいとかいひは年間いくら？",
+    "status": 200,
+    "items": [
+      {
+        "label": "生徒会費",
+        "answer": "生徒会費は年間600円です。",
+        "evidence": [
+          {
+            "page": 1,
+            "quote": "生徒会費は年間600円です。"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 2379,
+      "completion_tokens": 46,
+      "total_tokens": 2425,
+      "prompt_tokens_details": {
+        "cached_tokens": 1152,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "mode": "search",
+    "elapsedMs": 1325
+  },
+  {
+    "question": "教材費の年額は？",
+    "status": 200,
+    "items": [
+      {
+        "label": "教材費",
+        "answer": "教材費は年額600円です。",
+        "evidence": [
+          {
+            "page": 14,
+            "quote": "教材費は年額600円です。"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 7726,
+      "completion_tokens": 42,
+      "total_tokens": 7768,
+      "prompt_tokens_details": {
+        "cached_tokens": 7552,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "mode": "full",
+    "elapsedMs": 890
+  },
+  {
+    "question": "教材費の年額は？",
+    "status": 200,
+    "items": [
+      {
+        "label": "教材費の年額",
+        "answer": "教材費は年額600円です。",
+        "evidence": [
+          {
+            "page": 14,
+            "quote": "教材費は年額600円です。"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 2376,
+      "completion_tokens": 45,
+      "total_tokens": 2421,
+      "prompt_tokens_details": {
+        "cached_tokens": 1152,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "mode": "search",
+    "elapsedMs": 1287
+  }
+]
