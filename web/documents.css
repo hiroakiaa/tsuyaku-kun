@@ -38,7 +38,7 @@ input{min-width:0;width:100%;background:#202020;color:var(--ink);border:1px soli
 .primary{background:var(--lime);color:#212619;flex-shrink:0;font-weight:bold}
 .fine{font-size:13px;margin-top:9px}
 #messages{max-height:320px;overflow:auto;overflow-wrap:anywhere}
-.bubble{padding:11px 14px;background:#292f24;border:1px solid #455039;border-radius:15px;margin-bottom:8px;white-space:pre-line}
+.bubble{padding:11px 14px;background:transparent;border:0;border-radius:15px;margin-bottom:8px;white-space:pre-line}
 .user{margin-left:22px;background:#282828;border-color:var(--line)}
 .paper{background:#f7f5ed;color:#25251f;border-radius:14px;padding:clamp(15px,4vw,26px);scroll-margin-top:12px}
 .paper h3{font-size:21px;margin:3px 0 10px}
@@ -79,7 +79,7 @@ button:disabled,input:disabled{opacity:.55;cursor:default}
 #ask-form input{border:0;background:transparent}
 #ask-form button{border-radius:1rem;white-space:nowrap}
 #messages .bubble{width:fit-content;max-width:94%;padding:.7rem 1rem;border-radius:1rem 1rem 1rem .25rem}
-#messages .user{margin-inline-start:auto;border-radius:1rem 1rem .25rem 1rem;background:#30465c;color:white}
+#messages .user{margin-inline-start:auto;border-radius:1rem 1rem .25rem 1rem;background:#454549;color:white}
 #library-add{display:flex;align-items:end;flex-wrap:wrap;gap:.75rem}
 #library-add label{flex:1;min-width:12rem}
 #library-list{list-style:none;padding:0;display:grid;gap:.65rem}
