@@ -98,9 +98,10 @@ try {
         method:'POST',headers,
       });
       const reopened = await fetch(endpoint,{headers,cache:'no-store'});
-      return {removeStatus:response.status,reopenStatus:reopened.status};
+      const pdf = await fetch(endpoint+'/pdf',{headers,cache:'no-store'});
+      return {removeStatus:response.status,reopenStatus:reopened.status,pdfStatus:pdf.status};
     },guide);
-    assert.deepEqual(removed,{removeStatus:200,reopenStatus:404}); console.log('cleanup confirmed');
+    assert.deepEqual(removed,{removeStatus:200,reopenStatus:404,pdfStatus:404}); console.log('cleanup confirmed');
   }
 } finally {
   await browser.close();
