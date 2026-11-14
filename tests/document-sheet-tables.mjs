@@ -25,12 +25,14 @@ for(const [question,value,sheet,cell,page,context] of [
   }
 }
 
-const followup = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
-  method:'POST', body:JSON.stringify({question:'令和8年度です',previousQuestion:'会議室の子どもの休日料金は？'}),
-}),env,{uid:'test'});
-const clarified = await followup.json();
-assert.equal(clarified.answer,'400円');
-assert.deepEqual(clarified.items.flatMap(item=>item.evidence.map(e=>[e.sheet,e.cell,e.page])),['A3','B4','C1','D2','D4'].map(cell=>['R8料金表',cell,5]));
+for (const reply of ['令和8年度です','令和8年度','R8','Ｒ８']) {
+  const followup = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+    method:'POST', body:JSON.stringify({question:reply,previousQuestion:'会議室の子どもの休日料金は？'}),
+  }),env,{uid:'test'});
+  const clarified = await followup.json();
+  assert.equal(clarified.answer,'400円');
+  assert.deepEqual(clarified.items.flatMap(item=>item.evidence.map(e=>[e.sheet,e.cell,e.page])),['A3','B4','C1','D2','D4'].map(cell=>['R8料金表',cell,5]));
+}
 
 const threeYearPages = [...pages, pages[4].replace('R8料金表','R7料金表').replace('400円','350円')];
 const threeYearEnv = {ROOMS:{idFromName:x=>x,get:()=>({fetch:async()=>Response.json({pages:threeYearPages,sourceType:'xlsx'})})}};

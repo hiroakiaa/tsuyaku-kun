@@ -708,7 +708,7 @@ export async function documents(request,env,auth) {
     }
   }
   if (record.sourceType==='pdf' || record.sourceType==='xlsx') {
-    const yearReply = /^(?:令和|R)(\d+)年度?(?:です)?[。.]?$/iu.exec(normalized(currentQuestion));
+    const yearReply = /^(?:令和|R)(\d+)(?:年度?)?(?:です)?[。.]?$/iu.exec(normalized(currentQuestion));
     const previous = yearReply && typeof previousQuestion==='string' && previousQuestion.length<=300
       ? lookupWorksheetCell(record.pages,previousQuestion) : null;
     const worksheetQuestion = previous?.clarificationYears?.includes(yearReply?.[1])
