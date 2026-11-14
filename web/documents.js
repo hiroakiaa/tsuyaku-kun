@@ -982,7 +982,7 @@ async function reader() {
       if (sourceType==='pdf' && /高校の一般入試|高等学校の一般入試/.test(question)) {
         let item;
         try {
-          const {admissionsCell}=await import('./admissions-table.js');
+          const {admissionsCell}=await import('./admissions-table.js?v=73');
           const pdf=await (opened ?? openPdf({url:config.api+api+'/pdf',httpHeaders:await authHeaders()}));
           item=await admissionsCell(pdf,question);
         } catch {}

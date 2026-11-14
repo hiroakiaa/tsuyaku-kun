@@ -6,13 +6,13 @@ export async function admissionsCell(pdf, question) {
   for (let number=1; number<=pdf.numPages; number++) {
     const page=await pdf.getPage(number);
     const {items}=await page.getTextContent();
-    if (!compact(items.map(item=>item.str ?? '').join('')).includes(name)) continue;
+
     const viewport=page.getViewport({scale:1200/page.getViewport({scale:1}).width});
     const cells=items.filter(item=>item.str?.trim()).map(item=>{
       const [x,y]=viewport.convertToViewportPoint(item.transform[4],item.transform[5]);
       return {x,y:y-Math.abs(item.height)*viewport.scale*0.25,text:item.str};
     });
-    const header=cells.find(cell=>compact(cell.text).includes('一般入試'));
+    const header=cells.find(cell=>compact(cell.text).includes('一般入試')) ?? cells.find(cell=>compact(cell.text)==='一般' && cells.some(next=>Math.abs(next.y-cell.y)<3 && next.x>cell.x && next.x-cell.x<50 && compact(next.text).startsWith('入試')));
     if (!header) continue;
     const canvas=document.createElement('canvas');
     canvas.width=Math.ceil(viewport.width);
@@ -29,7 +29,7 @@ export async function admissionsCell(pdf, question) {
     for (let y=0;y<height;y++) {
       let count=0;
       for(let x=0;x<width;x++) if(dark(x,y)) count++;
-      if(count>width*0.63) {
+      if(count>width*0.55) {
         if(rules.length && y-rules.at(-1)<4) rules[rules.length-1]=y;
         else rules.push(y);
       }
@@ -50,8 +50,15 @@ export async function admissionsCell(pdf, question) {
     const right=columns.find(x=>x>header.x+3);
     const schoolLeft=columns[0], schoolRight=columns[1];
     if(left==null || right==null || schoolRight==null || left<=schoolRight) continue;
-    for(let i=0;i<rules.length-1;i++) {
-      const start=rules[i], end=rules[i+1];
+    const schoolRules = rules.filter(y=>{
+      let count=0;
+      for(let x=schoolLeft+2;x<schoolRight-2;x++) {
+        if(dark(x,y) || (y>0 && dark(x,y-1))) count++;
+      }
+      return count>(schoolRight-schoolLeft)*0.65;
+    });
+    for(let i=0;i<schoolRules.length-1;i++) {
+      const start=schoolRules[i], end=schoolRules[i+1];
       if(start<bottom) continue;
       const row=cells.filter(cell=>cell.y>start && cell.y<end);
       const school=row.filter(cell=>cell.x>=schoolLeft && cell.x<schoolRight).sort((a,b)=>a.y-b.y);
