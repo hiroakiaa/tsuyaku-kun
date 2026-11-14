@@ -88,6 +88,15 @@ try {
     await unanswered.getByText('この項目の根拠は資料内で確認できませんでした。',{exact:true}).waitFor({timeout:60_000});
     await page.locator('#ask-form button:enabled').waitFor();
     assert.equal(await unanswered.locator('.answer-source').count(),0);
+    await page.locator('#question').fill('When does the library close, and what is the annual parking permit fee? Answer each separately.');
+    await page.locator('#ask-form button').click();
+    await page.locator('#ask-form button:enabled').waitFor();
+    const mixed = page.locator('#messages .bubble').last();
+    const supported = mixed.locator('.answer-item').filter({hasText:/3\s*(?::00)?\s*PM/i});
+    const unsupported = mixed.locator('.answer-item').filter({hasText:'この項目の根拠は資料内で確認できませんでした。'});
+    assert.deepEqual(await citationNames(supported),['元のPDF 1ページ','元のPDF 2ページ']);
+    assert.equal(await unsupported.count(),1);
+    assert.deepEqual(await citationNames(unsupported),[]);
     console.log(JSON.stringify({fixture:'mixed-text-and-scan-pdf',preflightMs,registrationMs,libraryMs,poolMs,combinedMs}));
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
