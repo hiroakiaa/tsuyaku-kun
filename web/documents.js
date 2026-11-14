@@ -851,8 +851,13 @@ async function reader() {
     try {
       if (file.size>5000000) throw Error('追加資料は5 MBまでです。');
       const form = new FormData();
-      form.set('file',file);
-      if (/\.pdf$/i.test(file.name)) form.set('pages',JSON.stringify(await extract(file,status)));
+      let upload = file;
+      if (/\.(png|jpe?g|webp)$/i.test(file.name)) {
+        const {convertDocument} = await import('./document-convert.js?v=94');
+        upload = (await convertDocument(file)).file;
+      }
+      form.set('file',upload);
+      if (/\.pdf$/i.test(upload.name)) form.set('pages',JSON.stringify(await extract(upload,status)));
       if (/\.(docx|xlsx)$/i.test(file.name)) {
         const {officePages} = await import('./document-office.js?v=92');
         form.set('pages',JSON.stringify(await officePages(file)));
