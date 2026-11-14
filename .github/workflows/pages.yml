@@ -55,7 +55,7 @@ jobs:
       - name: Verify Word pagination and citations in the published app
         run: node tools/smoke-document-qa-word.mjs
       - name: Verify image OCR and citations in the published app
-        run: node tools/smoke-document-qa-image.mjs
+        run: node tools/smoke-document-qa-image.mjs png en --append
       - name: Verify JPEG and WebP OCR in the published app
         run: |
           node tools/smoke-document-qa-image.mjs jpeg

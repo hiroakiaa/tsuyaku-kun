@@ -93,6 +93,38 @@ try {
     assert.match(await bubble.locator('.answer-text').textContent(),japanese ? /14:00|午後\s*2\s*時/ : /14:00|2\s*(?::00)?\s*p\.?m\.?/i);
     assert.deepEqual(await bubble.locator('.answer-source a').allTextContents(),['元のPDF 1ページ']);
     assert.match(await bubble.locator('.answer-quote').textContent(),japanese ? /14\s*[:：]\s*00/ : /Blue group[\s\S]*14:00/);
+    if (process.argv.includes('--append')) {
+      const extra = await page.evaluate(()=>{
+        const canvas=document.createElement('canvas');
+        canvas.width=1000;
+        canvas.height=240;
+        const ctx=canvas.getContext('2d');
+        ctx.fillStyle='white';
+        ctx.fillRect(0,0,1000,240);
+        ctx.fillStyle='black';
+        ctx.font='42px Arial';
+        ctx.fillText('The Green group starts at 16:30.',40,130);
+        return canvas.toDataURL('image/png');
+      });
+      await page.locator('.open-material:visible').first().click();
+      await page.locator('#add-material input[type=file]').setInputFiles({
+        name:'green-schedule.png',mimeType:'image/png',buffer:Buffer.from(extra.split(',')[1],'base64'),
+      });
+      const requestPending=page.waitForRequest(request=>new URL(request.url()).pathname.endsWith('/material') && request.method()==='POST');
+      await page.locator('#add-material button').click();
+      const request=await requestPending;
+      assert.match(request.postData(),/filename="green-schedule\.pdf"/);
+      assert.match(request.postData(),/Green group starts at 16:30/i);
+      await page.getByText('追加しました。質問に使用できます。').waitFor();
+      await page.locator('#material-dialog').press('Escape');
+      await page.locator('#question').fill('What is the start time for the Green group?');
+      await page.locator('#ask-form button').click();
+      await page.locator('#ask-form button:enabled').waitFor();
+      assert.match(await bubble.locator('.answer-text').textContent(),/16:30|4:30\s*p\.?m\.?/i);
+      assert.match(await bubble.locator('.answer-source').textContent(),/green-schedule\.pdf\s*·\s*1/);
+      assert.match(await bubble.locator('.answer-quote').textContent(),/Green group[\s\S]*16:30/i);
+      assert.deepEqual(externalWrites,[]);
+    }
     console.log(JSON.stringify({fixture:format+'-browser-ocr',language,registrationMs,answerMs}));
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
