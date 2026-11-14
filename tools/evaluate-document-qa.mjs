@@ -47,6 +47,9 @@ const summary = ['full','search'].map(mode=>{
   const samples = rows.filter(row=>row.mode===mode);
   const durations = samples.map(row=>row.elapsedMs).sort((a,b)=>a-b);
   return {mode, cases:samples.length, passed:samples.filter(row=>row.correct).length,
-    medianMs:durations[Math.ceil(durations.length/2)-1], maxMs:durations.at(-1)};
+    medianMs:durations[Math.ceil(durations.length/2)-1], maxMs:durations.at(-1),
+    measuredCostCases:samples.filter(row=>row.estimatedUSD!==null).length,
+    estimatedUSD:samples.every(row=>row.estimatedUSD!==null)
+      ? samples.reduce((sum,row)=>sum+row.estimatedUSD,0) : null};
 });
 console.log(JSON.stringify({summary,rows},null,2));
