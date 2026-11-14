@@ -290,7 +290,7 @@ export async function documents(request,env,auth) {
     const unit = ext==='pdf' ? 'ページ' : ext==='xlsx' ? 'シート' : ext==='docx' ? '文書' : '画像';
     return target.fetch('https://room/document/material',{method:'POST',body:JSON.stringify({owner:auth.uid,name:file.name.slice(0,150),unit,pages})});
   }
-  if (!(action==='ask' && request.method==='POST') && !(!action && request.method==='GET')) return fail('この操作は使えません。',405);
+  if (!(action==='ask' && request.method==='POST') && !((!action || action==='text') && request.method==='GET')) return fail('この操作は使えません。',405);
   const info = await target.fetch('https://room/document/data',{headers:{'X-Document-Viewer':auth.uid}});
   if (!info.ok) return info;
   const record = await info.json();
