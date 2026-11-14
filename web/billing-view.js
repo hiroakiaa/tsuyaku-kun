@@ -49,6 +49,16 @@ export function createBillingView({el,connect=connectOwner,fetcher=fetch,now=()=
   const cost=documentUsage?.estimatedUSD;
   content.append(el('p',cost==null?'資料QA専用キーの当月推定額：未計測':'資料QA専用キーの当月推定額：$'+cost.toFixed(4)+'（'+documentUsage.calls+'回）'));
   content.append(el('p','資料QAは計測開始後のOpenAI使用量から推定。請求データの小計には含みません。'));
+  if(documentUsage?.history?.length){
+    const history=el('details');
+    history.append(el('summary','資料QAの月別利用額（UTC）'));
+    const list=el('ul');
+    for(const row of documentUsage.history){
+      list.append(el('li',row.month+'　$'+row.estimatedUSD.toFixed(4)+'（'+row.calls+'回）'));
+    }
+    history.append(list);
+    content.append(history);
+  }
   content.append(el('p',projectCost?.status==='ready'
     ? '通訳君のOpenAIプロジェクト当月使用料：'+amount(projectCost.usd,'USD')
     : '通訳君のOpenAIプロジェクト当月使用料：未取得'));

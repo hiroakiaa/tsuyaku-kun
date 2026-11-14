@@ -413,7 +413,12 @@ export async function documentStorage(request,storage) {
   if (path==='/document/usage') {
     const month = new Date().toISOString().slice(0,7);
     const key = 'dedicated-usage:'+month;
-    if (request.method==='GET') return reply({month,...await storage.get(key)});
+    if (request.method==='GET') {
+      const history = await storage.list({prefix:'dedicated-usage:',reverse:true,limit:12});
+      return reply({month,...history.get(key),history:[...history].map(([name,total])=>({
+        month:name.slice('dedicated-usage:'.length),...total,
+      }))});
+    }
     const usage = await request.json();
     return storage.transaction(async tx=>{
       const total = await tx.get(key) ?? {calls:0,input:0,output:0,cached:0};
