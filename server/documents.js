@@ -378,7 +378,7 @@ export async function documents(request,env,auth) {
   const question = typeof previousQuestion==='string' && previousQuestion.trim() && previousQuestion.length<=300
     ? JSON.stringify({前の質問:previousQuestion,今回の質問:currentQuestion})
     : currentQuestion;
-  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([2,record.pages,question.trim()])));
+  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([3,record.pages,record.materials ?? [],question.trim()])));
   const cacheKey = Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
   const cacheUrl = 'https://room/document/answer/'+cacheKey;
   const cached = await (await target.fetch(cacheUrl)).json();
@@ -388,7 +388,17 @@ export async function documents(request,env,auth) {
   const checkedItems = result => (Array.isArray(result?.items) ? result.items : [])
     .slice(0,12).map(item=>checkedAnswer(item,record.pages)).filter(Boolean);
   const needsFullDocument = items => usesPassages && (!items.length || items.some(item=>!item.answer));
-  const readFullDocument = async () => checkedItems(await generate(env,record.pages,question,record.materials,undefined,[]));
+  const readFullDocument = async (partial) => {
+    let full;
+    try {
+      full = checkedItems(await generate(env,record.pages,question,record.materials,undefined,[]));
+    } catch (error) {
+      if (partial.some(item=>item.answer)) return partial;
+      throw error;
+    }
+    const resolved = full.filter(item=>item.answer).length;
+    return resolved>=partial.filter(item=>item.answer).length && full.length>=partial.length ? full : partial;
+  };
   if (request.headers.get('Accept')==='application/x-ndjson') {
     const encoder = new TextEncoder();
     const stream = new TransformStream();
@@ -417,7 +427,7 @@ export async function documents(request,env,auth) {
         }
         if (needsFullDocument(answers)) {
           await send({status:'資料全体を確認しています…'});
-          answers = await readFullDocument();
+          answers = await readFullDocument(answers);
         }
         if (usesPassages) for (const item of answers) await send({item});
         if (answers.length && answers.every(item=>item.answer)) await saveAnswer(answers);
@@ -432,7 +442,7 @@ export async function documents(request,env,auth) {
   if (!items) {
     const result = await generate(env,record.pages,question,record.materials,undefined,record.index);
     items = checkedItems(result);
-    if (needsFullDocument(items)) items = await readFullDocument();
+    if (needsFullDocument(items)) items = await readFullDocument(items);
     if (items.length && items.every(item=>item.answer)) await saveAnswer(items);
   }
   return reply({items,answer:items.map(item=>item.answer ?? noAnswer).join('\n') || noAnswer,
