@@ -44,7 +44,7 @@ export async function convertDocument(file){
         }
         wrapped.push(line);
         let block=blocks.at(-1);
-        if (xlsx && block.length && wrapped.length<=50 && block.length+wrapped.length>50) {
+        if (block.length && wrapped.length<=50 && block.length+wrapped.length>50) {
           blocks.push(block=[]);
         }
         for (const [lineIndex,segment] of wrapped.entries()) {
