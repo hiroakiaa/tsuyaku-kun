@@ -155,3 +155,11 @@ dialog [tabindex="-1"][autofocus]:focus {
 .pdf-page-view { background:#fff; color:#222; margin-bottom: .5rem; }
 .pdf-page-view canvas { display:block; width:100%; height:auto; }
 
+
+.reader-heading {display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-bottom:1rem}
+.reader-heading h1,.reader-heading h2,.ask-heading h2 {margin:0;min-width:0;overflow-wrap:anywhere;font-size:1.15rem}
+.qa-actions {flex-shrink:0}
+.qa-actions > button,.qa-actions > form > button {box-sizing:border-box;height:44px;padding-inline:.55rem}
+#material-dialog {box-sizing:border-box;width:min(94vw,34rem);max-height:90dvh;overflow:auto;background:#202020;color:white;padding:1rem;border:1px solid #777;border-radius:1rem}
+#material-dialog::backdrop {background:#000a}
+#add-material {display:grid;gap:.65rem}

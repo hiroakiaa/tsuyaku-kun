@@ -112,7 +112,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '25');
+      guide.searchParams.set('v', '26');
       link.href = guide.href;
       if (entry.expires) {
         const expired = Date.now()>=entry.expires;
@@ -182,7 +182,7 @@ async function reader() {
   show('#reader');
   document.title = doc.title + '｜資料QA君';
   $('#doc-title').textContent = doc.title;
-  $('#doc-caption').textContent = '元のPDF · 全' + doc.pageCount + 'ページ';
+  $('#ask-heading').textContent = doc.title;
   if (!doc.items.length) $('#points-title').textContent = '資料から抜き出した要点';
   const dialog = $('#pdf-dialog');
   const askDialog=$('#ask-dialog');
@@ -229,7 +229,6 @@ async function reader() {
   $('#qa-source').addEventListener('click',()=>void showPdf(selectedPage || 1));
   const sourceType = doc.sourceType ?? 'pdf';
   if (sourceType!=='pdf') {
-    $('#doc-caption').textContent = '資料データ · '+sourceType.toUpperCase();
     $('#reopen-pdf').textContent = '資料データを表示';
   }
   let opened,originalUrl;
@@ -479,7 +478,10 @@ async function reader() {
   const listMaterial = material=>append($('#materials'),'li',material.name);
   materials.forEach(listMaterial);
   const addForm = $('#add-material');
-  addForm.hidden = !doc.canRemove;
+  for (const button of document.querySelectorAll('.open-material')) {
+    button.hidden = !doc.canRemove;
+    button.onclick = () => $('#material-dialog').showModal();
+  }
   addForm.onsubmit = async event=>{
     event.preventDefault();
     const button = event.submitter;
@@ -612,7 +614,7 @@ try {
       for (const entry of entries) {
         const card = append($('#shared-list'),'li','','library-card');
         const link = append(card,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=25';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=26';
         append(card,'small','公開期限 '+new Date(entry.expires).toLocaleDateString('ja-JP'));
       }
     } catch (error) {
