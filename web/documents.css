@@ -177,5 +177,8 @@ dialog [tabindex="-1"][autofocus]:focus {
 }
 #pdf-toc .pdf-toc-entry + .pdf-toc-entry {border-top:1px solid #ffffff24}
 #pdf-toc .pdf-toc-entry:hover,#pdf-toc .pdf-toc-entry[aria-current] {background:#ffffff15}
-#pdf-toc .pdf-toc-title {overflow-wrap:anywhere}
+#pdf-toc {display:block;max-height:min(65dvh,calc(100% - 1rem));overscroll-behavior:contain;transition:opacity .15s, transform .15s, visibility .15s}
+#pdf-toc[aria-hidden="true"] {opacity:0;transform:translateY(-.35rem);visibility:hidden;pointer-events:none}
+#pdf-toc .pdf-toc-title {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(prefers-reduced-motion:reduce) {#pdf-toc {transition:none}}
 #pdf-toc .pdf-toc-page {white-space:nowrap;color:#ccc;font-size:.8em;font-variant-numeric:tabular-nums}

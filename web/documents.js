@@ -112,7 +112,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '32');
+      guide.searchParams.set('v', '34');
       link.href = guide.href;
       if (entry.expires) {
         const expired = Date.now()>=entry.expires;
@@ -236,7 +236,9 @@ async function reader() {
   const tocButton = $('#pdf-toc-toggle');
   const toc = $('#pdf-toc');
   function showContents(open) {
-    toc.hidden = !open;
+    toc.inert = !open;
+    toc.setAttribute('aria-hidden',String(!open));
+    toc.hidden = false;
     tocButton.setAttribute('aria-expanded',String(open));
   }
   if (sourceType==='pdf') {
@@ -244,11 +246,14 @@ async function reader() {
     let loading = false;
     function renderContents() {
       toc.replaceChildren();
-      for (const {title,page} of entries) {
+      for (const [index,{title,page}] of entries.entries()) {
+        const nextPage = entries[index+1]?.page;
+        const endPage = nextPage > page ? nextPage-1 : page;
         const button = append(toc,'button','','pdf-toc-entry');
+        button.title = title;
         append(button,'span',title,'pdf-toc-title');
-        append(button,'span',page+'ページ','pdf-toc-page');
-        if (page===selectedPage) button.setAttribute('aria-current','page');
+        append(button,'span',endPage>page ? page+'〜'+endPage : String(page),'pdf-toc-page');
+        if (selectedPage>=page && selectedPage<=endPage) button.setAttribute('aria-current','page');
         button.type = 'button';
         button.onclick = () => {
           showContents(false);
@@ -259,8 +264,9 @@ async function reader() {
     }
     tocButton.hidden = false;
     tocButton.onclick = async () => {
-      showContents(toc.hidden);
-      if (toc.hidden || loading) return;
+      const open = tocButton.getAttribute('aria-expanded')!=='true';
+      showContents(open);
+      if (!open || loading) return;
       if (entries.length) {
         renderContents();
         return;
@@ -278,6 +284,10 @@ async function reader() {
         loading = false;
       }
     };
+    document.addEventListener('pointerdown',event=>{
+      if (tocButton.getAttribute('aria-expanded')==='true' &&
+          !toc.contains(event.target) && !tocButton.contains(event.target)) showContents(false);
+    });
     dialog.addEventListener('close',()=>showContents(false));
   }
   let pageViews;
@@ -706,7 +716,7 @@ try {
       for (const entry of entries) {
         const card = append($('#shared-list'),'li','','library-card');
         const link = append(card,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=32';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=34';
         append(card,'small','公開期限 '+new Date(entry.expires).toLocaleDateString('ja-JP'));
       }
     } catch (error) {
