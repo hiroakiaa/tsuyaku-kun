@@ -198,3 +198,6 @@ dialog [tabindex="-1"][autofocus]:focus {
 .library-filters {display:flex;flex-wrap:wrap;align-items:end;gap:.75rem}
 .library-filters label:first-child {flex:1 1 12rem}
 .library-filters input {width:100%;box-sizing:border-box}
+
+.answer-source {margin-block:.75rem}
+.answer-source blockquote {margin-block:.35rem .65rem}

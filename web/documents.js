@@ -771,9 +771,15 @@ async function reader() {
           if (item.evidence.length) {
             const evidence = append(section,'div','','answer-evidence');
             append(evidence,'h5','資料内表記');
+            const byPage = new Map();
             for (const {page,quote} of item.evidence) {
-              append(evidence,'blockquote',quote);
-              sourceLink(evidence,page);
+              if (!byPage.has(page)) byPage.set(page,new Set());
+              byPage.get(page).add(quote);
+            }
+            for (const [page,quotes] of byPage) {
+              const source = append(evidence,'div','','answer-source');
+              sourceLink(source,page);
+              for (const quote of quotes) append(source,'blockquote',quote);
             }
           }
         if (first) answer.scrollIntoView({behavior:'smooth',block:'start'});
