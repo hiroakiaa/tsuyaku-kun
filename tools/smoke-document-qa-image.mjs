@@ -106,7 +106,7 @@ try {
         ctx.fillText('The Green group starts at 16:30.',40,130);
         return canvas.toDataURL('image/png');
       });
-      await page.locator('.open-material:visible').first().click();
+      await page.locator('#ask .open-material').click();
       await page.locator('#add-material input[type=file]').setInputFiles({
         name:'green-schedule.png',mimeType:'image/png',buffer:Buffer.from(extra.split(',')[1],'base64'),
       });
