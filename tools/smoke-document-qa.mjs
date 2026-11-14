@@ -107,10 +107,16 @@ try {
       }
     }
     const combinedEvidence = await Promise.all([librarySource,poolSource].map(async item=>({
-        answer:await item.locator('.answer-text').textContent(), citations:await citationNames(item), quotes:await item.locator('.answer-quote blockquote').allTextContents(),
-      })));
-    assert.match(combinedEvidence[0].quotes.join(' '),/Library[\s\S]*3\s*(?::00)?\s*PM/i);
-    assert.match(combinedEvidence[1].quotes.join(' '),/swimming pool[\s\S]*8\s*(?::00)?\s*AM/i);
+      answer:await item.locator('.answer-text').textContent(),
+      sources:await item.locator('.answer-source').evaluateAll(entries=>entries.map(entry=>({
+        citation:entry.querySelector('a').textContent.trim(),
+        quotes:[...entry.querySelectorAll('blockquote')].map(quote=>quote.textContent),
+      }))),
+    })));
+    const quotesAt = (item,number)=>item.sources.find(source=>source.citation==='元のPDF '+number+'ページ')?.quotes.join(' ') ?? '';
+    assert.match(quotesAt(combinedEvidence[0],1),/Closing/i);
+    assert.match(quotesAt(combinedEvidence[0],2),/Library[\s\S]*3\s*(?::00)?\s*PM/i);
+    assert.match(quotesAt(combinedEvidence[1],scanPage),/swimming pool[\s\S]*8\s*(?::00)?\s*AM/i);
     await page.locator('#question').fill('What is the annual parking permit fee?');
     await page.locator('#ask-form button').click();
     const unanswered = page.locator('#messages .bubble').last();
