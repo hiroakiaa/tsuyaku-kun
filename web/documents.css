@@ -283,3 +283,20 @@ dialog [tabindex="-1"][autofocus]:focus {
 .answer-emphasis>span{animation:answer-emphasis .32s ease both}
 @keyframes answer-emphasis{from{color:#ededed}to{color:#ffe177}}
 @media(prefers-reduced-motion:reduce){.answer-emphasis>span{animation:none}}
+
+/* Document QA: clear paths from library to creation and reading. */
+body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
+.document-library,.create-panel{--qa-accent:#e6d5f7;--qa-edge:#ffffff20;max-width:48rem;margin-inline:auto;border-radius:1.25rem}
+.library-heading .document-entry{width:auto;height:auto;min-height:44px;padding:.55rem .9rem;gap:.5rem;background:var(--qa-accent);color:#251d30;border-radius:999px;font-weight:700}
+.document-library h2{display:flex;align-items:center;gap:.55rem;font-size:.95rem;margin-block:1.4rem .55rem}
+.document-library h2 i,.library-card .library-icon{color:var(--qa-accent)}
+.document-library .library-card{border-radius:1rem;border-color:var(--qa-edge)}
+.document-library .library-card:focus-within,.document-library .library-card:hover{border-color:#e6d5f780}
+.library-card-body a{display:block;padding-block:.3rem;text-decoration:none}
+.library-card-body a:hover{text-decoration:underline}
+.create-panel .create-guide{background:var(--qa-accent);color:#251d30;border-radius:999px;padding-inline:1.15rem}
+.create-panel .stack label{display:grid;gap:.4rem}
+.create-panel input::file-selector-button{border:0;border-radius:.55rem;background:#3b3047;color:#f1e5ff;padding:.5rem .65rem;margin-inline-end:.6rem;font:inherit}
+.create-panel #result{margin-top:1.25rem;padding:1rem;border:1px solid var(--qa-edge);border-radius:1rem}
+.create-panel #open-guide{display:inline-block;margin-block:.4rem .8rem;color:var(--qa-accent);font-weight:700}
+@media(max-width:480px){.library-filters label:first-child{flex-basis:100%}.library-filters select{width:100%}.library-filters label:last-child{flex:1}}

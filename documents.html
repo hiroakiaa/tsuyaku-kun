@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1d1d1d">
 <title>資料QA君</title>
-<link rel="stylesheet" href="web/documents.css?v=57">
+<link rel="stylesheet" href="web/documents.css?v=58">
 <script type="module" src="web/documents.js?v=64"></script>
 </head>
 <body><div class="shell">
@@ -29,7 +29,7 @@
 
 <div id="result" hidden>
 <h2>案内ページができました</h2>
-<a id="open-guide" class="ref">案内ページを開く →</a>
+<a id="open-guide" class="ref">資料を開いて質問する →</a>
 <label>共有URL<input id="guide-url" readonly></label>
 <button id="copy" type="button">URLをコピー</button>
 <p class="fine">共有期間は作成から30日間です。</p>
@@ -37,13 +37,13 @@
 </section>
 </template>
 <template id="library"><section class="panel document-library">
-<header class="library-heading"><h1>資料QAの保管庫</h1><a class="document-entry" href="?create=1&amp;v=64" aria-label="資料チャット作成" title="資料チャット作成"><i class="fa-solid fa-plus"></i></a></header>
+<header class="library-heading"><h1>資料QAの保管庫</h1><a class="document-entry" href="?create=1&amp;v=64" aria-label="資料チャット作成" title="資料チャット作成"><i class="fa-solid fa-plus" aria-hidden="true"></i><span>資料チャット作成</span></a></header>
 <div class="library-filters"><label class="library-search"><i class="fa-solid fa-magnifying-glass"></i><input id="library-search" type="search" aria-label="資料名" placeholder="資料を検索"></label><label><select id="library-sort" aria-label="並べ替え"><option value="recent">最近開いた順</option><option value="new">登録日の新しい順</option><option value="title">資料名順</option><option value="expiry">期限が近い順</option></select></label></div>
-<h2>このブラウザー</h2>
+<h2><i class="fa-solid fa-folder" aria-hidden="true"></i> この端末の資料</h2>
 
 <p id="library-status" role="status"></p>
 <ul id="library-list"></ul>
-<h2>共通保管庫</h2><p id="shared-status" role="status"></p><ul id="shared-list"></ul>
+<h2><i class="fa-solid fa-users" aria-hidden="true"></i> 共通の資料</h2><p id="shared-status" role="status"></p><ul id="shared-list"></ul>
 </section>
 </template>
 <template id="reader">
