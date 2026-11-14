@@ -58,8 +58,21 @@ async function extract(file, status) {
     for (let n = 1; n <= pdf.numPages; n++) {
       status.textContent = 'PDFを読んでいます… ' + n + ' / ' + pdf.numPages;
       const page = await pdf.getPage(n);
-      const {items} = await page.getTextContent();
-      pages.push(items.map(item=>item.str ? item.str + (item.hasEOL ? '\n' : '') : '').join('').trim());
+      // Older Safari supports stream readers without supporting stream iteration.
+      const reader = page.streamTextContent().getReader();
+      const parts = [];
+      try {
+        for (;;) {
+          const {done, value} = await reader.read();
+          if (done) break;
+          for (const item of value.items) {
+            if (item.str) parts.push(item.str, item.hasEOL ? '\n' : '');
+          }
+        }
+      } finally {
+        reader.releaseLock();
+      }
+      pages.push(parts.join('').trim());
     }
     if (!pages.some(page=>page.length >= 8)) throw new Error('文字を取り出せませんでした。文字を選べるPDFを使ってください。');
     if (pages.join('').length > 22000) throw new Error('文字数が多すぎます。資料を分けてください。');
@@ -99,7 +112,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '22');
+      guide.searchParams.set('v', '23');
       link.href = guide.href;
       if (entry.expires) {
         const expired = Date.now()>=entry.expires;
