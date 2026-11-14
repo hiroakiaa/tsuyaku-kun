@@ -157,6 +157,15 @@ function createReleaseChecks(el) {
    const link=el('a','この公開の実行結果');
    link.href='https://github.com/hiroakiaa/tsuyaku-kun/actions/runs/'+run;
    link.target='_blank';link.rel='noopener noreferrer';details.insertBefore(link,status.nextSibling);
+   const verification=el('p','公開後テストの結果を確認しています…');
+   link.after(verification);
+   try{
+    const jobResponse=await fetch('https://api.github.com/repos/hiroakiaa/tsuyaku-kun/actions/runs/'+run+'/jobs',{signal:AbortSignal.timeout(5000)});
+    if(!jobResponse.ok)throw Error();
+    const {jobs}=await jobResponse.json();
+    const step=jobs?.flatMap(job=>job.steps ?? []).find(step=>step.name==='Verify document QA in the published app');
+    verification.textContent='資料QAの公開後テスト '+(step?.conclusion==='success'?'成功':step?.conclusion==='failure'?'失敗':step?.status==='in_progress'?'実行中':step?.status==='pending'?'待機中':'結果なし');
+   }catch{verification.textContent='公開後テストの状態を取得できませんでした。';}
   }catch{status.textContent='公開中の版の記録を取得できませんでした。';}
  });
  return details;
