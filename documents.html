@@ -52,6 +52,7 @@
 <dialog id="material-dialog" aria-labelledby="material-heading">
 <header class="reader-heading"><h2 id="material-heading" tabindex="-1" autofocus>資料追加</h2><form method="dialog"><button aria-label="資料追加を閉じる">×</button></form></header>
 <form id="add-material"><label>追加資料<input name="file" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.docx,.xlsx" required></label><button>追加する</button><p id="material-status" role="status"></p></form>
+<form id="replace-pdf" hidden><label>新しいPDF<input name="pdf" type="file" accept=".pdf,application/pdf" required></label><button type="submit">元のPDFを差し替える</button><p role="status"></p></form>
 <ul id="materials"></ul>
 <button id="remove-guide" hidden>共有を終了</button><p id="remove-status" role="status"></p>
 </dialog>

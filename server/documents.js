@@ -268,10 +268,46 @@ export async function documents(request,env,auth) {
     }
     return reply({id,expires},201);
   }
-  const match = /^\/documents\/([a-f0-9-]{36})(?:\/(pdf|ask|remove|material|toc|text))?$/.exec(pathname);
+  const match = /^\/documents\/([a-f0-9-]{36})(?:\/(pdf|ask|remove|replace|material|toc|text))?$/.exec(pathname);
   if (!match) return fail('資料が見つかりません。',404);
   const [,id,action] = match;
   const target = env.ROOMS.get(env.ROOMS.idFromName('document:'+id));
+  if (action==='replace' && request.method==='POST') {
+    const owner = await target.fetch('https://room/document/owner',{method:'POST',body:auth.uid});
+    if (!owner.ok) return owner;
+    const reader = request.body?.getReader();
+    if (!reader) return fail('PDFを選んでください。');
+    const chunks = [];
+    let size = 0;
+    try {
+      for (;;) {
+        const {done,value} = await reader.read();
+        if (done) break;
+        size += value.byteLength;
+        if (size>MAX_PDF+100_000) {
+          await reader.cancel();
+          return fail('PDFは5 MBまでです。',413);
+        }
+        chunks.push(value);
+      }
+    } finally { reader.releaseLock(); }
+    const form = await new Response(new Blob(chunks),{headers:{'Content-Type':request.headers.get('Content-Type')||''}}).formData();
+    const pdf = form.get('pdf');
+    if (!(pdf instanceof File) || pdf.size>MAX_PDF || await pdf.slice(0,5).text()!=='%PDF-') return fail('PDFを確認してください。');
+    const pages = await readMaterial(env,pdf,form,'pdf');
+    if (pages instanceof Response) return pages;
+    if (!Array.isArray(pages) || pages.length>MAX_PAGES || pages.some(page=>typeof page!=='string') ||
+        pages.join('').length>MAX_TEXT || !pages.some(page=>page.trim().length>=5)) return fail('資料の文字を読み取れませんでした。');
+    const result = await generate(env,pages);
+    const items = (Array.isArray(result?.items) ? result.items : [])
+      .filter(item=>typeof item?.label==='string' && typeof item.text==='string' && supported(item.source,pages))
+      .slice(0,6).map(({label,text,source})=>({label:label.slice(0,45),text:text.slice(0,350),source:{page:source.page}}));
+    if (!items.length) return fail('根拠を確認できる要点を作れませんでした。',502);
+    const data = new FormData();
+    data.set('pdf',pdf);
+    data.set('record',JSON.stringify({owner:auth.uid,pages,items,toc:validatedToc(result,pages)}));
+    return target.fetch('https://room/document/replace',{method:'POST',body:data});
+  }
   if (action==='pdf' && request.method==='GET') return target.fetch('https://room/document/pdf',{headers:{'X-Document-Viewer':auth.uid}});
   if (action==='remove' && request.method==='POST') {
     const removed = await target.fetch('https://room/document/remove',{method:'POST',body:auth.uid});
@@ -442,6 +478,30 @@ export async function documentStorage(request,storage) {
   }
   const record = await storage.get('document');
   if (!record || record.expires<=Date.now()) return fail('資料が見つからないか、共有が終了しました。',404);
+  if (path==='/document/replace' && request.method==='POST') {
+    const form = await request.formData();
+    const input = JSON.parse(form.get('record'));
+    const pdf = new Uint8Array(await form.get('pdf').arrayBuffer());
+    return storage.transaction(async tx=>{
+      const current = await tx.get('document');
+      if (!current || current.expires<=Date.now()) return fail('資料の共有が終了しました。',404);
+      if (current.owner!==input.owner) return fail('作成者だけが資料を差し替えられます。',403);
+      const oldCount = current.originalPageCount ?? current.pages.length;
+      const shift = input.pages.length-oldCount;
+      const pages = [...input.pages,...current.pages.slice(oldCount)];
+      if (pages.join('').length>MAX_TEXT || new TextEncoder().encode(JSON.stringify(pages)).length>95_000) {
+        return fail('差し替え後の資料が本文の上限を超えています。',413);
+      }
+      const materials = (current.materials ?? []).map(material=>({...material,start:material.start+shift}));
+      const values = {document:{...current,pages,materials,index:searchIndex(pages),items:input.items,toc:input.toc,sourceType:'pdf',originalPageCount:input.pages.length}};
+      for (let offset=0;offset<pdf.length;offset+=CHUNK) values['pdf:'+offset]=pdf.slice(offset,offset+CHUNK);
+      const previous = await tx.list({prefix:'pdf:'});
+      const obsolete = [...previous.keys()].filter(key=>!(key in values));
+      if (obsolete.length) await tx.delete(obsolete);
+      await tx.put(values);
+      return reply({ok:true});
+    });
+  }
   if (/^\/document\/answer\/[a-f0-9]{64}$/.test(path)) {
     if (request.method==='GET') return reply(await storage.get(path) ?? null);
     const items = await request.json();

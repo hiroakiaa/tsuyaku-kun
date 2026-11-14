@@ -777,6 +777,29 @@ async function reader() {
   const askForm = $('#ask-form');
   const button = askForm.querySelector('button');
   const historyKey = 'document-qa-questions:'+id;
+  const replaceForm = $('#replace-pdf');
+  replaceForm.hidden = !doc.canRemove || sourceType!=='pdf';
+  replaceForm.onsubmit = async event=>{
+    event.preventDefault();
+    const submit = replaceForm.querySelector('button');
+    const status = replaceForm.querySelector('[role="status"]');
+    const file = replaceForm.elements.pdf.files[0];
+    if (!file || submit.disabled) return;
+    submit.disabled = true;
+    try {
+      const form = new FormData();
+      form.set('pdf',file);
+      form.set('pages',JSON.stringify(await extract(file,status)));
+      status.textContent = '要点と目次を更新しています…';
+      await request(api+'/replace',{method:'POST',body:form});
+      try { sessionStorage.removeItem(historyKey); } catch {}
+      readingPosition(id,{page:null});
+      location.reload();
+    } catch (error) {
+      status.textContent = error.message;
+      submit.disabled = false;
+    }
+  };
   let history = [];
   try {
     const saved = JSON.parse(sessionStorage.getItem(historyKey) ?? '[]');
