@@ -92,3 +92,4 @@ const summary = ['full','search'].map(mode=>{
       ? samples.reduce((sum,row)=>sum+row.estimatedUSD,0) : null};
 });
 console.log(JSON.stringify({summary,rows},null,2));
+if (process.argv.includes('--require-pass') && summary.some(result=>result.unmeasuredCases || result.passed!==result.expectedCases)) process.exitCode = 1;

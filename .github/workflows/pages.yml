@@ -22,6 +22,10 @@ jobs:
         with:
           node-version: 22
       - run: npm test
+      - name: Regrade saved document QA measurements
+        run: |
+          node tools/evaluate-document-qa.mjs docs/document-qa-current-benchmark.json --baseline-five --require-pass
+          node tools/evaluate-document-qa.mjs docs/document-qa-same-fees-timing.json --two-fees --require-pass
       - run: |
           mkdir -p site/web site/server
           cp index.html documents.html site/
