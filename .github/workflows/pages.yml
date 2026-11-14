@@ -88,6 +88,10 @@ jobs:
         env:
           DOCUMENT_QA_REPORT: document-qa-pdf-limits-report.json
         run: node tools/smoke-document-qa.mjs --page-limit --size-limit
+      - name: Verify Word pagination and citations in the published app
+        env:
+          DOCUMENT_QA_REPORT: document-qa-word-report.json
+        run: node tools/smoke-document-qa-word.mjs
       - name: Save document verification results
         uses: actions/upload-artifact@v4
         with:
@@ -101,9 +105,8 @@ jobs:
             document-qa-merged-report.json
             document-qa-zero-report.json
             document-qa-wide-report.json
+            document-qa-word-report.json
           if-no-files-found: error
-      - name: Verify Word pagination and citations in the published app
-        run: node tools/smoke-document-qa-word.mjs
       - name: Verify image OCR and citations in the published app
         run: node tools/smoke-document-qa-image.mjs png en --append
       - name: Verify JPEG and WebP OCR in the published app

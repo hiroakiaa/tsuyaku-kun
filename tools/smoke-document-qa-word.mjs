@@ -1,4 +1,4 @@
-import {readFile,appendFile} from 'node:fs/promises';
+import {readFile,appendFile,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 
@@ -86,7 +86,9 @@ try {
     },guide);
     assert.deepEqual(removed,{removeStatus:200,reopenStatus:404,pdfStatus:404}); console.log('cleanup confirmed');
   }
-  console.log(JSON.stringify(measurement));
+  const report = JSON.stringify(measurement);
+  console.log(report);
+  if (process.env.DOCUMENT_QA_REPORT) await writeFile(process.env.DOCUMENT_QA_REPORT, report + '\n');
   if (process.env.GITHUB_STEP_SUMMARY) {
     await appendFile(process.env.GITHUB_STEP_SUMMARY,
       `\n### Word QA in the published app\n\nRegistration: ${measurement.registrationMs} ms. Answer completion: ${measurement.answerMs} ms.\n\nVerified the answer, page 2 citation, original quote, and fixture removal.\n`);
