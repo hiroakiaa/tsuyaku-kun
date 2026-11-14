@@ -112,7 +112,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '29');
+      guide.searchParams.set('v', '30');
       link.href = guide.href;
       if (entry.expires) {
         const expired = Date.now()>=entry.expires;
@@ -240,19 +240,42 @@ async function reader() {
     tocButton.setAttribute('aria-expanded',String(open));
   }
   if (sourceType==='pdf') {
-    const entries = doc.toc?.length ? doc.toc : Array.from({length:doc.pageCount},(_,index)=>({page:index+1,title:(index+1)+'ページ'}));
-    tocButton.hidden = !entries.length;
-    tocButton.onclick = () => showContents(toc.hidden);
-    dialog.addEventListener('close',()=>showContents(false));
-    for (const {title,page} of entries) {
-      const button = append(toc,'button',title+' · '+page+'ページ');
-      button.type = 'button';
-      button.onclick = () => {
-        showContents(false);
-        tocButton.focus();
-        void showPdf(page);
-      };
+    let entries = doc.toc ?? [];
+    let loading = false;
+    function renderContents() {
+      toc.replaceChildren();
+      for (const {title,page} of entries) {
+        const button = append(toc,'button',title+' · '+page+'ページ');
+        button.type = 'button';
+        button.onclick = () => {
+          showContents(false);
+          tocButton.focus();
+          void showPdf(page);
+        };
+      }
     }
+    tocButton.hidden = false;
+    tocButton.onclick = async () => {
+      showContents(toc.hidden);
+      if (toc.hidden || loading) return;
+      if (entries.length) {
+        renderContents();
+        return;
+      }
+      loading = true;
+      toc.replaceChildren();
+      const status = append(toc,'p','本文から目次を作っています…');
+      status.setAttribute('role','status');
+      try {
+        entries = await request(api+'/toc',{method:'POST'});
+        renderContents();
+      } catch (error) {
+        status.textContent = error.message+'。「目次」を開き直して再試行できます。';
+      } finally {
+        loading = false;
+      }
+    };
+    dialog.addEventListener('close',()=>showContents(false));
   }
   let pageViews;
   const pageList = $('#pdf-pages');
@@ -677,7 +700,7 @@ try {
       for (const entry of entries) {
         const card = append($('#shared-list'),'li','','library-card');
         const link = append(card,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=29';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=30';
         append(card,'small','公開期限 '+new Date(entry.expires).toLocaleDateString('ja-JP'));
       }
     } catch (error) {
