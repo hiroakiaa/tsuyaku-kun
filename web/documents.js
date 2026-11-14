@@ -96,7 +96,11 @@ function documentLibrary() {
       icon.setAttribute('aria-hidden','true');
       const body = append(card,'div','','library-card-body');
       const link = append(body,'a',entry.title);
-      link.href = '?id='+entry.id;
+      const guide = new URL('documents.html', location.href);
+      guide.searchParams.set('id', entry.id);
+      if (window.parent !== window) guide.searchParams.set('embedded', '1');
+      guide.searchParams.set('v', '19');
+      link.href = guide.href;
       if (entry.expires) {
         const expired = Date.now()>=entry.expires;
         append(body,'small',expired ? '共有期限を過ぎました' : '共有期限 '+new Date(entry.expires).toLocaleDateString('ja-JP'));
