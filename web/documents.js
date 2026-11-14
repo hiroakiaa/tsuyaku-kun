@@ -1,3 +1,4 @@
+import {layoutPdfText} from './document-table.js';
 import {installLocalIcons,localIcon} from './icons.js?v=library';
 import {config} from './config.js';
 const $ = (selector) => document.querySelector(selector);
@@ -67,13 +68,13 @@ async function extract(file, status) {
           const {done, value} = await reader.read();
           if (done) break;
           for (const item of value.items) {
-            if (item.str) parts.push(item.str, item.hasEOL ? '\n' : '');
+            parts.push(item);
           }
         }
       } finally {
         reader.releaseLock();
       }
-      pages.push(parts.join('').trim());
+      pages.push(layoutPdfText(parts));
     }
     if (!pages.some(page=>page.length >= 8)) throw new Error('文字を取り出せませんでした。文字を選べるPDFを使ってください。');
     if (pages.join('').length > 22000) throw new Error('文字数が多すぎます。資料を分けてください。');
