@@ -162,13 +162,14 @@ try {
       content:JSON.stringify({items:[{label:'下校',answer:'4月から9月は17:00です。',sources:[{page:1,quote:table}]}]}),
     }}]});
     const env = {OPENAI_DOCUMENT_QA_KEY:'test',ROOMS:{idFromName:name=>name,get:()=>({
-      fetch:async url=>Response.json(url.endsWith('/data') ? {pages:[table],owner:'author'} : null),
+      fetch:async url=>Response.json(url.endsWith('/data') ? {pages:['学校生活の案内\n'+table],owner:'author'} : null),
     })}};
     const result = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
       method:'POST',body:JSON.stringify({question:'下校の時刻は何時ですか？'}),
     }),env,{uid:'author'});
     const data = await result.json();
     assert.deepEqual(data.pages,[1]);
+    assert.equal(data.items[0].evidence[0].quote,table);
     assert.match(JSON.stringify(data),/8月：部活終了16:30、下校完了16:45/);
     assert.match(JSON.stringify(data),/9月：部活終了16:30、下校完了16:45/);
   }
