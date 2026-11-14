@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {runInNewContext} from 'node:vm';
 import {lookupTableCell} from '../web/document-table-lookup.js';
 
 const width=1200,height=400;
@@ -39,3 +41,12 @@ const verticalPage = layoutPdfText([
 ]);
 assert.equal(verticalPage,'開館\n午前八時');
 console.log('PASS PDF vertical text follows right-to-left columns and top-to-bottom glyphs');
+
+const reader = await readFile(new URL('../web/documents.js',import.meta.url),'utf8');
+const formatQuoteSource = reader.slice(reader.indexOf('  function formatQuote('),reader.indexOf('  function renderAnswerText('));
+const formatQuote = runInNewContext(formatQuoteSource+'\nformatQuote');
+assert.deepEqual(Array.from(formatQuote('月 | 部活終了 | 下校完了\n４ | １６：４５ | １７：００\n１１ | １６：１０ | １６：２５')),[
+  '月 | 部活終了 | 下校完了','４ | １６：４５ | １７：００','１１ | １６：１０ | １６：２５',
+]);
+assert.deepEqual(Array.from(formatQuote('自然を観\n察します。\n\n実験を行います。')),['自然を観察します。','実験を行います。']);
+console.log('PASS table quotation preserves rows and prose joins wrapped lines');
