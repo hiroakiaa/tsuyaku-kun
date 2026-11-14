@@ -112,7 +112,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '24');
+      guide.searchParams.set('v', '25');
       link.href = guide.href;
       if (entry.expires) {
         const expired = Date.now()>=entry.expires;
@@ -158,6 +158,9 @@ function teacher() {
       $('#open-guide').href = url;
       $('#guide-url').value = new URL(url,location.href).href;
       $('#result').hidden = false;
+      const shared = data.get('visibility')==='shared';
+      $('#guide-url').closest('label').hidden = !shared;
+      $('#copy').hidden = !shared;
       if (!saveGuide({id,title:String(data.get('title')).trim(),expires})) {
         status.textContent = '資料を作成しましたが、保管庫には保存できませんでした。';
         return;
@@ -231,7 +234,29 @@ async function reader() {
   }
   let opened,originalUrl;
   let selectedPage = 0;
-  let activeRender;
+  let pageViews;
+  const pageList = $('#pdf-pages');
+  const visiblePages = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      visiblePages.unobserve(entry.target);
+      void renderPage(entry.target);
+    }
+  }, {root:$('#pdf-scroll'),rootMargin:'500px 0px'});
+  async function renderPage(slot) {
+    try {
+      const page = await (await opened).getPage(Number(slot.dataset.page));
+      const scale = Math.min(3, Math.max(1, preview.clientWidth * devicePixelRatio / page.getViewport({scale:1}).width));
+      const viewport = page.getViewport({scale});
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.ceil(viewport.width);
+      canvas.height = Math.ceil(viewport.height);
+      await page.render({canvas,viewport}).promise;
+      slot.replaceChildren(canvas);
+    } catch {
+      slot.textContent = 'このページを表示できませんでした。';
+    }
+  }
   const pagePicker = $('#pdf-page');
   for (let page=1;page<=doc.pageCount;page++) pagePicker.add(new Option(page+' / '+doc.pageCount,page));
   pagePicker.onchange = ()=>void showPdf(Number(pagePicker.value));
@@ -285,7 +310,7 @@ async function reader() {
     const bounds=preview.getBoundingClientRect();
     from ??= {x:bounds.width/2,y:bounds.height/2};
     to ??= from;
-    const surface=imageType ? previewImage : $('#pdf-canvas');
+    const surface=imageType ? previewImage : pageList;
     const before=surface.getBoundingClientRect();
     const previous=zoom;
     zoom=Math.min(4,Math.max(.5,value));
@@ -333,6 +358,23 @@ async function reader() {
     pinch=next;
   },{passive:false});
   for (const event of ['touchend','touchcancel']) preview.addEventListener(event,()=>{pinch=undefined;drag=undefined;});
+  let scrollFrame;
+  let lastNavigation = 0;
+  preview.addEventListener('scroll', () => {
+    if (scrollFrame) return;
+    scrollFrame = requestAnimationFrame(() => {
+      scrollFrame = 0;
+      if (!pageViews || performance.now()-lastNavigation < 650) return;
+      const top = preview.getBoundingClientRect().top;
+      const index = pageViews.findIndex(slot => slot.getBoundingClientRect().bottom > top+1);
+      if (index < 0) return;
+      selectedPage = index+1;
+      pagePicker.value = selectedPage;
+      $('#pdf-prev').disabled = selectedPage===1;
+      $('#pdf-next').disabled = selectedPage===doc.pageCount;
+      $('#pdf-file').href = originalUrl+'#page='+selectedPage;
+    });
+  }, {passive:true});
   async function showPdf(n) {
     if (n<1 || n>doc.pageCount) return;
     selectedPage = n;
@@ -360,7 +402,7 @@ async function reader() {
     if (sourceType!=='pdf') {
       if (!imageType) $('#pdf-file').textContent = 'ダウンロード';
       $('#pdf-file').removeAttribute('href');
-      for (const node of ['#pdf-prev','#pdf-next','#pdf-page','#pdf-canvas']) $(node).hidden=true;
+      for (const node of ['#pdf-prev','#pdf-next','#pdf-page','#pdf-pages']) $(node).hidden=true;
       try {
         const response=await fetch(config.api+api+'/pdf',{headers:await authHeaders()});
         if (!response.ok) throw Error('資料データを取得できませんでした。');
@@ -379,7 +421,7 @@ async function reader() {
       } catch(error) { $('#pdf-status').textContent=error.message; }
       return;
     }
-    if (activeRender) activeRender.cancel();
+
     try {
       opened ??= fetch(config.api + api + '/pdf',{headers:await authHeaders()}).then(async response=>{
         if (!response.ok) throw new Error('PDFを取得できませんでした。');
@@ -389,24 +431,29 @@ async function reader() {
       }).catch(error=>{opened=undefined;throw error;});
       const pdf = await opened;
       if (selectedPage === n) document.querySelector('#pdf-file').href = originalUrl + '#page=' + n;
-      const page = await pdf.getPage(n);
-      if (selectedPage !== n) return;
-      const canvas = document.createElement('canvas');
-      canvas.id = 'pdf-canvas';
-      canvas.setAttribute('aria-label','元のPDFの' + n + 'ページ');
-      const width=preview.clientWidth;
-      const scale = Math.min(4, width / page.getViewport({scale:1}).width * Math.max(2,devicePixelRatio));
-      const viewport = page.getViewport({scale});
-      canvas.width = Math.ceil(viewport.width);
-      canvas.height = Math.ceil(viewport.height);
-      activeRender = page.render({canvas, viewport});
-      await activeRender.promise;
-      if (selectedPage === n) {
-        $('#pdf-canvas').replaceWith(canvas);
-        fitWidth=width;
-        setZoom(zoom);
-        $('#pdf-status').textContent = '';
+      if (selectedPage !== n || !dialog.open) return;
+      if (!pageViews) {
+        const sizes = await Promise.all(Array.from({length:pdf.numPages},async (_,index) => {
+          const page = await pdf.getPage(index+1);
+          return page.getViewport({scale:1});
+        }));
+        if (selectedPage !== n || !dialog.open) return;
+        pageViews = sizes.map(({width,height},index) => {
+          const slot = document.createElement('div');
+          slot.className = 'pdf-page-view';
+          slot.dataset.page = index+1;
+          slot.style.aspectRatio = width+' / '+height;
+          visiblePages.observe(slot);
+          return slot;
+        });
+        pageList.replaceChildren(...pageViews);
       }
+      fitWidth = preview.clientWidth;
+      setZoom(zoom);
+      const slot = pageViews[n-1];
+      lastNavigation = performance.now();
+      preview.scrollTo({top:preview.scrollTop+slot.getBoundingClientRect().top-preview.getBoundingClientRect().top,behavior:'smooth'});
+      $('#pdf-status').textContent = '';
     } catch (error) {
       if (error.name === 'RenderingCancelledException' || selectedPage !== n) return;
       $('#pdf-status').textContent = '画面内で表示できません。「PDFを開く」から確認してください。';
@@ -556,7 +603,22 @@ async function reader() {
 }
 
 try {
-  if (!id && new URLSearchParams(location.search).has('library')) { show('#library'); documentLibrary(); }
+  if (!id && new URLSearchParams(location.search).has('library')) {
+    show('#library');
+    documentLibrary();
+    try {
+      const entries = await request('/documents/library');
+      $('#shared-status').textContent = entries.length ? '' : '公開されている資料はありません。';
+      for (const entry of entries) {
+        const card = append($('#shared-list'),'li','','library-card');
+        const link = append(card,'a',entry.title);
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=25';
+        append(card,'small','公開期限 '+new Date(entry.expires).toLocaleDateString('ja-JP'));
+      }
+    } catch (error) {
+      $('#shared-status').textContent = error.message;
+    }
+  }
   else if (!id) teacher();
   else await reader();
 } catch (error) {

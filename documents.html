@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1d1d1d">
 <title>資料QA君</title>
-<link rel="stylesheet" href="web/documents.css?v=24">
-<script type="module" src="web/documents.js?v=24"></script>
+<link rel="stylesheet" href="web/documents.css?v=25">
+<script type="module" src="web/documents.js?v=25"></script>
 </head>
 <body><div class="shell">
 
@@ -15,6 +15,7 @@
 <template id="teacher">
 <section class="intro">
 <h1>資料QAを作る</h1>
+<a class="register-link" href="?library=1&amp;v=25">保管庫を開く</a>
 <p>資料を登録すると、要点を示し、資料専用のチャットボットを作ります。</p>
 </section>
 <section class="panel document-panel">
@@ -22,6 +23,7 @@
 <label>案内のタイトル<input name="title" maxlength="100" placeholder="例：新1年生の入学案内" required></label>
 <label>資料データ<input type="file" name="pdf" accept=".pdf,.png,.jpg,.jpeg,.webp,.docx,.xlsx" required></label>
 <p class="fine">PDF、5 MB、40ページまで。画像（PNG・JPEG・WebP）、Excel（.xlsx）、Word（.docx）にも対応。</p>
+<label>保管先<select name="visibility"><option value="device">この端末の保管庫のみ</option><option value="shared">共通保管庫にも掲載（誰でも閲覧できます）</option></select></label>
 <button class="primary create-guide">作成する</button>
 </form>
 <p id="upload-status" role="status"></p>
@@ -40,6 +42,7 @@
 
 <p id="library-status" role="status"></p>
 <ul id="library-list"></ul>
+<h2>共通保管庫</h2><p id="shared-status" role="status"></p><ul id="shared-list"></ul>
 </section>
 </template>
 <template id="reader">
@@ -63,7 +66,7 @@
 <form method="dialog"><button aria-label="資料を閉じる">×</button></form>
 </header>
 <div class="pdf-stage">
-<div id="pdf-scroll"><canvas id="pdf-canvas" aria-label="PDFの該当ページ"></canvas><img id="source-image" hidden alt=""></div>
+<div id="pdf-scroll"><div id="pdf-pages"></div><img id="source-image" hidden alt=""></div>
 <p id="pdf-status" role="status"></p>
 <div class="pdf-zoom"><button id="zoom-out" aria-label="縮小">−</button><button id="zoom-in" aria-label="拡大">＋</button></div>
 </div>

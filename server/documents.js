@@ -133,6 +133,8 @@ async function readMaterial(env,file,form,ext) {
 
 export async function documents(request,env,auth) {
   const {pathname} = new URL(request.url);
+  const library = env.ROOMS.get(env.ROOMS.idFromName('__document_library__'));
+  if (pathname === '/documents/library' && request.method === 'GET') return library.fetch('https://room/document/library');
   if (pathname === '/documents' && request.method === 'POST') {
     const reader = request.body?.getReader();
     if (!reader) return fail('PDFを選んでください。');
@@ -167,16 +169,28 @@ export async function documents(request,env,auth) {
     const target = env.ROOMS.get(env.ROOMS.idFromName('document:'+id));
     const data = new FormData();
     data.set('pdf',pdf);
-    data.set('record',JSON.stringify({title,pages,items,owner:auth.uid,expires,sourceType:ext}));
+    data.set('record',JSON.stringify({title,pages,items,owner:auth.uid,expires,sourceType:ext,visibility:form.get('visibility')==='shared'?'shared':'device'}));
     const saved = await target.fetch('https://room/document/init',{method:'POST',body:data});
-    return saved.ok ? reply({id,expires},201) : fail('資料を保存できませんでした。',502);
+    if (!saved.ok) return fail('資料を保存できませんでした。',502);
+    if (form.get('visibility')==='shared') {
+      const listed = await library.fetch('https://room/document/library',{method:'POST',body:JSON.stringify({id,title,expires})}).catch(()=>null);
+      if (!listed?.ok) {
+        await target.fetch('https://room/document/remove',{method:'POST',body:auth.uid});
+        return fail('共通保管庫に保存できませんでした。',502);
+      }
+    }
+    return reply({id,expires},201);
   }
   const match = /^\/documents\/([a-f0-9-]{36})(?:\/(pdf|ask|remove|material))?$/.exec(pathname);
   if (!match) return fail('資料が見つかりません。',404);
   const [,id,action] = match;
   const target = env.ROOMS.get(env.ROOMS.idFromName('document:'+id));
-  if (action==='pdf' && request.method==='GET') return target.fetch('https://room/document/pdf');
-  if (action==='remove' && request.method==='POST') return target.fetch('https://room/document/remove',{method:'POST',body:auth.uid});
+  if (action==='pdf' && request.method==='GET') return target.fetch('https://room/document/pdf',{headers:{'X-Document-Viewer':auth.uid}});
+  if (action==='remove' && request.method==='POST') {
+    const removed = await target.fetch('https://room/document/remove',{method:'POST',body:auth.uid});
+    if (removed.ok) await library.fetch('https://room/document/library',{method:'DELETE',body:id}).catch(()=>{});
+    return removed;
+  }
   if (action==='material' && request.method==='POST') {
     const owner = await target.fetch('https://room/document/owner',{method:'POST',body:auth.uid});
     if (!owner.ok) return owner;
@@ -208,7 +222,7 @@ export async function documents(request,env,auth) {
     return target.fetch('https://room/document/material',{method:'POST',body:JSON.stringify({owner:auth.uid,name:file.name.slice(0,150),unit,pages})});
   }
   if (!(action==='ask' && request.method==='POST') && !(!action && request.method==='GET')) return fail('この操作は使えません。',405);
-  const info = await target.fetch('https://room/document/data');
+  const info = await target.fetch('https://room/document/data',{headers:{'X-Document-Viewer':auth.uid}});
   if (!info.ok) return info;
   const record = await info.json();
   if (!action) return reply({title:record.title,items:record.items,materials:record.materials ?? [],sourceType:record.sourceType ?? 'pdf',pageCount:record.originalPageCount ?? record.pages.length,expires:record.expires,canRemove:record.owner===auth.uid});
@@ -217,6 +231,11 @@ export async function documents(request,env,auth) {
   if (input.length > 4096) return fail('質問は300文字までです。',413);
   const {question} = JSON.parse(input);
   if (typeof question!=='string'||!question.trim()||question.length>300) return fail('質問は300文字までです。');
+  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([record.pages,question.trim()])));
+  const cacheKey = Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
+  const cacheUrl = 'https://room/document/answer/'+cacheKey;
+  const cached = await (await target.fetch(cacheUrl)).json();
+  const saveAnswer = items => target.fetch(cacheUrl,{method:'POST',body:JSON.stringify(items)}).catch(()=>{});
   if (request.headers.get('Accept')==='application/x-ndjson') {
     const encoder = new TextEncoder();
     const stream = new TransformStream();
@@ -225,12 +244,19 @@ export async function documents(request,env,auth) {
     void (async()=>{
       try {
         await send({status:'資料を参照して回答を作成しています…'});
+        if (cached) {
+          for (const item of cached) await send({item});
+          await send({done:true});
+          return;
+        }
+        const answers=[];
         let count=0;
         const writes=[];
         const result=await generate(env,record.pages,question,record.materials,raw=>{
           const item=checkedAnswer(raw,record.pages);
           if (item) {
             count++;
+            answers.push(item);
             writes.push(send({item}).catch(()=>{}));
           }
         });
@@ -238,9 +264,10 @@ export async function documents(request,env,auth) {
         if (!count) {
           for (const raw of (result?.items ?? []).slice(0,12)) {
             const item=checkedAnswer(raw,record.pages);
-            if (item) { await send({item}); count++; }
+            if (item) { await send({item}); answers.push(item); count++; }
           }
         }
+        if (answers.length && answers.every(item=>item.answer)) await saveAnswer(answers);
         await send({done:true,answer:count ? undefined : noAnswer});
       } catch(error) {
         await send({error:error.message}).catch(()=>{});
@@ -248,14 +275,31 @@ export async function documents(request,env,auth) {
     })();
     return new Response(stream.readable,{headers:{'Content-Type':'application/x-ndjson','Cache-Control':'no-store'}});
   }
-  const result = await generate(env,record.pages,question,record.materials);
-  const items = (Array.isArray(result?.items) ? result.items : []).slice(0,12).map(item=>checkedAnswer(item,record.pages)).filter(Boolean);
+  let items = cached;
+  if (!items) {
+    const result = await generate(env,record.pages,question,record.materials);
+    items = (Array.isArray(result?.items) ? result.items : []).slice(0,12).map(item=>checkedAnswer(item,record.pages)).filter(Boolean);
+    if (items.length && items.every(item=>item.answer)) await saveAnswer(items);
+  }
   return reply({items,answer:items.map(item=>item.answer ?? noAnswer).join('\n') || noAnswer,
     pages:[...new Set(items.flatMap(item=>item.evidence.map(source=>source.page)))]});
 }
 
 export async function documentStorage(request,storage) {
   const path = new URL(request.url).pathname;
+  if (path==='/document/library') {
+    if (request.method==='GET') {
+      const entries = await storage.list({prefix:'entry:',reverse:true});
+      return reply([...entries.values()].filter(entry=>entry.expires>Date.now()).sort((a,b)=>b.expires-a.expires));
+    }
+    if (request.method==='POST') {
+      const entry = await request.json();
+      await storage.put('entry:'+entry.id,entry);
+      return reply({ok:true});
+    }
+    await storage.delete('entry:'+await request.text());
+    return reply({ok:true});
+  }
   if (path==='/document/usage') {
     const month = new Date().toISOString().slice(0,7);
     const key = 'dedicated-usage:'+month;
@@ -283,6 +327,17 @@ export async function documentStorage(request,storage) {
   }
   const record = await storage.get('document');
   if (!record || record.expires<=Date.now()) return fail('資料が見つからないか、共有が終了しました。',404);
+  if (/^\/document\/answer\/[a-f0-9]{64}$/.test(path)) {
+    if (request.method==='GET') return reply(await storage.get(path) ?? null);
+    const items = await request.json();
+    await storage.transaction(async tx=>{
+      if (!await tx.get('document')) return;
+      const entries = await tx.list({prefix:'/document/answer/',limit:40});
+      if (entries.size>=40) await tx.delete(entries.keys().next().value);
+      await tx.put(path,items);
+    });
+    return reply({ok:true});
+  }
   if (path==='/document/owner') return record.owner===await request.text() ? reply({ok:true}) : fail('作成者だけが資料を追加できます。',403);
   if (path==='/document/material' && request.method==='POST') {
     const input = await request.json();
@@ -300,6 +355,7 @@ export async function documentStorage(request,storage) {
       return reply(material,201);
     });
   }
+  if ((path==='/document/data' || path==='/document/pdf') && record.visibility==='device' && record.owner!==request.headers.get('X-Document-Viewer')) return fail('資料が見つかりません。',404);
   if (path==='/document/data') return reply(record);
   if (path==='/document/remove' && request.method==='POST') {
     if (record.owner!==await request.text()) return fail('作成者だけが共有を終了できます。',403);

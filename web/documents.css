@@ -150,3 +150,8 @@ dialog [tabindex="-1"][autofocus]:focus {
   .qa-workspace #pdf-dialog[open] { position: relative; grid-area: 1 / 1; inset: auto; height: 100%; min-width: 0; }
   .qa-workspace.pdf-right #pdf-dialog[open] { grid-column: 3; }
 }
+
+#pdf-pages { width:100%; margin-inline:auto; }
+.pdf-page-view { background:#fff; color:#222; margin-bottom: .5rem; }
+.pdf-page-view canvas { display:block; width:100%; height:auto; }
+
