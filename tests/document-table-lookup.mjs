@@ -22,4 +22,8 @@ const pdf={numPages:1,getPage:async()=>page};
 assert.deepEqual((await lookupTableCell(pdf,'北館の所要時間の基準は？')).evidence,[{page:1,quote:'15分'}]);
 assert.equal((await lookupTableCell(pdf,'南館の費用はいくら？')).answer,'900円');
 assert.equal(await lookupTableCell(pdf,'西館の費用は？'),null);
+items.push(cell('北館別棟',60,250),cell('45分',230,250));
+for (const y of [290]) for(let x=20;x<=1100;x++) mark(x,y);
+assert.equal((await lookupTableCell(pdf,'北館の所要時間の基準は？')).answer,'15分');
+assert.equal((await lookupTableCell(pdf,'北館別の所要時間は？')).answer,'45分');
 console.log('PASS vertical row labels, duplicate headings and adjacent table cells');
