@@ -171,28 +171,23 @@ function teacher() {
   installLocalIcons($('#content'));
   const saveGuide = documentLibrary();
   const status = $('#upload-status');
-  const meter = $('#upload-progress');
   const fileInput = $('#upload [name="pdf"]');
   let preflight;
   function preparePdf(file) {
-    return extract(file,status).then(pages=>({pages}),error=>({error}));
+    return extract(file,document.createElement('span')).then(pages=>({pages}),error=>({error}));
   }
   fileInput.addEventListener('change', async () => {
     if ($('#upload button').disabled) return;
     const file = fileInput.files[0];
     preflight = undefined;
-    if (!$('#upload button').disabled) meter.hidden = true;
     status.textContent = '';
     if (!file || !/\.pdf$/i.test(file.name) || file.size>5000000) return;
     const progress = document.createElement('span');
     const pending = extract(file,progress).then(pages=>({pages}),error=>({error}));
     preflight = {file,pending};
-    meter.removeAttribute('value');
-    meter.hidden = false;
     status.textContent = 'PDFの文字を確認しています…';
     const {error} = await pending;
     if (preflight?.pending===pending && !$('#upload button').disabled) {
-      meter.hidden = true;
       status.textContent = error?.message || 'PDFの文字を確認しました。';
     }
   });
@@ -204,19 +199,9 @@ function teacher() {
     if (file.size > 5000000) { status.textContent = 'PDFは5 MBまでです。'; return; }
     button.disabled = true;
     $('#result').hidden = true;
-    meter.hidden = false;
-    meter.value = 0;
-    let stage = 1;
-    let previousFrame = performance.now();
-    let frame;
-    function animateProgress(now) {
-      const ceiling = stage===1 ? 1 : 2.85;
-      meter.value += (ceiling-meter.value)*(1-Math.exp(-(now-previousFrame)/1800));
-      previousFrame = now;
-      frame = requestAnimationFrame(animateProgress);
-    }
-    frame = requestAnimationFrame(animateProgress);
-    status.textContent = '1 / 3　資料を確認しています…';
+    button.setAttribute('aria-busy','true');
+    button.querySelector('span').textContent = '作成中…';
+    status.textContent = '10～20秒ほどで完成します（目安）。';
     try {
       if (/\.pdf$/i.test(file.name)) {
         const {pages,error} = await (preflight?.file===file ? preflight.pending : preparePdf(file));
@@ -227,11 +212,7 @@ function teacher() {
         const {officePages} = await import('./document-office.js');
         data.set('pages',JSON.stringify(await officePages(file)));
       }
-      stage = 2;
-      status.textContent = '2 / 3　要点・目次を作成しています…';
       const {id,expires} = await request('/documents',{method:'POST',body:data});
-      meter.hidden = true;
-      meter.value = 3;
       status.textContent = '作成が完了しました。';
       const url = '?id=' + id;
       $('#open-guide').href = url;
@@ -245,10 +226,10 @@ function teacher() {
         return;
       }
     } catch (error) {
-      meter.hidden = true;
       status.textContent = error.message;
     } finally {
-      cancelAnimationFrame(frame);
+      button.removeAttribute('aria-busy');
+      button.querySelector('span').textContent = '作成する';
       button.disabled = false;
     }
   });
