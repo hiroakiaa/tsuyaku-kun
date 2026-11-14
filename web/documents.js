@@ -983,6 +983,7 @@ async function reader() {
     if (entry.fallback) append(answer,'p',entry.fallback);
     lastQuestion = entry.items.at(-1)?.worksheetContext ?? entry.question;
   }
+  let taggedTables;
   async function sendQuestion(question,previousQuestion,retrying=false) {
     const log = $('#messages');
     if (button.disabled) return;
@@ -998,12 +999,17 @@ async function reader() {
     status.textContent = '資料から答えを探しています…';
     log.scrollTop = log.scrollHeight;
     try {
-      if (sourceType==='pdf' && /の/.test(question)) {
+      if (sourceType==='pdf' && (/の/.test(question) || /^what is the .+ (?:for|of) /i.test(question))) {
         let item;
         try {
           const {lookupTableCell}=await import('./document-table-lookup.js?v=84');
           const pdf=await (opened ?? openPdf({url:config.api+api+'/pdf',httpHeaders:await authHeaders()}));
-          item=await lookupTableCell(pdf,question);
+          if (!materials.length) {
+            const {readTaggedTables,findTaggedTableCell}=await import('./document-tagged-table.js');
+            taggedTables ??= readTaggedTables(pdf).catch(()=>[]);
+            item=findTaggedTableCell(await taggedTables,question);
+          }
+          item ??= await lookupTableCell(pdf,question);
         } catch {}
         if (item) {
           renderAnswerItem(append(log,'div','','bubble'),item);

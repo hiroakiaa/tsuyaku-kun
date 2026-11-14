@@ -440,3 +440,13 @@ R7多言語の公開版試験で各回答項目のPDFリンクと、日本語引
 - 公開版Chromeで年度を聞き返された直後にページを再読み込みし、質問タブを開き直すと年度確認が復元された。R9返信後、大人900円D3・子ども450円D4と各PDF2ページを表示。試験資料削除HTTP 200。再実行 node ../smoke-qa-combined-fees-year-reload.mjs。
 
 - 複数料金に回答後、年度だけを切り替えると両方の根拠を失う問題を公開版で再現。変更前後の各項目と根拠見出しを照合して表検索を継続するよう修正。公開Worker a3861250でR9の900円・450円/PDF2ページ、R8の800円・400円/PDF4ページ、各D3・D4を画面で確認。試験資料は削除済み。再実行 node ../smoke-qa-combined-fees-year-switch.mjs。
+
+- 配信版 d017e42 のChromeスマホ幅390×844で、年度確認→R9→R8の会話を照合。各回答のシート・D3/D4・PDF2/4ページのリンクを確認。試験資料削除HTTP 200。再実行 node ../smoke-qa-combined-fees-mobile.mjs。Safari実機未検証。
+
+- 公開版のChromeスマホ幅で、年度確認後にR9の根拠リンクを開くとPDF2ページ、R8へ切替後の根拠リンクで4ページへ移動し、各回ともPDFを閉じると回答に戻ることを確認。試験資料削除HTTP 200。再実行 node ../smoke-qa-combined-fees-mobile.mjs。
+
+- Actions 43653395476（d017e42）の個別ジョブ132626639667で、年度切替を含む標準Excel試験の成功を確認。REST APIの回数制限時は個別ジョブの公開HTMLの check-step 要素にある data-conclusion を参照できる。照合時点で残りの試験と成果物保存は未完了。
+
+- Actions 43653395476（d017e42）の個別ジョブで計測保存ステップの success を確認。年度切替を含むExcel試験とPDF・Word試験の後に保存された。ZIP内の値は未照合。
+
+- Actions 43653395476 の個別ジョブ公開HTMLで、英語画像、JPEG・WebP、日本語画像のOCR試験すべて success を確認。Excel年度切替、PDF、Word、計測保存に加えて、画像形式の公開後回帰も通過した。
