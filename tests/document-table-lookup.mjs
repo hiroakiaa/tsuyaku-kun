@@ -19,7 +19,7 @@ const page={
 };
 globalThis.document={createElement:()=>({getContext:()=>({getImageData:()=>({data:pixels})})})};
 const pdf={numPages:1,getPage:async()=>page};
-assert.deepEqual((await lookupTableCell(pdf,'北館の所要時間は？')).evidence,[{page:1,quote:'15分'}]);
+assert.deepEqual((await lookupTableCell(pdf,'北館の所要時間の基準は？')).evidence,[{page:1,quote:'15分'}]);
 assert.equal((await lookupTableCell(pdf,'南館の費用はいくら？')).answer,'900円');
 assert.equal(await lookupTableCell(pdf,'西館の費用は？'),null);
 console.log('PASS vertical row labels, duplicate headings and adjacent table cells');

@@ -1,7 +1,7 @@
 const compact = text => text.normalize('NFKC').replace(/\s/g,'');
 
 export async function lookupTableCell(pdf, question) {
-  const match = /^([^の？?、]{2,40}?)の([^？?、]{2,40}?)(?:の基準|を教えてください|を教えて|はいくら|は何|はいつ|はどこ|は)?[？?。]?$/u.exec(compact(question));
+  const match = /^([^の？?、]{2,40}?)の([^？?、]{2,40}?)(?:の基準(?:は)?|を教えてください|を教えて|はいくら|は何|はいつ|はどこ|は)?[？?。]?$/u.exec(compact(question));
   if (!match) return null;
   const [,rowName,columnName]=match;
   const normalizeLabel = text=>compact(text).replace(/(?:高等学校|高校)$/u,'');
