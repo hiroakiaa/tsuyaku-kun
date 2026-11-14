@@ -282,7 +282,7 @@ async function reader() {
   $('#qa-source').addEventListener('click',()=>void showPdf(selectedPage || 1));
   const sourceType = doc.sourceType ?? 'pdf';
   if (sourceType!=='pdf') {
-    $('#reopen-pdf').textContent = '資料データを表示';
+    $('#qa-source').textContent = '資料データを表示';
   }
   let opened,originalUrl;
   const previousPage = readingPosition(id,{opened:Date.now()}).page;
@@ -812,16 +812,19 @@ async function reader() {
         }
         if (!box) append(answerBox(),'p',entry.fallback=result.answer);
       } else {
-        const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+        if (!response.body) throw Error('回答の受信を開始できませんでした。');
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
         let pending='', finished=false;
         try {
           for (;;) {
             const {value,done} = await reader.read();
-            if (done) break;
-            pending+=value;
+            pending+=decoder.decode(value,{stream:!done});
+            if (done && pending) pending+='\n';
             const lines=pending.split('\n');
             pending=lines.pop();
             for (const line of lines) {
+              if (!line.trim()) continue;
               const event=JSON.parse(line);
               if (event.error) throw Error(event.error);
               if (event.status) status.textContent=event.status;
@@ -834,6 +837,7 @@ async function reader() {
                 if (event.answer) append(answerBox(),'p',entry.fallback=event.answer);
               }
             }
+            if (done) break;
           }
           if (!finished) throw Error('回答の受信が途中で止まりました。');
         } finally { await reader.cancel().catch(()=>{}); }
