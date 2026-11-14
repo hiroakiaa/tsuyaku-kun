@@ -1,4 +1,4 @@
-import {createAdoptionReport} from './admin-adoption-report.js?v=20261112-display-benchmark-1';
+import {createAdoptionReport} from './admin-adoption-report.js?v=20261114-lesson-report';
 import {createLiveSummarySetting} from './live-summary.js?v=20261113-summary-dialog-1';
 import {createLiveTranslationSetting} from './live-translation-setting.js?v=20261112-display-benchmark-1';
 import {improvementReport} from './analysis-focus.js?v=20261113-documents-1';

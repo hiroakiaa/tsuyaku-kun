@@ -1,5 +1,5 @@
 import {costOf} from './usage.js?v=20261112-display-benchmark-1';
-import {schoolUsageMetrics} from './admin-adoption-report.js?v=20261112-display-benchmark-1';
+import {schoolUsageMetrics} from './admin-adoption-report.js?v=20261114-lesson-report';
 import {createLiveSummary} from './live-summary.js?v=20261113-summary-dialog-1';
 import {createLiveCaptionBuffer} from './live-caption-buffer.js?v=20261112-display-benchmark-1';
 import {startLiveTranslation} from './live-translation-face.js?v=20261112-display-benchmark-1';
@@ -75,7 +75,7 @@ async function syncSchoolUsage(){
  if(!navigator.onLine)return;
  schoolSyncRunning=true;
  try{
-  const rows=ledger.list().filter(row=>row.monthlyUsage===true&&(row.captionCount>0||row.micSeconds>0))
+  const rows=ledger.list().filter(row=>row.monthlyUsage===true&&(row.captionCount>0||row.micSeconds>0||row.lessonDisplayedCaptions>0||row.lessonRecovery?.reconnects>0||row.lessonRecovery?.captionRecoveries>0))
    .map(row=>({id:row.id,mode:row.mode,month:schoolCalendar.format(row.startedAt),...schoolUsageMetrics({
      ...row,inputTokens:row.schoolInputTokens||0,outputTokens:row.schoolOutputTokens||0
    },costOf)}));
@@ -91,7 +91,7 @@ window.addEventListener('pageshow',syncSchoolUsage);
 const wordUsage=new WordUsage(localStorage);const ledger=new UsageLedger(localStorage,()=>Date.now(),sessionStorage),connections=new ConnectionDiary(localStorage);
 const showModalFeedback=installModalFeedback({dialog:$('#modal'),message:$('#message'),resolveFocus:referenceReturnFocus});
 let messageTimer;const message=text=>{clearTimeout(messageTimer);const n=$('#message');n.textContent=text;n.hidden=!text;if(text)messageTimer=setTimeout(()=>{n.replaceChildren();n.hidden=true;},6000);};
-installLazyAction($('#admin'),async attempt=>{const {installAdmin}=await import('./admin.js?v=20261114-qa-retry'+(attempt>1?'&retry='+attempt:''));installAdmin({wordUsage,sharedWords,api,createRecognitionSettings,showFrequentSources:()=>frequentButton.onclick(),getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});},{onError:()=>message('管理画面を読み込めませんでした。接続を確認して、もう一度ひらいてください。')});
+installLazyAction($('#admin'),async attempt=>{const {installAdmin}=await import('./admin.js?v=20261114-lesson-report'+(attempt>1?'&retry='+attempt:''));installAdmin({wordUsage,sharedWords,api,createRecognitionSettings,showFrequentSources:()=>frequentButton.onclick(),getConversationState:()=>conversationState(),getBudgetScenario:()=>currentBudgetScenario(),button:$('#admin'),modal,el,ledger,download,currentRecords:()=>[...records.values()],connectionHistory:()=>connections.list(),deliveryDiagnostics:()=>captionDelivery.export(),connectionAnalysis:()=>explainConnection(connections.list(),{authentication:user?'ready':'unavailable',online:navigator.onLine,sessions:ledger.list()}),checkConnection:showNetworkDiagnostics,message});},{onError:()=>message('管理画面を読み込めませんでした。接続を確認して、もう一度ひらいてください。')});
 const lessonCaptionWaiting='再接続しました。次の字幕を待っています。';
 const status=text=>{$('#connection').textContent=text;connectionHint(text);};
 function connectionHint(text){let box=$('#connection-hint');const show=room&&!room.local&&/再接続|切れ|停止|接続でき|別のタブ/.test(text);if(!box&&show){box=el('div',undefined,'connection-hint');box.id='connection-hint';box.setAttribute('role','status');const note=el('span'),retry=el('button','再接続','secondary');retry.onclick=retryConnection;box.append(note,retry);$('#live .live-tools').prepend(box);}if(box){box.hidden=!show;box.firstChild.textContent=text;const retry=box.querySelector('button');retry.hidden=text===lessonCaptionWaiting;retry.disabled=!navigator.onLine||room?.joinBlocked===true;}}
@@ -307,7 +307,7 @@ function send(data){if(backgroundCallPaused||pageClosing||socket?.readyState!==1
 function refreshDelivery(id){const record=records.get(id);if(record)renderCaption(record);}
 function trackCaptionSend(cap){const ok=send(cap);if(cap.final){captionDelivery.sent(selfId+'_'+cap.id,cap.revision||0,ok);refreshDelivery(selfId+'_'+cap.id);}return ok;}
 // A replay is also a fresh chance to acknowledge a lost display receipt. The server deduplicates it.
-function acknowledgeCaption(record){if(!record?.final||!['ready','failed'].includes(record.status)||!record.id||record.id.startsWith(selfId+'_')||!elements.has(record.id))return;const current=records.get(record.id);if(!current||current.revision!==record.revision)return;if(send({type:'caption_received',id:record.id,revision:record.revision||0})){captionDelivery.displayed(record.id,record.revision||0);}}
+function acknowledgeCaption(record){if(!record?.final||!['ready','failed'].includes(record.status)||!record.id||record.id.startsWith(selfId+'_')||!elements.has(record.id))return;const current=records.get(record.id);if(!current||current.revision!==record.revision)return;if(send({type:'caption_received',id:record.id,revision:record.revision||0})){captionDelivery.displayed(record.id,record.revision||0);if(room?.mode==="lesson"&&role!=="teacher")ledger.lessonCaptionDisplayed(record.id);}}
 function retryCaptionDelivery(){if(!room||room.local||backgroundCallPaused||pageClosing||document.visibilityState!=='visible'||socket?.readyState!==1)return;const sync=[];for(const job of captionDelivery.due()){if(!job.id.startsWith(selfId+'_'))continue;if(job.kind==='resend'){const cap=pending.get(job.id.slice(selfId.length+1));if(cap)trackCaptionSend(cap);}else sync.push(job.id);}if(sync.length)send({type:'caption_sync',ids:sync});for(const [id]of captionDelivery.rows)if(id.startsWith(selfId+'_'))refreshDelivery(id);}
 setInterval(retryCaptionDelivery,3000);
 function confirmLessonCaptionRecovery(data,previous){

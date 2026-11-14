@@ -21,6 +21,10 @@ export function schoolUsageMetrics(row, costOf) {
   const price = row.priceSnapshot || TRANSLATION_PRICE;
   return {
     uses: 1, captions: number(row.captionCount), seconds: number(row.durationSeconds), mic: number(row.micSeconds),
+    ...(row.mode==='lesson' ? {
+      ...(Number.isFinite(row.lessonDisplayedCaptions) ? {deliveredCaptions:row.lessonDisplayedCaptions} : {}),
+      ...(row.lessonRecovery ?? {}),
+    } : {}),
     base: number(costOf(row, row.priceSnapshot).total),
     live: [...recordings.values()].reduce((sum, event) => sum + number(event.liveAudioBytes), 0) /
       48000 / 60 * LIVE_TRANSLATION_USD_PER_MINUTE,
@@ -141,9 +145,18 @@ export function createAdoptionReport(el, { exchange, download }) {
     tableScroll.style.overflowX = 'auto';
     tableScroll.append(table);
     output.replaceChildren(el('p', range), el('p', scope), el('p', observed), tableScroll);
+    const lesson = snapshot.modes.lesson;
+    const recovery = [
+      '生徒端末の字幕表示確認：'+(lesson.deliveredCaptions ?? '未計測'),
+      '再接続試行：'+(lesson.reconnects ?? '未計測'),
+      '再接続後の字幕受信確認：'+(lesson.captionRecoveries ?? '未計測'),
+      '次の字幕までの平均時間：'+(lesson.captionRecoveries ? (lesson.recoverySeconds/lesson.captionRecoveries).toFixed(1)+'秒' : '未計測'),
+    ];
+    const recoveryNote = '授業の端末別記録から集計。次の字幕までの時間には次の発話を待つ時間も含まれます。';
+    output.append(el('h4','授業の接続復旧'),...recovery.map(line=>el('p',line)),el('p',recoveryNote));
     rateNote.textContent = costNote + ' 換算は1米ドル＝' + rate + '円です。';
     report.value = ['通訳君 学校導入向けの利用実績', range, scope, observed, headers.join('\t'),
-      ...data.map(row => row.join('\t')), definition, timeNote, rateNote.textContent, '字幕件数は履歴に記録された件数です。対面Liveの途中字幕は含みません。'].join('\n');
+      ...data.map(row => row.join('\t')), '授業の接続復旧', ...recovery, recoveryNote, definition, timeNote, rateNote.textContent, '字幕件数は履歴に記録された件数です。対面Liveの途中字幕は含みません。'].join('\n');
   }
   const timeNote = '利用時間は開始から最後の記録までの経過時間で、待機時間を含みます。月をまたぐ利用は開始月にまとめます。';
   const rateNote = el('p');

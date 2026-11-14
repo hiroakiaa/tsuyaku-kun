@@ -1,5 +1,6 @@
 const MODES = ['face', 'interpreter', 'lesson'];
 const FIELDS = ['uses', 'captions', 'seconds', 'mic', 'base', 'live', 'summary', 'partial'];
+const RECOVERY_FIELDS = ['deliveredCaptions', 'reconnects', 'captionRecoveries', 'recoverySeconds'];
 const MONTH = /^\d{4}\/(0[1-9]|1[0-2])$/;
 const UUID = /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/;
 const reply = (data, status = 200) => Response.json(data, { status });
@@ -11,11 +12,12 @@ export async function schoolUsage(storage, data) {
     const updates = {};
     for (const row of data.rows) {
       if (!row || !UUID.test(row.id || '') || !MONTH.test(row.month || '') || !MODES.includes(row.mode) ||
-          !FIELDS.every(key => Number.isFinite(row[key]) && row[key] >= 0 && row[key] <= 1e9)) {
+          !FIELDS.every(key => Number.isFinite(row[key]) && row[key] >= 0 && row[key] <= 1e9) ||
+          !RECOVERY_FIELDS.every(key => row[key]===undefined || (Number.isFinite(row[key]) && row[key]>=0 && row[key]<=1e9))) {
         return reply({error:'集計データを確認してください。'}, 400);
       }
       const key = 'usage:' + row.month + ':' + data.device + ':' + row.id;
-      updates[key] = {mode:row.mode, ...Object.fromEntries(FIELDS.map(field => [field,row[field]]))};
+      updates[key] = {mode:row.mode, ...Object.fromEntries([...FIELDS,...RECOVERY_FIELDS].filter(field=>row[field]!==undefined).map(field => [field,row[field]]))};
     }
     for (const [key, row] of Object.entries(updates)) await storage.put(key, row);
     return reply({ok:true});
@@ -25,6 +27,9 @@ export async function schoolUsage(storage, data) {
   const modes = Object.fromEntries(MODES.map(mode => [mode,Object.fromEntries(FIELDS.map(field => [field,0]))]));
   for (const row of rows.values()) {
     for (const field of FIELDS) modes[row.mode][field] += row[field];
+    for (const field of RECOVERY_FIELDS) {
+      if (row[field]!==undefined) modes[row.mode][field]=(modes[row.mode][field] ?? 0)+row[field];
+    }
   }
   return reply({ modes });
 }
