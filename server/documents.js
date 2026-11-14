@@ -42,7 +42,8 @@ function searchIndex(pages) {
 }
 
 function selectPassages(pages, question, index) {
-  const normalize = text => text.normalize('NFKC').toLowerCase();
+  const normalize = text => text.normalize('NFKC').toLowerCase()
+    .replace(/([\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}])[^\S\n]+(?=[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}])/gu,'');
   const query = normalize(question);
   const terms = new Set(query.match(/[a-z0-9]+|[一-龯々ァ-ヶー]{2,}/g) || []);
   for (const word of [...terms]) {
@@ -439,7 +440,7 @@ export async function documents(request,env,auth) {
     if (benchmarkMode!=='full' && benchmarkMode!=='search') return fail('比較方式を確認してください。');
     return reply(await evaluateDocumentQuestion(env,record.pages,question,benchmarkMode,record.materials,target));
   }
-  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([7,record.pages,record.materials ?? [],question.trim()])));
+  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([8,record.pages,record.materials ?? [],question.trim()])));
   const cacheKey = Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
   const cacheUrl = 'https://room/document/answer/'+cacheKey;
   const cached = await (await target.fetch(cacheUrl)).json();
