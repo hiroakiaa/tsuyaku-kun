@@ -142,6 +142,7 @@ const combinedFeeQuestion = '会議室の大人と子どもについて、それ
 for (const [body,expected] of [
   [{question:combinedFeeQuestion},[['令和8年度・令和9年度のうち、どの年度ですか？',undefined]]],
   [{question:'令和9年度です',previousQuestion:combinedFeeQuestion},[['900円','D3'],['450円','D4']]],
+  [{question:'令和8年度です',previousQuestion:'令和9年度の'+combinedFeeQuestion},[['800円','D3'],['400円','D4']]],
 ]) {
   const response = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
     method:'POST',body:JSON.stringify(body),

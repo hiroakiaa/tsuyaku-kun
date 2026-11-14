@@ -788,34 +788,51 @@ export async function documents(request,env,auth) {
         ? {...worksheetItem,worksheetContext:text}
         : lookupAdmissionCell(record.pages,text);
     };
-    const sharedQuestion = /^(.+?)について[、,]?\s*それぞれ(?:の|[、,])?\s*(.+)$/u.exec(normalized(worksheetQuestion));
-    const items = [];
-    if (sharedQuestion) {
-      const [, subjects, predicate] = sharedQuestion;
-      const [, year = '', names] = /^(?:(令和\d+年度?の|R\d+年度?の))?(.+)$/iu.exec(subjects);
-      const labels = names.split(/と|、|および|及び/u).map(name=>name.trim());
-      if (labels.length > 1 && labels.length <= 12 && labels.every(Boolean)) {
-        const first = lookup(year+labels[0]+'の'+predicate);
-        const group = first?.evidence?.[0];
-        const sharedGroup = group?.sheet && labels[0].startsWith(normalized(group.value)+'の');
-        const matches = [{label:labels[0],result:first},...labels.slice(1).map(label=>{
-          if (!sharedGroup || label.includes('の')) return {label,result:lookup(year+label+'の'+predicate)};
-          const result = lookup(year+group.value+'の'+label+'の'+predicate);
-          const source = result?.evidence?.[0];
-          return {label,result:source?.sheet===group.sheet && source.cell===group.cell ? result : null};
-        })];
-        if (first?.clarificationYears && matches.slice(1).every(({result})=>!result)) {
-          items.push({...first,worksheetContext:worksheetQuestion});
-        } else if (matches.some(({result})=>result)) {
-          items.push(...matches.map(({label,result})=>result
-            ? {...result,label,worksheetContext:worksheetQuestion}
-            : {label,answer:null,evidence:[],worksheetContext:worksheetQuestion}));
+    const lookupItems = worksheetQuestion => {
+      const sharedQuestion = /^(.+?)について[、,]?\s*それぞれ(?:の|[、,])?\s*(.+)$/u.exec(normalized(worksheetQuestion));
+      const items = [];
+      if (sharedQuestion) {
+        const [, subjects, predicate] = sharedQuestion;
+        const [, year = '', names] = /^(?:(令和\d+年度?の|R\d+年度?の))?(.+)$/iu.exec(subjects);
+        const labels = names.split(/と|、|および|及び/u).map(name=>name.trim());
+        if (labels.length > 1 && labels.length <= 12 && labels.every(Boolean)) {
+          const first = lookup(year+labels[0]+'の'+predicate);
+          const group = first?.evidence?.[0];
+          const sharedGroup = group?.sheet && labels[0].startsWith(normalized(group.value)+'の');
+          const matches = [{label:labels[0],result:first},...labels.slice(1).map(label=>{
+            if (!sharedGroup || label.includes('の')) return {label,result:lookup(year+label+'の'+predicate)};
+            const result = lookup(year+group.value+'の'+label+'の'+predicate);
+            const source = result?.evidence?.[0];
+            return {label,result:source?.sheet===group.sheet && source.cell===group.cell ? result : null};
+          })];
+          if (first?.clarificationYears && matches.slice(1).every(({result})=>!result)) {
+            items.push({...first,worksheetContext:worksheetQuestion});
+          } else if (matches.some(({result})=>result)) {
+            items.push(...matches.map(({label,result})=>result
+              ? {...result,label,worksheetContext:worksheetQuestion}
+              : {label,answer:null,evidence:[],worksheetContext:worksheetQuestion}));
+          }
         }
+      } else {
+        const item = lookup(worksheetQuestion);
+        if (item) items.push(item);
       }
-    } else {
-      const item = lookup(worksheetQuestion);
-      if (item) items.push(item);
+      return items;
+    };
+    if (yearReply && worksheetQuestion===currentQuestion && typeof previousQuestion==='string' && previousQuestion.length<=300) {
+      const prior = normalized(previousQuestion);
+      const prefix = /^(?:令和|R)\d+年度?の/iu;
+      if (prefix.test(prior) && /について[、,]?\s*それぞれ/u.test(prior)) {
+        const candidate = prior.replace(prefix,'令和'+yearReply[1]+'年度の');
+        const priorItems = lookupItems(prior);
+        const nextItems = lookupItems(candidate);
+        const headings = items=>items.map(item=>[item.label,item.evidence.slice(0,-1).map(cell=>normalized(cell.value))]);
+        if (priorItems.length>1 && priorItems.every(item=>item.evidence.length) &&
+            nextItems.every(item=>item.evidence.length) &&
+            JSON.stringify(headings(priorItems))===JSON.stringify(headings(nextItems))) worksheetQuestion = candidate;
+      }
     }
+    const items = lookupItems(worksheetQuestion);
     if (items.length) {
       if (request.headers.get('Accept')==='application/x-ndjson') {
         return new Response([...items.map(item=>JSON.stringify({item})),JSON.stringify({done:true})].join('\n')+'\n',{
