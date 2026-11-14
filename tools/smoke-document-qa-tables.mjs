@@ -91,6 +91,12 @@ try {
       }
       measurements.push({question,value,source,elapsedMs:Math.round(performance.now()-started)});
     }
+    await page.locator('#question').fill('令和9年度の青空高校の特進の入試日程は？');
+    await page.locator('#ask-form button').click();
+    await page.locator('#ask-form button:enabled').waitFor();
+    const blankAnswer = await page.locator('#messages .bubble').last().textContent();
+    assert.match(blankAnswer,/空欄|記載(?:が)?(?:ありません|されていません)|根拠(?:を|は資料内で)確認できません/);
+    assert.doesNotMatch(blankAnswer,/\b(?:20|40)\b/,'A capacity value must not be reused as the admission date');
     const result = {registrationMs,questions:measurements};
     console.log(JSON.stringify(result));
     if (process.env.GITHUB_STEP_SUMMARY) {
