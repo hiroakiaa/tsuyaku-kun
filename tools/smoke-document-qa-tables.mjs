@@ -109,7 +109,7 @@ try {
     const blankBubble = page.locator('#messages .bubble').last();
     const blankAnswer = await blankBubble.textContent();
     assert.equal(await blankBubble.locator('.answer-source').count(),0,blankQuestion);
-    assert.match(blankAnswer,/空欄|記載(?:が)?(?:ありません|されていません)|根拠(?:を|は資料内で)確認できません/);
+    assert.match(blankAnswer,/該当セルは空欄です。/);
     assert.doesNotMatch(blankAnswer,/\b(?:20|40)\b/,'A capacity value must not be reused as the admission date');
     measurements.push({question:blankQuestion,value:blankAnswer,source:null,citationLinks:[],citationCells:[],elapsedMs:Math.round(performance.now()-blankStarted)});
     const releaseResponse = await page.request.get(new URL('./web/release-checks.json',guide).href,{
