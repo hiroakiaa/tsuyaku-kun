@@ -5,26 +5,25 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1d1d1d">
 <title>資料QA君</title>
-<link rel="stylesheet" href="web/documents.css?v=49">
-<script type="module" src="web/documents.js?v=54"></script>
+<link rel="stylesheet" href="web/documents.css?v=50">
+<script type="module" src="web/documents.js?v=55"></script>
 </head>
 <body><div class="shell">
 
 <main id="content"><p role="status">読み込んでいます…</p></main>
 </div>
 <template id="teacher">
-<section class="intro">
+<section class="panel document-panel create-panel">
+<header class="create-heading">
 <h1>資料QAを作る</h1>
-<a class="register-link" href="?v=39">保管庫を開く</a>
-<p>資料を登録すると、要点を示し、資料専用のチャットボットを作ります。</p>
-</section>
-<section class="panel document-panel">
+<a class="document-entry" href="?v=55"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>保管庫に戻る</a>
+</header>
 <form class="stack" id="upload">
-<label>案内のタイトル<input name="title" maxlength="100" placeholder="例：新1年生の入学案内" required></label>
-<label>資料データ<input type="file" name="pdf" accept=".pdf,.png,.jpg,.jpeg,.webp,.docx,.xlsx" required></label>
-<p class="fine">PDF、5 MB、40ページまで。画像（PNG・JPEG・WebP）、Excel（.xlsx）、Word（.docx）にも対応。</p>
+<label>資料名<input name="title" maxlength="100" placeholder="例：新1年生の入学案内" required></label>
+<label><span><i class="fa-solid fa-folder" aria-hidden="true"></i> 資料ファイル</span><input type="file" aria-describedby="upload-formats" name="pdf" accept=".pdf,.png,.jpg,.jpeg,.webp,.docx,.xlsx" required></label>
+<p id="upload-formats" class="fine">PDF（5 MB・40ページまで）、PNG・JPEG・WebP、Excel（.xlsx）、Word（.docx）</p>
 <label>保管先<select name="visibility"><option value="device">この端末の保管庫のみ</option><option value="shared">共通保管庫にも掲載（誰でも閲覧できます）</option></select></label>
-<button class="primary create-guide">作成する</button>
+<button class="primary create-guide"><i class="fa-solid fa-plus" aria-hidden="true"></i> 作成する</button>
 </form>
 <p id="upload-status" role="status"></p>
 <div id="result" hidden>
@@ -37,7 +36,7 @@
 </section>
 </template>
 <template id="library"><section class="panel document-library">
-<header class="library-heading"><h1>資料QAの保管庫</h1><a class="document-entry" href="?create=1&amp;v=39" aria-label="資料チャット作成" title="資料チャット作成"><i class="fa-solid fa-plus"></i></a></header>
+<header class="library-heading"><h1>資料QAの保管庫</h1><a class="document-entry" href="?create=1&amp;v=55" aria-label="資料チャット作成" title="資料チャット作成"><i class="fa-solid fa-plus"></i></a></header>
 <div class="library-filters"><label class="library-search"><i class="fa-solid fa-magnifying-glass"></i><input id="library-search" type="search" aria-label="資料名" placeholder="資料を検索"></label><label><select id="library-sort" aria-label="並べ替え"><option value="recent">最近開いた順</option><option value="new">登録日の新しい順</option><option value="title">資料名順</option><option value="expiry">期限が近い順</option></select></label></div>
 <h2>このブラウザー</h2>
 

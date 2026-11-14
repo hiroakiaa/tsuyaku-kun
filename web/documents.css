@@ -232,3 +232,14 @@ dialog [tabindex="-1"][autofocus]:focus {
 .library-card-body small{color:#b7b7bb;font-size:.78rem;margin-top:.12rem}
 .library-card .library-remove{min-width:44px;min-height:44px}
 .document-library .local-icon{display:inline-flex}
+
+.create-panel{max-width:44rem;margin:1rem auto;padding:clamp(1rem,4vw,1.75rem)}
+.create-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.25rem}
+.create-heading h1{font-size:1.35rem;margin:0}
+.create-panel .document-entry{gap:.45rem;border-color:#ffffff30;color:inherit}
+.create-panel .local-icon{display:inline-flex;vertical-align:middle}
+.create-panel #upload{gap:.85rem}
+.create-panel #upload select,.create-panel #upload input{box-sizing:border-box;width:100%;min-width:0;min-height:44px;padding:.55rem .7rem;border:1px solid #ffffff30;border-radius:.65rem;background:#242426;color:inherit;font:inherit}
+.create-panel #upload-formats{margin:-.45rem 0 0;font-size:.79rem}
+.create-panel .create-guide{min-height:44px;background:#d7e8b1;color:#202619}
+.create-panel #upload-status:empty{display:none}

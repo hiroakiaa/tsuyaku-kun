@@ -168,6 +168,7 @@ function documentLibrary() {
 
 function teacher() {
   show('#teacher');
+  installLocalIcons($('#content'));
   const saveGuide = documentLibrary();
   const status = $('#upload-status');
   const fileInput = $('#upload [name="pdf"]');
