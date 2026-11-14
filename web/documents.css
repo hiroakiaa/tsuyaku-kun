@@ -268,3 +268,18 @@ dialog [tabindex="-1"][autofocus]:focus {
   .qa-workspace.pdf-full .qa-actions>:not(#qa-expand){display:none}
   .qa-actions{flex-wrap:wrap}
 }
+
+@media(min-width:800px){
+  .qa-workspace{grid-template-rows:minmax(0,1fr);overflow:hidden}
+  .qa-workspace .ask-layout{min-height:0;overflow:hidden}
+  .qa-workspace .ask-heading{flex:none}
+  .qa-workspace #messages{min-height:0;overflow-y:auto}
+  .qa-workspace #pdf-dialog .pdf-bar,.qa-workspace #pdf-dialog .pdf-navigation{min-width:0}
+}
+.answer-item blockquote{white-space:normal;line-height:1.65}
+.answer-item blockquote p{margin:0}
+.answer-item blockquote p+p{margin-top:.65em}
+.answer-emphasis{color:#ffe177}
+.answer-emphasis>span{animation:answer-emphasis .32s ease both}
+@keyframes answer-emphasis{from{color:#ededed}to{color:#ffe177}}
+@media(prefers-reduced-motion:reduce){.answer-emphasis>span{animation:none}}

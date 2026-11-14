@@ -868,10 +868,36 @@ async function reader() {
     if (Array.isArray(saved)) history = saved.filter(entry=>typeof entry?.question==='string' && Array.isArray(entry.items)).slice(-10);
   } catch {}
   let lastQuestion;
-  function renderAnswerItem(answer,item) {
+  function formatQuote(quote) {
+    return quote.trim().split(/\n[ \t]*\n/).flatMap(paragraph=>{
+      const joined = paragraph.replace(/([^\x00-\x7f])[ \t]*\n[ \t]*(?=[^\x00-\x7f])/g,'$1')
+        .replace(/[ \t]*\n[ \t]*/g,' ');
+      return joined.split(/(?<=。)\s*(?=・)/).filter(Boolean);
+    });
+  }
+  function renderAnswerText(section,item,animate) {
+    const body = append(section,'p','','answer-text');
+    const answer = item.answer ?? 'この項目の根拠は資料内で確認できませんでした。';
+    const keyFacts = /(?:[0-9０-９]+(?:[.,．][0-9０-９]+)*\s*(?:時(?:[0-9０-９]+分)?|分|円|月(?:[0-9０-９]+日)?|日|年|回|人|％|%))/gu;
+    const match = item.answer && (keyFacts.exec(answer) ?? /^[^。！？\n]{1,55}[。！？]/u.exec(answer));
+    if (!match) {
+      body.textContent = answer;
+      return;
+    }
+    body.append(answer.slice(0,match.index));
+    const emphasis = append(body,'span','','answer-emphasis');
+    if (animate) {
+      Array.from(match[0]).forEach((character,index)=>{
+        const letter = append(emphasis,'span',character);
+        letter.style.animationDelay = index * 65 + 'ms';
+      });
+    } else emphasis.textContent = match[0];
+    body.append(answer.slice(match.index + match[0].length));
+  }
+  function renderAnswerItem(answer,item,animate=false) {
     const section = append(answer,'section','','answer-item');
     append(section,'h4',item.label);
-    append(section,'p',item.answer ?? 'この項目の根拠は資料内で確認できませんでした。','answer-text');
+    renderAnswerText(section,item,animate);
     if (!item.evidence?.length) return;
     const evidence = append(section,'div','','answer-evidence');
     const byPage = new Map();
@@ -885,7 +911,10 @@ async function reader() {
       const disclosure = append(source,'details','','answer-quote');
       append(disclosure,'summary','資料内表記');
       const content = append(disclosure,'div');
-      for (const quote of quotes) append(content,'blockquote',quote);
+      for (const quote of quotes) {
+        const block = append(content,'blockquote');
+        for (const paragraph of formatQuote(quote)) append(block,'p',paragraph);
+      }
     }
   }
   for (const entry of history) {
@@ -927,7 +956,7 @@ async function reader() {
       async function showItem(item) {
         const first = !box;
         const answer = answerBox();
-        renderAnswerItem(answer,item);
+        renderAnswerItem(answer,item,true);
         entry.items.push(item);
         const evidence = item.evidence?.find(source=>source.page>=1 && source.page<=doc.pageCount && source.quote);
         if (!followedCitation && evidence && sourceType==='pdf') {
