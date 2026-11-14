@@ -99,7 +99,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '19');
+      guide.searchParams.set('v', '20');
       link.href = guide.href;
       if (entry.expires) {
         const expired = Date.now()>=entry.expires;
