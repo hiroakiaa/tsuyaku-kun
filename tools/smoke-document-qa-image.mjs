@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 
+const format = process.argv[2] ?? 'png';
+if (!['png','jpeg','webp'].includes(format)) throw new Error('Expected png, jpeg or webp');
+const mimeType = 'image/'+format;
 const browser = await chromium.launch();
 try {
   const page = await browser.newPage();
@@ -17,7 +20,7 @@ try {
   await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
   assert.equal(await page.getByRole('link',{name:'資料チャット作成',exact:true}).count(),0);
   await page.locator('#upload input[name=title]').fill('自動公開確認');
-  const image = await page.evaluate(()=>{
+  const image = await page.evaluate(type=>{
     const canvas=document.createElement('canvas');
     canvas.width=1000;
     canvas.height=300;
@@ -38,9 +41,10 @@ try {
       }
       return fetchOriginal.apply(this,arguments);
     };
-    return canvas.toDataURL().split(',')[1];
-  });
-  await page.locator('#upload input[type=file]').setInputFiles({name:'fixture.png',mimeType:'image/png',buffer:Buffer.from(image,'base64')});
+    return canvas.toDataURL(type);
+  },mimeType);
+  assert.ok(image.startsWith('data:'+mimeType+';base64,'));
+  await page.locator('#upload input[type=file]').setInputFiles({name:'fixture.'+format,mimeType,buffer:Buffer.from(image.split(',')[1],'base64')});
   const registrationStarted = performance.now();
   await page.locator('#upload button').click();
   const url = page.locator('#guide-url');
@@ -86,7 +90,7 @@ try {
     assert.match(await bubble.locator('.answer-text').textContent(),/14:00|2\s*(?::00)?\s*p\.?m\.?/i);
     assert.deepEqual(await bubble.locator('.answer-source a').allTextContents(),['元のPDF 1ページ']);
     assert.match(await bubble.locator('.answer-quote').textContent(),/Blue group[\s\S]*14:00/);
-    console.log(JSON.stringify({fixture:'png-browser-ocr',registrationMs,answerMs}));
+    console.log(JSON.stringify({fixture:format+'-browser-ocr',registrationMs,answerMs}));
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
       const {config} = await import('./web/config.js');
