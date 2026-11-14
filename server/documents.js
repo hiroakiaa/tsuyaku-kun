@@ -318,6 +318,12 @@ export async function documents(request,env,auth) {
   const cacheUrl = 'https://room/document/answer/'+cacheKey;
   const cached = await (await target.fetch(cacheUrl)).json();
   const saveAnswer = items => target.fetch(cacheUrl,{method:'POST',body:JSON.stringify(items)}).catch(()=>{});
+  const index = record.index ?? searchIndex(record.pages);
+  const usesPassages = Boolean(selectPassages(record.pages,question,index));
+  const checkedItems = result => (Array.isArray(result?.items) ? result.items : [])
+    .slice(0,12).map(item=>checkedAnswer(item,record.pages)).filter(Boolean);
+  const needsFullDocument = items => usesPassages && (!items.length || items.some(item=>!item.answer));
+  const readFullDocument = async () => checkedItems(await generate(env,record.pages,question,record.materials,undefined,[]));
   if (request.headers.get('Accept')==='application/x-ndjson') {
     const encoder = new TextEncoder();
     const stream = new TransformStream();
@@ -331,26 +337,26 @@ export async function documents(request,env,auth) {
           await send({done:true});
           return;
         }
-        const answers=[];
-        let count=0;
-        const writes=[];
-        const result=await generate(env,record.pages,question,record.materials,raw=>{
-          const item=checkedAnswer(raw,record.pages);
-          if (item) {
-            count++;
-            answers.push(item);
-            writes.push(send({item}).catch(()=>{}));
-          }
-        },record.index);
+        let answers = [];
+        const writes = [];
+        const result = await generate(env,record.pages,question,record.materials,raw=>{
+          const item = checkedAnswer(raw,record.pages);
+          if (!item) return;
+          answers.push(item);
+          if (!usesPassages) writes.push(send({item}).catch(()=>{}));
+        },index);
         await Promise.all(writes);
-        if (!count) {
-          for (const raw of (result?.items ?? []).slice(0,12)) {
-            const item=checkedAnswer(raw,record.pages);
-            if (item) { await send({item}); answers.push(item); count++; }
-          }
+        if (!answers.length) {
+          answers = checkedItems(result);
+          if (!usesPassages) for (const item of answers) await send({item});
         }
+        if (needsFullDocument(answers)) {
+          await send({status:'資料全体を確認しています…'});
+          answers = await readFullDocument();
+        }
+        if (usesPassages) for (const item of answers) await send({item});
         if (answers.length && answers.every(item=>item.answer)) await saveAnswer(answers);
-        await send({done:true,answer:count ? undefined : noAnswer});
+        await send({done:true,answer:answers.length ? undefined : noAnswer});
       } catch(error) {
         await send({error:error.message}).catch(()=>{});
       } finally { await writer.close().catch(()=>{}); }
@@ -360,7 +366,8 @@ export async function documents(request,env,auth) {
   let items = cached;
   if (!items) {
     const result = await generate(env,record.pages,question,record.materials,undefined,record.index);
-    items = (Array.isArray(result?.items) ? result.items : []).slice(0,12).map(item=>checkedAnswer(item,record.pages)).filter(Boolean);
+    items = checkedItems(result);
+    if (needsFullDocument(items)) items = await readFullDocument();
     if (items.length && items.every(item=>item.answer)) await saveAnswer(items);
   }
   return reply({items,answer:items.map(item=>item.answer ?? noAnswer).join('\n') || noAnswer,

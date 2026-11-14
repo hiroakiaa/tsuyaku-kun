@@ -1,0 +1,352 @@
+[
+  {
+    "index": 0,
+    "mode": "full",
+    "status": 200,
+    "items": [
+      {
+        "label": "給食費",
+        "answer": "年間の給食費は40,000円です。",
+        "evidence": [
+          {
+            "page": 1,
+            "quote": "年間の給食費は40,000円です。"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5105,
+      "completion_tokens": 49,
+      "total_tokens": 5154,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    }
+  },
+  {
+    "index": 0,
+    "mode": "search",
+    "status": 200,
+    "items": [
+      {
+        "label": "給食費",
+        "answer": "年間の給食費は40,000円です。",
+        "evidence": [
+          {
+            "page": 1,
+            "quote": "年間の給食費は40,000円です。"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 596,
+      "completion_tokens": 49,
+      "total_tokens": 645,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    }
+  },
+  {
+    "index": 1,
+    "mode": "full",
+    "status": 200,
+    "items": [
+      {
+        "label": "給食費",
+        "answer": "年間の給食費は40,000円です。",
+        "evidence": [
+          {
+            "page": 1,
+            "quote": "年間の給食費は40,000円です。"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5105,
+      "completion_tokens": 49,
+      "total_tokens": 5154,
+      "prompt_tokens_details": {
+        "cached_tokens": 4864,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    }
+  },
+  {
+    "index": 1,
+    "mode": "search",
+    "status": 200,
+    "items": [
+      {
+        "label": "給食費",
+        "answer": "年間の給食費は40,000円です。",
+        "evidence": [
+          {
+            "page": 1,
+            "quote": "年間の給食費は40,000円です。"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 596,
+      "completion_tokens": 49,
+      "total_tokens": 645,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    }
+  },
+  {
+    "index": 2,
+    "mode": "full",
+    "status": 200,
+    "items": [
+      {
+        "label": "給食費の月額",
+        "answer": "月額4,000円です。",
+        "evidence": [
+          {
+            "page": 1,
+            "quote": "給食費は月額4,000円です。"
+          }
+        ]
+      },
+      {
+        "label": "生徒会費の年額",
+        "answer": "年間600円です。",
+        "evidence": [
+          {
+            "page": 2,
+            "quote": "生徒会費は年間600円です。"
+          }
+        ]
+      },
+      {
+        "label": "PTA会費の年額",
+        "answer": "年間2,400円です。",
+        "evidence": [
+          {
+            "page": 3,
+            "quote": "PTA会費は年間2,400円です。"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5120,
+      "completion_tokens": 132,
+      "total_tokens": 5252,
+      "prompt_tokens_details": {
+        "cached_tokens": 4864,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    }
+  },
+  {
+    "index": 2,
+    "mode": "search",
+    "status": 200,
+    "items": [
+      {
+        "label": "給食費の月額",
+        "answer": "月額4,000円です。",
+        "evidence": [
+          {
+            "page": 1,
+            "quote": "給食費は月額4,000円です。"
+          }
+        ]
+      },
+      {
+        "label": "生徒会費の年額",
+        "answer": "年間600円です。",
+        "evidence": [
+          {
+            "page": 2,
+            "quote": "生徒会費は年間600円です。"
+          }
+        ]
+      },
+      {
+        "label": "PTA会費の年額",
+        "answer": "年間2,400円です。",
+        "evidence": [
+          {
+            "page": 3,
+            "quote": "PTA会費は年間2,400円です。"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 575,
+      "completion_tokens": 132,
+      "total_tokens": 707,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    }
+  },
+  {
+    "index": 3,
+    "mode": "full",
+    "status": 200,
+    "items": [
+      {
+        "label": "下校の時刻",
+        "answer": "下校完了は、4月から9月は17時30分、10月から3月は16時45分です。",
+        "evidence": [
+          {
+            "page": 13,
+            "quote": "下校完了は、4月から9月は17時30分、10月から3月は16時45分です。"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5102,
+      "completion_tokens": 85,
+      "total_tokens": 5187,
+      "prompt_tokens_details": {
+        "cached_tokens": 3968,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    }
+  },
+  {
+    "index": 3,
+    "mode": "search",
+    "status": 200,
+    "items": [
+      {
+        "label": "下校の時刻",
+        "answer": "4月から9月は17時30分、10月から3月は16時45分です。",
+        "evidence": [
+          {
+            "page": 13,
+            "quote": "下校完了は、4月から9月は17時30分、10月から3月は16時45分です。"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 519,
+      "completion_tokens": 79,
+      "total_tokens": 598,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    }
+  },
+  {
+    "index": 4,
+    "mode": "full",
+    "status": 200,
+    "items": [
+      {
+        "label": "学校指定の靴の販売店",
+        "answer": null,
+        "evidence": []
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5107,
+      "completion_tokens": 29,
+      "total_tokens": 5136,
+      "prompt_tokens_details": {
+        "cached_tokens": 4864,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    }
+  },
+  {
+    "index": 4,
+    "mode": "search",
+    "status": 200,
+    "items": [
+      {
+        "label": "学校指定の靴の販売店",
+        "answer": null,
+        "evidence": []
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5107,
+      "completion_tokens": 29,
+      "total_tokens": 5136,
+      "prompt_tokens_details": {
+        "cached_tokens": 4864,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    }
+  }
+]
