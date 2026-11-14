@@ -56,6 +56,8 @@ try {
     assert.deepEqual(externalWrites,[]);
     await page.goto(guide);
     await page.locator('#tab-ask').click();
+    await page.waitForFunction(expected=>document.querySelectorAll('#pdf-page option').length===expected,scanPage);
+    const pageCount = await page.locator('#pdf-page option').count();
     await page.locator('#question').fill('When does the library close?');
     const libraryStarted = performance.now();
     await page.locator('#ask-form button').click();
@@ -129,7 +131,7 @@ try {
     assert.match(commit,/^[0-9a-f]{40}$/);
     if (process.env.GITHUB_SHA) assert.equal(commit,process.env.GITHUB_SHA);
     const result = {
-      commit,
+      commit,pageCount,
       fixture:dense ? '28-page-dense-mixed-pdf' : long ? '28-page-mixed-pdf' : 'mixed-text-and-scan-pdf',preflightMs,registrationMs,libraryMs,poolMs,combinedMs,
       measuredAt:new Date().toISOString(), platform:process.platform,browserVersion:browser.version(),
       combinedEvidence,
