@@ -67,6 +67,10 @@ try {
       ['子どもは？','400円','R8料金表 · D4'],
       ['令和9年度の会議室の子どもの休日料金は？','450円','R9料金表 · D4'],
     ]){
+      if (question==='子どもは？') {
+        await page.reload();
+        await page.locator('#tab-ask').click();
+      }
       await page.locator('#question').fill(question);
       const started=performance.now();
       await page.locator('#ask-form button').click();
