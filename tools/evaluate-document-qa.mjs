@@ -93,3 +93,10 @@ const summary = ['full','search'].map(mode=>{
 });
 console.log(JSON.stringify({summary,rows},null,2));
 if (process.argv.includes('--require-pass') && summary.some(result=>result.unmeasuredCases || result.passed!==result.expectedCases)) process.exitCode = 1;
+if (process.argv.includes('--require-retrieval')) {
+  const searchRows = rows.filter(row=>row.mode==='search' && row.expectedPageCount>0);
+  const expectedQuestions = selectedCases.filter(([,expected])=>expected.length>0).length;
+  if (searchRows.length!==expectedQuestions || searchRows.some(row=>row.missingCandidatePages===null || row.missingCandidatePages.length)) {
+    process.exitCode = 1;
+  }
+}
