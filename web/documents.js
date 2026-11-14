@@ -540,12 +540,6 @@ async function reader() {
   $('.pdf-navigation').hidden=sourceType!=='pdf';
   $('#zoom-in').onclick=()=>setZoom(zoom*1.25);
   $('#zoom-out').onclick=()=>setZoom(zoom/1.25);
-  preview.addEventListener('wheel',event=>{
-    if (!zoomable) return;
-    event.preventDefault();
-    const bounds=preview.getBoundingClientRect();
-    setZoom(zoom*Math.exp(-event.deltaY*.002),{x:event.clientX-bounds.left,y:event.clientY-bounds.top});
-  },{passive:false});
   function measurePinch(event){
     const [a,b]=event.touches;
     const bounds=preview.getBoundingClientRect();
