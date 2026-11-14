@@ -49,17 +49,25 @@ try {
     await page.goto(guide);
     await page.locator('#tab-ask').click();
     await page.locator('#question').fill('When does the library close?');
+    const libraryStarted = performance.now();
     await page.locator('#ask-form button').click();
     await page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 2ページ'}).waitFor();
     await page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 1ページ'}).waitFor();
     assert.match(await page.locator('#messages').textContent(),/3\s*(?::00)?\s*PM/i);
+    await page.locator('#ask-form button:enabled').waitFor();
+    const libraryMs = Math.round(performance.now()-libraryStarted);
     await page.locator('#question').fill('When does the swimming pool open?');
+    const poolStarted = performance.now();
     await page.locator('#ask-form button').click();
     const citation = page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 3ページ'});
-    await citation.click({timeout:60_000});
+    await citation.waitFor({timeout:60_000});
+    await page.locator('#ask-form button:enabled').waitFor();
+    const poolMs = Math.round(performance.now()-poolStarted);
+    await citation.click();
     await page.waitForFunction(()=>document.querySelector('#pdf-page')?.value==='3');
     assert.match(await page.locator('#messages .bubble').last().textContent(),/8\s*(?::00)?\s*AM/i);
     await page.locator('#question').fill('When does the library close and when does the swimming pool open? Give both facts separately.');
+    const combinedStarted = performance.now();
     await page.locator('#ask-form button').click();
     const combined = page.locator('#messages .bubble').last();
     const librarySource = combined.locator('.answer-item').filter({hasText:/3\s*(?::00)?\s*PM/i});
@@ -71,8 +79,10 @@ try {
     const citationNames = async item => (await item.locator('.answer-source a').allTextContents())
       .map(label=>label.trim()).sort();
     assert.deepEqual(await citationNames(librarySource),['元のPDF 1ページ','元のPDF 2ページ']);
+    const combinedMs = Math.round(performance.now()-combinedStarted);
     assert.deepEqual(await citationNames(poolSource),['元のPDF 3ページ']);
     assert.deepEqual(externalWrites,[]);
+    console.log(JSON.stringify({fixture:'mixed-text-and-scan-pdf',preflightMs,registrationMs,libraryMs,poolMs,combinedMs}));
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
       const {config} = await import('./web/config.js');
@@ -88,7 +98,6 @@ try {
     },guide);
     assert.equal(removed,200);
   }
-  console.log(JSON.stringify({fixture:'mixed-text-and-scan-pdf',preflightMs,registrationMs}));
 } finally {
   await browser.close();
 }
