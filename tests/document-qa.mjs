@@ -25,9 +25,11 @@ const env = {
 };
 const originalFetch = globalThis.fetch;
 try {
+  let expectFullDocument = false;
   globalThis.fetch = async (_url,{body})=>{
     const payload = JSON.parse(JSON.parse(body).messages[1].content);
-    assert.ok(payload.資料.length<pages.length);
+    if (expectFullDocument) assert.equal(payload.資料.length,pages.length);
+    else assert.ok(payload.資料.length<pages.length);
     assert.ok(payload.資料.some(passage=>passage.page===16));
     const items = [{label:'冷房',answer:'午後2時からです。',sources:[{page:16,quote:pages[15]}]}];
     return Response.json({choices:[{finish_reason:'stop',message:{content:JSON.stringify({items})}}]});
@@ -47,6 +49,14 @@ try {
   assert.ok(evaluation.candidatePages.includes(16));
   assert.ok(evaluation.candidatePages.length < pages.length);
   assert.equal(new Set(evaluation.candidatePages).size,evaluation.candidatePages.length);
+  assert.deepEqual(Object.keys(evaluation.timing).sort(),['generationMs','retrievalMs']);
+  for (const milliseconds of Object.values(evaluation.timing)) {
+    assert.ok(Number.isInteger(milliseconds) && milliseconds>=0);
+  }
+  expectFullDocument = true;
+  const full = await evaluateDocumentQuestion(env,pages,'When does cooling start?','full');
+  assert.equal(full.timing.retrievalMs,null);
+  assert.ok(Number.isInteger(full.timing.generationMs) && full.timing.generationMs>=0);
 } finally {
   globalThis.fetch = originalFetch;
 }
@@ -62,6 +72,7 @@ const lexicalEnv = {
   })},
 };
 try {
+
   globalThis.fetch = async (_url,{body})=>{
     const {資料:passages} = JSON.parse(JSON.parse(body).messages[1].content);
     assert.ok(passages.length<japanesePages.length);

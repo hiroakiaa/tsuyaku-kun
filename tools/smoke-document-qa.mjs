@@ -1,4 +1,4 @@
-import {writeFile} from 'node:fs/promises';
+import {appendFile,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 
@@ -61,6 +61,7 @@ try {
   await page.waitForFunction(()=>Boolean(document.querySelector('#guide-url')?.value));
   const registrationMs = Math.round(performance.now()-registrationStarted);
   const guide = await url.inputValue();
+  let result;
   try {
     assert.deepEqual(externalWrites,[]);
     await page.goto(guide);
@@ -168,14 +169,12 @@ try {
     const {commit} = await releaseResponse.json();
     assert.match(commit,/^[0-9a-f]{40}$/);
     if (process.env.GITHUB_SHA) assert.equal(commit,process.env.GITHUB_SHA);
-    const result = {
+    result = {
       commit,pageCount,fileBytes:pdf.length,
       fixture:atPageLimit ? '40-page-mixed-pdf' : dense ? '28-page-dense-mixed-pdf' : long ? '28-page-mixed-pdf' : 'mixed-text-and-scan-pdf',preflightMs,registrationMs,libraryMs,poolMs,combinedMs,
       measuredAt:new Date().toISOString(), platform:process.platform,browserVersion:browser.version(),
       combinedEvidence,missingEvidence,
     };
-    console.log(JSON.stringify(result));
-    if (process.env.DOCUMENT_QA_REPORT) await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify(result,null,2));
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
       const {config} = await import('./web/config.js');
@@ -194,6 +193,21 @@ try {
       return {removeStatus:response.status,reopenStatus:reopened.status,pdfStatus:pdf.status};
     },guide);
     assert.deepEqual(removed,{removeStatus:200,reopenStatus:404,pdfStatus:404});
+  }
+  console.log(JSON.stringify(result));
+  if (process.env.DOCUMENT_QA_REPORT) await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify(result,null,2));
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    await appendFile(process.env.GITHUB_STEP_SUMMARY,[
+      '',
+      '### PDF: '+result.fixture,
+      '',
+      result.pageCount+' pages, '+result.fileBytes+' bytes. Test document deletion verified.',
+      '',
+      '| Preflight | Registration | Library | Pool | Combined | No evidence |',
+      '| ---: | ---: | ---: | ---: | ---: | ---: |',
+      '| '+[result.preflightMs,result.registrationMs,result.libraryMs,result.poolMs,result.combinedMs,result.missingEvidence.elapsedMs].map(ms=>ms+' ms').join(' | ')+' |',
+      '',
+    ].join('\n'));
   }
 } finally {
   await browser.close();
