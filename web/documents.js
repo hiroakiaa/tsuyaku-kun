@@ -1,3 +1,4 @@
+import {installLocalIcons,localIcon} from './icons.js?v=library';
 import {config} from './config.js';
 const $ = (selector) => document.querySelector(selector);
 const content = $('#content');
@@ -130,7 +131,8 @@ function documentLibrary() {
     if (!matches.length) append(list,'li',entries.length ? '一致する資料がありません。' : '保管した資料はまだありません。','fine');
     for (const entry of matches) {
       const card = append(list,'li','','library-card');
-      const icon = append(card,'span','▤','library-icon');
+      const icon = append(card,'span','','library-icon');
+      icon.append(localIcon('book-open'));
       icon.setAttribute('aria-hidden','true');
       const body = append(card,'div','','library-card-body');
       const link = append(body,'a',entry.title);
@@ -144,7 +146,8 @@ function documentLibrary() {
         const expired = Date.now()>=entry.expires;
         append(body,'small',expired ? '共有期限を過ぎました' : '共有期限 '+new Date(entry.expires).toLocaleDateString('ja-JP'));
       }
-      const remove = append(card,'button','🗑︎','library-remove');
+      const remove = append(card,'button','','library-remove');
+      remove.append(localIcon('trash'));
       remove.title = '一覧から外す';
       remove.type = 'button';
       remove.setAttribute('aria-label',entry.title+'を保管庫から外す');
@@ -935,6 +938,7 @@ async function reader() {
 try {
   if (!id && !new URLSearchParams(location.search).has('create')) {
     show('#library');
+    installLocalIcons($('#content'));
     documentLibrary();
     try {
       const entries = await request('/documents/library');
@@ -946,9 +950,12 @@ try {
         $('#shared-status').textContent = matches.length ? '' : entries.length ? '一致する資料がありません。' : '公開されている資料はありません。';
         for (const entry of matches) {
         const card = append(list,'li','','library-card');
-        const link = append(card,'a',entry.title);
+        const icon = append(card,'span','','library-icon');
+        icon.append(localIcon('book-open'));
+        const body = append(card,'div','','library-card-body');
+        const link = append(body,'a',entry.title);
         link.href = '?id='+encodeURIComponent(entry.id)+'&v=39';
-        append(card,'small','共通保管庫に公開 · 期限 '+new Date(entry.expires).toLocaleDateString('ja-JP'));
+        append(body,'small','期限 '+new Date(entry.expires).toLocaleDateString('ja-JP'));
         }
       };
       $('#library-search').addEventListener('input',renderShared);

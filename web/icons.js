@@ -1,5 +1,6 @@
 // Small, locally rendered UI symbols. No icon-font download is required.
 const paths={
+ trash:'M4 6h16M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7M14 10v7',
  folder:'M3 6h7l2 2h9v12H3Z',
  microphone:'M9 5a3 3 0 0 1 6 0v6a3 3 0 0 1-6 0V5M6 10v2a6 6 0 0 0 12 0v-2M12 18v4M9 22h6',
  'microphone-slash':'M9 8V5a3 3 0 0 1 6 0v6M6 10v2a6 6 0 0 0 10 4M12 18v4M9 22h6M3 3l18 18',
