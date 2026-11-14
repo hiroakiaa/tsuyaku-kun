@@ -73,6 +73,7 @@ const openDocuments=()=>{
  if(!dialog){
   dialog=el('dialog',undefined,'documents-dialog');
   dialog.id='documents-dialog';
+  dialog.addEventListener('cancel',event=>event.preventDefault());
   dialog.setAttribute('aria-label','資料QA');
   const heading=el('div',undefined,'modal-heading');
   heading.tabIndex=-1;
@@ -98,6 +99,7 @@ const openDocuments=()=>{
   library.onclick=()=>{
    const archive=el('dialog',undefined,'documents-dialog');
    archive.setAttribute('aria-label','資料QAの保管庫');
+   archive.addEventListener('cancel',event=>event.preventDefault());
    const bar=el('div',undefined,'modal-heading');
    bar.tabIndex=-1;
    bar.autofocus=true;
