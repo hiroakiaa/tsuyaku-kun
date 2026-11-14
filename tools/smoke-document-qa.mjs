@@ -11,6 +11,7 @@ try {
     const body = request.postDataBuffer();
     if (!body?.length) return;
     if (url.hostname==='cdn.jsdelivr.net') externalWrites.push('OCR asset host');
+    if (url.pathname.endsWith('/ask') && /data:image\//i.test(body.toString())) externalWrites.push('page image in question request');
     if (url.pathname==='/documents' && request.method()==='POST') uploadedPages = body.toString();
   });
   await page.setContent('<p>The library closes at 3 PM.</p>');
@@ -57,6 +58,7 @@ try {
     await citation.click({timeout:60_000});
     await page.waitForFunction(()=>document.querySelector('#pdf-page')?.value==='2');
     assert.match(await page.locator('#messages .bubble').last().textContent(),/8\s*(?::00)?\s*AM/i);
+    assert.deepEqual(externalWrites,[]);
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
       const {config} = await import('./web/config.js');
