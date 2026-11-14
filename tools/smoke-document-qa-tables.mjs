@@ -117,6 +117,21 @@ try {
     assert.match(blankAnswer,/該当セルは空欄です。/);
     assert.doesNotMatch(blankAnswer,/\b(?:20|40)\b/,'A capacity value must not be reused as the admission date');
     measurements.push({question:blankQuestion,value:blankAnswer,source:null,citationLinks:[],citationCells:[],elapsedMs:Math.round(performance.now()-blankStarted)});
+    const combinedQuestion = '令和9年度の青空高校と青空星雲高校について、それぞれ特進の入試定員は？';
+    await page.locator('#question').fill(combinedQuestion);
+    const combinedStarted = performance.now();
+    await page.locator('#ask-form button').click();
+    await page.locator('#ask-form button:enabled').waitFor();
+    const sections = page.locator('#messages .bubble').last().locator('.answer-item');
+    const values = await sections.locator('.answer-text').allTextContents();
+    assert.deepEqual(values,['20','この項目の根拠は資料内で確認できませんでした。'],combinedQuestion);
+    const citationLinks = await sections.first().locator('.answer-source a').allTextContents();
+    const citationCells = await sections.first().locator('.answer-source > div').allTextContents();
+    assert.deepEqual(citationLinks,['元のPDF 1ページ'],combinedQuestion);
+    assert.ok(citationCells.join('、').split('、').includes('R9入試表 · C4'),combinedQuestion);
+    assert.equal(await sections.last().locator('.answer-source').count(),0,combinedQuestion);
+    measurements.push({question:combinedQuestion,value:values.join(' ／ '),source:'R9入試表 · C4',
+      citationLinks,citationCells,elapsedMs:Math.round(performance.now()-combinedStarted)});
     const releaseResponse = await page.request.get(new URL('./web/release-checks.json',guide).href,{
       headers:{'Cache-Control':'no-cache'},
     });
