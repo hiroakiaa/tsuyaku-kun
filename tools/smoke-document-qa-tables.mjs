@@ -66,6 +66,8 @@ try {
       ['大人は？','800円','R8料金表 · D3'],
       ['子どもは？','400円','R8料金表 · D4'],
       ['R9','450円','R9料金表 · D4'],
+      ['説明会の午後組の開始時刻は？','14:00','R9予定表 · C4'],
+      ['午前組は？','10:00','R9予定表 · C3'],
     ]){
       if (question==='子どもは？') {
         await page.reload();
@@ -89,7 +91,7 @@ try {
         const expected = {
           'R9入試表':['A3','B4','C1','C2','C4'],
           'R9料金表':['A3','B4','C1','D2','D4'],
-          'R9予定表':['A3','B4','C1','C2','C4'],
+          'R9予定表':source.endsWith('C3') ? ['A3','B3','C1','C2','C3'] : ['A3','B4','C1','C2','C4'],
           'R8料金表':source.endsWith('D3') ? ['A3','B3','C1','D2','D3'] : ['A3','B4','C1','D2','D4'],
         }[sheet];
         assert.deepEqual(addresses.sort(),expected.map(cell=>sheet+' · '+cell),question);
