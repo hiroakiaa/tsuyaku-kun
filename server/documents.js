@@ -411,11 +411,16 @@ export async function documents(request,env,auth) {
   if (Number(request.headers.get('content-length')) > 4096) return fail('質問は300文字までです。',413);
   const input = await request.text();
   if (input.length > 4096) return fail('質問は300文字までです。',413);
-  const {question:currentQuestion,previousQuestion} = JSON.parse(input);
+  const {question:currentQuestion,previousQuestion,benchmarkMode} = JSON.parse(input);
   if (typeof currentQuestion!=='string'||!currentQuestion.trim()||currentQuestion.length>300) return fail('質問は300文字までです。');
   const question = typeof previousQuestion==='string' && previousQuestion.trim() && previousQuestion.length<=300
     ? JSON.stringify({前の質問:previousQuestion,今回の質問:currentQuestion})
     : currentQuestion;
+  if (benchmarkMode!==undefined) {
+    if (record.owner!==auth.uid) return fail('比較測定は資料の作成者だけが実行できます。',403);
+    if (benchmarkMode!=='full' && benchmarkMode!=='search') return fail('比較方式を確認してください。');
+    return reply(await evaluateDocumentQuestion(env,record.pages,question,benchmarkMode,record.materials,target));
+  }
   const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([3,record.pages,record.materials ?? [],question.trim()])));
   const cacheKey = Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
   const cacheUrl = 'https://room/document/answer/'+cacheKey;
@@ -641,9 +646,10 @@ export async function documentStorage(request,storage) {
   return fail('資料が見つかりません。',404);
 }
 
-export async function evaluateDocumentQuestion(env,pages,question,mode) {
+export async function evaluateDocumentQuestion(env,pages,question,mode,materials=[],target) {
   let usage;
-  const passages = mode==='full' ? null : await retrievalPassages(env,pages,question,searchIndex(pages));
-  const result = await generate(env,pages,question,[],undefined,passages,value=>{usage=value;});
+  const passages = mode==='full' ? null : await retrievalPassages(env,pages,question,searchIndex(pages),target);
+  const result = await generate(env,pages,question,materials,undefined,passages,value=>{usage=value;});
+  if (target) await recordUsage(env,usage).catch(()=>{});
   return {items:(result.items ?? []).map(item=>checkedAnswer(item,pages)).filter(Boolean),usage};
 }
