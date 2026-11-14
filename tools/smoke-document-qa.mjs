@@ -114,7 +114,15 @@ try {
     assert.deepEqual(await citationNames(closing),['元のPDF 1ページ','元のPDF 2ページ']);
     assert.equal(await missingFee.count(),1);
     assert.deepEqual(await citationNames(missingFee),[]);
+    const releaseUrl = new URL('./web/release-checks.json',guide);
+    releaseUrl.searchParams.set('check',String(Date.now()));
+    const releaseResponse = await page.request.get(releaseUrl.href);
+    assert.ok(releaseResponse.ok(),'Published release metadata is unavailable');
+    const {commit} = await releaseResponse.json();
+    assert.match(commit,/^[0-9a-f]{40}$/);
+    if (process.env.GITHUB_SHA) assert.equal(commit,process.env.GITHUB_SHA);
     const result = {
+      commit,
       fixture:'mixed-text-and-scan-pdf',preflightMs,registrationMs,libraryMs,poolMs,combinedMs,
       measuredAt:new Date().toISOString(), platform:process.platform,browserVersion:browser.version(),
       combinedEvidence,
