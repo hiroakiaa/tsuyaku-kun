@@ -741,13 +741,47 @@ async function reader() {
   });
   const askForm = $('#ask-form');
   const button = askForm.querySelector('button');
+  const historyKey = 'document-qa-questions:'+id;
+  let history = [];
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(historyKey) ?? '[]');
+    if (Array.isArray(saved)) history = saved.filter(entry=>typeof entry?.question==='string' && Array.isArray(entry.items)).slice(-10);
+  } catch {}
   let lastQuestion;
+  function renderAnswerItem(answer,item) {
+    const section = append(answer,'section','','answer-item');
+    append(section,'h4',item.label);
+    append(section,'p',item.answer ?? 'この項目の根拠は資料内で確認できませんでした。');
+    if (!item.evidence?.length) return;
+    const evidence = append(section,'div','','answer-evidence');
+    append(evidence,'h5','資料内表記');
+    const byPage = new Map();
+    for (const {page,quote} of item.evidence) {
+      if (!byPage.has(page)) byPage.set(page,new Set());
+      byPage.get(page).add(quote);
+    }
+    for (const [page,quotes] of byPage) {
+      const source = append(evidence,'div','','answer-source');
+      sourceLink(source,page);
+      for (const quote of quotes) append(source,'blockquote',quote);
+    }
+  }
+  for (const entry of history) {
+    const log = $('#messages');
+    append(log,'div',entry.question,'bubble user');
+    const answer = append(log,'div','','bubble');
+    append(answer,'h3','質問回答','answer-heading');
+    for (const item of entry.items) renderAnswerItem(answer,item);
+    if (entry.fallback) append(answer,'p',entry.fallback);
+    lastQuestion = entry.question;
+  }
   async function sendQuestion(question,previousQuestion,retrying=false) {
     const log = $('#messages');
     if (button.disabled) return;
     button.disabled = true;
     if (!retrying) append(log,'div',question,'bubble user');
     let box;
+    const entry = {question,items:[]};
     status.textContent = '資料から答えを探しています…';
     log.scrollTop = log.scrollHeight;
     try {
@@ -766,23 +800,8 @@ async function reader() {
         if (box) await new Promise(resolve=>setTimeout(resolve,220));
         const first = !box;
         const answer = answerBox();
-          const section = append(answer,'section','','answer-item');
-          append(section,'h4',item.label);
-          append(section,'p',item.answer ?? 'この項目の根拠は資料内で確認できませんでした。');
-          if (item.evidence.length) {
-            const evidence = append(section,'div','','answer-evidence');
-            append(evidence,'h5','資料内表記');
-            const byPage = new Map();
-            for (const {page,quote} of item.evidence) {
-              if (!byPage.has(page)) byPage.set(page,new Set());
-              byPage.get(page).add(quote);
-            }
-            for (const [page,quotes] of byPage) {
-              const source = append(evidence,'div','','answer-source');
-              sourceLink(source,page);
-              for (const quote of quotes) append(source,'blockquote',quote);
-            }
-          }
+        renderAnswerItem(answer,item);
+        entry.items.push(item);
         if (first) answer.scrollIntoView({behavior:'smooth',block:'start'});
       }
       if (!response.headers.get('Content-Type')?.includes('application/x-ndjson')) {
@@ -791,7 +810,7 @@ async function reader() {
           status.textContent = '確認できた回答を表示しています…';
           await showItem(item);
         }
-        if (!box) append(answerBox(),'p',result.answer);
+        if (!box) append(answerBox(),'p',entry.fallback=result.answer);
       } else {
         const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
         let pending='', finished=false;
@@ -812,7 +831,7 @@ async function reader() {
               }
               if (event.done) {
                 finished=true;
-                if (event.answer) append(answerBox(),'p',event.answer);
+                if (event.answer) append(answerBox(),'p',entry.fallback=event.answer);
               }
             }
           }
@@ -820,6 +839,8 @@ async function reader() {
         } finally { await reader.cancel().catch(()=>{}); }
       }
       lastQuestion = question;
+      history = [...history,entry].slice(-10);
+      try { sessionStorage.setItem(historyKey,JSON.stringify(history)); } catch {}
       status.textContent = '';
     } catch (error) {
       box?.remove();
