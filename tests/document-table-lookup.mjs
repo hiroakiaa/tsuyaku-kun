@@ -8,7 +8,7 @@ for (const y of [20,70,150,220]) for(let x=20;x<=1100;x++) mark(x,y);
 for (const x of [20,200,600,1100]) for(let y=20;y<=220;y++) mark(x,y);
 const cell=(str,x,y)=>({str,height:12,transform:[1,0,0,1,x,y+3]});
 const items=[
-  cell('項目',40,45),cell('所要時間',230,45),cell('所要時間',270,45),cell('費用',640,45),
+  cell('所要時間',230,10),cell('項目',40,45),cell('所要時間',230,45),cell('所要時間',270,45),cell('費用',640,45),
   cell('北',60,115),cell('館',60,125),cell('15分',230,115),cell('500円',640,115),
   cell('南館',60,180),cell('30分',230,180),cell('900円',640,180),
 ];

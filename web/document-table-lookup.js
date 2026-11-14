@@ -18,15 +18,12 @@ export async function lookupTableCell(pdf, question) {
     });
     const headers=cells.filter(cell=>{
       const text=compact(cell.text);
-      if(text.includes(columnName)) return true;
+      if(text===columnName || text.startsWith(columnName+'(')) return true;
       if(!columnName.startsWith(text) || text.length<2) return false;
       return cells.some(next=>Math.abs(next.y-cell.y)<3 && next.x>cell.x &&
         next.x-cell.x<50 && (text+compact(next.text)).startsWith(columnName));
     });
     if (!headers.length) continue;
-    // PDF text can repeat a heading in the body. Use its first occurrence on the page.
-    headers.sort((a,b)=>a.y-b.y);
-    const headerRow=headers.filter(cell=>Math.abs(cell.y-headers[0].y)<3);
     const canvas=document.createElement('canvas');
     canvas.width=Math.ceil(viewport.width);
     canvas.height=Math.ceil(viewport.height);
@@ -47,7 +44,7 @@ export async function lookupTableCell(pdf, question) {
         else rules.push(y);
       }
     }
-    for (const header of headerRow) {
+    for (const header of headers) {
       const top=rules.findLast(y=>y<header.y);
       const bottom=rules.find(y=>y>header.y);
       if(top==null || bottom==null) continue;
