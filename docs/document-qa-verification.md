@@ -93,3 +93,5 @@ R7要項の給食費を本番の全文・検索方式で各3回、順序を交�
 端末限定の合成Excelを公開版Chromeで登録。独立した認証セッションから資料情報とPDFを取得し、両方HTTP 404。作成者側は5問の回答・根拠・聞き返しが通過し、削除後の資料情報とPDFも404。再現は node tools/smoke-document-qa-tables.mjs。
 
 848da5d の [公開後試験 43622124247](https://github.com/hiroakiaa/tsuyaku-kun/actions/runs/43622124247) は成功。REST APIが取得上限に達したため、GitHub Actionsの公開ワークフロー一覧で実行番号・対象コミットを照合し、完了と成功を確認した。再開時も一覧で対象コミットを照合し、完了時の成否まで確認する。
+
+公開後の [Actions 43622489225](https://github.com/hiroakiaa/tsuyaku-kun/actions/runs/43622489225) は成功。混在PDFで、記載のない駐車許可料だけを質問すると根拠なしを表示。閉館時刻と同時に質問すると閉館時刻だけに1・2ページの根拠を表示した。再実行は node tools/smoke-document-qa.mjs。対象は合成PDFの英語質問。
