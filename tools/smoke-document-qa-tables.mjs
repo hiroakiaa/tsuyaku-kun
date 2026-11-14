@@ -96,7 +96,9 @@ try {
     const blankStarted = performance.now();
     await page.locator('#ask-form button').click();
     await page.locator('#ask-form button:enabled').waitFor();
-    const blankAnswer = await page.locator('#messages .bubble').last().textContent();
+    const blankBubble = page.locator('#messages .bubble').last();
+    const blankAnswer = await blankBubble.textContent();
+    assert.equal(await blankBubble.locator('.answer-source').count(),0,blankQuestion);
     assert.match(blankAnswer,/空欄|記載(?:が)?(?:ありません|されていません)|根拠(?:を|は資料内で)確認できません/);
     assert.doesNotMatch(blankAnswer,/\b(?:20|40)\b/,'A capacity value must not be reused as the admission date');
     measurements.push({question:blankQuestion,value:blankAnswer,source:null,elapsedMs:Math.round(performance.now()-blankStarted)});
