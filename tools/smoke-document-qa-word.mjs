@@ -30,6 +30,7 @@ try {
   await page.waitForFunction(()=>Boolean(document.querySelector('#guide-url')?.value),null,{timeout:120000}).catch(async e=>{throw Error(await page.locator('#upload-status').textContent(),{cause:e});});
   const registrationMs = Math.round(performance.now()-registrationStarted);
   const guide = await url.inputValue();
+  let measurement;
   try {
     assert.deepEqual(externalWrites,[]);
     const viewer = await browser.newPage();
@@ -65,7 +66,7 @@ try {
     assert.match(await bubble.locator('.answer-text').textContent(),/14:00|2\s*(?::00)?\s*p\.?m\.?/i);
     assert.deepEqual(await bubble.locator('.answer-source a').allTextContents(),['元のPDF 2ページ']);
     assert.match(await bubble.locator('.answer-quote').textContent(),/Blue group[\s\S]*14:00/);
-    console.log(JSON.stringify({fixture:'word-page-break',registrationMs,answerMs}));
+    measurement = {fixture:'word-page-break',registrationMs,answerMs};
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
       const {config} = await import('./web/config.js');
@@ -84,6 +85,11 @@ try {
       return {removeStatus:response.status,reopenStatus:reopened.status,pdfStatus:pdf.status};
     },guide);
     assert.deepEqual(removed,{removeStatus:200,reopenStatus:404,pdfStatus:404}); console.log('cleanup confirmed');
+  }
+  console.log(JSON.stringify(measurement));
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    await appendFile(process.env.GITHUB_STEP_SUMMARY,
+      `\n### Word QA in the published app\n\nRegistration: ${measurement.registrationMs} ms. Answer completion: ${measurement.answerMs} ms.\n\nVerified the answer, page 2 citation, original quote, and fixture removal.\n`);
   }
 } finally {
   await browser.close();
