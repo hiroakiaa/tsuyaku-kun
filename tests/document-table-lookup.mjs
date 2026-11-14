@@ -70,7 +70,12 @@ console.log('PASS table quotation preserves rows and prose joins wrapped lines')
     [marks(0,0),{str:'施設'},end,marks(0,1),{str:'最終'},begin(null),{str:'⼊'},end,{str:'館時刻'},end],
     [marks(1,0),{str:'図書館'},end,marks(1,1),{str:'13:00'},end],
   ];
+  assert.deepEqual(await readTaggedTables({
+    getMarkInfo:async()=>null,
+    getData:()=>assert.fail('An untagged PDF should not be parsed twice'),
+  }),[]);
   const tables=await readTaggedTables({
+    getMarkInfo:async()=>({Marked:true}),
     numPages:2,
     getData:()=>pdf.save(),
     getPage:async number=>({getTextContent:async()=>({items:items[number-1]})}),

@@ -1,4 +1,5 @@
 export async function readTaggedTables(rendered) {
+  if (!(await rendered.getMarkInfo())?.Marked) return [];
   const {PDFDocument,PDFName,PDFArray,PDFDict,PDFRef}=await import('./document-pdf-lib.mjs');
   const pdf=await PDFDocument.load(await rendered.getData());
   const root=pdf.catalog.get(PDFName.of('StructTreeRoot'));
