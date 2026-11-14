@@ -713,6 +713,18 @@ export async function documents(request,env,auth) {
       ? lookupWorksheetCell(record.pages,previousQuestion) : null;
     let worksheetQuestion = previous?.clarificationYears?.includes(yearReply?.[1])
       ? '令和'+yearReply[1]+'年度の'+previousQuestion : currentQuestion;
+    if (yearReply && previous?.evidence.length) {
+      const priorQuestion = normalized(previousQuestion);
+      const yearPrefix = /^(?:令和|R)\d+年度?の/iu;
+      if (yearPrefix.test(priorQuestion)) {
+        const candidate = priorQuestion.replace(yearPrefix,'令和'+yearReply[1]+'年度の');
+        const next = lookupWorksheetCell(record.pages,candidate);
+        const labels = item=>item.evidence.slice(0,-1).map(cell=>normalized(cell.value));
+        if (next?.evidence.length && JSON.stringify(labels(previous))===JSON.stringify(labels(next))) {
+          worksheetQuestion = candidate;
+        }
+      }
+    }
     const followup = /^([\p{L}]{1,12})は[?。]?$/u.exec(normalized(currentQuestion));
     if (followup && typeof previousQuestion==='string' && previousQuestion.length<=300) {
       const prior = lookupWorksheetCell(record.pages,previousQuestion);

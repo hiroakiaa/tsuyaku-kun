@@ -48,6 +48,13 @@ for (const reply of ['令和8年度です','令和8年度','R8','Ｒ８']) {
   assert.deepEqual(clarified.items.flatMap(item=>item.evidence.map(e=>[e.sheet,e.cell,e.page])),['A3','B4','C1','D2','D4'].map(cell=>['R8料金表',cell,5]));
 }
 
+const switchYear = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+  method:'POST', body:JSON.stringify({question:'R9',previousQuestion:'令和8年度の会議室の子どもの休日料金は？'}),
+}),env,{uid:'test'});
+const switched = await switchYear.json();
+assert.equal(switched.answer,'450円');
+assert.deepEqual(switched.items[0].evidence.map(e=>[e.sheet,e.cell,e.page]),
+  ['A3','B4','C1','D2','D4'].map(cell=>['R9料金表',cell,3]));
 const threeYearPages = [...pages, pages[4].replace('R8料金表','R7料金表').replace('400円','350円')];
 const threeYearEnv = {ROOMS:{idFromName:x=>x,get:()=>({fetch:async()=>Response.json({pages:threeYearPages,sourceType:'xlsx'})})}};
 const ambiguous = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
