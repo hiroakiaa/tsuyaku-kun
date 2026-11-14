@@ -110,13 +110,23 @@ try {
       await page.locator('#add-material input[type=file]').setInputFiles({
         name:'green-schedule.png',mimeType:'image/png',buffer:Buffer.from(extra.split(',')[1],'base64'),
       });
-      const requestPending=page.waitForRequest(request=>new URL(request.url()).pathname.endsWith('/material') && request.method()==='POST');
+      await page.evaluate(()=>{
+        const send=window.fetch;
+        window.fetch=function(url,options){
+          if (options?.body instanceof FormData && new URL(url,location.href).pathname.endsWith('/material')) {
+            const file=options.body.get('file');
+            window.qaMaterial={name:file.name,type:file.type,pages:options.body.get('pages')};
+          }
+          return send.apply(this,arguments);
+        };
+      });
       await page.locator('#add-material button').click();
-      const request=await requestPending;
-      assert.match(request.postData(),/filename="green-schedule\.pdf"/);
-      assert.match(request.postData(),/Green group starts at 16:30/i);
       await page.getByText('追加しました。質問に使用できます。').waitFor();
-      await page.locator('#material-dialog').press('Escape');
+      const attachment=await page.evaluate(()=>window.qaMaterial);
+      assert.equal(attachment.name,'green-schedule.pdf');
+      assert.equal(attachment.type,'application/pdf');
+      assert.match(attachment.pages,/Green group starts at 16:30/i);
+      await page.keyboard.press('Escape');
       await page.locator('#question').fill('What is the start time for the Green group?');
       await page.locator('#ask-form button').click();
       await page.locator('#ask-form button:enabled').waitFor();
