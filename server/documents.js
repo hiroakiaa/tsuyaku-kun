@@ -53,6 +53,14 @@ function selectPassages(pages, question, index) {
     ['下校','帰宅','帰る','帰り','dismissal','leave school'],
     ['年間','1年','year','annual'],['費用','金額','会費','お金','cost','fee'],
     ['締切','期限','いつまで','deadline'],['持ち物','持参','bring'],
+    ['欠席','休む','休みます','absent','absence'],
+    ['遅刻','遅れる','間に合わない','late arrival'],
+    ['引き渡し','お迎え','迎えに','pick up','pickup'],
+    ['入学式','入学の式','entrance ceremony'],
+    ['給食','昼食','ランチ','school lunch'],
+    ['振替','引き落とし','口座から','direct debit'],
+    ['提出','出してください','届け出','submit'],
+    ['連絡先','問い合わせ','電話番号','contact'],
   ]) {
     if (group.some(word=>query.includes(word))) group.forEach(word=>terms.add(word));
   }
