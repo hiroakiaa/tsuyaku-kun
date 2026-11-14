@@ -54,6 +54,13 @@ try {
     await citation.click({timeout:60_000});
     await page.waitForFunction(()=>document.querySelector('#pdf-page')?.value==='2');
     assert.match(await page.locator('#messages .bubble').last().textContent(),/8\s*(?::00)?\s*AM/i);
+    await page.locator('#question').fill('When does the library close and when does the swimming pool open? Give both facts separately.');
+    await page.locator('#ask-form button').click();
+    const combined = page.locator('#messages .bubble').last();
+    const librarySource = combined.locator('.answer-item').filter({hasText:/3\s*(?::00)?\s*PM/i});
+    const poolSource = combined.locator('.answer-item').filter({hasText:/8\s*(?::00)?\s*AM/i});
+    await librarySource.getByRole('link',{name:'元のPDF 1ページ'}).waitFor();
+    await poolSource.getByRole('link',{name:'元のPDF 2ページ'}).waitFor();
     assert.deepEqual(externalWrites,[]);
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
