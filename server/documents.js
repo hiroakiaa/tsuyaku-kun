@@ -711,9 +711,27 @@ export async function documents(request,env,auth) {
     const yearReply = /^(?:令和|R)(\d+)(?:年度?)?(?:です)?[。.]?$/iu.exec(normalized(currentQuestion));
     const previous = yearReply && typeof previousQuestion==='string' && previousQuestion.length<=300
       ? lookupWorksheetCell(record.pages,previousQuestion) : null;
-    const worksheetQuestion = previous?.clarificationYears?.includes(yearReply?.[1])
+    let worksheetQuestion = previous?.clarificationYears?.includes(yearReply?.[1])
       ? '令和'+yearReply[1]+'年度の'+previousQuestion : currentQuestion;
-    const item = lookupWorksheetCell(record.pages,worksheetQuestion) ?? lookupAdmissionCell(record.pages,currentQuestion);
+    const followup = /^([\p{L}]{1,12})は[?。]?$/u.exec(normalized(currentQuestion));
+    if (followup && typeof previousQuestion==='string' && previousQuestion.length<=300) {
+      const prior = lookupWorksheetCell(record.pages,previousQuestion);
+      const rowLabel = prior?.evidence?.[1]?.value;
+      if (rowLabel) {
+        const candidate = normalized(previousQuestion).replace(normalized(rowLabel),followup[1]);
+        const next = lookupWorksheetCell(record.pages,candidate);
+        if (next?.evidence?.[1]?.value && normalized(next.evidence[1].value)===followup[1] &&
+            [0,-3,-2].every(index=>{
+              const original=prior.evidence.at(index);
+              const updated=next.evidence.at(index);
+              return original.sheet===updated.sheet && original.cell===updated.cell;
+            })) worksheetQuestion = candidate;
+      }
+    }
+    const worksheetItem = lookupWorksheetCell(record.pages,worksheetQuestion);
+    const item = worksheetItem
+      ? {...worksheetItem,worksheetContext:worksheetQuestion}
+      : lookupAdmissionCell(record.pages,currentQuestion);
     if (item) {
       if (request.headers.get('Accept')==='application/x-ndjson') {
         return new Response(JSON.stringify({item})+'\n'+JSON.stringify({done:true})+'\n',{

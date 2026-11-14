@@ -978,7 +978,7 @@ async function reader() {
     const answer = append(log,'div','','bubble');
     for (const item of entry.items) renderAnswerItem(answer,item);
     if (entry.fallback) append(answer,'p',entry.fallback);
-    lastQuestion = entry.question;
+    lastQuestion = entry.items.at(-1)?.worksheetContext ?? entry.question;
   }
   async function sendQuestion(question,previousQuestion,retrying=false) {
     const log = $('#messages');
@@ -1005,7 +1005,7 @@ async function reader() {
         if (item) {
           renderAnswerItem(append(log,'div','','bubble'),item);
           entry.items.push(item);
-          lastQuestion = question;
+          lastQuestion = entry.items.at(-1)?.worksheetContext ?? question;
           history = [...history,entry].slice(-10);
           try { sessionStorage.setItem(historyKey,JSON.stringify(history)); } catch {}
           status.textContent = '';
@@ -1085,7 +1085,7 @@ async function reader() {
           if (!finished) throw Error('回答の受信が途中で止まりました。');
         } finally { await reader.cancel().catch(()=>{}); }
       }
-      lastQuestion = question;
+      lastQuestion = entry.items.at(-1)?.worksheetContext ?? question;
       history = [...history,entry].slice(-10);
       try { sessionStorage.setItem(historyKey,JSON.stringify(history)); } catch {}
       status.textContent = '';
