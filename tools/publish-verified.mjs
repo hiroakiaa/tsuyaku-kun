@@ -12,7 +12,7 @@ run('git',['fetch','origin','main']);
 if(run('git',['merge-base','--is-ancestor','origin/main','HEAD'],{allowFailure:true}).status!==0)throw Error('公開中のmainより古い履歴です。最新版へ変更を載せ直してから公開してください。');
 console.log('1/4 最新版との前後関係を確認しました。');
 run(process.execPath,['--experimental-vm-modules','tests/run.mjs']);
-for(const file of ['lesson-economy.mjs','group-chat.mjs','chat-recovery.mjs','reliability20.mjs','document-qa.mjs'])run(process.execPath,[`tests/${file}`]);
+for(const file of ['lesson-economy.mjs','group-chat.mjs','chat-recovery.mjs','reliability20.mjs','document-qa.mjs','document-sheet-tables.mjs','document-table-lookup.mjs'])run(process.execPath,[`tests/${file}`]);
 run(process.execPath,['--test','tests/live-translation.mjs']);
 console.log('2/4 全テストを通過しました。');
 const push=run('git',['push','origin','HEAD:main'],{allowFailure:true});
