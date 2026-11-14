@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#1d1d1d">
 <title>資料QA君</title>
 <link rel="stylesheet" href="web/documents.css?v=59">
-<script type="module" src="web/documents.js?v=67"></script>
+<script type="module" src="web/documents.js?v=68"></script>
 </head>
 <body><div class="shell">
 
@@ -22,7 +22,7 @@
 <form class="stack" id="upload">
 <label>資料名<input name="title" maxlength="100" placeholder="例：新1年生の入学案内" required></label>
 <label><span><i class="fa-solid fa-folder" aria-hidden="true"></i> 資料ファイル</span><input type="file" aria-describedby="upload-formats" name="pdf" accept=".pdf,.png,.jpg,.jpeg,.webp,.docx,.xlsx" required></label>
-<p id="upload-formats" class="fine">PDF（5 MB・40ページまで）、PNG・JPEG・WebP、Excel（.xlsx）、Word（.docx）</p>
+<p id="upload-formats" class="fine">PDF（5 MB・40ページまで）、画像・Excel・Wordは1つのPDFに変換します</p>
 <label>保管先<select name="visibility"><option value="device">この端末の保管庫のみ</option><option value="shared">共通保管庫にも掲載（誰でも閲覧できます）</option></select></label>
 <div class="create-actions"><small id="create-estimate" role="status" hidden>10～20秒ほどで完成します（目安）</small><button class="primary create-guide"><i class="fa-solid fa-plus" aria-hidden="true"></i> <span>作成する</span></button></div>
 </form>

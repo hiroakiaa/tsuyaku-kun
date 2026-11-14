@@ -209,9 +209,13 @@ function teacher() {
         if (error) throw error;
         data.set('pages',JSON.stringify(pages));
       }
-      if (/\.(docx|xlsx)$/i.test(file.name)) {
-        const {officePages} = await import('./document-office.js?v=66');
-        data.set('pages',JSON.stringify(await officePages(file)));
+      if (!/\.pdf$/i.test(file.name)) {
+        const {convertDocument}=await import('./document-convert.js');
+        const converted=await convertDocument(file);
+        data.set('pdf',converted.file);
+        data.set('converted','1');
+        if(converted.image) data.set('ocrImage',file);
+        else data.set('pages',JSON.stringify(converted.pages));
       }
       const {id,expires} = await request('/documents',{method:'POST',body:data});
       status.textContent = '作成が完了しました。';

@@ -278,22 +278,26 @@ export async function documents(request,env,auth) {
         const {done,value} = await reader.read();
         if (done) break;
         size += value.byteLength;
-        if (size > MAX_PDF + 1_000_000) { await reader.cancel(); return fail('PDFは5 MBまでです。',413); }
+        if (size > 26_000_000) { await reader.cancel(); return fail('PDFは5 MBまでです。',413); }
         chunks.push(value);
       }
     } finally { reader.releaseLock(); }
     const form = await new Response(new Blob(chunks),{headers:{'Content-Type':request.headers.get('Content-Type')||''}}).formData();
     const pdf = form.get('pdf');
     const title = String(form.get('title')||'').trim();
-    if (!(pdf instanceof File) || !pdf.size || pdf.size > MAX_PDF || !title || title.length > 100) return fail('資料とタイトルを確認してください。');
+    const converted=form.get('converted')==='1';
+    if (!(pdf instanceof File) || !pdf.size || pdf.size > (converted ? 20_000_000 : MAX_PDF) || !title || title.length > 100) return fail('資料とタイトルを確認してください。');
     const ext = pdf.name.split('.').pop().toLowerCase();
     if (ext==='pdf' && !(await pdf.slice(0,5).text()).startsWith('%PDF-')) return fail('PDFを確認してください。');
-    const pages = await readMaterial(env,pdf,form,ext);
+    const ocr = converted && form.get('ocrImage');
+    const ocrType = ocr instanceof File && ocr.size<=MAX_PDF ? ocr.name.split('.').pop().toLowerCase() : '';
+    const pages = await (ocr ? (['png','jpeg','jpg','webp'].includes(ocrType)
+      ? readMaterial(env,ocr,form,ocrType) : fail('画像形式を確認してください。')) : readMaterial(env,pdf,form,ext));
     if (pages instanceof Response) return pages;
-    if (!Array.isArray(pages) || pages.length>MAX_PAGES || pages.some(page=>typeof page!=='string') ||
-        pages.join('').length>(ext==='xlsx' ? MAX_EXCEL_TEXT : MAX_TEXT) || !pages.some(page=>page.trim().length>=5)) return fail('資料の文字を読み取れませんでした。');
-    const largeExcel = ext==='xlsx' && pages.join('').length>MAX_TEXT;
-    const overview = largeExcel ? pages.map((text,i)=>({page:i+1,text:text.slice(0,500)})) : undefined;
+    if (!Array.isArray(pages) || pages.length>(converted ? 160 : MAX_PAGES) || pages.some(page=>typeof page!=='string') ||
+        pages.join('').length>((converted || ext==='xlsx') ? MAX_EXCEL_TEXT : MAX_TEXT) || !pages.some(page=>page.trim().length>=5)) return fail('資料の文字を読み取れませんでした。');
+    const largeExcel = (converted || ext==='xlsx') && pages.join('').length>MAX_TEXT;
+    const overview = largeExcel ? pages.map((text,i)=>({page:i+1,text:text.slice(0,Math.min(500,Math.floor(12_000/pages.length)))})) : undefined;
     const result = await generate(env,pages,undefined,[],undefined,overview);
     const items = (Array.isArray(result?.items) ? result.items : [])
       .filter(item=>typeof item?.label==='string' && typeof item.text==='string' && supported(item.source,pages))
@@ -304,7 +308,7 @@ export async function documents(request,env,auth) {
     const target = env.ROOMS.get(env.ROOMS.idFromName('document:'+id));
     const data = new FormData();
     data.set('pdf',pdf);
-    data.set('record',JSON.stringify({title,pages,items,toc,index:ext==='xlsx' && pages.join('').length>MAX_TEXT ? undefined : searchIndex(pages),owner:auth.uid,expires,sourceType:ext,visibility:form.get('visibility')==='shared'?'shared':'device'}));
+    data.set('record',JSON.stringify({title,pages,items,toc,index:largeExcel ? undefined : searchIndex(pages),owner:auth.uid,expires,sourceType:ext,visibility:form.get('visibility')==='shared'?'shared':'device'}));
     const saved = await target.fetch('https://room/document/init',{method:'POST',body:data});
     if (!saved.ok) return fail('資料を保存できませんでした。',502);
     if (form.get('visibility')==='shared') {
@@ -550,7 +554,7 @@ export async function documentStorage(request,storage) {
     const pdf = new Uint8Array(await form.get('pdf').arrayBuffer());
     await storage.transaction(async tx=>{
       const values = {document:record};
-      if (record.sourceType==='xlsx' && record.pages.join('').length>MAX_TEXT) {
+      if (record.pages.join('').length>MAX_TEXT) {
         const serialized = JSON.stringify(record.pages);
         const {pages,...metadata} = record;
         values.document = {...metadata,pageCount:pages.length,textParts:Math.ceil(serialized.length/20_000)};
@@ -558,7 +562,7 @@ export async function documentStorage(request,storage) {
       }
       for (let offset=0;offset<pdf.length;offset+=CHUNK) values['pdf:'+offset]=pdf.slice(offset,offset+CHUNK);
       await tx.setAlarm(record.expires);
-      await tx.put(values);
+      for (const entries of Array.from({length:Math.ceil(Object.keys(values).length/100)},(_,i)=>Object.entries(values).slice(i*100,i*100+100))) await tx.put(Object.fromEntries(entries));
     });
     return reply({ok:true},201);
   }
@@ -584,7 +588,7 @@ export async function documentStorage(request,storage) {
     return reply({ok:true});
   }
   if (path==='/document/replace' && request.method==='POST') {
-    if (record.textParts) return fail('Excelの差し替えは新規作成から行ってください。',409);
+    if (record.textParts) return fail('本文が大きい資料の差し替えは新規作成から行ってください。',409);
     const form = await request.formData();
     const input = JSON.parse(form.get('record'));
     const pdf = new Uint8Array(await form.get('pdf').arrayBuffer());
@@ -621,7 +625,7 @@ export async function documentStorage(request,storage) {
   }
   if (path==='/document/owner') return record.owner===await request.text() ? reply({ok:true}) : fail('作成者だけが資料を追加できます。',403);
   if (path==='/document/material' && request.method==='POST') {
-    if (record.textParts) return fail('大きなExcelには資料を追加できません。別の資料として登録してください。',413);
+    if (record.textParts) return fail('本文が大きい資料には資料を追加できません。別の資料として登録してください。',413);
     const input = await request.json();
     return storage.transaction(async tx=>{
       const current = await tx.get('document');
