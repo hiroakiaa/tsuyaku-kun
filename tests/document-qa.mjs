@@ -137,7 +137,9 @@ try {
   tableQuote = 'Library | 9 AM | 3 PM. Members can stay until 6 PM.';
   const inventedQuote = await ask('図書館の閉館時刻を教えてください。');
   assert.deepEqual(inventedQuote.pages,[]);
-  assert.ok(inventedQuote.items.every(item=>!item.answer && !item.evidence.length));
+  assert.equal(inventedQuote.items.length,1);
+  assert.equal(inventedQuote.items[0].answer,null);
+  assert.deepEqual(inventedQuote.items[0].evidence,[]);
 } finally {
   globalThis.fetch = originalFetch;
 }
