@@ -47,7 +47,7 @@ async function entries(file) {
 const tags=(node,name)=>Array.from(node?.getElementsByTagNameNS('*',name) ?? []);
 const strings=node=>tags(node,'t').map(t=>t.textContent).join('');
 
-export async function officePages(file){
+export async function officePages(file,{includeMerges=false}={}){
   const zip=await entries(file);
   if(/\.docx$/i.test(file.name)){
     const doc=await zip.read('word/document.xml');
@@ -65,14 +65,16 @@ export async function officePages(file){
     const path=new URL(target,'https://office.invalid/xl/').pathname.slice(1);
     if(!path.startsWith('xl/worksheets/')) return '';
     const xml=await zip.read(path);
-    return sheet.getAttribute('name')+'\n'+tags(xml,'row').map(row=>tags(row,'c').map(cell=>{
+    const merges=tags(xml,'mergeCell').map(cell=>cell.getAttribute('ref')).filter(Boolean);
+    const text=sheet.getAttribute('name')+'\n'+tags(xml,'row').map(row=>tags(row,'c').map(cell=>{
       const value=tags(cell,'v')[0]?.textContent;
       const type=cell.getAttribute('t');
       const content=type==='s' ? shared[Number(value)] ?? '' : type==='inlineStr' ? strings(cell) : value ?? '';
       return content.trim() ? cell.getAttribute('r')+' '+content : '';
     }).filter(Boolean).join(' | ')).filter(Boolean).join('\n');
+    return includeMerges ? {text,merges} : text;
   }));
-  if(pages.reduce((total,page)=>total+page.length,0)>150_000) {
+  if(pages.reduce((total,page)=>total+(page?.text ?? page).length,0)>150_000) {
     throw Error('Excelの本文が150,000文字を超えています。必要なシートや行だけを別のExcelに保存して登録してください。');
   }
   return pages;

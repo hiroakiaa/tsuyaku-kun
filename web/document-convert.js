@@ -1,5 +1,5 @@
 import {PDFDocument} from './document-pdf-lib.mjs';
-import {officePages} from './document-office.js?v=66';
+import {officePages} from './document-office.js?v=70';
 
 export async function convertDocument(file){
   const pdf=await PDFDocument.create();
@@ -29,9 +29,9 @@ export async function convertDocument(file){
     }finally{URL.revokeObjectURL(url);}
   }else{
     const xlsx=/\.xlsx$/i.test(file.name);
-    const sections=await officePages(file);
+    const sections=await officePages(file,{includeMerges:xlsx});
     for(const [index,section] of sections.entries()){
-      const rows=section.split('\n');
+      const rows=(section.text ?? section).split('\n');
       const title=xlsx ? rows.shift() || 'シート '+(index+1) : file.name;
       const lines=[];
       ctx.font='19px sans-serif';
@@ -51,7 +51,14 @@ export async function convertDocument(file){
         ctx.fillText(title,50,65,1020);
         ctx.font='19px sans-serif';
         block.forEach((line,i)=>ctx.fillText(line,50,102+i*28));
-        pages.push([title,...block].join('\n'));
+        const merges = section.merges?.filter(range=>{
+          const [first,last=first]=range.split(':');
+          const start=Number(first.match(/\d+$/)?.[0]);
+          const end=Number(last.match(/\d+$/)?.[0]);
+          return block.some(line=>[...line.matchAll(/(?:^| \| )[A-Z]+(\d+) /g)].some(match=>Number(match[1])>=start && Number(match[1])<=end));
+        });
+        const metadata = merges?.length ? ['結合セル範囲: '+merges.join(', ')] : [];
+        pages.push([title,...block,...metadata].join('\n'));
         await save();
       }
     }
