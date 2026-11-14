@@ -991,7 +991,7 @@ async function reader() {
       if (sourceType==='pdf' && /の/.test(question)) {
         let item;
         try {
-          const {lookupTableCell}=await import('./document-table-lookup.js');
+          const {lookupTableCell}=await import('./document-table-lookup.js?v=80');
           const pdf=await (opened ?? openPdf({url:config.api+api+'/pdf',httpHeaders:await authHeaders()}));
           item=await lookupTableCell(pdf,question);
         } catch {}
