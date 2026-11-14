@@ -135,3 +135,5 @@ R7要項の給食費を本番の全文・検索方式で各3回、順序を交�
 公開版 Windows Chrome で『青組の開始時刻は14:00です。』と印字した合成PNGを1回登録。送信直前のフォームでファイル添付は閲覧用PDFの1件、抽出テキストには14:00相当の表記を確認。『青組の開始時刻は？』に対する回答とPDF 1ページの引用の時刻を照合し、削除後の資料情報とPDFはいずれも404。登録5081ms、回答完了1432ms。全文のOCR一致や手書き・低解像度の資料は未測定。
 
 78acabc の [公開後試験 43626303363](https://github.com/hiroakiaa/tsuyaku-kun/actions/runs/43626303363) は成功。画像形式別の再試験は node tools/smoke-document-qa-image.mjs に png、jpeg、webp のいずれかを指定する。各試験は生成した画像のMIME、登録時のPDF添付と抽出テキスト、回答と根拠、削除後404を照合する。公開後試験の画像は英語の合成資料。
+
+日本語PNGを含む [公開後試験 43626710239](https://github.com/hiroakiaa/tsuyaku-kun/actions/runs/43626710239) は成功。再実行は node tools/smoke-document-qa-image.mjs png ja。Windows Chromeで同じコマンドの試験を実行した際は、登録5366ms、回答完了1459ms。手書き、低解像度、全文一致はこの試験の範囲外。
