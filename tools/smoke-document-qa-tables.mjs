@@ -77,6 +77,7 @@ try {
         assert.ok(await bubble.getByRole('link',{name:'元のPDF '+expectedPage+'ページ',exact:true}).count());
       } else assert.equal(await bubble.locator('.answer-source').count(),0);
       await page.waitForFunction(()=>!document.querySelector('#ask-form button').disabled);
+      const elapsedMs=Math.round(performance.now()-started);
       if (source) {
         const sheet = source.split(' · ')[0];
         const addresses = (await bubble.locator('.answer-source > div').allTextContents()).flatMap(line=>line.split('、'));
@@ -89,9 +90,13 @@ try {
         assert.deepEqual(addresses.sort(),expected.map(cell=>sheet+' · '+cell),question);
         const pageLabel = '元のPDF '+(['R9入試表','R9料金表','R9予定表','R8料金表'].indexOf(sheet)+1)+'ページ';
         assert.deepEqual(await bubble.locator('.answer-source a').allTextContents(),[pageLabel],question);
+        if (source==='R8料金表 · D3') {
+          await bubble.getByRole('link',{name:pageLabel,exact:true}).click();
+          await page.waitForFunction(()=>document.querySelector('#pdf-page')?.value==='4');
+        }
       }
       measurements.push({question,value,source,citationLinks:await bubble.locator('.answer-source a').allTextContents(),
-        citationCells:await bubble.locator('.answer-source > div').allTextContents(),elapsedMs:Math.round(performance.now()-started)});
+        citationCells:await bubble.locator('.answer-source > div').allTextContents(),elapsedMs});
     }
     const blankQuestion = '令和9年度の青空高校の特進の入試日程は？';
     await page.locator('#question').fill(blankQuestion);
