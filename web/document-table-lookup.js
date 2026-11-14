@@ -80,7 +80,8 @@ export async function lookupTableCell(pdf, question) {
         if(label!==normalizeLabel(rowName) && !label.includes(normalizeLabel(rowName))) continue;
         const values=row.filter(cell=>cell.x>left && cell.x<right).sort((a,b)=>Math.abs(a.y-b.y)<2 ? a.x-b.x : a.y-b.y);
         const quote=values.map(cell=>cell.text.trim()).filter(Boolean).join('\n');
-        if(quote) matches.push({label,exact:label===normalizeLabel(rowName),answer:quote,evidence:[{page:number,quote}]});
+        const key = [number,start,end,left,right].join(':');
+        if(quote && !matches.some(item=>item.key===key)) matches.push({key,label,exact:label===normalizeLabel(rowName),answer:quote,evidence:[{page:number,quote}]});
       }
     }
   }
