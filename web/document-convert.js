@@ -61,7 +61,7 @@ export async function convertDocument(file){
         block.forEach(({segment},i)=>ctx.fillText(segment,50,102+i*28));
         const pageRows = [];
         for (const {segment,continued} of block) {
-          if (xlsx && continued) pageRows[pageRows.length-1]+=segment;
+          if (continued) pageRows[pageRows.length-1]+=segment;
           else pageRows.push(segment);
         }
         const merges = section.merges?.filter(range=>{

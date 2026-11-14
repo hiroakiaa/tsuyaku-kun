@@ -220,7 +220,7 @@ function teacher() {
         data.set('pages',JSON.stringify(pages));
       }
       if (!/\.pdf$/i.test(file.name)) {
-        const {convertDocument}=await import('./document-convert.js?v=93');
+        const {convertDocument}=await import('./document-convert.js?v=94');
         const converted=await convertDocument(file);
         data.set('pdf',converted.file);
         data.set('converted','1');
