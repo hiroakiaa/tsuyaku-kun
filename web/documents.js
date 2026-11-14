@@ -1005,7 +1005,7 @@ async function reader() {
           const {lookupTableCell}=await import('./document-table-lookup.js?v=84');
           const pdf=await (opened ?? openPdf({url:config.api+api+'/pdf',httpHeaders:await authHeaders()}));
           if (!materials.length) {
-            const {readTaggedTables,findTaggedTableCell}=await import('./document-tagged-table.js');
+            const {readTaggedTables,findTaggedTableCell}=await import('./document-tagged-table.js?v=1');
             taggedTables ??= readTaggedTables(pdf).catch(()=>[]);
             item=findTaggedTableCell(await taggedTables,question);
           }

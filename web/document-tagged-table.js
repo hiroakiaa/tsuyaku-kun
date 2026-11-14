@@ -9,7 +9,7 @@ export async function readTaggedTables(rendered) {
     const {items}=await page.getTextContent({includeMarkedContent:true});
     const active=[];
     for(const item of items){
-      if(item.type==='beginMarkedContentProps' || item.type==='beginMarkedContent') active.push(item.id);
+      if(item.type==='beginMarkedContentProps' || item.type==='beginMarkedContent') active.push(item.id ?? active.at(-1));
       else if(item.type==='endMarkedContent') active.pop();
       else if(item.str && active.at(-1)){
         const id=active.at(-1);
