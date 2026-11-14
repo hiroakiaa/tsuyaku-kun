@@ -24,7 +24,8 @@ const saved = process.argv[2] ? JSON.parse(await readFile(process.argv[2],'utf8'
 if (!saved) assert.ok(key,'検証用の OPENAI_DOCUMENT_QA_KEY を環境変数に設定してください。');
 const normalize = text=>text.normalize('NFKC').replace(/[,\s]/g,'');
 const rows = [];
-for (const [question,expected] of cases) {
+const selectedCases = process.argv.includes('--two-fees') ? cases.slice(0,2) : cases;
+for (const [question,expected] of selectedCases) {
   for (const mode of ['full','search']) {
     const started = performance.now();
     const recorded = saved?.find(row=>row.question===question && row.mode===mode);
@@ -50,10 +51,10 @@ console.table(rows);
 const summary = ['full','search'].map(mode=>{
   const samples = rows.filter(row=>row.mode===mode);
   const durations = samples.map(row=>row.elapsedMs).filter(Number.isFinite).sort((a,b)=>a-b);
-  return {mode, cases:samples.length, passed:samples.filter(row=>row.correct).length,
+  return {mode, expectedCases:selectedCases.length, unmeasuredCases:selectedCases.length-samples.length, cases:samples.length, passed:samples.filter(row=>row.correct).length,
     medianMs:durations[Math.ceil(durations.length/2)-1] ?? null, maxMs:durations.at(-1) ?? null,
     measuredCostCases:samples.filter(row=>row.estimatedUSD!==null).length,
-    estimatedUSD:samples.every(row=>row.estimatedUSD!==null)
+    estimatedUSD:samples.length===selectedCases.length && samples.every(row=>row.estimatedUSD!==null)
       ? samples.reduce((sum,row)=>sum+row.estimatedUSD,0) : null};
 });
 console.log(JSON.stringify({summary,rows},null,2));

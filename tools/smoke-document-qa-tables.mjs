@@ -105,14 +105,14 @@ try {
     const result = {registrationMs,questions:measurements};
     console.log(JSON.stringify(result));
     if (process.env.GITHUB_STEP_SUMMARY) {
-      const rows = measurements.map(({question,elapsedMs})=>`| ${question} | ${elapsedMs} |`);
+      const rows = measurements.map(({question,value,source,elapsedMs})=>`| ${question} | ${value} | ${source ?? "なし"} | ${elapsedMs} |`);
       await appendFile(process.env.GITHUB_STEP_SUMMARY,[
         '## 資料QAの速度（合成Excel、1回）',
         '',
         '作成操作から登録URLの表示まで '+registrationMs+' ms',
         '',
-        '| 質問 | 表示完了までの時間 (ms) |',
-        '| --- | ---: |',
+        '| 質問 | 確認した表示 | 根拠セル | 表示完了まで (ms) |',
+        '| --- | --- | --- | ---: |',
         ...rows,
         '',
       ].join('\n'));
