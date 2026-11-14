@@ -283,7 +283,7 @@ async function reader() {
     selectTab(tabs[0]);
     tabs[0].focus();
   });
-  $('#qa-source').addEventListener('click',()=>void showPdf(selectedPage || 1));
+  $('#qa-source').addEventListener('click',()=>void showPdf(citation?.page || selectedPage || 1));
   const sourceType = doc.sourceType ?? 'pdf';
   if (sourceType!=='pdf') {
     $('#qa-source').textContent = '資料データを表示';
@@ -426,19 +426,25 @@ async function reader() {
     const quote = normalize(selected.quote);
     const start = text.indexOf(quote);
     if (!quote || start<0) return;
+    for (const mark of slot.querySelectorAll('.pdf-citation-mark')) mark.remove();
     let offset = 0;
+    let firstMark;
     for (const run of runs) {
       const end = offset+run.text.length;
       if (end>start && offset<start+quote.length) {
         const {item} = run;
         const [x,y] = viewport.convertToViewportPoint(item.transform[4],item.transform[5]);
         const mark = append(slot,'span','','pdf-citation-mark');
+        firstMark ??= mark;
         mark.style.left = x/viewport.width*100+'%';
         mark.style.top = (y-item.height*viewport.scale)/viewport.height*100+'%';
         mark.style.width = item.width*viewport.scale/viewport.width*100+'%';
         mark.style.height = item.height*viewport.scale/viewport.height*100+'%';
       }
       offset = end;
+    }
+    if (firstMark && dialog.open && selectedPage===selected.page) {
+      preview.scrollTo({top:preview.scrollTop + firstMark.getBoundingClientRect().top - preview.getBoundingClientRect().top - preview.clientHeight*.25,behavior:scrollBehavior()});
     }
   }
   async function renderPage(slot) {
@@ -609,6 +615,7 @@ async function reader() {
       $('#pdf-file').href = originalUrl+'#page='+selectedPage;
     });
   }, {passive:true});
+  const scrollBehavior = ()=>matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
   async function showPdf(n) {
     if (n<1 || n>doc.pageCount) return;
     selectedPage = n;
@@ -692,7 +699,8 @@ async function reader() {
       setZoom(zoom);
       const slot = pageViews[n-1];
       lastNavigation = performance.now();
-      preview.scrollTo({top:preview.scrollTop+slot.getBoundingClientRect().top-preview.getBoundingClientRect().top,behavior:'smooth'});
+      preview.scrollTo({top:preview.scrollTop+slot.getBoundingClientRect().top-preview.getBoundingClientRect().top,behavior:scrollBehavior()});
+      if (citation?.page===n && slot.querySelector('canvas')) void pdf.getPage(n).then(page=>highlightCitation(slot,page,page.getViewport({scale:1}))).catch(()=>{});
       $('#pdf-status').textContent = '';
     } catch (error) {
       if (error.name === 'RenderingCancelledException' || selectedPage !== n) return;
@@ -704,6 +712,10 @@ async function reader() {
     }
   }
   const materials = doc.materials ?? [];
+  function clearCitation() {
+    citation = undefined;
+    for (const mark of preview.querySelectorAll('.pdf-citation-mark')) mark.remove();
+  }
   function sourceLink(parent,n,quote) {
     const material = materials.find(item=>n>=item.start && n<item.start+item.count);
     if (material) {
@@ -714,11 +726,9 @@ async function reader() {
     link.href = '#tab-ask';
     link.addEventListener('click',async event=>{
       event.preventDefault();
-      citation = quote ? {page:n,quote} : undefined;
-      for (const mark of preview.querySelectorAll('.pdf-citation-mark')) mark.remove();
+      clearCitation();
+      citation = quote && sourceType==='pdf' ? {page:n,quote} : undefined;
       await showPdf(n);
-      const slot = preview.querySelector('[data-page="'+n+'"]');
-      if (citation?.page===n && slot?.querySelector('canvas') && !slot.querySelector('.pdf-citation-mark')) await renderPage(slot);
     });
   }
   for (const item of doc.items) {
@@ -841,6 +851,8 @@ async function reader() {
     const log = $('#messages');
     if (button.disabled) return;
     button.disabled = true;
+    clearCitation();
+    let followedCitation = false;
     if (!retrying) append(log,'div',question,'bubble user');
     let box;
     log.append(status);
@@ -868,6 +880,12 @@ async function reader() {
         const answer = answerBox();
         renderAnswerItem(answer,item);
         entry.items.push(item);
+        const evidence = item.evidence?.find(source=>source.page>=1 && source.page<=doc.pageCount && source.quote);
+        if (!followedCitation && evidence && sourceType==='pdf') {
+          followedCitation = true;
+          citation = {page:evidence.page,quote:evidence.quote};
+          if (wide.matches || dialog.open) void showPdf(evidence.page);
+        }
         if (first) answer.scrollIntoView({behavior:'smooth',block:'start'});
       }
       if (!response.headers.get('Content-Type')?.includes('application/x-ndjson')) {
@@ -897,6 +915,8 @@ async function reader() {
               if (event.replaceItems) {
                 answerBox().replaceChildren();
                 entry.items = [];
+                clearCitation();
+                followedCitation = false;
                 for (const item of event.replaceItems) await showItem(item);
               }
               if (event.item) {
