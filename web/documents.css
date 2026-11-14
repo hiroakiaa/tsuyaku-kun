@@ -189,3 +189,4 @@ dialog [tabindex="-1"][autofocus]:focus {
 .library-heading h1 {margin:0;font-size:1.3rem}
 .document-library h2 {font-size:1.05rem;margin-top:1.5rem}
 #shared-list {list-style:none;padding:0;display:grid;gap:.65rem}
+.qa-actions {flex-wrap:nowrap;flex-shrink:0}
