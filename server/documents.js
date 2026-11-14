@@ -804,7 +804,9 @@ export async function documents(request,env,auth) {
           const source = result?.evidence?.[0];
           return {label,result:source?.sheet===group.sheet && source.cell===group.cell ? result : null};
         })];
-        if (matches.some(({result})=>result)) {
+        if (first?.clarificationYears && matches.slice(1).every(({result})=>!result)) {
+          items.push({...first,worksheetContext:worksheetQuestion});
+        } else if (matches.some(({result})=>result)) {
           items.push(...matches.map(({label,result})=>result
             ? {...result,label,worksheetContext:worksheetQuestion}
             : {label,answer:null,evidence:[],worksheetContext:worksheetQuestion}));
