@@ -32,13 +32,17 @@ try {
   await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
   assert.equal(await page.getByRole('link',{name:'資料チャット作成',exact:true}).count(),0);
   await page.locator('#upload input[name=title]').fill('自動公開確認');
+  const preflightStarted = performance.now();
   await page.locator('#upload input[type=file]').setInputFiles({name:'smoke.pdf',mimeType:'application/pdf',buffer:pdf});
   await page.getByText('PDFの文字を確認しました。',{exact:true}).waitFor({timeout:120_000}).catch(async error=>{
     throw new Error('PDF preflight: '+await page.locator('#upload-status').textContent(),{cause:error});
   });
+  const preflightMs = Math.round(performance.now()-preflightStarted);
+  const registrationStarted = performance.now();
   await page.locator('#upload button').click();
   const url = page.locator('#guide-url');
   await page.waitForFunction(()=>Boolean(document.querySelector('#guide-url')?.value));
+  const registrationMs = Math.round(performance.now()-registrationStarted);
   const guide = await url.inputValue();
   try {
     assert.deepEqual(externalWrites,[]);
@@ -84,6 +88,7 @@ try {
     },guide);
     assert.equal(removed,200);
   }
+  console.log(JSON.stringify({fixture:'mixed-text-and-scan-pdf',preflightMs,registrationMs}));
 } finally {
   await browser.close();
 }
