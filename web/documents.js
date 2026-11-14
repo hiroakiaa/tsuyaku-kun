@@ -112,7 +112,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '34');
+      guide.searchParams.set('v', '37');
       link.href = guide.href;
       if (entry.expires) {
         const expired = Date.now()>=entry.expires;
@@ -625,7 +625,8 @@ async function reader() {
       const createUrl = new URL(location.href);
       createUrl.searchParams.delete('id');
       createUrl.searchParams.delete('library');
-      createUrl.searchParams.set('v','31');
+      createUrl.searchParams.set('create','1');
+      createUrl.searchParams.set('v','37');
       location.replace(createUrl);
     } catch (error) {
       document.querySelector('#remove-status').textContent = error.message;
@@ -716,7 +717,7 @@ async function reader() {
 }
 
 try {
-  if (!id && new URLSearchParams(location.search).has('library')) {
+  if (!id && !new URLSearchParams(location.search).has('create')) {
     show('#library');
     documentLibrary();
     try {
@@ -725,7 +726,7 @@ try {
       for (const entry of entries) {
         const card = append($('#shared-list'),'li','','library-card');
         const link = append(card,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=34';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=37';
         append(card,'small','公開期限 '+new Date(entry.expires).toLocaleDateString('ja-JP'));
       }
     } catch (error) {
