@@ -90,7 +90,7 @@ function validatedToc(result,pages) {
       .sort((a,b)=>a.page-b.page);
 }
 
-async function generate(env,pages,question,materials=[],emit,index) {
+async function generate(env,pages,question,materials=[],emit,index,measure) {
   const passages = (question && selectPassages(pages,question,index ?? searchIndex(pages))) ||
     pages.map((text,i)=>({page:i+1,text}));
   const apiKey = env.OPENAI_DOCUMENT_QA_KEY;
@@ -115,7 +115,8 @@ async function generate(env,pages,question,materials=[],emit,index) {
   if (!response?.ok) throw Error('資料QAのOpenAI接続に失敗しました'+(response ? '（HTTP '+response.status+'）' : '')+'。');
   if (emit) return streamAnswers(response,emit,env);
   const result = await response.json();
-  await recordUsage(env,result.usage).catch(()=>{});
+  if (measure) measure(result.usage);
+  else await recordUsage(env,result.usage).catch(()=>{});
   const choice = result.choices?.[0];
   if (choice?.finish_reason!=='stop' || !choice.message?.content) throw Error('資料QAの回答を取得できませんでした。');
   return JSON.parse(choice.message.content);
@@ -249,7 +250,7 @@ export async function documents(request,env,auth) {
     }
     return reply({id,expires},201);
   }
-  const match = /^\/documents\/([a-f0-9-]{36})(?:\/(pdf|ask|remove|material|toc))?$/.exec(pathname);
+  const match = /^\/documents\/([a-f0-9-]{36})(?:\/(pdf|ask|remove|material|toc|text))?$/.exec(pathname);
   if (!match) return fail('資料が見つかりません。',404);
   const [,id,action] = match;
   const target = env.ROOMS.get(env.ROOMS.idFromName('document:'+id));
@@ -293,6 +294,10 @@ export async function documents(request,env,auth) {
   const info = await target.fetch('https://room/document/data',{headers:{'X-Document-Viewer':auth.uid}});
   if (!info.ok) return info;
   const record = await info.json();
+  if (action==='text' && request.method==='GET') {
+    if ((record.sourceType ?? 'pdf')!=='pdf') return fail('PDFが見つかりません。',404);
+    return reply(record.pages.slice(0,record.originalPageCount ?? record.pages.length));
+  }
   if (action==='toc' && request.method==='POST') {
     if ((record.sourceType ?? 'pdf')!=='pdf') return fail('PDFの目次のみ作成できます。',400);
     const pages = record.pages.slice(0,record.originalPageCount ?? record.pages.length);
@@ -460,4 +465,11 @@ export async function documentStorage(request,storage) {
     }});
   }
   return fail('資料が見つかりません。',404);
+}
+
+export async function evaluateDocumentQuestion(env,pages,question,mode) {
+  let usage;
+  const index = mode==='full' ? [] : searchIndex(pages);
+  const result = await generate(env,pages,question,[],undefined,index,value=>{usage=value;});
+  return {items:(result.items ?? []).map(item=>checkedAnswer(item,pages)).filter(Boolean),usage};
 }

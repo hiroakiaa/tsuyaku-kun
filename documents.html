@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1d1d1d">
 <title>資料QA君</title>
-<link rel="stylesheet" href="web/documents.css?v=39">
-<script type="module" src="web/documents.js?v=41"></script>
+<link rel="stylesheet" href="web/documents.css?v=42">
+<script type="module" src="web/documents.js?v=42"></script>
 </head>
 <body><div class="shell">
 
@@ -68,12 +68,17 @@
 <dialog id="pdf-dialog" aria-labelledby="pdf-heading">
 <header class="pdf-bar">
 <h2 id="pdf-heading" tabindex="-1" autofocus></h2>
+<button id="pdf-find-toggle" type="button" aria-controls="pdf-find" aria-expanded="false" hidden>検索</button>
 <button id="pdf-toc-toggle" type="button" aria-controls="pdf-toc" aria-expanded="false" hidden>目次</button>
 <a id="pdf-file" target="_blank" rel="noopener" class="ref">別タブで開く ↗</a>
 <form method="dialog"><button aria-label="資料を閉じる">×</button></form>
 </header>
 <div class="pdf-stage">
 <div id="pdf-scroll"><div id="pdf-pages"></div><img id="source-image" hidden alt=""></div>
+<section id="pdf-find" aria-label="PDF内検索" hidden>
+  <form><label class="sr" for="pdf-find-query">PDF内の語句</label><input id="pdf-find-query" type="search" placeholder="PDF内の語句" maxlength="100" required><button>検索</button></form>
+  <p role="status"></p><ul></ul>
+</section>
 <nav id="pdf-toc" aria-label="PDFの目次" hidden></nav>
 <p id="pdf-status" role="status"></p>
 <div class="pdf-zoom"><button id="zoom-out" aria-label="縮小">−</button><button id="zoom-in" aria-label="拡大">＋</button></div>

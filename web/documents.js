@@ -304,6 +304,55 @@ async function reader() {
     tocButton.setAttribute('aria-expanded',String(open));
   }
   if (sourceType==='pdf') {
+    const findToggle = $('#pdf-find-toggle');
+    const findPanel = $('#pdf-find');
+    const queryInput = $('#pdf-find-query');
+    const results = findPanel.querySelector('ul');
+    const status = findPanel.querySelector('[role="status"]');
+    let pageText;
+    function setFindOpen(open) {
+      findPanel.hidden = !open;
+      findToggle.setAttribute('aria-expanded',String(open));
+    }
+    findToggle.hidden = false;
+    findToggle.onclick = () => {
+      const open = findPanel.hidden;
+      setFindOpen(open);
+      if (open) {
+        showContents(false);
+        queryInput.focus();
+      }
+    };
+    dialog.addEventListener('close',()=>setFindOpen(false));
+    findPanel.querySelector('form').onsubmit = async event => {
+      event.preventDefault();
+      const normalize = text=>text.normalize('NFKC').toLowerCase().replace(/\s+/g,'');
+      const query = normalize(queryInput.value);
+      if (!query) return;
+      const submit = event.submitter;
+      submit.disabled = true;
+      results.replaceChildren();
+      status.textContent = '検索しています…';
+      try {
+        pageText ??= await request(api+'/text');
+        for (const [index,text] of pageText.entries()) {
+          if (!normalize(text).includes(query)) continue;
+          const item = append(results,'li','');
+          const button = append(item,'button',(index+1)+'ページ');
+          button.type = 'button';
+          button.onclick = () => {
+            setFindOpen(false);
+            findToggle.focus();
+            void showPdf(index+1);
+          };
+        }
+        status.textContent = results.children.length ? results.children.length+'ページに一致' : '一致するページがありません。';
+      } catch (error) {
+        status.textContent = error.message;
+      } finally {
+        submit.disabled = false;
+      }
+    };
     let entries = doc.toc ?? [];
     let loading = false;
     function renderContents() {
@@ -326,6 +375,7 @@ async function reader() {
     tocButton.hidden = false;
     tocButton.onclick = async () => {
       const open = tocButton.getAttribute('aria-expanded')!=='true';
+      if (open) setFindOpen(false);
       showContents(open);
       if (!open || loading) return;
       if (entries.length) {

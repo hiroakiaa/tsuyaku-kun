@@ -166,7 +166,11 @@ dialog [tabindex="-1"][autofocus]:focus {
 .qa-actions > form {display:flex;margin:0}
 .qa-actions > form > button {margin:0}
 
-#pdf-dialog .pdf-bar {grid-template-columns:minmax(0,1fr) auto auto auto}
+#pdf-dialog .pdf-bar {grid-template-columns:minmax(0,1fr) repeat(4,auto)}
+#pdf-find {position:absolute;z-index:3;inset:.5rem .5rem auto;max-height:calc(100% - 1rem);overflow:auto;background:#202020;border:1px solid #777;border-radius:.5rem;padding:.75rem}
+#pdf-find form {display:flex;gap:.5rem}
+#pdf-find input {min-width:0;flex:1}
+#pdf-dialog .pdf-bar #pdf-find-toggle {width:auto;border-radius:.5rem}
 #pdf-dialog .pdf-bar #pdf-toc-toggle {width:auto;border-radius:.5rem}
 #pdf-toc {position:absolute;z-index:2;inset:.5rem .5rem auto;max-height:calc(100% - 1rem);overflow:auto;padding:.5rem;background:#202020;border:1px solid #777;border-radius:.5rem}
 #pdf-toc {width:min(28rem,calc(100% - 1rem));box-sizing:border-box;inset-inline-end:auto;padding:.25rem .5rem}
