@@ -91,3 +91,5 @@ R7要項の給食費を本番の全文・検索方式で各3回、順序を交�
 公開版Chromeで、3ページの混在PDFと4シートの合成Excelを使い、削除直後に資料情報とPDF取得の両方がHTTP 404になることを確認。試験は 39be141。実行は node tools/smoke-document-qa.mjs と node tools/smoke-document-qa-tables.mjs。今回の確認範囲は認証済み作成者からの再取得。
 
 端末限定の合成Excelを公開版Chromeで登録。独立した認証セッションから資料情報とPDFを取得し、両方HTTP 404。作成者側は5問の回答・根拠・聞き返しが通過し、削除後の資料情報とPDFも404。再現は node tools/smoke-document-qa-tables.mjs。
+
+848da5d の [公開後試験 43622124247](https://github.com/hiroakiaa/tsuyaku-kun/actions/runs/43622124247) は成功。REST APIが取得上限に達したため、GitHub Actionsの公開ワークフロー一覧で実行番号・対象コミットを照合し、完了と成功を確認した。再開時も一覧で対象コミットを照合し、完了時の成否まで確認する。
