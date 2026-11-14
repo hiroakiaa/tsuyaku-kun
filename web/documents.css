@@ -169,4 +169,13 @@ dialog [tabindex="-1"][autofocus]:focus {
 #pdf-dialog .pdf-bar {grid-template-columns:minmax(0,1fr) auto auto auto}
 #pdf-dialog .pdf-bar #pdf-toc-toggle {width:auto;border-radius:.5rem}
 #pdf-toc {position:absolute;z-index:2;inset:.5rem .5rem auto;max-height:calc(100% - 1rem);overflow:auto;padding:.5rem;background:#202020;border:1px solid #777;border-radius:.5rem}
-#pdf-toc button {display:block;width:100%;text-align:start}
+#pdf-toc {width:min(28rem,calc(100% - 1rem));box-sizing:border-box;inset-inline-end:auto;padding:.25rem .5rem}
+#pdf-toc .pdf-toc-entry {
+  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:.75rem;
+  width:100%;min-height:44px;margin:0;padding:.55rem .65rem;text-align:start;
+  border:0;border-radius:0;background:transparent;line-height:1.4;
+}
+#pdf-toc .pdf-toc-entry + .pdf-toc-entry {border-top:1px solid #ffffff24}
+#pdf-toc .pdf-toc-entry:hover,#pdf-toc .pdf-toc-entry[aria-current] {background:#ffffff15}
+#pdf-toc .pdf-toc-title {overflow-wrap:anywhere}
+#pdf-toc .pdf-toc-page {white-space:nowrap;color:#ccc;font-size:.8em;font-variant-numeric:tabular-nums}

@@ -112,7 +112,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '30');
+      guide.searchParams.set('v', '32');
       link.href = guide.href;
       if (entry.expires) {
         const expired = Date.now()>=entry.expires;
@@ -245,7 +245,10 @@ async function reader() {
     function renderContents() {
       toc.replaceChildren();
       for (const {title,page} of entries) {
-        const button = append(toc,'button',title+' · '+page+'ページ');
+        const button = append(toc,'button','','pdf-toc-entry');
+        append(button,'span',title,'pdf-toc-title');
+        append(button,'span',page+'ページ','pdf-toc-page');
+        if (page===selectedPage) button.setAttribute('aria-current','page');
         button.type = 'button';
         button.onclick = () => {
           showContents(false);
@@ -703,7 +706,7 @@ try {
       for (const entry of entries) {
         const card = append($('#shared-list'),'li','','library-card');
         const link = append(card,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=30';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=32';
         append(card,'small','公開期限 '+new Date(entry.expires).toLocaleDateString('ja-JP'));
       }
     } catch (error) {
