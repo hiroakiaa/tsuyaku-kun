@@ -98,6 +98,13 @@ function selectPassages(pages, question, index) {
     if (first>=0 && pages[page].slice(0,900).includes(" | ")) chosen.add(first);
   }
   for (const item of strongest) chosen.add(item.position);
+  // Preserve the preceding table header even when its page ends with a long footer.
+  for (const {page,text} of strongest) {
+    if (page===0 || !text.includes(' | ')) continue;
+    const header = index.findIndex(([source,start,end])=>
+      source===page-1 && pages[source].slice(start,end).includes(' | '));
+    if (header>=0) chosen.add(header);
+  }
   // A table's heading or continuation can be on the neighboring PDF page.
   for (const {page,position} of strongest) {
     for (const neighbor of [position-1,position+1]) {
@@ -441,7 +448,7 @@ export async function documents(request,env,auth) {
     if (benchmarkMode!=='full' && benchmarkMode!=='search') return fail('比較方式を確認してください。');
     return reply(await evaluateDocumentQuestion(env,record.pages,question,benchmarkMode,record.materials,target));
   }
-  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([10,record.pages,record.materials ?? [],question.trim()])));
+  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([11,record.pages,record.materials ?? [],question.trim()])));
   const cacheKey = Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
   const cacheUrl = 'https://room/document/answer/'+cacheKey;
   const cached = await (await target.fetch(cacheUrl)).json();
