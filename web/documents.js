@@ -20,7 +20,7 @@ async function pdfLibrary() {
     pdfModule = import('./pdf.min.mjs?v=legacy-5.6.205').then(lib=>{
       lib.GlobalWorkerOptions.workerSrc = new URL('./pdf.worker.min.mjs?v=legacy-5.6.205',import.meta.url).href;
       return lib;
-    });
+    }).catch(error=>{pdfModule=undefined;throw error;});
   }
   return pdfModule;
 }
@@ -112,7 +112,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '28');
+      guide.searchParams.set('v', '29');
       link.href = guide.href;
       if (entry.expires) {
         const expired = Date.now()>=entry.expires;
@@ -274,7 +274,14 @@ async function reader() {
       await page.render({canvas,viewport}).promise;
       slot.replaceChildren(canvas);
     } catch {
-      slot.textContent = 'このページを表示できませんでした。';
+      const retry = document.createElement('button');
+      retry.type = 'button';
+      retry.textContent = 'このページを再読み込み';
+      retry.onclick = () => {
+        retry.remove();
+        void renderPage(slot);
+      };
+      slot.replaceChildren(retry);
     }
   }
   const pagePicker = $('#pdf-page');
@@ -287,7 +294,20 @@ async function reader() {
   const imageType = /^(png|jpe?g|webp)$/.test(sourceType);
   const zoomable = sourceType==='pdf' || imageType;
   let zoom=1, fitWidth=0;
-  let pinch, drag;
+  let pinch, drag, coastFrame;
+  let velocityX = 0, velocityY = 0, lastMove = 0;
+  function coast(time) {
+    const elapsed = Math.min(32,time-lastMove);
+    lastMove = time;
+    const left = preview.scrollLeft;
+    const top = preview.scrollTop;
+    preview.scrollLeft += velocityX*elapsed;
+    preview.scrollTop += velocityY*elapsed;
+    const decay = Math.exp(-elapsed/140);
+    velocityX = preview.scrollLeft===left ? 0 : velocityX*decay;
+    velocityY = preview.scrollTop===top ? 0 : velocityY*decay;
+    if (Math.hypot(velocityX,velocityY)>.03) coastFrame=requestAnimationFrame(coast);
+  }
   const workspace = $('.qa-workspace');
   const divider = $('#qa-divider');
   const wide = matchMedia('(min-width: 800px)');
@@ -317,8 +337,9 @@ async function reader() {
   function syncWorkspace() {
     if (!askDialog.open) return;
     if (wide.matches && dialog.parentElement === workspace) return;
-    if (dialog.open) dialog.close();
-    if (wide.matches) void showPdf(selectedPage || 1);
+    const wasOpen = dialog.open;
+    if (wasOpen) dialog.close();
+    if (wide.matches || wasOpen) void showPdf(selectedPage || 1);
   }
   wide.addEventListener('change',syncWorkspace);
   new ResizeObserver(() => {
@@ -358,6 +379,9 @@ async function reader() {
   }
   preview.addEventListener('touchstart',event=>{
     if (!zoomable) return;
+    cancelAnimationFrame(coastFrame);
+    velocityX = velocityY = 0;
+    lastMove = performance.now();
     if (event.touches.length===1) drag=event.touches[0];
     if (event.touches.length!==2) return;
     drag=undefined;
@@ -367,8 +391,15 @@ async function reader() {
   preview.addEventListener('touchmove',event=>{
     if (drag && event.touches.length===1) {
       const next=event.touches[0];
-      preview.scrollLeft+=drag.clientX-next.clientX;
-      preview.scrollTop+=drag.clientY-next.clientY;
+      const now = performance.now();
+      const elapsed = Math.max(8,now-lastMove);
+      const dx = drag.clientX-next.clientX;
+      const dy = drag.clientY-next.clientY;
+      velocityX = velocityX*.35 + dx/elapsed*.65;
+      velocityY = velocityY*.35 + dy/elapsed*.65;
+      preview.scrollLeft += dx;
+      preview.scrollTop += dy;
+      lastMove = now;
       drag=next;
     }
     if (!pinch || !pinch.distance || event.touches.length!==2) return;
@@ -377,7 +408,15 @@ async function reader() {
     setZoom(zoom*next.distance/pinch.distance,pinch,next);
     pinch=next;
   },{passive:false});
-  for (const event of ['touchend','touchcancel']) preview.addEventListener(event,()=>{pinch=undefined;drag=undefined;});
+  for (const event of ['touchend','touchcancel']) preview.addEventListener(event,()=>{
+    if (event==='touchend' && drag && performance.now()-lastMove<80) {
+      lastMove=performance.now();
+      coastFrame=requestAnimationFrame(coast);
+    }
+    pinch=undefined;
+    drag=undefined;
+  });
+  dialog.addEventListener('close',()=>cancelAnimationFrame(coastFrame));
   let scrollFrame;
   let lastNavigation = 0;
   preview.addEventListener('scroll', () => {
@@ -476,7 +515,10 @@ async function reader() {
       $('#pdf-status').textContent = '';
     } catch (error) {
       if (error.name === 'RenderingCancelledException' || selectedPage !== n) return;
-      $('#pdf-status').textContent = '画面内で表示できません。「PDFを開く」から確認してください。';
+      $('#pdf-status').textContent = 'PDFを読み込めませんでした。';
+      const retry = append($('#pdf-status'),'button','再読み込み');
+      retry.type = 'button';
+      retry.onclick = () => void showPdf(n);
     }
   }
   const materials = doc.materials ?? [];
@@ -635,7 +677,7 @@ try {
       for (const entry of entries) {
         const card = append($('#shared-list'),'li','','library-card');
         const link = append(card,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=28';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=29';
         append(card,'small','公開期限 '+new Date(entry.expires).toLocaleDateString('ja-JP'));
       }
     } catch (error) {
