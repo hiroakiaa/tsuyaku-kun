@@ -266,14 +266,20 @@ function lookupWorksheetCell(pages, question) {
             cell.column<heading[1] && cell.cell!==owner.cell && query.includes(normalized(cell.value)));
           for (const row of new Set(rowLabels.map(cell=>cell.row))) {
             const address = child.column+row;
-            const value = cells.get(address);
-            if (!value && [...ranges].some(range=>{
-              const bounds = /^([A-Z]+)(\d+):([A-Z]+)(\d+)$/u.exec(range);
-              return bounds && row>=Number(bounds[2]) && row<=Number(bounds[4]) &&
-                child.column.length>=bounds[1].length && child.column.length<=bounds[3].length &&
-                (child.column.length>bounds[1].length || child.column>=bounds[1]) &&
-                (child.column.length<bounds[3].length || child.column<=bounds[3]);
-            })) continue;
+            let value = cells.get(address);
+            if (!value) {
+              const mergedRange = [...ranges].find(range=>{
+                const bounds = /^([A-Z]+)(\d+):([A-Z]+)(\d+)$/u.exec(range);
+                return bounds && row>=Number(bounds[2]) && row<=Number(bounds[4]) &&
+                  child.column.length>=bounds[1].length && child.column.length<=bounds[3].length &&
+                  (child.column.length>bounds[1].length || child.column>=bounds[1]) &&
+                  (child.column.length<bounds[3].length || child.column<=bounds[3]);
+              });
+              if (mergedRange) {
+                value = cells.get(mergedRange.split(':')[0]);
+                if (!value) continue;
+              }
+            }
             const labels = rowLabels.filter(cell=>cell.row===row);
             matches.push({year:sheetYear,key:sheet+'!'+address,value,evidence:[owner,...labels,parent,child,value]});
           }
