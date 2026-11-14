@@ -47,3 +47,34 @@ try {
   globalThis.fetch = originalFetch;
 }
 console.log('PASS document QA semantic retrieval reuses document vectors');
+const japanesePages = Array.from({length:20},()=> '施設の紹介です。'.repeat(70));
+japanesePages[12] = '山 本 学 園の出願は11月20日までです。';
+const lexicalEnv = {
+  OPENAI_DOCUMENT_QA_KEY:'test',
+  ROOMS:{idFromName:name=>name,get:()=>({
+    async fetch(url) {
+      return Response.json(url.endsWith('/data') ? {pages:japanesePages,owner:'author'} : null);
+    },
+  })},
+};
+try {
+  globalThis.fetch = async (_url,{body})=>{
+    const {資料:passages} = JSON.parse(JSON.parse(body).messages[1].content);
+    assert.ok(passages.length<japanesePages.length);
+    assert.ok(passages.some(passage=>passage.page===13));
+    const items = [{label:'出願期限',answer:'11月20日です。',sources:[
+      {page:12,quote:japanesePages[12]},
+      {page:13,quote:japanesePages[12]},
+    ]}];
+    return Response.json({choices:[{finish_reason:'stop',message:{content:JSON.stringify({items})}}]});
+  };
+  const response = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+    method:'POST',body:JSON.stringify({question:'山本学園の出願期限は？'}),
+  }),lexicalEnv,{uid:'author'});
+  assert.equal(response.status,200);
+  const result = await response.json();
+  assert.deepEqual(result.items[0].evidence.map(source=>source.page),[13]);
+} finally {
+  globalThis.fetch = originalFetch;
+}
+console.log('PASS spaced Japanese keywords retrieve the right page and reject a wrong-page citation');
