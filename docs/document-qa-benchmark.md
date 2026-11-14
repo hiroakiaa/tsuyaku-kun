@@ -96,3 +96,7 @@ OpenAIの推定費用は、全文方式で合計0.0050468 USD、検索方式で0
 合成PDFの構造化検索試作で、同じ行名LibraryをClosing/Last admissionの列名で区別し、それぞれ値と根拠ページ組（1・3、5・7）を自動照合。再実行 node ../verify-qa-pdf-paired-table-citations.mjs。公開画面へは未統合、試験資料の登録なし。
 
 タグ付き表検索を資料QAに組み込み、Chromeでフロントのローカル差し替えと本番APIの組み合わせを検証。図書館3 PMとPDF3・1ページのリンクを確認、試験資料削除済み。再実行 node ../verify-qa-tagged-table-ui.mjs。表の対応が一意に確定する単純なタグ付き表が対象。
+
+公開版 e350fc0 の画面で、同型2表の図書館閉館15:00（PDF1・3ページ）と最終入館13:00（5・7ページ）を確認。ローカル差し替えなし。登録5425ms、試験資料削除確認。再実行 node ../verify-qa-tagged-table-published.mjs。
+
+公開版4c7ff51で日本語のタグ付き2表を確認。閉館3 PMはPDF3・1ページ、最終入館1 PMはPDF7・5ページ。入の異体字がIDのない入れ子のSpanにあっても親セルに帰属し、NFKCで質問と照合。登録6293ms、削除確認。再実行 node ../verify-qa-tagged-table-ja.mjs。

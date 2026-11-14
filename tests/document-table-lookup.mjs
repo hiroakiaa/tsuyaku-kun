@@ -50,3 +50,34 @@ assert.deepEqual(Array.from(formatQuote('月 | 部活終了 | 下校完了\n４ 
 ]);
 assert.deepEqual(Array.from(formatQuote('自然を観\n察します。\n\n実験を行います。')),['自然を観察します。','実験を行います。']);
 console.log('PASS table quotation preserves rows and prose joins wrapped lines');
+
+{
+  const {PDFDocument,PDFName}=await import('../web/document-pdf-lib.mjs');
+  const {readTaggedTables,findTaggedTableCell}=await import('../web/document-tagged-table.js');
+  const pdf=await PDFDocument.create();
+  const pages=[pdf.addPage(),pdf.addPage()];
+  const context=pdf.context;
+  const cell=(role,page,index)=>context.obj({S:role,K:[
+    context.obj({S:'NonStruct',Pg:pages[page].ref,K:index}),
+  ]});
+  const row=(role,page)=>context.obj({S:'TR',K:[cell(role,page,0),cell(role,page,1)]});
+  const table=context.obj({S:'Table',K:[row('TH',0),row('TD',1)]});
+  pdf.catalog.set(PDFName.of('StructTreeRoot'),context.register(context.obj({K:[table]})));
+  const begin=id=>({type:'beginMarkedContentProps',id});
+  const end={type:'endMarkedContent'};
+  const marks=(page,index)=>begin('p'+pages[page].ref.objectNumber+'R_mc'+index);
+  const items=[
+    [marks(0,0),{str:'施設'},end,marks(0,1),{str:'最終'},begin(null),{str:'⼊'},end,{str:'館時刻'},end],
+    [marks(1,0),{str:'図書館'},end,marks(1,1),{str:'13:00'},end],
+  ];
+  const tables=await readTaggedTables({
+    numPages:2,
+    getData:()=>pdf.save(),
+    getPage:async number=>({getTextContent:async()=>({items:items[number-1]})}),
+  });
+  const answer=findTaggedTableCell(tables,'図書館の最終入館時刻は？');
+  assert.equal(answer?.answer,'13:00');
+  assert.deepEqual(answer.evidence,[{page:2,quote:'図書館 | 13:00'},{page:1,quote:'最終⼊館時刻'}]);
+  assert.equal(findTaggedTableCell([...tables,...tables],'図書館の最終入館時刻は？'),null);
+  console.log('PASS tagged PDF nested text and unambiguous cross-page citations');
+}
