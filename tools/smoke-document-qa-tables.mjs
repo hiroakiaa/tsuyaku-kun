@@ -2,6 +2,7 @@ import {readFile,appendFile,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 
+const merged = process.argv.includes('--merged');
 const browser = await chromium.launch();
 try {
   const page = await browser.newPage();
@@ -18,7 +19,7 @@ try {
   await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
   assert.equal(await page.getByRole('link',{name:'資料チャット作成',exact:true}).count(),0);
   await page.locator('#upload input[name=title]').fill('自動公開確認');
-  await page.locator('#upload input[type=file]').setInputFiles({name:'document-qa-tables.xlsx',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',buffer:await readFile(new URL('../tests/fixtures/document-qa-tables.xlsx',import.meta.url))});
+  await page.locator('#upload input[type=file]').setInputFiles({name:'document-qa-tables.xlsx',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',buffer:await readFile(new URL(merged ? '../tests/fixtures/document-qa-merged.xlsx' : '../tests/fixtures/document-qa-tables.xlsx',import.meta.url))});
   const sheets=await page.evaluate(async()=>{
     const {officePages}=await import('./web/document-office.js');
     return officePages(document.querySelector('#upload input[type=file]').files[0],{includeMerges:true});
@@ -59,13 +60,13 @@ try {
     const measurements=[];
     for(const [question,value,source] of [
       ['令和9年度の青空高校の特進の入試定員は？','20','R9入試表 · C4'],
-      ['令和9年度の会議室の子どもの休日料金は？','450円','R9料金表 · D4'],
+      ['令和9年度の会議室の子どもの休日料金は？',merged ? '900円' : '450円',merged ? 'R9料金表 · D3' : 'R9料金表 · D4'],
       ['説明会の午後組の開始時刻は？','14:00','R9予定表 · C4'],
       ['会議室の子どもの休日料金は？','令和8年度・令和9年度のうち、どの年度ですか？',null],
       ['R8','400円','R8料金表 · D4'],
       ['大人は？','800円','R8料金表 · D3'],
       ['子どもは？','400円','R8料金表 · D4'],
-      ['R9','450円','R9料金表 · D4'],
+      ['R9',merged ? '900円' : '450円',merged ? 'R9料金表 · D3' : 'R9料金表 · D4'],
       ['説明会の午後組の開始時刻は？','14:00','R9予定表 · C4'],
       ['午前組は？','10:00','R9予定表 · C3'],
     ]){
@@ -86,7 +87,7 @@ try {
         const addresses = (await bubble.locator('.answer-source > div').allTextContents()).flatMap(line=>line.split('、'));
         const expected = {
           'R9入試表':['A3','B4','C1','C2','C4'],
-          'R9料金表':['A3','B4','C1','D2','D4'],
+          'R9料金表':['A3','B4','C1','D2',merged ? 'D3' : 'D4'],
           'R9予定表':source.endsWith('C3') ? ['A3','B3','C1','C2','C3'] : ['A3','B4','C1','C2','C4'],
           'R8料金表':source.endsWith('D3') ? ['A3','B3','C1','D2','D3'] : ['A3','B4','C1','D2','D4'],
         }[sheet];
