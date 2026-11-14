@@ -32,6 +32,7 @@ try {
     assert.deepEqual(externalWrites,[]);
     await page.goto(guide);
     await page.locator('#tab-ask').click();
+    assert.equal(await page.locator('#pdf-page option').count(),sheets.length);
     const measurements=[];
     for(const [question,value,source] of [
       ['令和9年度の青空高校の特進の入試定員は？','20','R9入試表 · C4'],
