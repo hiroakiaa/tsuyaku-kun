@@ -63,7 +63,7 @@ export async function lookupTableCell(pdf, question) {
       const left=columns.findLast(x=>x<=header.x+1);
       const right=columns.find(x=>x>header.x+3);
       const schoolLeft=columns[0], schoolRight=columns[1];
-      if(left==null || right==null || schoolRight==null || left<=schoolRight) continue;
+      if(left==null || right==null || schoolRight==null || left<schoolRight) continue;
       const schoolRules = rules.filter(y=>{
         let count=0;
         for(let x=schoolLeft+2;x<schoolRight-2;x++) {
