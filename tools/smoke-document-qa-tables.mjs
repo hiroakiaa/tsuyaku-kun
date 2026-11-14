@@ -1,4 +1,4 @@
-import {readFile,appendFile} from 'node:fs/promises';
+import {readFile,appendFile,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 
@@ -105,6 +105,7 @@ try {
     measurements.push({question:blankQuestion,value:blankAnswer,source:null,elapsedMs:Math.round(performance.now()-blankStarted)});
     const result = {registrationMs,questions:measurements};
     console.log(JSON.stringify(result));
+    if (process.env.DOCUMENT_QA_REPORT) await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify(result,null,2));
     if (process.env.GITHUB_STEP_SUMMARY) {
       const rows = measurements.map(({question,value,source,elapsedMs})=>`| ${question} | ${value} | ${source ?? "なし"} | ${elapsedMs} |`);
       await appendFile(process.env.GITHUB_STEP_SUMMARY,[

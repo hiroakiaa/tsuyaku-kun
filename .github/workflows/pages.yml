@@ -51,7 +51,15 @@ jobs:
       - name: Verify document QA in the published app
         run: node tools/smoke-document-qa.mjs
       - name: Verify worksheet answers and citations in the published app
+        env:
+          DOCUMENT_QA_REPORT: document-qa-tables-report.json
         run: node tools/smoke-document-qa-tables.mjs
+      - name: Save worksheet verification results
+        uses: actions/upload-artifact@v4
+        with:
+          name: document-qa-tables-report
+          path: document-qa-tables-report.json
+          if-no-files-found: error
       - name: Verify Word pagination and citations in the published app
         run: node tools/smoke-document-qa-word.mjs
       - name: Verify image OCR and citations in the published app
