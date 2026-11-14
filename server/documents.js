@@ -435,7 +435,7 @@ function checkedAnswer(item,pages,question='') {
         if (headings.length!==1) continue;
         const quote = headings[0];
         if (!quote.split(/ \| |\n/).some(cell=>normalized(cell).length>=2 &&
-          (terms.includes(normalized(cell).toLowerCase()) || (normalized(cell).toLowerCase()==='closing' && /clos(?:e|es|ed)/.test(terms)) || (normalized(cell).toLowerCase()==='opening' && /open/.test(terms))))) continue;
+          (terms.includes(normalized(cell).toLowerCase()) || (normalized(cell).toLowerCase()==='closing' && /clos(?:e|es|ed)|閉館|閉店|閉ま/u.test(terms)) || (normalized(cell).toLowerCase()==='opening' && /open|開館|開店|開く|開き/u.test(terms))))) continue;
         if (!evidence.some(item=>item.page===source.page-1 && item.quote===quote)) {
           evidence.push({page:source.page-1,quote});
         }

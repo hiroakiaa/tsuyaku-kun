@@ -97,6 +97,15 @@ try {
     assert.deepEqual(await citationNames(supported),['元のPDF 1ページ','元のPDF 2ページ']);
     assert.equal(await unsupported.count(),1);
     assert.deepEqual(await citationNames(unsupported),[]);
+    await page.locator('#question').fill('図書館は何時に閉まりますか？ 年間駐車許可料はいくらですか？ 項目ごとに答えてください。');
+    await page.locator('#ask-form button').click();
+    await page.locator('#ask-form button:enabled').waitFor();
+    const translated = page.locator('#messages .bubble').last();
+    const closing = translated.locator('.answer-item').filter({hasText:/午後\s*3\s*時|15:00/});
+    const missingFee = translated.locator('.answer-item').filter({hasText:'この項目の根拠は資料内で確認できませんでした。'});
+    assert.deepEqual(await citationNames(closing),['元のPDF 1ページ','元のPDF 2ページ']);
+    assert.equal(await missingFee.count(),1);
+    assert.deepEqual(await citationNames(missingFee),[]);
     console.log(JSON.stringify({fixture:'mixed-text-and-scan-pdf',preflightMs,registrationMs,libraryMs,poolMs,combinedMs}));
   } finally {
     const removed = await page.evaluate(async documentUrl=>{

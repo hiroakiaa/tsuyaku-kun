@@ -110,6 +110,8 @@ try {
   }),env,{uid:'author'})).json();
   assert.deepEqual((await ask('When does the library close?')).pages,[2,1]);
   assert.deepEqual((await ask('What is the Library capacity?')).pages,[2]);
+  assert.deepEqual((await ask('図書館は何時に閉まりますか？')).pages,[2,1]);
+  assert.deepEqual((await ask('図書館の定員は？')).pages,[2]);
   tablePages[0] = 'Facility | Hours\nOpening | Closing';
   assert.deepEqual((await ask('When does the library close?')).pages,[2,1]);
   tablePages[0] = 'Hours\nFacility\nOpening | Closing';
