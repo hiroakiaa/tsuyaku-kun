@@ -78,3 +78,21 @@ try {
   globalThis.fetch = originalFetch;
 }
 console.log('PASS spaced Japanese keywords retrieve the right page and reject a wrong-page citation');
+const admissionsPage = '北学園の一般入試は5科13以上。\n南学園の一般入試は9科15以上。';
+try {
+  globalThis.fetch = async ()=>Response.json({choices:[{finish_reason:'stop',message:{
+    content:JSON.stringify({items:[{label:'一般入試',answer:'5科13以上。',sources:[{page:1,quote:'北学園の一般入試は5科13以上。'}]}]}),
+  }}]});
+  const env = {OPENAI_DOCUMENT_QA_KEY:'test',ROOMS:{idFromName:name=>name,get:()=>({
+    fetch:async url=>Response.json(url.endsWith('/data') ? {pages:[admissionsPage],owner:'author'} : null),
+  })}};
+  const response = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+    method:'POST',body:JSON.stringify({question:'南学園の一般入試の基準は？',previousQuestion:'北学園高校の一般入試は？'}),
+  }),env,{uid:'author'});
+  const result = await response.json();
+  assert.equal(result.items[0].answer,null);
+  assert.deepEqual(result.pages,[]);
+} finally {
+  globalThis.fetch = originalFetch;
+}
+console.log('PASS rejects another school on the same PDF page');

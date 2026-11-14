@@ -193,7 +193,8 @@ async function generate(env,pages,question,materials=[],emit,selectedPassages,me
 }
 
 function checkedAnswer(item,pages,question='') {
-  const school = /([\p{L}\p{N}・]{2,30})(?:高等学校|高校)/u.exec(question)?.[1];
+  const school = /^([\p{L}\p{N}・]{2,30}?)(?:高等学校|高校)?の(?:一般|推薦)?入試/u.exec(normalized(question))?.[1]
+    ?? /([\p{L}\p{N}・]{2,30})(?:高等学校|高校)/u.exec(question)?.[1];
   const admission = /入試|入学|出願|受験/.test(question);
 
   if (typeof item?.label!=='string' || !item.label.trim()) return null;
@@ -440,7 +441,7 @@ export async function documents(request,env,auth) {
     if (benchmarkMode!=='full' && benchmarkMode!=='search') return fail('比較方式を確認してください。');
     return reply(await evaluateDocumentQuestion(env,record.pages,question,benchmarkMode,record.materials,target));
   }
-  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([8,record.pages,record.materials ?? [],question.trim()])));
+  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([9,record.pages,record.materials ?? [],question.trim()])));
   const cacheKey = Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
   const cacheUrl = 'https://room/document/answer/'+cacheKey;
   const cached = await (await target.fetch(cacheUrl)).json();
@@ -449,7 +450,7 @@ export async function documents(request,env,auth) {
   let semanticIndex;
   const findPassages = () => retrievalPassages(env,record.pages,question,index,target,value=>{semanticIndex=value;});
   const checkedItems = result => (Array.isArray(result?.items) ? result.items : [])
-    .slice(0,12).map(item=>checkedAnswer(item,record.pages,question)).filter(Boolean);
+    .slice(0,12).map(item=>checkedAnswer(item,record.pages,currentQuestion)).filter(Boolean);
   const needsFullDocument = items => !items.length || items.some(item=>!item.answer);
   const readFullDocument = async (partial) => {
     let full;
@@ -481,7 +482,7 @@ export async function documents(request,env,auth) {
         let answers = [];
         const writes = [];
         const result = await generate(env,record.pages,question,record.materials,raw=>{
-          const item = checkedAnswer(raw,record.pages,question);
+          const item = checkedAnswer(raw,record.pages,currentQuestion);
           if (!item) return;
           answers.push(item);
           if (item.answer) writes.push(send({item}).catch(()=>{}));
