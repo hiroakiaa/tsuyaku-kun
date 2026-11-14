@@ -424,3 +424,5 @@ R7多言語の公開版試験で各回答項目のPDFリンクと、日本語引
 - 公開版で複数校質問を未掲載校→掲載校の順に反転。応答が指定順で、未掲載校は根拠なし、掲載校は20・C4。画面では未確認案内と20の両方が表示され、根拠リンクはPDF1ページの1件のみ。試験資料削除HTTP 200。再実行 node ../smoke-qa-mixed-reversed.mjs。
 
 - 公開版で説明会の午前組と午後組をまとめると、共通の行見出しが午後組に引き継がれず欠落することを再現。見出しの根拠セルが一致する場合に限り引き継ぐよう修正。本番Worker 23bdebd9-419d-4998-8dfa-511f491856cb で10:00（C3）・14:00（C4）、両方PDF3ページを照合。両試験資料削除HTTP 200。再実行 node ../smoke-qa-combined-schedule.mjs。
+
+- 午前・午後組の照合を tools/smoke-document-qa-tables.mjs に追加し、公開版Chromeで標準Excelの13問と削除確認が通過。午前・午後の質問は133ms。Windowsでは親ディレクトリの smoke-tables-combined-local.mjs で再実行。

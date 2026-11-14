@@ -132,6 +132,21 @@ try {
     assert.equal(await sections.last().locator('.answer-source').count(),0,combinedQuestion);
     measurements.push({question:combinedQuestion,value:values.join(' ／ '),source:'R9入試表 · C4',
       citationLinks,citationCells,elapsedMs:Math.round(performance.now()-combinedStarted)});
+    const scheduleQuestion = '説明会の午前組と午後組について、それぞれ開始時刻は？';
+    await page.locator('#question').fill(scheduleQuestion);
+    const scheduleStarted = performance.now();
+    await page.locator('#ask-form button').click();
+    await page.locator('#ask-form button:enabled').waitFor();
+    const scheduleSections = page.locator('#messages .bubble').last().locator('.answer-item');
+    assert.deepEqual(await scheduleSections.locator('.answer-text').allTextContents(),['10:00','14:00']);
+    const scheduleLinks = await scheduleSections.locator('.answer-source a').allTextContents();
+    assert.deepEqual(scheduleLinks,['元のPDF 3ページ','元のPDF 3ページ']);
+    const scheduleCells = await scheduleSections.locator('.answer-source > div').allTextContents();
+    assert.deepEqual(scheduleCells.map(line=>line.split('、').filter(cell=>/ · C[34]$/.test(cell))),[
+      ['R9予定表 · C3'],['R9予定表 · C4'],
+    ]);
+    measurements.push({question:scheduleQuestion,value:'10:00 ／ 14:00',source:'R9予定表 · C3・C4',
+      citationLinks:scheduleLinks,citationCells:scheduleCells,elapsedMs:Math.round(performance.now()-scheduleStarted)});
     const releaseResponse = await page.request.get(new URL('./web/release-checks.json',guide).href,{
       headers:{'Cache-Control':'no-cache'},
     });
