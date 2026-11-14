@@ -46,6 +46,11 @@ for (const [question,expected] of selectedCases) {
     const expectedPages = new Set(expected.map(([,page])=>page));
     const missingCandidatePages = Array.isArray(candidatePages) ? [...expectedPages].filter(page=>!candidatePages.includes(page)) : null;
     const unexpectedPages = [...new Set(items.flatMap(item=>item.evidence.map(source=>source.page)))].filter(page=>!expectedPages.has(page));
+    // The two-fee fixture has fixed source text and page numbering.
+    const invalidQuotes = twoFees ? items.flatMap(item=>item.evidence).filter(source=>{
+      const original = pages[source.page-1];
+      return !original || !normalize(source.quote) || !normalize(original).includes(normalize(source.quote));
+    }).length : null;
     const input = usage?.prompt_tokens ?? null;
     const output = usage?.completion_tokens ?? null;
     const cached = usage?.prompt_tokens_details?.cached_tokens ?? null;
@@ -53,7 +58,7 @@ for (const [question,expected] of selectedCases) {
       ? ((input-cached)*0.4+cached*0.1+output*1.6)/1e6 : null;
     const evidencePages = [...new Set(items.flatMap(item=>item.evidence.map(source=>source.page)))];
     const matchedPages = evidencePages.filter(page=>expectedPages.has(page)).length;
-    rows.push({question,mode,candidatePages:candidatePages ?? null,missingCandidatePages,matchedPages,expectedPageCount:expectedPages.size,returnedPageCount:evidencePages.length,correct:correct && !unexpectedPages.length,unexpectedPages,pages:evidencePages.join(', '),input,output,cached,estimatedUSD,elapsedMs,retrievalMs:timing?.retrievalMs ?? null,generationMs:timing?.generationMs ?? null});
+    rows.push({question,mode,candidatePages:candidatePages ?? null,missingCandidatePages,matchedPages,expectedPageCount:expectedPages.size,returnedPageCount:evidencePages.length,correct:correct && !unexpectedPages.length && !invalidQuotes,invalidQuotes,unexpectedPages,pages:evidencePages.join(', '),input,output,cached,estimatedUSD,elapsedMs,retrievalMs:timing?.retrievalMs ?? null,generationMs:timing?.generationMs ?? null});
   }
 }
 console.table(rows);
