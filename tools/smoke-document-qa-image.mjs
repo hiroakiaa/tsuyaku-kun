@@ -3,6 +3,9 @@ import {chromium} from 'playwright';
 
 const format = process.argv[2] ?? 'png';
 if (!['png','jpeg','webp'].includes(format)) throw new Error('Expected png, jpeg or webp');
+const language = process.argv[3] ?? 'en';
+if (!['en','ja'].includes(language)) throw new Error('Expected en or ja');
+const japanese = language==='ja';
 const mimeType = 'image/'+format;
 const browser = await chromium.launch();
 try {
@@ -20,7 +23,7 @@ try {
   await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
   assert.equal(await page.getByRole('link',{name:'資料チャット作成',exact:true}).count(),0);
   await page.locator('#upload input[name=title]').fill('自動公開確認');
-  const image = await page.evaluate(type=>{
+  const image = await page.evaluate(({type,label})=>{
     const canvas=document.createElement('canvas');
     canvas.width=1000;
     canvas.height=300;
@@ -29,7 +32,7 @@ try {
     ctx.fillRect(0,0,1000,300);
     ctx.fillStyle='black';
     ctx.font='42px Arial';
-    ctx.fillText('The Blue group starts at 14:00.',40,140);
+    ctx.fillText(label,40,140);
     const fetchOriginal=window.fetch;
     window.fetch=function(input,init) {
       if (init?.body instanceof FormData && new URL(input,location.href).pathname.endsWith('/documents')) {
@@ -42,7 +45,7 @@ try {
       return fetchOriginal.apply(this,arguments);
     };
     return canvas.toDataURL(type);
-  },mimeType);
+  },{type:mimeType,label:japanese ? '青組の開始時刻は14:00です。' : 'The Blue group starts at 14:00.'});
   assert.ok(image.startsWith('data:'+mimeType+';base64,'));
   await page.locator('#upload input[type=file]').setInputFiles({name:'fixture.'+format,mimeType,buffer:Buffer.from(image.split(',')[1],'base64')});
   const registrationStarted = performance.now();
@@ -55,7 +58,7 @@ try {
     const upload=await page.evaluate(()=>window.qaUpload);
     assert.deepEqual(upload.files,['application/pdf']);
     assert.equal(upload.originalImage,false);
-    assert.match(upload.pages,/Blue group starts at 14:00/i);
+    assert.match(upload.pages,japanese ? /14\s*[:：]\s*00/ : /Blue group starts at 14:00/i);
     assert.deepEqual(externalWrites,[]);
     const viewer = await browser.newPage();
     try {
@@ -81,16 +84,16 @@ try {
     await page.goto(guide);
     await page.locator('#tab-ask').click();
     assert.equal(await page.locator('#pdf-page option').count(),1);
-    await page.locator('#question').fill('What is the start time for the Blue group?');
+    await page.locator('#question').fill(japanese ? '青組の開始時刻は？' : 'What is the start time for the Blue group?');
     const questionStarted = performance.now();
     await page.locator('#ask-form button').click();
     await page.locator('#ask-form button:enabled').waitFor();
     const answerMs = Math.round(performance.now()-questionStarted);
     const bubble=page.locator('#messages .bubble').last();
-    assert.match(await bubble.locator('.answer-text').textContent(),/14:00|2\s*(?::00)?\s*p\.?m\.?/i);
+    assert.match(await bubble.locator('.answer-text').textContent(),japanese ? /14:00|午後\s*2\s*時/ : /14:00|2\s*(?::00)?\s*p\.?m\.?/i);
     assert.deepEqual(await bubble.locator('.answer-source a').allTextContents(),['元のPDF 1ページ']);
-    assert.match(await bubble.locator('.answer-quote').textContent(),/Blue group[\s\S]*14:00/);
-    console.log(JSON.stringify({fixture:format+'-browser-ocr',registrationMs,answerMs}));
+    assert.match(await bubble.locator('.answer-quote').textContent(),japanese ? /14\s*[:：]\s*00/ : /Blue group[\s\S]*14:00/);
+    console.log(JSON.stringify({fixture:format+'-browser-ocr',language,registrationMs,answerMs}));
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
       const {config} = await import('./web/config.js');
