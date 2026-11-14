@@ -2,29 +2,35 @@ import {readFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import {evaluateDocumentQuestion} from '../server/documents.js';
 
-const pages = [
+const twoFees = process.argv.includes('--two-fees');
+const pages = twoFees ? [
+  '生徒会費は年間600円です。',
+  ...Array.from({length:12},()=> '図書室では本を借りられます。返却は図書室のカウンターで行います。'.repeat(19)),
+  '教材費は年額600円です。',
+] : [
   '給食費は月額4,000円です。年間10回徴収します。年間の給食費は40,000円です。',
   '生徒会費は年間600円です。',
   'PTA会費は年間2,400円です。',
   ...Array.from({length:9},()=> '図書室では本を借りられます。返却は図書室のカウンターで行います。'.repeat(19)),
   '下校完了は、4月から9月は17時30分、10月から3月は16時45分です。',
+  '教材費は年額600円です。',
 ];
-pages.push('教材費は年額600円です。');
 const cases = [
-  ['せいとかいひは年間いくら？', [['600',process.argv.includes('--two-fees') ? 1 : 2,'生徒会費']]],
+  ['せいとかいひは年間いくら？', [['600',twoFees ? 1 : 2,'生徒会費']]],
   ['教材費の年額は？', [['600',14,'教材費']]],
   ['給食費は1年でいくら？', [['40,000',1,'給食費']]],
   ['給食費は1年間でいくら？', [['40,000',1,'給食費']]],
-  ['給食費の月額と、生徒会費・PTA会費の年額をそれぞれ教えて', [['4,000',1,'給食費'],['600',process.argv.includes('--two-fees') ? 1 : 2,'生徒会費'],['2,400',3,'PTA会費']]],
+  ['給食費の月額と、生徒会費・PTA会費の年額をそれぞれ教えて', [['4,000',1,'給食費'],['600',twoFees ? 1 : 2,'生徒会費'],['2,400',3,'PTA会費']]],
   ['下校の時刻は？', [['17時30分',13,'下校完了'],['16時45分',13,'下校完了']]],
   ['学校指定の靴の販売店はどこ？', []],
 ];
 const key = process.env.OPENAI_DOCUMENT_QA_KEY;
-const saved = process.argv[2] ? JSON.parse(await readFile(process.argv[2],'utf8')) : null;
+const inputPath = process.argv.slice(2).find(argument=>!argument.startsWith('--'));
+const saved = inputPath ? JSON.parse(await readFile(inputPath,'utf8')) : null;
 if (!saved) assert.ok(key,'検証用の OPENAI_DOCUMENT_QA_KEY を環境変数に設定してください。');
 const normalize = text=>text.normalize('NFKC').replace(/[,\s]/g,'');
 const rows = [];
-const selectedCases = process.argv.includes('--two-fees') ? cases.slice(0,2)
+const selectedCases = twoFees ? cases.slice(0,2)
   : process.argv.includes('--baseline-five') ? cases.slice(2) : cases;
 for (const [question,expected] of selectedCases) {
   for (const mode of ['full','search']) {
@@ -53,11 +59,13 @@ for (const [question,expected] of selectedCases) {
 console.table(rows);
 const summary = ['full','search'].map(mode=>{
   const samples = rows.filter(row=>row.mode===mode);
-  const durations = samples.map(row=>row.elapsedMs).filter(Number.isFinite).sort((a,b)=>a-b);
-  const middle = Math.floor(durations.length/2);
-  const medianMs = durations.length
-    ? (durations[Math.floor((durations.length-1)/2)] + durations[middle])/2
-    : null;
+  const latency = field=>{
+    const durations = samples.map(row=>row[field]).filter(Number.isFinite).sort((a,b)=>a-b);
+    const count = durations.length;
+    const medianMs = count ? (durations[Math.floor((count-1)/2)]+durations[Math.floor(count/2)])/2 : null;
+    return {count,medianMs,maxMs:durations.at(-1) ?? null};
+  };
+  const overall = latency('elapsedMs');
   const passed = samples.filter(row=>row.correct).length;
   const complete = samples.length===selectedCases.length;
   const retrievalSamples = samples.filter(row=>row.expectedPageCount && row.missingCandidatePages!==null);
@@ -76,7 +84,9 @@ const summary = ['full','search'].map(mode=>{
       expected:samples.reduce((sum,row)=>sum+row.expectedPageCount,0),
       returned:samples.reduce((sum,row)=>sum+row.returnedPageCount,0),
     },
-    measuredLatencyCases:durations.length, medianMs, maxMs:durations.at(-1) ?? null,
+    measuredLatencyCases:overall.count, medianMs:overall.medianMs, maxMs:overall.maxMs,
+    retrievalLatency:mode==='search' ? latency('retrievalMs') : null,
+    generationLatency:latency('generationMs'),
     measuredCostCases:samples.filter(row=>row.estimatedUSD!==null).length,
     estimatedUSD:complete && samples.every(row=>row.estimatedUSD!==null)
       ? samples.reduce((sum,row)=>sum+row.estimatedUSD,0) : null};
