@@ -148,10 +148,11 @@ try {
     measurements.push({question:scheduleQuestion,value:'10:00 ／ 14:00',source:'R9予定表 · C3・C4',
       citationLinks:scheduleLinks,citationCells:scheduleCells,elapsedMs:Math.round(performance.now()-scheduleStarted)});
     if (!merged && !wide) {
-      for (const [question, values, cells] of [
+      for (const [question, values, cells, sheet, pageNumber] of [
         ['会議室の大人と子どもについて、それぞれ休日料金は？',
           ['令和8年度・令和9年度のうち、どの年度ですか？'],[]],
-        ['令和9年度です',['900円','450円'],['D3','D4']],
+        ['令和9年度です',['900円','450円'],['D3','D4'],'R9料金表',2],
+        ['令和8年度です',['800円','400円'],['D3','D4'],'R8料金表',4],
       ]) {
         await page.locator('#question').fill(question);
         const started = performance.now();
@@ -160,11 +161,11 @@ try {
         const answers = page.locator('#messages .bubble').last().locator('.answer-item');
         assert.deepEqual(await answers.locator('.answer-text').allTextContents(),values,question);
         const citationLinks = await answers.locator('.answer-source a').allTextContents();
-        assert.deepEqual(citationLinks,cells.map(()=> '元のPDF 2ページ'),question);
+        assert.deepEqual(citationLinks,cells.map(()=> '元のPDF '+pageNumber+'ページ'),question);
         const citationCells = await answers.locator('.answer-source > div').allTextContents();
         assert.deepEqual(citationCells.map(line=>line.split('、').filter(cell=>/ · D[34]$/.test(cell))),
-          cells.map(cell=>['R9料金表 · '+cell]),question);
-        measurements.push({question,value:values.join(' ／ '),source:cells.length ? 'R9料金表 · '+cells.join('・') : null,
+          cells.map(cell=>[sheet+' · '+cell]),question);
+        measurements.push({question,value:values.join(' ／ '),source:cells.length ? sheet+' · '+cells.join('・') : null,
           citationLinks,citationCells,elapsedMs:Math.round(performance.now()-started)});
       }
     }
