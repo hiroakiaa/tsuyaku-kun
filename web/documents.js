@@ -300,7 +300,8 @@ async function reader() {
   if (sourceType!=='pdf') {
     $('#qa-source').textContent = '資料データを表示';
   }
-  let opened,originalUrl;
+  let opened,originalUrl,officeText,officeRender = 0;
+  const officeType = ['xlsx','docx'].includes(sourceType);
   const previousPage = readingPosition(id,{opened:Date.now()}).page;
   let selectedPage = Number.isInteger(previousPage) && previousPage>=1 && previousPage<=doc.pageCount ? previousPage : 0;
   const tocButton = $('#pdf-toc-toggle');
@@ -689,13 +690,46 @@ async function reader() {
     }
     updateMobileControls();
     $('#pdf-file').removeAttribute('href');
-    $('#pdf-status').textContent = 'PDFを表示しています…';
+    $('#pdf-status').textContent = sourceType==='pdf' ? 'PDFを表示しています…' : '資料を表示しています…';
 
     if (sourceType!=='pdf') {
+      if (officeType) {
+        const version = ++officeRender;
+        try {
+          officeText ??= request(api+'/text').catch(error=>{officeText=undefined;throw error;});
+          const sheets = await officeText;
+          if (version!==officeRender) return;
+          selectedPage = Math.min(Math.max(1,n),sheets.length);
+          readingPosition(id,{page:selectedPage});
+          let panel = $('#office-preview');
+          if (!panel) panel = append(preview,'section','','office-preview'), panel.id='office-preview';
+          panel.replaceChildren();
+          if (sourceType==='xlsx') {
+            const picker = append(panel,'select','');
+            picker.setAttribute('aria-label','表示するシート');
+            sheets.forEach((sheet,i)=>{
+              const name = sheet.split('\n',1)[0];
+              picker.add(new Option(name || 'シート '+(i+1),String(i+1)));
+            });
+            picker.value=String(selectedPage);
+            picker.onchange=()=>void showPdf(Number(picker.value));
+          }
+          const sheet = sheets[selectedPage-1] ?? '';
+          append(panel,'pre',sourceType==='xlsx' ? sheet.split('\n').slice(1).join('\n') || 'このシートには表示できるセルがありません。' : sheet);
+          preview.scrollTop=0;
+        } catch (error) {
+          if (version!==officeRender) return;
+          $('#pdf-status').textContent=error.message;
+          const retry=append($('#pdf-status'),'button','再読み込み');
+          retry.onclick=()=>void showPdf(n);
+          return;
+        }
+      }
       if (!imageType) $('#pdf-file').textContent = 'ダウンロード';
       $('#pdf-file').removeAttribute('href');
       for (const node of ['#pdf-prev','#pdf-next','#pdf-page','#pdf-pages']) $(node).hidden=true;
       try {
+        if (officeType && originalUrl) { $('#pdf-file').href=originalUrl; $('#pdf-status').textContent=''; return; }
         const response=await fetch(config.api+api+'/pdf',{headers:await authHeaders()});
         if (!response.ok) throw Error('資料データを取得できませんでした。');
         if (originalUrl) URL.revokeObjectURL(originalUrl);

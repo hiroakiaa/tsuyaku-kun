@@ -397,7 +397,7 @@ export async function documents(request,env,auth) {
   if (!info.ok) return info;
   const record = await info.json();
   if (action==='text' && request.method==='GET') {
-    if ((record.sourceType ?? 'pdf')!=='pdf') return fail('PDFが見つかりません。',404);
+    if (!['pdf','xlsx','docx'].includes(record.sourceType ?? 'pdf')) return fail('資料の本文が見つかりません。',404);
     return reply(record.pages.slice(0,record.originalPageCount ?? record.pages.length));
   }
   if (action==='toc' && request.method==='POST') {

@@ -300,3 +300,7 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
 .create-panel #result{margin-top:1.25rem;padding:1rem;border:1px solid var(--qa-edge);border-radius:1rem}
 .create-panel #open-guide{display:inline-block;margin-block:.4rem .8rem;color:var(--qa-accent);font-weight:700}
 @media(max-width:480px){.library-filters label:first-child{flex-basis:100%}.library-filters select{width:100%}.library-filters label:last-child{flex:1}}
+
+.office-preview{min-width:0;padding:1rem;color:#eee;background:#1c1c1e}
+.office-preview select{max-width:100%;min-height:44px;padding:.4rem .7rem;border-radius:.6rem;color:inherit;background:#29282d}
+.office-preview pre{margin:.8rem 0 0;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;font:inherit;line-height:1.6}
