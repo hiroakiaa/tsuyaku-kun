@@ -189,3 +189,24 @@ for (const path of ['data','pdf']) {
   }});
   assert.equal(response.status,404,path);
 }
+
+const yearlyAdmissionPages = [
+  'R8入試表\nA1 校名 | J1 一般入試\nA2 青空高校 | J2 9科14以上',
+  'R9入試表\nA1 校名 | J1 一般入試\nA2 青空高校 | J2 9科16以上',
+];
+const yearlyAdmissionEnv = {ROOMS:{idFromName:name=>name,get:()=>({
+  fetch:async url=>Response.json(url.endsWith('/data') ? {pages:yearlyAdmissionPages,owner:'author',sourceType:'xlsx'} : null),
+})}};
+const askAdmission = async (question,previousQuestion)=>(await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+  method:'POST',body:JSON.stringify({question,previousQuestion}),
+}),yearlyAdmissionEnv,{uid:'author'})).json();
+const ambiguousAdmission = '青空高校の一般入試の基準は？';
+const clarification = await askAdmission(ambiguousAdmission);
+assert.deepEqual(clarification.items[0].clarificationYears,['8','9']);
+assert.deepEqual(clarification.pages,[]);
+for (const [year,answer,page] of [['R8','9科14以上',1],['R9','9科16以上',2]]) {
+  const resolved = await askAdmission(year,ambiguousAdmission);
+  assert.equal(resolved.answer,answer);
+  assert.deepEqual(resolved.pages,[page]);
+}
+console.log('PASS admissions clarification and both year-only replies');

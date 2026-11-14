@@ -76,6 +76,8 @@ jobs:
         env:
           DOCUMENT_QA_REPORT: document-qa-wide-report.json
         run: node tools/smoke-document-qa-tables.mjs --wide
+      - name: Verify ambiguous admission years in the published app
+        run: node tools/smoke-document-qa-admission-years.mjs
       - name: Save document verification results
         uses: actions/upload-artifact@v4
         with:

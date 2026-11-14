@@ -301,7 +301,16 @@ function lookupWorksheetCell(pages, question) {
 function lookupAdmissionCell(pages, question) {
   const request = /^(?:令和|R)(\d{1,2})年度?の([^|、。]{2,30}?)(?:の([^|、。]{2,30}?)コース)?の一般入試の?基準(?:は)?[?。]?$/iu.exec(normalized(question));
   const recommendation = /^(?:令和|R)(\d{1,2})年度?の([^|、。]{2,30}?)の([^|、。]{2,30}?)コースの推薦入試で([359](?:科[・、][359])*科)の基準は[?。]?$/iu.exec(normalized(question));
-  if (!request && !recommendation) return null;
+  if (!request && !recommendation) {
+    const query = normalized(question);
+    if (!/^[^|、。]{2,30}の一般入試の?基準(?:は)?[?。]?$/u.test(query) ||
+        /^(?:令和|R)\d/iu.test(query)) return null;
+    const years = [...new Set(pages.map(page=>/^R(\d{1,2})(?!\d)/iu.exec(normalized(page.split('\n',1)[0]))?.[1]).filter(Boolean))];
+    const matchingYears = years.filter(year=>lookupAdmissionCell(pages,'令和'+year+'年度の'+query)?.evidence?.length)
+      .sort((a,b)=>Number(a)-Number(b));
+    if (matchingYears.length<2) return null;
+    return {label:'年度の確認',clarificationYears:matchingYears,answer:matchingYears.map(year=>'令和'+year+'年度').join('・')+'のうち、どの年度ですか？',evidence:[]};
+  }
   const [,year,school,course,subjects] = request ?? recommendation;
   const schoolName = school.replace(/(?:高等学校|高校)$/u,'');
   const columns = new Map();
@@ -729,7 +738,7 @@ export async function documents(request,env,auth) {
   if (record.sourceType==='pdf' || record.sourceType==='xlsx') {
     const yearReply = /^(?:令和|R)(\d+)(?:年度?)?(?:です)?[。.]?$/iu.exec(normalized(currentQuestion));
     const previous = yearReply && typeof previousQuestion==='string' && previousQuestion.length<=300
-      ? lookupWorksheetCell(record.pages,previousQuestion) : null;
+      ? lookupWorksheetCell(record.pages,previousQuestion) ?? lookupAdmissionCell(record.pages,previousQuestion) : null;
     let worksheetQuestion = previous?.clarificationYears?.includes(yearReply?.[1])
       ? '令和'+yearReply[1]+'年度の'+previousQuestion : currentQuestion;
     if (yearReply && previous?.evidence.length) {
@@ -762,7 +771,7 @@ export async function documents(request,env,auth) {
     const worksheetItem = lookupWorksheetCell(record.pages,worksheetQuestion);
     const item = worksheetItem
       ? {...worksheetItem,worksheetContext:worksheetQuestion}
-      : lookupAdmissionCell(record.pages,currentQuestion);
+      : lookupAdmissionCell(record.pages,worksheetQuestion);
     if (item) {
       if (request.headers.get('Accept')==='application/x-ndjson') {
         return new Response(JSON.stringify({item})+'\n'+JSON.stringify({done:true})+'\n',{
