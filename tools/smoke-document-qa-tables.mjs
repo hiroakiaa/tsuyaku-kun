@@ -147,6 +147,27 @@ try {
     ]);
     measurements.push({question:scheduleQuestion,value:'10:00 ／ 14:00',source:'R9予定表 · C3・C4',
       citationLinks:scheduleLinks,citationCells:scheduleCells,elapsedMs:Math.round(performance.now()-scheduleStarted)});
+    if (!merged && !wide) {
+      for (const [question, values, cells] of [
+        ['会議室の大人と子どもについて、それぞれ休日料金は？',
+          ['令和8年度・令和9年度のうち、どの年度ですか？'],[]],
+        ['令和9年度です',['900円','450円'],['D3','D4']],
+      ]) {
+        await page.locator('#question').fill(question);
+        const started = performance.now();
+        await page.locator('#ask-form button').click();
+        await page.locator('#ask-form button:enabled').waitFor();
+        const answers = page.locator('#messages .bubble').last().locator('.answer-item');
+        assert.deepEqual(await answers.locator('.answer-text').allTextContents(),values,question);
+        const citationLinks = await answers.locator('.answer-source a').allTextContents();
+        assert.deepEqual(citationLinks,cells.map(()=> '元のPDF 2ページ'),question);
+        const citationCells = await answers.locator('.answer-source > div').allTextContents();
+        assert.deepEqual(citationCells.map(line=>line.split('、').filter(cell=>/ · D[34]$/.test(cell))),
+          cells.map(cell=>['R9料金表 · '+cell]),question);
+        measurements.push({question,value:values.join(' ／ '),source:cells.length ? 'R9料金表 · '+cells.join('・') : null,
+          citationLinks,citationCells,elapsedMs:Math.round(performance.now()-started)});
+      }
+    }
     const releaseResponse = await page.request.get(new URL('./web/release-checks.json',guide).href,{
       headers:{'Cache-Control':'no-cache'},
     });
