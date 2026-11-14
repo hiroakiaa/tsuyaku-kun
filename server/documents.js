@@ -72,6 +72,12 @@ function selectPassages(pages, question, index) {
   }
   const strongest = scored.filter(item=>item.score>0).slice(0,4);
   for (const item of strongest) chosen.add(item.position);
+  // A table's heading or continuation can be on the neighboring PDF page.
+  for (const {page,position} of strongest) {
+    for (const neighbor of [position-1,position+1]) {
+      if (Math.abs((index[neighbor]?.[0] ?? page)-page)===1 && chosen.size<14) chosen.add(neighbor);
+    }
+  }
   for (const {page,position} of strongest) {
     for (const neighbor of [position-1,position+1]) {
       if (index[neighbor]?.[0]===page && chosen.size<12) chosen.add(neighbor);
