@@ -18,7 +18,7 @@ export async function admissionsCell(pdf, question) {
     canvas.width=Math.ceil(viewport.width);
     canvas.height=Math.ceil(viewport.height);
     const ctx=canvas.getContext('2d',{willReadFrequently:true});
-    await page.render({canvasContext:ctx,viewport}).promise;
+    await page.render({canvas,viewport}).promise;
     const {width,height}=canvas;
     const pixels=ctx.getImageData(0,0,width,height).data;
     const dark=(x,y)=>{
