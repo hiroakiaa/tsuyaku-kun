@@ -85,3 +85,5 @@ R7要項の給食費を本番の全文・検索方式で各3回、順序を交�
 合成Excel（4シート、6,958バイト）の公開版Chrome計測。作成ボタンの操作直前から登録URLが入力欄に入るまで4,534ms。ファイル選択と事前のシート数確認は測定外。5問の表示時間は959・135・137・127・146msで、削除はHTTP 200。単一試行。計測を含む試験は 15ec5db の node tools/smoke-document-qa-tables.mjs。
 
 公開コミット 7cc5a1c の [Actions 43620952153](https://github.com/hiroakiaa/tsuyaku-kun/actions/runs/43620952153) でPDF・Excel試験が成功。公開版を使ったWindows Chromeの再試験では GITHUB_STEP_SUMMARY に登録4,340msと質問5件（953・150・134・126・76ms）の表を出力し、削除後404を確認した。GitHubの実行概要ページの取得HTMLからは表を確認できていない。2種類の実行環境の時間は混ぜて集計しない。
+
+公開版Chromeの3ページ混在PDF（本文とスキャン画像）の単一試行。選択から事前確認2,377ms、作成操作から登録3,448ms、質問送信から完了は図書館1,449ms・プール864ms・まとめ1,409ms。各回答の根拠を確認し試験資料を削除。再実行は node tools/smoke-document-qa.mjs。
