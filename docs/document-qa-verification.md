@@ -79,3 +79,5 @@ R7要項の給食費を本番の全文・検索方式で各3回、順序を交�
 公開版Chromeの合成Excel再試験。根拠付き4回答で、期待する値・セル番地を確認し、表示された根拠セルはすべて対象シートに属し、引用リンクも各回答で期待したPDFページ1件だけだった。聞き返しを含む5問の表示時間は444・144・136・129・80ms。試験資料の削除はHTTP 200。試験資料は4シートの合成表で、同一シート内の余分なセル番地までは公開試験で完全一致判定していない。
 
 公開版Chromeで合成Excelの根拠セルを完全一致で再照合。入試表と予定表は各A3・B4・C1・C2・C4、年度別料金表は各A3・B4・C1・D2・D4が期待通り。PDFリンクも各回答の期待ページ1件に一致。聞き返しを含む5問の表示時間は956・142・153・127・141ms。試験資料は削除済み。再実行は node ../smoke-public-tables.mjs。
+
+コミット f03f9a6 の [GitHub Actions 実行 43620232908](https://github.com/hiroakiaa/tsuyaku-kun/actions/runs/43620232908) で、公開版のPDF・Excel両方の試験が成功。Excelは node tools/smoke-document-qa-tables.mjs で再実行でき、合成資料は tests/fixtures/document-qa-tables.xlsx。指定の入試PDFそのものとiPad実機は引き続き未検証。
