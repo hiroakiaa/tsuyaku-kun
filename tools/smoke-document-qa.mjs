@@ -2,6 +2,11 @@ import {writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 
+const long = process.argv.includes('--long');
+const padding = long ? Array.from({length:25},(_,i)=>
+  '<p style="break-before:page">School garden notices and planting instructions. Section '+(i+1)+'.</p>').join('') : '';
+const scanPage = long ? 28 : 3;
+const scanCitation = '元のPDF '+scanPage+'ページ';
 const browser = await chromium.launch();
 try {
   const page = await browser.newPage();
@@ -26,7 +31,7 @@ try {
     ctx.fillText('The swimming pool opens at 8 AM.',30,100);
     return canvas.toDataURL();
   });
-  await page.setContent(`<table style="width:600px;text-align:left"><tr><th rowspan="2">Facility</th><th colspan="2">Hours</th></tr><tr><th>Opening</th><th>Closing</th></tr></table><table style="break-before:page;width:600px"><tr><td>Library</td><td>9 AM</td><td>3 PM</td></tr><tr><td>Museum</td><td>10 AM</td><td>5 PM</td></tr></table><div style="break-before:page"><img width="550" src="${scan}"></div>`);
+  await page.setContent(`<table style="width:600px;text-align:left"><tr><th rowspan="2">Facility</th><th colspan="2">Hours</th></tr><tr><th>Opening</th><th>Closing</th></tr></table><table style="break-before:page;width:600px"><tr><td>Library</td><td>9 AM</td><td>3 PM</td></tr><tr><td>Museum</td><td>10 AM</td><td>5 PM</td></tr></table>${padding}<div style="break-before:page"><img width="550" src="${scan}"></div>`);
   const pdf = await page.pdf();
   await page.goto('https://hiroakiaa.github.io/tsuyaku-kun/documents.html');
   await page.getByRole('heading',{name:'資料QAの保管庫'}).waitFor();
@@ -60,12 +65,12 @@ try {
     await page.locator('#question').fill('When does the swimming pool open?');
     const poolStarted = performance.now();
     await page.locator('#ask-form button').click();
-    const citation = page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 3ページ'});
+    const citation = page.locator('#messages .answer-source').getByRole('link',{name:scanCitation});
     await citation.waitFor({timeout:60_000});
     await page.locator('#ask-form button:enabled').waitFor();
     const poolMs = Math.round(performance.now()-poolStarted);
     await citation.click();
-    await page.waitForFunction(()=>document.querySelector('#pdf-page')?.value==='3');
+    await page.waitForFunction(expected=>document.querySelector('#pdf-page')?.value===String(expected),scanPage);
     assert.match(await page.locator('#messages .bubble').last().textContent(),/8\s*(?::00)?\s*AM/i);
     await page.locator('#question').fill('When does the library close and when does the swimming pool open? Give both facts separately.');
     const combinedStarted = performance.now();
@@ -75,14 +80,14 @@ try {
     const poolSource = combined.locator('.answer-item').filter({hasText:/8\s*(?::00)?\s*AM/i});
     await librarySource.getByRole('link',{name:'元のPDF 2ページ'}).waitFor();
     await librarySource.getByRole('link',{name:'元のPDF 1ページ'}).waitFor();
-    await poolSource.getByRole('link',{name:'元のPDF 3ページ'}).waitFor();
+    await poolSource.getByRole('link',{name:scanCitation}).waitFor();
     await page.locator('#ask-form button:enabled').waitFor();
     const citationNames = async item => (await item.locator('.answer-source a').allTextContents())
       .map(label=>label.trim()).sort();
     assert.deepEqual(await citationNames(librarySource),['元のPDF 1ページ','元のPDF 2ページ']);
     const combinedMs = Math.round(performance.now()-combinedStarted);
-    assert.deepEqual(await citationNames(poolSource),['元のPDF 3ページ']);
-    for (const [item,number] of [[librarySource,1],[librarySource,2],[poolSource,3]]) {
+    assert.deepEqual(await citationNames(poolSource),[scanCitation]);
+    for (const [item,number] of [[librarySource,1],[librarySource,2],[poolSource,scanPage]]) {
       await item.getByRole('link',{name:'元のPDF '+number+'ページ',exact:true}).click();
       await page.waitForFunction(expected=>document.querySelector('#pdf-page')?.value===String(expected),number);
     }
@@ -123,7 +128,7 @@ try {
     if (process.env.GITHUB_SHA) assert.equal(commit,process.env.GITHUB_SHA);
     const result = {
       commit,
-      fixture:'mixed-text-and-scan-pdf',preflightMs,registrationMs,libraryMs,poolMs,combinedMs,
+      fixture:long ? '28-page-mixed-pdf' : 'mixed-text-and-scan-pdf',preflightMs,registrationMs,libraryMs,poolMs,combinedMs,
       measuredAt:new Date().toISOString(), platform:process.platform,browserVersion:browser.version(),
       combinedEvidence,
     };
