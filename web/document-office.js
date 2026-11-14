@@ -45,7 +45,7 @@ async function entries(file) {
   }};
 }
 const tags=(node,name)=>Array.from(node?.getElementsByTagNameNS('*',name) ?? []);
-const strings=node=>tags(node,'t').map(t=>t.textContent).join('');
+const strings=node=>tags(node,'t').filter(t=>t.parentElement?.localName!=='rPh').map(t=>t.textContent).join('');
 
 export async function officePages(file,{includeMerges=false}={}){
   const zip=await entries(file);
@@ -70,7 +70,7 @@ export async function officePages(file,{includeMerges=false}={}){
       const value=tags(cell,'v')[0]?.textContent;
       const type=cell.getAttribute('t');
       const content=type==='s' ? shared[Number(value)] ?? '' : type==='inlineStr' ? strings(cell) : value ?? '';
-      return content.trim() ? cell.getAttribute('r')+' '+content : '';
+      return content.trim() ? cell.getAttribute('r')+' '+content.trim().replace(/\s*[\r\n]+\s*/g,' ') : '';
     }).filter(Boolean).join(' | ')).filter(Boolean).join('\n');
     return includeMerges ? {text,merges} : text;
   }));

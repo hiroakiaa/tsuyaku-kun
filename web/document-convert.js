@@ -1,5 +1,5 @@
 import {PDFDocument} from './document-pdf-lib.mjs';
-import {officePages} from './document-office.js?v=70';
+import {officePages} from './document-office.js?v=87';
 
 export async function convertDocument(file){
   const pdf=await PDFDocument.create();
@@ -33,32 +33,45 @@ export async function convertDocument(file){
     for(const [index,section] of sections.entries()){
       const rows=(section.text ?? section).split('\n');
       const title=xlsx ? rows.shift() || 'シート '+(index+1) : file.name;
-      const lines=[];
+      const blocks=[[]];
       ctx.font='19px sans-serif';
       for(const row of rows){
+        const wrapped=[];
         let line='';
         for(const char of row){
-          if(line && ctx.measureText(line+char).width>1010){lines.push(line);line='';}
+          if(line && ctx.measureText(line+char).width>1010){wrapped.push(line);line='';}
           line+=char;
         }
-        lines.push(line);
+        wrapped.push(line);
+        let block=blocks.at(-1);
+        if (xlsx && block.length && wrapped.length<=50 && block.length+wrapped.length>50) {
+          blocks.push(block=[]);
+        }
+        for (const [lineIndex,segment] of wrapped.entries()) {
+          if (block.length===50) blocks.push(block=[]);
+          block.push({segment,continued:lineIndex>0 && block.length>0});
+        }
       }
-      for(let offset=0;offset<Math.max(1,lines.length);offset+=50){
+      for(const block of blocks){
         if(pages.length>=160)throw Error('変換後のPDFは160ページまでです。');
-        const block=lines.slice(offset,offset+50);
         clear();
         ctx.font='bold 26px sans-serif';
         ctx.fillText(title,50,65,1020);
         ctx.font='19px sans-serif';
-        block.forEach((line,i)=>ctx.fillText(line,50,102+i*28));
+        block.forEach(({segment},i)=>ctx.fillText(segment,50,102+i*28));
+        const pageRows = [];
+        for (const {segment,continued} of block) {
+          if (xlsx && continued) pageRows[pageRows.length-1]+=segment;
+          else pageRows.push(segment);
+        }
         const merges = section.merges?.filter(range=>{
           const [first,last=first]=range.split(':');
           const start=Number(first.match(/\d+$/)?.[0]);
           const end=Number(last.match(/\d+$/)?.[0]);
-          return block.some(line=>[...line.matchAll(/(?:^| \| )[A-Z]+(\d+) /g)].some(match=>Number(match[1])>=start && Number(match[1])<=end));
+          return pageRows.some(line=>[...line.matchAll(/(?:^| \| )[A-Z]+(\d+) /g)].some(match=>Number(match[1])>=start && Number(match[1])<=end));
         });
         const metadata = merges?.length ? ['結合セル範囲: '+merges.join(', ')] : [];
-        pages.push([title,...block,...metadata].join('\n'));
+        pages.push([title,...pageRows,...metadata].join('\n'));
         await save();
       }
     }

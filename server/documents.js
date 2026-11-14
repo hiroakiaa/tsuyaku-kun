@@ -226,8 +226,41 @@ function monthlyDismissal(evidence) {
   return null;
 }
 
+function lookupAdmissionCell(pages, question) {
+  const request = /^(?:令和|R)(\d{1,2})年度?の([^|、。]{2,30}?)の一般入試の?基準(?:は)?[?。]?$/iu.exec(normalized(question));
+  if (!request) return null;
+  const [,year,school] = request;
+  const schoolName = school.replace(/(?:高等学校|高校)$/u,'');
+  const columns = new Map();
+  for (const page of pages) {
+    const sheet = page.split('\n',1)[0];
+    if (!new RegExp('^R'+Number(year)+'(?!\\d)','iu').test(normalized(sheet))) continue;
+    const header = /(?:^|[\n|])\s*([A-Z]+)\d+\s+一般入試[^|\n]*/u.exec(page);
+    if (header) {
+      const existing = columns.get(sheet);
+      columns.set(sheet, existing!==undefined && existing!==header[1] ? null : header[1]);
+    }
+  }
+  const matches = [];
+  for (const [index,page] of pages.entries()) {
+    const column = columns.get(page.split('\n',1)[0]);
+    if (!column) continue;
+    for (const line of page.split('\n')) {
+      const cells = line.split(' | ');
+      const row = /^A(\d+)\s+(.+)$/u.exec(cells[0]);
+      if (!row || normalized(row[2]).replace(/(?:高等学校|高校)$/u,'')!==schoolName) continue;
+      const cell = cells.find(value=>value.startsWith(column+row[1]+' '));
+      if (cell) matches.push({label:school+'の一般入試基準',answer:cell.slice(cell.indexOf(' ')+1),
+        evidence:[{page:index+1,quote:cells[0]},{page:index+1,quote:cell}]});
+    }
+  }
+  return matches.length===1 ? matches[0] : null;
+}
+
 function checkedAnswer(item,pages,question='') {
-  const school = /^([\p{L}\p{N}・]{2,30}?)(?:高等学校|高校)?の(?:一般|推薦)?入試/u.exec(normalized(question))?.[1]
+  const requestedYear = /^(?:令和|R)(\d{1,2})年度?の/iu.exec(normalized(question))?.[1];
+  const schoolQuestion = normalized(question).replace(/^(?:令和|平成|昭和|R|H|S)?[0-9]{1,4}年度?の/iu,'');
+  const school = /^([\p{L}\p{N}・]{2,30}?)(?:高等学校|高校)?の(?:一般|推薦)?入試/u.exec(schoolQuestion)?.[1]
     ?? /([\p{L}\p{N}・]{2,30})(?:高等学校|高校)/u.exec(question)?.[1];
   const admission = /入試|入学|出願|受験/.test(question);
 
@@ -248,6 +281,11 @@ function checkedAnswer(item,pages,question='') {
           return rows.length===1 ? {...source,quote:rows[0]} : source;
         })
         .filter(source=>supported(source,pages) && source.quote.length<=500)
+        .filter(({page})=>{
+          const heading = normalized(pages[page-1].split('\n',1)[0]);
+          const sourceYear = /^R(\d{1,2})(?=私立|国立|専修)/iu.exec(heading)?.[1];
+          return !requestedYear || !sourceYear || Number(requestedYear)===Number(sourceYear);
+        })
         .slice(0,4).map(({page,quote})=>({page,quote}));
       for (const source of [...evidence]) {
         if (source.page<2 || evidence.length>=4) continue;
@@ -279,7 +317,16 @@ function checkedAnswer(item,pages,question='') {
           evidence.push({page:source.page-1,quote});
         }
       }
-      const schoolEvidence = !school || !admission || evidence.some(({quote})=>{
+      const schoolEvidence = !school || !admission || evidence.some(({page,quote})=>{
+        if (/一般入試/u.test(question)) {
+          const sheet = pages[page-1].split('\n',1)[0];
+          const heading = pages.find(text=>text.startsWith(sheet+'\n') &&
+            /(?:^|[\n|])\s*([A-Z]+)\d+\s+一般入試/u.test(text));
+          const column = heading?.match(/(?:^|[\n|])\s*([A-Z]+)\d+\s+一般入試/u)?.[1];
+          const row = quote.match(/(?:^|[\n|])\s*A(\d+)\s+([^|\n]+)/u);
+          if (column && (!row || !normalized(row[2]).includes(normalized(school)) ||
+              !new RegExp('(?:^|[\\n|])\\s*'+column+row[1]+'\\s+\\S','u').test(quote))) return false;
+        }
         const text = normalized(quote);
         const name = normalized(school);
         return text.includes(name) && text.replace(name,'').length>=8;
@@ -392,7 +439,7 @@ export async function documents(request,env,auth) {
         pages.join('').length>((converted || ext==='xlsx') ? MAX_EXCEL_TEXT : MAX_TEXT) || !pages.some(page=>page.trim().length>=5)) return fail('資料の文字を読み取れませんでした。');
     const largeExcel = (converted || ext==='xlsx') && pages.join('').length>MAX_TEXT;
     const overview = largeExcel ? pages.map((text,i)=>({page:i+1,text:text.slice(0,Math.min(500,Math.floor(12_000/pages.length)))})) : undefined;
-    const result = await generate(env,pages,undefined,[],undefined,overview);
+    const result = await generate(env,pages,undefined,[],undefined,overview).catch(error=>{ if (!largeExcel) throw error; return null; });
     const items = (Array.isArray(result?.items) ? result.items : [])
       .filter(item=>typeof item?.label==='string' && typeof item.text==='string' && supported(item.source,pages))
       .slice(0,6).map(({label,text,source})=>({label:label.slice(0,45),text:text.slice(0,350),source:{page:source.page}}));
@@ -537,7 +584,18 @@ export async function documents(request,env,auth) {
       return reply({items:[item],answer:item.answer,pages:[item.evidence[0].page]});
     }
   }
-  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([13,record.pages,record.materials ?? [],question.trim()])));
+  if (record.sourceType==='pdf' || record.sourceType==='xlsx') {
+    const item = lookupAdmissionCell(record.pages,currentQuestion);
+    if (item) {
+      if (request.headers.get('Accept')==='application/x-ndjson') {
+        return new Response(JSON.stringify({item})+'\n'+JSON.stringify({done:true})+'\n',{
+          headers:{'Content-Type':'application/x-ndjson','Cache-Control':'no-store'},
+        });
+      }
+      return reply({items:[item],answer:item.answer,pages:[item.evidence[0].page]});
+    }
+  }
+  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([15,record.pages,record.materials ?? [],question.trim()])));
   const cacheKey = Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
   const cacheUrl = 'https://room/document/answer/'+cacheKey;
   const cached = await (await target.fetch(cacheUrl)).json();
