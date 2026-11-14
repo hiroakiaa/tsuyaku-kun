@@ -102,3 +102,5 @@ R7要項の給食費を本番の全文・検索方式で各3回、順序を交�
 [公開後試験 43622855153](https://github.com/hiroakiaa/tsuyaku-kun/actions/runs/43622855153) は成功。合成PDFの日本語質問で、英語の見出しと値の両ページおよび記載のない項目の根拠なし表示を照合した。
 
 公開版 84f81d4 の Windows Chrome で、本文と3列の表（Group、Room、Start time）を含む合成DOCXを登録した。Blue group の Room は空欄、Start time は14:00。抽出時に空欄と列順が保持され、変換PDFは1ページ。開始時刻の質問に14:00相当の回答とPDF 1ページの根拠が表示された。削除はHTTP 200、削除後は資料情報とPDFがともに404。結合セルを含むWord、複数ページのWord、追加資料として登録した場合の一連の操作は未検証。
+
+公開版 f7e6ba7 で documents.js と Office 読み取りの更新を確認。横に2列結合した Group details と3列目の Start time、中央が空欄の Blue group の行を持つ合成Wordを登録。抽出した見出しと値はともに3列目に残り、公開版は開始時刻14:00と変換PDFの1ページを表示した。削除後は資料情報・PDFともに404。縦結合とページをまたぐ表は未検証。
