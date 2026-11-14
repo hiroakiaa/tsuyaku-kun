@@ -54,11 +54,15 @@ export async function officePages(file,{includeMerges=false}={}){
     const body=tags(doc,'body')[0];
     if (!body) return [''];
     const blocks=Array.from(body.children).flatMap(block=>{
-      if (block.localName!=='tbl') return tags(block,'p').map(strings).concat(block.localName==='p' ? [strings(block)] : []);
+      if (block.localName==='p') return [strings(block)];
+      if (block.localName!=='tbl') return tags(block,'p').map(strings);
       return Array.from(block.children).filter(row=>row.localName==='tr').map(row=>
-        Array.from(row.children).filter(cell=>cell.localName==='tc').map(cell=>
-          tags(cell,'p').map(strings).filter(Boolean).join(' ')
-        ).join(' | ')
+        Array.from(row.children).filter(cell=>cell.localName==='tc').flatMap(cell=>{
+          const span=Number(tags(cell,'gridSpan')[0]?.getAttributeNS(cell.namespaceURI,'val'));
+          const text=tags(cell,'p').map(strings).filter(Boolean).join(' ');
+          const columns=Number.isInteger(span) && span>1 && span<=63 ? span : 1;
+          return [text,...Array(columns-1).fill('')];
+        }).join(' | ')
       );
     });
     return [blocks.join('\n')];
