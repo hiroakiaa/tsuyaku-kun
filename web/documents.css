@@ -252,3 +252,19 @@ dialog [tabindex="-1"][autofocus]:focus {
 .create-guide[aria-busy=true]::before{content:"";display:inline-block;width:.85em;height:.85em;margin-inline-end:.5em;border:2px solid currentColor;border-inline-end-color:transparent;border-radius:50%;vertical-align:-.12em;animation:create-spin .8s linear infinite}
 @keyframes create-spin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.create-guide[aria-busy=true]::before{animation:none}}
+
+.create-actions{display:flex;justify-content:flex-end;align-items:center;gap:.65rem}
+#create-estimate{font-size:.8rem;color:#ccc}
+@media(max-width:799px){
+  .qa-workspace:has(>#pdf-dialog[open]){display:grid;grid-template-rows:minmax(0,var(--pdf-share,50%)) 18px minmax(0,1fr)}
+  .qa-workspace>#pdf-dialog[open]{position:relative;inset:auto;margin:0;width:100%;height:100%;grid-row:1}
+  .qa-workspace:has(>#pdf-dialog[open]) #qa-divider{display:block;grid-row:2;touch-action:none;cursor:row-resize;background:#242426;border-block:1px solid #4a4a4e;position:relative}
+  .qa-workspace #qa-divider::after{content:"";position:absolute;inset:50% auto auto 50%;transform:translate(-50%,-50%);height:3px;width:32px;background:#999;border-radius:4px}
+  .qa-workspace:has(>#pdf-dialog[open]) .ask-layout{grid-row:3;min-height:0}
+  .qa-workspace.qa-keyboard:has(>#pdf-dialog[open]){grid-template-rows:minmax(0,24%) 18px minmax(0,1fr)}
+  .qa-workspace.pdf-full:has(>#pdf-dialog[open]){grid-template-rows:minmax(0,1fr) 0 auto}
+  .qa-workspace.pdf-full #qa-divider,.qa-workspace.pdf-full #messages,.qa-workspace.pdf-full #ask-form{display:none}
+  .qa-workspace.pdf-full .ask-heading{margin:0}
+  .qa-workspace.pdf-full .qa-actions>:not(#qa-expand){display:none}
+  .qa-actions{flex-wrap:wrap}
+}

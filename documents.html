@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1d1d1d">
 <title>資料QA君</title>
-<link rel="stylesheet" href="web/documents.css?v=55">
-<script type="module" src="web/documents.js?v=61"></script>
+<link rel="stylesheet" href="web/documents.css?v=56">
+<script type="module" src="web/documents.js?v=62"></script>
 </head>
 <body><div class="shell">
 
@@ -16,7 +16,7 @@
 <section class="panel document-panel create-panel">
 <header class="create-heading">
 <h1>資料QAを作る</h1>
-<a class="document-entry" href="?v=61"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>保管庫に戻る</a>
+<a class="document-entry" href="?v=62"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>保管庫に戻る</a>
 </header>
 <p id="upload-status" role="status"></p>
 <form class="stack" id="upload">
@@ -24,7 +24,7 @@
 <label><span><i class="fa-solid fa-folder" aria-hidden="true"></i> 資料ファイル</span><input type="file" aria-describedby="upload-formats" name="pdf" accept=".pdf,.png,.jpg,.jpeg,.webp,.docx,.xlsx" required></label>
 <p id="upload-formats" class="fine">PDF（5 MB・40ページまで）、PNG・JPEG・WebP、Excel（.xlsx）、Word（.docx）</p>
 <label>保管先<select name="visibility"><option value="device">この端末の保管庫のみ</option><option value="shared">共通保管庫にも掲載（誰でも閲覧できます）</option></select></label>
-<button class="primary create-guide"><i class="fa-solid fa-plus" aria-hidden="true"></i> <span>作成する</span></button>
+<div class="create-actions"><small id="create-estimate" role="status" hidden>10～20秒ほどで完成します（目安）</small><button class="primary create-guide"><i class="fa-solid fa-plus" aria-hidden="true"></i> <span>作成する</span></button></div>
 </form>
 
 <div id="result" hidden>
@@ -37,7 +37,7 @@
 </section>
 </template>
 <template id="library"><section class="panel document-library">
-<header class="library-heading"><h1>資料QAの保管庫</h1><a class="document-entry" href="?create=1&amp;v=61" aria-label="資料チャット作成" title="資料チャット作成"><i class="fa-solid fa-plus"></i></a></header>
+<header class="library-heading"><h1>資料QAの保管庫</h1><a class="document-entry" href="?create=1&amp;v=62" aria-label="資料チャット作成" title="資料チャット作成"><i class="fa-solid fa-plus"></i></a></header>
 <div class="library-filters"><label class="library-search"><i class="fa-solid fa-magnifying-glass"></i><input id="library-search" type="search" aria-label="資料名" placeholder="資料を検索"></label><label><select id="library-sort" aria-label="並べ替え"><option value="recent">最近開いた順</option><option value="new">登録日の新しい順</option><option value="title">資料名順</option><option value="expiry">期限が近い順</option></select></label></div>
 <h2>このブラウザー</h2>
 
@@ -58,7 +58,7 @@
 <div class="doc-tabs" role="tablist" aria-label="資料の案内"><button id="tab-points" role="tab" aria-controls="points" aria-selected="true">要点</button><button id="tab-ask" role="tab" aria-controls="ask" aria-selected="false" tabindex="-1">質問する</button></div>
 <section class="panel" id="points" role="tabpanel" aria-labelledby="tab-points"><h2 id="points-title">まず確認すること</h2><div id="cards" class="cards"></div></section>
 <section class="panel" id="ask" role="tabpanel" aria-labelledby="tab-ask" hidden>
-<dialog id="ask-dialog" aria-labelledby="ask-heading"><div class="qa-workspace"><div id="qa-divider" role="separator" aria-label="列幅" aria-orientation="vertical" aria-valuemin="25" aria-valuemax="75" aria-valuenow="50" tabindex="0"></div><div class="ask-layout"><div class="ask-heading"><h2 id="ask-heading" tabindex="-1" autofocus></h2><div class="qa-actions"><button id="qa-source" type="button">元のPDF</button><button id="qa-swap" type="button">左右入れ替え</button><button class="open-material" type="button" hidden>資料追加</button><form method="dialog"><button aria-label="質問画面を閉じる">×</button></form></div></div>
+<dialog id="ask-dialog" aria-labelledby="ask-heading"><div class="qa-workspace"><div id="qa-divider" role="separator" aria-label="列幅" aria-orientation="vertical" aria-valuemin="25" aria-valuemax="75" aria-valuenow="50" tabindex="0"></div><div class="ask-layout"><div class="ask-heading"><h2 id="ask-heading" tabindex="-1" autofocus></h2><div class="qa-actions"><button id="qa-source" type="button">元のPDF</button><button id="qa-expand" type="button" hidden>PDF全画面</button><button id="qa-swap" type="button">左右入れ替え</button><button class="open-material" type="button" hidden>資料追加</button><form method="dialog"><button aria-label="質問画面を閉じる">×</button></form></div></div>
 <div id="messages" role="log" aria-live="polite"></div>
 <form id="ask-form"><label for="question" class="sr">資料への質問</label><input id="question" maxlength="300" placeholder="例：いつまでに だしますか？" required><button class="primary">送る</button></form>
 <p id="answer-status" class="fine" role="status"></p>

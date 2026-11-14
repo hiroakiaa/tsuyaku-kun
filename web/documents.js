@@ -201,7 +201,8 @@ function teacher() {
     $('#result').hidden = true;
     button.setAttribute('aria-busy','true');
     button.querySelector('span').textContent = '作成中…';
-    status.textContent = '10～20秒ほどで完成します（目安）。';
+    status.textContent = '';
+    $('#create-estimate').hidden = false;
     try {
       if (/\.pdf$/i.test(file.name)) {
         const {pages,error} = await (preflight?.file===file ? preflight.pending : preparePdf(file));
@@ -228,6 +229,7 @@ function teacher() {
     } catch (error) {
       status.textContent = error.message;
     } finally {
+      $('#create-estimate').hidden = true;
       button.removeAttribute('aria-busy');
       button.querySelector('span').textContent = '作成する';
       button.disabled = false;
@@ -290,7 +292,10 @@ async function reader() {
     selectTab(tabs[0]);
     tabs[0].focus();
   });
-  $('#qa-source').addEventListener('click',()=>void showPdf(citation?.page || selectedPage || 1));
+  $('#qa-source').addEventListener('click',()=>{
+    if (!wide.matches && dialog.open) dialog.close();
+    else void showPdf(citation?.page || selectedPage || 1);
+  });
   const sourceType = doc.sourceType ?? 'pdf';
   if (sourceType!=='pdf') {
     $('#qa-source').textContent = '資料データを表示';
@@ -504,6 +509,37 @@ async function reader() {
   const workspace = $('.qa-workspace');
   const divider = $('#qa-divider');
   const wide = matchMedia('(min-width: 800px)');
+  const expand = $('#qa-expand');
+  const sourceButton = $('#qa-source');
+  const updateMobileControls = () => {
+    expand.hidden = wide.matches || !dialog.open;
+    sourceButton.setAttribute('aria-expanded', String(dialog.open));
+    sourceButton.textContent = dialog.open && !wide.matches ? '資料を折りたたむ' : sourceType==='pdf' ? '元のPDF' : '資料データを表示';
+  };
+  expand.onclick = () => {
+    const full = workspace.classList.toggle('pdf-full');
+    expand.textContent = full ? '上下表示に戻る' : 'PDF全画面';
+  };
+  dialog.addEventListener('close', () => {
+    if (dialog.open) return;
+    workspace.classList.remove('pdf-full');
+    expand.textContent = 'PDF全画面';
+    updateMobileControls();
+  });
+  const viewport = window.visualViewport;
+  function syncKeyboard() {
+    const editing = document.activeElement === $('#question');
+    const available = window.parent === window ? viewport?.height : window.parent.visualViewport?.height;
+    const keyboard = editing && !wide.matches && available && available < window.innerHeight - 90;
+    workspace.classList.toggle('qa-keyboard', Boolean(keyboard));
+    if (keyboard) askDialog.style.height = available + 'px';
+    else askDialog.style.removeProperty('height');
+  }
+  viewport?.addEventListener('resize',syncKeyboard);
+  if (window.parent !== window) window.parent.visualViewport?.addEventListener('resize',syncKeyboard);
+  window.addEventListener('pagehide',()=>window.parent !== window && window.parent.visualViewport?.removeEventListener('resize',syncKeyboard));
+  $('#question').addEventListener('focus',syncKeyboard);
+  $('#question').addEventListener('blur',syncKeyboard);
   let reversed = false;
   let split = 50;
   function setSplit(value) {
@@ -518,16 +554,27 @@ async function reader() {
   divider.onpointerdown = event => divider.setPointerCapture(event.pointerId);
   divider.onpointermove = event => {
     if (!divider.hasPointerCapture(event.pointerId)) return;
-    const {left,width} = workspace.getBoundingClientRect();
+    const {left,width,top,height} = workspace.getBoundingClientRect();
+    if (!wide.matches) { setSplit((event.clientY-top)/height*100); return; }
     const percent = (event.clientX-left)/width*100;
     setSplit(reversed ? 100-percent : percent);
   };
   divider.onkeydown = event => {
-    if (!['ArrowLeft','ArrowRight'].includes(event.key)) return;
+    if (!wide.matches && ['ArrowUp','ArrowDown'].includes(event.key)) {
+      event.preventDefault();
+      setSplit(split + (event.key==='ArrowDown' ? 2 : -2));
+      return;
+    }
+    if (!wide.matches || !['ArrowLeft','ArrowRight'].includes(event.key)) return;
     event.preventDefault();
     setSplit(split + (event.key==='ArrowRight' ? 2 : -2)*(reversed ? -1 : 1));
   };
   function syncWorkspace() {
+    divider.setAttribute('aria-orientation', wide.matches ? 'vertical' : 'horizontal');
+    divider.setAttribute('aria-label', wide.matches ? '列幅' : 'PDFの高さ');
+    workspace.classList.remove('pdf-full');
+    expand.textContent = 'PDF全画面';
+    updateMobileControls();
     if (!askDialog.open) return;
     if (wide.matches && dialog.parentElement === workspace) return;
     if (dialog.open) dialog.close();
@@ -636,16 +683,11 @@ async function reader() {
       selectTab($('#tab-ask'));
       askDialog.showModal();
     }
-    const inline = wide.matches;
     if (!dialog.open) {
-      if (inline) {
-        workspace.prepend(dialog);
-        dialog.show();
-      } else {
-        askDialog.after(dialog);
-        dialog.showModal();
-      }
+      workspace.prepend(dialog);
+      dialog.show();
     }
+    updateMobileControls();
     $('#pdf-file').removeAttribute('href');
     $('#pdf-status').textContent = 'PDFを表示しています…';
 
@@ -959,6 +1001,7 @@ async function reader() {
     const question = field.value.trim();
     if (!question || button.disabled) return;
     field.value = '';
+    if (!wide.matches) field.blur();
     void sendQuestion(question,lastQuestion);
   });
 }
