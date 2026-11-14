@@ -250,3 +250,9 @@ dialog [tabindex="-1"][autofocus]:focus {
 
 .upload-feedback:has(progress:not([hidden])){position:sticky;top:0;z-index:2;background:#18181a;padding:.5rem .75rem;margin-bottom:.75rem;border:1px solid #ffffff30;border-radius:.65rem}
 .upload-feedback #upload-progress{height:1rem;margin:0}
+
+#upload-progress[value]{appearance:none;border:0;border-radius:1rem;background:#38383b;overflow:hidden}
+#upload-progress[value]::-webkit-progress-bar{background:#38383b}
+#upload-progress[value]::-webkit-progress-value{background:#d7e8b1;border-radius:1rem;transition:width .55s ease-out}
+#upload-progress[value]::-moz-progress-bar{background:#d7e8b1;border-radius:1rem}
+@media(prefers-reduced-motion:reduce){#upload-progress[value]::-webkit-progress-value{transition:none}}

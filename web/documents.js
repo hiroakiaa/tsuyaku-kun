@@ -205,7 +205,17 @@ function teacher() {
     button.disabled = true;
     $('#result').hidden = true;
     meter.hidden = false;
-    meter.value = 1;
+    meter.value = 0;
+    let stage = 1;
+    let previousFrame = performance.now();
+    let frame;
+    function animateProgress(now) {
+      const ceiling = stage===1 ? 1 : 2.85;
+      meter.value += (ceiling-meter.value)*(1-Math.exp(-(now-previousFrame)/1800));
+      previousFrame = now;
+      frame = requestAnimationFrame(animateProgress);
+    }
+    frame = requestAnimationFrame(animateProgress);
     status.textContent = '1 / 3　資料を確認しています…';
     try {
       if (/\.pdf$/i.test(file.name)) {
@@ -217,11 +227,12 @@ function teacher() {
         const {officePages} = await import('./document-office.js');
         data.set('pages',JSON.stringify(await officePages(file)));
       }
-      meter.value = 2;
+      stage = 2;
       status.textContent = '2 / 3　要点・目次を作成しています…';
       const {id,expires} = await request('/documents',{method:'POST',body:data});
+      meter.hidden = true;
       meter.value = 3;
-      status.textContent = '3 / 3　作成が完了しました。';
+      status.textContent = '作成が完了しました。';
       const url = '?id=' + id;
       $('#open-guide').href = url;
       $('#guide-url').value = new URL(url,location.href).href;
@@ -236,7 +247,10 @@ function teacher() {
     } catch (error) {
       meter.hidden = true;
       status.textContent = error.message;
-    } finally { button.disabled = false; }
+    } finally {
+      cancelAnimationFrame(frame);
+      button.disabled = false;
+    }
   });
   $('#copy').addEventListener('click',async ()=>{
     try { await navigator.clipboard.writeText($('#guide-url').value); status.textContent = 'URLをコピーしました。'; }
