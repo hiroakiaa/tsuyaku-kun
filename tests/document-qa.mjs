@@ -134,6 +134,10 @@ try {
   tablePages[0] = 'Hours\nFacility\nOpening | Closing';
   tableQuote = '3 PM';
   assert.deepEqual((await ask('When does the library close?')).pages,[2,1]);
+  tableQuote = 'Library | 9 AM | 3 PM. Members can stay until 6 PM.';
+  const inventedQuote = await ask('図書館の閉館時刻を教えてください。');
+  assert.deepEqual(inventedQuote.pages,[]);
+  assert.ok(inventedQuote.items.every(item=>!item.answer && !item.evidence.length));
 } finally {
   globalThis.fetch = originalFetch;
 }
