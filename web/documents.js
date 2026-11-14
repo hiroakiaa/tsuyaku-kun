@@ -99,7 +99,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '21');
+      guide.searchParams.set('v', '22');
       link.href = guide.href;
       if (entry.expires) {
         const expired = Date.now()>=entry.expires;
@@ -171,9 +171,15 @@ async function reader() {
   const dialog = $('#pdf-dialog');
   const askDialog=$('#ask-dialog');
   if(window.parent!==window){
-    const syncFullscreen=()=>window.parent.postMessage({type:'document-fullscreen',open:dialog.open||askDialog.open},location.origin);
+    const syncFullscreen=()=>{
+      const open=dialog.open||askDialog.open;
+      const host=window.frameElement?.closest('dialog.documents-dialog');
+      if (host) host.classList.toggle('document-fullscreen',open);
+      else window.parent.postMessage({type:'document-fullscreen',open},location.origin);
+    };
     const observer=new MutationObserver(syncFullscreen);
     for(const panel of [dialog,askDialog])observer.observe(panel,{attributes:true,attributeFilter:['open']});
+    syncFullscreen();
     window.addEventListener('pagehide',()=>window.parent.postMessage({type:'document-fullscreen',open:false},location.origin));
   }
   const tabs = [...document.querySelectorAll('.doc-tabs [role=tab]')];

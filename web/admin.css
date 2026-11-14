@@ -97,5 +97,11 @@ dialog.documents-dialog.document-fullscreen[open] {
   width:100%!important;height:100dvh!important;max-width:none!important;max-height:none!important;
   padding:0!important;border:0!important;border-radius:0!important;
 }
-.documents-dialog.document-fullscreen > .modal-heading {display:none}
+body dialog.documents-dialog.document-fullscreen[open] {
+  display: block !important;
+  overflow: hidden;
+}
+body dialog.documents-dialog.document-fullscreen[open] > .modal-heading {
+  display: none !important;
+}
 .documents-dialog.document-fullscreen > iframe {display:block;height:100dvh!important;min-height:100dvh!important;max-height:none!important;width:100%;border:0}
