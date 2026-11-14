@@ -243,3 +243,7 @@ dialog [tabindex="-1"][autofocus]:focus {
 .create-panel #upload-formats{margin:-.45rem 0 0;font-size:.79rem}
 .create-panel .create-guide{min-height:44px;background:#d7e8b1;color:#202619}
 .create-panel #upload-status:empty{display:none}
+
+#upload-progress{display:block;width:100%;height:.65rem;margin-top:1rem;accent-color:#d7e8b1}
+#upload-progress[hidden]{display:none}
+#upload-status{margin:.4rem 0 .8rem}

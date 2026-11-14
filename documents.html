@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1d1d1d">
 <title>資料QA君</title>
-<link rel="stylesheet" href="web/documents.css?v=51">
-<script type="module" src="web/documents.js?v=56"></script>
+<link rel="stylesheet" href="web/documents.css?v=52">
+<script type="module" src="web/documents.js?v=57"></script>
 </head>
 <body><div class="shell">
 
@@ -25,6 +25,7 @@
 <label>保管先<select name="visibility"><option value="device">この端末の保管庫のみ</option><option value="shared">共通保管庫にも掲載（誰でも閲覧できます）</option></select></label>
 <button class="primary create-guide"><i class="fa-solid fa-plus" aria-hidden="true"></i> 作成する</button>
 </form>
+<progress id="upload-progress" max="3" value="0" aria-label="資料作成の進捗" aria-describedby="upload-status" hidden></progress>
 <p id="upload-status" role="status"></p>
 <div id="result" hidden>
 <h2>案内ページができました</h2>

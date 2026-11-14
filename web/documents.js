@@ -171,6 +171,7 @@ function teacher() {
   installLocalIcons($('#content'));
   const saveGuide = documentLibrary();
   const status = $('#upload-status');
+  const meter = $('#upload-progress');
   const fileInput = $('#upload [name="pdf"]');
   let preflight;
   function preparePdf(file) {
@@ -179,6 +180,7 @@ function teacher() {
   fileInput.addEventListener('change', async () => {
     const file = fileInput.files[0];
     preflight = undefined;
+    if (!$('#upload button').disabled) meter.hidden = true;
     status.textContent = '';
     if (!file || !/\.pdf$/i.test(file.name) || file.size>5000000) return;
     const progress = document.createElement('span');
@@ -198,7 +200,9 @@ function teacher() {
     if (file.size > 5000000) { status.textContent = 'PDFは5 MBまでです。'; return; }
     button.disabled = true;
     $('#result').hidden = true;
-    status.textContent = 'PDFを開いています…';
+    meter.hidden = false;
+    meter.value = 1;
+    status.textContent = '1 / 3　資料を確認しています…';
     try {
       if (/\.pdf$/i.test(file.name)) {
         const {pages,error} = await (preflight?.file===file ? preflight.pending : preparePdf(file));
@@ -209,8 +213,11 @@ function teacher() {
         const {officePages} = await import('./document-office.js');
         data.set('pages',JSON.stringify(await officePages(file)));
       }
-      status.textContent = '案内ページを作っています…';
+      meter.value = 2;
+      status.textContent = '2 / 3　要点・目次を作成しています…';
       const {id,expires} = await request('/documents',{method:'POST',body:data});
+      meter.value = 3;
+      status.textContent = '3 / 3　作成が完了しました。';
       const url = '?id=' + id;
       $('#open-guide').href = url;
       $('#guide-url').value = new URL(url,location.href).href;
@@ -222,9 +229,10 @@ function teacher() {
         status.textContent = '資料を作成しましたが、保管庫には保存できませんでした。';
         return;
       }
-      status.textContent = '';
-    } catch (error) { status.textContent = error.message; }
-    finally { button.disabled = false; }
+    } catch (error) {
+      meter.hidden = true;
+      status.textContent = error.message;
+    } finally { button.disabled = false; }
   });
   $('#copy').addEventListener('click',async ()=>{
     try { await navigator.clipboard.writeText($('#guide-url').value); status.textContent = 'URLをコピーしました。'; }
