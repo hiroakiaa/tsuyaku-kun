@@ -109,6 +109,8 @@ try {
   }),env,{uid:'author'})).json();
   assert.deepEqual((await ask('When does the library close?')).pages,[2,1]);
   assert.deepEqual((await ask('What is the Library capacity?')).pages,[2]);
+  tablePages[0] = 'Facility | Hours\nOpening | Closing';
+  assert.deepEqual((await ask('When does the library close?')).pages,[2,1]);
 } finally {
   globalThis.fetch = originalFetch;
 }
