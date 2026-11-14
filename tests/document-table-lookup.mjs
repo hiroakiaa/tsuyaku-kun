@@ -27,3 +27,15 @@ for (const y of [290]) for(let x=20;x<=1100;x++) mark(x,y);
 assert.equal((await lookupTableCell(pdf,'北館の所要時間の基準は？')).answer,'15分');
 assert.equal((await lookupTableCell(pdf,'北館別の所要時間は？')).answer,'45分');
 console.log('PASS vertical row labels, duplicate headings and adjacent table cells');
+import {layoutPdfText} from '../web/document-table.js';
+const verticalGlyph = (str,x,y)=>({str,dir:'ttb',width:10,transform:[10,0,0,10,x,y]});
+const verticalPage = layoutPdfText([
+  verticalGlyph('館',100,160),
+  verticalGlyph('午',80,180),
+  verticalGlyph('開',100,180),
+  verticalGlyph('前',80,160),
+  verticalGlyph('時',80,120),
+  verticalGlyph('八',80,140),
+]);
+assert.equal(verticalPage,'開館\n午前八時');
+console.log('PASS PDF vertical text follows right-to-left columns and top-to-bottom glyphs');
