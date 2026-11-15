@@ -360,8 +360,8 @@ console.log('PASS localized dismissal reads completion column and preserves sour
 
 {
   const pages=[
-    '施設 | 開館時刻 | 閉館時刻\n図書館 | 9 AM | 3 PM',
-    '施設 | 開館時刻 | 最終⼊館時刻\n図書館 | 9 AM | 1 PM',
+    '施設 | 開館時刻 | 閉館時刻\n図書館 | 午前９時 | 午後３時',
+    '施設 | 開館時刻 | 最終⼊館時刻\n図書館 | 午前９時 | 午後１時',
   ];
   const env={ROOMS:{idFromName:id=>id,get:()=>({
     fetch:async url=>{
@@ -370,8 +370,8 @@ console.log('PASS localized dismissal reads completion column and preserves sour
     },
   })}};
   for (const [question,answer,page] of [
-    ['図書館の閉館時刻は？','3 PM',1],
-    ['図書館の最終入館時刻は？','1 PM',2],
+    ['図書館の閉館時刻は？','午後３時',1],
+    ['図書館の最終入館時刻は？','午後１時',2],
   ]) {
     const request=new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
       method:'POST',body:JSON.stringify({question}),
