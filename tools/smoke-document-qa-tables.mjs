@@ -110,6 +110,14 @@ try {
       const elapsedMs=Math.round(performance.now()-started);
       const submitEpoch = Number(await page.locator('#ask-form').getAttribute('data-test-submit-at'));
       assert.ok(submitEpoch >= startedEpoch && submitEpoch <= requestedAt.epoch, 'Missing or out-of-order submit event');
+      const preRequestResources = await page.evaluate(({submitEpoch, requestEpoch}) =>
+        performance.getEntriesByType('resource').flatMap(entry => {
+          const start = performance.timeOrigin + entry.startTime;
+          if (start < submitEpoch || start > requestEpoch) return [];
+          const name = new URL(entry.name).pathname.split('/').at(-1);
+          if (!['pdf','document-table-lookup.js','document-tagged-table.js','pdf.min.mjs','pdf.worker.min.mjs'].includes(name)) return [];
+          return [{name, startMs:Math.round(start - submitEpoch), durationMs:Math.round(entry.duration)}];
+        }), {submitEpoch, requestEpoch:requestedAt.epoch});
       const clickToSubmitEventMs = submitEpoch - startedEpoch;
       const submitEventToRequestMs = requestedAt.epoch - submitEpoch;
       const submitToRequestMs = Math.round(requestedAt.monotonic - started);
@@ -135,7 +143,7 @@ try {
         }
       }
       measurements.push({question,value,source,citationLinks:await bubble.locator('.answer-source a').allTextContents(),
-        citationCells:await bubble.locator('.answer-source > div').allTextContents(),elapsedMs,clickToSubmitEventMs,submitEventToRequestMs,submitToRequestMs,requestToHeadersMs,responseHeadersMs,responseToVisibleMs});
+        citationCells:await bubble.locator('.answer-source > div').allTextContents(),elapsedMs,preRequestResources,clickToSubmitEventMs,submitEventToRequestMs,submitToRequestMs,requestToHeadersMs,responseHeadersMs,responseToVisibleMs});
 
     }
     const blankQuestion = '令和9年度の青空高校の特進の入試日程は？';
