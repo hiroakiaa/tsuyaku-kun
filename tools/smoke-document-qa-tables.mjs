@@ -83,11 +83,15 @@ try {
       }
       await page.locator('#question').fill(question);
       const started=performance.now();
+      const isQuestionRequest = request =>
+        request.method() === 'POST' && new URL(request.url()).pathname.endsWith('/ask');
+      const requestStarted = page.waitForRequest(isQuestionRequest).then(() => performance.now());
       const headers = page.waitForResponse(response =>
-        new URL(response.url()).pathname.endsWith('/ask') && response.request().method() === 'POST',
+        isQuestionRequest(response.request()),
       ).then(() => performance.now());
       const bubble=page.locator('#messages .bubble').last();
-      const [receivedAt, visibleAt] = await Promise.all([
+      const [requestedAt, receivedAt, visibleAt] = await Promise.all([
+        requestStarted,
         headers,
         (async () => {
           await page.locator('#ask-form button').click();
@@ -97,6 +101,8 @@ try {
       ]);
       await page.locator('#ask-form button:enabled').waitFor();
       const elapsedMs=Math.round(performance.now()-started);
+      const submitToRequestMs = Math.round(requestedAt - started);
+      const requestToHeadersMs = Math.round(receivedAt - requestedAt);
       const responseHeadersMs = Math.round(receivedAt - started);
       const responseToVisibleMs = Math.round(visibleAt - receivedAt);
       if (!source) assert.equal(await bubble.locator('.answer-source').count(),0);
@@ -118,7 +124,7 @@ try {
         }
       }
       measurements.push({question,value,source,citationLinks:await bubble.locator('.answer-source a').allTextContents(),
-        citationCells:await bubble.locator('.answer-source > div').allTextContents(),elapsedMs,responseHeadersMs,responseToVisibleMs});
+        citationCells:await bubble.locator('.answer-source > div').allTextContents(),elapsedMs,submitToRequestMs,requestToHeadersMs,responseHeadersMs,responseToVisibleMs});
 
     }
     const blankQuestion = '令和9年度の青空高校の特進の入試日程は？';
