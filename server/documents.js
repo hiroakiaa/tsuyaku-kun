@@ -277,7 +277,7 @@ function lookupTimetableCell(pages,question) {
   }
   return matches.length===1 ? matches[0] : null;
 }
-function lookupWorksheetCell(pages, question) {
+function lookupWorksheetCell(pages, question, {contextOnly=false}={}) {
   const query = normalized(question);
   const compareColumns = (a,b)=>a.length-b.length || (a===b ? 0 : a<b ? -1 : 1);
   const year = /(?:令和|R)(\d+)年度?/iu.exec(query)?.[1];
@@ -340,6 +340,7 @@ function lookupWorksheetCell(pages, question) {
   const unique = [...new Map(matches.map(match=>[match.key,match])).values()];
   if (unique.length===1) {
     const match = unique[0];
+    if (contextOnly) return match.evidence.slice(0,-1);
     return match.value
       ? {label:'該当するセル',answer:match.value.value,evidence:match.evidence}
       : {label:'該当するセル',answer:'該当セルは空欄です。',evidence:[]};
@@ -851,17 +852,16 @@ export async function documents(request,env,auth) {
     }
     const followup = /^([\p{L}]{1,12})は[?。]?$/u.exec(normalized(currentQuestion));
     if (followup && typeof previousQuestion==='string' && previousQuestion.length<=300) {
-      const prior = lookupWorksheetCell(record.pages,previousQuestion);
-      const evidence = prior?.evidence ?? [];
-      if (evidence.length === 5) {
+      const evidence = lookupWorksheetCell(record.pages,previousQuestion,{contextOnly:true});
+      if (Array.isArray(evidence) && evidence.length === 4) {
         const candidates = [1, 3].flatMap(changedIndex => {
           const label = normalized(evidence[changedIndex].value);
           const originalQuestion = normalized(previousQuestion);
           if (!label || !originalQuestion.includes(label)) return [];
           const candidate = originalQuestion.replace(label,followup[1]);
-          const next = lookupWorksheetCell(record.pages,candidate)?.evidence;
+          const next = lookupWorksheetCell(record.pages,candidate,{contextOnly:true});
           if (next?.length !== evidence.length || normalized(next[changedIndex].value)!==followup[1]) return [];
-          const sameContext = evidence.slice(0,-1).every((original,index) =>
+          const sameContext = evidence.every((original,index) =>
             index===changedIndex || (original.sheet===next[index].sheet && original.cell===next[index].cell));
           return sameContext ? [candidate] : [];
         });

@@ -197,5 +197,19 @@ for (const [body,expected] of [
   assert.equal(branchResult.answer,'3台');
   assert.deepEqual(branchResult.items[0].evidence.map(e=>[e.sheet,e.cell,e.page]),
     ['A3','B4','C1','C2','C4'].map(cell=>['貸出備品表',cell,1]));
+  let previousQuestion = branchResult.items[0].worksheetContext;
+  for (const [question, expected, cells] of [
+    ['午前は？','該当セルは空欄です。',[]],
+    ['分館は？','2台',['A3','B3','C1','D2','D3']],
+  ]) {
+    const response = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+      method:'POST',body:JSON.stringify({question,previousQuestion}),
+    }),archiveEnv,{uid:'test'});
+    const answer = await response.json();
+    assert.equal(answer.answer,expected,question);
+    assert.deepEqual(answer.items[0].evidence.map(e=>[e.sheet,e.cell,e.page]),
+      cells.map(cell=>['貸出備品表',cell,1]),question);
+    previousQuestion = answer.items[0].worksheetContext;
+  }
   console.log('PASS converted worksheet inventory values and citations');
 }
