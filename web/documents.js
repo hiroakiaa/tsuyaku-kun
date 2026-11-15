@@ -79,7 +79,7 @@ async function extract(file, status) {
       let text = layoutPdfText(parts);
       if (!text.trim()) {
         status.textContent = 'スキャンページを端末で読んでいます… ' + n + ' / ' + pdf.numPages;
-        const {createPdfOcr} = await import('./document-ocr.js?v=79');
+        const {createPdfOcr} = await import('./document-ocr.js?v=80');
         ocr ??= await createPdfOcr();
         text = await ocr.read(page);
       }

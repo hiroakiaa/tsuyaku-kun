@@ -107,6 +107,11 @@ try {
       const uploadStarted = performance.now();
       await page.locator('#upload input[type=file]').setInputFiles(file);
       if (!fixture.excel) await page.getByText('PDFの文字を確認しました。',{exact:true}).waitFor({timeout:120_000});
+      const ocrStages = fixture.scan ? await page.evaluate(()=>Object.fromEntries(
+        ['initialization','render','recognition'].map(stage=>[
+          stage,performance.getEntriesByName('document-ocr:'+stage,'measure').map(entry=>Math.round(entry.duration)),
+        ]),
+      )) : null;
       const registrationStarted = performance.now();
       await page.locator('#upload button').click();
       await page.waitForFunction(()=>Boolean(document.querySelector('#guide-url')?.value),null,{timeout:120_000});
@@ -115,10 +120,15 @@ try {
       const registration = {
         fixture:fixture.label,elapsedMs:Math.round(finished-uploadStarted),
         preflightMs:Math.round(registrationStarted-uploadStarted),submitMs:Math.round(finished-registrationStarted),
-        ocrDownloads,pageCount:null,deleted:false,
+        ocrDownloads,ocrStages,pageCount:null,deleted:false,
       };
       registrations.push(registration);
       try {
+        if (fixture.scan) {
+          assert.equal(ocrStages.initialization.length,1);
+          assert.equal(ocrStages.render.length,fixture.pages.length);
+          assert.equal(ocrStages.recognition.length,fixture.pages.length);
+        }
         if (registration.elapsedMs>limits.registration) failures.push(Error(fixture.label+' registration exceeded '+limits.registration+' ms'));
         await page.goto(guide);
         await page.locator('#tab-ask').click();
