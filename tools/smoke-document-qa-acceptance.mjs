@@ -34,8 +34,8 @@ const fixtures = [
     label:'万円表記PDF',
     pages:['講習会の参加費は1万500円です。','年間の施設利用料は1.2万円です。'],
     questions:[
-      ['講習会の参加費を円単位で教えてください。',/(?:1\s*万\s*500|10,?500)\s*円/u,1,,/(?<![\d,万])500\s*円/u],
-      ['年間の施設利用料を円単位で教えてください。',/(?:1\.2\s*万|12,?000)\s*円/u,2,,/(?<![\d.,万])2\s*万円/u],
+      ['講習会の参加費を万を使わず数字だけの円表記で教えてください。',/(?:1\s*万\s*500|10,?500)\s*円/u,1,,/(?<![\d,万])500\s*円/u,/(?<![\d,])10,?500\s*円/u],
+      ['年間の施設利用料を万を使わず数字だけの円表記で教えてください。',/(?:1\.2\s*万|12,?000)\s*円/u,2,,/(?<![\d.,万])2\s*万円/u,/(?<![\d,])12,?000\s*円/u],
     ],
   },
 ];
@@ -97,7 +97,7 @@ try {
         const expectedPages = fixture.excel ? 2 : fixture.pages.length;
         await page.waitForFunction(count=>document.querySelectorAll('#pdf-page option').length===count,expectedPages);
         registration.pageCount = expectedPages;
-        for (const [question,expected,sourcePage=1,cell,wrong=fixture.otherValue] of fixture.questions) {
+        for (const [question,expected,sourcePage=1,cell,wrong=fixture.otherValue,display=expected] of fixture.questions) {
           try {
             const answers = page.locator('#messages .answer-item');
             const before = await answers.count();
@@ -115,7 +115,7 @@ try {
             measurements.push(measurement);
             console.log(JSON.stringify({fixture:fixture.label,question,answer,citations,quotes,elapsedMs}));
             if (expected) {
-              assert.match(answer,expected,question);
+              assert.match(answer,display,question);
               assert.doesNotMatch(answer,wrong,question);
               assert.deepEqual(citations,['元のPDF '+sourcePage+'ページ'],question);
               if (cell) {
