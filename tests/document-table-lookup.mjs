@@ -97,7 +97,7 @@ console.log('PASS table quotation preserves rows and prose joins wrapped lines')
   ];
   assert.equal(layoutPdfText(rows),[
     'Exhibition','Visitor | Fee','Adults | 780 yen','Students | 420 yen',
-    'Workshop','Visitor | Fee','Adults | 1350 yen','Students | 650 yen',
+    '','Workshop','Visitor | Fee','Adults | 1350 yen','Students | 650 yen',
   ].join('\n'));
   assert.match(layoutPdfText(rows.map(item=>({...item,transform:item.transform.map((value,i)=>i===0||i===3?12:value)}))),
     /^Exhibition \| Workshop\nVisitor \| Fee \| Visitor \| Fee/);

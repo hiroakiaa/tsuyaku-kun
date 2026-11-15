@@ -226,6 +226,28 @@ function monthlyDismissal(evidence) {
   return null;
 }
 
+function lookupFeeTableCell(pages,question) {
+  const query=question.normalize('NFKC').trim().toLowerCase();
+  if (!/^what is the .+ fee\??$/u.test(query)) return null;
+  const matches=[];
+  for (const [index,page] of pages.entries()) {
+    const blocks=page.split(/\n\s*\n/u);
+    if (blocks.length<2) continue;
+    for (const block of blocks) {
+      const [title,header,...rows]=block.trim().split('\n');
+      if (!title || title.includes('|') || !query.includes(title.toLowerCase()) ||
+          !/^[^|]+ \| fee$/iu.test(header??'')) continue;
+      for (const row of rows) {
+        const cell=/^([^|\d]+?)(?: \| |\s+)(\d[\d,]*(?:\.\d+)?\s+(?:yen|dollars?|euros?))$/iu.exec(row.trim());
+        if (!cell) continue;
+        const prefix='what is the '+cell[1].trim().toLowerCase().replace(/s$/u,'')+' '+title.toLowerCase()+' fee';
+        if (query.replace(/\?$/u,'')!==prefix) continue;
+        matches.push({label:title,answer:cell[2],evidence:[{page:index+1,quote:row},{page:index+1,quote:title}]});
+      }
+    }
+  }
+  return matches.length===1 ? matches[0] : null;
+}
 function lookupTimetableCell(pages,question) {
   const query=question.normalize('NFKC').trim().toLowerCase().replace(/[?。]$/u,'');
   const verb=/^when does (?:the )?(.+?) (open|close)$/u.exec(query);
@@ -846,7 +868,7 @@ export async function documents(request,env,auth) {
       const worksheetItem = lookupWorksheetCell(record.pages,text);
       return worksheetItem
         ? {...worksheetItem,worksheetContext:text}
-        : lookupAdmissionCell(record.pages,text) ?? (record.sourceType==='pdf' ? lookupTimetableCell(record.pages,text) : null);
+        : lookupAdmissionCell(record.pages,text) ?? (record.sourceType==='pdf' ? lookupTimetableCell(record.pages,text) ?? lookupFeeTableCell(record.pages,text) : null);
     };
     const lookupItems = worksheetQuestion => {
       const sharedQuestion = /^(.+?)について[、,]?\s*それぞれ(?:の|[、,])?\s*(.+)$/u.exec(normalized(worksheetQuestion));

@@ -58,7 +58,7 @@ export function layoutPdfText(items) {
     const gutter = Math.min(...split.map(([left,right])=>left.length && right.length
       ? right[0].x-Math.max(...left.map(cell=>cell.end)) : 0));
     if (titles.every(title=>title.size>=regularSize*1.2) && gutter>regularSize*2) {
-      horizontal = [0,1].flatMap(side=>split.map(groups=>formatRow(groups[side])));
+      horizontal = [...split.map(([left])=>formatRow(left)), '', ...split.map(([,right])=>formatRow(right))];
     }
   }
   const columns = vertical.sort((a,b)=>b.x-a.x).map(column=>
