@@ -461,15 +461,16 @@ function lookupAdmissionCell(pages, question) {
 }
 
 function quantities(text) {
-  return [...text.normalize('NFKC').replaceAll('−','-').matchAll(/(?<![\d.,])([+-]?(?:\d{1,3}(?:,\d{3})+|\d+))(\.\d+)?\s*(円|人(?!目|分)|名(?!目|義)|%)/gu)]
-    .map(([,integer,fraction,unit])=>[Number(integer.replaceAll(',','')+(fraction ?? '')),unit==='名'?'人':unit]);
+  return [...text.normalize('NFKC').replaceAll('−','-').matchAll(/(?<![\d.,])([+-]?(?:\d{1,3}(?:,\d{3})+|\d+))(\.\d+)?\s*(円|人(?!目|分)|名(?!目|義)|%)(?:\s*(以上|以下|未満|超(?:え|過)?))?/gu)]
+    .map(([,integer,fraction,unit,comparison])=>[Number(integer.replaceAll(',','')+(fraction ?? '')),unit==='名'?'人':unit,comparison?.startsWith('超') ? '超' : comparison]);
 }
 
 function supportsQuantities(answer,evidence) {
   const cited = evidence.flatMap(({quote})=>quantities(quote));
-  return quantities(answer).every(([value,unit])=>{
+  return quantities(answer).every(([value,unit,comparison])=>{
     const comparable = cited.filter(([,sourceUnit])=>sourceUnit===unit);
-    return !comparable.length || comparable.some(([sourceValue])=>sourceValue===value);
+    return !comparable.length || comparable.some(([sourceValue,,sourceComparison])=>sourceValue===value &&
+      (!comparison || !sourceComparison || comparison===sourceComparison));
   });
 }
 
@@ -955,7 +956,7 @@ export async function documents(request,env,auth) {
       return reply({items,answer:items[0].answer,pages:[...new Set(items.flatMap(item=>item.evidence.map(source=>source.page)))]});
     }
   }
-  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([21,record.pages,record.materials ?? [],question.trim()])));
+  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([22,record.pages,record.materials ?? [],question.trim()])));
   const cacheKey = Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
   const cacheUrl = 'https://room/document/answer/'+cacheKey;
   const cached = await (await target.fetch(cacheUrl)).json();
