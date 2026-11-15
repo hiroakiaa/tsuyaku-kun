@@ -167,8 +167,9 @@ for (const [body,expected] of [
     });
     const result = await (await documents(request,archiveEnv,{uid:'test'})).json();
     assert.equal(result.answer,expected,question);
-    const evidence = result.items[0].evidence.at(-1);
-    assert.deepEqual([evidence.sheet,evidence.cell,evidence.page],['貸出備品表',cell,1],question);
+    const expectedCells = ['A3', slot === '午前' ? 'B3' : 'B4', 'C1', branch === '本館' ? 'C2' : 'D2', cell];
+    assert.deepEqual(result.items.flatMap(item=>item.evidence.map(e=>[e.sheet,e.cell,e.page])),
+      expectedCells.map(address=>['貸出備品表',address,1]),question);
   }
   console.log('PASS converted worksheet inventory values and citations');
 }

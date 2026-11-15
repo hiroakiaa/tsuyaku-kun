@@ -74,7 +74,8 @@ try {
         await answer.getByText(expected,{exact:true}).waitFor({timeout:30000});
         await page.locator('#ask-form button:enabled').waitFor();
         const addresses = (await answer.locator('.answer-source > div').allTextContents()).flatMap(line=>line.split('、'));
-        assert.ok(addresses.includes('貸出備品表 · '+cell), JSON.stringify(addresses));
+        const expectedCells = ['A3', slot === '午前' ? 'B3' : 'B4', 'C1', branch === '本館' ? 'C2' : 'D2', cell];
+        assert.deepEqual(addresses.sort(), expectedCells.sort().map(address=>'貸出備品表 · '+address));
         assert.deepEqual(await answer.locator('.answer-source a').allTextContents(),['元のPDF 1ページ']);
         console.log('Inventory answer and citation matched:',expected,cell,1);
       }
