@@ -331,3 +331,29 @@ console.log('PASS localized dismissal reads completion column and preserves sour
   }
   console.log('PASS timetable citations distinguish unsupported conflicts and labeled schedules');
 }
+
+{
+  const pages=[
+    'Facility | Opening | Closing\nLibrary | 9 AM | 3 PM',
+    'Facility | Opening | Last admission\nLibrary | 9 AM | 1 PM',
+  ];
+  const env={ROOMS:{idFromName:id=>id,get:()=>({
+    fetch:async url=>{
+      assert.ok(url.endsWith('/data'),'A confirmed timetable answer should bypass generation and cache');
+      return Response.json({pages,sourceType:'pdf',owner:'author'});
+    },
+  })}};
+  for (const [question,answer,page] of [
+    ['When does the library close?','3 PM',1],
+    ['When is the last admission for the library?','1 PM',2],
+  ]) {
+    const request=new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+      method:'POST',body:JSON.stringify({question}),
+    });
+    const result=await (await documents(request,env,{uid:'author'})).json();
+    assert.equal(result.answer,answer);
+    const [heading,row]=pages[page-1].split('\n');
+    assert.deepEqual(result.items[0].evidence,[{page,quote:row},{page,quote:heading}]);
+  }
+  console.log('PASS repeated timetable headings distinguish closing and last admission');
+}
