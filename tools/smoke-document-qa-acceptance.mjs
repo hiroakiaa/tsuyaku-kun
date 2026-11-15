@@ -44,7 +44,9 @@ const network = process.argv.includes('--limited-network') ? {
   latency:150,downloadThroughput:4_000_000/8,uploadThroughput:1_000_000/8,offline:false,
 } : null;
 const limits = network ? {registration:30_000,firstAnswer:15_000} : {registration:15_000,firstAnswer:8_000};
-const total = fixtures.reduce((count,fixture)=>count+fixture.questions.length,0);
+const fastOcr = process.argv.includes('--fast-ocr');
+const selectedFixtures = fastOcr ? fixtures.filter(fixture=>fixture.scan) : fixtures;
+const total = selectedFixtures.reduce((count,fixture)=>count+fixture.questions.length,0);
 const browser = await chromium.launch();
 const failures = [];
 const measurements = [];
@@ -52,7 +54,7 @@ const registrations = [];
 const normalize = text=>text.normalize('NFKC').replace(/[\s、。，,]/gu,'');
 let passed = 0;
 try {
-  for (const fixture of fixtures) {
+  for (const fixture of selectedFixtures) {
     const page = await browser.newPage();
     try {
       if (!fixture.excel) {
@@ -100,6 +102,17 @@ try {
         ocrDownloads.push({name:request.name,ms:Math.round((timestamp-request.timestamp)*1000),bytes:encodedDataLength});
         ocrRequests.delete(requestId);
       });
+      if (fastOcr) {
+        await page.route(/\/web\/document-ocr\.js\?v=\d+$/u,async route=>{
+          const response = await route.fetch();
+          const source = await response.text();
+          const candidate = source.replace(
+            "    workerPath:", "    langPath:'https://tessdata.projectnaptha.com/4.0.0_fast',\n    workerPath:",
+          );
+          assert.notEqual(candidate,source,'OCR worker configuration not found');
+          await route.fulfill({response,body:candidate});
+        });
+      }
       if (network) await session.send('Network.emulateNetworkConditions',network);
       await page.goto('https://hiroakiaa.github.io/tsuyaku-kun/documents.html');
       await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
@@ -216,6 +229,6 @@ try {
 
 console.log('Acceptance questions passed: '+passed+'/'+total);
 if (process.env.DOCUMENT_QA_REPORT) {
-  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,network,limits,commit:process.env.GITHUB_SHA ?? null,measuredAt:new Date().toISOString(),browser:browser.version(),registrations,measurements},null,2));
+  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,network,limits,fastOcr,commit:process.env.GITHUB_SHA ?? null,measuredAt:new Date().toISOString(),browser:browser.version(),registrations,measurements},null,2));
 }
 if (failures.length) throw new AggregateError(failures,'Document QA acceptance failed');

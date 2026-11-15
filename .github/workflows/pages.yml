@@ -138,6 +138,11 @@ jobs:
         env:
           DOCUMENT_QA_REPORT: document-qa-acceptance-limited-report.json
         run: node tools/smoke-document-qa-acceptance.mjs --limited-network
+      - name: Compare lightweight OCR data on a limited network
+        if: ${{ !cancelled() && steps.document_browser.outcome == 'success' }}
+        env:
+          DOCUMENT_QA_REPORT: document-qa-acceptance-fast-ocr-report.json
+        run: node tools/smoke-document-qa-acceptance.mjs --limited-network --fast-ocr
       - name: Record document verification provenance
         if: always()
         env:
@@ -153,6 +158,7 @@ jobs:
             document-qa-run.json
             document-qa-acceptance-report.json
             document-qa-acceptance-limited-report.json
+            document-qa-acceptance-fast-ocr-report.json
             document-qa-pdf-report.json
             document-qa-long-pdf-report.json
             document-qa-long-pdf-report-comparison.md
