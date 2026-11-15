@@ -83,8 +83,23 @@ try {
     } finally {
       await viewer.close();
     }
-    await page.goto(guide);
-    await page.locator('#tab-ask').click();
+    const guideMetadataStatuses = [];
+    const browserErrors = [];
+    const documentId = new URL(guide).searchParams.get('id');
+    page.on('response', response => {
+      if (response.request().method()==='GET' && new URL(response.url()).pathname==='/documents/'+documentId) {
+        guideMetadataStatuses.push(response.status());
+      }
+    });
+    page.on('pageerror', error => browserErrors.push(error.name));
+    const navigation = await page.goto(guide);
+    try {
+      await page.locator('#tab-ask').click();
+    } catch (cause) {
+      throw Error('Image question tab unavailable: '+JSON.stringify({
+        format, language, pageStatus:navigation?.status(), guideMetadataStatuses, browserErrors,
+      }),{cause});
+    }
     assert.equal(await page.locator('#pdf-page option').count(),1);
     await page.locator('#question').fill(japanese ? '青組の開始時刻は？' : 'What is the start time for the Blue group?');
     const questionStarted = performance.now();
