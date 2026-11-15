@@ -1,6 +1,6 @@
 import {createLiveSummarySetting} from './live-summary.js?v=20261113-summary-dialog-1';
 import {createLiveTranslationSetting} from './live-translation-setting.js?v=20261112-display-benchmark-1';
-import {improvementReport} from './analysis-focus.js?v=20261114-admin-no-google';
+import {improvementReport} from './analysis-focus.js?v=20261115-qa-retention';
 import {createRecognitionCostView} from './recognition-cost-view.js?v=20261112-display-benchmark-1';
 import {guardedStorage} from './storage-access.js?v=20261024-usability20-4';
 const localStorage=guardedStorage(()=>globalThis.localStorage);
@@ -95,7 +95,7 @@ const openDocuments=()=>{
   heading.append(el('h2','資料QA'),library,close);
   const frame=el('iframe');
   frame.title='資料QA';
-  frame.src='documents.html?embedded=1&v=64';
+  frame.src='documents.html?embedded=1&v=65';
   library.onclick=()=>{
    const archive=el('dialog',undefined,'documents-dialog');
    archive.setAttribute('aria-label','資料QAの保管庫');
@@ -108,7 +108,7 @@ const openDocuments=()=>{
    bar.append(el('h2','資料QAの保管庫'),dismiss);
    const listFrame=el('iframe');
    listFrame.title='資料QAの保管庫';
-   listFrame.src='documents.html?embedded=1&library=1&v=64';
+   listFrame.src='documents.html?embedded=1&library=1&v=65';
    expandDocumentFrame(listFrame,archive);
    archive.append(bar,listFrame);
    document.body.append(archive);

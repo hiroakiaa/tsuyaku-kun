@@ -5,7 +5,7 @@ const MAX_PAGES = 40;
 const MAX_TEXT = 22_000;
 const MAX_EXCEL_TEXT = 150_000;
 const CHUNK = 64_000;
-const TTL = 30 * 86400000;
+const LEGACY_RETENTION_MS = 30 * 86400000;
 const noAnswer = 'この資料では答えを確認できません。学校に聞いてください。';
 const reply = (data,status=200) => Response.json(data,{status,headers:{'Cache-Control':'no-store'}});
 const fail = (message,status=400) => reply({error:message},status);
@@ -642,7 +642,21 @@ async function readMaterial(env,file,form,ext) {
 export async function documents(request,env,auth) {
   const {pathname} = new URL(request.url);
   const library = env.ROOMS.get(env.ROOMS.idFromName('__document_library__'));
-  if (pathname === '/documents/library' && request.method === 'GET') return library.fetch('https://room/document/library');
+  if (pathname === '/documents/library' && request.method === 'GET') {
+    const response = await library.fetch('https://room/document/library');
+    if (!response.ok) return response;
+    const entries = await response.json();
+    const visible = await Promise.all(entries.map(async entry=>{
+      if (!entry.expires || entry.expires>Date.now()) return entry;
+      // Earlier deployments could delete a document while leaving its directory entry.
+      const room = env.ROOMS.get(env.ROOMS.idFromName(entry.id));
+      const status = await room.fetch('https://room/document/library-status');
+      return status.status===404 ? null : entry;
+    }));
+    return reply(visible.filter(Boolean).map(({id,title,createdAt,expires})=>({
+      id,title,createdAt:createdAt ?? expires-LEGACY_RETENTION_MS,
+    })));
+  }
   if (pathname === '/documents' && request.method === 'POST') {
     const reader = request.body?.getReader();
     if (!reader) return fail('PDFを選んでください。');
@@ -679,21 +693,21 @@ export async function documents(request,env,auth) {
       .slice(0,6).map(({label,text,source})=>({label:label.slice(0,45),text:text.slice(0,350),source:{page:source.page}}));
     const toc = validatedToc(result,pages);
     const id = crypto.randomUUID();
-    const expires = Date.now()+TTL;
+    const createdAt = Date.now();
     const target = env.ROOMS.get(env.ROOMS.idFromName('document:'+id));
     const data = new FormData();
     data.set('pdf',pdf);
-    data.set('record',JSON.stringify({title,pages,items,toc,index:largeExcel ? undefined : searchIndex(pages),owner:auth.uid,expires,sourceType:ext,convertedWorksheet:converted && form.get('convertedWorksheet')==='1',visibility:form.get('visibility')==='shared'?'shared':'device'}));
+    data.set('record',JSON.stringify({title,pages,items,toc,index:largeExcel ? undefined : searchIndex(pages),owner:auth.uid,createdAt,sourceType:ext,convertedWorksheet:converted && form.get('convertedWorksheet')==='1',visibility:form.get('visibility')==='shared'?'shared':'device'}));
     const saved = await target.fetch('https://room/document/init',{method:'POST',body:data});
     if (!saved.ok) return fail('資料を保存できませんでした。',502);
     if (form.get('visibility')==='shared') {
-      const listed = await library.fetch('https://room/document/library',{method:'POST',body:JSON.stringify({id,title,expires})}).catch(()=>null);
+      const listed = await library.fetch('https://room/document/library',{method:'POST',body:JSON.stringify({id,title,createdAt})}).catch(()=>null);
       if (!listed?.ok) {
         await target.fetch('https://room/document/remove',{method:'POST',body:auth.uid});
         return fail('共通保管庫に保存できませんでした。',502);
       }
     }
-    return reply({id,expires},201);
+    return reply({id,createdAt},201);
   }
   const match = /^\/documents\/([a-f0-9-]{36})(?:\/(pdf|ask|remove|replace|material|toc|text))?$/.exec(pathname);
   if (!match) return fail('資料が見つかりません。',404);
@@ -788,7 +802,7 @@ export async function documents(request,env,auth) {
     if (!toc.length) return fail('本文から目次を作れませんでした。',502);
     return target.fetch('https://room/document/toc',{method:'POST',body:JSON.stringify(toc)});
   }
-  if (!action) return reply({title:record.title,items:record.items,toc:validatedToc(record,record.pages.slice(0,record.originalPageCount ?? record.pages.length)),materials:record.materials ?? [],sourceType:record.sourceType ?? 'pdf',convertedWorksheet:record.convertedWorksheet===true,revision:record.revision ?? 0,pageCount:record.originalPageCount ?? record.pages.length,expires:record.expires,canRemove:record.owner===auth.uid});
+  if (!action) return reply({title:record.title,items:record.items,toc:validatedToc(record,record.pages.slice(0,record.originalPageCount ?? record.pages.length)),materials:record.materials ?? [],sourceType:record.sourceType ?? 'pdf',convertedWorksheet:record.convertedWorksheet===true,revision:record.revision ?? 0,pageCount:record.originalPageCount ?? record.pages.length,canRemove:record.owner===auth.uid});
   if (Number(request.headers.get('content-length')) > 4096) return fail('質問は300文字までです。',413);
   const input = await request.text();
   if (input.length > 4096) return fail('質問は300文字までです。',413);
@@ -1016,7 +1030,7 @@ export async function documentStorage(request,storage) {
   if (path==='/document/library') {
     if (request.method==='GET') {
       const entries = await storage.list({prefix:'entry:',reverse:true});
-      return reply([...entries.values()].filter(entry=>entry.expires>Date.now()).sort((a,b)=>b.expires-a.expires));
+      return reply([...entries.values()]);
     }
     if (request.method==='POST') {
       const entry = await request.json();
@@ -1062,13 +1076,13 @@ export async function documentStorage(request,storage) {
         for (let i=0;i<values.document.textParts;i++) values['document-text:'+i]=serialized.slice(i*20_000,(i+1)*20_000);
       }
       for (let offset=0;offset<pdf.length;offset+=CHUNK) values['pdf:'+offset]=pdf.slice(offset,offset+CHUNK);
-      await tx.setAlarm(record.expires);
       for (const entries of Array.from({length:Math.ceil(Object.keys(values).length/100)},(_,i)=>Object.entries(values).slice(i*100,i*100+100))) await tx.put(Object.fromEntries(entries));
     });
     return reply({ok:true},201);
   }
   const record = await storage.get('document');
-  if (!record || record.expires<=Date.now()) return fail('資料が見つからないか、共有が終了しました。',404);
+  if (!record) return fail('資料が見つからないか、共有が終了しました。',404);
+  if (path==='/document/library-status') return record.visibility==='shared' ? reply({ok:true}) : fail('資料が見つかりません。',404);
   if (/^\/document\/vectors\/[a-f0-9]{64}$/.test(path)) {
     if (request.method==='GET') {
       const rows = await storage.list({prefix:'semantic-index:'});
@@ -1095,7 +1109,7 @@ export async function documentStorage(request,storage) {
     const pdf = new Uint8Array(await form.get('pdf').arrayBuffer());
     return storage.transaction(async tx=>{
       const current = await tx.get('document');
-      if (!current || current.expires<=Date.now()) return fail('資料の共有が終了しました。',404);
+      if (!current) return fail('資料の共有が終了しました。',404);
       if (current.owner!==input.owner) return fail('作成者だけが資料を差し替えられます。',403);
       const oldCount = current.originalPageCount ?? current.pages.length;
       const shift = input.pages.length-oldCount;
@@ -1130,7 +1144,7 @@ export async function documentStorage(request,storage) {
     const input = await request.json();
     return storage.transaction(async tx=>{
       const current = await tx.get('document');
-      if (!current || current.expires<=Date.now()) return fail('資料の共有が終了しました。',404);
+      if (!current) return fail('資料の共有が終了しました。',404);
       if (current.owner!==input.owner) return fail('作成者だけが資料を追加できます。',403);
       const materials = current.materials ?? [];
       const pages = [...current.pages,...input.pages];
@@ -1147,7 +1161,7 @@ export async function documentStorage(request,storage) {
     const toc = await request.json();
     return storage.transaction(async tx=>{
       const current = await tx.get('document');
-      if (!current || current.expires<=Date.now()) return fail('資料の共有が終了しました。',404);
+      if (!current) return fail('資料の共有が終了しました。',404);
       const existing = validatedToc(current,current.pages ?? Array(current.pageCount).fill(""));
       if (existing.length) return reply(existing);
       await tx.put('document',{...current,toc});

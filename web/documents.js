@@ -109,15 +109,15 @@ function readingPosition(id, update) {
 function filterLibrary(entries) {
   const normalize = value => value.normalize('NFKC').toLowerCase();
   const term = normalize($('#library-search').value.trim());
+  const createdAt = entry => entry.createdAt ?? (entry.expires ? entry.expires-30*86400000 : 0);
   const sort = $('#library-sort').value;
   return entries.filter(entry=>normalize(entry.title).includes(term)).sort((a,b)=>{
     if (sort==='title') return a.title.localeCompare(b.title,'ja');
-    if (sort==='expiry') return (a.expires ?? Infinity)-(b.expires ?? Infinity);
     if (sort==='recent') {
       const difference = (readingPosition(b.id).opened ?? 0)-(readingPosition(a.id).opened ?? 0);
       if (difference) return difference;
     }
-    return (b.expires ?? 0)-(a.expires ?? 0);
+    return createdAt(b)-createdAt(a);
   });
 }
 
@@ -154,10 +154,6 @@ function documentLibrary() {
       guide.searchParams.set('v', '39');
       link.href = guide.href;
       if (typeof entry.shared==='boolean') append(body,'small',entry.shared?'共通保管庫に公開':'作成したブラウザーで閲覧');
-      if (entry.expires) {
-        const expired = Date.now()>=entry.expires;
-        append(body,'small',expired ? '共有期限を過ぎました' : '共有期限 '+new Date(entry.expires).toLocaleDateString('ja-JP'));
-      }
       const remove = append(card,'button','','library-remove');
       remove.append(localIcon('trash'));
       remove.title = '一覧から外す';
@@ -230,7 +226,7 @@ function teacher() {
         const pages = converted.image ? await extract(converted.file,document.createElement('span')) : converted.pages;
         data.set('pages',JSON.stringify(pages));
       }
-      const {id,expires} = await request('/documents',{method:'POST',body:data});
+      const {id,createdAt} = await request('/documents',{method:'POST',body:data});
       status.textContent = '作成が完了しました。';
       const url = '?id=' + id;
       $('#open-guide').href = url;
@@ -239,7 +235,7 @@ function teacher() {
       const shared = data.get('visibility')==='shared';
       $('#guide-url').closest('label').hidden = !shared;
       $('#copy').hidden = !shared;
-      if (!saveGuide({id,title:String(data.get('title')).trim(),expires,shared})) {
+      if (!saveGuide({id,title:String(data.get('title')).trim(),createdAt,shared})) {
         status.textContent = '資料を作成しましたが、保管庫には保存できませんでした。';
         return;
       }
@@ -1168,7 +1164,6 @@ try {
         const body = append(card,'div','','library-card-body');
         const link = append(body,'a',entry.title);
         link.href = '?id='+encodeURIComponent(entry.id)+'&v=39';
-        append(body,'small','期限 '+new Date(entry.expires).toLocaleDateString('ja-JP'));
         }
       };
       $('#library-search').addEventListener('input',renderShared);

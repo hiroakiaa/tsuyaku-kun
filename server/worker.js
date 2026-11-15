@@ -20,7 +20,7 @@ import {resourceFailure} from '../web/resource-policy.js';
 import {protectUncertainSpeech,restoreUncertainSpeech,schoolContextHints} from './quality.js';
 import {safeRecognitionHints,recognitionHints} from '../web/recognition-hints.js';
 import {storedTranslations,correctionHints} from './dictionary.js';
-const BUILD_ID='20261114-admin-no-google';
+const BUILD_ID='20261115-qa-retention';
 const AI_MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 export function aiFailure(error){
  const chain=[],pending=[error];for(let i=0;i<8&&pending.length;i++){const value=pending.shift();if(!value||chain.includes(value))continue;chain.push(value);if(value.cause)pending.push(value.cause);if(Array.isArray(value.errors))pending.push(...value.errors.slice(0,4));}
@@ -449,6 +449,8 @@ export class TranslationRoom {
   async webSocketClose(ws){for(const [id,job]of this.queuedCaptions)if(job.ws===ws){this.queuedCaptions.delete(id);await this.rejectCaption(ws,id,job.cap,'発言側の接続が切れたため、この文の翻訳は開始していません。');}const a=ws.deserializeAttachment();if(a?.left)return;ws.serializeAttachment({...a,left:true});try{ws.close(1000,'left');}catch{}const room=await this.info();if(a?.uid&&!a.pending&&(room?.mode!=='lesson'||a.role==='teacher'))this.broadcast({type:'notice',text:a.name+'さんが退室しました。'});this.roster(room);await this.scheduleAlarm(room);}
   async webSocketError(ws){await this.webSocketClose(ws);}
   async alarm(){
+    // Legacy document alarms can still fire after the retention policy changes.
+    if(await this.ctx.storage.get('document'))return;
     if(await this.ctx.storage.get('codesDirectory')){await new LessonCodes(this.ctx.storage).cleanup();return;}
     const room=await this.info();
     if(!room||room.expires<=Date.now()){for(const ws of this.ctx.getWebSockets()){try{ws.close(1000,'expired');}catch{}}await this.ctx.storage.deleteAll();this.lessonTranslations.clear();return;}

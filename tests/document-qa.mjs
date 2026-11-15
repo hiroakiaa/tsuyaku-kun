@@ -221,27 +221,10 @@ for (const viewer of ['author','another-user']) {
     }),{get:async key=>{
       assert.equal(key,'document');
       return expiredRecord;
-    }});
-    assert.equal(response.status,404,path);
+    },list:async()=>new Map()});
+    assert.equal(response.status,200,path);
   }
 }
-const expiredEnv = {ROOMS:{idFromName:name=>name,get:()=>({
-  fetch:(url,options)=>documentStorage(new Request(url,options),{get:async()=>expiredRecord}),
-})}};
-for (const uid of ['author','another-user']) {
-  const response = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
-    method:'POST',body:JSON.stringify({question:'資料の内容は？'}),
-  }),expiredEnv,{uid});
-  assert.equal(response.status,404,uid);
-}
-const activeEntry = {id:'active',expires:privateRecord.expires};
-const expiredEntry = {id:'expired',expires:expiredRecord.expires};
-const libraryResponse = await documentStorage(new Request('https://room/document/library'),{
-  list:async ()=>new Map([['entry:expired',expiredEntry],['entry:active',activeEntry]]),
-});
-assert.equal(libraryResponse.status,200);
-assert.deepEqual(await libraryResponse.json(),[activeEntry]);
-console.log('PASS expired shared document metadata, PDF and QA are unavailable');
 const expiredStorage = new Map();
 let scheduledExpiration;
 const documentStore = {
@@ -257,7 +240,7 @@ expiredUpload.set('record',JSON.stringify({...expiredRecord,pages:['試験資料
 expiredUpload.set('pdf',new Blob(['pdf data']),'fixture.pdf');
 const initialized = await documentStorage(new Request('https://room/document/init',{method:'POST',body:expiredUpload}),documentStore);
 assert.equal(initialized.status,201);
-assert.equal(scheduledExpiration,expiredRecord.expires);
+assert.equal(scheduledExpiration,undefined);
 assert.ok(expiredStorage.has('pdf:0'));
 expiredStorage.set('semantic-index:0','vectors');
 expiredStorage.set('answer:test','cached answer');
@@ -266,8 +249,16 @@ const expiredRoom = new TranslationRoom({
   getWebSockets:()=>[],
 },{});
 await expiredRoom.alarm();
+assert.ok(expiredStorage.has('document'));
+assert.ok(expiredStorage.has('pdf:0'));
+assert.ok(expiredStorage.has('semantic-index:0'));
+assert.ok(expiredStorage.has('answer:test'));
+for (const owner of ['another-user','author']) {
+  const result = await documentStorage(new Request('https://room/document/remove',{method:'POST',body:owner}),documentStore);
+  assert.equal(result.status,owner==='author' ? 200 : 403);
+}
 assert.equal(expiredStorage.size,0);
-console.log('PASS document expiration alarm clears stored PDF, vectors and answers');
+console.log('PASS legacy document remains available after its alarm and can be removed by its creator');
 const yearlyAdmissionPages = [
   'R8入試表\nA1 校名 | J1 一般入試\nA2 青空高校 | J2 9科14以上',
   'R9入試表\nA1 校名 | J1 一般入試\nA2 青空高校 | J2 9科16以上',
