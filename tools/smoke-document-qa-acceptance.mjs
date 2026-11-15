@@ -53,10 +53,10 @@ const network = process.argv.includes('--limited-network') ? {
 } : null;
 const limits = network ? {registration:30_000,firstAnswer:15_000} : {registration:15_000,firstAnswer:8_000};
 const retryScan = process.argv.includes('--retry-scan');
-const binarizedOcr = process.argv.includes('--ocr-binarized');
-const selectedFixtures = binarizedOcr ? fixtures.filter(fixture=>fixture.printedPageNumbers) : retryScan ? fixtures.filter(fixture=>fixture.label==='スキャンPDF') : fixtures;
+const maskedPageNumber = process.argv.includes('--ocr-mask-page-number');
+const selectedFixtures = maskedPageNumber ? fixtures.filter(fixture=>fixture.printedPageNumbers) : retryScan ? fixtures.filter(fixture=>fixture.label==='スキャンPDF') : fixtures;
 const total = selectedFixtures.reduce((count,fixture)=>count+fixture.questions.length,0);
-assert.equal(total,(retryScan || binarizedOcr) ? 2 : 13,'Unexpected acceptance question count');
+assert.equal(total,(retryScan || maskedPageNumber) ? 2 : 13,'Unexpected acceptance question count');
 const browser = await chromium.launch();
 const failures = [];
 const measurements = [];
@@ -127,20 +127,21 @@ try {
           await route.fulfill({response,body:candidate});
         });
       }
-      if (binarizedOcr) {
+      if (maskedPageNumber) {
         await page.route(/\/web\/document-ocr\.js\?v=\d+$/u,async route=>{
           const response = await route.fetch();
           const source = await response.text();
           const marker = "        const recognitionStarted = performance.now();";
           const preprocessing = [
-            "        const ctx = canvas.getContext('2d');",
-            "        const image = ctx.getImageData(0,0,canvas.width,canvas.height);",
-            "        for (let offset=0;offset<image.data.length;offset+=4) {",
-            "          const luminance = 0.299*image.data[offset]+0.587*image.data[offset+1]+0.114*image.data[offset+2];",
-            "          const value = luminance<175 ? 0 : 255;",
-            "          image.data[offset] = image.data[offset+1] = image.data[offset+2] = value;",
+            "        const {items} = await page.getTextContent();",
+            "        const text = items.filter(item=>item.str?.trim());",
+            "        if (text.length===1 && text[0].str.trim()===String(page.pageNumber)) {",
+            "          const {width,height,transform} = text[0];",
+            "          const [x,y] = viewport.convertToViewportPoint(transform[4],transform[5]);",
+            "          const ctx = canvas.getContext('2d');",
+            "          ctx.fillStyle = '#fff';",
+            "          ctx.fillRect(x-2,y-height*viewport.scale-2,width*viewport.scale+4,height*viewport.scale+4);",
             "        }",
-            "        ctx.putImageData(image,0,0);",
             marker,
           ].join("\n");
           assert.ok(source.includes(marker),'OCR processing entry point missing');
@@ -267,6 +268,6 @@ try {
 
 console.log('Acceptance questions passed: '+passed+'/'+total);
 if (process.env.DOCUMENT_QA_REPORT) {
-  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,network,limits,retryScan,binarizedOcr,commit:process.env.GITHUB_SHA ?? null,measuredAt:new Date().toISOString(),browser:browser.version(),registrations,measurements},null,2));
+  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,network,limits,retryScan,maskedPageNumber,commit:process.env.GITHUB_SHA ?? null,measuredAt:new Date().toISOString(),browser:browser.version(),registrations,measurements},null,2));
 }
 if (failures.length) throw new AggregateError(failures,'Document QA acceptance failed');
