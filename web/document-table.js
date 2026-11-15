@@ -36,7 +36,8 @@ export function layoutPdfText(items) {
         column.sort((a,b)=>b.y-a.y).map(glyph=>glyph.text.trim()).join('')).join('');
     }
   }
-  const horizontal = rows.sort((a,b)=>b.y-a.y).map(({cells})=>{
+  rows.sort((a,b)=>b.y-a.y);
+  const formatRow = cells=>{
     cells.sort((a,b)=>a.x-b.x);
     return cells.map((cell,i)=>{
       if (!i) return cell.text;
@@ -45,7 +46,21 @@ export function layoutPdfText(items) {
       if (gap>Math.max(8,cell.size*0.8)) return ' | '+cell.text;
       return (gap>cell.size*0.16 ? ' ' : '')+cell.text;
     }).join('').trim();
-  });
+  };
+  let horizontal = rows.map(({cells})=>formatRow(cells));
+  const titles = rows[0]?.cells;
+  if (titles?.length===2 && rows.length>=4 && !vertical.length && !rotated.length) {
+    const rightStart = titles[1].x;
+    const regularSize = Math.max(...rows.slice(1).flatMap(row=>row.cells.map(cell=>cell.size)));
+    const split = rows.map(({cells})=>[
+      cells.filter(cell=>cell.x<rightStart-2),cells.filter(cell=>cell.x>=rightStart-2),
+    ]);
+    const gutter = Math.min(...split.map(([left,right])=>left.length && right.length
+      ? right[0].x-Math.max(...left.map(cell=>cell.end)) : 0));
+    if (titles.every(title=>title.size>=regularSize*1.2) && gutter>regularSize*2) {
+      horizontal = [0,1].flatMap(side=>split.map(groups=>formatRow(groups[side])));
+    }
+  }
   const columns = vertical.sort((a,b)=>b.x-a.x).map(column=>
     column.fragments.sort((a,b)=>b.y-a.y).map(fragment=>fragment.text).join(''));
   return [...horizontal,...columns,...rotated].join('\n');

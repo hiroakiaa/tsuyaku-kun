@@ -86,3 +86,19 @@ console.log('PASS table quotation preserves rows and prose joins wrapped lines')
   assert.equal(findTaggedTableCell([...tables,...tables],'図書館の最終入館時刻は？'),null);
   console.log('PASS tagged PDF nested text and unambiguous cross-page citations');
 }
+
+{
+  const part=(str,x,y,size=12,width=str.length*5)=>({str,width,transform:[size,0,0,size,x,y]});
+  const rows=[
+    part('Exhibition',0,100,18),part('Workshop',180,100,18),
+    part('Visitor',0,80),part('Fee',75,80),part('Visitor',180,80),part('Fee',255,80),
+    part('Adults',0,60),part('780 yen',75,60),part('Adults',180,60),part('1350 yen',255,60),
+    part('Students',0,40),part('420 yen',75,40),part('Students',180,40),part('650 yen',255,40),
+  ];
+  assert.equal(layoutPdfText(rows),[
+    'Exhibition','Visitor | Fee','Adults | 780 yen','Students | 420 yen',
+    'Workshop','Visitor | Fee','Adults | 1350 yen','Students | 650 yen',
+  ].join('\n'));
+  assert.match(layoutPdfText(rows.map(item=>({...item,transform:item.transform.map((value,i)=>i===0||i===3?12:value)}))),
+    /^Exhibition \| Workshop\nVisitor \| Fee \| Visitor \| Fee/);
+}
