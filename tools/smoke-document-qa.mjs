@@ -255,6 +255,20 @@ try {
   console.log(JSON.stringify(result));
   if (process.env.DOCUMENT_QA_REPORT) await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify(result,null,2));
   if (process.env.GITHUB_STEP_SUMMARY) {
+    const comparison = result.groupVisitEvidence?.comparison;
+    if (comparison) {
+      const rows = comparison.map(({mode,candidatePages,usage,timing,estimatedGenerationUSD}) =>
+        '| '+[mode,candidatePages.length,usage?.prompt_tokens ?? '—',
+          usage?.prompt_tokens_details?.cached_tokens ?? '—',
+          timing?.retrievalMs ?? '—',timing?.generationMs ?? '—',
+          estimatedGenerationUSD?.toFixed(7) ?? '—'].join(' | ')+' |');
+      await appendFile(process.env.GITHUB_STEP_SUMMARY,[
+        '', '### 団体見学の回答比較', '',
+        '| 方式 | 候補ページ数 | 入力トークン | キャッシュ済み | 検索 ms | 生成 ms | 推定生成費 USD |',
+        '| --- | ---: | ---: | ---: | ---: | ---: | ---: |',
+        ...rows,'',
+      ].join('\n'));
+    }
     await appendFile(process.env.GITHUB_STEP_SUMMARY,[
       '',
       '### PDF: '+result.fixture,
