@@ -60,8 +60,19 @@ try {
     } finally {
       await viewer.close();
     }
-    await page.goto(guide);
-    await page.locator('#tab-ask').click();
+    const metadataStatuses = [];
+    const documentId = new URL(guide).searchParams.get('id');
+    page.on('response', response => {
+      if (response.request().method()==='GET' && new URL(response.url()).pathname==='/documents/'+documentId) {
+        metadataStatuses.push(response.status());
+      }
+    });
+    const navigation = await page.goto(guide);
+    await page.locator('#tab-ask').click().catch(cause => {
+      throw Error('Worksheet question tab unavailable: '+JSON.stringify({
+        fixture,pageStatus:navigation?.status(),metadataStatuses,
+      }),{cause});
+    });
     assert.equal(await page.locator('#pdf-page option').count(),sheets.length);
     if (inventory) {
       for (const [slot, branch, expected, cell, followup] of [
