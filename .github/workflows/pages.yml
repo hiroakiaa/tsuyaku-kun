@@ -95,15 +95,15 @@ jobs:
           DOCUMENT_QA_REPORT: document-qa-word-report.json
         run: node tools/smoke-document-qa-word.mjs
       - name: Verify image OCR and citations in the published app
-        run: node tools/smoke-document-qa-image.mjs png en --append
+        run: DOCUMENT_QA_REPORT=document-qa-image-png-en-report.json node tools/smoke-document-qa-image.mjs png en --append
       - name: Verify JPEG and WebP OCR in the published app
         run: |
-          node tools/smoke-document-qa-image.mjs jpeg
-          node tools/smoke-document-qa-image.mjs webp
+          DOCUMENT_QA_REPORT=document-qa-image-jpeg-en-report.json node tools/smoke-document-qa-image.mjs jpeg
+          DOCUMENT_QA_REPORT=document-qa-image-webp-en-report.json node tools/smoke-document-qa-image.mjs webp
       - name: Verify Japanese image OCR in the published app
         run: |
           sudo apt-get install -y fonts-noto-cjk
-          node tools/smoke-document-qa-image.mjs png ja
+          DOCUMENT_QA_REPORT=document-qa-image-png-ja-report.json node tools/smoke-document-qa-image.mjs png ja
       - name: Record document verification provenance
         if: always()
         env:
@@ -125,6 +125,7 @@ jobs:
             document-qa-merged-report.json
             document-qa-zero-report.json
             document-qa-wide-report.json
+            document-qa-image-*-report.json
             document-qa-word-report.json
             document-qa-admission-years-report.json
           if-no-files-found: error

@@ -1,3 +1,4 @@
+import {writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 
@@ -11,6 +12,7 @@ const browser = await chromium.launch();
 try {
   const page = await browser.newPage();
   const externalWrites = [];
+  let measurement;
   page.on('request',request=>{
     const url = new URL(request.url());
     const body = request.postDataBuffer();
@@ -135,7 +137,7 @@ try {
       assert.match(await bubble.locator('.answer-quote').textContent(),/Green group[\s\S]*16:30/i);
       assert.deepEqual(externalWrites,[]);
     }
-    console.log(JSON.stringify({fixture:format+'-browser-ocr',language,registrationMs,answerMs}));
+    measurement = {fixture:format+'-browser-ocr',language,registrationMs,answerMs,browserVersion:browser.version()};
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
       const {config} = await import('./web/config.js');
@@ -154,6 +156,10 @@ try {
       return {removeStatus:response.status,reopenStatus:reopened.status,pdfStatus:pdf.status};
     },guide);
     assert.deepEqual(removed,{removeStatus:200,reopenStatus:404,pdfStatus:404}); console.log('cleanup confirmed');
+  }
+  console.log(JSON.stringify(measurement));
+  if (process.env.DOCUMENT_QA_REPORT) {
+    await writeFile(process.env.DOCUMENT_QA_REPORT, JSON.stringify(measurement, null, 2));
   }
 } finally {
   await browser.close();
