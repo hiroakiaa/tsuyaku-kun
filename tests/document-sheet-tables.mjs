@@ -153,10 +153,11 @@ for (const [body,expected] of [
 
 {
   const archivePages = [
-    '貸出備品表\nA1 備品 | B1 貸出枠 | C1 在庫\nC2 本館 | D2 分館\nA3 プロジェクター | B3 午前 | C3 8台 | D3 2台\nB4 午後 | C4 3台 | D4 6台\n結合セル範囲: C1:D1, A3:A4',
+    '貸出備品表\nA1 備品 | B1 貸出枠 | C1 在庫\nC2 本館 | D2 分館\nA3 プロジェクター | B3 午前 | D3 2台\nB4 午後 | C4 3台 | D4 6台\n結合セル範囲: C1:D1, A3:A4',
   ];
   const archiveEnv = {ROOMS:{idFromName:x=>x,get:()=>({fetch:async()=>Response.json({pages:archivePages,sourceType:'pdf',convertedWorksheet:true})})}};
   for (const [slot, branch, expected, cell] of [
+    ['午前','本館','該当セルは空欄です。',null],
     ['午前','分館','2台','D3'],
     ['午後','本館','3台','C4'],
     ['午後','分館','6台','D4'],
@@ -167,6 +168,11 @@ for (const [body,expected] of [
     });
     const result = await (await documents(request,archiveEnv,{uid:'test'})).json();
     assert.equal(result.answer,expected,question);
+    if (!cell) {
+      assert.deepEqual(result.items.flatMap(item=>item.evidence),[],question);
+      assert.deepEqual(result.pages,[],question);
+      continue;
+    }
     const expectedCells = ['A3', slot === '午前' ? 'B3' : 'B4', 'C1', branch === '本館' ? 'C2' : 'D2', cell];
     assert.deepEqual(result.items.flatMap(item=>item.evidence.map(e=>[e.sheet,e.cell,e.page])),
       expectedCells.map(address=>['貸出備品表',address,1]),question);

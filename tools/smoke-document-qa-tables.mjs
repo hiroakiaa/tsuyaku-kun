@@ -65,6 +65,7 @@ try {
     if (inventory) {
       for (const [slot, branch, expected, cell] of [
         ['午前','分館','2台','D3'],
+        ['午前','本館','該当セルは空欄です。',null],
         ['午後','本館','3台','C4'],
         ['午後','分館','6台','D4'],
       ]) {
@@ -73,6 +74,11 @@ try {
         const answer = page.locator('#messages .bubble').last();
         await answer.getByText(expected,{exact:true}).waitFor({timeout:30000});
         await page.locator('#ask-form button:enabled').waitFor();
+        if (!cell) {
+          assert.equal(await answer.locator('.answer-source').count(),0);
+          console.log('Blank inventory cell matched without citations');
+          continue;
+        }
         const addresses = (await answer.locator('.answer-source > div').allTextContents()).flatMap(line=>line.split('、'));
         const expectedCells = ['A3', slot === '午前' ? 'B3' : 'B4', 'C1', branch === '本館' ? 'C2' : 'D2', cell];
         assert.deepEqual(addresses.sort(), expectedCells.sort().map(address=>'貸出備品表 · '+address));
