@@ -36,6 +36,7 @@ const total = fixtures.reduce((count,fixture)=>count+fixture.questions.length,0)
 const browser = await chromium.launch();
 const failures = [];
 const measurements = [];
+const registrations = [];
 const normalize = text=>text.normalize('NFKC').replace(/[\s、。，,.]/gu,'');
 let passed = 0;
 try {
@@ -74,14 +75,20 @@ try {
       await page.goto('https://hiroakiaa.github.io/tsuyaku-kun/documents.html');
       await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
       await page.locator('#upload input[name=title]').fill('自動受入確認 '+fixture.label);
+      const uploadStarted = performance.now();
       await page.locator('#upload input[type=file]').setInputFiles(file);
       if (!fixture.excel) await page.getByText('PDFの文字を確認しました。',{exact:true}).waitFor({timeout:120_000});
       await page.locator('#upload button').click();
       await page.waitForFunction(()=>Boolean(document.querySelector('#guide-url')?.value),null,{timeout:120_000});
       const guide = await page.locator('#guide-url').inputValue();
+      const registration = {fixture:fixture.label,elapsedMs:Math.round(performance.now()-uploadStarted),pageCount:null,deleted:false};
+      registrations.push(registration);
       try {
         await page.goto(guide);
         await page.locator('#tab-ask').click();
+        const expectedPages = fixture.excel ? 2 : fixture.pages.length;
+        await page.waitForFunction(count=>document.querySelectorAll('#pdf-page option').length===count,expectedPages);
+        registration.pageCount = expectedPages;
         for (const [question,expected,sourcePage=1,cell,wrong=fixture.otherValue] of fixture.questions) {
           try {
             const answers = page.locator('#messages .answer-item');
@@ -116,6 +123,14 @@ try {
               assert.match(answer,fixture.excel ? /令和8年度.*令和9年度.*どの年度/u : /確認できません/u,question);
               assert.deepEqual(citations,[],question);
             }
+            if (expected) {
+              const otherPage = sourcePage===1 ? 2 : 1;
+              await page.locator('#pdf-page').selectOption(String(otherPage));
+              await page.waitForFunction(number=>document.querySelector('#pdf-page')?.value===String(number),otherPage);
+              await source.locator('a').click();
+              await page.waitForFunction(number=>document.querySelector('#pdf-page')?.value===String(number),sourcePage);
+              measurement.citationNavigation = true;
+            }
             measurement.passed = true;
             passed++;
           } catch (error) {
@@ -138,7 +153,8 @@ try {
           return [removed.status,info.status,pdf.status];
         },guide);
         assert.deepEqual(statuses,[200,404,404],fixture.label+' cleanup');
-        console.log(fixture.label+' cleanup confirmed');
+        registration.deleted = true;
+        console.log(JSON.stringify(registration));
       }
     } catch (error) {
       failures.push(error);
@@ -153,6 +169,6 @@ try {
 
 console.log('Acceptance questions passed: '+passed+'/'+total);
 if (process.env.DOCUMENT_QA_REPORT) {
-  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,measurements},null,2));
+  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,commit:process.env.GITHUB_SHA ?? null,measuredAt:new Date().toISOString(),browser:browser.version(),registrations,measurements},null,2));
 }
 if (failures.length) throw new AggregateError(failures,'Document QA acceptance failed');
