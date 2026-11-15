@@ -198,6 +198,15 @@ try {
           }
           return results;
         });
+        for (const {mode,candidatePages,items} of groupVisitEvidence.comparison) {
+          assert.ok([6,21].every(number=>candidatePages.includes(number)),mode+' omitted a required page');
+          if (mode==='search') assert.ok(candidatePages.length<pageCount,'Search did not narrow the candidates');
+          assert.deepEqual(items.flatMap(item=>item.evidence.map(source=>source.page)).sort((a,b)=>a-b),[6,21],mode);
+          for (const [number, days] of [[6,14],[21,3]]) {
+            const item = items.find(item=>item.evidence.some(source=>source.page===number));
+            assert.match(item.answer,new RegExp('\\b'+days+'\\s+days','i'),mode+' page '+number);
+          }
+        }
       }
     }
     const releaseUrl = new URL('./web/release-checks.json',guide);
