@@ -6,16 +6,19 @@ const fixtures = [
   {
     label:'Excel',
     excel:true,
+    otherValue:/410\s*円/u,
     questions:[['令和9年度の会議室の子どもの休日料金は？',/470\s*円/u,2,'R9料金表 · AA4'],['会議室の子どもの休日料金は？',null]],
   },
   {
     label:'本文PDF',
+    otherValue:/5,?300\s*円/u,
     pages:['体験会の参加費は3,500円です。','職員研修の参加費は5,300円です。'],
     questions:[['体験会の参加費はいくら？',/3,?500\s*円/u],['体験会のキャンセル料はいくら？',null]],
   },
   {
     label:'スキャンPDF',
     scan:true,
+    otherValue:/800\s*円/u,
     pages:['窓口交付手数料 400円','郵送交付手数料 800円'],
     questions:[['窓口の交付手数料はいくら？',/400\s*円/u],['窓口で使える支払方法は？',null]],
   },
@@ -69,25 +72,30 @@ try {
         await page.goto(guide);
         await page.locator('#tab-ask').click();
         for (const [question,expected,sourcePage=1,cell] of fixture.questions) {
-          const answers = page.locator('#messages .answer-item');
-          const before = await answers.count();
-          await page.locator('#question').fill(question);
-          await page.locator('#ask-form button').click();
-          await page.waitForFunction(count=>document.querySelectorAll('#messages .answer-item').length>count,before,{timeout:60_000});
-          await page.locator('#ask-form button:enabled').waitFor({timeout:60_000});
-          const answer = await answers.last().locator('.answer-text').textContent();
-          const citations = await answers.last().locator('.answer-source a').allTextContents();
-          console.log(JSON.stringify({fixture:fixture.label,question,answer,citations}));
-          if (expected) {
-            assert.match(answer,expected,question);
-            assert.doesNotMatch(answer,fixture.scan ? /800\s*円/u : /5,?300\s*円/u,question);
-            assert.deepEqual(citations,['元のPDF '+sourcePage+'ページ'],question);
-            if (cell) assert.ok((await answers.last().locator('.answer-source').textContent()).includes(cell),question);
-          } else {
-            assert.match(answer,fixture.excel ? /令和8年度.*令和9年度.*どの年度/u : /確認できません/u,question);
-            assert.deepEqual(citations,[],question);
+          try {
+            const answers = page.locator('#messages .answer-item');
+            const before = await answers.count();
+            await page.locator('#question').fill(question);
+            await page.locator('#ask-form button').click();
+            await page.waitForFunction(count=>document.querySelectorAll('#messages .answer-item').length>count,before,{timeout:60_000});
+            await page.locator('#ask-form button:enabled').waitFor({timeout:60_000});
+            const answer = await answers.last().locator('.answer-text').textContent();
+            const citations = await answers.last().locator('.answer-source a').allTextContents();
+            console.log(JSON.stringify({fixture:fixture.label,question,answer,citations}));
+            if (expected) {
+              assert.match(answer,expected,question);
+              assert.doesNotMatch(answer,fixture.otherValue,question);
+              assert.deepEqual(citations,['元のPDF '+sourcePage+'ページ'],question);
+              if (cell) assert.ok((await answers.last().locator('.answer-source').textContent()).includes(cell),question);
+            } else {
+              assert.match(answer,fixture.excel ? /令和8年度.*令和9年度.*どの年度/u : /確認できません/u,question);
+              assert.deepEqual(citations,[],question);
+            }
+            passed++;
+          } catch (error) {
+            failures.push(error);
+            console.error(fixture.label,question,error);
           }
-          passed++;
         }
       } finally {
         const statuses = await page.evaluate(async documentUrl=>{
