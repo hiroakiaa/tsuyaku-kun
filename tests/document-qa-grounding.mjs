@@ -1,0 +1,35 @@
+import assert from 'node:assert/strict';
+import {documents} from '../server/documents.js';
+
+const cases = [
+  {format:'PDF', pages:['研修の参加費は3,500円です。','別の研修の参加費は5,300円です。'], quote:'研修の参加費は3,500円です。', correct:'3,500円です。', wrong:'5,300円です。'},
+  {format:'Excel抽出', pages:['受付 | 定員 ３０人 | 予備席 12人','別会場の定員は60人です。'], quote:'受付 | 定員 ３０人', correct:'30人です。', wrong:'60人です。'},
+  {format:'スキャンOCR抽出', pages:['交付手数料は４００円です。','郵送手数料は800円です。'], quote:'交付手数料は４００円です。', correct:'400円です。', wrong:'800円です。'},
+];
+
+const savedFetch = globalThis.fetch;
+let passed = 0;
+try {
+  for (const {format,pages,quote,correct,wrong} of cases) {
+    for (const [answer,page,expected] of [[correct,1,true],[wrong,1,false],[correct,2,false]]) {
+      globalThis.fetch = async ()=>Response.json({choices:[{finish_reason:'stop',message:{
+        content:JSON.stringify({items:[{label:format,answer,sources:[{page,quote}]}]}),
+      }}]});
+      const env = {OPENAI_DOCUMENT_QA_KEY:'test',ROOMS:{idFromName:name=>name,get:()=>({
+        fetch:async url=>Response.json(url.endsWith('/data') ? {pages,owner:'author'} : null),
+      })}};
+      const response = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+        method:'POST',body:JSON.stringify({question:'資料の記載を教えてください。'}),
+      }),env,{uid:'author'});
+      const result = await response.json();
+      const ok = expected ? result.items[0]?.answer===answer && result.pages.join()==='1'
+        : result.items[0]?.answer===null && result.pages.length===0;
+      if (ok) passed++;
+      console.log(format,expected?'正しい根拠':page===2?'誤ったページ':'根拠にない数値',ok?'PASS':'FAIL');
+    }
+  }
+} finally {
+  globalThis.fetch = savedFetch;
+}
+console.log(`${passed}/${cases.length*3}`);
+assert.equal(passed,cases.length*3);

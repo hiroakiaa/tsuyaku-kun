@@ -460,6 +460,19 @@ function lookupAdmissionCell(pages, question) {
   return matches.length===1 ? matches[0] : null;
 }
 
+function quantities(text) {
+  return [...text.normalize('NFKC').matchAll(/(?<![\d.,])(\d{1,3}(?:,\d{3})+|\d+)(\.\d+)?\s*(円|人(?!目|分|以上|以下)|名(?!目|義)|%)/gu)]
+    .map(([,integer,fraction,unit])=>[Number(integer.replaceAll(',','')+(fraction ?? '')),unit==='名'?'人':unit]);
+}
+
+function supportsQuantities(answer,evidence) {
+  const cited = evidence.flatMap(({quote})=>quantities(quote));
+  return quantities(answer).every(([value,unit])=>{
+    const comparable = cited.filter(([,sourceUnit])=>sourceUnit===unit);
+    return !comparable.length || comparable.some(([sourceValue])=>sourceValue===value);
+  });
+}
+
 function checkedAnswer(item,pages,question='') {
   const requestedYear = /^(?:令和|R)(\d{1,2})年度?の/iu.exec(normalized(question))?.[1];
   const schoolQuestion = normalized(question).replace(/^(?:令和|平成|昭和|R|H|S)?[0-9]{1,4}年度?の/iu,'');
@@ -565,7 +578,7 @@ function checkedAnswer(item,pages,question='') {
         const name = normalized(school);
         return text.includes(name) && text.replace(name,'').length>=8;
       });
-      const found = schoolEvidence && evidence.length && typeof item.answer==='string' && item.answer.trim();
+      const found = schoolEvidence && evidence.length && typeof item.answer==='string' && item.answer.trim() && supportsQuantities(item.answer,evidence);
       const schedule = found && /^下校の?(?:時刻|時間)は何時(?:ですか)?[？?。]?$/u.test(normalized(question))
         ? monthlyDismissal(evidence) : null;
       return {label:item.label.slice(0,100),answer:found ? schedule?.answer ?? item.answer.slice(0,600) : null,evidence:found ? evidence : []};
@@ -942,7 +955,7 @@ export async function documents(request,env,auth) {
       return reply({items,answer:items[0].answer,pages:[...new Set(items.flatMap(item=>item.evidence.map(source=>source.page)))]});
     }
   }
-  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([19,record.pages,record.materials ?? [],question.trim()])));
+  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([20,record.pages,record.materials ?? [],question.trim()])));
   const cacheKey = Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
   const cacheUrl = 'https://room/document/answer/'+cacheKey;
   const cached = await (await target.fetch(cacheUrl)).json();
