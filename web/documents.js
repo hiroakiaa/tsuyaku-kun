@@ -1002,13 +1002,13 @@ async function reader() {
     lastQuestion = entry.items.at(-1)?.worksheetContext ?? entry.question;
   }
   let taggedTables;
-  async function sendQuestion(question,previousQuestion,retrying=false) {
+  async function sendQuestion(question,previousQuestion,questionBubble) {
     const log = $('#messages');
     if (button.disabled) return;
     button.disabled = true;
     clearCitation();
     let followedCitation = false;
-    if (!retrying) append(log,'div',question,'bubble user');
+    questionBubble ??= append(log,'div',question,'bubble user');
     let box;
     log.append(status);
     const entry = {question,items:[]};
@@ -1121,12 +1121,16 @@ async function reader() {
       status.textContent = error.message+'（'+stage+(httpStatus && httpStatus!==200?' / HTTP '+httpStatus:'')+'） ';
       const retry = append(status,'button','再試行');
       retry.type = 'button';
-      retry.onclick = () => void sendQuestion(question,previousQuestion,true);
+      retry.onclick = () => void sendQuestion(question,previousQuestion,questionBubble);
       const edit = append(status,'button','質問を編集');
       edit.type = 'button';
       edit.onclick = () => {
         const field = $('#question');
-        if (!field.value.trim()) field.value = question;
+        if (!field.value.trim()) {
+          field.value = question;
+          questionBubble.remove();
+          status.textContent = '';
+        }
         field.focus();
         field.setSelectionRange(field.value.length,field.value.length);
       };

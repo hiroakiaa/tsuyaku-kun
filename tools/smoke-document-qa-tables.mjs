@@ -107,11 +107,13 @@ try {
       await field.fill(failedQuestion);
       await page.locator('#ask-form button').click();
       const edit = page.getByRole('button',{name:'質問を編集',exact:true});
-      await edit.click();
-      assert.equal(await field.inputValue(),failedQuestion);
       await field.fill('編集中の質問');
       await edit.click();
       assert.equal(await field.inputValue(),'編集中の質問');
+      await field.fill('');
+      await edit.click();
+      assert.equal(await field.inputValue(),failedQuestion);
+      assert.equal(await page.locator('#messages .bubble.user').filter({hasText:failedQuestion}).count(),0);
 
       for (const [slot, branch, expected, cell, followup] of [
         ['午前','分館','2台','D3'],
