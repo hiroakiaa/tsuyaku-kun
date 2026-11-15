@@ -38,6 +38,14 @@ const fixtures = [
       ['年間の施設利用料を万を使わず数字だけの円表記で教えてください。',/(?:1\.2\s*万|12,?000)\s*円/u,2,,/(?<![\d.,万])2\s*万円/u,/(?<![\d,])12,?000\s*円/u],
     ],
   },
+  {
+    label:'ページ番号付きスキャンPDF',
+    scan:true,
+    printedPageNumbers:true,
+    otherValue:/760\s*円/u,
+    pages:['初級講習の受講料は320円です。','上級講習の受講料は760円です。'],
+    questions:[['初級講習の受講料はいくら？',/320\s*円/u],['初級講習の開始時刻は何時ですか？',null]],
+  },
 ];
 
 const network = process.argv.includes('--limited-network') ? {
@@ -47,6 +55,7 @@ const limits = network ? {registration:30_000,firstAnswer:15_000} : {registratio
 const retryScan = process.argv.includes('--retry-scan');
 const selectedFixtures = retryScan ? fixtures.filter(fixture=>fixture.label==='スキャンPDF') : fixtures;
 const total = selectedFixtures.reduce((count,fixture)=>count+fixture.questions.length,0);
+assert.equal(total,retryScan ? 2 : 13,'Unexpected acceptance question count');
 const browser = await chromium.launch();
 const failures = [];
 const measurements = [];
