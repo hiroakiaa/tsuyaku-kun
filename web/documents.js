@@ -315,6 +315,18 @@ async function reader() {
     $('#qa-source').textContent = '資料データを表示';
   }
   let opened,originalUrl,officeText,officeRender = 0;
+  function getOriginalPdf() {
+    return opened ??= (async()=>{
+      const blob = await fetch(config.api + api + '/pdf',{headers:await authHeaders()}).then(response=>{
+        if (!response.ok) throw Error();
+        return response.blob();
+      }).catch(()=>{throw Error('PDF取得に失敗しました。');});
+      const pdf = await openPdf({data:new Uint8Array(await blob.arrayBuffer())})
+        .catch(()=>{throw Error('PDFの解析に失敗しました。');});
+      originalUrl = URL.createObjectURL(blob);
+      return pdf;
+    })().catch(error=>{opened=undefined;throw error;});
+  }
   const officeType = ['xlsx','docx'].includes(sourceType);
   const previousPage = readingPosition(id,{opened:Date.now()}).page;
   let selectedPage = Number.isInteger(previousPage) && previousPage>=1 && previousPage<=doc.pageCount ? previousPage : 0;
@@ -763,17 +775,7 @@ async function reader() {
     }
 
     try {
-      opened ??= (async()=>{
-        const blob = await fetch(config.api + api + '/pdf',{headers:await authHeaders()}).then(response=>{
-          if (!response.ok) throw Error();
-          return response.blob();
-        }).catch(()=>{throw Error('PDF取得に失敗しました。');});
-        const pdf = await openPdf({data:new Uint8Array(await blob.arrayBuffer())})
-          .catch(()=>{throw Error('PDFの解析に失敗しました。');});
-        originalUrl = URL.createObjectURL(blob);
-        return pdf;
-      })().catch(error=>{opened=undefined;throw error;});
-      const pdf = await opened;
+      const pdf = await getOriginalPdf();
       if (selectedPage === n) document.querySelector('#pdf-file').href = originalUrl + '#page=' + n;
       if (selectedPage !== n || !dialog.open) return;
       if (!pageViews) {
@@ -1003,7 +1005,7 @@ async function reader() {
         let item;
         try {
           const {lookupTableCell}=await import('./document-table-lookup.js?v=84');
-          const pdf=await (opened ?? openPdf({url:config.api+api+'/pdf',httpHeaders:await authHeaders()}));
+          const pdf=await getOriginalPdf();
           if (!materials.length) {
             const {readTaggedTables,findTaggedTableCell}=await import('./document-tagged-table.js?v=2');
             taggedTables ??= readTaggedTables(pdf).catch(()=>[]);
