@@ -82,10 +82,17 @@ try {
         await page.locator('#tab-ask').click();
       }
       await page.locator('#question').fill(question);
+      await page.locator('#ask-form').evaluate(form => {
+        form.removeAttribute('data-test-submit-at');
+        form.addEventListener('submit', () => {
+          form.dataset.testSubmitAt = String(Date.now());
+        }, {once:true, capture:true});
+      });
       const started=performance.now();
+      const startedEpoch = Date.now();
       const isQuestionRequest = request =>
         request.method() === 'POST' && new URL(request.url()).pathname.endsWith('/ask');
-      const requestStarted = page.waitForRequest(isQuestionRequest).then(() => performance.now());
+      const requestStarted = page.waitForRequest(isQuestionRequest).then(() => ({monotonic:performance.now(), epoch:Date.now()}));
       const headers = page.waitForResponse(response =>
         isQuestionRequest(response.request()),
       ).then(() => performance.now());
@@ -101,8 +108,12 @@ try {
       ]);
       await page.locator('#ask-form button:enabled').waitFor();
       const elapsedMs=Math.round(performance.now()-started);
-      const submitToRequestMs = Math.round(requestedAt - started);
-      const requestToHeadersMs = Math.round(receivedAt - requestedAt);
+      const submitEpoch = Number(await page.locator('#ask-form').getAttribute('data-test-submit-at'));
+      assert.ok(submitEpoch >= startedEpoch && submitEpoch <= requestedAt.epoch, 'Missing or out-of-order submit event');
+      const clickToSubmitEventMs = submitEpoch - startedEpoch;
+      const submitEventToRequestMs = requestedAt.epoch - submitEpoch;
+      const submitToRequestMs = Math.round(requestedAt.monotonic - started);
+      const requestToHeadersMs = Math.round(receivedAt - requestedAt.monotonic);
       const responseHeadersMs = Math.round(receivedAt - started);
       const responseToVisibleMs = Math.round(visibleAt - receivedAt);
       if (!source) assert.equal(await bubble.locator('.answer-source').count(),0);
@@ -124,7 +135,7 @@ try {
         }
       }
       measurements.push({question,value,source,citationLinks:await bubble.locator('.answer-source a').allTextContents(),
-        citationCells:await bubble.locator('.answer-source > div').allTextContents(),elapsedMs,submitToRequestMs,requestToHeadersMs,responseHeadersMs,responseToVisibleMs});
+        citationCells:await bubble.locator('.answer-source > div').allTextContents(),elapsedMs,clickToSubmitEventMs,submitEventToRequestMs,submitToRequestMs,requestToHeadersMs,responseHeadersMs,responseToVisibleMs});
 
     }
     const blankQuestion = '令和9年度の青空高校の特進の入試日程は？';
