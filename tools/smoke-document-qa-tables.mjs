@@ -37,6 +37,7 @@ try {
   const registrationMs = Math.round(performance.now()-registrationStarted);
   const guide = await url.inputValue();
   const inventoryChecks = [];
+  let simulatedFailure = false;
   try {
     assert.deepEqual(externalWrites,[]);
     const viewer = await browser.newPage();
@@ -67,12 +68,31 @@ try {
         metadataStatuses.push(response.status());
       }
     });
+    if (inventory) {
+      await page.route(url=>url.pathname==='/documents/'+documentId, async route => {
+        if (route.request().method() !== 'GET' || simulatedFailure) return route.continue();
+        simulatedFailure = true;
+        const upstream = await route.fetch();
+        assert.equal(upstream.status(),200);
+        const headers = {...upstream.headers(),'content-type':'application/json'};
+        delete headers['content-encoding'];
+        delete headers['content-length'];
+        await route.fulfill({status:503,headers,json:{error:'試験用の一時エラー'}});
+      });
+    }
     const navigation = await page.goto(guide);
+    if (inventory) {
+      await page.getByRole('alert').filter({hasText:'資料を読み込めませんでした'}).waitFor();
+      assert.ok(simulatedFailure);
+      assert.ok(metadataStatuses.includes(503));
+      await page.getByRole('button',{name:'再読み込み',exact:true}).click();
+    }
     await page.locator('#tab-ask').click().catch(cause => {
       throw Error('Worksheet question tab unavailable: '+JSON.stringify({
         fixture,pageStatus:navigation?.status(),metadataStatuses,
       }),{cause});
     });
+    if (inventory) assert.ok(metadataStatuses.includes(200));
     assert.equal(await page.locator('#pdf-page option').count(),sheets.length);
     if (inventory) {
       for (const [slot, branch, expected, cell, followup] of [
@@ -309,7 +329,7 @@ try {
     assert.deepEqual(removed,{removeStatus:200,reopenStatus:404,pdfStatus:404}); console.log('cleanup confirmed');
   }
   if (inventory && process.env.DOCUMENT_QA_REPORT) {
-    await writeFile(process.env.DOCUMENT_QA_REPORT, JSON.stringify({fixture,registrationMs,browserVersion:browser.version(),checks:inventoryChecks},null,2));
+    await writeFile(process.env.DOCUMENT_QA_REPORT, JSON.stringify({fixture,registrationMs,browserVersion:browser.version(),metadataRecovery:simulatedFailure,checks:inventoryChecks},null,2));
   }
 } finally {
   await browser.close();

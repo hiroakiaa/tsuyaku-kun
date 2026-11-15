@@ -35,7 +35,9 @@ async function openPdf(input) {
 async function request(url, options) {
   const res = await fetch(config.api + url, {...options, headers:await authHeaders(options?.headers)});
   const data = await res.json().catch(()=>null);
-  if (!res.ok || !data) throw new Error(data?.error || '通信できませんでした。もう一度お試しください。');
+  if (!res.ok || !data) {
+    throw Object.assign(new Error(data?.error || '通信できませんでした。もう一度お試しください。'), {status:res.status});
+  }
   return data;
 }
 
@@ -259,7 +261,20 @@ function teacher() {
 async function reader() {
   if (!/^[a-f0-9-]{36}$/.test(id)) throw new Error('資料のURLを確認してください。');
   const api = '/documents/' + id;
-  const doc = await request(api);
+  let doc;
+  try {
+    doc = await request(api);
+  } catch (error) {
+    if (!(error instanceof TypeError) && error.status !== 429 && !(error.status >= 500)) throw error;
+    content.replaceChildren();
+    const panel = append(content,'section','','panel');
+    const message = append(panel,'p','資料を読み込めませんでした。時間をおいて再試行してください。');
+    message.setAttribute('role','alert');
+    const retry = append(panel,'button','再読み込み');
+    retry.type = 'button';
+    retry.onclick = () => location.reload();
+    return;
+  }
   show('#reader');
   document.title = doc.title + '｜資料QA君';
   $('#doc-title').textContent = doc.title;
