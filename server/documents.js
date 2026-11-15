@@ -852,16 +852,20 @@ export async function documents(request,env,auth) {
     const followup = /^([\p{L}]{1,12})は[?。]?$/u.exec(normalized(currentQuestion));
     if (followup && typeof previousQuestion==='string' && previousQuestion.length<=300) {
       const prior = lookupWorksheetCell(record.pages,previousQuestion);
-      const rowLabel = prior?.evidence?.[1]?.value;
-      if (rowLabel) {
-        const candidate = normalized(previousQuestion).replace(normalized(rowLabel),followup[1]);
-        const next = lookupWorksheetCell(record.pages,candidate);
-        if (next?.evidence?.[1]?.value && normalized(next.evidence[1].value)===followup[1] &&
-            [0,-3,-2].every(index=>{
-              const original=prior.evidence.at(index);
-              const updated=next.evidence.at(index);
-              return original.sheet===updated.sheet && original.cell===updated.cell;
-            })) worksheetQuestion = candidate;
+      const evidence = prior?.evidence ?? [];
+      if (evidence.length === 5) {
+        const candidates = [1, 3].flatMap(changedIndex => {
+          const label = normalized(evidence[changedIndex].value);
+          const originalQuestion = normalized(previousQuestion);
+          if (!label || !originalQuestion.includes(label)) return [];
+          const candidate = originalQuestion.replace(label,followup[1]);
+          const next = lookupWorksheetCell(record.pages,candidate)?.evidence;
+          if (next?.length !== evidence.length || normalized(next[changedIndex].value)!==followup[1]) return [];
+          const sameContext = evidence.slice(0,-1).every((original,index) =>
+            index===changedIndex || (original.sheet===next[index].sheet && original.cell===next[index].cell));
+          return sameContext ? [candidate] : [];
+        });
+        if (candidates.length === 1) worksheetQuestion = candidates[0];
       }
     }
     const lookup = text => {

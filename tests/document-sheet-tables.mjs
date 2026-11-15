@@ -187,5 +187,15 @@ for (const [body,expected] of [
   assert.equal(result.answer,'6台');
   assert.deepEqual(result.items[0].evidence.map(e=>[e.sheet,e.cell,e.page]),
     ['A3','B4','C1','D2','D4'].map(cell=>['貸出備品表',cell,1]));
+  const branchFollowup = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+    method:'POST',body:JSON.stringify({
+      question:'本館は？',
+      previousQuestion:result.items[0].worksheetContext,
+    }),
+  }),archiveEnv,{uid:'test'});
+  const branchResult = await branchFollowup.json();
+  assert.equal(branchResult.answer,'3台');
+  assert.deepEqual(branchResult.items[0].evidence.map(e=>[e.sheet,e.cell,e.page]),
+    ['A3','B4','C1','C2','C4'].map(cell=>['貸出備品表',cell,1]));
   console.log('PASS converted worksheet inventory values and citations');
 }
