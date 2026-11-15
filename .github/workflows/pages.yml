@@ -64,9 +64,11 @@ jobs:
           done
           exit 1
       - name: Install browser for document QA
+        id: document_browser
         run: |
           npm install --no-save --package-lock=false playwright@1.61.0
           npx playwright install --with-deps chromium
+          sudo apt-get install -y fonts-noto-cjk
       - name: Verify document QA in the published app
         env:
           DOCUMENT_QA_REPORT: document-qa-pdf-report.json
@@ -127,6 +129,9 @@ jobs:
         run: |
           sudo apt-get install -y fonts-noto-cjk
           DOCUMENT_QA_REPORT=document-qa-image-png-ja-report.json node tools/smoke-document-qa-image.mjs png ja
+      - name: Verify initial PDF, Excel and scan acceptance questions
+        if: ${{ !cancelled() && steps.document_browser.outcome == 'success' }}
+        run: node tools/smoke-document-qa-acceptance.mjs
       - name: Record document verification provenance
         if: always()
         env:
