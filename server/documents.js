@@ -230,9 +230,11 @@ function lookupTimetableCell(pages,question) {
   const query=question.normalize('NFKC').trim().toLowerCase().replace(/[?。]$/u,'');
   const verb=/^when does (?:the )?(.+?) (open|close)$/u.exec(query);
   const field=/^when is the (.+?) for (?:the )?(.+)$/u.exec(query);
-  if (!verb && !field) return null;
-  const subject=verb?.[1] ?? field[2];
-  const column=verb ? (verb[2]==='open' ? 'opening' : 'closing') : field[1];
+  const japanese=/^([^の、]+)の([^の、]+?時刻)(?:は(?:何時(?:ですか)?)?)?$/u.exec(query);
+  if (!verb && !field && !japanese) return null;
+  const subject=verb?.[1] ?? field?.[2] ?? japanese[1];
+  const column=verb ? (verb[2]==='open' ? 'opening' : 'closing') : field?.[1] ?? japanese[2];
+  const columnNames = new Set([column, japanese ? column.replace(/時刻$/u,'') : column+' time']);
   const matches=[];
   for (const [index,page] of pages.entries()) {
     const lines=page.split('\n').filter(line=>line.trim());
@@ -240,12 +242,12 @@ function lookupTimetableCell(pages,question) {
     const header=lines[0].split(' | ');
     const rows=lines.slice(1).map(line=>line.split(' | '));
     if (header.length<2 || rows.some(row=>row.length!==header.length)) continue;
-    const columns=header.flatMap((cell,i)=>i>0 && [column,column+' time'].includes(cell.trim().toLowerCase()) ? [i] : []);
+    const columns=header.flatMap((cell,i)=>i>0 && columnNames.has(cell.normalize('NFKC').trim().toLowerCase()) ? [i] : []);
     if (columns.length!==1) continue;
     for (const [rowIndex,row] of rows.entries()) {
-      if (row[0].trim().toLowerCase()!==subject) continue;
+      if (row[0].normalize('NFKC').trim().toLowerCase()!==subject) continue;
       const value=row[columns[0]].trim();
-      if (!/^(?:\d{1,2}(?::\d{2})?\s*[ap]\.?m\.?|\d{1,2}:\d{2})$/iu.test(value)) continue;
+      if (!/^(?:\d{1,2}(?::\d{2})?\s*[ap]\.?m\.?|\d{1,2}:\d{2}|(?:午前|午後)?\s*\d{1,2}\s*時(?:\s*\d{1,2}\s*分)?)$/iu.test(value.normalize('NFKC'))) continue;
       matches.push({label:header[columns[0]],answer:value,evidence:[
         {page:index+1,quote:lines[rowIndex+1]},{page:index+1,quote:lines[0]},
       ]});

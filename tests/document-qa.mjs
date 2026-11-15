@@ -357,3 +357,29 @@ console.log('PASS localized dismissal reads completion column and preserves sour
   }
   console.log('PASS repeated timetable headings distinguish closing and last admission');
 }
+
+{
+  const pages=[
+    '施設 | 開館時刻 | 閉館時刻\n図書館 | 9 AM | 3 PM',
+    '施設 | 開館時刻 | 最終⼊館時刻\n図書館 | 9 AM | 1 PM',
+  ];
+  const env={ROOMS:{idFromName:id=>id,get:()=>({
+    fetch:async url=>{
+      assert.ok(url.endsWith('/data'),'A confirmed timetable answer should bypass generation and cache');
+      return Response.json({pages,sourceType:'pdf',owner:'author'});
+    },
+  })}};
+  for (const [question,answer,page] of [
+    ['図書館の閉館時刻は？','3 PM',1],
+    ['図書館の最終入館時刻は？','1 PM',2],
+  ]) {
+    const request=new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+      method:'POST',body:JSON.stringify({question}),
+    });
+    const result=await (await documents(request,env,{uid:'author'})).json();
+    assert.equal(result.answer,answer);
+    const [heading,row]=pages[page-1].split('\n');
+    assert.deepEqual(result.items[0].evidence,[{page,quote:row},{page,quote:heading}]);
+  }
+  console.log('PASS Japanese timetable headings normalize compatible glyphs');
+}
