@@ -38,6 +38,8 @@ try {
   const guide = await url.inputValue();
   const inventoryChecks = [];
   let simulatedFailure = false;
+  let recoveryStarted;
+  let metadataRecoveryMs;
   try {
     assert.deepEqual(externalWrites,[]);
     const viewer = await browser.newPage();
@@ -85,6 +87,7 @@ try {
       await page.getByRole('alert').filter({hasText:'資料を読み込めませんでした'}).waitFor();
       assert.ok(simulatedFailure);
       assert.ok(metadataStatuses.includes(503));
+      recoveryStarted = performance.now();
       await page.getByRole('button',{name:'再読み込み',exact:true}).click();
     }
     await page.locator('#tab-ask').click().catch(cause => {
@@ -92,7 +95,10 @@ try {
         fixture,pageStatus:navigation?.status(),metadataStatuses,
       }),{cause});
     });
-    if (inventory) assert.ok(metadataStatuses.includes(200));
+    if (inventory) {
+      assert.ok(metadataStatuses.includes(200));
+      metadataRecoveryMs = Math.round(performance.now()-recoveryStarted);
+    }
     assert.equal(await page.locator('#pdf-page option').count(),sheets.length);
     if (inventory) {
       for (const [slot, branch, expected, cell, followup] of [
@@ -329,7 +335,7 @@ try {
     assert.deepEqual(removed,{removeStatus:200,reopenStatus:404,pdfStatus:404}); console.log('cleanup confirmed');
   }
   if (inventory && process.env.DOCUMENT_QA_REPORT) {
-    await writeFile(process.env.DOCUMENT_QA_REPORT, JSON.stringify({fixture,registrationMs,browserVersion:browser.version(),metadataRecovery:simulatedFailure,checks:inventoryChecks},null,2));
+    await writeFile(process.env.DOCUMENT_QA_REPORT, JSON.stringify({fixture,registrationMs,browserVersion:browser.version(),metadataRecovery:simulatedFailure,metadataRecoveryMs,checks:inventoryChecks},null,2));
   }
 } finally {
   await browser.close();
