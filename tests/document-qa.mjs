@@ -383,3 +383,33 @@ console.log('PASS localized dismissal reads completion column and preserves sour
   }
   console.log('PASS Japanese timetable headings normalize compatible glyphs');
 }
+
+{
+  const pages=[[
+    'Exhibition admission','Visitor | Fee','Students 420 yen','',
+    'Workshop admission','Visitor | Fee','Students | 650 yen',
+  ].join('\n')];
+  const env={ROOMS:{idFromName:id=>id,get:()=>({
+    fetch:async url=>{
+      assert.ok(url.endsWith('/data'),'A confirmed fee must bypass answer generation');
+      return Response.json({pages,sourceType:'pdf',owner:'author'});
+    },
+  })}};
+  for (const [title,answer,row] of [
+    ['Exhibition admission','420 yen','Students 420 yen'],
+    ['Workshop admission','650 yen','Students | 650 yen'],
+  ]) {
+    const request=new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+      method:'POST',
+      headers:{Accept:'application/x-ndjson'},
+      body:JSON.stringify({question:'What is the student '+title+' fee?'}),
+    });
+    const response=await documents(request,env,{uid:'author'});
+    assert.equal(response.status,200);
+    assert.deepEqual((await response.text()).trim().split('\n').map(JSON.parse),[
+      {item:{label:title,answer,evidence:[{page:1,quote:row},{page:1,quote:title}]}},
+      {done:true},
+    ]);
+  }
+  console.log('PASS adjacent fee tables preserve their own titles and values');
+}
