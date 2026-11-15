@@ -56,6 +56,7 @@ const retryScan = process.argv.includes('--retry-scan');
 const selectedFixtures = retryScan ? fixtures.filter(fixture=>fixture.label==='スキャンPDF') : fixtures;
 const total = selectedFixtures.reduce((count,fixture)=>count+fixture.questions.length,0);
 assert.equal(total,retryScan ? 2 : 13,'Unexpected acceptance question count');
+const scanFixturePath = process.env.DOCUMENT_QA_EXPORT_SCAN_FIXTURE;
 const browser = await chromium.launch();
 const failures = [];
 const measurements = [];
@@ -63,7 +64,7 @@ const registrations = [];
 const normalize = text=>text.normalize('NFKC').replace(/[\s、。，,]/gu,'');
 let passed = 0;
 try {
-  for (const fixture of selectedFixtures) {
+  for (const fixture of scanFixturePath ? fixtures.filter(fixture=>fixture.printedPageNumbers) : selectedFixtures) {
     const page = await browser.newPage();
     try {
       if (!fixture.excel) {
@@ -100,6 +101,11 @@ try {
         name:'acceptance.xlsx',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         buffer:await readFile(new URL('../tests/fixtures/document-qa-acceptance.xlsx',import.meta.url)),
       } : {name:'acceptance.pdf',mimeType:'application/pdf',buffer:await page.pdf()};
+      if (scanFixturePath) {
+        await writeFile(scanFixturePath,file.buffer);
+        console.log('Exported the synthetic page-number scan fixture');
+        continue;
+      }
       const session = await page.context().newCDPSession(page);
       const ocrDownloads = [];
       const ocrRequests = new Map();
@@ -178,12 +184,13 @@ try {
             const citations = await source.locator('a').allTextContents();
             const quotes = await source.locator('blockquote').allTextContents();
             const elapsedMs = Math.round(performance.now()-started);
-            const measurement = {fixture:fixture.label,question,answer,citations,quotes,elapsedMs,passed:false};
+            const measurement = {fixture:fixture.label,question,answer,citations,quotes,elapsedMs,passed:false,answerPassed:false,citationPassed:false,citationNavigation:null,firstAnswerWithinLimit:before===0 ? elapsedMs<=limits.firstAnswer : null};
             measurements.push(measurement);
             console.log(JSON.stringify({fixture:fixture.label,question,answer,citations,quotes,elapsedMs}));
             if (expected) {
               assert.match(answer,display,question);
               assert.doesNotMatch(answer,wrong,question);
+              measurement.answerPassed = true;
               assert.deepEqual(citations,['元のPDF '+sourcePage+'ページ'],question);
               if (cell) {
                 const addresses = (await source.locator(':scope > div').allTextContents()).flatMap(text=>text.split('、'));
@@ -196,9 +203,12 @@ try {
               }
             } else {
               assert.match(answer,fixture.excel ? /令和8年度.*令和9年度.*どの年度/u : /確認できません/u,question);
+              measurement.answerPassed = true;
               assert.deepEqual(citations,[],question);
             }
+            measurement.citationPassed = true;
             if (expected) {
+              measurement.citationNavigation = false;
               const otherPage = sourcePage===1 ? 2 : 1;
               await page.locator('#pdf-page').selectOption(String(otherPage));
               await page.waitForFunction(number=>document.querySelector('#pdf-page')?.value===String(number),otherPage);
@@ -243,8 +253,8 @@ try {
   await browser.close();
 }
 
-console.log('Acceptance questions passed: '+passed+'/'+total);
-if (process.env.DOCUMENT_QA_REPORT) {
+if (!scanFixturePath) console.log('Acceptance questions passed: '+passed+'/'+total);
+if (!scanFixturePath && process.env.DOCUMENT_QA_REPORT) {
   await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,network,limits,retryScan,commit:process.env.GITHUB_SHA ?? null,measuredAt:new Date().toISOString(),browser:browser.version(),registrations,measurements},null,2));
 }
 if (failures.length) throw new AggregateError(failures,'Document QA acceptance failed');
