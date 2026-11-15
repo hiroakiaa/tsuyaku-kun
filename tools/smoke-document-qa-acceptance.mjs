@@ -1,4 +1,4 @@
-import {readFile} from 'node:fs/promises';
+import {readFile,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 
@@ -26,6 +26,8 @@ const fixtures = [
 
 const browser = await chromium.launch();
 const failures = [];
+const measurements = [];
+const normalize = text=>text.normalize('NFKC').replace(/[\s、。，,.]/gu,'');
 let passed = 0;
 try {
   for (const fixture of fixtures) {
@@ -76,21 +78,36 @@ try {
             const answers = page.locator('#messages .answer-item');
             const before = await answers.count();
             await page.locator('#question').fill(question);
+            const started = performance.now();
             await page.locator('#ask-form button').click();
             await page.waitForFunction(count=>document.querySelectorAll('#messages .answer-item').length>count,before,{timeout:60_000});
             await page.locator('#ask-form button:enabled').waitFor({timeout:60_000});
             const answer = await answers.last().locator('.answer-text').textContent();
-            const citations = await answers.last().locator('.answer-source a').allTextContents();
-            console.log(JSON.stringify({fixture:fixture.label,question,answer,citations}));
+            const source = answers.last().locator('.answer-source');
+            const citations = await source.locator('a').allTextContents();
+            const quotes = await source.locator('blockquote').allTextContents();
+            const elapsedMs = Math.round(performance.now()-started);
+            const measurement = {fixture:fixture.label,question,answer,citations,quotes,elapsedMs,passed:false};
+            measurements.push(measurement);
+            console.log(JSON.stringify({fixture:fixture.label,question,answer,citations,quotes,elapsedMs}));
             if (expected) {
               assert.match(answer,expected,question);
               assert.doesNotMatch(answer,fixture.otherValue,question);
               assert.deepEqual(citations,['元のPDF '+sourcePage+'ページ'],question);
-              if (cell) assert.ok((await answers.last().locator('.answer-source').textContent()).includes(cell),question);
+              if (cell) {
+                const addresses = (await source.locator(':scope > div').allTextContents()).flatMap(text=>text.split('、'));
+                assert.ok(addresses.includes(cell),question);
+                assert.ok(quotes.some(quote=>normalize(quote).includes('AA4470円')),question);
+              } else {
+                const original = normalize(fixture.pages[sourcePage-1]);
+                const matching = quotes.map(normalize).find(quote=>original.includes(quote) && expected.test(quote));
+                assert.ok(matching,question+'の引用が原文に一致しません');
+              }
             } else {
               assert.match(answer,fixture.excel ? /令和8年度.*令和9年度.*どの年度/u : /確認できません/u,question);
               assert.deepEqual(citations,[],question);
             }
+            measurement.passed = true;
             passed++;
           } catch (error) {
             failures.push(error);
@@ -126,4 +143,7 @@ try {
 }
 
 console.log('Acceptance questions passed: '+passed+'/6');
+if (process.env.DOCUMENT_QA_REPORT) {
+  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total:6,measurements},null,2));
+}
 if (failures.length) throw new AggregateError(failures,'Document QA acceptance failed');
