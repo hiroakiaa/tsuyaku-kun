@@ -127,7 +127,7 @@ jobs:
         env:
           CHECK_OUTCOME: ${{ job.status }}
         run: |
-          node --input-type=module -e 'import fs from "node:fs"; const { GITHUB_SHA: commit, GITHUB_RUN_ID: run, GITHUB_RUN_ATTEMPT: attempt, CHECK_OUTCOME: outcome } = process.env; const reports = fs.readdirSync(".").filter(name => /^document-qa-.*-report[.]json$/.test(name)).sort(); fs.writeFileSync("document-qa-run.json", JSON.stringify({commit, run, attempt, outcome, recordedAt:new Date().toISOString(), reports}, null, 2));'
+          node --input-type=module -e 'import fs from "node:fs"; const { GITHUB_SHA: commit, GITHUB_RUN_ID: run, GITHUB_RUN_ATTEMPT: attempt, GITHUB_EVENT_NAME: trigger, CHECK_OUTCOME: outcome } = process.env; const reports = fs.readdirSync(".").filter(name => /^document-qa-.*-report[.]json$/.test(name)).sort(); fs.writeFileSync("document-qa-run.json", JSON.stringify({commit, run, attempt, trigger, outcome, recordedAt:new Date().toISOString(), reports}, null, 2));'
       - name: Save document verification results
         if: always()
         uses: actions/upload-artifact@v4
