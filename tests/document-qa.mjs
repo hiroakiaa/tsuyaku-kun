@@ -225,6 +225,15 @@ for (const viewer of ['author','another-user']) {
     assert.equal(response.status,404,path);
   }
 }
+const expiredEnv = {ROOMS:{idFromName:name=>name,get:()=>({
+  fetch:(url,options)=>documentStorage(new Request(url,options),{get:async()=>expiredRecord}),
+})}};
+for (const uid of ['author','another-user']) {
+  const response = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+    method:'POST',body:JSON.stringify({question:'資料の内容は？'}),
+  }),expiredEnv,{uid});
+  assert.equal(response.status,404,uid);
+}
 const activeEntry = {id:'active',expires:privateRecord.expires};
 const expiredEntry = {id:'expired',expires:expiredRecord.expires};
 const libraryResponse = await documentStorage(new Request('https://room/document/library'),{
@@ -232,7 +241,7 @@ const libraryResponse = await documentStorage(new Request('https://room/document
 });
 assert.equal(libraryResponse.status,200);
 assert.deepEqual(await libraryResponse.json(),[activeEntry]);
-console.log('PASS expired shared document metadata and PDF are unavailable');
+console.log('PASS expired shared document metadata, PDF and QA are unavailable');
 const expiredStorage = new Map();
 let scheduledExpiration;
 const documentStore = {
