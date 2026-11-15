@@ -92,21 +92,6 @@ jobs:
         env:
           DOCUMENT_QA_REPORT: document-qa-word-report.json
         run: node tools/smoke-document-qa-word.mjs
-      - name: Save document verification results
-        uses: actions/upload-artifact@v4
-        with:
-          name: document-qa-tables-report
-          path: |
-            document-qa-pdf-report.json
-            document-qa-long-pdf-report.json
-            document-qa-dense-pdf-report.json
-            document-qa-pdf-limits-report.json
-            document-qa-tables-report.json
-            document-qa-merged-report.json
-            document-qa-zero-report.json
-            document-qa-wide-report.json
-            document-qa-word-report.json
-          if-no-files-found: error
       - name: Verify image OCR and citations in the published app
         run: node tools/smoke-document-qa-image.mjs png en --append
       - name: Verify JPEG and WebP OCR in the published app
@@ -117,3 +102,26 @@ jobs:
         run: |
           sudo apt-get install -y fonts-noto-cjk
           node tools/smoke-document-qa-image.mjs png ja
+      - name: Record document verification provenance
+        if: always()
+        env:
+          CHECK_OUTCOME: ${{ job.status }}
+        run: |
+          node --input-type=module -e 'import fs from "node:fs"; const { GITHUB_SHA: commit, GITHUB_RUN_ID: run, GITHUB_RUN_ATTEMPT: attempt, CHECK_OUTCOME: outcome } = process.env; const reports = fs.readdirSync(".").filter(name => /^document-qa-.*-report[.]json$/.test(name)).sort(); fs.writeFileSync("document-qa-run.json", JSON.stringify({commit, run, attempt, outcome, recordedAt:new Date().toISOString(), reports}, null, 2));'
+      - name: Save document verification results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: document-qa-tables-report
+          path: |
+            document-qa-run.json
+            document-qa-pdf-report.json
+            document-qa-long-pdf-report.json
+            document-qa-dense-pdf-report.json
+            document-qa-pdf-limits-report.json
+            document-qa-tables-report.json
+            document-qa-merged-report.json
+            document-qa-zero-report.json
+            document-qa-wide-report.json
+            document-qa-word-report.json
+          if-no-files-found: error
