@@ -118,6 +118,8 @@ try {
           if (!['pdf','document-table-lookup.js','document-tagged-table.js','pdf.min.mjs','pdf.worker.min.mjs'].includes(name)) return [];
           return [{name, startMs:Math.round(start - submitEpoch), durationMs:Math.round(entry.duration)}];
         }), {submitEpoch, requestEpoch:requestedAt.epoch});
+      assert.ok(!preRequestResources.some(({name}) => name === 'document-table-lookup.js' || name === 'document-tagged-table.js'),
+        'Converted Excel questions must use the saved worksheet data without loading local PDF table analysis');
       const clickToSubmitEventMs = submitEpoch - startedEpoch;
       const submitEventToRequestMs = requestedAt.epoch - submitEpoch;
       const submitToRequestMs = Math.round(requestedAt.monotonic - started);

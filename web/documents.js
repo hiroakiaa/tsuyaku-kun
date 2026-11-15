@@ -224,6 +224,7 @@ function teacher() {
         const converted=await convertDocument(file);
         data.set('pdf',converted.file);
         data.set('converted','1');
+        if (/\.xlsx$/i.test(file.name)) data.set('convertedWorksheet','1');
         const pages = converted.image ? await extract(converted.file,document.createElement('span')) : converted.pages;
         data.set('pages',JSON.stringify(pages));
       }
@@ -1001,7 +1002,7 @@ async function reader() {
     status.textContent = '資料から答えを探しています…';
     log.scrollTop = log.scrollHeight;
     try {
-      if (sourceType==='pdf' && (/の/.test(question) || /^what is the .+ (?:for|of) /i.test(question))) {
+      if (sourceType==='pdf' && (!doc.convertedWorksheet || materials.length) && (/の/.test(question) || /^what is the .+ (?:for|of) /i.test(question))) {
         let item;
         try {
           const {lookupTableCell}=await import('./document-table-lookup.js?v=84');
