@@ -44,7 +44,9 @@ const network = process.argv.includes('--limited-network') ? {
   latency:150,downloadThroughput:4_000_000/8,uploadThroughput:1_000_000/8,offline:false,
 } : null;
 const limits = network ? {registration:30_000,firstAnswer:15_000} : {registration:15_000,firstAnswer:8_000};
-const total = fixtures.reduce((count,fixture)=>count+fixture.questions.length,0);
+const retryScan = process.argv.includes('--retry-scan');
+const selectedFixtures = retryScan ? fixtures.filter(fixture=>fixture.scan && !fixture.lowResolution) : fixtures;
+const total = selectedFixtures.reduce((count,fixture)=>count+fixture.questions.length,0);
 const browser = await chromium.launch();
 const failures = [];
 const measurements = [];
@@ -52,7 +54,7 @@ const registrations = [];
 const normalize = text=>text.normalize('NFKC').replace(/[\s、。，,]/gu,'');
 let passed = 0;
 try {
-  for (const fixture of fixtures) {
+  for (const fixture of selectedFixtures) {
     const page = await browser.newPage();
     try {
       if (!fixture.excel) {
@@ -100,27 +102,40 @@ try {
         ocrDownloads.push({name:request.name,ms:Math.round((timestamp-request.timestamp)*1000),bytes:encodedDataLength});
         ocrRequests.delete(requestId);
       });
+      if (retryScan) {
+        await page.route(/\/web\/document-ocr\.js\?v=\d+$/u,async route=>{
+          const response = await route.fetch();
+          const source = await response.text();
+          const candidate = source.replace('export async function createPdfOcr() {',
+            "let initialAttempt = true;\nexport async function createPdfOcr() {\n  if (initialAttempt) { initialAttempt = false; throw Error('OCRの一時エラー'); }");
+          assert.notEqual(candidate,source,'OCR initialization entry point missing');
+          await route.fulfill({response,body:candidate});
+        });
+      }
       if (network) await session.send('Network.emulateNetworkConditions',network);
       await page.goto('https://hiroakiaa.github.io/tsuyaku-kun/documents.html');
       await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
       await page.locator('#upload input[name=title]').fill('自動受入確認 '+fixture.label);
       const uploadStarted = performance.now();
       await page.locator('#upload input[type=file]').setInputFiles(file);
-      if (!fixture.excel) await page.getByText('PDFの文字を確認しました。',{exact:true}).waitFor({timeout:120_000});
-      const ocrStages = fixture.scan ? await page.evaluate(()=>Object.fromEntries(
+      if (retryScan) await page.getByText('OCRの一時エラー',{exact:true}).waitFor({timeout:120_000});
+      else if (!fixture.excel) await page.getByText('PDFの文字を確認しました。',{exact:true}).waitFor({timeout:120_000});
+      const readOcrStages = ()=>page.evaluate(()=>Object.fromEntries(
         ['initialization','render','recognition'].map(stage=>[
           stage,performance.getEntriesByName('document-ocr:'+stage,'measure').map(entry=>Math.round(entry.duration)),
         ]),
-      )) : null;
+      ));
+      let ocrStages = fixture.scan && !retryScan ? await readOcrStages() : null;
       const registrationStarted = performance.now();
       await page.locator('#upload button').click();
       await page.waitForFunction(()=>Boolean(document.querySelector('#guide-url')?.value),null,{timeout:120_000});
       const guide = await page.locator('#guide-url').inputValue();
       const finished = performance.now();
+      if (retryScan) ocrStages = await readOcrStages();
       const registration = {
         fixture:fixture.label,elapsedMs:Math.round(finished-uploadStarted),
         preflightMs:Math.round(registrationStarted-uploadStarted),submitMs:Math.round(finished-registrationStarted),
-        ocrDownloads,ocrStages,pageCount:null,deleted:false,
+        ocrDownloads,ocrStages,retriedAfterReadFailure:retryScan,pageCount:null,deleted:false,
       };
       registrations.push(registration);
       try {
@@ -216,6 +231,6 @@ try {
 
 console.log('Acceptance questions passed: '+passed+'/'+total);
 if (process.env.DOCUMENT_QA_REPORT) {
-  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,network,limits,commit:process.env.GITHUB_SHA ?? null,measuredAt:new Date().toISOString(),browser:browser.version(),registrations,measurements},null,2));
+  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,network,limits,retryScan,commit:process.env.GITHUB_SHA ?? null,measuredAt:new Date().toISOString(),browser:browser.version(),registrations,measurements},null,2));
 }
 if (failures.length) throw new AggregateError(failures,'Document QA acceptance failed');

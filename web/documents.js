@@ -195,7 +195,9 @@ function teacher() {
     preflight = {file,pending};
     status.textContent = 'PDFの文字を確認しています…';
     const {error} = await pending;
-    if (preflight?.pending===pending && !$('#upload button').disabled) {
+    if (preflight?.pending!==pending) return;
+    if (error) preflight = undefined;
+    if (!$('#upload button').disabled) {
       status.textContent = error?.message || 'PDFの文字を確認しました。';
     }
   });
