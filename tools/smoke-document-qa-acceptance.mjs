@@ -53,10 +53,10 @@ const network = process.argv.includes('--limited-network') ? {
 } : null;
 const limits = network ? {registration:30_000,firstAnswer:15_000} : {registration:15_000,firstAnswer:8_000};
 const retryScan = process.argv.includes('--retry-scan');
-const bestOcr = process.argv.includes('--ocr-best-model');
-const selectedFixtures = bestOcr ? fixtures.filter(fixture=>fixture.printedPageNumbers) : retryScan ? fixtures.filter(fixture=>fixture.label==='スキャンPDF') : fixtures;
+const binarizedOcr = process.argv.includes('--ocr-binarized');
+const selectedFixtures = binarizedOcr ? fixtures.filter(fixture=>fixture.printedPageNumbers) : retryScan ? fixtures.filter(fixture=>fixture.label==='スキャンPDF') : fixtures;
 const total = selectedFixtures.reduce((count,fixture)=>count+fixture.questions.length,0);
-assert.equal(total,(retryScan || bestOcr) ? 2 : 13,'Unexpected acceptance question count');
+assert.equal(total,(retryScan || binarizedOcr) ? 2 : 13,'Unexpected acceptance question count');
 const browser = await chromium.launch();
 const failures = [];
 const measurements = [];
@@ -127,13 +127,24 @@ try {
           await route.fulfill({response,body:candidate});
         });
       }
-      if (bestOcr) {
+      if (binarizedOcr) {
         await page.route(/\/web\/document-ocr\.js\?v=\d+$/u,async route=>{
           const response = await route.fetch();
           const source = await response.text();
-          const candidate = source.replace('    workerPath:',
-            "    langPath:'https://raw.githubusercontent.com/tesseract-ocr/tessdata_best/4.1.0',\n    gzip:false,\n    cachePath:'document-ocr-best-4.1.0',\n    workerPath:");
-          assert.notEqual(candidate,source,'OCR worker configuration missing');
+          const marker = "        const recognitionStarted = performance.now();";
+          const preprocessing = [
+            "        const ctx = canvas.getContext('2d');",
+            "        const image = ctx.getImageData(0,0,canvas.width,canvas.height);",
+            "        for (let offset=0;offset<image.data.length;offset+=4) {",
+            "          const luminance = 0.299*image.data[offset]+0.587*image.data[offset+1]+0.114*image.data[offset+2];",
+            "          const value = luminance<175 ? 0 : 255;",
+            "          image.data[offset] = image.data[offset+1] = image.data[offset+2] = value;",
+            "        }",
+            "        ctx.putImageData(image,0,0);",
+            marker,
+          ].join("\n");
+          assert.ok(source.includes(marker),'OCR processing entry point missing');
+          const candidate = source.replace(marker,preprocessing);
           await route.fulfill({response,body:candidate});
         });
       }
@@ -256,6 +267,6 @@ try {
 
 console.log('Acceptance questions passed: '+passed+'/'+total);
 if (process.env.DOCUMENT_QA_REPORT) {
-  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,network,limits,retryScan,bestOcr,commit:process.env.GITHUB_SHA ?? null,measuredAt:new Date().toISOString(),browser:browser.version(),registrations,measurements},null,2));
+  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,network,limits,retryScan,binarizedOcr,commit:process.env.GITHUB_SHA ?? null,measuredAt:new Date().toISOString(),browser:browser.version(),registrations,measurements},null,2));
 }
 if (failures.length) throw new AggregateError(failures,'Document QA acceptance failed');
