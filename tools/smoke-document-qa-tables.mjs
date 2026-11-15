@@ -79,7 +79,12 @@ try {
         await page.locator('#ask-form button:enabled').waitFor();
         if (!cell) {
           assert.equal(await answer.locator('.answer-source').count(),0);
-          console.log('Blank inventory cell matched without citations');
+          await page.reload();
+          await page.locator('#tab-ask').click();
+          const restored = page.locator('#messages .bubble').last();
+          await restored.getByText(expected,{exact:true}).waitFor();
+          assert.equal(await restored.locator('.answer-source').count(),0);
+          console.log('Blank inventory answer restored after reload without citations');
           continue;
         }
         const addresses = (await answer.locator('.answer-source > div').allTextContents()).flatMap(line=>line.split('、'));
