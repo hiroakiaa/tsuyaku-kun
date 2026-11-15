@@ -80,12 +80,15 @@ const summary = ['full','search'].map(mode=>{
   const retrievalSamples = samples.filter(row=>row.expectedPageCount && row.missingCandidatePages!==null);
   const expectedCandidates = retrievalSamples.reduce((sum,row)=>sum+row.expectedPageCount,0);
   const missedCandidates = retrievalSamples.reduce((sum,row)=>sum+row.missingCandidatePages.length,0);
+  const returnedCandidates = retrievalSamples.reduce((sum,row)=>sum+new Set(row.candidatePages).size,0);
   return {mode, expectedCases:selectedCases.length, unmeasuredCases:selectedCases.length-samples.length, cases:samples.length, passed,
     accuracy:complete && samples.length ? passed/samples.length : null,
     retrieval: {
       measuredCases:retrievalSamples.length,
       expectedPages:expectedCandidates,
       missedPages:missedCandidates,
+      returnedPages:returnedCandidates,
+      precision:returnedCandidates ? (expectedCandidates-missedCandidates)/returnedCandidates : null,
       recall:expectedCandidates ? 1-missedCandidates/expectedCandidates : null,
     },
     citationPages: {
