@@ -30,6 +30,14 @@ const fixtures = [
     pages:['窓口の発行手数料は260円です。','郵送の発行手数料は780円です。'],
     questions:[['窓口の発行手数料はいくら？',/260\s*円/u],['窓口の支払方法は何ですか？',null]],
   },
+  {
+    label:'万円表記PDF',
+    pages:['講習会の参加費は1万500円です。','年間の施設利用料は1.2万円です。'],
+    questions:[
+      ['講習会の参加費を円単位で教えてください。',/(?:1\s*万\s*500|10,?500)\s*円/u,1,,/(?<![\d,万])500\s*円/u],
+      ['年間の施設利用料を円単位で教えてください。',/(?:1\.2\s*万|12,?000)\s*円/u,2,,/(?<![\d.,万])2\s*万円/u],
+    ],
+  },
 ];
 
 const total = fixtures.reduce((count,fixture)=>count+fixture.questions.length,0);
@@ -37,7 +45,7 @@ const browser = await chromium.launch();
 const failures = [];
 const measurements = [];
 const registrations = [];
-const normalize = text=>text.normalize('NFKC').replace(/[\s、。，,.]/gu,'');
+const normalize = text=>text.normalize('NFKC').replace(/[\s、。，,]/gu,'');
 let passed = 0;
 try {
   for (const fixture of fixtures) {
