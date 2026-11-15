@@ -84,21 +84,39 @@ try {
         name:'acceptance.xlsx',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         buffer:await readFile(new URL('../tests/fixtures/document-qa-acceptance.xlsx',import.meta.url)),
       } : {name:'acceptance.pdf',mimeType:'application/pdf',buffer:await page.pdf()};
-      if (network) {
-        const session = await page.context().newCDPSession(page);
-        await session.send('Network.enable');
-        await session.send('Network.emulateNetworkConditions',network);
-      }
+      const session = await page.context().newCDPSession(page);
+      const ocrDownloads = [];
+      const ocrRequests = new Map();
+      await session.send('Network.enable');
+      session.on('Network.requestWillBeSent',({requestId,request,timestamp})=>{
+        const name = new URL(request.url).pathname.split('/').pop();
+        if (/^(?:tesseract.*\.js|worker\.min\.js|tesseract.*\.wasm|(?:jpn|eng)\.traineddata(?:\.gz)?)$/u.test(name)) {
+          ocrRequests.set(requestId,{name,timestamp});
+        }
+      });
+      session.on('Network.loadingFinished',({requestId,timestamp,encodedDataLength})=>{
+        const request = ocrRequests.get(requestId);
+        if (!request) return;
+        ocrDownloads.push({name:request.name,ms:Math.round((timestamp-request.timestamp)*1000),bytes:encodedDataLength});
+        ocrRequests.delete(requestId);
+      });
+      if (network) await session.send('Network.emulateNetworkConditions',network);
       await page.goto('https://hiroakiaa.github.io/tsuyaku-kun/documents.html');
       await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
       await page.locator('#upload input[name=title]').fill('自動受入確認 '+fixture.label);
       const uploadStarted = performance.now();
       await page.locator('#upload input[type=file]').setInputFiles(file);
       if (!fixture.excel) await page.getByText('PDFの文字を確認しました。',{exact:true}).waitFor({timeout:120_000});
+      const registrationStarted = performance.now();
       await page.locator('#upload button').click();
       await page.waitForFunction(()=>Boolean(document.querySelector('#guide-url')?.value),null,{timeout:120_000});
       const guide = await page.locator('#guide-url').inputValue();
-      const registration = {fixture:fixture.label,elapsedMs:Math.round(performance.now()-uploadStarted),pageCount:null,deleted:false};
+      const finished = performance.now();
+      const registration = {
+        fixture:fixture.label,elapsedMs:Math.round(finished-uploadStarted),
+        preflightMs:Math.round(registrationStarted-uploadStarted),submitMs:Math.round(finished-registrationStarted),
+        ocrDownloads,pageCount:null,deleted:false,
+      };
       registrations.push(registration);
       try {
         if (registration.elapsedMs>limits.registration) failures.push(Error(fixture.label+' registration exceeded '+limits.registration+' ms'));
