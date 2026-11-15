@@ -36,6 +36,7 @@ try {
   await page.waitForFunction(()=>Boolean(document.querySelector('#guide-url')?.value),null,{timeout:120000}).catch(async e=>{throw Error(await page.locator('#upload-status').textContent(),{cause:e});});
   const registrationMs = Math.round(performance.now()-registrationStarted);
   const guide = await url.inputValue();
+  const inventoryChecks = [];
   try {
     assert.deepEqual(externalWrites,[]);
     const viewer = await browser.newPage();
@@ -72,11 +73,14 @@ try {
         ['午後','本館','3台','C4'],
         ['午後','分館','6台','D4'],
       ]) {
-        await page.locator('#question').fill(followup ?? 'プロジェクターの'+slot+'の'+branch+'の在庫は？');
+        const question = followup ?? 'プロジェクターの'+slot+'の'+branch+'の在庫は？';
+        await page.locator('#question').fill(question);
+        const started = performance.now();
         await page.locator('#ask-form button').click();
         const answer = page.locator('#messages .bubble').last();
         await answer.getByText(expected,{exact:true}).waitFor({timeout:30000});
         await page.locator('#ask-form button:enabled').waitFor();
+        const elapsedMs = Math.round(performance.now()-started);
         if (!cell) {
           assert.equal(await answer.locator('.answer-source').count(),0);
           await page.reload();
@@ -84,6 +88,7 @@ try {
           const restored = page.locator('#messages .bubble').last();
           await restored.getByText(expected,{exact:true}).waitFor();
           assert.equal(await restored.locator('.answer-source').count(),0);
+          inventoryChecks.push({question,expected,elapsedMs,addresses:[],page:null,restoredAfterReload:true});
           console.log('Blank inventory answer restored after reload without citations');
           continue;
         }
@@ -91,6 +96,7 @@ try {
         const expectedCells = ['A3', slot === '午前' ? 'B3' : 'B4', 'C1', branch === '本館' ? 'C2' : 'D2', cell];
         assert.deepEqual(addresses.sort(), expectedCells.sort().map(address=>'貸出備品表 · '+address));
         assert.deepEqual(await answer.locator('.answer-source a').allTextContents(),['元のPDF 1ページ']);
+        inventoryChecks.push({question,expected,elapsedMs,addresses,page:1});
         console.log('Inventory answer and citation matched:',expected,cell,1);
       }
     } else {
@@ -290,6 +296,9 @@ try {
       return {removeStatus:response.status,reopenStatus:reopened.status,pdfStatus:pdf.status};
     },guide);
     assert.deepEqual(removed,{removeStatus:200,reopenStatus:404,pdfStatus:404}); console.log('cleanup confirmed');
+  }
+  if (inventory && process.env.DOCUMENT_QA_REPORT) {
+    await writeFile(process.env.DOCUMENT_QA_REPORT, JSON.stringify({fixture,registrationMs,browserVersion:browser.version(),checks:inventoryChecks},null,2));
   }
 } finally {
   await browser.close();
