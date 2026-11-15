@@ -65,7 +65,10 @@ try {
       assert.deepEqual(await sources.locator('a').allTextContents(),['元のPDF '+expectedPage+'ページ']);
       const quotes = await sources.locator('blockquote').allTextContents();
       assert.ok(quotes.some(quote=>normalize(quote)===normalize(candidates[0])),'Missing full quote for '+year+' '+school+' '+cell);
-      checks.push({kind:'answer',year,cell,page:expectedPage,elapsedMs});
+      await sources.getByRole('link',{name:'元のPDF '+expectedPage+'ページ',exact:true}).click();
+      await page.waitForFunction(expected =>
+        document.querySelector('#pdf-page')?.value===String(expected),expectedPage);
+      checks.push({kind:'answer',year,cell,page:expectedPage,elapsedMs,citationNavigation:true});
       console.log(year,school,cell,expectedPage,'full answer matched');
     }
   } finally {
