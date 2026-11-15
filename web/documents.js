@@ -1122,6 +1122,14 @@ async function reader() {
       const retry = append(status,'button','再試行');
       retry.type = 'button';
       retry.onclick = () => void sendQuestion(question,previousQuestion,true);
+      const edit = append(status,'button','質問を編集');
+      edit.type = 'button';
+      edit.onclick = () => {
+        const field = $('#question');
+        if (!field.value.trim()) field.value = question;
+        field.focus();
+        field.setSelectionRange(field.value.length,field.value.length);
+      };
     }
     finally { button.disabled = false; }
   }
