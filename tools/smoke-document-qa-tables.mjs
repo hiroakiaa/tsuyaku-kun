@@ -73,7 +73,8 @@ try {
         const answer = page.locator('#messages .bubble').last();
         await answer.getByText(expected,{exact:true}).waitFor({timeout:30000});
         await page.locator('#ask-form button:enabled').waitFor();
-        assert.ok((await answer.locator('.answer-source > div').allTextContents()).includes('貸出備品表 · '+cell));
+        const addresses = (await answer.locator('.answer-source > div').allTextContents()).flatMap(line=>line.split('、'));
+        assert.ok(addresses.includes('貸出備品表 · '+cell), JSON.stringify(addresses));
         assert.deepEqual(await answer.locator('.answer-source a').allTextContents(),['元のPDF 1ページ']);
         console.log('Inventory answer and citation matched:',expected,cell,1);
       }
