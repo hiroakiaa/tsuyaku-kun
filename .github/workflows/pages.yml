@@ -143,11 +143,11 @@ jobs:
         env:
           DOCUMENT_QA_REPORT: document-qa-acceptance-retry-report.json
         run: node tools/smoke-document-qa-acceptance.mjs --retry-scan
-      - name: Compare OCR after masking the text page number
+      - name: Compare independent browser-based Japanese OCR
         if: ${{ !cancelled() && steps.document_browser.outcome == 'success' }}
         env:
-          DOCUMENT_QA_REPORT: document-qa-acceptance-ocr-mask-page-number-report.json
-        run: node tools/smoke-document-qa-acceptance.mjs --ocr-mask-page-number
+          DOCUMENT_QA_REPORT: document-qa-acceptance-ndl-ocr-report.json
+        run: node tools/smoke-document-qa-acceptance.mjs --compare-ndl-ocr
       - name: Record document verification provenance
         if: always()
         env:
@@ -164,7 +164,7 @@ jobs:
             document-qa-acceptance-report.json
             document-qa-acceptance-limited-report.json
             document-qa-acceptance-retry-report.json
-            document-qa-acceptance-ocr-mask-page-number-report.json
+            document-qa-acceptance-ndl-ocr-report.json
             document-qa-pdf-report.json
             document-qa-long-pdf-report.json
             document-qa-long-pdf-report-comparison.md

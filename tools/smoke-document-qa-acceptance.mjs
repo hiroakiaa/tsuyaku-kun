@@ -53,10 +53,10 @@ const network = process.argv.includes('--limited-network') ? {
 } : null;
 const limits = network ? {registration:30_000,firstAnswer:15_000} : {registration:15_000,firstAnswer:8_000};
 const retryScan = process.argv.includes('--retry-scan');
-const maskedPageNumber = process.argv.includes('--ocr-mask-page-number');
-const selectedFixtures = maskedPageNumber ? fixtures.filter(fixture=>fixture.printedPageNumbers) : retryScan ? fixtures.filter(fixture=>fixture.label==='スキャンPDF') : fixtures;
+const compareNdlOcr = process.argv.includes('--compare-ndl-ocr');
+const selectedFixtures = compareNdlOcr ? fixtures.filter(fixture=>fixture.printedPageNumbers) : retryScan ? fixtures.filter(fixture=>fixture.label==='スキャンPDF') : fixtures;
 const total = selectedFixtures.reduce((count,fixture)=>count+fixture.questions.length,0);
-assert.equal(total,(retryScan || maskedPageNumber) ? 2 : 13,'Unexpected acceptance question count');
+assert.equal(total,(retryScan || compareNdlOcr) ? 2 : 13,'Unexpected acceptance question count');
 const browser = await chromium.launch();
 const failures = [];
 const measurements = [];
@@ -127,27 +127,24 @@ try {
           await route.fulfill({response,body:candidate});
         });
       }
-      if (maskedPageNumber) {
-        await page.route(/\/web\/document-ocr\.js\?v=\d+$/u,async route=>{
-          const response = await route.fetch();
-          const source = await response.text();
-          const marker = "        const recognitionStarted = performance.now();";
-          const preprocessing = [
-            "        const {items} = await page.getTextContent();",
-            "        const text = items.filter(item=>item.str?.trim());",
-            "        if (text.length===1 && text[0].str.trim()===String(page.pageNumber)) {",
-            "          const {width,height,transform} = text[0];",
-            "          const [x,y] = viewport.convertToViewportPoint(transform[4],transform[5]);",
-            "          const ctx = canvas.getContext('2d');",
-            "          ctx.fillStyle = '#fff';",
-            "          ctx.fillRect(x-2,y-height*viewport.scale-2,width*viewport.scale+4,height*viewport.scale+4);",
-            "        }",
-            marker,
-          ].join("\n");
-          assert.ok(source.includes(marker),'OCR processing entry point missing');
-          const candidate = source.replace(marker,preprocessing);
-          await route.fulfill({response,body:candidate});
-        });
+      if (compareNdlOcr) {
+        await page.context().route('**/*',route=>['GET','HEAD','OPTIONS'].includes(route.request().method())
+          ? route.continue() : route.abort());
+        const started = performance.now();
+        await page.goto('https://ndlocr-liteweb.netlify.app/');
+        await page.locator('input[type=file]').setInputFiles(file);
+        await page.getByRole('button',{name:/認識を開始|Start OCR|Start Recognition/i}).click({timeout:120_000});
+        const pages = page.locator('.result-sidebar-item');
+        for (const [index,expected] of fixture.pages.entries()) {
+          await pages.nth(index).click({timeout:120_000});
+          const extracted = await page.locator('.result-panel .full-text').textContent({timeout:120_000});
+          const match = normalize(extracted).includes(normalize(expected));
+          console.log(JSON.stringify({engine:'NDLOCR-Lite',page:index+1,expected,extracted,match,
+            elapsedMs:Math.round(performance.now()-started)}));
+          if (match) passed++;
+          else failures.push(Error('OCR source mismatch on page '+(index+1)));
+        }
+        continue;
       }
       if (network) await session.send('Network.emulateNetworkConditions',network);
       await page.goto('https://hiroakiaa.github.io/tsuyaku-kun/documents.html');
@@ -268,6 +265,6 @@ try {
 
 console.log('Acceptance questions passed: '+passed+'/'+total);
 if (process.env.DOCUMENT_QA_REPORT) {
-  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,network,limits,retryScan,maskedPageNumber,commit:process.env.GITHUB_SHA ?? null,measuredAt:new Date().toISOString(),browser:browser.version(),registrations,measurements},null,2));
+  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,network,limits,retryScan,compareNdlOcr,commit:process.env.GITHUB_SHA ?? null,measuredAt:new Date().toISOString(),browser:browser.version(),registrations,measurements},null,2));
 }
 if (failures.length) throw new AggregateError(failures,'Document QA acceptance failed');
