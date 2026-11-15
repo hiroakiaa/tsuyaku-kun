@@ -37,7 +37,7 @@ jobs:
         run: |
           mkdir -p site/web site/server
           cp index.html documents.html site/
-          cp web/* site/web/
+          cp -R web/. site/web/
           cp server/catalog.js site/server/
           node --input-type=module -e 'import fs from "node:fs"; fs.writeFileSync("site/web/release-checks.json", JSON.stringify({commit:process.env.GITHUB_SHA,run:process.env.GITHUB_RUN_ID,preparedAt:new Date().toISOString(),checks:["npm test"]}));'
       - uses: actions/configure-pages@v5

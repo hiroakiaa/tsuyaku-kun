@@ -144,7 +144,7 @@ try {
       if (retryScan) await page.getByText('OCRの一時エラー',{exact:true}).waitFor({timeout:120_000});
       else if (!fixture.excel) await page.getByText('PDFの文字を確認しました。',{exact:true}).waitFor({timeout:120_000});
       const readOcrStages = ()=>page.evaluate(()=>Object.fromEntries(
-        ['initialization','render','recognition','native-recognition','full-recognition'].map(stage=>[
+        ['initialization','render','recognition','native-recognition','full-recognition','horizontal-recognition'].map(stage=>[
           stage,performance.getEntriesByName('document-ocr:'+stage,'measure').map(entry=>Math.round(entry.duration)),
         ]),
       ));
