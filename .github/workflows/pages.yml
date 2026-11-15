@@ -3,6 +3,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      verification_only:
+        description: Verify the published app without deploying
+        type: boolean
+        default: false
   schedule:
     - cron: '23 20 * * 0'
 permissions:
@@ -11,7 +16,7 @@ permissions:
   id-token: write
 concurrency:
   group: pages
-  cancel-in-progress: ${{ github.event_name != 'schedule' }}
+  cancel-in-progress: ${{ github.event_name != 'schedule' && !inputs.verification_only }}
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -28,7 +33,7 @@ jobs:
         run: |
           node tools/evaluate-document-qa.mjs docs/document-qa-current-benchmark.json --baseline-five --require-pass
           node tools/evaluate-document-qa.mjs docs/document-qa-same-fees-timing.json --two-fees --require-pass --require-retrieval
-      - if: github.event_name != 'schedule'
+      - if: github.event_name != 'schedule' && !inputs.verification_only
         run: |
           mkdir -p site/web site/server
           cp index.html documents.html site/
@@ -36,17 +41,17 @@ jobs:
           cp server/catalog.js site/server/
           node --input-type=module -e 'import fs from "node:fs"; fs.writeFileSync("site/web/release-checks.json", JSON.stringify({commit:process.env.GITHUB_SHA,run:process.env.GITHUB_RUN_ID,preparedAt:new Date().toISOString(),checks:["npm test"]}));'
       - uses: actions/configure-pages@v5
-        if: github.event_name != 'schedule'
+        if: github.event_name != 'schedule' && !inputs.verification_only
       - uses: actions/upload-pages-artifact@v3
-        if: github.event_name != 'schedule'
+        if: github.event_name != 'schedule' && !inputs.verification_only
         with:
           name: github-pages-${{ github.run_attempt }}
           path: site
       - name: Wait for artifact availability
-        if: github.event_name != 'schedule'
+        if: github.event_name != 'schedule' && !inputs.verification_only
         run: sleep 30
       - name: Deploy
-        if: github.event_name != 'schedule'
+        if: github.event_name != 'schedule' && !inputs.verification_only
         id: deployment
         uses: actions/deploy-pages@v4
         with:
