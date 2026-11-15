@@ -142,6 +142,7 @@ jobs:
             document-qa-run.json
             document-qa-pdf-report.json
             document-qa-long-pdf-report.json
+            document-qa-long-pdf-report-comparison.md
             document-qa-dense-pdf-report.json
             document-qa-pdf-limits-report.json
             document-qa-tables-report.json

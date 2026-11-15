@@ -262,12 +262,16 @@ try {
           usage?.prompt_tokens_details?.cached_tokens ?? '—',
           timing?.retrievalMs ?? '—',timing?.generationMs ?? '—',
           estimatedGenerationUSD?.toFixed(7) ?? '—'].join(' | ')+' |');
-      await appendFile(process.env.GITHUB_STEP_SUMMARY,[
+      const comparisonTable = [
         '', '### 団体見学の回答比較', '',
         '| 方式 | 候補ページ数 | 入力トークン | キャッシュ済み | 検索 ms | 生成 ms | 推定生成費 USD |',
         '| --- | ---: | ---: | ---: | ---: | ---: | ---: |',
         ...rows,'',
-      ].join('\n'));
+      ].join('\n');
+      await appendFile(process.env.GITHUB_STEP_SUMMARY,comparisonTable);
+      if (process.env.DOCUMENT_QA_REPORT) {
+        await writeFile(process.env.DOCUMENT_QA_REPORT.replace(/\.json$/,'-comparison.md'),comparisonTable);
+      }
     }
     await appendFile(process.env.GITHUB_STEP_SUMMARY,[
       '',
