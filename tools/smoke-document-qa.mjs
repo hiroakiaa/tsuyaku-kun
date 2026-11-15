@@ -198,6 +198,17 @@ try {
           }
           return results;
         });
+        const ratesUSDPerMillion = {input:0.4,cachedInput:0.1,output:1.6};
+        groupVisitEvidence.ratesUSDPerMillion = ratesUSDPerMillion;
+        for (const measurement of groupVisitEvidence.comparison) {
+          const {usage} = measurement;
+          const input = usage?.prompt_tokens;
+          const cached = usage?.prompt_tokens_details?.cached_tokens;
+          const output = usage?.completion_tokens;
+          measurement.estimatedGenerationUSD = [input,cached,output].every(Number.isFinite)
+            ? ((input-cached)*ratesUSDPerMillion.input+cached*ratesUSDPerMillion.cachedInput+output*ratesUSDPerMillion.output)/1e6
+            : null;
+        }
         for (const {mode,candidatePages,items} of groupVisitEvidence.comparison) {
           assert.ok([6,21].every(number=>candidatePages.includes(number)),mode+' omitted a required page');
           if (mode==='search') assert.ok(candidatePages.length<pageCount,'Search did not narrow the candidates');
