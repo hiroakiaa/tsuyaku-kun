@@ -62,7 +62,7 @@ try {
     await page.locator('#tab-ask').click();
     assert.equal(await page.locator('#pdf-page option').count(),sheets.length);
     const measurements=[];
-    for(const [question,value,source] of [
+    const questions = [
       ['令和9年度の青空高校の特進の入試定員は？','20','R9入試表 · C4'],
       ['令和9年度の会議室の子どもの休日料金は？',expectedR9Fee,wide ? 'R9料金表 · AA4' : merged ? 'R9料金表 · D3' : 'R9料金表 · D4'],
       ['説明会の午後組の開始時刻は？','14:00','R9予定表 · C4'],
@@ -73,7 +73,10 @@ try {
       ['R9',expectedR9Fee,wide ? 'R9料金表 · AA4' : merged ? 'R9料金表 · D3' : 'R9料金表 · D4'],
       ['説明会の午後組の開始時刻は？','14:00','R9予定表 · C4'],
       ['午前組は？','10:00','R9予定表 · C3'],
-    ]){
+    ];
+    const reverseOpening = process.argv.includes('--reverse-opening');
+    if (reverseOpening) questions.splice(0, 2, questions[1], questions[0]);
+    for (const [question,value,source] of questions) {
       if (question==='子どもは？') {
         await page.reload();
         await page.locator('#tab-ask').click();
@@ -191,7 +194,7 @@ try {
     const result = {
       commit:release.commit, measuredAt:new Date().toISOString(),
       platform:process.platform, browserVersion:browser.version(),
-      fixture, registrationMs, questions:measurements,
+      fixture, registrationMs, reverseOpening, questions:measurements,
     };
     console.log(JSON.stringify(result));
     if (process.env.DOCUMENT_QA_REPORT) await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify(result,null,2));

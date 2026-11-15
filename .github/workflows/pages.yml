@@ -79,6 +79,10 @@ jobs:
         env:
           DOCUMENT_QA_REPORT: document-qa-merged-report.json
         run: node tools/smoke-document-qa-tables.mjs --merged
+      - name: Verify the same opening questions in reverse order
+        env:
+          DOCUMENT_QA_REPORT: document-qa-merged-reversed-report.json
+        run: node tools/smoke-document-qa-tables.mjs --merged --reverse-opening
       - name: Verify zero-valued merged cells in the published app
         env:
           DOCUMENT_QA_REPORT: document-qa-zero-report.json
@@ -130,6 +134,7 @@ jobs:
             document-qa-pdf-limits-report.json
             document-qa-tables-report.json
             document-qa-merged-report.json
+            document-qa-merged-reversed-report.json
             document-qa-zero-report.json
             document-qa-wide-report.json
             document-qa-image-*-report.json
