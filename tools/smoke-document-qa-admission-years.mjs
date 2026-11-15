@@ -34,40 +34,39 @@ try {
     assert.deepEqual(externalWrites,[]);
     await page.goto(guide);
     await page.locator('#tab-ask').click();
-    const clarification = page.waitForResponse(r=>r.url().endsWith('/ask')&&r.request().method()==='POST');
-    await page.locator('#question').fill('青空高校の一般入試の基準は？');
-    const started = performance.now();
-    await page.locator('#ask-form button').click();
-    const clarificationEvents=(await (await clarification).text()).trim().split('\n').map(JSON.parse);
-    const clarificationItems=clarificationEvents.flatMap(event=>event.item?[event.item]:event.replaceItems??[]);
-    assert.match(clarificationItems.map(item=>item.answer).join(' '),/令和8年度.*令和9年度.*どの年度/);
-    assert.equal(clarificationItems.flatMap(item=>item.evidence??[]).length,0);
-    await page.waitForFunction(()=>!document.querySelector('#ask-form button').disabled);
-    const bubble = page.locator('#messages .bubble').last();
-    await bubble.getByText(/令和8年度.*令和9年度.*どの年度/).waitFor();
-    checks.push({kind:'clarification', elapsedMs:Math.round(performance.now()-started)});
-    console.log('clarification matched');
-    for(const [year,school,cell] of [[9,'青空','J2'],[8,'青空','J2']]){
-      const response=page.waitForResponse(r=>r.url().endsWith('/ask')&&r.request().method()==='POST',{timeout:30000});
-      await page.locator('#question').fill(year===9 ? 'R9' : '令和'+year+'年度の'+school+'の一般入試の基準は？');
+    const answers = page.locator('#messages .bubble:not(.user)');
+    async function ask(question) {
+      const index = await answers.count();
+      await page.locator('#question').fill(question);
       const started = performance.now();
       await page.locator('#ask-form button').click();
-      const events=(await (await response).text()).trim().split('\n').map(JSON.parse);
-      const cited=events.flatMap(event=>event.item?.evidence??[]).find(e=>e.quote.startsWith(cell+' '));
-      assert.ok(cited,'Missing '+year+' '+school+' '+cell);
-      assert.doesNotMatch(cited.quote,/ヒツヨウ$|バアイカ$/);
-      const normalize = value => value.normalize('NFKC').replace(/\s+/g,'');
+      const bubble = answers.nth(index);
+      await bubble.locator('.answer-text').waitFor();
+      await page.locator('#ask-form button:enabled').waitFor();
+      return {bubble, elapsedMs:Math.round(performance.now()-started)};
+    }
+
+    const clarification = await ask('青空高校の一般入試の基準は？');
+    assert.match(await clarification.bubble.locator('.answer-text').textContent(),/令和8年度.*令和9年度.*どの年度/);
+    assert.equal(await clarification.bubble.locator('.answer-source').count(),0);
+    checks.push({kind:'clarification',elapsedMs:clarification.elapsedMs});
+    console.log('clarification matched');
+    for (const year of [9,8]) {
+      const school = '青空';
+      const cell = 'J2';
       const expectedPage = year - 7;
-      assert.equal(cited.page,expectedPage);
+      const normalize = value => value.normalize('NFKC').replace(/\s+/g,'');
       const candidates = sheets.filter(sheet => normalize(sheet.text.split('\n')[0]).includes('R'+year)).flatMap(sheet => sheet.text.split('\n').filter(line=>normalize(line).includes(school)).flatMap(line=>line.split(' | '))).filter(entry=>entry.startsWith(cell+' '));
       assert.equal(candidates.length,1,'Source row must resolve uniquely for '+year+' '+school);
-      assert.ok(normalize(candidates[0]).includes(normalize(cited.quote)),'Quote mismatch for '+year+' '+school);
-      const answers = events.flatMap(event=>event.item?[event.item]:event.replaceItems??[]).map(item=>normalize(item.answer));
-      assert.deepEqual(answers,[normalize(candidates[0].slice(cell.length + 1))],'Answer differs from full source cell for '+year+' '+school);
-      await page.locator('#messages .bubble').last().getByText(events.flatMap(event=>event.item?[event.item]:event.replaceItems??[])[0].answer,{exact:true}).waitFor();
-      checks.push({kind:'answer', year, cell, page:cited.page, elapsedMs:Math.round(performance.now()-started)});
-      console.log(year,school,cell,cited.page,'full answer matched');
-      await page.waitForFunction(()=>!document.querySelector('#ask-form button').disabled);
+      const {bubble,elapsedMs} = await ask(year===9 ? 'R9' : '令和'+year+'年度の'+school+'の一般入試の基準は？');
+      const displayed = (await bubble.locator('.answer-text').allTextContents()).map(normalize);
+      assert.deepEqual(displayed,[normalize(candidates[0].slice(cell.length + 1))]);
+      const sources = bubble.locator('.answer-source');
+      assert.deepEqual(await sources.locator('a').allTextContents(),['元のPDF '+expectedPage+'ページ']);
+      const quotes = await sources.locator('blockquote').allTextContents();
+      assert.ok(quotes.some(quote=>normalize(quote)===normalize(candidates[0])),'Missing full quote for '+year+' '+school+' '+cell);
+      checks.push({kind:'answer',year,cell,page:expectedPage,elapsedMs});
+      console.log(year,school,cell,expectedPage,'full answer matched');
     }
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
