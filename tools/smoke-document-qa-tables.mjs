@@ -2,10 +2,11 @@ import {readFile,appendFile,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 
+const inventory = process.argv.includes('--inventory');
 const zero = process.argv.includes('--zero');
 const merged = zero || process.argv.includes('--merged');
 const wide = process.argv.includes('--wide');
-const fixture = wide ? 'document-qa-wide.xlsx' : zero ? 'document-qa-zero.xlsx' : merged ? 'document-qa-merged.xlsx' : 'document-qa-tables.xlsx';
+const fixture = inventory ? 'document-qa-inventory.xlsx' : wide ? 'document-qa-wide.xlsx' : zero ? 'document-qa-zero.xlsx' : merged ? 'document-qa-merged.xlsx' : 'document-qa-tables.xlsx';
 const expectedR9Fee = zero ? '0' : merged ? '900円' : '450円';
 const browser = await chromium.launch();
 try {
@@ -28,7 +29,7 @@ try {
     const {officePages}=await import('./web/document-office.js');
     return officePages(document.querySelector('#upload input[type=file]').files[0],{includeMerges:true});
   });
-  assert.equal(sheets.length,4);
+  assert.equal(sheets.length,inventory ? 1 : 4);
   const registrationStarted = performance.now();
   await page.locator('#upload button').click();
   const url = page.locator('#guide-url');
@@ -61,6 +62,22 @@ try {
     await page.goto(guide);
     await page.locator('#tab-ask').click();
     assert.equal(await page.locator('#pdf-page option').count(),sheets.length);
+    if (inventory) {
+      for (const [slot, branch, expected, cell] of [
+        ['午前','分館','2台','D3'],
+        ['午後','本館','3台','C4'],
+        ['午後','分館','6台','D4'],
+      ]) {
+        await page.locator('#question').fill('プロジェクターの'+slot+'の'+branch+'の在庫は？');
+        await page.locator('#ask-form button').click();
+        const answer = page.locator('#messages .bubble').last();
+        await answer.getByText(expected,{exact:true}).waitFor({timeout:30000});
+        await page.locator('#ask-form button:enabled').waitFor();
+        assert.ok((await answer.locator('.answer-source > div').allTextContents()).includes('貸出備品表 · '+cell));
+        assert.deepEqual(await answer.locator('.answer-source a').allTextContents(),['元のPDF 1ページ']);
+        console.log('Inventory answer and citation matched:',expected,cell,1);
+      }
+    } else {
     const measurements=[];
     const questions = [
       ['令和9年度の青空高校の特進の入試定員は？','20','R9入試表 · C4'],
@@ -237,6 +254,7 @@ try {
         ...rows,
         '',
       ].join('\n'));
+    }
     }
   } finally {
     const removed = await page.evaluate(async documentUrl=>{

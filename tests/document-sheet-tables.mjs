@@ -150,3 +150,25 @@ for (const [body,expected] of [
   const result = await response.json();
   assert.deepEqual(result.items.map(item=>[item.answer,item.evidence.at(-1)?.cell]),expected);
 }
+
+{
+  const archivePages = [
+    '貸出備品表\nA1 備品 | B1 貸出枠 | C1 在庫\nC2 本館 | D2 分館\nA3 プロジェクター | B3 午前 | C3 8台 | D3 2台\nB4 午後 | C4 3台 | D4 6台\n結合セル範囲: C1:D1, A3:A4',
+  ];
+  const archiveEnv = {ROOMS:{idFromName:x=>x,get:()=>({fetch:async()=>Response.json({pages:archivePages,sourceType:'pdf',convertedWorksheet:true})})}};
+  for (const [slot, branch, expected, cell] of [
+    ['午前','分館','2台','D3'],
+    ['午後','本館','3台','C4'],
+    ['午後','分館','6台','D4'],
+  ]) {
+    const question = 'プロジェクターの'+slot+'の'+branch+'の在庫は？';
+    const request = new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+      method:'POST',body:JSON.stringify({question}),
+    });
+    const result = await (await documents(request,archiveEnv,{uid:'test'})).json();
+    assert.equal(result.answer,expected,question);
+    const evidence = result.items[0].evidence.at(-1);
+    assert.deepEqual([evidence.sheet,evidence.cell,evidence.page],['貸出備品表',cell,1],question);
+  }
+  console.log('PASS converted worksheet inventory values and citations');
+}

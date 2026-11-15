@@ -94,6 +94,8 @@ jobs:
         env:
           DOCUMENT_QA_REPORT: document-qa-wide-report.json
         run: node tools/smoke-document-qa-tables.mjs --wide
+      - name: Verify inventory worksheet answers and citations
+        run: node tools/smoke-document-qa-tables.mjs --inventory
       - name: Verify ambiguous admission years in the published app
         env:
           DOCUMENT_QA_REPORT: document-qa-admission-years-report.json
