@@ -330,9 +330,13 @@ try {
       });
       const reopened = await fetch(endpoint,{headers,cache:'no-store'});
       const pdf = await fetch(endpoint+'/pdf',{headers,cache:'no-store'});
-      return {removeStatus:response.status,reopenStatus:reopened.status,pdfStatus:pdf.status};
+      const answer = await fetch(endpoint+'/ask',{
+        method:'POST',headers:{...headers,'Content-Type':'application/json'},
+        body:JSON.stringify({question:'資料の内容を教えてください。'}),
+      });
+      return {removeStatus:response.status,reopenStatus:reopened.status,pdfStatus:pdf.status,askStatus:answer.status};
     },guide);
-    assert.deepEqual(removed,{removeStatus:200,reopenStatus:404,pdfStatus:404}); console.log('cleanup confirmed');
+    assert.deepEqual(removed,{removeStatus:200,reopenStatus:404,pdfStatus:404,askStatus:404}); console.log('cleanup confirmed');
   }
   if (inventory && process.env.DOCUMENT_QA_REPORT) {
     await writeFile(process.env.DOCUMENT_QA_REPORT, JSON.stringify({fixture,registrationMs,browserVersion:browser.version(),metadataRecovery:simulatedFailure,metadataRecoveryMs,checks:inventoryChecks},null,2));
