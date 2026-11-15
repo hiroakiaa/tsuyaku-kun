@@ -7,7 +7,7 @@ const dense = process.argv.includes('--dense');
 const atPageLimit = process.argv.includes('--page-limit');
 const long = atPageLimit || dense || process.argv.includes('--long');
 const groupVisit = process.argv.includes('--long');
-const gardenNotes = dense ? 'Planting beds are watered in the early morning. Seed packets are stored in labelled drawers. Volunteers record rainfall and rotate the crops. '.repeat(5) : '';
+const gardenNotes = dense || groupVisit ? 'Planting beds are watered in the early morning. Seed packets are stored in labelled drawers. Volunteers record rainfall and rotate the crops. '.repeat(dense ? 5 : 2) : '';
 const padding = long ? Array.from({length:atPageLimit ? 37 : 25},(_,i)=>
   '<p style="break-before:page">School garden notices and planting instructions. Section '+(i+1)+'. '+gardenNotes+(groupVisit && i===3 ? ' Group visits must be booked at least 14 days before the visit.' : groupVisit && i===18 ? ' Group visit cancellations must be received at least 3 days before the visit.' : '')+'</p>').join('') : '';
 const scanPage = atPageLimit ? 40 : long ? 28 : 3;
