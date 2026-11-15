@@ -177,6 +177,28 @@ try {
         assert.match(await item.locator('blockquote').textContent(),quote);
       }
       groupVisitEvidence = {pages:[6,21],elapsedMs:Math.round(performance.now()-started)};
+      if (process.argv.includes('--compare-search')) {
+        groupVisitEvidence.comparison = await page.evaluate(async () => {
+          const {config} = await import('./web/config.js');
+          const {getApp} = await import('https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js');
+          const {getAuth} = await import('https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js');
+          const auth = getAuth(getApp());
+          await auth.authStateReady();
+          const token = await auth.currentUser.getIdToken();
+          const id = new URL(location.href).searchParams.get('id');
+          const results = [];
+          for (const mode of ['full','search']) {
+            const response = await fetch(config.api+'/documents/'+id+'/ask',{
+              method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+              body:JSON.stringify({question:'For group visits, how many days in advance must I book and cancel? Answer each separately.',benchmarkMode:mode}),
+            });
+            if (!response.ok) throw Error('Group visit comparison returned '+response.status);
+            const {candidatePages,items,usage,timing} = await response.json();
+            results.push({mode,candidatePages,items,usage,timing});
+          }
+          return results;
+        });
+      }
     }
     const releaseUrl = new URL('./web/release-checks.json',guide);
     releaseUrl.searchParams.set('check',String(Date.now()));

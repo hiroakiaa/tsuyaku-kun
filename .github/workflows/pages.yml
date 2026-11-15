@@ -69,7 +69,7 @@ jobs:
       - name: Verify long PDF citations in the published app
         env:
           DOCUMENT_QA_REPORT: document-qa-long-pdf-report.json
-        run: node tools/smoke-document-qa.mjs --long
+        run: node tools/smoke-document-qa.mjs --long --compare-search
       - name: Verify dense PDF citations in the published app
         env:
           DOCUMENT_QA_REPORT: document-qa-dense-pdf-report.json
