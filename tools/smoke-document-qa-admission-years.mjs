@@ -1,10 +1,12 @@
 import {fileURLToPath} from 'node:url';
+import {writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 
 const browser = await chromium.launch();
 try {
   const page = await browser.newPage();
+  const checks = [];
   const externalWrites = [];
   page.on('request',request=>{
     const url = new URL(request.url());
@@ -34,16 +36,21 @@ try {
     await page.locator('#tab-ask').click();
     const clarification = page.waitForResponse(r=>r.url().endsWith('/ask')&&r.request().method()==='POST');
     await page.locator('#question').fill('青空高校の一般入試の基準は？');
+    const started = performance.now();
     await page.locator('#ask-form button').click();
     const clarificationEvents=(await (await clarification).text()).trim().split('\n').map(JSON.parse);
     const clarificationItems=clarificationEvents.flatMap(event=>event.item?[event.item]:event.replaceItems??[]);
     assert.match(clarificationItems.map(item=>item.answer).join(' '),/令和8年度.*令和9年度.*どの年度/);
     assert.equal(clarificationItems.flatMap(item=>item.evidence??[]).length,0);
     await page.waitForFunction(()=>!document.querySelector('#ask-form button').disabled);
+    const bubble = page.locator('#messages .bubble').last();
+    await bubble.getByText(/令和8年度.*令和9年度.*どの年度/).waitFor();
+    checks.push({kind:'clarification', elapsedMs:Math.round(performance.now()-started)});
     console.log('clarification matched');
     for(const [year,school,cell] of [[9,'青空','J2'],[8,'青空','J2']]){
       const response=page.waitForResponse(r=>r.url().endsWith('/ask')&&r.request().method()==='POST',{timeout:30000});
       await page.locator('#question').fill(year===9 ? 'R9' : '令和'+year+'年度の'+school+'の一般入試の基準は？');
+      const started = performance.now();
       await page.locator('#ask-form button').click();
       const events=(await (await response).text()).trim().split('\n').map(JSON.parse);
       const cited=events.flatMap(event=>event.item?.evidence??[]).find(e=>e.quote.startsWith(cell+' '));
@@ -57,6 +64,8 @@ try {
       assert.ok(normalize(candidates[0]).includes(normalize(cited.quote)),'Quote mismatch for '+year+' '+school);
       const answers = events.flatMap(event=>event.item?[event.item]:event.replaceItems??[]).map(item=>normalize(item.answer));
       assert.deepEqual(answers,[normalize(candidates[0].slice(cell.length + 1))],'Answer differs from full source cell for '+year+' '+school);
+      await page.locator('#messages .bubble').last().getByText(events.flatMap(event=>event.item?[event.item]:event.replaceItems??[])[0].answer,{exact:true}).waitFor();
+      checks.push({kind:'answer', year, cell, page:cited.page, elapsedMs:Math.round(performance.now()-started)});
       console.log(year,school,cell,cited.page,'full answer matched');
       await page.waitForFunction(()=>!document.querySelector('#ask-form button').disabled);
     }
@@ -75,13 +84,9 @@ try {
     },guide);
     assert.equal(removed,200);
   }
+  if (process.env.DOCUMENT_QA_REPORT) {
+    await writeFile(process.env.DOCUMENT_QA_REPORT, JSON.stringify({checks, browserVersion:browser.version()}, null, 2));
+  }
 } finally {
   await browser.close();
 }
-
-
-
-
-
-
-

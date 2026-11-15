@@ -81,6 +81,8 @@ jobs:
           DOCUMENT_QA_REPORT: document-qa-wide-report.json
         run: node tools/smoke-document-qa-tables.mjs --wide
       - name: Verify ambiguous admission years in the published app
+        env:
+          DOCUMENT_QA_REPORT: document-qa-admission-years-report.json
         run: node tools/smoke-document-qa-admission-years.mjs
       - name: Verify PDF upload boundaries in the published app
         run: node tools/smoke-document-qa-pdf-limits.mjs
@@ -124,4 +126,5 @@ jobs:
             document-qa-zero-report.json
             document-qa-wide-report.json
             document-qa-word-report.json
+            document-qa-admission-years-report.json
           if-no-files-found: error
