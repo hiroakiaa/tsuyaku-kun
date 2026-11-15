@@ -53,10 +53,10 @@ const network = process.argv.includes('--limited-network') ? {
 } : null;
 const limits = network ? {registration:30_000,firstAnswer:15_000} : {registration:15_000,firstAnswer:8_000};
 const retryScan = process.argv.includes('--retry-scan');
-const highResolution = process.argv.includes('--ocr-higher-resolution');
-const selectedFixtures = highResolution ? fixtures.filter(fixture=>fixture.printedPageNumbers) : retryScan ? fixtures.filter(fixture=>fixture.label==='スキャンPDF') : fixtures;
+const sparseOcr = process.argv.includes('--ocr-sparse-text');
+const selectedFixtures = sparseOcr ? fixtures.filter(fixture=>fixture.printedPageNumbers) : retryScan ? fixtures.filter(fixture=>fixture.label==='スキャンPDF') : fixtures;
 const total = selectedFixtures.reduce((count,fixture)=>count+fixture.questions.length,0);
-assert.equal(total,(retryScan || highResolution) ? 2 : 13,'Unexpected acceptance question count');
+assert.equal(total,(retryScan || sparseOcr) ? 2 : 13,'Unexpected acceptance question count');
 const browser = await chromium.launch();
 const failures = [];
 const measurements = [];
@@ -127,12 +127,13 @@ try {
           await route.fulfill({response,body:candidate});
         });
       }
-      if (highResolution) {
+      if (sparseOcr) {
         await page.route(/\/web\/document-ocr\.js\?v=\d+$/u,async route=>{
           const response = await route.fetch();
           const source = await response.text();
-          const candidate = source.replace('Math.min(3,2400/','Math.min(4,3200/');
-          assert.notEqual(candidate,source,'OCR scale configuration missing');
+          const candidate = source.replace('  recordTiming(timingNames[0],start);',
+            "  await worker.setParameters({tessedit_pageseg_mode:'11'});\n  recordTiming(timingNames[0],start);");
+          assert.notEqual(candidate,source,'OCR initialization completion missing');
           await route.fulfill({response,body:candidate});
         });
       }
@@ -255,6 +256,6 @@ try {
 
 console.log('Acceptance questions passed: '+passed+'/'+total);
 if (process.env.DOCUMENT_QA_REPORT) {
-  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,network,limits,retryScan,highResolution,commit:process.env.GITHUB_SHA ?? null,measuredAt:new Date().toISOString(),browser:browser.version(),registrations,measurements},null,2));
+  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,network,limits,retryScan,sparseOcr,commit:process.env.GITHUB_SHA ?? null,measuredAt:new Date().toISOString(),browser:browser.version(),registrations,measurements},null,2));
 }
 if (failures.length) throw new AggregateError(failures,'Document QA acceptance failed');

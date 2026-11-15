@@ -64,10 +64,19 @@ try {
       await viewer.close();
     }
     const metadataStatuses = [];
+    const metadataFailures = [];
     const documentId = new URL(guide).searchParams.get('id');
     page.on('response', response => {
       if (response.request().method()==='GET' && new URL(response.url()).pathname==='/documents/'+documentId) {
         metadataStatuses.push(response.status());
+        if (!response.ok()) metadataFailures.push(response.json().then(body=>{
+          const message = typeof body?.error==='string' ? body.error : '';
+          const reason = /different request|request context|I[/]O on behalf/iu.test(message) ? 'worker-request-context'
+            : /認証|ログイン/u.test(message) ? 'authentication'
+            : /資料が見つか|共有が終了/u.test(message) ? 'document-not-found'
+            : message ? 'other-error-body' : 'no-error-body';
+          return {status:response.status(),reason};
+        }).catch(()=>({status:response.status(),reason:'non-json-response'})));
       }
     });
     if (inventory) {
@@ -90,9 +99,9 @@ try {
       recoveryStarted = performance.now();
       await page.getByRole('button',{name:'再読み込み',exact:true}).click();
     }
-    await page.locator('#tab-ask').click().catch(cause => {
+    await page.locator('#tab-ask').click().catch(async cause => {
       throw Error('Worksheet question tab unavailable: '+JSON.stringify({
-        fixture,pageStatus:navigation?.status(),metadataStatuses,
+        fixture,pageStatus:navigation?.status(),metadataStatuses,metadataFailures:await Promise.all(metadataFailures),
       }),{cause});
     });
     if (inventory) {

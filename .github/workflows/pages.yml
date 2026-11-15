@@ -143,11 +143,11 @@ jobs:
         env:
           DOCUMENT_QA_REPORT: document-qa-acceptance-retry-report.json
         run: node tools/smoke-document-qa-acceptance.mjs --retry-scan
-      - name: Compare higher resolution for scanned page citations
+      - name: Compare sparse-text OCR for scanned page citations
         if: ${{ !cancelled() && steps.document_browser.outcome == 'success' }}
         env:
-          DOCUMENT_QA_REPORT: document-qa-acceptance-ocr-resolution-report.json
-        run: node tools/smoke-document-qa-acceptance.mjs --limited-network --ocr-higher-resolution
+          DOCUMENT_QA_REPORT: document-qa-acceptance-ocr-sparse-report.json
+        run: node tools/smoke-document-qa-acceptance.mjs --limited-network --ocr-sparse-text
       - name: Record document verification provenance
         if: always()
         env:
@@ -164,7 +164,7 @@ jobs:
             document-qa-acceptance-report.json
             document-qa-acceptance-limited-report.json
             document-qa-acceptance-retry-report.json
-            document-qa-acceptance-ocr-resolution-report.json
+            document-qa-acceptance-ocr-sparse-report.json
             document-qa-pdf-report.json
             document-qa-long-pdf-report.json
             document-qa-long-pdf-report-comparison.md
