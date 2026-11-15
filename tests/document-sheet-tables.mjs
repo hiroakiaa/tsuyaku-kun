@@ -177,5 +177,15 @@ for (const [body,expected] of [
     assert.deepEqual(result.items.flatMap(item=>item.evidence.map(e=>[e.sheet,e.cell,e.page])),
       expectedCells.map(address=>['貸出備品表',address,1]),question);
   }
+  const followup = await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+    method:'POST',body:JSON.stringify({
+      question:'午後は？',
+      previousQuestion:'プロジェクターの午前の分館の在庫は？',
+    }),
+  }),archiveEnv,{uid:'test'});
+  const result = await followup.json();
+  assert.equal(result.answer,'6台');
+  assert.deepEqual(result.items[0].evidence.map(e=>[e.sheet,e.cell,e.page]),
+    ['A3','B4','C1','D2','D4'].map(cell=>['貸出備品表',cell,1]));
   console.log('PASS converted worksheet inventory values and citations');
 }

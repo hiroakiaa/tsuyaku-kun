@@ -63,13 +63,14 @@ try {
     await page.locator('#tab-ask').click();
     assert.equal(await page.locator('#pdf-page option').count(),sheets.length);
     if (inventory) {
-      for (const [slot, branch, expected, cell] of [
+      for (const [slot, branch, expected, cell, followup] of [
         ['午前','分館','2台','D3'],
+        ['午後','分館','6台','D4','午後は？'],
         ['午前','本館','該当セルは空欄です。',null],
         ['午後','本館','3台','C4'],
         ['午後','分館','6台','D4'],
       ]) {
-        await page.locator('#question').fill('プロジェクターの'+slot+'の'+branch+'の在庫は？');
+        await page.locator('#question').fill(followup ?? 'プロジェクターの'+slot+'の'+branch+'の在庫は？');
         await page.locator('#ask-form button').click();
         const answer = page.locator('#messages .bubble').last();
         await answer.getByText(expected,{exact:true}).waitFor({timeout:30000});
