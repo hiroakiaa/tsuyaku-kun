@@ -6,9 +6,10 @@ const atSizeLimit = process.argv.includes('--size-limit');
 const dense = process.argv.includes('--dense');
 const atPageLimit = process.argv.includes('--page-limit');
 const long = atPageLimit || dense || process.argv.includes('--long');
+const groupVisit = process.argv.includes('--long');
 const gardenNotes = dense ? 'Planting beds are watered in the early morning. Seed packets are stored in labelled drawers. Volunteers record rainfall and rotate the crops. '.repeat(5) : '';
 const padding = long ? Array.from({length:atPageLimit ? 37 : 25},(_,i)=>
-  '<p style="break-before:page">School garden notices and planting instructions. Section '+(i+1)+'. '+gardenNotes+'</p>').join('') : '';
+  '<p style="break-before:page">School garden notices and planting instructions. Section '+(i+1)+'. '+gardenNotes+(groupVisit && i===3 ? ' Group visits must be booked at least 14 days before the visit.' : groupVisit && i===18 ? ' Group visit cancellations must be received at least 3 days before the visit.' : '')+'</p>').join('') : '';
 const scanPage = atPageLimit ? 40 : long ? 28 : 3;
 const scanCitation = '元のPDF '+scanPage+'ページ';
 const browser = await chromium.launch();
@@ -162,6 +163,21 @@ try {
     assert.deepEqual(await citationNames(closing),['元のPDF 1ページ','元のPDF 2ページ']);
     assert.equal(await missingFee.count(),1);
     assert.deepEqual(await citationNames(missingFee),[]);
+    let groupVisitEvidence;
+    if (groupVisit) {
+      await page.locator('#question').fill('For group visits, how many days in advance must I book and cancel? Answer each separately.');
+      const started = performance.now();
+      await page.locator('#ask-form button').click();
+      await page.locator('#ask-form button:enabled').waitFor();
+      const answer = page.locator('#messages .bubble').last();
+      for (const [days, number, quote] of [[14,6,/booked at least 14 days/i],[3,21,/cancellations must be received at least 3 days/i]]) {
+        const item = answer.locator('.answer-item').filter({has:page.locator('.answer-text').filter({hasText:new RegExp('\\b'+days+'\\s+days','i')})});
+        assert.equal(await item.count(),1);
+        assert.deepEqual(await citationNames(item),['元のPDF '+number+'ページ']);
+        assert.match(await item.locator('blockquote').textContent(),quote);
+      }
+      groupVisitEvidence = {pages:[6,21],elapsedMs:Math.round(performance.now()-started)};
+    }
     const releaseUrl = new URL('./web/release-checks.json',guide);
     releaseUrl.searchParams.set('check',String(Date.now()));
     const releaseResponse = await page.request.get(releaseUrl.href);
@@ -173,7 +189,7 @@ try {
       commit,pageCount,fileBytes:pdf.length,
       fixture:atPageLimit ? '40-page-mixed-pdf' : dense ? '28-page-dense-mixed-pdf' : long ? '28-page-mixed-pdf' : 'mixed-text-and-scan-pdf',preflightMs,registrationMs,libraryMs,poolMs,combinedMs,
       measuredAt:new Date().toISOString(), platform:process.platform,browserVersion:browser.version(),
-      combinedEvidence,missingEvidence,
+      combinedEvidence,missingEvidence,groupVisitEvidence,
     };
   } finally {
     const removed = await page.evaluate(async documentUrl=>{

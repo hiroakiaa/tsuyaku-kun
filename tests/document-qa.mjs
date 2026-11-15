@@ -413,3 +413,28 @@ console.log('PASS localized dismissal reads completion column and preserves sour
   }
   console.log('PASS adjacent fee tables preserve their own titles and values');
 }
+
+{
+  const guide = Array.from({length:24},()=> '展示室では写真を撮影できます。'.repeat(48));
+  guide[5] = '団体見学の予約は利用日の14日前までに申し込んでください。';
+  guide[20] = '団体見学のキャンセルは利用日の3日前までに連絡してください。';
+  const expectedPages = [6,21];
+  try {
+    globalThis.fetch = async (_url,{body})=>{
+      const {資料:passages} = JSON.parse(JSON.parse(body).messages[1].content);
+      assert.ok(expectedPages.every(page=>passages.some(passage=>passage.page===page)));
+      return Response.json({choices:[{finish_reason:'stop',message:{content:JSON.stringify({
+        items:[{label:'団体見学',answer:'予約は14日前まで、キャンセルは3日前までです。',
+          sources:expectedPages.map(page=>({page,quote:guide[page-1]}))}],
+      })}}]});
+    };
+    const result = await evaluateDocumentQuestion({OPENAI_DOCUMENT_QA_KEY:'test'},guide,
+      '団体見学の予約とキャンセルはそれぞれ何日前まで？','search');
+    assert.ok(expectedPages.every(page=>result.candidatePages.includes(page)));
+    assert.ok(result.candidatePages.length<guide.length);
+    assert.deepEqual(result.items.flatMap(item=>item.evidence.map(source=>source.page)),expectedPages);
+    console.log('PASS group visit deadlines retrieve both evidence pages from '+result.candidatePages.length+' candidates');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+}
