@@ -1,4 +1,4 @@
-const timingNames = ['initialization','render','recognition'].map(stage=>'document-ocr:'+stage);
+const timingNames = ['initialization','render','recognition','native-recognition','full-recognition'].map(stage=>'document-ocr:'+stage);
 
 function recordTiming(name,start) {
   try { performance.measure(name,{start,end:performance.now()}); } catch { /* Optional browser timing. */ }
@@ -96,12 +96,18 @@ export async function createPdfOcr(ops) {
             context.fillStyle = '#fff';
             context.fillRect(0,0,native.width,native.height);
             context.drawImage(bitmap,0,0);
+            const nativeStarted = performance.now();
             text = (await worker.recognize(native)).data.text.trim();
+            recordTiming('document-ocr:native-recognition',nativeStarted);
           } finally {
             native.width = native.height = 0;
           }
         }
-        if (text.replace(/\s/gu,'').length<8) text = (await worker.recognize(canvas)).data.text.trim();
+        if (text.replace(/\s/gu,'').length<8) {
+          const fullStarted = performance.now();
+          text = (await worker.recognize(canvas)).data.text.trim();
+          recordTiming('document-ocr:full-recognition',fullStarted);
+        }
         recordTiming(timingNames[2],recognitionStarted);
         return text;
       } catch (error) {

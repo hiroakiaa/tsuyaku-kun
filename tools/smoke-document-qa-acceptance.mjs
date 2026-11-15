@@ -101,6 +101,9 @@ try {
         name:'acceptance.xlsx',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         buffer:await readFile(new URL('../tests/fixtures/document-qa-acceptance.xlsx',import.meta.url)),
       } : {name:'acceptance.pdf',mimeType:'application/pdf',buffer:await page.pdf()};
+      if (fixture.printedPageNumbers && process.env.DOCUMENT_QA_SAVE_SYNTHETIC_PDF) {
+        await writeFile(process.env.DOCUMENT_QA_SAVE_SYNTHETIC_PDF,file.buffer);
+      }
       if (scanFixturePath) {
         await writeFile(scanFixturePath,file.buffer);
         console.log('Exported the synthetic page-number scan fixture');
@@ -126,8 +129,8 @@ try {
         await page.route(/\/web\/document-ocr\.js\?v=\d+$/u,async route=>{
           const response = await route.fetch();
           const source = await response.text();
-          const candidate = source.replace('export async function createPdfOcr() {',
-            "let initialAttempt = true;\nexport async function createPdfOcr() {\n  if (initialAttempt) { initialAttempt = false; throw Error('OCRの一時エラー'); }");
+          const candidate = source.replace(/export async function createPdfOcr\([^)]*\) \{/u,
+            signature=>"let initialAttempt = true;\n"+signature+"\n  if (initialAttempt) { initialAttempt = false; throw Error('OCRの一時エラー'); }");
           assert.notEqual(candidate,source,'OCR initialization entry point missing');
           await route.fulfill({response,body:candidate});
         });
@@ -141,7 +144,7 @@ try {
       if (retryScan) await page.getByText('OCRの一時エラー',{exact:true}).waitFor({timeout:120_000});
       else if (!fixture.excel) await page.getByText('PDFの文字を確認しました。',{exact:true}).waitFor({timeout:120_000});
       const readOcrStages = ()=>page.evaluate(()=>Object.fromEntries(
-        ['initialization','render','recognition'].map(stage=>[
+        ['initialization','render','recognition','native-recognition','full-recognition'].map(stage=>[
           stage,performance.getEntriesByName('document-ocr:'+stage,'measure').map(entry=>Math.round(entry.duration)),
         ]),
       ));
