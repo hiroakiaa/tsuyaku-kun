@@ -7,7 +7,7 @@ const fixtures = [
     label:'Excel',
     excel:true,
     otherValue:/410\s*円/u,
-    questions:[['令和9年度の会議室の子どもの休日料金は？',/470\s*円/u,2,'R9料金表 · AA4'],['会議室の子どもの休日料金は？',null]],
+    questions:[['令和9年度の会議室の子どもの休日料金は？',/470\s*円/u,2,'R9料金表 · AA4'],['会議室の子どもの休日料金は？',null],['令和8年度',/410\s*円/u,1,'R8料金表 · D4',/470\s*円/u]],
   },
   {
     label:'本文PDF',
@@ -22,8 +22,17 @@ const fixtures = [
     pages:['窓口交付手数料 400円','郵送交付手数料 800円'],
     questions:[['窓口の交付手数料はいくら？',/400\s*円/u],['窓口で使える支払方法は？',null]],
   },
+  {
+    label:'低解像度スキャンPDF',
+    scan:true,
+    lowResolution:true,
+    otherValue:/780\s*円/u,
+    pages:['窓口の発行手数料は260円です。','郵送の発行手数料は780円です。'],
+    questions:[['窓口の発行手数料はいくら？',/260\s*円/u],['窓口の支払方法は何ですか？',null]],
+  },
 ];
 
+const total = fixtures.reduce((count,fixture)=>count+fixture.questions.length,0);
 const browser = await chromium.launch();
 const failures = [];
 const measurements = [];
@@ -35,22 +44,22 @@ try {
     try {
       if (!fixture.excel) {
         await page.setContent('<meta charset="utf-8">');
-        await page.evaluate(({pages,scan})=>{
+        await page.evaluate(({pages,scan,lowResolution})=>{
           for (const [index,line] of pages.entries()) {
             const section = document.createElement('section');
             if (index) section.style.breakBefore = 'page';
             if (scan) {
               const canvas = document.createElement('canvas');
-              canvas.width = 1100;
-              canvas.height = 240;
+              canvas.width = lowResolution ? 460 : 1100;
+              canvas.height = lowResolution ? 100 : 240;
               const ctx = canvas.getContext('2d');
               ctx.fillStyle = 'white';
               ctx.fillRect(0,0,canvas.width,canvas.height);
-              ctx.fillStyle = 'black';
-              ctx.font = '48px sans-serif';
-              ctx.fillText(line,40,110);
+              ctx.fillStyle = lowResolution ? '#777' : 'black';
+              ctx.font = lowResolution ? '21px sans-serif' : '48px sans-serif';
+              ctx.fillText(line,lowResolution ? 15 : 40,lowResolution ? 48 : 110);
               const image = document.createElement('img');
-              image.src = canvas.toDataURL();
+              image.src = lowResolution ? canvas.toDataURL('image/jpeg',0.55) : canvas.toDataURL();
               image.style.width = '600px';
               section.append(image);
             } else section.textContent = line;
@@ -73,7 +82,7 @@ try {
       try {
         await page.goto(guide);
         await page.locator('#tab-ask').click();
-        for (const [question,expected,sourcePage=1,cell] of fixture.questions) {
+        for (const [question,expected,sourcePage=1,cell,wrong=fixture.otherValue] of fixture.questions) {
           try {
             const answers = page.locator('#messages .answer-item');
             const before = await answers.count();
@@ -92,12 +101,12 @@ try {
             console.log(JSON.stringify({fixture:fixture.label,question,answer,citations,quotes,elapsedMs}));
             if (expected) {
               assert.match(answer,expected,question);
-              assert.doesNotMatch(answer,fixture.otherValue,question);
+              assert.doesNotMatch(answer,wrong,question);
               assert.deepEqual(citations,['元のPDF '+sourcePage+'ページ'],question);
               if (cell) {
                 const addresses = (await source.locator(':scope > div').allTextContents()).flatMap(text=>text.split('、'));
                 assert.ok(addresses.includes(cell),question);
-                assert.ok(quotes.some(quote=>normalize(quote).includes('AA4470円')),question);
+                assert.ok(quotes.some(quote=>normalize(quote).startsWith(cell.split(' · ')[1]) && expected.test(normalize(quote))),question);
               } else {
                 const original = normalize(fixture.pages[sourcePage-1]);
                 const matching = quotes.map(normalize).find(quote=>original.includes(quote) && expected.test(quote));
@@ -142,8 +151,8 @@ try {
   await browser.close();
 }
 
-console.log('Acceptance questions passed: '+passed+'/6');
+console.log('Acceptance questions passed: '+passed+'/'+total);
 if (process.env.DOCUMENT_QA_REPORT) {
-  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total:6,measurements},null,2));
+  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,measurements},null,2));
 }
 if (failures.length) throw new AggregateError(failures,'Document QA acceptance failed');
