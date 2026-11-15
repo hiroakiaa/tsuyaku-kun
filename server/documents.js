@@ -226,6 +226,33 @@ function monthlyDismissal(evidence) {
   return null;
 }
 
+function lookupTimetableCell(pages,question) {
+  const query=question.normalize('NFKC').trim().toLowerCase().replace(/[?。]$/u,'');
+  const verb=/^when does (?:the )?(.+?) (open|close)$/u.exec(query);
+  const field=/^when is the (.+?) for (?:the )?(.+)$/u.exec(query);
+  if (!verb && !field) return null;
+  const subject=verb?.[1] ?? field[2];
+  const column=verb ? (verb[2]==='open' ? 'opening' : 'closing') : field[1];
+  const matches=[];
+  for (const [index,page] of pages.entries()) {
+    const lines=page.split('\n').filter(line=>line.trim());
+    if (lines.length<2) continue;
+    const header=lines[0].split(' | ');
+    const rows=lines.slice(1).map(line=>line.split(' | '));
+    if (header.length<2 || rows.some(row=>row.length!==header.length)) continue;
+    const columns=header.flatMap((cell,i)=>i>0 && [column,column+' time'].includes(cell.trim().toLowerCase()) ? [i] : []);
+    if (columns.length!==1) continue;
+    for (const [rowIndex,row] of rows.entries()) {
+      if (row[0].trim().toLowerCase()!==subject) continue;
+      const value=row[columns[0]].trim();
+      if (!/^(?:\d{1,2}(?::\d{2})?\s*[ap]\.?m\.?|\d{1,2}:\d{2})$/iu.test(value)) continue;
+      matches.push({label:header[columns[0]],answer:value,evidence:[
+        {page:index+1,quote:lines[rowIndex+1]},{page:index+1,quote:lines[0]},
+      ]});
+    }
+  }
+  return matches.length===1 ? matches[0] : null;
+}
 function lookupWorksheetCell(pages, question) {
   const query = normalized(question);
   const compareColumns = (a,b)=>a.length-b.length || (a===b ? 0 : a<b ? -1 : 1);
@@ -817,7 +844,7 @@ export async function documents(request,env,auth) {
       const worksheetItem = lookupWorksheetCell(record.pages,text);
       return worksheetItem
         ? {...worksheetItem,worksheetContext:text}
-        : lookupAdmissionCell(record.pages,text);
+        : lookupAdmissionCell(record.pages,text) ?? (record.sourceType==='pdf' ? lookupTimetableCell(record.pages,text) : null);
     };
     const lookupItems = worksheetQuestion => {
       const sharedQuestion = /^(.+?)について[、,]?\s*それぞれ(?:の|[、,])?\s*(.+)$/u.exec(normalized(worksheetQuestion));
