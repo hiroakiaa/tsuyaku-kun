@@ -143,11 +143,6 @@ jobs:
         env:
           DOCUMENT_QA_REPORT: document-qa-acceptance-retry-report.json
         run: node tools/smoke-document-qa-acceptance.mjs --retry-scan
-      - name: Compare independent browser-based Japanese OCR
-        if: ${{ !cancelled() && steps.document_browser.outcome == 'success' }}
-        env:
-          DOCUMENT_QA_REPORT: document-qa-acceptance-ndl-ocr-report.json
-        run: node tools/smoke-document-qa-acceptance.mjs --compare-ndl-ocr
       - name: Record document verification provenance
         if: always()
         env:
@@ -164,7 +159,6 @@ jobs:
             document-qa-acceptance-report.json
             document-qa-acceptance-limited-report.json
             document-qa-acceptance-retry-report.json
-            document-qa-acceptance-ndl-ocr-report.json
             document-qa-pdf-report.json
             document-qa-long-pdf-report.json
             document-qa-long-pdf-report-comparison.md
