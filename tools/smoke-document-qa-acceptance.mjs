@@ -40,6 +40,10 @@ const fixtures = [
   },
 ];
 
+const network = process.argv.includes('--limited-network') ? {
+  latency:150,downloadThroughput:4_000_000/8,uploadThroughput:1_000_000/8,offline:false,
+} : null;
+const limits = network ? {registration:30_000,firstAnswer:15_000} : {registration:15_000,firstAnswer:8_000};
 const total = fixtures.reduce((count,fixture)=>count+fixture.questions.length,0);
 const browser = await chromium.launch();
 const failures = [];
@@ -80,6 +84,11 @@ try {
         name:'acceptance.xlsx',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         buffer:await readFile(new URL('../tests/fixtures/document-qa-acceptance.xlsx',import.meta.url)),
       } : {name:'acceptance.pdf',mimeType:'application/pdf',buffer:await page.pdf()};
+      if (network) {
+        const session = await page.context().newCDPSession(page);
+        await session.send('Network.enable');
+        await session.send('Network.emulateNetworkConditions',network);
+      }
       await page.goto('https://hiroakiaa.github.io/tsuyaku-kun/documents.html');
       await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
       await page.locator('#upload input[name=title]').fill('自動受入確認 '+fixture.label);
@@ -92,6 +101,7 @@ try {
       const registration = {fixture:fixture.label,elapsedMs:Math.round(performance.now()-uploadStarted),pageCount:null,deleted:false};
       registrations.push(registration);
       try {
+        if (registration.elapsedMs>limits.registration) failures.push(Error(fixture.label+' registration exceeded '+limits.registration+' ms'));
         await page.goto(guide);
         await page.locator('#tab-ask').click();
         const expectedPages = fixture.excel ? 2 : fixture.pages.length;
@@ -139,6 +149,7 @@ try {
               await page.waitForFunction(number=>document.querySelector('#pdf-page')?.value===String(number),sourcePage);
               measurement.citationNavigation = true;
             }
+            if (before===0 && elapsedMs>limits.firstAnswer) failures.push(Error(fixture.label+' first answer exceeded '+limits.firstAnswer+' ms'));
             measurement.passed = true;
             passed++;
           } catch (error) {
@@ -177,6 +188,6 @@ try {
 
 console.log('Acceptance questions passed: '+passed+'/'+total);
 if (process.env.DOCUMENT_QA_REPORT) {
-  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,commit:process.env.GITHUB_SHA ?? null,measuredAt:new Date().toISOString(),browser:browser.version(),registrations,measurements},null,2));
+  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,network,limits,commit:process.env.GITHUB_SHA ?? null,measuredAt:new Date().toISOString(),browser:browser.version(),registrations,measurements},null,2));
 }
 if (failures.length) throw new AggregateError(failures,'Document QA acceptance failed');
