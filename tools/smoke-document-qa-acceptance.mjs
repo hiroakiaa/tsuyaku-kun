@@ -45,7 +45,7 @@ const network = process.argv.includes('--limited-network') ? {
 } : null;
 const limits = network ? {registration:30_000,firstAnswer:15_000} : {registration:15_000,firstAnswer:8_000};
 const retryScan = process.argv.includes('--retry-scan');
-const selectedFixtures = retryScan ? fixtures.filter(fixture=>fixture.scan && !fixture.lowResolution) : fixtures;
+const selectedFixtures = retryScan ? fixtures.filter(fixture=>fixture.label==='スキャンPDF') : fixtures;
 const total = selectedFixtures.reduce((count,fixture)=>count+fixture.questions.length,0);
 const browser = await chromium.launch();
 const failures = [];
@@ -59,7 +59,7 @@ try {
     try {
       if (!fixture.excel) {
         await page.setContent('<meta charset="utf-8">');
-        await page.evaluate(({pages,scan,lowResolution})=>{
+        await page.evaluate(({pages,scan,lowResolution,printedPageNumbers})=>{
           for (const [index,line] of pages.entries()) {
             const section = document.createElement('section');
             if (index) section.style.breakBefore = 'page';
@@ -77,6 +77,11 @@ try {
               image.src = lowResolution ? canvas.toDataURL('image/jpeg',0.55) : canvas.toDataURL();
               image.style.width = '600px';
               section.append(image);
+              if (printedPageNumbers) {
+                const footer = document.createElement('footer');
+                footer.textContent = String(index+1);
+                section.append(footer);
+              }
             } else section.textContent = line;
             document.body.append(section);
           }

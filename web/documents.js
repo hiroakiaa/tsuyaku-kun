@@ -77,7 +77,9 @@ async function extract(file, status) {
         reader.releaseLock();
       }
       let text = layoutPdfText(parts);
-      if (!text.trim()) {
+      const compact = text.normalize('NFKC').replace(/\s+/gu,'');
+      const pageNumberOnly = [String(n),'ページ'+n,n+'ページ','-'+n+'-'].includes(compact);
+      if (!compact || pageNumberOnly) {
         status.textContent = 'スキャンページを端末で読んでいます… ' + n + ' / ' + pdf.numPages;
         const {createPdfOcr} = await import('./document-ocr.js?v=80');
         ocr ??= await createPdfOcr();
