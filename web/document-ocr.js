@@ -149,7 +149,7 @@ export async function createPdfOcr(ops) {
                   if (!horizontal) {
                     const started=performance.now();
                     const {createHorizontalScanReader}=await import('./document-ocr-horizontal.js');
-                    const workerUrl=new URL('./ocr/assets/recognition.worker-CFphUR-D.js',import.meta.url);
+                    const workerUrl=new URL('./ocr/assets/recognition.worker-CFphUR-D.js?v=2',import.meta.url);
                     horizontal=await createHorizontalScanReader(workerUrl);
                     if (!standard) recordTiming(timingNames[0],started);
                   }
