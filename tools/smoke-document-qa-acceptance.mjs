@@ -258,6 +258,6 @@ try {
 
 if (!scanFixturePath) console.log('Acceptance questions passed: '+passed+'/'+total);
 if (!scanFixturePath && process.env.DOCUMENT_QA_REPORT) {
-  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,network,limits,retryScan,commit:process.env.GITHUB_SHA ?? null,measuredAt:new Date().toISOString(),browser:browser.version(),registrations,measurements},null,2));
+  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,network,limits,retryScan,commit:process.env.GITHUB_SHA ?? null,measuredAt:new Date().toISOString(),browser:browser.version(),registrations,measurements,failures:failures.map(error=>error.message)},null,2));
 }
 if (failures.length) throw new AggregateError(failures,'Document QA acceptance failed');
