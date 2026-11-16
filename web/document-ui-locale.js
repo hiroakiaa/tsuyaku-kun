@@ -45,6 +45,7 @@ export const documentUiLabels=[
   ['元のPDF','Original PDF','PDF original'],
   ['原文','Original','Original'],
   ['PDF上に訳文を表示','Show translation on PDF','Mostrar traducción sobre el PDF'],
+  ['原文と比較','Compare with original','Comparar con el original'],
   ['このページに翻訳できる文字はありません。','There is no translatable text on this page.','Esta página no contiene texto traducible.'],
   ['PDF全画面','Full-screen PDF','PDF a pantalla completa'],
   ['資料データを表示','View document','Ver documento'],

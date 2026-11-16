@@ -2,7 +2,7 @@ import {layoutPdfText} from './document-table.js?v=94';
 import {installLocalIcons,localIcon} from './icons.js?v=library';
 import {config} from './config.js';
 import {withEasyJapanese} from './core.js';
-import {createDocumentUiLocale} from './document-ui-locale.js?v=2';
+import {createDocumentUiLocale} from './document-ui-locale.js?v=3';
 const $ = (selector) => document.querySelector(selector);
 const content = $('#content');
 const id = new URLSearchParams(location.search).get('id');
@@ -567,6 +567,9 @@ async function reader() {
   const translationMode=$('#pdf-language');
   const translatedPage=$('#pdf-translation');
   const layoutTranslation=$('#pdf-layout-translation');
+  const compareTranslation=$('#pdf-compare');
+  const pdfStage=preview.parentElement;
+  let compareOriginal=false;
   let showTranslationOnPdf=false;
   const pageTranslations=new Map();
   const readyEnglishPages=new Set();
@@ -646,6 +649,10 @@ async function reader() {
     const page=Number(pagePicker.value)||1;
     translatedPage.hidden=!language;
     layoutTranslation.hidden=!language || sourceType!=='pdf';
+    compareTranslation.hidden=!language || sourceType!=='pdf';
+    const comparison=Boolean(language && sourceType==='pdf' && compareOriginal);
+    compareTranslation.setAttribute('aria-pressed',String(comparison));
+    pdfStage.classList.toggle('compare-original',comparison);
     translatedPage.lang=language==='ja-easy'?'ja':language;
     if (!language) return;
     translatedPage.scrollTop=0;
@@ -759,6 +766,11 @@ async function reader() {
     firstMark?.scrollIntoView({block:'center',behavior:'smooth'});
   }
   translationMode.onchange=()=>void updatePageTranslation();
+  compareTranslation.onclick=()=>{
+    compareOriginal=!compareOriginal;
+    void updatePageTranslation();
+    if (compareOriginal) void showPdf(Number(pagePicker.value)||1);
+  };
   layoutTranslation.onclick=()=>{
     showTranslationOnPdf=!showTranslationOnPdf;
     layoutTranslation.setAttribute('aria-pressed',String(showTranslationOnPdf));
@@ -941,10 +953,12 @@ async function reader() {
       const top = preview.getBoundingClientRect().top;
       const index = pageViews.findIndex(slot => slot.getBoundingClientRect().bottom > top+1);
       if (index < 0) return;
+      const changed=selectedPage!==index+1;
       selectedPage = index+1;
       readingPosition(id,{page:selectedPage});
       syncContentsPage();
       pagePicker.value = selectedPage;
+      if (changed && compareOriginal && translationMode.value) void updatePageTranslation();
       $('#pdf-prev').disabled = selectedPage===1;
       $('#pdf-next').disabled = selectedPage===doc.pageCount;
       $('#pdf-file').href = originalUrl+'#page='+selectedPage;
