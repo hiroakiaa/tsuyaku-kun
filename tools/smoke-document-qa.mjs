@@ -88,11 +88,12 @@ try {
     const libraryStages=await answerTimings();
     assert.ok(Number.isInteger(libraryStages['first-grounded-answer']));
     await page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 2ページ'}).click();
-    await page.waitForFunction(()=>[...document.querySelectorAll('[data-page="2"] .pdf-citation-visible')].some(mark=>{
+    const waitForOriginalMarker = () => page.waitForFunction(()=>[...document.querySelectorAll('[data-page="2"] .pdf-citation-visible')].some(mark=>{
       const fill=getComputedStyle(mark,'::after');
       return mark.getBoundingClientRect().width>0 && fill.backgroundColor==='rgb(245, 217, 117)' &&
         fill.transform==='matrix(1, 0, 0, 1, 0, 0)';
     }),null,{timeout:15_000});
+    await waitForOriginalMarker();
     if (!long && !dense && !atPageLimit && !atSizeLimit) {
       const language=page.locator('select.document-language:visible');
       await language.selectOption('en');
@@ -103,6 +104,7 @@ try {
       await toggle.locator('[data-language=""]').click();
       await page.locator('#pdf-translation').waitFor({state:'hidden'});
       assert.equal(await page.locator('#pdf-page').inputValue(),'2');
+      await waitForOriginalMarker();
       await language.selectOption('ja');
     }
     await page.locator('#question').fill('When does the swimming pool open?');
