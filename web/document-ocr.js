@@ -186,7 +186,13 @@ export async function createPdfOcr(ops) {
           recordTiming('document-ocr:full-recognition',fullStarted);
         }
         recordTiming(timingNames[2],recognitionStarted);
-        return text;
+        // In a complete kanji date, katakana ニ can be a glyph-level OCR error.
+        return text.replace(/((?:十一|十二|十|[一二三四五六七八九])\s*月\s*)([一二三四五六七八九十\s]*ニ[一二三四五六七八九十\s]*)(\s*日)/gu,
+          (original,month,day,suffix)=>{
+            const normalized=day.replaceAll('ニ','二');
+            const valid=/^(?:[一二三四五六七八九]|十[一二三四五六七八九]?|二十[一二三四五六七八九]?|三十[一]?)$/u;
+            return valid.test(normalized.replace(/\s/gu,'')) ? month+normalized+suffix : original;
+          });
       } catch (error) {
         throw new Error('スキャンページの文字を読み取れませんでした。',{cause:error});
       } finally {
