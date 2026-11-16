@@ -1066,7 +1066,7 @@ async function reader() {
         definitionPages ??= request(api+'/text').catch(()=>[]);
         const pages=await definitionPages;
         const definitions=pages.flatMap((text,index)=>text.split('\n').flatMap(quote=>{
-          const line=quote.normalize('NFKC').trim();
+          const line=quote.normalize('NFKC').replaceAll('⺠','民').trim();
           const match=/^([^()|。]{3,40})\(([^()]{2,12})\)$/u.exec(line);
           return match && match[2]===alias && match[1]!==alias && match[1].startsWith(alias)
             ? [{page:index+1,quote:quote.trim()}] : [];
