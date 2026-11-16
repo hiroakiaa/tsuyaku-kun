@@ -888,10 +888,10 @@ export async function documents(request,env,auth) {
       layoutText.length<=MAX_TEXT && plain(layoutText)===plain(storedText);
     const text=hasLayout ? layoutText : storedText;
     if (!text.trim()) return reply({text:'',source:[],lines:[],reuse:'empty'});
-    const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([2,DOCUMENT_MODEL,code,text])));
+    const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([hasLayout ? 3 : 2,DOCUMENT_MODEL,code,text])));
     const key=Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
     const url='https://room/document/page-translation/'+key;
-    return target.fetch(url,{method:'POST',body:JSON.stringify({id,text,language})});
+    return target.fetch(url,{method:'POST',body:JSON.stringify({id,text,language,hasLayout})});
   }
   if (action==='text' && request.method==='GET') {
     if (!['pdf','xlsx','docx'].includes(record.sourceType ?? 'pdf')) return fail('資料の本文が見つかりません。',404);
@@ -1241,7 +1241,7 @@ export async function documentStorage(request,storage,env) {
   if (!record) return fail('資料が見つからないか、共有が終了しました。',404);
   const translationKey=/^\/document\/page-translation\/[a-f0-9]{64}$/.test(path) && path;
   if (translationKey && request.method==='POST') {
-    const {id,text,language}=await request.json();
+    const {id,text,language,hasLayout}=await request.json();
     const key=id+':'+translationKey;
     const current=pendingPageTranslations.get(key);
     if (current) {
@@ -1262,9 +1262,22 @@ export async function documentStorage(request,storage,env) {
           usage.cached+=value.prompt_tokens_details?.cached_tokens??0;
         }
       };
-      const aligned=await translateDocumentText(env,JSON.stringify(nonempty),language,true,captureUsage);
-      let translations;
-      try { translations=JSON.parse(aligned)?.lines; } catch {}
+      const translateLines=async lines=>{
+        const aligned=await translateDocumentText(env,JSON.stringify(lines),language,true,captureUsage);
+        try {
+          const translated=JSON.parse(aligned)?.lines;
+          return Array.isArray(translated) && translated.length===lines.length &&
+            translated.every(line=>typeof line==='string' && line.trim()) ? translated : null;
+        } catch { return null; }
+      };
+      let translations=await translateLines(nonempty);
+      if (!translations && hasLayout) {
+        const batches=[];
+        for (let start=0;start<nonempty.length;start+=8) batches.push(nonempty.slice(start,start+8));
+        const translated=await Promise.all(batches.map(translateLines));
+        if (translated.every(Boolean)) translations=translated.flat();
+        else throw Error('翻訳文とPDFの行を対応づけられませんでした。');
+      }
       let index=0;
       const lines=Array.isArray(translations) && translations.length===nonempty.length &&
         translations.every(line=>typeof line==='string' && line.trim())
