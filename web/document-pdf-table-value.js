@@ -13,7 +13,10 @@ export function lookupPdfTableValue(pages,question) {
   const isValue = fee ? value=>/^(?:\d[\d,]*(?:\.\d+)?\s*(?:万)?円)$/u.test(value.normalize('NFKC').trim()) : isTime;
   let continuation;
   for (const [index,page] of pages.entries()) {
-    const lines=page.split('\n').filter(line=>line.trim());
+    const pageLines=page.split('\n').filter(line=>line.trim());
+    const tableStart=pageLines.findIndex(line=>line.includes(' | '));
+    if (tableStart<0) {continuation=undefined; continue;}
+    const lines=pageLines.slice(tableStart);
     const cells=lines.map(line=>line.split(' | '));
     const header=cells[0] ?? [];
     const headingText = value=>value.normalize('NFKC').trim().toLowerCase();
@@ -38,9 +41,9 @@ export function lookupPdfTableValue(pages,question) {
     });
     const ownHeading=columns.length===1;
     const table=ownHeading ? {
-      header:lines.slice(0,start).join('\n'),page:index+1,width:header.length,
+      header:pageLines.slice(tableStart>0 ? tableStart-1 : tableStart,tableStart+start).join('\n'),page:index+1,width:header.length,
       column:columns[0],label:headings[columns[0]],unit:units[columns[0]],
-    } : continuation;
+    } : tableStart===0 ? continuation : undefined;
     continuation=undefined;
     if (!table) continue;
     if (!ownHeading) start=0;
