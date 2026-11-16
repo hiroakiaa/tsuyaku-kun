@@ -164,7 +164,13 @@ export async function createPdfOcr(ops) {
               }
             }
             const nativeStarted = performance.now();
-            if (text.replace(/\s/gu,'').length<8) text = (await (await standardWorker()).recognize(native)).data.text.trim();
+            const compact=value=>value.normalize('NFKC').replace(/\s/gu,'');
+            const malformedMonth=/[ァ-ヶー]{2,4}月[0-9一二三四五六七八九十]{1,3}日/u;
+            const calendarDate=/(?:1[0-2]|[1-9]|十[一二]?|[一二三四五六七八九])月[0-9一二三四五六七八九十]{1,3}日/u;
+            if (compact(text).length<8 || malformedMonth.test(compact(text))) {
+              const alternative=(await (await standardWorker()).recognize(native)).data.text.trim();
+              if (compact(text).length<8 || calendarDate.test(compact(alternative))) text=alternative;
+            }
             recordTiming('document-ocr:native-recognition',nativeStarted);
           } finally {
             native.width = native.height = 0;
