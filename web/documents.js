@@ -633,7 +633,17 @@ async function reader() {
     if (!pageTranslations.has(key)) {
       pageTranslations.set(key,(async()=>{
         const layoutText=sourceType==='pdf' ? await pdfTranslationSource(page) : undefined;
-        return request(api+'/translate',{method:'POST',signal:AbortSignal.timeout(60_000),headers:{'Content-Type':'application/json'},body:JSON.stringify({page,language,layoutText})});
+        const translate=layout=>request(api+'/translate',{
+          method:'POST',
+          signal:AbortSignal.timeout(60_000),
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({page,language,layoutText:layout}),
+        });
+        if (layoutText) {
+          try { return await translate(layoutText); }
+          catch { return translate(); }
+        }
+        return translate();
       })()
         .then(result=>{
           if (language==='en') {
