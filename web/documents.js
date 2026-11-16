@@ -1066,10 +1066,11 @@ async function reader() {
         if (!alias || !item.answer || !item.evidence?.length || sourceType!=='pdf' || materials.length) return item;
         definitionPages ??= request(api+'/text').catch(()=>[]);
         const pages=await definitionPages;
+        const compactName=value=>value.normalize('NFKC').replaceAll('⺠','民').replace(/\s/gu,'');
         const definitions=pages.flatMap((text,index)=>text.split('\n').flatMap(quote=>{
-          const line=quote.normalize('NFKC').replaceAll('⺠','民').trim();
+          const line=compactName(quote);
           const match=/^([^()|。]{3,40})\(([^()]{2,12})\)$/u.exec(line);
-          return match && match[2]===alias && match[1]!==alias && match[1].startsWith(alias)
+          return match && match[2]===alias && match[1]!==alias && item.evidence.some(source=>compactName(source.quote).includes(match[1]))
             ? [{page:index+1,quote:quote.trim()}] : [];
         }));
         if (definitions.length!==1) return item;
