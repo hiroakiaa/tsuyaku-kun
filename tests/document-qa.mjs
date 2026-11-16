@@ -468,3 +468,31 @@ console.log('PASS localized dismissal reads completion column and preserves sour
     globalThis.fetch = originalFetch;
   }
 }
+
+const cacheFixture = {sourceType:'pdf',owner:'author',pages:['第一ページの説明。','第二ページの説明。']};
+const cachedPageKeys = new Set();
+const cacheEnv = {ROOMS:{idFromName:name=>name,get:()=>({
+  async fetch(url) {
+    if (url.endsWith('/data')) return Response.json(cacheFixture);
+    assert.match(url,/\/document\/page-translation\/[a-f0-9]{64}$/);
+    const reuse=cachedPageKeys.has(url) ? 'cache' : 'generated';
+    cachedPageKeys.add(url);
+    return Response.json({reuse});
+  },
+})}};
+async function translateFixture(page,language='en') {
+  const response=await documents(new Request('https://test/documents/30000000-0000-0000-0000-000000000000/translate',{
+    method:'POST',body:JSON.stringify({page,language,layoutText:cacheFixture.pages[page-1]}),
+  }),cacheEnv,{uid:'author'});
+  assert.equal(response.status,200);
+  return (await response.json()).reuse;
+}
+assert.equal(await translateFixture(1),'generated');
+assert.equal(await translateFixture(2),'generated');
+cacheFixture.pages[1]='差し替え後の第二ページ。';
+cacheFixture.revision=1;
+assert.equal(await translateFixture(1),'cache');
+assert.equal(await translateFixture(2),'generated');
+assert.equal(await translateFixture(2),'cache');
+assert.equal(await translateFixture(1,'es'),'generated');
+console.log('PASS PDF translation cache keys only change for edited pages or languages');
