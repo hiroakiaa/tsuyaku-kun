@@ -353,7 +353,7 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
   color: var(--muted);
 }
 /* Keep titles readable when the controls need the whole width of the chat column. */
-.ask-layout{container-type:inline-size}
+.ask-layout{width:100%;min-width:0;container-type:inline-size}
 @container (max-width:42rem){
   .ask-heading{display:grid;grid-template-columns:minmax(0,1fr);gap:.5rem}
   .ask-heading h2{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
