@@ -88,3 +88,69 @@ export async function lookupTableCell(pdf, question) {
   const {label,answer,evidence}=candidates[0];
   return {label:label+'の'+columnName,answer,evidence};
 }
+
+export async function lookupAlignedTableCell(pdf, question) {
+  const terms=compact(question).replace(/[?？。]$/u,'').replace(/(?:はいくら(?:ですか)?|は何ですか|を教えてください|は)$/u,'').split('の');
+  if(terms.length<2 || terms.length>3 || terms.some(term=>term.length<2)) return null;
+  const [entity]=terms;
+  const field=terms.at(-1);
+  const matches=[];
+  for(let page=1;page<=pdf.numPages;page++){
+    const {items}=await (await pdf.getPage(page)).getTextContent();
+    const fragments=items.filter(item=>item.str?.trim()).map(item=>({
+      x:item.transform[4],y:item.transform[5],end:item.transform[4]+item.width,text:item.str
+    })).sort((a,b)=>b.y-a.y || a.x-b.x);
+    const lines=[];
+    for(const fragment of fragments){
+      if(Math.abs((lines.at(-1)?.y??Infinity)-fragment.y)>1.5) lines.push({y:fragment.y,cells:[]});
+      const cells=lines.at(-1).cells;
+      const last=cells.at(-1);
+      if(last && fragment.x-last.end>=-1 && fragment.x-last.end<=3){
+        last.text+=fragment.text;
+        last.end=fragment.end;
+      }else cells.push({...fragment});
+    }
+    const at=(line,x)=>line?.cells.find(cell=>Math.abs(cell.x-x)<2);
+    for(const [index,header] of lines.entries()){
+      if(header.cells.length<3) continue;
+      const repeated=terms.length===2 && new Set(header.cells.map(cell=>compact(cell.text))).size===1;
+      const key=repeated ? lines[index+1]?.cells[0] : header.cells[0];
+      const columns=repeated ? header.cells : header.cells.slice(1);
+      if(!key || key.x>=columns[0].x) continue;
+      const gap=lines[index+1] && header.y-lines[index+1].y;
+      if(!gap || gap<8) continue;
+      const body=lines.slice(index+1).filter(line=>Math.abs((header.y-line.y)/gap-Math.round((header.y-line.y)/gap))<0.07);
+      const byPosition=(line)=>columns.every(column=>at(line,column.x));
+      if(terms.length===3){
+        const column=columns.find(cell=>compact(cell.text)===field);
+        const selector=columns.find(cell=>cell!==column && body.some(line=>compact(at(line,cell.x)?.text??'')===terms[1]));
+        if(!column || !selector) continue;
+        const group=lines.slice(index+1).filter(line=>compact(at(line,key.x)?.text??'')===entity);
+        if(group.length!==1) continue;
+        const [anchor]=group;
+        for(const row of body){
+          const value=at(row,column.x);
+          if(compact(at(row,selector.x)?.text??'')!==terms[1] || at(row,key.x) || value) continue;
+          const neighboring=body.filter(line=>Math.abs(line.y-anchor.y)<=Math.abs(row.y-anchor.y)+1 && at(line,selector.x));
+          if(neighboring.length!==2 || Math.abs(neighboring[0].y-neighboring[1].y-gap)>1.5 ||
+            neighboring.some(line=>at(line,key.x)) || !neighboring.some(byPosition)) continue;
+          matches.push({label:field,answer:'この欄は空欄です。資料内に記載がありません。',evidence:[{page,quote:[entity,at(row,selector.x).text,column.text].join(' | ')}]});
+        }
+        continue;
+      }
+      if(columns.length<4 || new Set(columns.map(cell=>compact(cell.text))).size!==1) continue;
+      const bands=lines.slice(Math.max(0,index-2),index);
+      if(bands.length!==2 || bands.some(line=>line.y-header.y>2*gap+1.5)) continue;
+      for(const row of body){
+        if(compact(at(row,key.x)?.text??'')!==entity || !byPosition(row)) continue;
+        for(const column of columns){
+          const [group,subheading]=bands.map(line=>line.cells.findLast(cell=>cell.x<=column.x+2 && columns.some(axis=>Math.abs(axis.x-cell.x)<2)));
+          if(!group || !subheading || compact(group.text+subheading.text+column.text)!==field) continue;
+          const value=at(row,column.x);
+          matches.push({label:field,answer:value.text,evidence:[{page,quote:[at(row,key.x).text,group.text,subheading.text,column.text,value.text].join(' | ')}]});
+        }
+      }
+    }
+  }
+  return matches.length===1 ? matches[0] : null;
+}

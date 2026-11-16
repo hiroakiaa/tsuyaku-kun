@@ -1020,7 +1020,7 @@ async function reader() {
       if (sourceType==='pdf' && (!doc.convertedWorksheet || materials.length) && (/の/.test(question) || /^what is the .+ (?:for|of) /i.test(question))) {
         let item;
         try {
-          const {lookupTableCell}=await import('./document-table-lookup.js?v=84');
+          const {lookupTableCell,lookupAlignedTableCell}=await import('./document-table-lookup.js?v=85');
           const pdf=await getOriginalPdf();
           if (!materials.length) {
             const {readTaggedTables,findTaggedTableCell}=await import('./document-tagged-table.js?v=2');
@@ -1033,6 +1033,7 @@ async function reader() {
             item=lookupPdfTableValue(pages,question);
           }
           item ??= await lookupTableCell(pdf,question);
+          item ??= await lookupAlignedTableCell(pdf,question);
         } catch {}
         if (item) {
           renderAnswerItem(append(log,'div','','bubble'),item);
