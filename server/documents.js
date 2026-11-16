@@ -69,6 +69,15 @@ async function translateDocumentText(env,text,language,aligned=false,onUsage,lin
   return choice.message.content.trim();
 }
 
+function findVerticalLabel(text, label) {
+  if (!label || normalized(text).includes(label)) return null;
+  const lines=text.split('\n');
+  const characters=[...label];
+  const leadingCharacter = line=>/^\s*([\p{L}\p{N}・])\s*(?:\||$)/u.exec(line)?.[1];
+  const start=lines.findIndex((_,index)=>characters.every((character,offset)=>
+    leadingCharacter(lines[index+offset] ?? '')===character));
+  return start<0 ? null : lines.slice(Math.max(0,start-1),start+characters.length).join('\n');
+}
 function selectPassages(pages, question, index) {
   const normalize = text => text.normalize('NFKC').toLowerCase()
     .replace(/([\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}])[^\S\n]+(?=[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}])/gu,'');
@@ -98,6 +107,7 @@ function selectPassages(pages, question, index) {
     const text = normalize(pages[page].slice(start,end));
     let score = 0;
     for (const term of terms) if (text.includes(term)) score += Math.min(12,term.length**2);
+    if ([...terms].some(term=>/^[\p{Script=Han}\p{Script=Katakana}]{2,12}$/u.test(term) && findVerticalLabel(text,term))) score+=18;
     return {page,start,end,position,score,text};
   }).sort((a,b)=>b.score-a.score);
   if (!scored[0]?.score || pages.join('').length<=4200) return null;
@@ -199,13 +209,8 @@ async function retrievalPassages(env,pages,question,index,target,onSemantic) {
 async function generate(env,pages,question,materials=[],emit,selectedPassages,measure,operation=question ? "answer" : "create",language,bilingual) {
   const passages = (selectedPassages ?? pages.map((text,i)=>({page:i+1,text}))).map(passage=>{
     const label = /([\p{L}\p{N}・]{2,16})(?:の|って|では|は)/u.exec(question ?? '')?.[1];
-    if (!label || normalized(passage.text).includes(label)) return passage;
-    const lines = passage.text.split('\n');
-    const leadingCharacter = line=>/^\s*([\p{L}\p{N}・])\s*(?:\||$)/u.exec(line)?.[1];
-    const characters = [...label];
-    const start = lines.findIndex((_,start)=>characters.every((character,offset)=>
-      leadingCharacter(lines[start+offset] ?? '')===character));
-    return start<0 ? passage : {...passage,verticalLabel:{label,context:lines.slice(Math.max(0,start-1),start+characters.length).join("\n")}};
+    const context=findVerticalLabel(passage.text,label);
+    return context ? {...passage,verticalLabel:{label,context}} : passage;
   });
   const apiKey = env.OPENAI_DOCUMENT_QA_KEY;
   if (!apiKey) throw Error('資料QAのOpenAI接続が設定されていません。');
