@@ -63,6 +63,36 @@ try {
   globalThis.fetch = originalFetch;
 }
 console.log('PASS document QA semantic retrieval reuses document vectors');
+try {
+  const documentPages=Array.from({length:20},()=> '施設の案内です。'.repeat(70));
+  documentPages[3]='施設の受付は入口の右にあります。';
+  documentPages[15]='施設の休館日は火曜日です。';
+  let calls=0;
+  globalThis.fetch=async (_url,{body})=>{
+    const passages=JSON.parse(JSON.parse(body).messages.at(-1).content).資料;
+    calls++;
+    const items=passages.length<documentPages.length
+      ? [{label:'受付',answer:'入口の右です。',sources:[{page:4,quote:documentPages[3]}]},
+         {label:'休館日',answer:null,sources:[]}]
+      : [{label:'休館日',answer:'火曜日です。',sources:[{page:16,quote:documentPages[15]}]}];
+    return Response.json({choices:[{finish_reason:'stop',message:{content:JSON.stringify({items})}}]});
+  };
+  const environment={...env,AI:undefined,ROOMS:{...env.ROOMS,get:()=>({
+    async fetch(url) { return Response.json(url.endsWith('/data') ? {pages:documentPages,owner:'author'} : null); },
+  })}};
+  const response=await documents(new Request('https://test/documents/20000000-0000-0000-0000-000000000000/ask',{
+    method:'POST',body:JSON.stringify({question:'受付の場所と休館日を教えてください。'}),
+  }),environment,{uid:'author'});
+  const result=await response.json();
+  assert.equal(calls,2);
+  assert.deepEqual(result.items.map(({label,answer,evidence})=>[label,answer,evidence[0]?.page]),[
+    ['受付','入口の右です。',4],
+    ['休館日','火曜日です。',16],
+  ]);
+} finally {
+  globalThis.fetch=originalFetch;
+}
+console.log('PASS full review retains earlier grounded answers and completes missing items');
 const japanesePages = Array.from({length:20},()=> '施設の紹介です。'.repeat(70));
 japanesePages[12] = '山 本 学 園の出願は11月20日までです。';
 const lexicalEnv = {
