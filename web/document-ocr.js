@@ -90,8 +90,19 @@ export async function createPdfOcr(ops) {
       canvas.height=Math.ceil(viewport.height);
       try {
         await page.render({canvas,viewport}).promise;
-        const {data}=await (await standardWorker()).recognize(canvas,{}, {blocks:true});
-        return (data.blocks ?? []).flatMap(block=>block.paragraphs).flatMap(paragraph=>paragraph.lines)
+        const context=canvas.getContext('2d');
+        let lines;
+        try {
+          const {createHorizontalScanReader}=await import('./document-ocr-horizontal.js?v=2');
+          horizontal ??= await createHorizontalScanReader(new URL('./ocr/assets/recognition.worker-CFphUR-D.js?v=2',import.meta.url));
+          const recognized=await horizontal.read(context.getImageData(0,0,canvas.width,canvas.height),{withLayout:true});
+          lines=recognized?.map(({text,box:{x,y,width,height}})=>({text,bbox:{x0:x,y0:y,x1:x+width,y1:y+height}}));
+        } catch { /* Fall back to the general OCR reader. */ }
+        if (!lines?.length) {
+          const {data}=await (await standardWorker()).recognize(canvas,{}, {blocks:true});
+          lines=(data.blocks ?? []).flatMap(block=>block.paragraphs).flatMap(paragraph=>paragraph.lines);
+        }
+        return lines
           .flatMap(({text,bbox})=>{
             const str=text.trim();
             const width=(bbox.x1-bbox.x0)/viewport.scale;

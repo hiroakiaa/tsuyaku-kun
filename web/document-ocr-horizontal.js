@@ -26,7 +26,7 @@ export async function createHorizontalScanReader(workerUrl) {
   catch (error) { worker.terminate(); throw error; }
 
   return {
-    async read(imageData) {
+    async read(imageData,{withLayout=false}={}) {
       const lines=findHorizontalScanLines(imageData);
       if (!lines) return null;
       const canvas=document.createElement('canvas');
@@ -43,7 +43,8 @@ export async function createHorizontalScanReader(workerUrl) {
       const {results}=await request({type:'REC_PROCESS',jobs},'REC_COMPLETE',jobs.map(job=>job.croppedImageData.data.buffer));
       const text=new Map(results.map(({id,text})=>[id,text.trim()]));
       const ordered=jobs.map(({id})=>text.get(id));
-      return ordered.every(Boolean) ? ordered.join('\n') : null;
+      if (!ordered.every(Boolean)) return null;
+      return withLayout ? lines.map((box,index)=>({box,text:ordered[index]})) : ordered.join('\n');
     },
     close:()=>worker.terminate(),
   };

@@ -116,7 +116,7 @@ async function extract(file, status) {
       const pageNumberOnly = [String(n),'ページ'+n,n+'ページ','-'+n+'-'].includes(compact);
       if (!compact || pageNumberOnly) {
         status.textContent = 'スキャンページを端末で読んでいます… ' + n + ' / ' + pdf.numPages;
-        const {createPdfOcr} = await import('./document-ocr.js?v=93');
+        const {createPdfOcr} = await import('./document-ocr.js?v=94');
         ocr ??= await createPdfOcr((await pdfLibrary()).OPS);
         text = await ocr.read(page,{pageNumberOnly});
       }
@@ -540,7 +540,7 @@ async function reader() {
     if (compact && ![String(number),'ページ'+number,number+'ページ','-'+number+'-'].includes(compact)) return items;
     if (!scanLayouts.has(number)) {
       scanLayouts.set(number,(async()=>{
-        const {createPdfOcr}=await import('./document-ocr.js?v=93');
+        const {createPdfOcr}=await import('./document-ocr.js?v=94');
         const reader=await createPdfOcr((await pdfLibrary()).OPS);
         try { return await reader.readLayout(page); }
         finally { await reader.close(); }
