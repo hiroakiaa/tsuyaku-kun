@@ -77,6 +77,12 @@ try {
     assert.match(await page.locator('#messages').textContent(),/3\s*(?::00)?\s*PM/i);
     await page.locator('#ask-form button:enabled').waitFor();
     const libraryMs = Math.round(performance.now()-libraryStarted);
+    await page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 2ページ'}).click();
+    await page.waitForFunction(()=>[...document.querySelectorAll('[data-page="2"] .pdf-citation-visible')].some(mark=>{
+      const fill=getComputedStyle(mark,'::after');
+      return mark.getBoundingClientRect().width>0 && fill.backgroundColor==='rgb(245, 217, 117)' &&
+        fill.transform==='matrix(1, 0, 0, 1, 0, 0)';
+    }),null,{timeout:15_000});
     await page.locator('#question').fill('When does the swimming pool open?');
     const poolStarted = performance.now();
     await page.locator('#ask-form button').click();

@@ -529,6 +529,7 @@ async function reader() {
     const literalQuote = normalize(selected.quote);
     const quote = text.includes(literalQuote) ? literalQuote : literalQuote.replaceAll('|','');
     const start = text.indexOf(quote);
+    slot.classList.toggle("pdf-citation-page", !quote || start<0);
     if (!quote || start<0) return;
     removeCitationMarks(slot);
     let offset = 0;
@@ -762,6 +763,7 @@ async function reader() {
       if (!blocks.length || from!==pageText.length) return;
       const frame=document.createElement('div');
       frame.className='pdf-page-view pdf-translation-layout';
+      if (citation?.page===number && citationStart<0) frame.classList.add('pdf-citation-page');
       const canvas=append(frame,'canvas','');
       const renderViewport=page.getViewport({scale:Math.min(3,devicePixelRatio||1)});
       canvas.width=Math.ceil(renderViewport.width);
@@ -1109,6 +1111,7 @@ async function reader() {
   function clearCitation() {
     citation = undefined;
     removeCitationMarks(preview);
+    for (const slot of document.querySelectorAll(".pdf-citation-page")) slot.classList.remove("pdf-citation-page");
     for (const mark of translatedPage.querySelectorAll('.pdf-translated-citation')) mark.replaceWith(mark.textContent);
   }
   function sourceLink(parent,n,quote) {
