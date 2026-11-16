@@ -218,6 +218,11 @@ try {
               await source.locator('a').click();
               await page.waitForFunction(number=>document.querySelector('#pdf-page')?.value===String(number),sourcePage);
               measurement.citationNavigation = true;
+              if (fixture.printedPageNumbers) {
+                const marker=page.locator('[data-page="'+sourcePage+'"] .pdf-citation-mark').first();
+                await marker.waitFor({state:'visible',timeout:60_000});
+                measurement.scanLineMarker = true;
+              }
             }
             if (before===0 && elapsedMs>limits.firstAnswer) failures.push(Error(fixture.label+' first answer exceeded '+limits.firstAnswer+' ms'));
             measurement.passed = true;
