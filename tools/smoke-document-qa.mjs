@@ -94,6 +94,7 @@ try {
         fill.transform==='matrix(1, 0, 0, 1, 0, 0)';
     }),null,{timeout:15_000});
     await waitForOriginalMarker();
+    let originalMarkerAfterTranslation = null;
     if (!long && !dense && !atPageLimit && !atSizeLimit) {
       const language=page.locator('select.document-language:visible');
       await language.selectOption('en');
@@ -105,6 +106,7 @@ try {
       await page.locator('#pdf-translation').waitFor({state:'hidden'});
       assert.equal(await page.locator('#pdf-page').inputValue(),'2');
       await waitForOriginalMarker();
+      originalMarkerAfterTranslation = true;
       await language.selectOption('ja');
     }
     await page.locator('#question').fill('When does the swimming pool open?');
@@ -265,6 +267,7 @@ try {
       measuredAt:new Date().toISOString(), platform:process.platform,browserVersion:browser.version(),
       combinedEvidence,missingEvidence,groupVisitEvidence,
       answerStages:{library:libraryStages,missingEvidence:missingStages},
+      originalMarkerAfterTranslation,
     };
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
