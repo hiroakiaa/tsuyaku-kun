@@ -510,7 +510,7 @@ async function reader() {
       entry.target.classList.add('pdf-citation-visible');
       visibleCitationMarks.unobserve(entry.target);
     }
-  }, {root:preview});
+  }, {root:$('#pdf-scroll')});
   function removeCitationMarks(container) {
     for (const mark of container.querySelectorAll('.pdf-citation-mark')) {
       visibleCitationMarks.unobserve(mark);
