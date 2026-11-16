@@ -77,6 +77,16 @@ try {
     assert.match(await page.locator('#messages').textContent(),/3\s*(?::00)?\s*PM/i);
     await page.locator('#ask-form button:enabled').waitFor();
     const libraryMs = Math.round(performance.now()-libraryStarted);
+    const answerTimings=async()=>{
+      const raw=await page.locator('#messages').getAttribute('data-answer-timings');
+      assert.ok(raw,'Answer processing did not record its timings');
+      const values=JSON.parse(raw);
+      assert.ok(Number.isInteger(values.finished) && values.finished>=0);
+      for (const ms of Object.values(values)) assert.ok(Number.isInteger(ms) && ms>=0 && ms<=values.finished);
+      return values;
+    };
+    const libraryStages=await answerTimings();
+    assert.ok(Number.isInteger(libraryStages['first-grounded-answer']));
     await page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 2ページ'}).click();
     await page.waitForFunction(()=>[...document.querySelectorAll('[data-page="2"] .pdf-citation-visible')].some(mark=>{
       const fill=getComputedStyle(mark,'::after');
@@ -159,6 +169,8 @@ try {
     await page.locator('#ask-form button:enabled').waitFor();
     const missingMs = Math.round(performance.now()-missingStarted);
     assert.equal(await unanswered.locator('.answer-source').count(),0);
+    const missingStages=await answerTimings();
+    assert.equal(missingStages['first-grounded-answer'],undefined);
     const missingEvidence = {
       question:missingQuestion, answer:await unanswered.locator('.answer-text').textContent(),
       sources:await citationNames(unanswered), elapsedMs:missingMs,
@@ -250,6 +262,7 @@ try {
       fixture:atPageLimit ? '40-page-mixed-pdf' : dense ? '28-page-dense-mixed-pdf' : long ? '28-page-mixed-pdf' : 'mixed-text-and-scan-pdf',preflightMs,registrationMs,libraryMs,poolMs,combinedMs,
       measuredAt:new Date().toISOString(), platform:process.platform,browserVersion:browser.version(),
       combinedEvidence,missingEvidence,groupVisitEvidence,
+      answerStages:{library:libraryStages,missingEvidence:missingStages},
     };
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
