@@ -106,6 +106,7 @@ export async function createPdfOcr(ops) {
                 workerPath:'https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/worker.min.js',
                 corePath:'https://cdn.jsdelivr.net/npm/tesseract.js-core@6.0.0',
               });
+              await vertical.setParameters({tessedit_pageseg_mode:'5'});
               if (!standard && !horizontal) recordTiming(timingNames[0],started);
             }
             const {data}=await vertical.recognize(canvas);
