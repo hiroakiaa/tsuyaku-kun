@@ -1027,6 +1027,11 @@ async function reader() {
             taggedTables ??= readTaggedTables(pdf).catch(()=>[]);
             item=findTaggedTableCell(await taggedTables,question);
           }
+          if (!item && !materials.length && /(?:時刻|利用料|料金|手数料)(?:はいくら(?:ですか)?|は)?[?？。]?$/.test(question)) {
+            const {lookupPdfTableValue}=await import('./document-pdf-table-value.js');
+            const pages=await request(api+'/text');
+            item=lookupPdfTableValue(pages,question);
+          }
           item ??= await lookupTableCell(pdf,question);
         } catch {}
         if (item) {
