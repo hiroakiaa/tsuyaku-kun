@@ -43,7 +43,7 @@ export function findHorizontalScanLines({data,width,height}) {
 }
 
 /** Identify pages in which the ink is mostly in narrow, tall text columns. */
-export function hasVerticalScanColumns({data,width,height}) {
+export function findVerticalScanRegion({data,width,height}) {
   const bands=[];
   let band;
   let totalInk=0;
@@ -71,5 +71,22 @@ export function hasVerticalScanColumns({data,width,height}) {
     const width=right-left+1, height=bottom-top+1;
     return width>=8 && height>=width*4;
   });
-  return vertical.length>=2 && vertical.reduce((sum,band)=>sum+band.ink,0)>=totalInk*0.85;
+  const ink=vertical.reduce((sum,band)=>sum+band.ink,0);
+  if(vertical.length>=2 && ink>=totalInk*0.85) return {wholePage:true};
+  const other=bands.filter(band=>!vertical.includes(band));
+  if(!vertical.length || !other.length) return null;
+  const bounds=group=>({
+    left:Math.min(...group.map(band=>band.left)),
+    right:Math.max(...group.map(band=>band.right)),
+    top:Math.min(...group.map(band=>band.top)),
+    bottom:Math.max(...group.map(band=>band.bottom)),
+  });
+  const upright=bounds(vertical), sideways=bounds(other);
+  if(Math.max(upright.left-sideways.right,sideways.left-upright.right)<32 ||
+    sideways.right-sideways.left<3*(sideways.bottom-sideways.top+1)) return null;
+  const rectangle=({left,right,top,bottom})=>{
+    const x=Math.max(0,left-12), y=Math.max(0,top-12);
+    return {left:x,top:y,width:Math.min(width,right+13)-x,height:Math.min(height,bottom+13)-y};
+  };
+  return {vertical:rectangle(upright),horizontal:rectangle(sideways)};
 }

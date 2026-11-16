@@ -95,9 +95,10 @@ export async function createPdfOcr(ops) {
         const recognitionStarted = performance.now();
         const image = operatorList && nativeScanImage(page,ops,operatorList);
         let text = '';
-        const {hasVerticalScanColumns}=await import('./document-ocr-lines.js?v=2');
+        const {findVerticalScanRegion}=await import('./document-ocr-lines.js?v=3');
         const context=canvas.getContext('2d');
-        if (hasVerticalScanColumns(context.getImageData(0,0,canvas.width,canvas.height))) {
+        const layout=findVerticalScanRegion(context.getImageData(0,0,canvas.width,canvas.height));
+        if (layout) {
           try {
             if (!vertical) {
               const started=performance.now();
@@ -109,10 +110,12 @@ export async function createPdfOcr(ops) {
               await vertical.setParameters({tessedit_pageseg_mode:'5'});
               if (!standard && !horizontal) recordTiming(timingNames[0],started);
             }
-            const {data}=await vertical.recognize(canvas);
+            const {data}=await vertical.recognize(canvas,layout.vertical ? {rectangle:layout.vertical} : {});
             if (data.confidence>=70 && data.text.replace(/\s/gu,'').length>=8) {
               recordTiming(timingNames[2],recognitionStarted);
-              return data.text.trim();
+              if (layout.wholePage) return data.text.trim();
+              const horizontalText=(await (await standardWorker()).recognize(canvas,{rectangle:layout.horizontal})).data.text.trim();
+              if(horizontalText) return [data.text.trim(),horizontalText].join("\n");
             }
           } catch { /* Use the standard reader if vertical recognition is unavailable. */ }
         }
