@@ -1094,6 +1094,12 @@ async function reader() {
             !item.evidence?.some(source=>freePrice.test(source.quote.normalize('NFKC')))) {
           item={...item,answer:null,evidence:[]};
         }
+        const priceEvidence=/無料|無償|実費|要(?:問合せ|問い合わせ)|[0-9一二三四五六七八九十百千万億][0-9一二三四五六七八九十百千万億,.\s]*円|[¥￥]\s*\d/u;
+        if (/(?:いくら|何円)/u.test(question) && /(?:代|費|料|値段|価格|金額)/u.test(question) &&
+            item.answer && item.evidence?.length &&
+            !item.evidence.some(source=>priceEvidence.test(source.quote.normalize('NFKC')))) {
+          item={...item,answer:null,evidence:[]};
+        }
         item=await includeAliasDefinition(item);
         const first = !box;
         const answer = answerBox();
