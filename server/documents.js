@@ -1274,7 +1274,14 @@ export async function documentStorage(request,storage,env) {
       if (!translations && hasLayout) {
         const batches=[];
         for (let start=0;start<nonempty.length;start+=8) batches.push(nonempty.slice(start,start+8));
-        const translated=await Promise.all(batches.map(translateLines));
+        const translateBatch=async lines=>{
+          if (lines.length===1) return [await translateDocumentText(env,lines[0],language,false,captureUsage)];
+          const aligned=await translateLines(lines);
+          if (aligned) return aligned;
+          const middle=Math.ceil(lines.length/2);
+          return (await Promise.all([translateBatch(lines.slice(0,middle)),translateBatch(lines.slice(middle))])).flat();
+        };
+        const translated=await Promise.all(batches.map(translateBatch));
         if (translated.every(Boolean)) translations=translated.flat();
         else throw Error('翻訳文とPDFの行を対応づけられませんでした。');
       }
