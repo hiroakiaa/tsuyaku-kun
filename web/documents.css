@@ -244,9 +244,6 @@ dialog [tabindex="-1"][autofocus]:focus {
 .pdf-language-toggle{display:inline-flex;align-items:center;gap:.15rem;padding:.15rem;border:1px solid var(--line);border-radius:.7rem}
 .pdf-language-toggle button{min-height:2.25rem;padding:.25rem .6rem;border:0;border-radius:.5rem;background:transparent;white-space:nowrap}
 .pdf-language-toggle button[aria-pressed=true]{background:var(--lime);color:#20241a}
-#pdf-translation:has(.pdf-readable-translation){background:#fff;color:#222}
-.pdf-readable-translation{max-width:72ch;margin-inline:auto;font:clamp(1rem,2.2vw,1.15rem)/1.7 system-ui,sans-serif;white-space:normal}
-.pdf-readable-translation p{margin:0 0 .7em}
 .answer-english{border-top:1px solid #ffffff32;padding-top:.65rem;margin:.7rem 0;white-space:pre-wrap}
 .pdf-translated-citation{background:var(--pdf-citation-yellow);color:#211c0d;border-radius:.2rem;padding:.12em .2em}
 #pdf-translation:has(.pdf-translation-layout){padding:0;background:#fff}
