@@ -896,7 +896,7 @@ export async function documents(request,env,auth) {
       layoutText.length<=MAX_TEXT && plain(layoutText)===plain(storedText);
     const text=hasLayout ? layoutText : storedText;
     if (!text.trim()) return reply({text:'',source:[],lines:[],reuse:'empty'});
-    const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([hasLayout ? 5 : 2,DOCUMENT_MODEL,code,text])));
+    const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([hasLayout ? 6 : 2,DOCUMENT_MODEL,code,text])));
     const key=Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
     const url='https://room/document/page-translation/'+key;
     return target.fetch(url,{method:'POST',body:JSON.stringify({id,text,language,hasLayout})});
@@ -1280,15 +1280,24 @@ export async function documentStorage(request,storage,env) {
       };
       let translations;
       if (hasLayout) {
-        const lineKeys=nonempty.map((_,index)=>'line_'+index);
-        const input=Object.fromEntries(lineKeys.map((key,index)=>[key,nonempty[index]]));
-        const output=JSON.parse(await translateDocumentText(env,JSON.stringify(input),language,true,captureUsage,lineKeys));
-        translations=await Promise.all(lineKeys.map((key,index)=>{
-          const translated=output[key];
-          return typeof translated==='string' && translated.trim()
-            ? translated
-            : translateDocumentText(env,nonempty[index],language,false,captureUsage);
-        }));
+        const numberTokens=value=>value.normalize('NFKC').match(/[0-9]+(?:[.,][0-9]+)*/g) ?? [];
+        const batches=[];
+        for (let offset=0;offset<nonempty.length;offset+=8) batches.push(nonempty.slice(offset,offset+8));
+        const translateBatch=async batch=>{
+          const keys=batch.map((_,index)=>'line_'+index);
+          const input=Object.fromEntries(keys.map((key,index)=>[key,batch[index]]));
+          const output=JSON.parse(await translateDocumentText(env,JSON.stringify(input),language,true,captureUsage,keys));
+          return Promise.all(keys.map((key,index)=>{
+            const original=batch[index];
+            const translated=output[key];
+            const preservesNumbers=typeof translated==='string' &&
+              numberTokens(original).join('|')===numberTokens(translated).join('|');
+            return preservesNumbers && translated.trim()
+              ? translated
+              : translateDocumentText(env,original,language,false,captureUsage);
+          }));
+        };
+        translations=(await Promise.all(batches.map(translateBatch))).flat();
       } else {
         const aligned=await translateDocumentText(env,JSON.stringify(nonempty),language,true,captureUsage);
         try { translations=JSON.parse(aligned)?.lines; } catch {}
