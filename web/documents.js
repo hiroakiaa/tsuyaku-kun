@@ -526,17 +526,25 @@ async function reader() {
     if (citation!==selected) return;
     const runs = items.filter(item=>item.str).map(item=>({item,text:normalize(item.str)}));
     const text = runs.map(run=>run.text).join('');
-    const literalQuote = normalize(selected.quote);
-    const quote = text.includes(literalQuote) ? literalQuote : literalQuote.replaceAll('|','');
-    const start = text.indexOf(quote);
-    slot.classList.toggle("pdf-citation-page", !quote || start<0);
-    if (!quote || start<0) return;
+    const locate = source=>{
+      const literal = normalize(source);
+      const quote = text.includes(literal) ? literal : literal.replaceAll('|','');
+      const start = quote ? text.indexOf(quote) : -1;
+      if (start<0 || text.indexOf(quote,start+1)>=0) return null;
+      return {start,end:start+quote.length};
+    };
+    const whole = locate(selected.quote);
+    const ranges = whole ? [whole] : selected.quote.split(/\n|\s\|\s/u)
+      .filter(fragment=>normalize(fragment).length>=8)
+      .map(locate).filter(Boolean);
     removeCitationMarks(slot);
+    slot.classList.toggle('pdf-citation-page',ranges.length===0);
+    if (!ranges.length) return;
     let offset = 0;
     let firstMark;
     for (const run of runs) {
       const end = offset+run.text.length;
-      if (end>start && offset<start+quote.length) {
+      if (ranges.some(range=>end>range.start && offset<range.end)) {
         const {item} = run;
         const [x,y] = viewport.convertToViewportPoint(item.transform[4],item.transform[5]);
         const mark = append(slot,'span','','pdf-citation-mark');
@@ -828,7 +836,7 @@ async function reader() {
     let offset=0, firstMark;
     result.lines.forEach((line,index)=>{
       const end=offset+source[index].length;
-      if (end>start && offset<start+quote.length) {
+      if (ranges.some(range=>end>range.start && offset<range.end)) {
         const mark=append(translatedPage,'mark',line,'pdf-translated-citation');
         firstMark??=mark;
       } else translatedPage.append(line);
