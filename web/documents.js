@@ -562,7 +562,7 @@ async function reader() {
     if (!selected || selected.page!==Number(slot.dataset.page)) return;
     const items = await pageTextRuns(page);
     const scan = items.some(item=>item.ocr);
-    const normalize = text=>text.normalize('NFKC').replace(scan ? /[\s、。,.]+/gu : /\s+/gu,'');
+    const normalize = text=>text.normalize('NFKC').replace(scan ? /[\s、。]+/gu : /\s+/gu,'');
     if (citation!==selected) return;
     const runs = items.filter(item=>item.str).map(item=>({item,text:normalize(item.str)}));
     const text = runs.map(run=>run.text).join('');
