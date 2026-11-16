@@ -537,8 +537,15 @@ async function reader() {
       .map(locate).filter(Boolean);
   }
   const scanLayouts=new Map();
+  const pdfTextLayers=new WeakMap();
   async function pageTextRuns(page) {
-    const {items}=await page.getTextContent();
+    if (!pdfTextLayers.has(page)) {
+      pdfTextLayers.set(page,page.getTextContent().catch(error=>{
+        pdfTextLayers.delete(page);
+        throw error;
+      }));
+    }
+    const {items}=await pdfTextLayers.get(page);
     const number=page.pageNumber;
     if (!pdfPageTextStatus(layoutPdfText(items),number).requiresOcr) return items;
     if (!scanLayouts.has(number)) {
