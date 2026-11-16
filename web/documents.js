@@ -715,23 +715,43 @@ async function reader() {
     renderEnglishProgress();
     if (translatedPage.getClientRects().length || translationToggle.getClientRects().length) void updatePageTranslation();
   }
+  function pageViewportPosition(scroller, surface) {
+    if (!surface?.clientHeight || !surface.clientWidth) return null;
+    const page=surface.getBoundingClientRect();
+    const view=scroller.getBoundingClientRect();
+    return {x:(view.left-page.left)/page.width,y:(view.top-page.top)/page.height};
+  }
+  function restorePageViewport(scroller,surface,position) {
+    if (!surface || !position) return;
+    const page=surface.getBoundingClientRect();
+    const view=scroller.getBoundingClientRect();
+    scroller.scrollLeft+=page.left-view.left+page.width*position.x;
+    scroller.scrollTop+=page.top-view.top+page.height*position.y;
+  }
   async function updatePageTranslation(retry=false) {
     const revision=++translationRevision;
     const language=translationMode.value;
     for (const button of translationToggle.children) button.setAttribute("aria-pressed",String(button.dataset.language===language));
     renderEnglishProgress();
     const page=Number(pagePicker.value)||1;
+    const pageSelector='[data-page="'+page+'"]';
+    const original=pageList.querySelector(pageSelector);
+    const previous=translatedPage.querySelector('.pdf-translation-layout'+pageSelector);
+    const position=pageViewportPosition(translatedPage,previous);
     translatedPage.hidden=!language;
     translatedPage.lang=language==='ja-easy'?'ja':language;
-    if (!language) return;
-    translatedPage.scrollTop=0;
+    if (!language) {
+      restorePageViewport(preview,original,position);
+      return;
+    }
+    const viewportPosition=position ?? pageViewportPosition(preview,original);
     translatedPage.textContent='翻訳しています…';
     foregroundTranslation++;
     try {
       const result=await loadPageTranslation(page,language,retry);
       if(revision===translationRevision) {
         if (sourceType==='pdf') {
-          if (!await renderTranslationOnPdf(result,page,revision) && revision===translationRevision) {
+          if (!await renderTranslationOnPdf(result,page,revision,viewportPosition) && revision===translationRevision) {
             throw Error('このページでは訳文を元の位置に配置できませんでした。');
           }
         } else {
@@ -752,7 +772,7 @@ async function reader() {
       void prefetchTranslations();
     }
   }
-  async function renderTranslationOnPdf(result,number,revision) {
+  async function renderTranslationOnPdf(result,number,revision,position) {
     try {
       const pdf=await getOriginalPdf();
       const page=await pdf.getPage(number);
@@ -804,6 +824,8 @@ async function reader() {
       if (!blocks.length || from!==pageText.length) return;
       const frame=document.createElement('div');
       frame.className='pdf-page-view pdf-translation-layout';
+      frame.dataset.page=number;
+      frame.style.width=(fitWidth || translatedPage.clientWidth)*zoom+'px';
       if (citation?.page===number && citationStart<0) frame.classList.add('pdf-citation-page');
       const canvas=append(frame,'canvas','');
       const renderViewport=page.getViewport({scale:Math.min(3,devicePixelRatio||1)});
@@ -820,6 +842,7 @@ async function reader() {
         block.style.fontSize=size/unit+'cqw';
       }
       translatedPage.replaceChildren(frame);
+      restorePageViewport(translatedPage,frame,position);
       return true;
     } catch {}
   }
@@ -959,6 +982,12 @@ async function reader() {
     zoom=Math.min(4,Math.max(.5,value));
     if (!fitWidth) return;
     surface.style.width=fitWidth*zoom+'px';
+    const translated=translatedPage.querySelector('.pdf-translation-layout');
+    if (translated && !translatedPage.hidden) {
+      const position=pageViewportPosition(translatedPage,translated);
+      translated.style.width=fitWidth*zoom+'px';
+      restorePageViewport(translatedPage,translated,position);
+    }
     const after=surface.getBoundingClientRect();
     preview.scrollLeft+=after.left-bounds.left+(bounds.left+from.x-before.left)*zoom/previous-to.x;
     preview.scrollTop+=after.top-bounds.top+(bounds.top+from.y-before.top)*zoom/previous-to.y;
