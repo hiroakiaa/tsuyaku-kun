@@ -228,6 +228,9 @@ dialog [tabindex="-1"][autofocus]:focus {
 #pdf-translation[hidden],#pdf-language[hidden]{display:none}
 .answer-english{border-top:1px solid #ffffff32;padding-top:.65rem;margin:.7rem 0;white-space:pre-wrap}
 .pdf-translated-citation{background:#f5d975;color:#211c0d;border-radius:.2rem;padding:.12em .2em}
+.pdf-translation-layout{container-type:inline-size;color:#202020;margin:0}
+.pdf-layout-line{position:absolute;display:block;overflow:hidden;background:#fff;color:#222;line-height:1;white-space:nowrap;padding:0}
+.pdf-layout-line.pdf-translated-citation{background:#f5d975}
 .document-library h2{margin:1.1rem 0 .45rem}
 .document-library ul{margin:.4rem 0}
 .document-library [role=status]:empty,.document-library ul:empty{display:none}

@@ -2,7 +2,7 @@ import {layoutPdfText} from './document-table.js?v=94';
 import {installLocalIcons,localIcon} from './icons.js?v=library';
 import {config} from './config.js';
 import {withEasyJapanese} from './core.js';
-import {createDocumentUiLocale} from './document-ui-locale.js?v=1';
+import {createDocumentUiLocale} from './document-ui-locale.js?v=2';
 const $ = (selector) => document.querySelector(selector);
 const content = $('#content');
 const id = new URLSearchParams(location.search).get('id');
@@ -566,6 +566,8 @@ async function reader() {
   const preview = $('#pdf-scroll');
   const translationMode=$('#pdf-language');
   const translatedPage=$('#pdf-translation');
+  const layoutTranslation=$('#pdf-layout-translation');
+  let showTranslationOnPdf=false;
   const pageTranslations=new Map();
   let translationRevision=0;
   let prefetching=false;
@@ -615,6 +617,7 @@ async function reader() {
     const language=translationMode.value;
     const page=Number(pagePicker.value)||1;
     translatedPage.hidden=!language;
+    layoutTranslation.hidden=!language || sourceType!=='pdf';
     translatedPage.lang=language==='ja-easy'?'ja':language;
     if (!language) return;
     translatedPage.scrollTop=0;
@@ -623,6 +626,9 @@ async function reader() {
       const result=await loadPageTranslation(page,language);
       if(revision===translationRevision) {
         renderTranslatedPage(result,page);
+        if (showTranslationOnPdf && sourceType==='pdf' && result.lines?.length) {
+          void renderTranslationOnPdf(result,page,revision);
+        }
         void prefetchTranslations();
       }
     } catch(error) {
@@ -634,6 +640,73 @@ async function reader() {
         void updatePageTranslation();
       };
     }
+  }
+  async function renderTranslationOnPdf(result,number,revision) {
+    try {
+      const pdf=await getOriginalPdf();
+      const page=await pdf.getPage(number);
+      const viewport=page.getViewport({scale:1});
+      const {items}=await page.getTextContent();
+      if (revision!==translationRevision) return;
+      const normalize=text=>text.normalize('NFKC').replace(/\s/gu,'');
+      let offset=0;
+      const runs=items.filter(item=>item.str?.trim()).map(item=>{
+        const start=offset;
+        offset+=normalize(item.str).length;
+        return {item,start,end:offset};
+      });
+      const pageText=runs.map(({item})=>normalize(item.str)).join('');
+      const blocks=[];
+      const measuringCanvas=document.createElement('canvas');
+      const context=measuringCanvas.getContext('2d');
+      const unit=viewport.width/100;
+      const citationText=citation?.page===number ? normalize(citation.quote) : '';
+      const citationStart=citationText?pageText.indexOf(citationText):-1;
+      let from=0;
+      for (const [index,original] of result.source.entries()) {
+        const needle=normalize(original);
+        if (!needle) continue;
+        const start=pageText.indexOf(needle,from);
+        if (start!==from) return;
+        from=start+needle.length;
+        const matched=runs.filter(run=>run.end>start && run.start<from);
+        if (matched[0]?.start!==start || matched.at(-1)?.end!==from) return;
+        const first=matched[0].item;
+        const [x,y]=viewport.convertToViewportPoint(first.transform[4],first.transform[5]);
+        const height=Math.max(...matched.map(({item})=>item.height));
+        if (!height || matched.some(({item})=>Math.abs(item.transform[5]-first.transform[5])>height*.25 || item.transform[1] || item.transform[2])) return;
+        const width=Math.max(...matched.map(({item})=>viewport.convertToViewportPoint(item.transform[4],item.transform[5])[0]+item.width))-x;
+        if (!(width>0)) return;
+        const nextX=runs.filter(({item})=>Math.abs(item.transform[5]-first.transform[5])<height*.5)
+          .map(({item})=>viewport.convertToViewportPoint(item.transform[4],item.transform[5])[0])
+          .filter(value=>value>=x+width-.1);
+        const available=Math.max(width,Math.min(viewport.width-8,...nextX)-x-2);
+        context.font=height+'px sans-serif';
+        const measured=Math.max(1,context.measureText(result.lines[index]).width);
+        const size=Math.min(height,available/measured*height);
+        if (size<Math.max(7,height*.58)) return;
+        blocks.push({x,y,height,width:Math.max(width,measured*size/height),size,line:result.lines[index],
+          marked:citationStart>=0 && from>citationStart && start<citationStart+citationText.length});
+      }
+      if (!blocks.length || from!==pageText.length) return;
+      const frame=document.createElement('div');
+      frame.className='pdf-page-view pdf-translation-layout';
+      const canvas=append(frame,'canvas','');
+      const renderViewport=page.getViewport({scale:Math.min(3,devicePixelRatio||1)});
+      canvas.width=Math.ceil(renderViewport.width);
+      canvas.height=Math.ceil(renderViewport.height);
+      await page.render({canvas,viewport:renderViewport}).promise;
+      if (revision!==translationRevision) return;
+      for (const {x,y,height,width,size,line,marked} of blocks) {
+        const block=append(frame,marked?'mark':'span',line,'pdf-layout-line'+(marked?' pdf-translated-citation':''));
+        block.style.left=x/unit+'%';
+        block.style.top=(y-height)/viewport.height*100+'%';
+        block.style.width=width/unit+'%';
+        block.style.height=height/viewport.height*100+'%';
+        block.style.fontSize=size/unit+'cqw';
+      }
+      translatedPage.replaceChildren(frame);
+    } catch {}
   }
   function renderTranslatedPage(result,page) {
     const normalize=text=>text.normalize('NFKC').replace(/[\s|]/gu,'');
@@ -658,6 +731,11 @@ async function reader() {
     firstMark?.scrollIntoView({block:'center',behavior:'smooth'});
   }
   translationMode.onchange=()=>void updatePageTranslation();
+  layoutTranslation.onclick=()=>{
+    showTranslationOnPdf=!showTranslationOnPdf;
+    layoutTranslation.setAttribute('aria-pressed',String(showTranslationOnPdf));
+    void updatePageTranslation();
+  };
   document.addEventListener('visibilitychange',()=>void prefetchTranslations());
   window.addEventListener('online',()=>{englishFailures.clear();prefetchFailures.clear();void prefetchTranslations();});
   window.addEventListener('document-language-change',syncTranslationOptions);
