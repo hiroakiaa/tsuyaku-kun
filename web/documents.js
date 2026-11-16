@@ -1464,6 +1464,13 @@ async function reader() {
     let reviewStarted;
     const answerTimings={};
     delete log.dataset.answerTimings;
+    function recordAnswerMetrics() {
+      recordDocumentQaMetric(id,doc.title,{
+        ms:Math.round(performance.now()-started),
+        items:entry.items.length || 1,
+        unsupported:entry.items.length ? entry.items.filter(item=>!item.answer).length : 1,
+      });
+    }
     function measureAnswer(phase,start=started) {
       const name='document-qa:'+phase;
       if (performance.getEntriesByName(name).length>=20) performance.clearMeasures(name);
@@ -1500,12 +1507,8 @@ async function reader() {
         if (item) {
           renderAnswerItem(append(log,'div','','bubble'),item);
           entry.items.push(item);
-          recordDocumentQaMetric(id,doc.title,{
-        ms:Math.round(performance.now()-started),
-        items:entry.items.length || 1,
-        unsupported:entry.items.length ? entry.items.filter(item=>!item.answer && !item.clarify).length : 1,
-      });
-      lastQuestion = entry.items.at(-1)?.worksheetContext ?? question;
+          recordAnswerMetrics();
+          lastQuestion = entry.items.at(-1)?.worksheetContext ?? question;
           history = [...history,entry].slice(-10);
           try { sessionStorage.setItem(historyKey,JSON.stringify(history)); } catch {}
           status.textContent = '';
@@ -1649,11 +1652,7 @@ async function reader() {
           if (!finished) throw Error('回答の受信が途中で止まりました。');
         } finally { await reader.cancel().catch(()=>{}); }
       }
-      recordDocumentQaMetric(id,doc.title,{
-        ms:Math.round(performance.now()-started),
-        items:entry.items.length || 1,
-        unsupported:entry.items.length ? entry.items.filter(item=>!item.answer && !item.clarify).length : 1,
-      });
+      recordAnswerMetrics();
       lastQuestion = entry.items.at(-1)?.worksheetContext ?? question;
       history = [...history,entry].slice(-10);
       try { sessionStorage.setItem(historyKey,JSON.stringify(history)); } catch {}
