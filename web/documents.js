@@ -504,6 +504,19 @@ async function reader() {
       void renderPage(entry.target);
     }
   }, {root:$('#pdf-scroll'),rootMargin:'500px 0px'});
+  const visibleCitationMarks = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      entry.target.classList.add('pdf-citation-visible');
+      visibleCitationMarks.unobserve(entry.target);
+    }
+  }, {root:preview});
+  function removeCitationMarks(container) {
+    for (const mark of container.querySelectorAll('.pdf-citation-mark')) {
+      visibleCitationMarks.unobserve(mark);
+      mark.remove();
+    }
+  }
   let citation;
   async function highlightCitation(slot,page,viewport) {
     const selected = citation;
@@ -516,7 +529,7 @@ async function reader() {
     const quote = normalize(selected.quote);
     const start = text.indexOf(quote);
     if (!quote || start<0) return;
-    for (const mark of slot.querySelectorAll('.pdf-citation-mark')) mark.remove();
+    removeCitationMarks(slot);
     let offset = 0;
     let firstMark;
     for (const run of runs) {
@@ -530,6 +543,7 @@ async function reader() {
         mark.style.top = (y-item.height*viewport.scale)/viewport.height*100+'%';
         mark.style.width = item.width*viewport.scale/viewport.width*100+'%';
         mark.style.height = item.height*viewport.scale/viewport.height*100+'%';
+        visibleCitationMarks.observe(mark);
       }
       offset = end;
     }
@@ -1084,7 +1098,7 @@ async function reader() {
   const materials = doc.materials ?? [];
   function clearCitation() {
     citation = undefined;
-    for (const mark of preview.querySelectorAll('.pdf-citation-mark')) mark.remove();
+    removeCitationMarks(preview);
     for (const mark of translatedPage.querySelectorAll('.pdf-translated-citation')) mark.replaceWith(mark.textContent);
   }
   function sourceLink(parent,n,quote) {
