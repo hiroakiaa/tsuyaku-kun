@@ -14,7 +14,8 @@ function addLanguagePicker(parent) {
   const select=document.createElement('select');
   select.className='document-language';
   select.setAttribute('aria-label','資料QAの利用言語');
-  select.add(new Option('言語：自動',''));
+  select.title='母国語を選ぶと、資料と回答をその言語で表示します';
+  select.add(new Option('母国語：自動',''));
   for (const language of documentLanguages) {
     select.add(new Option(language.labelNative,language.code));
   }
@@ -569,7 +570,8 @@ async function reader() {
     if(language) translationMode.add(new Option(language.labelNative,language.code));
     if(language && !['ja','ja-easy','en'].includes(language.code)) translationMode.add(new Option('English','en'));
     translationMode.hidden=!language;
-    void updatePageTranslation();
+    translationMode.value=language?.code??'';
+    if (translatedPage.getClientRects().length || $('#pdf-language').getClientRects().length) void updatePageTranslation();
   }
   async function updatePageTranslation() {
     const revision=++translationRevision;
