@@ -194,7 +194,16 @@ async function retrievalPassages(env,pages,question,index,target,onSemantic) {
 }
 
 async function generate(env,pages,question,materials=[],emit,selectedPassages,measure,operation=question ? "answer" : "create",language,bilingual) {
-  const passages = selectedPassages ?? pages.map((text,i)=>({page:i+1,text}));
+  const passages = (selectedPassages ?? pages.map((text,i)=>({page:i+1,text}))).map(passage=>{
+    const label = /([\p{L}\p{N}・]{2,16})の/u.exec(question ?? '')?.[1];
+    if (!label || normalized(passage.text).includes(label)) return passage;
+    const lines = passage.text.split('\n');
+    const leadingCharacter = line=>/^\s*([\p{L}\p{N}・])\s*(?:\||$)/u.exec(line)?.[1];
+    const characters = [...label];
+    const matches = lines.some((_,start)=>characters.every((character,offset)=>
+      leadingCharacter(lines[start+offset] ?? '')===character));
+    return matches ? {...passage,verticalLabel:label} : passage;
+  });
   const apiKey = env.OPENAI_DOCUMENT_QA_KEY;
   if (!apiKey) throw Error('資料QAのOpenAI接続が設定されていません。');
   const response = await fetch('https://api.openai.com/v1/chat/completions',{
@@ -210,7 +219,7 @@ async function generate(env,pages,question,materials=[],emit,selectedPassages,me
         (question ? '今回尋ねられた情報に回答を絞り、その情報を直接裏づける原文を引用してください。場所だけを尋ねられた場合は場所や行き先を答え、持ち物や手続きの詳細は、その場所を使う条件として不可欠な場合に含めてください。複数項目を尋ねられた場合や、回答の意味を左右する条件・例外がある場合は、それぞれの根拠を残してください。対象者や参加条件を聞かれたときは、資料に明記された対象者と対象外の人の両方を確認してください。両方がある場合は回答に含め、それぞれの原文とページを引用してください。回答言語の指定がない場合は、質問文で求められた言語、なければ質問文の言語で、label と answer の両方を書いてください。金額の通貨名や「1食」「月額」のような単位・頻度もその言語で表してください。sources の quote には資料の言語の原文を入れてください。前の質問が渡された場合は、今回の質問が指す対象を特定するために使ってください。回答する対象は今回の質問です。合計費用の質問で、資料に金額と回数が明記されていれば、回答欄に内訳と計算式（例：月額×徴収回数＋一度だけの必須費用）を示してください。任意の費用は別に示し、回数や必須かどうかが不明な費用を推測で合計に加えないでください。計算に使った金額・回数・条件はそれぞれ原文引用で裏づけてください。引用は翻訳しないでください。金額を「万を使わず円で」「数字だけの円表記で」などと指定された場合は、回答だけを指定の表記に換算してください（1.2万円は12,000円）。引用には換算前の原文を残してください。ひらがなの語は資料にある漢字の語と照合してください。目次や別紙への案内だけでは、別紙にしかない日時などは確認できません。複数の質問には確認できた項目だけ答え、確認できない項目を明示してください。数字・単位・予定などの条件ごとに裏づける引用を付けてください。答えを含む一文を途中で言い換えず、そのまま引用してください。質問された項目ごとに必ず別の行を作る（例：給食費・生徒会費・PTA会費なら3行）。各行の引用はその項目名と値を直接含む資料の一節。別項目の引用を流用しない。形式は {"items":[{"label":"項目名","answer":"その項目だけの回答","sources":[{"page":1,"quote":"原文"}]}]}。根拠なしの行も項目名を返し sources は空配列。' :
           '締切、提出物、持ち物、日時を優先し、最大6件。資料の構成に沿った見出しを最大24件、toc に title と page で追加してください。見出しは章の内容が分かる短い題名にし、ページ番号だけの題名は禁止です。各章が始まる実際のページを付け、ページ順に並べてください。形式は {"items":[{"label":"項目","text":"要点","source":{"page":1,"quote":"原文"}}],"toc":[{"title":"見出し","page":1}]}。')},
       ...(language ? [{role:'system',content:`Write every answer and label in ${language}, regardless of the question or source language. Keep all source quotations in the original language and preserve their page numbers.${bilingual?' Include an englishAnswer field in each item with an English translation of its answer.':''}`}] : []),
-      {role:'user',content:JSON.stringify({資料:passages.map(({page,text})=>({page,資料名:materials.find(file=>page>=file.start && page<file.start+file.count)?.name,text:text.normalize('NFKC')})),質問:question})},
+      {role:'user',content:JSON.stringify({資料:passages.map(({page,text,verticalLabel})=>({page,縦書き見出し候補:verticalLabel,資料名:materials.find(file=>page>=file.start && page<file.start+file.count)?.name,text:text.normalize('NFKC')})),質問:question})},
     ],
     temperature:0,max_completion_tokens:2200,store:false,
     }),
