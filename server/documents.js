@@ -1078,14 +1078,22 @@ export async function documents(request,env,auth) {
       if (partial.some(item=>item.answer)) return partial;
       throw error;
     }
-    const resolved = full.filter(item=>item.answer).length;
-    const previouslyResolved = partial.filter(item=>item.answer).length;
-    if (resolved>0 && previouslyResolved===0 && full.length===1 && partial.length>1) {
-      const label = normalized(full[0].label);
-      const matching = partial.filter(item=>normalized(item.label)===label);
-      if (matching.length===1) return partial.map(item=>item===matching[0] ? full[0] : item);
+    if (!partial.length || partial.every(item=>!item.answer) && full.length>=partial.length) return full;
+    const additions = new Map();
+    for (const item of full) {
+      const label = normalized(item.label);
+      additions.set(label,additions.has(label) ? null : item);
     }
-    return resolved>=previouslyResolved && full.length>=partial.length ? full : partial;
+    let updated=false;
+    const merged=partial.map(item=>{
+      if (item.answer) return item;
+      const label=normalized(item.label);
+      const candidate=additions.get(label);
+      if (!candidate?.answer || partial.filter(other=>normalized(other.label)===label).length!==1) return item;
+      updated=true;
+      return candidate;
+    });
+    return updated ? merged : partial;
   };
   const localize = async items => {
     if (!language) return items;
