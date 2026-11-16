@@ -121,3 +121,14 @@ console.log('PASS table quotation preserves rows and prose joins wrapped lines')
     cell('団体',10,60),cell('要予約',100,60),cell('680円',190,60),
   ]),/個人 \|  \| 240円/u);
 }
+
+{
+  const cell=(str,x,y)=>({str,width:str.length*10,transform:[10,0,0,10,x,y]});
+  const items=[
+    ['施設','平日','','休日',''],
+    ['施設','開始','終了','開始','終了'],
+    ['受付','09:00','16:00','10:00','17:00'],
+    ['研修室','08:00','15:00','09:00','16:00'],
+  ].flatMap((row,index)=>row.flatMap((str,column)=>str?[cell(str,10+column*100,100-index*15)]:[]));
+  assert.equal(layoutPdfText(items).split('\n')[0],'施設 | 平日 |  | 休日 | ');
+}

@@ -85,6 +85,15 @@ export function layoutPdfText(items) {
       const values = anchors.map((_,column)=>cells[positions.indexOf(column)]?.text.trim() ?? '');
       horizontal[index] = values.join(' | ');
     }
+    const upper = groupedRows[first-1];
+    const repeatedLabels = new Set(header.slice(1).map(cell=>cell.text.trim().normalize('NFKC'))).size<header.length-1;
+    if (upper && repeatedLabels && upper.cells.length>=2 && upper.cells.length<anchors.length &&
+        upper.y-rows[first].y<=size*3) {
+      const positions=upper.cells.map(cell=>anchors.findIndex(anchor=>Math.abs(anchor.x-cell.x)<=3));
+      if (positions[0]===0 && positions[1]===1 && positions.every((column,i)=>column>=0 && (!i || column>positions[i-1]))) {
+        horizontal[first-1]=anchors.map((_,column)=>upper.cells[positions.indexOf(column)]?.text.trim() ?? '').join(' | ');
+      }
+    }
     first += aligned.length;
   }
   const titles = rows[0]?.cells;
