@@ -352,3 +352,10 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
   font-size: .85em;
   color: var(--muted);
 }
+/* Keep titles readable when the controls need the whole width of the chat column. */
+.ask-layout{container-type:inline-size}
+@container (max-width:42rem){
+  .ask-heading{display:grid;grid-template-columns:minmax(0,1fr);gap:.5rem}
+  .ask-heading h2{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ask-heading .qa-actions{justify-content:flex-end;flex-wrap:wrap;min-width:0}
+}
