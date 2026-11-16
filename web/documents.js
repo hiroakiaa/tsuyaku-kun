@@ -8,9 +8,10 @@ const content = $('#content');
 const id = new URLSearchParams(location.search).get('id');
 const documentLanguages=withEasyJapanese({languages:[]}).languages;
 const languagePreference='tsuyaku-document-language';
-let selectedLanguage='';
-try { selectedLanguage=localStorage.getItem(languagePreference)??''; } catch {}
-if (!documentLanguages.some(language=>language.code===selectedLanguage)) selectedLanguage='';
+const defaultDocumentLanguage='ja';
+let selectedLanguage=defaultDocumentLanguage;
+try { selectedLanguage=localStorage.getItem(languagePreference)??defaultDocumentLanguage; } catch {}
+if (selectedLanguage && !documentLanguages.some(language=>language.code===selectedLanguage)) selectedLanguage=defaultDocumentLanguage;
 const setUiLanguage=createDocumentUiLocale(content,language=>request('/documents/ui-language/'+encodeURIComponent(language)));
 setUiLanguage(selectedLanguage);
 window.addEventListener('document-language-change',()=>setUiLanguage(selectedLanguage));
@@ -31,7 +32,7 @@ function addLanguagePicker(parent) {
   });
   window.addEventListener('storage',event=>{
     if(event.key!==languagePreference) return;
-    select.value=event.newValue??'';
+    select.value=event.newValue??defaultDocumentLanguage;
     selectedLanguage=select.value;
     window.dispatchEvent(new Event('document-language-change'));
   });
