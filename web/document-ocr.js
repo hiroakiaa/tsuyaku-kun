@@ -66,7 +66,7 @@ function nativeScanImage(page, ops, operatorList) {
 
 export async function createPdfOcr(ops) {
   for (const name of timingNames) performance.clearMeasures(name);
-  let standard, horizontal, disabled=false;
+  let standard, horizontal, vertical, disabled=false;
   async function standardWorker() {
     standard ??= (async()=>{
       const started=performance.now();
@@ -75,7 +75,7 @@ export async function createPdfOcr(ops) {
         workerPath:'https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/worker.min.js',
         corePath:'https://cdn.jsdelivr.net/npm/tesseract.js-core@6.0.0',
       });
-      if (!horizontal) recordTiming(timingNames[0],started);
+      if (!horizontal && !vertical) recordTiming(timingNames[0],started);
       return worker;
     })();
     return standard;
@@ -95,6 +95,26 @@ export async function createPdfOcr(ops) {
         const recognitionStarted = performance.now();
         const image = operatorList && nativeScanImage(page,ops,operatorList);
         let text = '';
+        const {hasVerticalScanColumns}=await import('./document-ocr-lines.js?v=2');
+        const context=canvas.getContext('2d');
+        if (hasVerticalScanColumns(context.getImageData(0,0,canvas.width,canvas.height))) {
+          try {
+            if (!vertical) {
+              const started=performance.now();
+              const {default:{createWorker}}=await import('https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/tesseract.esm.min.js');
+              vertical=await createWorker('jpn_vert',1,{
+                workerPath:'https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/worker.min.js',
+                corePath:'https://cdn.jsdelivr.net/npm/tesseract.js-core@6.0.0',
+              });
+              if (!standard && !horizontal) recordTiming(timingNames[0],started);
+            }
+            const {data}=await vertical.recognize(canvas);
+            if (data.confidence>=70 && data.text.replace(/\s/gu,'').length>=8) {
+              recordTiming(timingNames[2],recognitionStarted);
+              return data.text.trim();
+            }
+          } catch { /* Use the standard reader if vertical recognition is unavailable. */ }
+        }
         if (image) {
           const native = document.createElement('canvas');
           native.width = image.width;
@@ -161,6 +181,7 @@ export async function createPdfOcr(ops) {
     },
     async close() {
       horizontal?.close();
+      await vertical?.terminate();
       const worker=await standard?.catch(()=>null);
       await worker?.terminate();
     },

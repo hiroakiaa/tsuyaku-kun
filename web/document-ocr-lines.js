@@ -41,3 +41,35 @@ export function findHorizontalScanLines({data,width,height}) {
   }
   return lines;
 }
+
+/** Identify pages in which the ink is mostly in narrow, tall text columns. */
+export function hasVerticalScanColumns({data,width,height}) {
+  const bands=[];
+  let band;
+  let totalInk=0;
+  for (let x=0; x<width; x++) {
+    let top=height, bottom=-1, ink=0;
+    for (let y=0; y<height; y++) {
+      const offset=(y*width+x)*4;
+      if (data[offset+3]<128 || data[offset]+data[offset+1]+data[offset+2]>540) continue;
+      top=Math.min(top,y);
+      bottom=y;
+      ink++;
+    }
+    if (ink<2) continue;
+    totalInk+=ink;
+    if (!band || x-band.right>4) {
+      band={left:x,right:x,top,bottom,ink:0};
+      bands.push(band);
+    }
+    band.right=x;
+    band.top=Math.min(band.top,top);
+    band.bottom=Math.max(band.bottom,bottom);
+    band.ink+=ink;
+  }
+  const vertical=bands.filter(({left,right,top,bottom})=>{
+    const width=right-left+1, height=bottom-top+1;
+    return width>=8 && height>=width*4;
+  });
+  return vertical.length>=2 && vertical.reduce((sum,band)=>sum+band.ink,0)>=totalInk*0.85;
+}
