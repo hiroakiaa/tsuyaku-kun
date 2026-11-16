@@ -81,7 +81,7 @@ export async function createPdfOcr(ops) {
     return standard;
   }
   return {
-    async readLayout(page) {
+    async readLayout(page,pageNumberItems=[]) {
       if (page.rotate) return [];
       const size=page.getViewport({scale:1});
       const viewport=page.getViewport({scale:Math.min(3,2400/Math.max(size.width,size.height))});
@@ -91,6 +91,13 @@ export async function createPdfOcr(ops) {
       try {
         await page.render({canvas,viewport}).promise;
         const context=canvas.getContext('2d');
+        context.fillStyle='#fff';
+        for (const item of pageNumberItems) {
+          if (!item.str?.trim() || item.transform[1] || item.transform[2]) continue;
+          const [x,y]=viewport.convertToViewportPoint(item.transform[4],item.transform[5]);
+          const height=item.height*viewport.scale;
+          context.fillRect(x-2,y-height*1.2-2,item.width*viewport.scale+4,height*1.4+4);
+        }
         let lines;
         try {
           const {createHorizontalScanReader}=await import('./document-ocr-horizontal.js?v=2');

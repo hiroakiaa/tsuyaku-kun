@@ -120,7 +120,7 @@ async function extract(file, status) {
       const {requiresOcr,pageNumberOnly}=pdfPageTextStatus(text,n);
       if (requiresOcr) {
         status.textContent = 'スキャンページを端末で読んでいます… ' + n + ' / ' + pdf.numPages;
-        const {createPdfOcr} = await import('./document-ocr.js?v=95');
+        const {createPdfOcr} = await import('./document-ocr.js?v=96');
         ocr ??= await createPdfOcr((await pdfLibrary()).OPS);
         text = await ocr.read(page,{pageNumberOnly});
       }
@@ -547,13 +547,14 @@ async function reader() {
     }
     const {items}=await pdfTextLayers.get(page);
     const number=page.pageNumber;
-    if (!pdfPageTextStatus(layoutPdfText(items),number).requiresOcr) return items;
+    const {requiresOcr,pageNumberOnly}=pdfPageTextStatus(layoutPdfText(items),number);
+    if (!requiresOcr) return items;
     if (!scanLayouts.has(number)) {
       scanLayouts.set(number,(async()=>{
-        const {createPdfOcr}=await import('./document-ocr.js?v=95');
+        const {createPdfOcr}=await import('./document-ocr.js?v=96');
         const reader=await createPdfOcr((await pdfLibrary()).OPS);
         try {
-          const runs=await reader.readLayout(page);
+          const runs=await reader.readLayout(page,pageNumberOnly ? items : []);
           if (!runs.length) console.warn('Document QA: no OCR line boxes for PDF page',number);
           return runs;
         }
