@@ -542,7 +542,11 @@ async function reader() {
       scanLayouts.set(number,(async()=>{
         const {createPdfOcr}=await import('./document-ocr.js?v=94');
         const reader=await createPdfOcr((await pdfLibrary()).OPS);
-        try { return await reader.readLayout(page); }
+        try {
+          const runs=await reader.readLayout(page);
+          if (!runs.length) console.warn('Document QA: no OCR line boxes for PDF page',number);
+          return runs;
+        }
         finally { await reader.close(); }
       })().catch(()=>{
         console.warn('Document QA: scan layout recognition failed for PDF page',number);
