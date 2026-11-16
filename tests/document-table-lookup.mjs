@@ -102,3 +102,13 @@ console.log('PASS table quotation preserves rows and prose joins wrapped lines')
   assert.match(layoutPdfText(rows.map(item=>({...item,transform:item.transform.map((value,i)=>i===0||i===3?12:value)}))),
     /^Exhibition \| Workshop\nVisitor \| Fee \| Visitor \| Fee/);
 }
+
+{
+  const cell = (str,x,y) => ({str,width:str.length*10,transform:[10,0,0,10,x,y]});
+  const items = [
+    cell('区分',10,90),cell('予約',100,90),cell('料金',190,90),
+    cell('個人',10,75),cell('240円',190,75),
+    cell('団体',10,60),cell('要予約',100,60),cell('680円',190,60),
+  ];
+  assert.equal(layoutPdfText(items),'区分 | 予約 | 料金\n個人 |  | 240円\n団体 | 要予約 | 680円');
+}

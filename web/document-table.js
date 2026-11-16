@@ -48,6 +48,26 @@ export function layoutPdfText(items) {
     }).join('').trim();
   };
   let horizontal = rows.map(({cells})=>formatRow(cells));
+  // Preserve empty cells when several adjacent rows share the same column anchors.
+  for (let first=0; first+2<rows.length; first++) {
+    const anchors = rows[first].cells;
+    if (anchors.length<3 || anchors.some((cell,i)=>i && cell.x-anchors[i-1].end<=Math.max(8,cell.size))) continue;
+    const aligned = [];
+    for (let index=first+1; index<rows.length; index++) {
+      const {cells,y} = rows[index];
+      if (rows[index-1].y-y>Math.max(...anchors.map(cell=>cell.size))*3) break;
+      const positions = cells.map(cell=>anchors.findIndex(anchor=>Math.abs(anchor.x-cell.x)<=3));
+      if (positions.length<2 || positions[0]!==0 || positions.includes(-1) ||
+          new Set(positions).size!==positions.length) break;
+      aligned.push({index,cells,positions});
+    }
+    if (aligned.length<2) continue;
+    for (const {index,cells,positions} of aligned) {
+      const values = anchors.map((_,column)=>cells[positions.indexOf(column)]?.text.trim() ?? '');
+      horizontal[index] = values.join(' | ');
+    }
+    first += aligned.length;
+  }
   const titles = rows[0]?.cells;
   if (titles?.length===2 && rows.length>=4 && !vertical.length && !rotated.length) {
     const rightStart = titles[1].x;
