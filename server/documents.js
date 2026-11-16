@@ -878,11 +878,15 @@ export async function documents(request,env,auth) {
   const record = await info.json();
   if (action==='translate') {
     const input=await request.text();
-    if (input.length>512) return fail('翻訳するページと言語を確認してください。',413);
-    const {page,language:code}=JSON.parse(input);
+    if (input.length>MAX_TEXT*2) return fail('翻訳するページと言語を確認してください。',413);
+    const {page,language:code,layoutText}=JSON.parse(input);
     const language=answerLanguages.get(code);
-    const text=Number.isInteger(page) && page>0 && page<=(record.originalPageCount ?? record.pages.length) ? record.pages[page-1] : null;
-    if (!language || typeof text!=='string') return fail('翻訳するページと言語を確認してください。');
+    const storedText=Number.isInteger(page) && page>0 && page<=(record.originalPageCount ?? record.pages.length) ? record.pages[page-1] : null;
+    if (!language || typeof storedText!=='string') return fail('翻訳するページと言語を確認してください。');
+    const plain = value=>normalized(value).replaceAll('|','');
+    const hasLayout=(record.sourceType ?? 'pdf')==='pdf' && typeof layoutText==='string' &&
+      layoutText.length<=MAX_TEXT && plain(layoutText)===plain(storedText);
+    const text=hasLayout ? layoutText : storedText;
     if (!text.trim()) return reply({text:'',source:[],lines:[],reuse:'empty'});
     const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([2,DOCUMENT_MODEL,code,text])));
     const key=Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');

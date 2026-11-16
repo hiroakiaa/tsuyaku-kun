@@ -604,10 +604,35 @@ async function reader() {
       };
     }
   }
+  const pdfTranslationSources=new Map();
+  function pdfTranslationSource(number) {
+    if (!pdfTranslationSources.has(number)) {
+      pdfTranslationSources.set(number,(async()=>{
+        const page=await (await getOriginalPdf()).getPage(number);
+        const {items}=await page.getTextContent();
+        const lines=[];
+        let last;
+        for (const item of items) {
+          if (!item.str?.trim()) continue;
+          const [, , , ,x,y]=item.transform;
+          const gap=last ? x-last.transform[4]-last.width : 0;
+          if (!last || Math.abs(y-last.transform[5])>Math.max(1,item.height*.2) ||
+              gap>item.height || x<last.transform[4]) lines.push(item.str);
+          else lines[lines.length-1]+=(gap>item.height*.22?' ':'')+item.str;
+          last=item;
+        }
+        return lines.join('\n');
+      })().catch(()=>undefined));
+    }
+    return pdfTranslationSources.get(number);
+  }
   function loadPageTranslation(page,language) {
     const key=page+':'+language;
     if (!pageTranslations.has(key)) {
-      pageTranslations.set(key,request(api+'/translate',{method:'POST',signal:AbortSignal.timeout(60_000),headers:{'Content-Type':'application/json'},body:JSON.stringify({page,language})})
+      pageTranslations.set(key,(async()=>{
+        const layoutText=sourceType==='pdf' ? await pdfTranslationSource(page) : undefined;
+        return request(api+'/translate',{method:'POST',signal:AbortSignal.timeout(60_000),headers:{'Content-Type':'application/json'},body:JSON.stringify({page,language,layoutText})});
+      })()
         .then(result=>{
           if (language==='en') {
             readyEnglishPages.add(page);
