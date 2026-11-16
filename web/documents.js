@@ -1,3 +1,4 @@
+import {recordDocumentQaMetric} from './document-qa-metrics.js?v=1';
 import {layoutPdfText} from './document-table.js?v=94';
 import {installLocalIcons,localIcon} from './icons.js?v=library';
 import {config} from './config.js';
@@ -755,6 +756,7 @@ async function reader() {
       const result=await loadPageTranslation(page,language,retry);
       if(revision===translationRevision) {
         if (result.reuse) translatedPage.dataset.translationReuse=result.reuse;
+        if (['cache','in-flight','generated'].includes(result.reuse)) recordDocumentQaMetric(id,doc.title,{translation:result.reuse});
         if (sourceType==='pdf') {
           if (!await renderTranslationOnPdf(result,page,revision,viewportPosition) && revision===translationRevision) {
             throw Error('このページでは訳文を元の位置に配置できませんでした。');
@@ -1498,7 +1500,12 @@ async function reader() {
         if (item) {
           renderAnswerItem(append(log,'div','','bubble'),item);
           entry.items.push(item);
-          lastQuestion = entry.items.at(-1)?.worksheetContext ?? question;
+          recordDocumentQaMetric(id,doc.title,{
+        ms:Math.round(performance.now()-started),
+        items:entry.items.length || 1,
+        unsupported:entry.items.length ? entry.items.filter(item=>!item.answer && !item.clarify).length : 1,
+      });
+      lastQuestion = entry.items.at(-1)?.worksheetContext ?? question;
           history = [...history,entry].slice(-10);
           try { sessionStorage.setItem(historyKey,JSON.stringify(history)); } catch {}
           status.textContent = '';
@@ -1642,6 +1649,11 @@ async function reader() {
           if (!finished) throw Error('回答の受信が途中で止まりました。');
         } finally { await reader.cancel().catch(()=>{}); }
       }
+      recordDocumentQaMetric(id,doc.title,{
+        ms:Math.round(performance.now()-started),
+        items:entry.items.length || 1,
+        unsupported:entry.items.length ? entry.items.filter(item=>!item.answer && !item.clarify).length : 1,
+      });
       lastQuestion = entry.items.at(-1)?.worksheetContext ?? question;
       history = [...history,entry].slice(-10);
       try { sessionStorage.setItem(historyKey,JSON.stringify(history)); } catch {}
