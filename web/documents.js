@@ -589,6 +589,7 @@ async function reader() {
   const englishProgress=$('#pdf-english-progress');
   let translationRevision=0;
   let prefetching=false;
+  let foregroundTranslation=0;
   const englishFailures=new Map();
   const prefetchFailures=new Set();
   function renderEnglishProgress() {
@@ -660,7 +661,7 @@ async function reader() {
     return pageTranslations.get(key);
   }
   async function prefetchTranslations() {
-    if (prefetching || document.hidden || navigator.onLine===false) return;
+    if (prefetching || foregroundTranslation || document.hidden || navigator.onLine===false) return;
     const language=translationMode.value;
     const current=Number(pagePicker.value)||1;
     const englishPages=Array.from({length:doc.pageCount},(_,i)=>i+1);
@@ -716,6 +717,7 @@ async function reader() {
     if (!language) return;
     translatedPage.scrollTop=0;
     translatedPage.textContent='翻訳しています…';
+    foregroundTranslation++;
     try {
       const result=await loadPageTranslation(page,language,retry);
       if(revision===translationRevision) {
@@ -726,7 +728,7 @@ async function reader() {
         } else {
           renderTranslatedPage(result,page);
         }
-        void prefetchTranslations();
+
       }
     } catch(error) {
       if(revision!==translationRevision) return;
@@ -736,6 +738,9 @@ async function reader() {
         translationMode.value='';
         void updatePageTranslation();
       };
+    } finally {
+      foregroundTranslation--;
+      void prefetchTranslations();
     }
   }
   async function renderTranslationOnPdf(result,number,revision) {
@@ -1356,7 +1361,7 @@ async function reader() {
       if (!answerLanguage && sourceType==='pdf' && (!doc.convertedWorksheet || materials.length) && (priceContext || /の/.test(question) || /^what is the .+ (?:for|of) /i.test(question))) {
         let item;
         try {
-          const {lookupTableCell,lookupAlignedTableCell}=await import('./document-table-lookup.js?v=85');
+          const {lookupTableCell,lookupAlignedTableCell}=await import('./document-table-lookup.js?v=86');
           const pdf=await getOriginalPdf();
           if (!materials.length) {
             const {readTaggedTables,findTaggedTableCell}=await import('./document-tagged-table.js?v=2');

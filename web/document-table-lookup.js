@@ -1,5 +1,18 @@
 const compact = text => text.normalize('NFKC').replace(/\s/g,'');
 
+const pdfPageText = new WeakMap();
+function pageText(pdf, number) {
+  let pages=pdfPageText.get(pdf);
+  if (!pages) pdfPageText.set(pdf,pages=new Map());
+  if (!pages.has(number)) {
+    pages.set(number,pdf.getPage(number).then(async page=>({page,...await page.getTextContent()})).catch(error=>{
+      pages.delete(number);
+      throw error;
+    }));
+  }
+  return pages.get(number);
+}
+
 export async function lookupTableCell(pdf, question) {
   const match = /^([^の？?、]{2,40}?)の([^？?、]{2,40}?)(?:の基準(?:は)?|を教えてください|を教えて|はいくら|は何|はいつ|はどこ|は)?[？?。]?$/u.exec(compact(question));
   if (!match) return null;
@@ -8,8 +21,7 @@ export async function lookupTableCell(pdf, question) {
   const matches=[];
 
   for (let number=1; number<=pdf.numPages; number++) {
-    const page=await pdf.getPage(number);
-    const {items}=await page.getTextContent();
+    const {page,items}=await pageText(pdf,number);
 
     const viewport=page.getViewport({scale:1200/page.getViewport({scale:1}).width});
     const cells=items.filter(item=>item.str?.trim()).map(item=>{
@@ -96,7 +108,7 @@ export async function lookupAlignedTableCell(pdf, question) {
   const field=terms.at(-1);
   const matches=[];
   for(let page=1;page<=pdf.numPages;page++){
-    const {items}=await (await pdf.getPage(page)).getTextContent();
+    const {items}=await pageText(pdf,page);
     const fragments=items.filter(item=>item.str?.trim()).map(item=>({
       x:item.transform[4],y:item.transform[5],end:item.transform[4]+item.width,text:item.str
     })).sort((a,b)=>b.y-a.y || a.x-b.x);
