@@ -2,6 +2,7 @@ import {layoutPdfText} from './document-table.js?v=94';
 import {installLocalIcons,localIcon} from './icons.js?v=library';
 import {config} from './config.js';
 import {withEasyJapanese} from './core.js';
+import {createDocumentUiLocale} from './document-ui-locale.js?v=1';
 const $ = (selector) => document.querySelector(selector);
 const content = $('#content');
 const id = new URLSearchParams(location.search).get('id');
@@ -10,6 +11,9 @@ const languagePreference='tsuyaku-document-language';
 let selectedLanguage='';
 try { selectedLanguage=localStorage.getItem(languagePreference)??''; } catch {}
 if (!documentLanguages.some(language=>language.code===selectedLanguage)) selectedLanguage='';
+const setUiLanguage=createDocumentUiLocale(content,language=>request('/documents/ui-language/'+encodeURIComponent(language)));
+setUiLanguage(selectedLanguage);
+window.addEventListener('document-language-change',()=>setUiLanguage(selectedLanguage));
 function addLanguagePicker(parent) {
   const select=document.createElement('select');
   select.className='document-language';

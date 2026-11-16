@@ -1,4 +1,5 @@
 import {mergeLanguages} from '../web/language-registry.js';
+import {documentUiLabels} from '../web/document-ui-locale.js';
 
 const DOCUMENT_MODEL = 'gpt-4.1-mini';
 const pendingPageTranslations=new Map();
@@ -711,6 +712,13 @@ async function readMaterial(env,file,form,ext) {
 
 export async function documents(request,env,auth) {
   const {pathname} = new URL(request.url);
+  const uiLanguage=/^\/documents\/ui-language\/([\w-]+)$/.exec(pathname)?.[1];
+  if (uiLanguage && request.method==='GET') {
+    const language=answerLanguages.get(uiLanguage);
+    if (!language) return fail('表示言語を確認してください。');
+    const locale=env.ROOMS.get(env.ROOMS.idFromName('__document_ui_locale__:'+uiLanguage));
+    return locale.fetch('https://room/document/ui-locale/'+uiLanguage,{method:'POST',body:JSON.stringify({language})});
+  }
   const library = env.ROOMS.get(env.ROOMS.idFromName('__document_library__'));
   if (pathname === '/documents/library' && request.method === 'GET') {
     const response = await library.fetch('https://room/document/library');
@@ -1136,6 +1144,25 @@ export async function documents(request,env,auth) {
 
 export async function documentStorage(request,storage,env) {
   const path = new URL(request.url).pathname;
+  if (path.startsWith('/document/ui-locale/') && request.method==='POST') {
+    const {language}=await request.json();
+    const key=path+':v1';
+    if (!pendingPageTranslations.has(key)) {
+      pendingPageTranslations.set(key,(async()=>{
+        const cached=await storage.get(key);
+        if (cached) return cached;
+        const source=documentUiLabels.map(([label])=>label);
+        const {lines}=JSON.parse(await translateDocumentText(env,JSON.stringify(source),language,true));
+        if (!Array.isArray(lines) || lines.length!==source.length ||
+            lines.some(line=>typeof line!=='string' || !line.trim())) throw Error('画面の翻訳を完了できませんでした。');
+        const result={lines};
+        await storage.put(key,result);
+        return result;
+      })().finally(()=>pendingPageTranslations.delete(key)));
+    }
+    try { return reply(await pendingPageTranslations.get(key)); }
+    catch(error) { return fail(error.message,502); }
+  }
   if (path==='/document/library') {
     if (request.method==='GET') {
       const entries = await storage.list({prefix:'entry:',reverse:true});
