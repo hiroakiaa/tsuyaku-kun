@@ -81,6 +81,29 @@ export async function createPdfOcr(ops) {
     return standard;
   }
   return {
+    async readLayout(page) {
+      if (page.rotate) return [];
+      const size=page.getViewport({scale:1});
+      const viewport=page.getViewport({scale:Math.min(3,2400/Math.max(size.width,size.height))});
+      const canvas=document.createElement('canvas');
+      canvas.width=Math.ceil(viewport.width);
+      canvas.height=Math.ceil(viewport.height);
+      try {
+        await page.render({canvas,viewport}).promise;
+        const {data}=await (await standardWorker()).recognize(canvas,{}, {blocks:true});
+        return (data.blocks ?? []).flatMap(block=>block.paragraphs).flatMap(paragraph=>paragraph.lines)
+          .flatMap(({text,bbox})=>{
+            const str=text.trim();
+            const width=(bbox.x1-bbox.x0)/viewport.scale;
+            const height=(bbox.y1-bbox.y0)/viewport.scale;
+            if (!str || width<=0 || height<=0) return [];
+            const [x,y]=viewport.convertToPdfPoint(bbox.x0,bbox.y1);
+            return [{str,width,height,transform:[height,0,0,height,x,y]}];
+          });
+      } finally {
+        canvas.width=canvas.height=0;
+      }
+    },
     async read(page,{pageNumberOnly=false}={}) {
       const size = page.getViewport({scale:1});
       const viewport = page.getViewport({scale:Math.min(3,2400/Math.max(size.width,size.height))});

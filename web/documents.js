@@ -116,7 +116,7 @@ async function extract(file, status) {
       const pageNumberOnly = [String(n),'ページ'+n,n+'ページ','-'+n+'-'].includes(compact);
       if (!compact || pageNumberOnly) {
         status.textContent = 'スキャンページを端末で読んでいます… ' + n + ' / ' + pdf.numPages;
-        const {createPdfOcr} = await import('./document-ocr.js?v=92');
+        const {createPdfOcr} = await import('./document-ocr.js?v=93');
         ocr ??= await createPdfOcr((await pdfLibrary()).OPS);
         text = await ocr.read(page,{pageNumberOnly});
       }
@@ -532,11 +532,31 @@ async function reader() {
       .filter(fragment=>normalize(fragment).length>=8)
       .map(locate).filter(Boolean);
   }
+  const scanLayouts=new Map();
+  async function pageTextRuns(page) {
+    const {items}=await page.getTextContent();
+    const compact=items.map(item=>item.str ?? '').join('').normalize('NFKC').replace(/\s/gu,'');
+    const number=page.pageNumber;
+    if (compact && ![String(number),'ページ'+number,number+'ページ','-'+number+'-'].includes(compact)) return items;
+    if (!scanLayouts.has(number)) {
+      scanLayouts.set(number,(async()=>{
+        const {createPdfOcr}=await import('./document-ocr.js?v=93');
+        const reader=await createPdfOcr((await pdfLibrary()).OPS);
+        try { return await reader.readLayout(page); }
+        finally { await reader.close(); }
+      })().catch(()=>{
+        scanLayouts.delete(number);
+        return [];
+      }));
+    }
+    const runs=await scanLayouts.get(number);
+    return runs.length ? runs : items;
+  }
   async function highlightCitation(slot,page,viewport) {
     const selected = citation;
     if (!selected || selected.page!==Number(slot.dataset.page)) return;
     const normalize = text=>text.normalize('NFKC').replace(/\s+/g,'');
-    const {items} = await page.getTextContent();
+    const items = await pageTextRuns(page);
     if (citation!==selected) return;
     const runs = items.filter(item=>item.str).map(item=>({item,text:normalize(item.str)}));
     const text = runs.map(run=>run.text).join('');
@@ -625,7 +645,7 @@ async function reader() {
     if (!pdfTranslationSources.has(key)) {
       pdfTranslationSources.set(key,(async()=>{
         const page=await (await getOriginalPdf()).getPage(number);
-        const {items}=await page.getTextContent();
+        const items=await pageTextRuns(page);
         const lines=[];
         let last;
         for (const item of items) {
@@ -784,7 +804,7 @@ async function reader() {
       const pdf=await getOriginalPdf();
       const page=await pdf.getPage(number);
       const viewport=page.getViewport({scale:1});
-      const {items}=await page.getTextContent();
+      const items=await pageTextRuns(page);
       if (revision!==translationRevision) return;
       const normalize=text=>text.normalize('NFKC').replace(/\s/gu,'');
       let offset=0;
