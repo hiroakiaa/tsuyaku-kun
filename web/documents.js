@@ -1018,7 +1018,9 @@ async function reader() {
     log.scrollTop = log.scrollHeight;
     try {
       const barePrice=/(?:^)(?:利用料金|料金)(?:はいくら(?:ですか)?|は)?[?？。]?$/u;
-      const priceContext=barePrice.test(question.trim()) || barePrice.test(previousQuestion?.trim()??'');
+      const namedPrice=/^[\p{L}\p{N}]{2,24}は(?:何円|いくら)(?:ですか)?[?？。]?$/u;
+      const priceQuestion=value=>barePrice.test(value?.trim()??'') || namedPrice.test(value?.trim()??'');
+      const priceContext=priceQuestion(question) || priceQuestion(previousQuestion);
       if (sourceType==='pdf' && (!doc.convertedWorksheet || materials.length) && (priceContext || /の/.test(question) || /^what is the .+ (?:for|of) /i.test(question))) {
         let item;
         try {
@@ -1030,7 +1032,7 @@ async function reader() {
             item=findTaggedTableCell(await taggedTables,question);
           }
           if (!item && !materials.length && (priceContext || /(?:時刻|利用料|料金|手数料|延長料)(?:はいくら(?:ですか)?|は)?[?？。]?$/.test(question))) {
-            const {lookupPdfTableValue}=await import('./document-pdf-table-value.js?v=6');
+            const {lookupPdfTableValue}=await import('./document-pdf-table-value.js?v=7');
             const pages=await request(api+'/text');
             item=lookupPdfTableValue(pages,question,previousQuestion);
           }

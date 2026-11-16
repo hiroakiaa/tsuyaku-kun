@@ -1,6 +1,8 @@
 const barePrice=/^(利用料金|料金)(?:はいくら(?:ですか)?|は)?$/u;
+const namedPrice=/^([\p{L}\p{N}]{2,24})は(?:何円|いくら)(?:ですか)?$/u;
 export function isPdfTablePriceQuestion(question) {
-  return barePrice.test(question?.normalize('NFKC').trim().replace(/[?。]$/u,'') ?? '');
+  const query=question?.normalize('NFKC').trim().replace(/[?。]$/u,'') ?? '';
+  return barePrice.test(query) || namedPrice.test(query);
 }
 
 export function lookupPdfTableValue(pages,question,previousQuestion) {
@@ -11,7 +13,9 @@ export function lookupPdfTableValue(pages,question,previousQuestion) {
   const field=/^when is the (.+?) for (?:the )?(.+)$/u.exec(query);
   const japanese=/^([^の、]+)の([^の、]+?時刻)(?:は(?:何時(?:ですか)?)?)?$/u.exec(query);
   const fee=/^([^の、]+)の([^、]*?(?:利用料|料金|手数料|延長料))(?:はいくら(?:ですか)?|は)?$/u.exec(query);
-  const bare=barePrice.exec(query);
+  const product=namedPrice.exec(query)?.[1];
+  const previousProduct=isFollowup ? namedPrice.exec(previousQuestion.normalize('NFKC').trim().replace(/[?。]$/u,''))?.[1] : undefined;
+  const bare=barePrice.exec(query) || product;
   if (!verb && !field && !japanese && !fee && !bare) return null;
   const subject=verb?.[1] ?? field?.[2] ?? japanese?.[1] ?? fee?.[1];
   const column=verb ? (verb[2]==='open' ? 'opening' : 'closing') : field?.[1] ?? japanese?.[2] ?? (bare ? '料金' : fee[2].replace(/の/gu,''));
@@ -48,7 +52,8 @@ export function lookupPdfTableValue(pages,question,previousQuestion) {
       const label=headingText(cell);
       return i>0 && columnNames.has(units[i] ? label.replace(/\s*\([^()]+\)$/u,'') : label) ? [i] : [];
     });
-    const ownHeading=columns.length===1;
+    const productTitle=product || previousProduct;
+    const ownHeading=columns.length===1 && (!productTitle || tableStart>0 && headingText(pageLines[tableStart-1])===productTitle);
     const continuesTable = tableStart===0 || (tableStart===1 && /(?:[（(]続き[）)]|^続き)$/u.test(pageLines[0].trim()));
     const table=ownHeading ? {
       header:pageLines.slice(tableStart>0 ? tableStart-1 : tableStart,tableStart+start).join('\n'),page:index+1,width:header.length,
@@ -73,7 +78,7 @@ export function lookupPdfTableValue(pages,question,previousQuestion) {
     if (consistent) continuation=table;
     for (const [offset,row] of rows.entries()) {
       const answer=readValue(row[table.column]);
-      if ((subject && headingText(row[0])!==subject) || answer===null || (bare && !table.unit)) continue;
+      if ((subject && headingText(row[0])!==subject) || answer===null || (bare && !product && !table.unit)) continue;
       matches.push({subject:row[0].trim(),label:table.label,answer,evidence:[
         {page:index+1,quote:lines[start+offset]},{page:table.page,quote:table.header},
       ]});
