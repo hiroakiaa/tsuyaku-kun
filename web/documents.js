@@ -569,14 +569,39 @@ async function reader() {
   const layoutTranslation=$('#pdf-layout-translation');
   let showTranslationOnPdf=false;
   const pageTranslations=new Map();
+  const readyEnglishPages=new Set();
+  const englishProgress=$('#pdf-english-progress');
   let translationRevision=0;
   let prefetching=false;
   const englishFailures=new Map();
   const prefetchFailures=new Set();
+  function renderEnglishProgress() {
+    englishProgress.hidden=translationMode.value!=='en';
+    if (englishProgress.hidden) return;
+    englishProgress.replaceChildren();
+    const ready=readyEnglishPages.size;
+    englishProgress.append(`English · ${ready} / ${doc.pageCount}`);
+    if ([...englishFailures].some(([page,count])=>count>=2 && !readyEnglishPages.has(page))) {
+      const retry=append(englishProgress,'button','Retry incomplete pages');
+      retry.onclick=()=>{
+        englishFailures.clear();
+        renderEnglishProgress();
+        void prefetchTranslations();
+      };
+    }
+  }
   function loadPageTranslation(page,language) {
     const key=page+':'+language;
     if (!pageTranslations.has(key)) {
       pageTranslations.set(key,request(api+'/translate',{method:'POST',signal:AbortSignal.timeout(60_000),headers:{'Content-Type':'application/json'},body:JSON.stringify({page,language})})
+        .then(result=>{
+          if (language==='en') {
+            readyEnglishPages.add(page);
+            englishFailures.delete(page);
+            renderEnglishProgress();
+          }
+          return result;
+        })
         .catch(error=>{pageTranslations.delete(key);throw error;}));
     }
     return pageTranslations.get(key);
@@ -598,6 +623,7 @@ async function reader() {
     catch {
       if (next.language==='en') englishFailures.set(next.page,(englishFailures.get(next.page)??0)+1);
       else prefetchFailures.add(next.page+':'+next.language);
+      renderEnglishProgress();
       delay=1500;
     }
     finally { prefetching=false; }
@@ -610,11 +636,13 @@ async function reader() {
     if(language && !['ja','ja-easy','en'].includes(language.code)) translationMode.add(new Option('English','en'));
     translationMode.hidden=!language || language.code==='ja';
     translationMode.value=language && language.code!=='ja'?language.code:'';
+    renderEnglishProgress();
     if (translatedPage.getClientRects().length || $('#pdf-language').getClientRects().length) void updatePageTranslation();
   }
   async function updatePageTranslation() {
     const revision=++translationRevision;
     const language=translationMode.value;
+    renderEnglishProgress();
     const page=Number(pagePicker.value)||1;
     translatedPage.hidden=!language;
     layoutTranslation.hidden=!language || sourceType!=='pdf';
