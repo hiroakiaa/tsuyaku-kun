@@ -1523,14 +1523,15 @@ async function reader() {
             item={...item,answer:null,evidence:[]};
           }
         }
+        const isPriceItem=/(?:代金|費|料|値段|価格|金額|\b(?:fee|cost|price)\b)/iu.test(item.label);
         const freePrice=/無料|無償|(?:^|[^\d])0\s*円/u;
-        if (/(?:いくら|何円|費用|料金|手数料|教材費)/u.test(question) &&
+        if (isPriceItem && /(?:いくら|何円|費用|料金|手数料|教材費)/u.test(question) &&
             freePrice.test((item.answer??'').normalize('NFKC')) &&
             !item.evidence?.some(source=>freePrice.test(source.quote.normalize('NFKC')))) {
           item={...item,answer:null,evidence:[]};
         }
         const priceEvidence=/無料|無償|実費|要(?:問合せ|問い合わせ)|[0-9一二三四五六七八九十百千万億][0-9一二三四五六七八九十百千万億,.\s]*円|[¥￥]\s*\d/u;
-        if (/(?:いくら|何円)/u.test(question) && /(?:代|費|料|値段|価格|金額)/u.test(question) &&
+        if (isPriceItem && /(?:いくら|何円)/u.test(question) &&
             item.answer && item.evidence?.length &&
             !item.evidence.some(source=>priceEvidence.test(source.quote.normalize('NFKC')))) {
           item={...item,answer:null,evidence:[]};
