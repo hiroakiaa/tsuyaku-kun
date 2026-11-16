@@ -545,6 +545,7 @@ async function reader() {
         try { return await reader.readLayout(page); }
         finally { await reader.close(); }
       })().catch(()=>{
+        console.warn('Document QA: scan layout recognition failed for PDF page',number);
         scanLayouts.delete(number);
         return [];
       }));
