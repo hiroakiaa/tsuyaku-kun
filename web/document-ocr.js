@@ -111,7 +111,7 @@ export async function createPdfOcr(ops) {
             const height=(bbox.y1-bbox.y0)/viewport.scale;
             if (width<=0 || height<=0) return [];
             const [x,y]=viewport.convertToPdfPoint(bbox.x0,bbox.y1);
-            return [{str,width,height,transform:[height,0,0,height,x,y]}];
+            return [{str,width,height,ocr:true,transform:[height,0,0,height,x,y]}];
           });
       } finally {
         canvas.width=canvas.height=0;

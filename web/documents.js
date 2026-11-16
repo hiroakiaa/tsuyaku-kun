@@ -116,7 +116,7 @@ async function extract(file, status) {
       const pageNumberOnly = [String(n),'ページ'+n,n+'ページ','-'+n+'-'].includes(compact);
       if (!compact || pageNumberOnly) {
         status.textContent = 'スキャンページを端末で読んでいます… ' + n + ' / ' + pdf.numPages;
-        const {createPdfOcr} = await import('./document-ocr.js?v=94');
+        const {createPdfOcr} = await import('./document-ocr.js?v=95');
         ocr ??= await createPdfOcr((await pdfLibrary()).OPS);
         text = await ocr.read(page,{pageNumberOnly});
       }
@@ -540,7 +540,7 @@ async function reader() {
     if (compact && ![String(number),'ページ'+number,number+'ページ','-'+number+'-'].includes(compact)) return items;
     if (!scanLayouts.has(number)) {
       scanLayouts.set(number,(async()=>{
-        const {createPdfOcr}=await import('./document-ocr.js?v=94');
+        const {createPdfOcr}=await import('./document-ocr.js?v=95');
         const reader=await createPdfOcr((await pdfLibrary()).OPS);
         try {
           const runs=await reader.readLayout(page);
@@ -560,12 +560,14 @@ async function reader() {
   async function highlightCitation(slot,page,viewport) {
     const selected = citation;
     if (!selected || selected.page!==Number(slot.dataset.page)) return;
-    const normalize = text=>text.normalize('NFKC').replace(/\s+/g,'');
     const items = await pageTextRuns(page);
+    const scan = items.some(item=>item.ocr);
+    const normalize = text=>text.normalize('NFKC').replace(scan ? /[\s、。,.]+/gu : /\s+/gu,'');
     if (citation!==selected) return;
     const runs = items.filter(item=>item.str).map(item=>({item,text:normalize(item.str)}));
     const text = runs.map(run=>run.text).join('');
     const ranges=citationRanges(text,selected.quote,normalize);
+    if (scan && !ranges.length) console.warn('Document QA: citation did not match OCR lines for page',selected.page);
     removeCitationMarks(slot);
     slot.classList.toggle('pdf-citation-page',ranges.length===0);
     if (!ranges.length) return;
