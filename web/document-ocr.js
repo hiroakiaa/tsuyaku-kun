@@ -104,10 +104,12 @@ export async function createPdfOcr(ops) {
         }
         return lines
           .flatMap(({text,bbox})=>{
-            const str=text.trim();
+            const str=typeof text==='string' ? text.trim() : '';
+            if (!str || !bbox || ![bbox.x0,bbox.y0,bbox.x1,bbox.y1].every(Number.isFinite) ||
+                bbox.x0<0 || bbox.y0<0 || bbox.x1>canvas.width || bbox.y1>canvas.height) return [];
             const width=(bbox.x1-bbox.x0)/viewport.scale;
             const height=(bbox.y1-bbox.y0)/viewport.scale;
-            if (!str || width<=0 || height<=0) return [];
+            if (width<=0 || height<=0) return [];
             const [x,y]=viewport.convertToPdfPoint(bbox.x0,bbox.y1);
             return [{str,width,height,transform:[height,0,0,height,x,y]}];
           });
