@@ -1177,7 +1177,7 @@ async function reader() {
     for (const slot of document.querySelectorAll(".pdf-citation-page")) slot.classList.remove("pdf-citation-page");
     for (const mark of translatedPage.querySelectorAll('.pdf-translated-citation')) mark.replaceWith(mark.textContent);
   }
-  function sourceLink(parent,n,quote,sequence) {
+  function sourceLink(parent,n,quote,getSequence) {
     const material = materials.find(item=>n>=item.start && n<item.start+item.count);
     if (material) {
       append(parent,'p',material.name+' · '+(n-material.start+1)+' '+material.unit,'ref');
@@ -1188,7 +1188,8 @@ async function reader() {
     link.addEventListener('click',async event=>{
       event.preventDefault();
       clearCitation();
-      if (sequence?.length) {
+      const sequence=getSequence?.();
+      if (sequence?.length && quote) {
         citationSequence=sequence;
         await openCitation(sequence.findIndex(source=>source.page===n && source.quote===quote));
         return;
@@ -1332,6 +1333,7 @@ async function reader() {
     } else emphasis.textContent = match[0];
     body.append(answer.slice(match.index + match[0].length));
   }
+  const citationsBySection=new WeakMap();
   function renderAnswerItem(answer,item,animate=false) {
     const section = append(answer,'section','','answer-item');
     append(section,'h4',item.label);
@@ -1350,9 +1352,11 @@ async function reader() {
     const sequence=sourceType==='pdf' ? Array.from(byPage,([page,quotes])=>
       materials.some(material=>page>=material.start && page<material.start+material.count) ? [] :
       [...quotes.keys()].filter(Boolean).map(quote=>({page,quote}))).flat() : [];
+    citationsBySection.set(section,sequence);
+    const answerCitations=()=>[...answer.children].flatMap(child=>citationsBySection.get(child) ?? []);
     for (const [page,quotes] of byPage) {
       const source = append(evidence,'div','','answer-source');
-      sourceLink(source,page,quotes.keys().next().value,sequence);
+      sourceLink(source,page,quotes.keys().next().value,answerCitations);
       const addresses = [...new Set([...quotes.values()].filter(Boolean))];
       if (addresses.length) append(source,'div',addresses.join('、'));
       const disclosure = append(source,'details','','answer-quote');
