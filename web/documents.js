@@ -1263,7 +1263,7 @@ async function reader() {
   }
   let taggedTables;
   async function sendQuestion(question,previousQuestion,questionBubble) {
-    const answerLanguage=selectedLanguage;
+    const answerLanguage=selectedLanguage==='ja' ? '' : selectedLanguage;
     const log = $('#messages');
     if (button.disabled) return;
     button.disabled = true;

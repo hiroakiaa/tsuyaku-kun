@@ -898,8 +898,8 @@ export async function documents(request,env,auth) {
   const input = await request.text();
   if (input.length > 4096) return fail('質問は300文字までです。',413);
   const {question:currentQuestion,previousQuestion,benchmarkMode,answerLanguage} = JSON.parse(input);
-  const language = answerLanguage===undefined ? null : answerLanguages.get(answerLanguage);
-  if (answerLanguage!==undefined && !language) return fail('回答言語を確認してください。');
+  if (answerLanguage!==undefined && !answerLanguages.has(answerLanguage)) return fail('回答言語を確認してください。');
+  const language = answerLanguage==='ja' ? null : answerLanguages.get(answerLanguage);
   if (typeof currentQuestion!=='string'||!currentQuestion.trim()||currentQuestion.length>300) return fail('質問は300文字までです。');
   const question = typeof previousQuestion==='string' && previousQuestion.trim() && previousQuestion.length<=300
     ? JSON.stringify({前の質問:previousQuestion,今回の質問:currentQuestion})
