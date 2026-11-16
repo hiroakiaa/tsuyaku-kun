@@ -695,10 +695,13 @@ async function reader() {
       button.dataset.language=option.value;
       button.onclick=()=>{
         translationMode.value=option.value;
+        readingPosition(id,{translationMode:option.value});
         void updatePageTranslation();
       };
     }
-    translationMode.value=language && language.code!=='ja'?language.code:'';
+    const savedMode=readingPosition(id).translationMode;
+    const hasSavedMode=[...translationMode.options].some(option=>option.value===savedMode);
+    translationMode.value=hasSavedMode ? savedMode : language && language.code!=='ja' ? language.code : '';
     renderEnglishProgress();
     if (translatedPage.getClientRects().length || translationToggle.getClientRects().length) void updatePageTranslation();
   }
@@ -1217,29 +1220,42 @@ async function reader() {
   const askForm = $('#ask-form');
   const button = askForm.querySelector('button');
   const historyKey = 'document-qa-questions:'+id+(doc.revision ? ':'+doc.revision : '');
-  const replaceForm = $('#replace-pdf');
+  const replaceForm = document.getElementById('replace-pdf');
+  const reanalyseButton = document.getElementById('reanalyse-pdf');
+  const replaceButton = replaceForm.querySelector('[type="submit"]');
   replaceForm.hidden = !doc.canRemove || sourceType!=='pdf';
-  replaceForm.onsubmit = async event=>{
-    event.preventDefault();
-    const submit = replaceForm.querySelector('button');
+  reanalyseButton.hidden = doc.convertedWorksheet;
+  async function refreshPdf(file) {
+    if (replaceButton.disabled) return;
+    const replacing = Boolean(file);
+    replaceButton.disabled = reanalyseButton.disabled = true;
     const status = replaceForm.querySelector('[role="status"]');
-    const file = replaceForm.elements.pdf.files[0];
-    if (!file || submit.disabled) return;
-    submit.disabled = true;
     try {
+      if (!file) {
+        status.textContent = '登録済みのPDFを読み込んでいます…';
+        const response = await fetch(config.api+api+'/pdf',{headers:await authHeaders()});
+        if (!response.ok) throw Error('登録済みのPDFを取得できませんでした。');
+        file = new File([await response.blob()], 'document.pdf',{type:'application/pdf'});
+      }
       const form = new FormData();
       form.set('pdf',file);
       form.set('pages',JSON.stringify(await extract(file,status)));
       status.textContent = '要点と目次を更新しています…';
       await request(api+'/replace',{method:'POST',body:form});
       try { sessionStorage.removeItem(historyKey); } catch {}
-      readingPosition(id,{page:null});
+      if (replacing) readingPosition(id,{page:null});
       location.reload();
     } catch (error) {
       status.textContent = error.message;
-      submit.disabled = false;
+      replaceButton.disabled = reanalyseButton.disabled = false;
     }
+  }
+  replaceForm.onsubmit = event=>{
+    event.preventDefault();
+    const file = replaceForm.elements.pdf.files[0];
+    if (file) void refreshPdf(file);
   };
+  reanalyseButton.onclick = ()=>void refreshPdf();
   let history = [];
   try {
     const saved = JSON.parse(sessionStorage.getItem(historyKey) ?? '[]');
