@@ -81,7 +81,7 @@ async function extract(file, status) {
       const pageNumberOnly = [String(n),'ページ'+n,n+'ページ','-'+n+'-'].includes(compact);
       if (!compact || pageNumberOnly) {
         status.textContent = 'スキャンページを端末で読んでいます… ' + n + ' / ' + pdf.numPages;
-        const {createPdfOcr} = await import('./document-ocr.js?v=90');
+        const {createPdfOcr} = await import('./document-ocr.js?v=91');
         ocr ??= await createPdfOcr((await pdfLibrary()).OPS);
         text = await ocr.read(page,{pageNumberOnly});
       }

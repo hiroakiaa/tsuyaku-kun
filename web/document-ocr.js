@@ -165,7 +165,7 @@ export async function createPdfOcr(ops) {
             }
             const nativeStarted = performance.now();
             const compact=value=>value.normalize('NFKC').replace(/\s/gu,'');
-            const malformedMonth=/(?:[ァ-ヶー]{2,4}月[0-9一二三四五六七八九十]{1,3}日|[0-9一二三四五六七八九十]{1,3}月[一二三四五六七八九十]*ニ[一二三四五六七八九十]*日)/u;
+            const malformedMonth=/(?:[ァ-ヶー]{2,4}月[0-9一二三四五六七八九十]{1,3}日|[0-9一二三四五六七八九十]{1,3}月[一二三四五六七八九十]*ニ[ニ一二三四五六七八九十]*日)/u;
             const calendarDate=/(?:1[0-2]|[1-9]|十[一二]?|[一二三四五六七八九])月[0-9一二三四五六七八九十]{1,3}日/u;
             if (compact(text).length<8 || malformedMonth.test(compact(text))) {
               const alternative=(await (await standardWorker()).recognize(native)).data.text.trim();
@@ -187,7 +187,7 @@ export async function createPdfOcr(ops) {
         }
         recordTiming(timingNames[2],recognitionStarted);
         // In a complete kanji date, katakana ニ can be a glyph-level OCR error.
-        return text.replace(/((?:十一|十二|十|[一二三四五六七八九])\s*月\s*)([一二三四五六七八九十\s]*ニ[一二三四五六七八九十\s]*)(\s*日)/gu,
+        return text.replace(/((?:十一|十二|十|[一二三四五六七八九])\s*月\s*)([一二三四五六七八九十\s]*ニ[ニ一二三四五六七八九十\s]*)(\s*日)/gu,
           (original,month,day,suffix)=>{
             const normalized=day.replaceAll('ニ','二');
             const valid=/^(?:[一二三四五六七八九]|十[一二三四五六七八九]?|二十[一二三四五六七八九]?|三十[一]?)$/u;
