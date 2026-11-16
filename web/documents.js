@@ -1508,6 +1508,14 @@ async function reader() {
         return {...item,evidence:[...item.evidence,definition]};
       }
       async function showItem(item) {
+        if (!answerLanguage && /[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}]/u.test(question)) {
+          const time=/^(1[0-2]|0?[1-9])(?::([0-5]\d))?\s*([ap])\.?m\.?$/iu.exec(item.answer?.trim() ?? '');
+          if (time) {
+            const [,hour,minute,period]=time;
+            item={...item,answer:(period.toLowerCase()==='a'?'午前':'午後')+Number(hour)+'時'+
+              (Number(minute) ? Number(minute)+'分' : '')};
+          }
+        }
         const currentHours=/^(?:現在|最新)の(?:受付|窓口)(?:時間|時刻)(?:は)?[?？。]?$/u;
         if (currentHours.test(question.normalize('NFKC').trim()) && item.answer) {
           const corrected=(item.evidence??[]).filter(source=>
