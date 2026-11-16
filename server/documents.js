@@ -1057,7 +1057,13 @@ export async function documents(request,env,auth) {
       throw error;
     }
     const resolved = full.filter(item=>item.answer).length;
-    return resolved>=partial.filter(item=>item.answer).length && full.length>=partial.length ? full : partial;
+    const previouslyResolved = partial.filter(item=>item.answer).length;
+    if (resolved>0 && previouslyResolved===0 && full.length===1 && partial.length>1) {
+      const label = normalized(full[0].label);
+      const matching = partial.filter(item=>normalized(item.label)===label);
+      if (matching.length===1) return partial.map(item=>item===matching[0] ? full[0] : item);
+    }
+    return resolved>=previouslyResolved && full.length>=partial.length ? full : partial;
   };
   const localize = async items => {
     if (!language) return items;
