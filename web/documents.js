@@ -1088,6 +1088,12 @@ async function reader() {
             item={...item,answer:null,evidence:[]};
           }
         }
+        const freePrice=/無料|無償|(?:^|[^\d])0\s*円/u;
+        if (/(?:いくら|何円|費用|料金|手数料|教材費)/u.test(question) &&
+            freePrice.test((item.answer??'').normalize('NFKC')) &&
+            !item.evidence?.some(source=>freePrice.test(source.quote.normalize('NFKC')))) {
+          item={...item,answer:null,evidence:[]};
+        }
         item=await includeAliasDefinition(item);
         const first = !box;
         const answer = answerBox();
