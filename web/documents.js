@@ -526,7 +526,8 @@ async function reader() {
     if (citation!==selected) return;
     const runs = items.filter(item=>item.str).map(item=>({item,text:normalize(item.str)}));
     const text = runs.map(run=>run.text).join('');
-    const quote = normalize(selected.quote);
+    const literalQuote = normalize(selected.quote);
+    const quote = text.includes(literalQuote) ? literalQuote : literalQuote.replaceAll('|','');
     const start = text.indexOf(quote);
     if (!quote || start<0) return;
     removeCitationMarks(slot);
@@ -710,7 +711,8 @@ async function reader() {
       const measuringCanvas=document.createElement('canvas');
       const context=measuringCanvas.getContext('2d');
       const unit=viewport.width/100;
-      const citationText=citation?.page===number ? normalize(citation.quote) : '';
+      const literalCitation=citation?.page===number ? normalize(citation.quote) : '';
+      const citationText=pageText.includes(literalCitation) ? literalCitation : literalCitation.replaceAll('|','');
       const citationStart=citationText?pageText.indexOf(citationText):-1;
       let from=0;
       for (const [index,original] of result.source.entries()) {
