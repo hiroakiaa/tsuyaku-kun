@@ -1028,7 +1028,7 @@ async function reader() {
             item=findTaggedTableCell(await taggedTables,question);
           }
           if (!item && !materials.length && /(?:時刻|利用料|料金|手数料|延長料)(?:はいくら(?:ですか)?|は)?[?？。]?$/.test(question)) {
-            const {lookupPdfTableValue}=await import('./document-pdf-table-value.js?v=4');
+            const {lookupPdfTableValue}=await import('./document-pdf-table-value.js?v=5');
             const pages=await request(api+'/text');
             item=lookupPdfTableValue(pages,question);
           }
@@ -1077,6 +1077,15 @@ async function reader() {
         return {...item,evidence:[...item.evidence,definition]};
       }
       async function showItem(item) {
+        const feeKeyword=/^([\p{Script=Han}\p{Script=Katakana}]{1,10})(?:料金|手数料)[?？。]?$/u.exec(question.normalize('NFKC').trim());
+        if (feeKeyword && item.answer && item.evidence?.length) {
+          const compact=text=>text.normalize('NFKC').replace(/\s/gu,'');
+          const citations=item.evidence.map(source=>compact(source.quote));
+          if (citations.every(quote=>!quote.includes(feeKeyword[1])) &&
+              citations.some(quote=>/[\p{Script=Han}\p{Script=Katakana}]{2,}(?:料金|手数料)[^\n]*\d[\d,]*円/u.test(quote))) {
+            item={...item,answer:null,evidence:[]};
+          }
+        }
         item=await includeAliasDefinition(item);
         const first = !box;
         const answer = answerBox();

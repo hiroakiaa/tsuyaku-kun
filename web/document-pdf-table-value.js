@@ -19,7 +19,7 @@ export function lookupPdfTableValue(pages,question) {
     const lines=pageLines.slice(tableStart);
     const cells=lines.map(line=>line.split(' | '));
     const header=cells[0] ?? [];
-    const headingText = value=>value.normalize('NFKC').trim().toLowerCase();
+    const headingText = value=>value.normalize('NFKC').replaceAll('⻑','長').trim().toLowerCase();
     const lower = cells[1];
     let start=1;
     let headings=header;
