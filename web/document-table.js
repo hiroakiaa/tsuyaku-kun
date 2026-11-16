@@ -50,7 +50,13 @@ export function layoutPdfText(items) {
   let horizontal = rows.map(({cells})=>formatRow(cells));
   // Preserve empty cells when several adjacent rows share the same column anchors.
   for (let first=0; first+2<rows.length; first++) {
-    const anchors = rows[first].cells;
+    const header = rows[first].cells;
+    const size = Math.max(...header.map(cell=>cell.size));
+    // A centered header may start at a different x coordinate from its data.
+    const completeRow = rows.slice(first+1,first+4).find(({cells,y})=>
+      rows[first].y-y<=size*6 && cells.length===header.length &&
+      cells.every((cell,i)=>Math.abs(cell.x-header[i].x)<=size*2.5));
+    const anchors = completeRow?.cells ?? header;
     if (anchors.length<3 || anchors.some((cell,i)=>i && cell.x-anchors[i-1].end<=Math.max(8,cell.size))) continue;
     const aligned = [];
     for (let index=first+1; index<rows.length; index++) {

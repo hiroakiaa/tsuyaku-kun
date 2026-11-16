@@ -112,3 +112,12 @@ console.log('PASS table quotation preserves rows and prose joins wrapped lines')
   ];
   assert.equal(layoutPdfText(items),'区分 | 予約 | 料金\n個人 |  | 240円\n団体 | 要予約 | 680円');
 }
+
+{
+  const cell = (str,x,y) => ({str,width:str.length*10,transform:[10,0,0,10,x,y]});
+  assert.match(layoutPdfText([
+    cell('区分',22,90),cell('予約',113,90),cell('利用料金',200,90),
+    cell('個人',10,75),cell('240円',190,75),
+    cell('団体',10,60),cell('要予約',100,60),cell('680円',190,60),
+  ]),/個人 \|  \| 240円/u);
+}
