@@ -742,6 +742,7 @@ async function reader() {
     const previous=translatedPage.querySelector('.pdf-translation-layout'+pageSelector);
     const position=pageViewportPosition(translatedPage,previous);
     translatedPage.hidden=!language;
+    delete translatedPage.dataset.translationReuse;
     translatedPage.lang=language==='ja-easy'?'ja':language;
     if (!language) {
       restorePageViewport(preview,original,position);
@@ -753,6 +754,7 @@ async function reader() {
     try {
       const result=await loadPageTranslation(page,language,retry);
       if(revision===translationRevision) {
+        if (result.reuse) translatedPage.dataset.translationReuse=result.reuse;
         if (sourceType==='pdf') {
           if (!await renderTranslationOnPdf(result,page,revision,viewportPosition) && revision===translationRevision) {
             throw Error('このページでは訳文を元の位置に配置できませんでした。');
