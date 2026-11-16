@@ -107,6 +107,15 @@ try {
       assert.equal(await page.locator('#pdf-page').inputValue(),'2');
       await waitForOriginalMarker();
       originalMarkerAfterTranslation = true;
+      const metrics = await page.evaluate(async () => {
+        const {documentQaMetrics}=await import('./web/document-qa-metrics.js?v=1');
+        const id=new URLSearchParams(location.search).get('id');
+        return documentQaMetrics().find(row=>row.id===id);
+      });
+      assert.equal(metrics?.title,'自動公開確認');
+      assert.equal(metrics.answers,1);
+      assert.equal(metrics.unsupported,0);
+      assert.ok(metrics.answerMs>0 && metrics.translations>0);
       await language.selectOption('ja');
     }
     await page.locator('#question').fill('When does the swimming pool open?');
