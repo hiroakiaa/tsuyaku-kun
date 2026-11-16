@@ -600,6 +600,21 @@ function checkedAnswer(item,pages,question='',language=null) {
           return !requestedYear || !sourceYear || Number(requestedYear)===Number(sourceYear);
         })
         .slice(0,4).map(({page,quote})=>({page,quote}));
+      if (!language && !Array.isArray(item.clarify) && /いくら|何円/u.test(question) &&
+          !/それぞれ|全て|すべて|両方|比較|一覧|区分ごと/u.test(question)) {
+        const scopes=evidence.flatMap(({page,quote})=>{
+          const heading=pages[page-1].split('\n',1)[0];
+          const scope=/^([^|\s]{1,24}(?:校舎|コース|会場))(?=\s|$)/u.exec(heading)?.[1];
+          const amounts=quantities(quote).filter(([,unit])=>unit==='円').map(([value])=>value);
+          return scope && amounts.length===1 ? [{scope,amount:amounts[0],source:{page,quote:heading}}] : [];
+        });
+        const distinctScopes=new Set(scopes.map(({scope})=>scope));
+        if (distinctScopes.size>=2 && distinctScopes.size<=4 && new Set(scopes.map(({amount})=>amount)).size>1 &&
+            ![...distinctScopes].some(scope=>normalized(question).includes(normalized(scope)))) {
+          return {label:'対象の確認',answer:[...distinctScopes].join('・')+'のうち、どれですか？',
+            evidence:[...new Map(scopes.map(({scope,source})=>[scope,source])).values()]};
+        }
+      }
       if (Array.isArray(item.clarify)) {
         const options=[...new Set(item.clarify.filter(option=>typeof option==='string')
           .map(option=>option.trim()).filter(option=>option.length>=2 && option.length<=45))];
@@ -1093,7 +1108,7 @@ export async function documents(request,env,auth) {
       return reply({items,answer:items[0].answer,pages:[...new Set(items.flatMap(item=>item.evidence.map(source=>source.page)))]});
     }
   }
-  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([language ? 28 : 25,record.pages,record.materials ?? [],generationQuestion.trim()])));
+  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([language ? 28 : 26,record.pages,record.materials ?? [],generationQuestion.trim()])));
   const cacheKey = Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
   const cacheUrl = 'https://room/document/answer/'+cacheKey;
   const cached = await (await target.fetch(cacheUrl)).json();
