@@ -227,6 +227,7 @@ dialog [tabindex="-1"][autofocus]:focus {
 #pdf-translation{position:absolute;inset:0;z-index:2;overflow:auto;overscroll-behavior:contain;white-space:pre-wrap;background:#202023;color:#f6f6f6;padding:clamp(1rem,4vw,2rem);line-height:1.7;overflow-wrap:anywhere}
 #pdf-translation[hidden],#pdf-language[hidden]{display:none}
 .answer-english{border-top:1px solid #ffffff32;padding-top:.65rem;margin:.7rem 0;white-space:pre-wrap}
+.pdf-translated-citation{background:#f5d975;color:#211c0d;border-radius:.2rem;padding:.12em .2em}
 .document-library h2{margin:1.1rem 0 .45rem}
 .document-library ul{margin:.4rem 0}
 .document-library [role=status]:empty,.document-library ul:empty{display:none}

@@ -564,6 +564,29 @@ async function reader() {
   const translatedPage=$('#pdf-translation');
   const pageTranslations=new Map();
   let translationRevision=0;
+  let prefetching=false;
+  function loadPageTranslation(page,language) {
+    const key=page+':'+language;
+    if (!pageTranslations.has(key)) {
+      pageTranslations.set(key,request(api+'/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page,language})})
+        .catch(error=>{pageTranslations.delete(key);throw error;}));
+    }
+    return pageTranslations.get(key);
+  }
+  async function prefetchTranslations() {
+    if (prefetching || document.hidden || !translationMode.value || !dialog.open && !askDialog.open) return;
+    const language=translationMode.value;
+    const current=Number(pagePicker.value)||1;
+    const pages=Array.from({length:doc.pageCount},(_,i)=>i+1)
+      .sort((a,b)=>Math.abs(a-current)-Math.abs(b-current)||b-a);
+    const next=pages.find(page=>!pageTranslations.has(page+':'+language));
+    if (next===undefined) return;
+    prefetching=true;
+    let success=false;
+    try { await loadPageTranslation(next,language); success=true; } catch {}
+    finally { prefetching=false; }
+    if (success || language!==translationMode.value) setTimeout(prefetchTranslations,750);
+  }
   function syncTranslationOptions() {
     const language=documentLanguages.find(option=>option.code===selectedLanguage);
     translationMode.replaceChildren(new Option('原文',''));
@@ -582,21 +605,42 @@ async function reader() {
     if (!language) return;
     translatedPage.scrollTop=0;
     translatedPage.textContent='翻訳しています…';
-    const key=page+':'+language;
-    if (!pageTranslations.has(key)) {
-      pageTranslations.set(key,request(api+'/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page,language})})
-        .catch(error=>{pageTranslations.delete(key);throw error;}));
-    }
     try {
-      const result=await pageTranslations.get(key);
-      if(revision===translationRevision) translatedPage.textContent=result.text;
+      const result=await loadPageTranslation(page,language);
+      if(revision===translationRevision) {
+        renderTranslatedPage(result,page);
+        void prefetchTranslations();
+      }
     } catch(error) {
       if(revision!==translationRevision) return;
       translatedPage.textContent=error.message+' ';
       append(translatedPage,'button','再試行').onclick=()=>void updatePageTranslation();
     }
   }
+  function renderTranslatedPage(result,page) {
+    const normalize=text=>text.normalize('NFKC').replace(/[\s|]/gu,'');
+    const quote=citation?.page===page ? normalize(citation.quote) : '';
+    const source=result.source?.map(normalize)??[];
+    const start=quote ? source.join('').indexOf(quote) : -1;
+    if (start<0 || !Array.isArray(result.lines)) {
+      translatedPage.textContent=result.text;
+      return;
+    }
+    translatedPage.replaceChildren();
+    let offset=0, firstMark;
+    result.lines.forEach((line,index)=>{
+      const end=offset+source[index].length;
+      if (end>start && offset<start+quote.length) {
+        const mark=append(translatedPage,'mark',line,'pdf-translated-citation');
+        firstMark??=mark;
+      } else translatedPage.append(line);
+      if(index<result.lines.length-1) translatedPage.append('\n');
+      offset=end;
+    });
+    firstMark?.scrollIntoView({block:'center',behavior:'smooth'});
+  }
   translationMode.onchange=()=>void updatePageTranslation();
+  document.addEventListener('visibilitychange',()=>void prefetchTranslations());
   window.addEventListener('document-language-change',syncTranslationOptions);
   syncTranslationOptions();
   const previewImage = $('#source-image');
@@ -900,6 +944,7 @@ async function reader() {
   function clearCitation() {
     citation = undefined;
     for (const mark of preview.querySelectorAll('.pdf-citation-mark')) mark.remove();
+    for (const mark of translatedPage.querySelectorAll('.pdf-translated-citation')) mark.replaceWith(mark.textContent);
   }
   function sourceLink(parent,n,quote) {
     const material = materials.find(item=>n>=item.start && n<item.start+item.count);
@@ -911,8 +956,6 @@ async function reader() {
     link.href = '#tab-ask';
     link.addEventListener('click',async event=>{
       event.preventDefault();
-      translationMode.value='';
-      void updatePageTranslation();
       clearCitation();
       citation = quote && sourceType==='pdf' ? {page:n,quote} : undefined;
       await showPdf(n);
