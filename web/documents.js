@@ -829,7 +829,7 @@ async function reader() {
     expand.textContent = 'PDF全画面';
     updateMobileControls();
     if (!askDialog.open) return;
-    if (wide.matches && dialog.parentElement === workspace) return;
+    if (wide.matches && dialog.open && dialog.parentElement === workspace) return;
     if (dialog.open) dialog.close();
     if (wide.matches) void showPdf(selectedPage || 1);
   }
