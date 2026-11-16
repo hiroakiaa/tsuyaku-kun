@@ -577,15 +577,12 @@ async function reader() {
     if (prefetching || document.hidden || !translationMode.value || !dialog.open && !askDialog.open) return;
     const language=translationMode.value;
     const current=Number(pagePicker.value)||1;
-    const pages=Array.from({length:doc.pageCount},(_,i)=>i+1)
-      .sort((a,b)=>Math.abs(a-current)-Math.abs(b-current)||b-a);
-    const next=pages.find(page=>!pageTranslations.has(page+':'+language));
-    if (next===undefined) return;
+    const next=current+1;
+    if (next>doc.pageCount || pageTranslations.has(next+':'+language)) return;
     prefetching=true;
-    let success=false;
-    try { await loadPageTranslation(next,language); success=true; } catch {}
+    try { await loadPageTranslation(next,language); } catch {}
     finally { prefetching=false; }
-    if (success || language!==translationMode.value) setTimeout(prefetchTranslations,750);
+    if (language!==translationMode.value || current!==Number(pagePicker.value)) void prefetchTranslations();
   }
   function syncTranslationOptions() {
     const language=documentLanguages.find(option=>option.code===selectedLanguage);

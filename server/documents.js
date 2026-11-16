@@ -45,7 +45,7 @@ function searchIndex(pages) {
   });
 }
 
-async function translateDocumentText(env,text,language,aligned=false) {
+async function translateDocumentText(env,text,language,aligned=false,onUsage) {
   if (!env.OPENAI_DOCUMENT_QA_KEY) throw Error('資料の翻訳に接続できませんでした。');
   const response=await fetch('https://api.openai.com/v1/chat/completions',{
     method:'POST',signal:AbortSignal.timeout(45000),
@@ -58,6 +58,7 @@ async function translateDocumentText(env,text,language,aligned=false) {
   }).catch(()=>null);
   if (!response?.ok) throw Error('資料を翻訳できませんでした。');
   const result=await response.json();
+  onUsage?.(result.usage);
   await recordUsage(env,result.usage,'translate').catch(()=>{});
   const choice=result.choices?.[0];
   if (choice?.finish_reason!=='stop' || !choice.message?.content?.trim()) throw Error('翻訳を完了できませんでした。');
@@ -868,25 +869,7 @@ export async function documents(request,env,auth) {
     const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([2,DOCUMENT_MODEL,code,text])));
     const key=Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
     const url='https://room/document/page-translation/'+key;
-    const cached=await target.fetch(url);
-    if (cached.ok) return cached;
-    const pendingKey=id+':'+key;
-    if (!pendingPageTranslations.has(pendingKey)) {
-      pendingPageTranslations.set(pendingKey,(async()=>{
-        const source=text.split('\n');
-        const {lines}=JSON.parse(await translateDocumentText(env,JSON.stringify(source),language,true));
-        if (!Array.isArray(lines) || lines.length!==source.length ||
-            lines.some((line,index)=>typeof line!=='string' || Boolean(line.trim())!==Boolean(source[index].trim()))) {
-          throw Error('原文と翻訳の対応を確認できませんでした。');
-        }
-        const translation={text:lines.join('\n'),source,lines};
-        const payload=JSON.stringify(translation);
-        if (new TextEncoder().encode(payload).length<120_000) await target.fetch(url,{method:'POST',body:payload}).catch(()=>{});
-        return translation;
-      })().finally(()=>pendingPageTranslations.delete(pendingKey)));
-    }
-    try { return reply(await pendingPageTranslations.get(pendingKey)); }
-    catch(error) { return fail(error.message,502); }
+    return target.fetch(url,{method:'POST',body:JSON.stringify({id,text,language})});
   }
   if (action==='text' && request.method==='GET') {
     if (!['pdf','xlsx','docx'].includes(record.sourceType ?? 'pdf')) return fail('資料の本文が見つかりません。',404);
@@ -1151,7 +1134,7 @@ export async function documents(request,env,auth) {
     pages:[...new Set(items.flatMap(item=>item.evidence.map(source=>source.page)))]});
 }
 
-export async function documentStorage(request,storage) {
+export async function documentStorage(request,storage,env) {
   const path = new URL(request.url).pathname;
   if (path==='/document/library') {
     if (request.method==='GET') {
@@ -1209,20 +1192,42 @@ export async function documentStorage(request,storage) {
   const record = await storage.get('document');
   if (!record) return fail('資料が見つからないか、共有が終了しました。',404);
   const translationKey=/^\/document\/page-translation\/[a-f0-9]{64}$/.test(path) && path;
-  if (translationKey && request.method==='GET') {
-    const cached=await storage.get(translationKey);
-    return cached ? reply(cached.result) : fail('翻訳がありません。',404);
-  }
   if (translationKey && request.method==='POST') {
-    const result=await request.json();
-    await storage.transaction(async tx=>{
-      if (!await tx.get('document')) return;
-      const manifest='/document/page-translation-manifest';
-      const entries=(await tx.get(manifest)??[]).filter(key=>key!==translationKey);
-      if (entries.length>=160) await tx.delete(entries.shift());
-      await tx.put({[translationKey]:{result},[manifest]:[...entries,translationKey]});
-    });
-    return reply({ok:true});
+    const {id,text,language}=await request.json();
+    const key=id+':'+translationKey;
+    const current=pendingPageTranslations.get(key);
+    if (current) {
+      try { return reply({...await current,reuse:'in-flight'}); }
+      catch(error) { return fail(error.message,502); }
+    }
+    const work=(async()=>{
+      const cached=await storage.get(translationKey);
+      if (cached) return {...cached.result,reuse:'cache'};
+      let usage;
+      const source=text.split('\n');
+      const {lines}=JSON.parse(await translateDocumentText(env,JSON.stringify(source),language,true,value=>{
+        if (Number.isSafeInteger(value?.prompt_tokens) && Number.isSafeInteger(value?.completion_tokens)) {
+          usage={input:value.prompt_tokens,output:value.completion_tokens,cached:value.prompt_tokens_details?.cached_tokens??0};
+        }
+      }));
+      if (!Array.isArray(lines) || lines.length!==source.length ||
+          lines.some((line,index)=>typeof line!=='string' || Boolean(line.trim())!==Boolean(source[index].trim()))) {
+        throw Error('原文と翻訳の対応を確認できませんでした。');
+      }
+      const result={text:lines.join('\n'),source,lines,usage};
+      if (new TextEncoder().encode(JSON.stringify(result)).length<120_000) await storage.transaction(async tx=>{
+        if (!await tx.get('document')) return;
+        const manifest='/document/page-translation-manifest';
+        const entries=(await tx.get(manifest)??[]).filter(key=>key!==translationKey);
+        if (entries.length>=160) await tx.delete(entries.shift());
+        await tx.put({[translationKey]:{result},[manifest]:[...entries,translationKey]});
+      });
+      return {...result,reuse:'generated'};
+    })();
+    pendingPageTranslations.set(key,work);
+    try { return reply(await work); }
+    catch(error) { return fail(error.message,502); }
+    finally { pendingPageTranslations.delete(key); }
   }
   if (path==='/document/library-status') return record.visibility==='shared' ? reply({ok:true}) : fail('資料が見つかりません。',404);
   if (/^\/document\/vectors\/[a-f0-9]{64}$/.test(path)) {
