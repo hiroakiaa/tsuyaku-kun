@@ -331,3 +331,24 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
 .office-preview{min-width:0;padding:1rem;color:#eee;background:#1c1c1e}
 .office-preview select{max-width:100%;min-height:44px;padding:.4rem .7rem;border-radius:.6rem;color:inherit;background:#29282d}
 .office-preview pre{margin:.8rem 0 0;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;font:inherit;line-height:1.6}
+
+#pdf-dialog .pdf-bar .pdf-language-toggle {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  justify-self: start;
+  max-width: 100%;
+  flex-wrap: wrap;
+  margin-block-end: .5rem;
+}
+#pdf-dialog .pdf-bar .pdf-language-toggle button {
+  width: auto;
+  border-radius: .5rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+#messages [data-elapsed]::before {
+  content: attr(data-elapsed);
+  display: block;
+  font-size: .85em;
+  color: var(--muted);
+}

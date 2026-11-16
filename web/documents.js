@@ -607,9 +607,10 @@ async function reader() {
     }
   }
   const pdfTranslationSources=new Map();
-  function pdfTranslationSource(number) {
-    if (!pdfTranslationSources.has(number)) {
-      pdfTranslationSources.set(number,(async()=>{
+  function pdfTranslationSource(number,compact=false) {
+    const key=number+":"+compact;
+    if (!pdfTranslationSources.has(key)) {
+      pdfTranslationSources.set(key,(async()=>{
         const page=await (await getOriginalPdf()).getPage(number);
         const {items}=await page.getTextContent();
         const lines=[];
@@ -619,20 +620,21 @@ async function reader() {
           const [, , , ,x,y]=item.transform;
           const gap=last ? x-last.transform[4]-last.width : 0;
           if (!last || Math.abs(y-last.transform[5])>Math.max(1,item.height*.2) ||
-              gap>item.height || x<last.transform[4]) lines.push(item.str);
+              gap>item.height*(compact ? .4 : 1) || x<last.transform[4]) lines.push(item.str);
           else lines[lines.length-1]+=(gap>item.height*.22?' ':'')+item.str;
           last=item;
         }
         return lines.join('\n');
       })().catch(()=>undefined));
     }
-    return pdfTranslationSources.get(number);
+    return pdfTranslationSources.get(key);
   }
-  function loadPageTranslation(page,language) {
+  function loadPageTranslation(page,language,retry=false) {
     const key=page+':'+language;
+    if (retry) pageTranslations.delete(key);
     if (!pageTranslations.has(key)) {
       pageTranslations.set(key,(async()=>{
-        const layoutText=sourceType==='pdf' ? await pdfTranslationSource(page) : undefined;
+        const layoutText=sourceType==='pdf' ? await pdfTranslationSource(page,retry) : undefined;
         const translate=layout=>request(api+'/translate',{
           method:'POST',
           signal:AbortSignal.timeout(60_000),
@@ -700,7 +702,7 @@ async function reader() {
     renderEnglishProgress();
     if (translatedPage.getClientRects().length || translationToggle.getClientRects().length) void updatePageTranslation();
   }
-  async function updatePageTranslation() {
+  async function updatePageTranslation(retry=false) {
     const revision=++translationRevision;
     const language=translationMode.value;
     for (const button of translationToggle.children) button.setAttribute("aria-pressed",String(button.dataset.language===language));
@@ -712,7 +714,7 @@ async function reader() {
     translatedPage.scrollTop=0;
     translatedPage.textContent='翻訳しています…';
     try {
-      const result=await loadPageTranslation(page,language);
+      const result=await loadPageTranslation(page,language,retry);
       if(revision===translationRevision) {
         if (sourceType==='pdf') {
           if (!await renderTranslationOnPdf(result,page,revision) && revision===translationRevision) {
@@ -726,7 +728,7 @@ async function reader() {
     } catch(error) {
       if(revision!==translationRevision) return;
       translatedPage.textContent=error.message+' ';
-      append(translatedPage,'button','再試行').onclick=()=>void updatePageTranslation();
+      append(translatedPage,'button','再試行').onclick=()=>void updatePageTranslation(true);
       append(translatedPage,'button','原文').onclick=()=>{
         translationMode.value='';
         void updatePageTranslation();
@@ -1325,6 +1327,10 @@ async function reader() {
     let stage = '接続';
     let httpStatus;
     status.textContent = '資料から答えを探しています…';
+    const started=performance.now();
+    const updateElapsed=()=>{status.dataset.elapsed=Math.floor((performance.now()-started)/1000)+'秒 作業中…';};
+    updateElapsed();
+    const elapsedTimer=setInterval(updateElapsed,1000);
     log.scrollTop = log.scrollHeight;
     try {
       const barePrice=/(?:^)(?:利用料金|料金)(?:はいくら(?:ですか)?|は)?[?？。]?$/u;
@@ -1504,7 +1510,11 @@ async function reader() {
         field.setSelectionRange(field.value.length,field.value.length);
       };
     }
-    finally { button.disabled = false; }
+    finally {
+      clearInterval(elapsedTimer);
+      delete status.dataset.elapsed;
+      button.disabled = false;
+    }
   }
   askForm.addEventListener('submit',event=>{
     event.preventDefault();
