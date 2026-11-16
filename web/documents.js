@@ -1358,6 +1358,12 @@ async function reader() {
     let httpStatus;
     status.textContent = '資料から答えを探しています…';
     const started=performance.now();
+    let reviewStarted;
+    function measureAnswer(phase,start=started) {
+      const name='document-qa:'+phase;
+      if (performance.getEntriesByName(name).length>=20) performance.clearMeasures(name);
+      performance.measure(name,{start,end:performance.now()});
+    }
     const updateElapsed=()=>{status.dataset.elapsed=Math.floor((performance.now()-started)/1000)+'秒 作業中…';};
     updateElapsed();
     const elapsedTimer=setInterval(updateElapsed,1000);
@@ -1392,6 +1398,7 @@ async function reader() {
           history = [...history,entry].slice(-10);
           try { sessionStorage.setItem(historyKey,JSON.stringify(history)); } catch {}
           status.textContent = '';
+          measureAnswer('first-grounded-answer');
           citation=item.evidence[0];
           if (wide.matches || dialog.open) void showPdf(citation.page);
           return;
@@ -1463,6 +1470,7 @@ async function reader() {
         const first = !box;
         const answer = answerBox();
         renderAnswerItem(answer,item,true);
+        if (item.answer && !entry.items.some(previous=>previous.answer)) measureAnswer('first-grounded-answer');
         entry.items.push(item);
         const evidence = item.evidence?.find(source=>source.page>=1 && source.page<=doc.pageCount && source.quote);
         if (!followedCitation && evidence && sourceType==='pdf') {
@@ -1495,7 +1503,11 @@ async function reader() {
               if (!line.trim()) continue;
               const event=JSON.parse(line);
               if (event.error) throw Error(event.error);
-              if (event.status) status.textContent=event.status;
+              if (event.status) {
+                status.textContent=event.status;
+                if (event.status==='資料を参照して回答を作成しています…') measureAnswer('retrieval');
+                if (event.status==='資料全体を確認しています…') reviewStarted=performance.now();
+              }
               if (event.replaceItems) {
                 answerBox().replaceChildren();
                 entry.items = [];
@@ -1542,6 +1554,8 @@ async function reader() {
     }
     finally {
       clearInterval(elapsedTimer);
+      if (reviewStarted!==undefined) measureAnswer('full-review',reviewStarted);
+      measureAnswer('finished');
       delete status.dataset.elapsed;
       button.disabled = false;
     }
