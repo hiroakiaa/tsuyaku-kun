@@ -1359,10 +1359,13 @@ async function reader() {
     status.textContent = '資料から答えを探しています…';
     const started=performance.now();
     let reviewStarted;
+    const answerTimings={};
+    delete log.dataset.answerTimings;
     function measureAnswer(phase,start=started) {
       const name='document-qa:'+phase;
       if (performance.getEntriesByName(name).length>=20) performance.clearMeasures(name);
-      performance.measure(name,{start,end:performance.now()});
+      const measurement=performance.measure(name,{start,end:performance.now()});
+      answerTimings[phase]=Math.round(measurement.duration);
     }
     const updateElapsed=()=>{status.dataset.elapsed=Math.floor((performance.now()-started)/1000)+'秒 作業中…';};
     updateElapsed();
@@ -1556,6 +1559,7 @@ async function reader() {
       clearInterval(elapsedTimer);
       if (reviewStarted!==undefined) measureAnswer('full-review',reviewStarted);
       measureAnswer('finished');
+      log.dataset.answerTimings=JSON.stringify(answerTimings);
       delete status.dataset.elapsed;
       button.disabled = false;
     }
