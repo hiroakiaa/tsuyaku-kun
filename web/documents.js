@@ -1,4 +1,4 @@
-import {layoutPdfText} from './document-table.js?v=92';
+import {layoutPdfText} from './document-table.js?v=93';
 import {installLocalIcons,localIcon} from './icons.js?v=library';
 import {config} from './config.js';
 const $ = (selector) => document.querySelector(selector);
