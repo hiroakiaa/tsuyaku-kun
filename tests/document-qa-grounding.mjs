@@ -39,3 +39,27 @@ try {
 }
 console.log(`${passed}/${cases.length*3}`);
 assert.equal(passed,cases.length*3);
+
+const feePage='教材費は月400円を10回徴収します。登録費は初回のみ100円です。';
+const feeEnv={OPENAI_DOCUMENT_QA_KEY:'test',ROOMS:{idFromName:id=>id,get:()=>({
+  async fetch(url) { return Response.json(url.endsWith('/data') ? {pages:[feePage],owner:'author'} : null); },
+})}};
+try {
+  for (const [formula,expected] of [
+    ['400円×10回＋100円＝4,100円',true],
+    ['400円×11回＋100円＝4,500円',false],
+    ['400円×10回＋100円＝4,200円',false],
+  ]) {
+    globalThis.fetch=async()=>Response.json({choices:[{finish_reason:'stop',message:{
+      content:JSON.stringify({items:[{label:'年間費用',answer:formula,sources:[{page:1,quote:feePage}]}]}),
+    }}]});
+    const response=await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+      method:'POST',body:JSON.stringify({question:'年間費用の合計を教えてください。'}),
+    }),feeEnv,{uid:'author'});
+    const result=await response.json();
+    assert.equal(result.items[0]?.answer,expected ? formula : null);
+  }
+} finally {
+  globalThis.fetch=savedFetch;
+}
+console.log('PASS annual fee totals require matching quoted amounts and counts');
