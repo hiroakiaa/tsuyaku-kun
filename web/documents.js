@@ -703,6 +703,7 @@ async function reader() {
     const savedMode=readingPosition(id).translationMode;
     const hasSavedMode=[...translationMode.options].some(option=>option.value===savedMode);
     translationMode.value=hasSavedMode ? savedMode : language && language.code!=='ja' ? language.code : '';
+    for (const button of translationToggle.children) button.setAttribute("aria-pressed", String(button.dataset.language===translationMode.value));
     renderEnglishProgress();
     if (translatedPage.getClientRects().length || translationToggle.getClientRects().length) void updatePageTranslation();
   }
