@@ -13,8 +13,8 @@ export function lookupPdfTableValue(pages,question,previousQuestion) {
   const field=/^when is the (.+?) for (?:the )?(.+)$/u.exec(query);
   const japanese=/^([^の、]+)の([^の、]+?時刻)(?:は(?:何時(?:ですか)?)?)?$/u.exec(query);
   const fee=/^([^の、]+)の([^、]*?(?:利用料|料金|手数料|延長料))(?:はいくら(?:ですか)?|は)?$/u.exec(query);
-  const product=namedPrice.exec(query)?.[1];
-  const previousProduct=isFollowup ? namedPrice.exec(previousQuestion.normalize('NFKC').trim().replace(/[?。]$/u,''))?.[1] : undefined;
+  const product=barePrice.test(query) ? undefined : namedPrice.exec(query)?.[1];
+  const previousProduct=isFollowup && !barePrice.test(previousQuestion.normalize('NFKC').trim().replace(/[?。]$/u,'')) ? namedPrice.exec(previousQuestion.normalize('NFKC').trim().replace(/[?。]$/u,''))?.[1] : undefined;
   const bare=barePrice.exec(query) || product;
   if (!verb && !field && !japanese && !fee && !bare) return null;
   const subject=verb?.[1] ?? field?.[2] ?? japanese?.[1] ?? fee?.[1];
