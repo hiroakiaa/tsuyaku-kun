@@ -1081,6 +1081,12 @@ async function reader() {
         return {...item,evidence:[...item.evidence,definition]};
       }
       async function showItem(item) {
+        const currentHours=/^(?:現在|最新)の(?:受付|窓口)(?:時間|時刻)(?:は)?[?？。]?$/u;
+        if (currentHours.test(question.normalize('NFKC').trim()) && item.answer) {
+          const corrected=(item.evidence??[]).filter(source=>
+            /^(?:訂正後|変更後)の(?:受付|窓口)(?:時間|時刻)?は(?:午前|午後)?[0-9一二三四五六七八九十]{1,3}時(?:[0-9一二三四五六七八九十]{1,3}分)?までです。?$/u.test(source.quote.normalize('NFKC').replace(/\s/gu,'')));
+          if (corrected.length===1) item={...item,answer:corrected[0].quote,evidence:corrected};
+        }
         const feeKeyword=/^([\p{Script=Han}\p{Script=Katakana}]{1,10})(?:料金|手数料)[?？。]?$/u.exec(question.normalize('NFKC').trim());
         if (feeKeyword && item.answer && item.evidence?.length) {
           const compact=text=>text.normalize('NFKC').replace(/\s/gu,'');
