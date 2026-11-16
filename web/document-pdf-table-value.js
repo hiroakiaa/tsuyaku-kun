@@ -3,7 +3,7 @@ export function lookupPdfTableValue(pages,question) {
   const verb=/^when does (?:the )?(.+?) (open|close)$/u.exec(query);
   const field=/^when is the (.+?) for (?:the )?(.+)$/u.exec(query);
   const japanese=/^([^の、]+)の([^の、]+?時刻)(?:は(?:何時(?:ですか)?)?)?$/u.exec(query);
-  const fee=/^([^の、]+)の([^、]*?(?:利用料|料金|手数料))(?:はいくら(?:ですか)?|は)?$/u.exec(query);
+  const fee=/^([^の、]+)の([^、]*?(?:利用料|料金|手数料|延長料))(?:はいくら(?:ですか)?|は)?$/u.exec(query);
   if (!verb && !field && !japanese && !fee) return null;
   const subject=verb?.[1] ?? field?.[2] ?? japanese?.[1] ?? fee[1];
   const column=verb ? (verb[2]==='open' ? 'opening' : 'closing') : field?.[1] ?? japanese?.[2] ?? fee[2].replace(/の/gu,'');
@@ -40,10 +40,11 @@ export function lookupPdfTableValue(pages,question) {
       return i>0 && columnNames.has(units[i] ? label.replace(/\s*\([^()]+\)$/u,'') : label) ? [i] : [];
     });
     const ownHeading=columns.length===1;
+    const continuesTable = tableStart===0 || (tableStart===1 && /(?:[（(]続き[）)]|^続き)$/u.test(pageLines[0].trim()));
     const table=ownHeading ? {
       header:pageLines.slice(tableStart>0 ? tableStart-1 : tableStart,tableStart+start).join('\n'),page:index+1,width:header.length,
       column:columns[0],label:headings[columns[0]],unit:units[columns[0]],
-    } : tableStart===0 ? continuation : undefined;
+    } : continuesTable ? continuation : undefined;
     continuation=undefined;
     if (!table) continue;
     if (!ownHeading) start=0;
