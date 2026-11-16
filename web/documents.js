@@ -1110,6 +1110,9 @@ async function reader() {
             !item.evidence.some(source=>priceEvidence.test(source.quote.normalize('NFKC')))) {
           item={...item,answer:null,evidence:[]};
         }
+        if (item.answer && /^(?:資料(?:内)?に|本文に)[^。！？\r\n]{1,80}(?:記載されていません|記載がありません|見当たりません)。?$/u.test(item.answer.trim())) {
+          item={...item,answer:null,evidence:[]};
+        }
         item=await includeAliasDefinition(item);
         const first = !box;
         const answer = answerBox();
