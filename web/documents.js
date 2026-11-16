@@ -1070,7 +1070,7 @@ async function reader() {
         const definitions=pages.flatMap((text,index)=>text.split('\n').flatMap(quote=>{
           const line=compactName(quote);
           const match=/^([^()|。]{3,40})\(([^()]{2,12})\)$/u.exec(line);
-          return match && match[2]===alias && match[1]!==alias && item.evidence.some(source=>compactName(source.quote).includes(match[1]))
+          return match && match[2]===alias && match[1]!==alias && (match[1].startsWith(alias) || item.evidence.some(source=>compactName(source.quote).includes(match[1])))
             ? [{page:index+1,quote:quote.trim()}] : [];
         }));
         if (definitions.length!==1) return item;
