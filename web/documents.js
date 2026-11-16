@@ -1059,7 +1059,25 @@ async function reader() {
         }
         return box;
       }
+      let definitionPages;
+      async function includeAliasDefinition(item) {
+        const alias=/^([\p{Script=Han}\p{Script=Katakana}\p{ASCII}]{2,12})の/u.exec(question.normalize('NFKC'))?.[1];
+        if (!alias || !item.answer || !item.evidence?.length || sourceType!=='pdf' || materials.length) return item;
+        definitionPages ??= request(api+'/text').catch(()=>[]);
+        const pages=await definitionPages;
+        const definitions=pages.flatMap((text,index)=>text.split('\n').flatMap(quote=>{
+          const line=quote.normalize('NFKC').trim();
+          const match=/^([^()|。]{3,40})\(([^()]{2,12})\)$/u.exec(line);
+          return match && match[2]===alias && match[1]!==alias && match[1].startsWith(alias)
+            ? [{page:index+1,quote:quote.trim()}] : [];
+        }));
+        if (definitions.length!==1) return item;
+        const definition=definitions[0];
+        if (item.evidence.some(source=>source.page===definition.page && source.quote.includes(definition.quote))) return item;
+        return {...item,evidence:[...item.evidence,definition]};
+      }
       async function showItem(item) {
+        item=await includeAliasDefinition(item);
         const first = !box;
         const answer = answerBox();
         renderAnswerItem(answer,item,true);
