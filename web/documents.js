@@ -859,6 +859,8 @@ async function reader() {
       canvas.height=Math.ceil(renderViewport.height);
       await page.render({canvas,viewport:renderViewport}).promise;
       if (revision!==translationRevision) return;
+      const rendered=canvas.getContext('2d');
+      const scale=renderViewport.scale;
       for (const {x,top,boxHeight,width,size,line,marked} of blocks) {
         const block=append(frame,'span',line,'pdf-layout-line'+(marked?' pdf-translated-citation':''));
         block.style.left=x/unit+'%';
@@ -866,6 +868,12 @@ async function reader() {
         block.style.width=width/unit+'%';
         block.style.height=boxHeight/viewport.height*100+'%';
         block.style.fontSize=size/unit+'cqw';
+        if (!marked && rendered) {
+          const sampleX=Math.min(canvas.width-1,Math.max(0,Math.floor((x-.5)*scale)));
+          const sampleY=Math.min(canvas.height-1,Math.max(0,Math.floor((top+boxHeight/2)*scale)));
+          const [red,green,blue,alpha]=rendered.getImageData(sampleX,sampleY,1,1).data;
+          if (alpha===255 && Math.min(red,green,blue)>=180) block.style.backgroundColor='rgb('+red+' '+green+' '+blue+')';
+        }
         if (line.includes('\n')) { block.style.whiteSpace='pre'; block.style.lineHeight='1.1'; }
       }
       translatedPage.replaceChildren(frame);
