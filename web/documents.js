@@ -1017,7 +1017,9 @@ async function reader() {
     status.textContent = '資料から答えを探しています…';
     log.scrollTop = log.scrollHeight;
     try {
-      if (sourceType==='pdf' && (!doc.convertedWorksheet || materials.length) && (/の/.test(question) || /^what is the .+ (?:for|of) /i.test(question))) {
+      const barePrice=/(?:^)(?:利用料金|料金)(?:はいくら(?:ですか)?|は)?[?？。]?$/u;
+      const priceContext=barePrice.test(question.trim()) || barePrice.test(previousQuestion?.trim()??'');
+      if (sourceType==='pdf' && (!doc.convertedWorksheet || materials.length) && (priceContext || /の/.test(question) || /^what is the .+ (?:for|of) /i.test(question))) {
         let item;
         try {
           const {lookupTableCell,lookupAlignedTableCell}=await import('./document-table-lookup.js?v=85');
@@ -1027,10 +1029,10 @@ async function reader() {
             taggedTables ??= readTaggedTables(pdf).catch(()=>[]);
             item=findTaggedTableCell(await taggedTables,question);
           }
-          if (!item && !materials.length && /(?:時刻|利用料|料金|手数料|延長料)(?:はいくら(?:ですか)?|は)?[?？。]?$/.test(question)) {
-            const {lookupPdfTableValue}=await import('./document-pdf-table-value.js?v=5');
+          if (!item && !materials.length && (priceContext || /(?:時刻|利用料|料金|手数料|延長料)(?:はいくら(?:ですか)?|は)?[?？。]?$/.test(question))) {
+            const {lookupPdfTableValue}=await import('./document-pdf-table-value.js?v=6');
             const pages=await request(api+'/text');
-            item=lookupPdfTableValue(pages,question);
+            item=lookupPdfTableValue(pages,question,previousQuestion);
           }
           item ??= await lookupTableCell(pdf,question);
           item ??= await lookupAlignedTableCell(pdf,question);

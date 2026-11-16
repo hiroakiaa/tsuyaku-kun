@@ -1,16 +1,25 @@
-export function lookupPdfTableValue(pages,question) {
+const barePrice=/^(利用料金|料金)(?:はいくら(?:ですか)?|は)?$/u;
+export function isPdfTablePriceQuestion(question) {
+  return barePrice.test(question?.normalize('NFKC').trim().replace(/[?。]$/u,'') ?? '');
+}
+
+export function lookupPdfTableValue(pages,question,previousQuestion) {
+  const isFollowup=isPdfTablePriceQuestion(previousQuestion) && /^[^の、?？。\r\n]{2,32}$/u.test(question?.trim());
+  if (isFollowup && !isPdfTablePriceQuestion(question)) question=question.trim()+'の料金';
   const query=question.normalize('NFKC').trim().toLowerCase().replace(/[?。]$/u,'');
   const verb=/^when does (?:the )?(.+?) (open|close)$/u.exec(query);
   const field=/^when is the (.+?) for (?:the )?(.+)$/u.exec(query);
   const japanese=/^([^の、]+)の([^の、]+?時刻)(?:は(?:何時(?:ですか)?)?)?$/u.exec(query);
   const fee=/^([^の、]+)の([^、]*?(?:利用料|料金|手数料|延長料))(?:はいくら(?:ですか)?|は)?$/u.exec(query);
-  if (!verb && !field && !japanese && !fee) return null;
-  const subject=verb?.[1] ?? field?.[2] ?? japanese?.[1] ?? fee[1];
-  const column=verb ? (verb[2]==='open' ? 'opening' : 'closing') : field?.[1] ?? japanese?.[2] ?? fee[2].replace(/の/gu,'');
+  const bare=barePrice.exec(query);
+  if (!verb && !field && !japanese && !fee && !bare) return null;
+  const subject=verb?.[1] ?? field?.[2] ?? japanese?.[1] ?? fee?.[1];
+  const column=verb ? (verb[2]==='open' ? 'opening' : 'closing') : field?.[1] ?? japanese?.[2] ?? (bare ? '料金' : fee[2].replace(/の/gu,''));
   const columnNames = new Set([column, japanese ? column.replace(/時刻$/u,'') : column+' time']);
+  if (bare || isFollowup) columnNames.add('利用料金');
   const matches=[];
   const isTime = value=>/^(?:\d{1,2}(?::\d{2})?\s*[ap]\.?m\.?|\d{1,2}:\d{2}|(?:午前|午後)?\s*\d{1,2}\s*時(?:\s*\d{1,2}\s*分)?)$/iu.test(value.normalize('NFKC').trim());
-  const isValue = fee ? value=>/^(?:\d[\d,]*(?:\.\d+)?\s*(?:万)?円)$/u.test(value.normalize('NFKC').trim()) : isTime;
+  const isValue = fee || bare ? value=>/^(?:\d[\d,]*(?:\.\d+)?\s*(?:万)?円)$/u.test(value.normalize('NFKC').trim()) : isTime;
   let continuation;
   for (const [index,page] of pages.entries()) {
     const pageLines=page.split('\n').filter(line=>line.trim());
@@ -34,7 +43,7 @@ export function lookupPdfTableValue(pages,question) {
       });
       start=2;
     }
-    const units = headings.map(cell=>fee ? /\((千円|万円|円)\)$/u.exec(headingText(cell))?.[1] : undefined);
+    const units = headings.map(cell=>fee || bare ? /\((千円|万円|円)\)$/u.exec(headingText(cell))?.[1] : undefined);
     const columns=headings.flatMap((cell,i)=>{
       const label=headingText(cell);
       return i>0 && columnNames.has(units[i] ? label.replace(/\s*\([^()]+\)$/u,'') : label) ? [i] : [];
@@ -64,11 +73,18 @@ export function lookupPdfTableValue(pages,question) {
     if (consistent) continuation=table;
     for (const [offset,row] of rows.entries()) {
       const answer=readValue(row[table.column]);
-      if (row[0].normalize('NFKC').trim().toLowerCase()!==subject || answer===null) continue;
-      matches.push({label:table.label,answer,evidence:[
+      if ((subject && headingText(row[0])!==subject) || answer===null || (bare && !table.unit)) continue;
+      matches.push({subject:row[0].trim(),label:table.label,answer,evidence:[
         {page:index+1,quote:lines[start+offset]},{page:table.page,quote:table.header},
       ]});
     }
+  }
+  if (bare) {
+    const names=new Set(matches.map(item=>item.subject.normalize('NFKC')));
+    if (matches.length<2 || matches.length>8 || names.size!==matches.length) return null;
+    const evidence=matches.flatMap(item=>item.evidence);
+    return {label:'料金',answer:matches.map(item=>item.subject+'は'+item.answer).join('、')+'です。',
+      evidence:evidence.filter((source,index)=>evidence.findIndex(other=>other.page===source.page && other.quote===source.quote)===index)};
   }
   return matches.length===1 ? matches[0] : null;
 }
