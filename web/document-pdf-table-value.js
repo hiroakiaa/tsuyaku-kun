@@ -3,7 +3,7 @@ export function lookupPdfTableValue(pages,question) {
   const verb=/^when does (?:the )?(.+?) (open|close)$/u.exec(query);
   const field=/^when is the (.+?) for (?:the )?(.+)$/u.exec(query);
   const japanese=/^([^の、]+)の([^の、]+?時刻)(?:は(?:何時(?:ですか)?)?)?$/u.exec(query);
-  const fee=/^([^の、]+)の([^、]+?(?:利用料|料金|手数料))(?:はいくら(?:ですか)?|は)?$/u.exec(query);
+  const fee=/^([^の、]+)の([^、]*?(?:利用料|料金|手数料))(?:はいくら(?:ですか)?|は)?$/u.exec(query);
   if (!verb && !field && !japanese && !fee) return null;
   const subject=verb?.[1] ?? field?.[2] ?? japanese?.[1] ?? fee[1];
   const column=verb ? (verb[2]==='open' ? 'opening' : 'closing') : field?.[1] ?? japanese?.[2] ?? fee[2].replace(/の/gu,'');
@@ -31,11 +31,15 @@ export function lookupPdfTableValue(pages,question) {
       });
       start=2;
     }
-    const columns=headings.flatMap((cell,i)=>i>0 && columnNames.has(headingText(cell)) ? [i] : []);
+    const units = headings.map(cell=>fee ? /\((千円|万円|円)\)$/u.exec(headingText(cell))?.[1] : undefined);
+    const columns=headings.flatMap((cell,i)=>{
+      const label=headingText(cell);
+      return i>0 && columnNames.has(units[i] ? label.replace(/\s*\([^()]+\)$/u,'') : label) ? [i] : [];
+    });
     const ownHeading=columns.length===1;
     const table=ownHeading ? {
       header:lines.slice(0,start).join('\n'),page:index+1,width:header.length,
-      column:columns[0],label:headings[columns[0]],
+      column:columns[0],label:headings[columns[0]],unit:units[columns[0]],
     } : continuation;
     continuation=undefined;
     if (!table) continue;
@@ -43,12 +47,21 @@ export function lookupPdfTableValue(pages,question) {
     const rows=cells.slice(start);
     if (!rows.length || rows.some(row=>row.length!==table.width)) continue;
     // Carry headings only when every row on both sides has the same value column.
-    const consistent=rows.every(row=>row[0].trim() && isValue(row[table.column]));
+    function readValue(value) {
+      if (!table.unit) return isValue(value) ? value.trim() : null;
+      const digits=value.normalize('NFKC').trim();
+      if (!/^(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/u.test(digits)) return null;
+      const scale={'円':1,'千円':1000,'万円':10000}[table.unit];
+      const converted=Number(digits.replaceAll(',',''))*scale;
+      return Number.isSafeInteger(converted) ? converted.toLocaleString('ja-JP')+'円' : null;
+    }
+    const consistent=rows.every(row=>row[0].trim() && readValue(row[table.column])!==null);
     if (!ownHeading && !consistent) continue;
     if (consistent) continuation=table;
     for (const [offset,row] of rows.entries()) {
-      if (row[0].normalize('NFKC').trim().toLowerCase()!==subject || !isValue(row[table.column])) continue;
-      matches.push({label:table.label,answer:row[table.column].trim(),evidence:[
+      const answer=readValue(row[table.column]);
+      if (row[0].normalize('NFKC').trim().toLowerCase()!==subject || answer===null) continue;
+      matches.push({label:table.label,answer,evidence:[
         {page:index+1,quote:lines[start+offset]},{page:table.page,quote:table.header},
       ]});
     }
