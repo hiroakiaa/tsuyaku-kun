@@ -928,7 +928,8 @@ export async function documents(request,env,auth) {
     ? new Set(Array.from(dismissalQuestion.matchAll(/(?<!\d)(1[0-2]|[1-9])月/gu),match=>match[1]))
     : new Set(portugueseMonths.flatMap((month,index)=>new RegExp('\\b'+month+'\\b','u').test(dismissalQuestion) ? [String(index+1)] : []));
   const localizedDismissal = requestedMonths.size>0 && (chineseDismissal || portugueseDismissal);
-  if (!language && (localizedDismissal || /^下校の?(?:時刻|時間)は何時(?:ですか)?[？?。]?$/u.test(normalized(currentQuestion)))) {
+  const japaneseMonth = /^(1[0-2]|[1-9])月(?:の|は)?(?:下校(?:完了)?(?:時刻|時間)?(?:は|って)?(?:何時(?:ですか)?)?|何時に下校(?:しますか)?)[?。]?$/u.exec(normalized(currentQuestion))?.[1];
+  if (!language && (japaneseMonth || localizedDismissal || /^下校の?(?:時刻|時間)は何時(?:ですか)?[？?。]?$/u.test(normalized(currentQuestion)))) {
     const matches = record.pages.flatMap((quote,index)=>{
       const evidence = [{page:index+1,quote}];
       const schedule = monthlyDismissal(evidence);
@@ -937,7 +938,7 @@ export async function documents(request,env,auth) {
       const answer = localizedDismissal
         ? schedule.months.filter(([month])=>requestedMonths.has(month)).map(([month,,leave])=>
           chineseDismissal ? `${month}月：${leave}` : `${portugueseMonths[Number(month)-1]}: ${leave}`).join('\n')
-        : schedule.answer;
+        : japaneseMonth ? japaneseMonth+'月の下校完了時刻は'+schedule.months.find(([month])=>month===japaneseMonth)[2]+'です。' : schedule.answer;
       return [{label,answer,evidence:[{page:index+1,quote:schedule.quote}]}];
     });
     if (matches.length===1) {
