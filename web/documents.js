@@ -582,6 +582,7 @@ async function reader() {
   $('#pdf-next').onclick = ()=>void showPdf(selectedPage+1);
   const preview = $('#pdf-scroll');
   const translationMode=$('#pdf-language');
+  const translationToggle=document.getElementById("pdf-language-toggle");
   const translatedPage=$('#pdf-translation');
   const pageTranslations=new Map();
   const readyEnglishPages=new Set();
@@ -674,14 +675,25 @@ async function reader() {
     translationMode.replaceChildren(new Option('原文',''));
     if(language && language.code!=='ja') translationMode.add(new Option(language.labelNative,language.code));
     if(language && !['ja','ja-easy','en'].includes(language.code)) translationMode.add(new Option('English','en'));
-    translationMode.hidden=!language || language.code==='ja';
+    translationToggle.hidden=!language || language.code==='ja';
+    translationToggle.replaceChildren();
+    for (const option of translationMode.options) {
+      const button=append(translationToggle,'button',option.textContent);
+      button.type='button';
+      button.dataset.language=option.value;
+      button.onclick=()=>{
+        translationMode.value=option.value;
+        void updatePageTranslation();
+      };
+    }
     translationMode.value=language && language.code!=='ja'?language.code:'';
     renderEnglishProgress();
-    if (translatedPage.getClientRects().length || $('#pdf-language').getClientRects().length) void updatePageTranslation();
+    if (translatedPage.getClientRects().length || translationToggle.getClientRects().length) void updatePageTranslation();
   }
   async function updatePageTranslation() {
     const revision=++translationRevision;
     const language=translationMode.value;
+    for (const button of translationToggle.children) button.setAttribute("aria-pressed",String(button.dataset.language===language));
     renderEnglishProgress();
     const page=Number(pagePicker.value)||1;
     translatedPage.hidden=!language;
@@ -694,7 +706,7 @@ async function reader() {
       if(revision===translationRevision) {
         if (sourceType==='pdf') {
           if (!await renderTranslationOnPdf(result,page,revision) && revision===translationRevision) {
-            throw Error('このページの原文と翻訳の位置を合わせられませんでした。');
+            renderReadableTranslation(result,page);
           }
         } else {
           renderTranslatedPage(result,page);
@@ -761,6 +773,14 @@ async function reader() {
           marked:citationStart>=0 && from>citationStart && start<citationStart+citationText.length});
       }
       if (!blocks.length || from!==pageText.length) return;
+      const readableWidth=translatedPage.clientWidth || preview.clientWidth;
+      const crowded=blocks.some((block,index)=>{
+        const next=blocks[index+1];
+        const shrink=block.size/block.height;
+        return shrink<.76 || block.size*readableWidth/viewport.width<12 ||
+          (next && next.y>block.y && next.y-block.y<Math.max(next.height,block.height)*1.22);
+      });
+      if (crowded) return false;
       const frame=document.createElement('div');
       frame.className='pdf-page-view pdf-translation-layout';
       if (citation?.page===number && citationStart<0) frame.classList.add('pdf-citation-page');
@@ -773,14 +793,39 @@ async function reader() {
       for (const {x,y,height,width,size,line,marked} of blocks) {
         const block=append(frame,marked?'mark':'span',line,'pdf-layout-line'+(marked?' pdf-translated-citation':''));
         block.style.left=x/unit+'%';
-        block.style.top=(y-height)/viewport.height*100+'%';
+        block.style.top=(y-height*1.08)/viewport.height*100+'%';
         block.style.width=width/unit+'%';
-        block.style.height=height/viewport.height*100+'%';
+        block.style.height=height*1.35/viewport.height*100+'%';
         block.style.fontSize=size/unit+'cqw';
       }
       translatedPage.replaceChildren(frame);
       return true;
     } catch {}
+  }
+  function renderReadableTranslation(result,page) {
+    const article=document.createElement('article');
+    article.className='pdf-readable-translation';
+    const normalize=text=>text.normalize('NFKC').replace(/[\s|]/gu,'');
+    const source=result.source?.map(normalize) ?? [];
+    const quote=citation?.page===page ? normalize(citation.quote) : '';
+    const start=quote ? source.join('').indexOf(quote) : -1;
+    if (citation?.page===page && start<0) article.classList.add('pdf-citation-page');
+    let offset=0;
+    let firstMark;
+    for (const [index,line] of (result.lines ?? [result.text]).entries()) {
+      const end=offset+(source[index]?.length ?? 0);
+      if (line?.trim()) {
+        const paragraph=append(article,'p');
+        if (start>=0 && end>start && offset<start+quote.length) {
+          const mark=append(paragraph,'mark',line,'pdf-translated-citation');
+          firstMark??=mark;
+        } else paragraph.textContent=line;
+      }
+      offset=end;
+    }
+    if (!article.childElementCount) append(article,'p','このページに翻訳できる文字はありません。');
+    translatedPage.replaceChildren(article);
+    firstMark?.scrollIntoView({block:'center',behavior:scrollBehavior()});
   }
   function renderTranslatedPage(result,page) {
     const normalize=text=>text.normalize('NFKC').replace(/[\s|]/gu,'');
