@@ -518,6 +518,19 @@ async function reader() {
     }
   }
   let citation;
+  function citationRanges(text, sourceQuote, normalize) {
+    const locate = source=>{
+      const literal = normalize(source);
+      const quote = text.includes(literal) ? literal : literal.replaceAll('|','');
+      const start = quote ? text.indexOf(quote) : -1;
+      if (start<0 || text.indexOf(quote,start+1)>=0) return null;
+      return {start,end:start+quote.length};
+    };
+    const whole = locate(sourceQuote);
+    return whole ? [whole] : sourceQuote.split(/\n|\s\|\s/u)
+      .filter(fragment=>normalize(fragment).length>=8)
+      .map(locate).filter(Boolean);
+  }
   async function highlightCitation(slot,page,viewport) {
     const selected = citation;
     if (!selected || selected.page!==Number(slot.dataset.page)) return;
@@ -526,17 +539,7 @@ async function reader() {
     if (citation!==selected) return;
     const runs = items.filter(item=>item.str).map(item=>({item,text:normalize(item.str)}));
     const text = runs.map(run=>run.text).join('');
-    const locate = source=>{
-      const literal = normalize(source);
-      const quote = text.includes(literal) ? literal : literal.replaceAll('|','');
-      const start = quote ? text.indexOf(quote) : -1;
-      if (start<0 || text.indexOf(quote,start+1)>=0) return null;
-      return {start,end:start+quote.length};
-    };
-    const whole = locate(selected.quote);
-    const ranges = whole ? [whole] : selected.quote.split(/\n|\s\|\s/u)
-      .filter(fragment=>normalize(fragment).length>=8)
-      .map(locate).filter(Boolean);
+    const ranges=citationRanges(text,selected.quote,normalize);
     removeCitationMarks(slot);
     slot.classList.toggle('pdf-citation-page',ranges.length===0);
     if (!ranges.length) return;
@@ -791,9 +794,7 @@ async function reader() {
       const measuringCanvas=document.createElement('canvas');
       const context=measuringCanvas.getContext('2d');
       const unit=viewport.width/100;
-      const literalCitation=citation?.page===number ? normalize(citation.quote) : '';
-      const citationText=pageText.includes(literalCitation) ? literalCitation : literalCitation.replaceAll('|','');
-      const citationStart=citationText?pageText.indexOf(citationText):-1;
+      const ranges=citation?.page===number ? citationRanges(pageText,citation.quote,normalize) : [];
       let from=0;
       for (const [index,original] of result.source.entries()) {
         const literal=normalize(original);
@@ -819,14 +820,14 @@ async function reader() {
         const size=Math.min(height,available/measured*height);
         if (!(size>0)) return;
         blocks.push({x,y,height,width:Math.max(width,measured*size/height),size,line:result.lines[index],
-          marked:citationStart>=0 && from>citationStart && start<citationStart+citationText.length});
+          marked:ranges.some(range=>from>range.start && start<range.end)});
       }
       if (!blocks.length || from!==pageText.length) return;
       const frame=document.createElement('div');
       frame.className='pdf-page-view pdf-translation-layout';
       frame.dataset.page=number;
       frame.style.width=(fitWidth || translatedPage.clientWidth)*zoom+'px';
-      if (citation?.page===number && citationStart<0) frame.classList.add('pdf-citation-page');
+      if (citation?.page===number && !ranges.length) frame.classList.add('pdf-citation-page');
       const canvas=append(frame,'canvas','');
       const renderViewport=page.getViewport({scale:Math.min(3,devicePixelRatio||1)});
       canvas.width=Math.ceil(renderViewport.width);
@@ -834,7 +835,7 @@ async function reader() {
       await page.render({canvas,viewport:renderViewport}).promise;
       if (revision!==translationRevision) return;
       for (const {x,y,height,width,size,line,marked} of blocks) {
-        const block=append(frame,marked?'mark':'span',line,'pdf-layout-line'+(marked?' pdf-translated-citation':''));
+        const block=append(frame,'span',line,'pdf-layout-line'+(marked?' pdf-translated-citation':''));
         block.style.left=x/unit+'%';
         block.style.top=(y-height*1.08)/viewport.height*100+'%';
         block.style.width=width/unit+'%';
@@ -1204,7 +1205,10 @@ async function reader() {
     citation = undefined;
     removeCitationMarks(preview);
     for (const slot of document.querySelectorAll(".pdf-citation-page")) slot.classList.remove("pdf-citation-page");
-    for (const mark of translatedPage.querySelectorAll('.pdf-translated-citation')) mark.replaceWith(mark.textContent);
+    for (const mark of translatedPage.querySelectorAll('.pdf-translated-citation')) {
+      if (mark.classList.contains('pdf-layout-line')) mark.classList.remove('pdf-translated-citation');
+      else mark.replaceWith(mark.textContent);
+    }
   }
   function sourceLink(parent,n,quote,getSequence) {
     const material = materials.find(item=>n>=item.start && n<item.start+item.count);
