@@ -88,6 +88,11 @@ function append(parent, tag, text, className) {
   return node;
 }
 
+function pdfPageTextStatus(text,number) {
+  const compact=text.normalize('NFKC').replace(/\s+/gu,'');
+  const pageNumberOnly=[String(number),'ページ'+number,number+'ページ','-'+number+'-'].includes(compact);
+  return {requiresOcr:!compact || pageNumberOnly,pageNumberOnly};
+}
 async function extract(file, status) {
   let pdf, ocr;
   try {
@@ -112,9 +117,8 @@ async function extract(file, status) {
         reader.releaseLock();
       }
       let text = layoutPdfText(parts);
-      const compact = text.normalize('NFKC').replace(/\s+/gu,'');
-      const pageNumberOnly = [String(n),'ページ'+n,n+'ページ','-'+n+'-'].includes(compact);
-      if (!compact || pageNumberOnly) {
+      const {requiresOcr,pageNumberOnly}=pdfPageTextStatus(text,n);
+      if (requiresOcr) {
         status.textContent = 'スキャンページを端末で読んでいます… ' + n + ' / ' + pdf.numPages;
         const {createPdfOcr} = await import('./document-ocr.js?v=95');
         ocr ??= await createPdfOcr((await pdfLibrary()).OPS);
@@ -535,9 +539,8 @@ async function reader() {
   const scanLayouts=new Map();
   async function pageTextRuns(page) {
     const {items}=await page.getTextContent();
-    const compact=items.map(item=>item.str ?? '').join('').normalize('NFKC').replace(/\s/gu,'');
     const number=page.pageNumber;
-    if (compact && ![String(number),'ページ'+number,number+'ページ','-'+number+'-'].includes(compact)) return items;
+    if (!pdfPageTextStatus(layoutPdfText(items),number).requiresOcr) return items;
     if (!scanLayouts.has(number)) {
       scanLayouts.set(number,(async()=>{
         const {createPdfOcr}=await import('./document-ocr.js?v=95');
