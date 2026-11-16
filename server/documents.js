@@ -248,6 +248,24 @@ function lookupFeeTableCell(pages,question) {
   }
   return matches.length===1 ? matches[0] : null;
 }
+function lookupExplicitYenFee(pages,question) {
+  const query=question.normalize('NFKC').replace(/\s/gu,'').replace(/[?？。]$/u,'');
+  const match=/^([\p{L}\p{N}]{2,30}の[\p{L}]{1,16}(?:費|料|料金|手数料))は(?:いくら|何円)(?:ですか)?$/u.exec(query);
+  if (!match) return null;
+  const label=match[1];
+  const subject=label.slice(0,label.lastIndexOf('の'));
+  const matches=[];
+  for (const [index,page] of pages.entries()){
+    const compact=page.normalize('NFKC').replace(/\s/gu,'');
+    if (!compact.includes(subject)) continue;
+    if (!compact.startsWith(label+'は')) return null;
+    const amount=/^((?:0|[1-9][0-9]*|[1-9][0-9]{0,2}(?:,[0-9]{3})+)円)です。?$/u.exec(compact.slice(label.length+1));
+    if (!amount) return null;
+    matches.push({label,answer:amount[1],evidence:[{page:index+1,quote:page.trim()}]});
+  }
+  return matches.length===1 ? matches[0] : null;
+}
+
 function lookupTimetableCell(pages,question) {
   const query=question.normalize('NFKC').trim().toLowerCase().replace(/[?。]$/u,'');
   const verb=/^when does (?:the )?(.+?) (open|close)$/u.exec(query);
@@ -904,7 +922,7 @@ export async function documents(request,env,auth) {
       const worksheetItem = lookupWorksheetCell(record.pages,text);
       return worksheetItem
         ? {...worksheetItem,worksheetContext:text}
-        : lookupAdmissionCell(record.pages,text) ?? (record.sourceType==='pdf' ? lookupTimetableCell(record.pages,text) ?? lookupFeeTableCell(record.pages,text) : null);
+        : lookupAdmissionCell(record.pages,text) ?? (record.sourceType==='pdf' ? lookupTimetableCell(record.pages,text) ?? lookupFeeTableCell(record.pages,text) ?? lookupExplicitYenFee(record.pages,text) : null);
     };
     const lookupItems = worksheetQuestion => {
       const sharedQuestion = /^(.+?)について[、,]?\s*それぞれ(?:の|[、,])?\s*(.+)$/u.exec(normalized(worksheetQuestion));
