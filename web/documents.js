@@ -1149,13 +1149,35 @@ async function reader() {
     }
   }
   const materials = doc.materials ?? [];
-  function clearCitation() {
+  const citationNavigation=document.getElementById('pdf-citation-navigation');
+  const citationPrevious=document.getElementById('pdf-citation-previous');
+  const citationNext=document.getElementById('pdf-citation-next');
+  let citationSequence=[];
+  let citationIndex=0;
+  async function openCitation(index) {
+    if (!citationSequence[index]) return;
+    clearCitation(true);
+    citationIndex=index;
+    citation=citationSequence[index];
+    citationNavigation.hidden=citationSequence.length<2;
+    citationPrevious.disabled=index===0;
+    citationNext.disabled=index===citationSequence.length-1;
+    citationNavigation.querySelector('output').textContent=(index+1)+' / '+citationSequence.length;
+    await showPdf(citation.page);
+  }
+  citationPrevious.onclick=()=>void openCitation(citationIndex-1);
+  citationNext.onclick=()=>void openCitation(citationIndex+1);
+  function clearCitation(keepSequence=false) {
+    if (!keepSequence) {
+      citationSequence=[];
+      citationNavigation.hidden=true;
+    }
     citation = undefined;
     removeCitationMarks(preview);
     for (const slot of document.querySelectorAll(".pdf-citation-page")) slot.classList.remove("pdf-citation-page");
     for (const mark of translatedPage.querySelectorAll('.pdf-translated-citation')) mark.replaceWith(mark.textContent);
   }
-  function sourceLink(parent,n,quote) {
+  function sourceLink(parent,n,quote,sequence) {
     const material = materials.find(item=>n>=item.start && n<item.start+item.count);
     if (material) {
       append(parent,'p',material.name+' · '+(n-material.start+1)+' '+material.unit,'ref');
@@ -1166,6 +1188,11 @@ async function reader() {
     link.addEventListener('click',async event=>{
       event.preventDefault();
       clearCitation();
+      if (sequence?.length) {
+        citationSequence=sequence;
+        await openCitation(sequence.findIndex(source=>source.page===n && source.quote===quote));
+        return;
+      }
       citation = quote && sourceType==='pdf' ? {page:n,quote} : undefined;
       await showPdf(n);
     });
@@ -1320,9 +1347,12 @@ async function reader() {
       if (!byPage.has(page)) byPage.set(page,new Map());
       byPage.get(page).set(quote,sheet && cell ? sheet+' · '+cell : null);
     }
+    const sequence=sourceType==='pdf' ? Array.from(byPage,([page,quotes])=>
+      materials.some(material=>page>=material.start && page<material.start+material.count) ? [] :
+      [...quotes.keys()].filter(Boolean).map(quote=>({page,quote}))).flat() : [];
     for (const [page,quotes] of byPage) {
       const source = append(evidence,'div','','answer-source');
-      sourceLink(source,page,quotes.keys().next().value);
+      sourceLink(source,page,quotes.keys().next().value,sequence);
       const addresses = [...new Set([...quotes.values()].filter(Boolean))];
       if (addresses.length) append(source,'div',addresses.join('、'));
       const disclosure = append(source,'details','','answer-quote');
