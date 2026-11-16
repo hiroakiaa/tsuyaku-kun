@@ -1,9 +1,37 @@
 import {layoutPdfText} from './document-table.js?v=94';
 import {installLocalIcons,localIcon} from './icons.js?v=library';
 import {config} from './config.js';
+import {withEasyJapanese} from './core.js';
 const $ = (selector) => document.querySelector(selector);
 const content = $('#content');
 const id = new URLSearchParams(location.search).get('id');
+const documentLanguages=withEasyJapanese({languages:[]}).languages;
+const languagePreference='tsuyaku-document-language';
+let selectedLanguage='';
+try { selectedLanguage=localStorage.getItem(languagePreference)??''; } catch {}
+if (!documentLanguages.some(language=>language.code===selectedLanguage)) selectedLanguage='';
+function addLanguagePicker(parent) {
+  const select=document.createElement('select');
+  select.className='document-language';
+  select.setAttribute('aria-label','資料QAの利用言語');
+  select.add(new Option('言語：自動',''));
+  for (const language of documentLanguages) {
+    select.add(new Option(language.labelNative,language.code));
+  }
+  select.value=selectedLanguage;
+  select.addEventListener('change',()=>{
+    selectedLanguage=select.value;
+    try { localStorage.setItem(languagePreference,selectedLanguage); } catch {}
+    window.dispatchEvent(new Event('document-language-change'));
+  });
+  window.addEventListener('storage',event=>{
+    if(event.key!==languagePreference) return;
+    select.value=event.newValue??'';
+    selectedLanguage=select.value;
+    window.dispatchEvent(new Event('document-language-change'));
+  });
+  parent.prepend(select);
+}
 let pdfModule;
 let authModule, session;
 async function authHeaders(headers={}) {
@@ -276,6 +304,7 @@ async function reader() {
     return;
   }
   show('#reader');
+  addLanguagePicker($('.qa-actions'));
   document.title = doc.title + '｜資料QA君';
   $('#doc-title').textContent = doc.title;
   $('#ask-heading').textContent = doc.title;
@@ -530,6 +559,44 @@ async function reader() {
   $('#pdf-prev').onclick = ()=>void showPdf(selectedPage-1);
   $('#pdf-next').onclick = ()=>void showPdf(selectedPage+1);
   const preview = $('#pdf-scroll');
+  const translationMode=$('#pdf-language');
+  const translatedPage=$('#pdf-translation');
+  const pageTranslations=new Map();
+  let translationRevision=0;
+  function syncTranslationOptions() {
+    const language=documentLanguages.find(option=>option.code===selectedLanguage);
+    translationMode.replaceChildren(new Option('原文',''));
+    if(language) translationMode.add(new Option(language.labelNative,language.code));
+    if(language && !['ja','ja-easy','en'].includes(language.code)) translationMode.add(new Option('English','en'));
+    translationMode.hidden=!language;
+    void updatePageTranslation();
+  }
+  async function updatePageTranslation() {
+    const revision=++translationRevision;
+    const language=translationMode.value;
+    const page=Number(pagePicker.value)||1;
+    translatedPage.hidden=!language;
+    translatedPage.lang=language==='ja-easy'?'ja':language;
+    if (!language) return;
+    translatedPage.scrollTop=0;
+    translatedPage.textContent='翻訳しています…';
+    const key=page+':'+language;
+    if (!pageTranslations.has(key)) {
+      pageTranslations.set(key,request(api+'/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page,language})})
+        .catch(error=>{pageTranslations.delete(key);throw error;}));
+    }
+    try {
+      const result=await pageTranslations.get(key);
+      if(revision===translationRevision) translatedPage.textContent=result.text;
+    } catch(error) {
+      if(revision!==translationRevision) return;
+      translatedPage.textContent=error.message+' ';
+      append(translatedPage,'button','再試行').onclick=()=>void updatePageTranslation();
+    }
+  }
+  translationMode.onchange=()=>void updatePageTranslation();
+  window.addEventListener('document-language-change',syncTranslationOptions);
+  syncTranslationOptions();
   const previewImage = $('#source-image');
   const imageType = /^(png|jpe?g|webp)$/.test(sourceType);
   const zoomable = sourceType==='pdf' || imageType;
@@ -719,6 +786,7 @@ async function reader() {
     readingPosition(id,{page:n});
     syncContentsPage();
     pagePicker.value = n;
+    if (translationMode.value) void updatePageTranslation();
     $('#pdf-prev').disabled = n===1;
     $('#pdf-next').disabled = n===doc.pageCount;
     $('#pdf-heading').textContent = doc.title;
@@ -841,6 +909,8 @@ async function reader() {
     link.href = '#tab-ask';
     link.addEventListener('click',async event=>{
       event.preventDefault();
+      translationMode.value='';
+      void updatePageTranslation();
       clearCitation();
       citation = quote && sourceType==='pdf' ? {page:n,quote} : undefined;
       await showPdf(n);
@@ -972,6 +1042,10 @@ async function reader() {
     const section = append(answer,'section','','answer-item');
     append(section,'h4',item.label);
     renderAnswerText(section,item,animate);
+    if (item.answer && item.englishAnswer) {
+      const english=append(section,'p',item.englishAnswer,'answer-english');
+      english.lang='en';
+    }
     if (!item.evidence?.length) return;
     const evidence = append(section,'div','','answer-evidence');
     const byPage = new Map();
@@ -1003,6 +1077,7 @@ async function reader() {
   }
   let taggedTables;
   async function sendQuestion(question,previousQuestion,questionBubble) {
+    const answerLanguage=selectedLanguage;
     const log = $('#messages');
     if (button.disabled) return;
     button.disabled = true;
@@ -1021,7 +1096,7 @@ async function reader() {
       const namedPrice=/^[\p{L}\p{N}]{2,24}は(?:何円|いくら)(?:ですか)?[?？。]?$/u;
       const priceQuestion=value=>barePrice.test(value?.trim()??'') || namedPrice.test(value?.trim()??'');
       const priceContext=priceQuestion(question) || priceQuestion(previousQuestion);
-      if (sourceType==='pdf' && (!doc.convertedWorksheet || materials.length) && (priceContext || /の/.test(question) || /^what is the .+ (?:for|of) /i.test(question))) {
+      if (!answerLanguage && sourceType==='pdf' && (!doc.convertedWorksheet || materials.length) && (priceContext || /の/.test(question) || /^what is the .+ (?:for|of) /i.test(question))) {
         let item;
         try {
           const {lookupTableCell,lookupAlignedTableCell}=await import('./document-table-lookup.js?v=85');
@@ -1053,7 +1128,7 @@ async function reader() {
       }
       const response = await fetch(config.api+api+'/ask',{method:'POST',
         headers:await authHeaders({'Content-Type':'application/json',Accept:'application/x-ndjson'}),
-        body:JSON.stringify({question,previousQuestion})});
+        body:JSON.stringify({question,previousQuestion,answerLanguage:answerLanguage||undefined})});
       httpStatus = response.status;
       if (!response.ok) throw Error((await response.json().catch(()=>null))?.error || '回答を取得できませんでした。');
       stage = '回答受信';
@@ -1210,6 +1285,7 @@ async function reader() {
 try {
   if (!id && !new URLSearchParams(location.search).has('create')) {
     show('#library');
+    addLanguagePicker($('.library-filters'));
     installLocalIcons($('#content'));
     documentLibrary();
     try {
