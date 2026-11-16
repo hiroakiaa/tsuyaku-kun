@@ -873,7 +873,8 @@ export async function documents(request,env,auth) {
     const {page,language:code}=JSON.parse(input);
     const language=answerLanguages.get(code);
     const text=Number.isInteger(page) && page>0 && page<=(record.originalPageCount ?? record.pages.length) ? record.pages[page-1] : null;
-    if (!language || !text?.trim()) return fail('翻訳するページと言語を確認してください。');
+    if (!language || typeof text!=='string') return fail('翻訳するページと言語を確認してください。');
+    if (!text.trim()) return reply({text:'',source:[],lines:[],reuse:'empty'});
     const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([2,DOCUMENT_MODEL,code,text])));
     const key=Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
     const url='https://room/document/page-translation/'+key;
@@ -1232,19 +1233,29 @@ export async function documentStorage(request,storage,env) {
       if (cached) return {...cached.result,reuse:'cache'};
       let usage;
       const source=text.split('\n');
-      const {lines}=JSON.parse(await translateDocumentText(env,JSON.stringify(source),language,true,value=>{
+      const nonempty=source.filter(line=>line.trim());
+      const captureUsage=value=>{
         if (Number.isSafeInteger(value?.prompt_tokens) && Number.isSafeInteger(value?.completion_tokens)) {
-          usage={input:value.prompt_tokens,output:value.completion_tokens,cached:value.prompt_tokens_details?.cached_tokens??0};
+          usage??={input:0,output:0,cached:0};
+          usage.input+=value.prompt_tokens;
+          usage.output+=value.completion_tokens;
+          usage.cached+=value.prompt_tokens_details?.cached_tokens??0;
         }
-      }));
-      if (!Array.isArray(lines) || lines.length!==source.length ||
-          lines.some((line,index)=>typeof line!=='string' || Boolean(line.trim())!==Boolean(source[index].trim()))) {
-        throw Error('原文と翻訳の対応を確認できませんでした。');
-      }
-      const result={text:lines.join('\n'),source,lines,usage};
+      };
+      const aligned=await translateDocumentText(env,JSON.stringify(nonempty),language,true,captureUsage);
+      let translations;
+      try { translations=JSON.parse(aligned)?.lines; } catch {}
+      let index=0;
+      const lines=Array.isArray(translations) && translations.length===nonempty.length &&
+        translations.every(line=>typeof line==='string' && line.trim())
+        ? source.map(line=>line.trim()?translations[index++]:line)
+        : null;
+      const result=lines
+        ? {text:lines.join('\n'),source,lines,usage}
+        : {text:await translateDocumentText(env,text,language,false,captureUsage),usage};
       if (new TextEncoder().encode(JSON.stringify(result)).length<120_000) await storage.transaction(async tx=>{
         if (!await tx.get('document')) return;
-        const manifest='/document/page-translation-manifest';
+        const manifest='/document/page-translation-manifest'+(language==='English'?':english':'');
         const entries=(await tx.get(manifest)??[]).filter(key=>key!==translationKey);
         if (entries.length>=160) await tx.delete(entries.shift());
         await tx.put({[translationKey]:{result},[manifest]:[...entries,translationKey]});

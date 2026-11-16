@@ -569,32 +569,45 @@ async function reader() {
   const pageTranslations=new Map();
   let translationRevision=0;
   let prefetching=false;
+  const englishFailures=new Map();
+  const prefetchFailures=new Set();
   function loadPageTranslation(page,language) {
     const key=page+':'+language;
     if (!pageTranslations.has(key)) {
-      pageTranslations.set(key,request(api+'/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page,language})})
+      pageTranslations.set(key,request(api+'/translate',{method:'POST',signal:AbortSignal.timeout(60_000),headers:{'Content-Type':'application/json'},body:JSON.stringify({page,language})})
         .catch(error=>{pageTranslations.delete(key);throw error;}));
     }
     return pageTranslations.get(key);
   }
   async function prefetchTranslations() {
-    if (prefetching || document.hidden || !translationMode.value || !dialog.open && !askDialog.open) return;
+    if (prefetching || document.hidden || navigator.onLine===false) return;
     const language=translationMode.value;
     const current=Number(pagePicker.value)||1;
-    const next=current+1;
-    if (next>doc.pageCount || pageTranslations.has(next+':'+language)) return;
+    const englishPages=Array.from({length:doc.pageCount},(_,i)=>i+1);
+    const near=current+1;
+    const visible=dialog.open && language && language!=='en' && near<=doc.pageCount &&
+      !prefetchFailures.has(near+':'+language) && !pageTranslations.has(near+':'+language) ? {page:near,language} : null;
+    const english=englishPages.find(page=>!pageTranslations.has(page+':en') && (englishFailures.get(page)??0)<2);
+    const next=visible ?? (english ? {page:english,language:'en'} : null);
+    if (!next) return;
     prefetching=true;
-    try { await loadPageTranslation(next,language); } catch {}
+    let delay=400;
+    try { await loadPageTranslation(next.page,next.language); }
+    catch {
+      if (next.language==='en') englishFailures.set(next.page,(englishFailures.get(next.page)??0)+1);
+      else prefetchFailures.add(next.page+':'+next.language);
+      delay=1500;
+    }
     finally { prefetching=false; }
-    if (language!==translationMode.value || current!==Number(pagePicker.value)) void prefetchTranslations();
+    setTimeout(prefetchTranslations,delay);
   }
   function syncTranslationOptions() {
     const language=documentLanguages.find(option=>option.code===selectedLanguage);
     translationMode.replaceChildren(new Option('原文',''));
-    if(language) translationMode.add(new Option(language.labelNative,language.code));
+    if(language && language.code!=='ja') translationMode.add(new Option(language.labelNative,language.code));
     if(language && !['ja','ja-easy','en'].includes(language.code)) translationMode.add(new Option('English','en'));
-    translationMode.hidden=!language;
-    translationMode.value=language?.code??'';
+    translationMode.hidden=!language || language.code==='ja';
+    translationMode.value=language && language.code!=='ja'?language.code:'';
     if (translatedPage.getClientRects().length || $('#pdf-language').getClientRects().length) void updatePageTranslation();
   }
   async function updatePageTranslation() {
@@ -616,6 +629,10 @@ async function reader() {
       if(revision!==translationRevision) return;
       translatedPage.textContent=error.message+' ';
       append(translatedPage,'button','再試行').onclick=()=>void updatePageTranslation();
+      append(translatedPage,'button','原文').onclick=()=>{
+        translationMode.value='';
+        void updatePageTranslation();
+      };
     }
   }
   function renderTranslatedPage(result,page) {
@@ -624,7 +641,7 @@ async function reader() {
     const source=result.source?.map(normalize)??[];
     const start=quote ? source.join('').indexOf(quote) : -1;
     if (start<0 || !Array.isArray(result.lines)) {
-      translatedPage.textContent=result.text;
+      translatedPage.textContent=result.text || 'このページに翻訳できる文字はありません。';
       return;
     }
     translatedPage.replaceChildren();
@@ -642,6 +659,7 @@ async function reader() {
   }
   translationMode.onchange=()=>void updatePageTranslation();
   document.addEventListener('visibilitychange',()=>void prefetchTranslations());
+  window.addEventListener('online',()=>{englishFailures.clear();prefetchFailures.clear();void prefetchTranslations();});
   window.addEventListener('document-language-change',syncTranslationOptions);
   syncTranslationOptions();
   const previewImage = $('#source-image');
@@ -845,6 +863,7 @@ async function reader() {
       workspace.prepend(dialog);
       dialog.show();
     }
+    void prefetchTranslations();
     updateMobileControls();
     $('#pdf-file').removeAttribute('href');
     $('#pdf-status').textContent = sourceType==='pdf' ? 'PDFを表示しています…' : '資料を表示しています…';
@@ -1326,6 +1345,7 @@ async function reader() {
     if (!wide.matches) field.blur();
     void sendQuestion(question,lastQuestion);
   });
+  void prefetchTranslations();
 }
 
 try {
