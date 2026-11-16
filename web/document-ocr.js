@@ -170,6 +170,10 @@ export async function createPdfOcr(ops) {
             if (compact(text).length<8 || malformedMonth.test(compact(text))) {
               const alternative=(await (await standardWorker()).recognize(native)).data.text.trim();
               if (compact(text).length<8 || calendarDate.test(compact(alternative))) text=alternative;
+              if (malformedMonth.test(compact(text))) {
+                const rendered=(await (await standardWorker()).recognize(canvas)).data.text.trim();
+                if (!malformedMonth.test(compact(rendered)) && calendarDate.test(compact(rendered))) text=rendered;
+              }
             }
             recordTiming('document-ocr:native-recognition',nativeStarted);
           } finally {
