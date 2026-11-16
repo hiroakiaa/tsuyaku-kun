@@ -582,11 +582,6 @@ async function reader() {
   const preview = $('#pdf-scroll');
   const translationMode=$('#pdf-language');
   const translatedPage=$('#pdf-translation');
-  const layoutTranslation=$('#pdf-layout-translation');
-  const compareTranslation=$('#pdf-compare');
-  const pdfStage=preview.parentElement;
-  let compareOriginal=false;
-  let showTranslationOnPdf=false;
   const pageTranslations=new Map();
   const readyEnglishPages=new Set();
   const englishProgress=$('#pdf-english-progress');
@@ -664,11 +659,6 @@ async function reader() {
     renderEnglishProgress();
     const page=Number(pagePicker.value)||1;
     translatedPage.hidden=!language;
-    layoutTranslation.hidden=!language || sourceType!=='pdf';
-    compareTranslation.hidden=!language || sourceType!=='pdf';
-    const comparison=Boolean(language && sourceType==='pdf' && compareOriginal);
-    compareTranslation.setAttribute('aria-pressed',String(comparison));
-    pdfStage.classList.toggle('compare-original',comparison);
     translatedPage.lang=language==='ja-easy'?'ja':language;
     if (!language) return;
     translatedPage.scrollTop=0;
@@ -676,9 +666,12 @@ async function reader() {
     try {
       const result=await loadPageTranslation(page,language);
       if(revision===translationRevision) {
-        renderTranslatedPage(result,page);
-        if (showTranslationOnPdf && sourceType==='pdf' && result.lines?.length) {
-          void renderTranslationOnPdf(result,page,revision);
+        if (sourceType==='pdf') {
+          if (!await renderTranslationOnPdf(result,page,revision) && revision===translationRevision) {
+            throw Error('このページの原文と翻訳の位置を合わせられませんでした。');
+          }
+        } else {
+          renderTranslatedPage(result,page);
         }
         void prefetchTranslations();
       }
@@ -716,7 +709,8 @@ async function reader() {
       const citationStart=citationText?pageText.indexOf(citationText):-1;
       let from=0;
       for (const [index,original] of result.source.entries()) {
-        const needle=normalize(original);
+        const literal=normalize(original);
+        const needle=pageText.startsWith(literal,from) ? literal : literal.replaceAll('|','');
         if (!needle) continue;
         const start=pageText.indexOf(needle,from);
         if (start!==from) return;
@@ -736,7 +730,7 @@ async function reader() {
         context.font=height+'px sans-serif';
         const measured=Math.max(1,context.measureText(result.lines[index]).width);
         const size=Math.min(height,available/measured*height);
-        if (size<Math.max(7,height*.58)) return;
+        if (!(size>0)) return;
         blocks.push({x,y,height,width:Math.max(width,measured*size/height),size,line:result.lines[index],
           marked:citationStart>=0 && from>citationStart && start<citationStart+citationText.length});
       }
@@ -758,6 +752,7 @@ async function reader() {
         block.style.fontSize=size/unit+'cqw';
       }
       translatedPage.replaceChildren(frame);
+      return true;
     } catch {}
   }
   function renderTranslatedPage(result,page) {
@@ -783,16 +778,6 @@ async function reader() {
     firstMark?.scrollIntoView({block:'center',behavior:'smooth'});
   }
   translationMode.onchange=()=>void updatePageTranslation();
-  compareTranslation.onclick=()=>{
-    compareOriginal=!compareOriginal;
-    void updatePageTranslation();
-    if (compareOriginal) void showPdf(Number(pagePicker.value)||1);
-  };
-  layoutTranslation.onclick=()=>{
-    showTranslationOnPdf=!showTranslationOnPdf;
-    layoutTranslation.setAttribute('aria-pressed',String(showTranslationOnPdf));
-    void updatePageTranslation();
-  };
   document.addEventListener('visibilitychange',()=>void prefetchTranslations());
   window.addEventListener('online',()=>{englishFailures.clear();prefetchFailures.clear();void prefetchTranslations();});
   window.addEventListener('document-language-change',syncTranslationOptions);
@@ -970,12 +955,10 @@ async function reader() {
       const top = preview.getBoundingClientRect().top;
       const index = pageViews.findIndex(slot => slot.getBoundingClientRect().bottom > top+1);
       if (index < 0) return;
-      const changed=selectedPage!==index+1;
       selectedPage = index+1;
       readingPosition(id,{page:selectedPage});
       syncContentsPage();
       pagePicker.value = selectedPage;
-      if (changed && compareOriginal && translationMode.value) void updatePageTranslation();
       $('#pdf-prev').disabled = selectedPage===1;
       $('#pdf-next').disabled = selectedPage===doc.pageCount;
       $('#pdf-file').href = originalUrl+'#page='+selectedPage;
