@@ -818,10 +818,33 @@ async function reader() {
           .filter(value=>value>=x+width-.1);
         const available=Math.max(width,Math.min(viewport.width-8,...nextX)-x-2);
         context.font=height+'px sans-serif';
-        const measured=Math.max(1,context.measureText(result.lines[index]).width);
-        const size=Math.min(height,available/measured*height);
+        let line=result.lines[index].trim();
+        let measured=Math.max(1,context.measureText(line).width);
+        let boxHeight=height*1.35;
+        const top=y-height*1.08;
+        const nextTop=Math.min(viewport.height,...runs.flatMap(({item})=>{
+          const [nextLeft,nextBaseline]=viewport.convertToViewportPoint(item.transform[4],item.transform[5]);
+          if (nextBaseline<=y+height*.5 || nextLeft>=x+available || nextLeft+item.width<=x) return [];
+          return [nextBaseline-item.height*1.08];
+        }));
+        const availableHeight=Math.max(boxHeight,nextTop-top);
+        if (measured>available && availableHeight>=height*1.75) {
+          const breaks=[...line.matchAll(/\s+/gu)].map(match=>match.index);
+          const midpoint=breaks.reduce((best,offset)=>Math.abs(offset-line.length/2)<Math.abs(best-line.length/2) ? offset : best,Infinity);
+          if (Number.isFinite(midpoint)) {
+            const parts=[line.slice(0,midpoint),line.slice(midpoint).trimStart()];
+            const wrappedWidth=Math.max(...parts.map(part=>context.measureText(part).width));
+            const wrappedSize=Math.min(height,available/wrappedWidth*height,availableHeight/2.2);
+            if (wrappedSize>available/measured*height*1.15) {
+              line=parts.join('\n');
+              measured=wrappedWidth;
+              boxHeight=Math.max(boxHeight,wrappedSize*2.2);
+            }
+          }
+        }
+        const size=Math.min(height,available/measured*height,line.includes('\n') ? boxHeight/2.2 : height);
         if (!(size>0)) return;
-        blocks.push({x,y,height,width:Math.max(width,measured*size/height),size,line:result.lines[index],
+        blocks.push({x,top,boxHeight,width:Math.max(width,measured*size/height),size,line,
           marked:ranges.some(range=>from>range.start && start<range.end)});
       }
       if (!blocks.length || from!==pageText.length) return;
@@ -836,13 +859,14 @@ async function reader() {
       canvas.height=Math.ceil(renderViewport.height);
       await page.render({canvas,viewport:renderViewport}).promise;
       if (revision!==translationRevision) return;
-      for (const {x,y,height,width,size,line,marked} of blocks) {
+      for (const {x,top,boxHeight,width,size,line,marked} of blocks) {
         const block=append(frame,'span',line,'pdf-layout-line'+(marked?' pdf-translated-citation':''));
         block.style.left=x/unit+'%';
-        block.style.top=(y-height*1.08)/viewport.height*100+'%';
+        block.style.top=top/viewport.height*100+'%';
         block.style.width=width/unit+'%';
-        block.style.height=height*1.35/viewport.height*100+'%';
+        block.style.height=boxHeight/viewport.height*100+'%';
         block.style.fontSize=size/unit+'cqw';
+        if (line.includes('\n')) { block.style.whiteSpace='pre'; block.style.lineHeight='1.1'; }
       }
       translatedPage.replaceChildren(frame);
       restorePageViewport(translatedPage,frame,position);
