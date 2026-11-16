@@ -765,7 +765,7 @@ export async function documents(request,env,auth) {
         pages.join('').length>((converted || ext==='xlsx') ? MAX_EXCEL_TEXT : MAX_TEXT) || !pages.some(page=>page.trim().length>=5)) return fail('資料の文字を読み取れませんでした。');
     const largeExcel = (converted || ext==='xlsx') && pages.join('').length>MAX_TEXT;
     const overview = largeExcel ? pages.map((text,i)=>({page:i+1,text:text.slice(0,Math.min(500,Math.floor(12_000/pages.length)))})) : undefined;
-    const result = await generate(env,pages,undefined,[],undefined,overview).catch(error=>{ if (!largeExcel) throw error; return null; });
+    const result = await generate(env,pages,undefined,[],undefined,overview).catch(()=>null);
     const items = (Array.isArray(result?.items) ? result.items : [])
       .filter(item=>typeof item?.label==='string' && typeof item.text==='string' && supported(item.source,pages))
       .slice(0,6).map(({label,text,source})=>({label:label.slice(0,45),text:text.slice(0,350),source:{page:source.page}}));
