@@ -253,15 +253,23 @@ function lookupExplicitYenFee(pages,question) {
   const match=/^([\p{L}\p{N}]{2,30}の[\p{L}]{1,16}(?:費|料|料金|手数料))は(?:いくら|何円)(?:ですか)?$/u.exec(query);
   if (!match) return null;
   const label=match[1];
-  const subject=label.slice(0,label.lastIndexOf('の'));
+  const separator=label.lastIndexOf('の');
+  const subject=label.slice(0,separator);
+  const joinedLabel=subject+label.slice(separator+1);
   const matches=[];
   for (const [index,page] of pages.entries()){
-    const compact=page.normalize('NFKC').replace(/\s/gu,'');
+    const normalizedPage=page.normalize('NFKC').trim();
+    const compact=normalizedPage.replace(/\s/gu,'');
     if (!compact.includes(subject)) continue;
-    if (!compact.startsWith(label+'は')) return null;
-    const amount=/^((?:0|[1-9][0-9]*|[1-9][0-9]{0,2}(?:,[0-9]{3})+)円)です。?$/u.exec(compact.slice(label.length+1));
+    const sentence=compact.startsWith(label+'は') ? compact.slice(label.length+1) : null;
+    const field=normalizedPage.match(/^(.+?)\s+([0-9][0-9,]*\s*円)$/u);
+    const fieldLabel=field?.[1].replace(/\s/gu,'');
+    const amount=sentence!==null
+      ? /^((?:0|[1-9][0-9]*|[1-9][0-9]{0,2}(?:,[0-9]{3})+)円)です。?$/u.exec(sentence)?.[1]
+      : fieldLabel===label || fieldLabel===joinedLabel ? field[2].replace(/\s/gu,'') : null;
     if (!amount) return null;
-    matches.push({label,answer:amount[1],evidence:[{page:index+1,quote:page.trim()}]});
+    if (!/^(?:0|[1-9][0-9]*|[1-9][0-9]{0,2}(?:,[0-9]{3})+)円$/u.test(amount)) return null;
+    matches.push({label,answer:amount,evidence:[{page:index+1,quote:page.trim()}]});
   }
   return matches.length===1 ? matches[0] : null;
 }
