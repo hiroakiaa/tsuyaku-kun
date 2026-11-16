@@ -83,6 +83,18 @@ try {
       return mark.getBoundingClientRect().width>0 && fill.backgroundColor==='rgb(245, 217, 117)' &&
         fill.transform==='matrix(1, 0, 0, 1, 0, 0)';
     }),null,{timeout:15_000});
+    if (!long && !dense && !atPageLimit && !atSizeLimit) {
+      const language=page.locator('select.document-language:visible');
+      await language.selectOption('en');
+      const toggle=page.locator('#pdf-language-toggle');
+      await toggle.locator('[data-language="en"]').click();
+      await page.locator('.pdf-translation-layout[data-page="2"] .pdf-layout-line').first().waitFor({timeout:65_000});
+      assert.equal(await page.locator('#pdf-page').inputValue(),'2');
+      await toggle.locator('[data-language=""]').click();
+      await page.locator('#pdf-translation').waitFor({state:'hidden'});
+      assert.equal(await page.locator('#pdf-page').inputValue(),'2');
+      await language.selectOption('ja');
+    }
     await page.locator('#question').fill('When does the swimming pool open?');
     const poolStarted = performance.now();
     await page.locator('#ask-form button').click();
