@@ -1,5 +1,5 @@
 @font-face{font-family:Zen Maru;src:url(ZenMaruGothic-Regular.ttf) format("truetype");font-display:swap}
-:root{color-scheme:dark;--bg:#1d1d1d;--panel:#191919;--soft:#242424;--line:#383838;--ink:#ededed;--muted:#bcbcbc;--lime:#d9eaaa}
+:root{color-scheme:dark;--bg:#1d1d1d;--panel:#191919;--soft:#242424;--line:#383838;--ink:#ededed;--muted:#bcbcbc;--lime:#d9eaaa;--pdf-citation-yellow:#f5d975}
 *{box-sizing:border-box}
 html{scroll-padding-top:16px}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 "Zen Maru",system-ui,sans-serif}
@@ -158,7 +158,8 @@ dialog [tabindex="-1"][autofocus]:focus {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgb(255 209 49 / 52%);
+  background: var(--pdf-citation-yellow);
+  mix-blend-mode: multiply;
   transform: scaleX(0);
   transform-origin: left center;
   transition: transform .55s ease-out;
@@ -240,10 +241,10 @@ dialog [tabindex="-1"][autofocus]:focus {
 #pdf-translation{position:absolute;inset:0;z-index:2;overflow:auto;overscroll-behavior:contain;white-space:pre-wrap;background:#202023;color:#f6f6f6;padding:clamp(1rem,4vw,2rem);line-height:1.7;overflow-wrap:anywhere}
 #pdf-translation[hidden],#pdf-language[hidden]{display:none}
 .answer-english{border-top:1px solid #ffffff32;padding-top:.65rem;margin:.7rem 0;white-space:pre-wrap}
-.pdf-translated-citation{background:#f5d975;color:#211c0d;border-radius:.2rem;padding:.12em .2em}
+.pdf-translated-citation{background:var(--pdf-citation-yellow);color:#211c0d;border-radius:.2rem;padding:.12em .2em}
 .pdf-translation-layout{container-type:inline-size;color:#202020;margin:0}
 .pdf-layout-line{position:absolute;display:block;overflow:hidden;background:#fff;color:#222;line-height:1;white-space:nowrap;padding:0}
-.pdf-layout-line.pdf-translated-citation{background:#f5d975}
+.pdf-layout-line.pdf-translated-citation{background:var(--pdf-citation-yellow)}
 .pdf-stage.compare-original{container-type:inline-size}
 .compare-original #pdf-scroll{inset:0 50% 0 0}
 .compare-original #pdf-translation{inset:0 0 0 50%;border-inline-start:1px solid #555}
