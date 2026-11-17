@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1d1d1d">
 <title>資料QA君</title>
-<link rel="stylesheet" href="web/documents.css?v=82">
-<script type="module" src="web/documents.js?v=227"></script>
+<link rel="stylesheet" href="web/documents.css?v=83">
+<script type="module" src="web/documents.js?v=228"></script>
 </head>
 <body><div class="shell">
 
@@ -16,7 +16,7 @@
 <section class="panel document-panel create-panel">
 <header class="create-heading">
 <h1>資料QAを作る</h1>
-<a class="document-entry" href="?v=227"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>保管庫に戻る</a>
+<a class="document-entry" href="?v=228"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>保管庫に戻る</a>
 </header>
 <p id="upload-status" role="status"></p>
 <form class="stack" id="upload">
@@ -44,7 +44,7 @@
 </div>
 </header>
 <div id="library-search-panel" hidden><input id="library-search" type="search" aria-label="資料名" placeholder="資料を検索"></div>
-<a class="document-entry" href="?create=1&amp;v=227"><i class="fa-solid fa-plus" aria-hidden="true"></i><span>資料チャット作成</span></a>
+<a class="document-entry" href="?create=1&amp;v=228"><i class="fa-solid fa-plus" aria-hidden="true"></i><span>資料チャット作成</span></a>
 <div class="library-tabs" role="group" aria-label="保管庫">
 <button id="library-device" type="button" aria-pressed="true">この端末の資料</button>
 <button id="library-shared" type="button" aria-pressed="false">共通の資料</button>
@@ -58,13 +58,17 @@
 </section>
 </template>
 <template id="reader">
-<header class="reader-heading"><h1 id="doc-title"></h1><a class="ref" href="?v=227">保管庫に戻る</a><button class="open-material" type="button" hidden>資料追加</button></header>
+<header class="reader-heading"><h1 id="doc-title"></h1><a class="ref" href="?v=228">保管庫に戻る</a><button class="open-material" type="button" hidden>資料追加</button></header>
 <dialog id="material-dialog" aria-labelledby="material-heading">
 <header class="reader-heading"><h2 id="material-heading" tabindex="-1" autofocus>資料追加</h2><form method="dialog"><button aria-label="資料追加を閉じる">×</button></form></header>
 <form id="add-material"><label>追加資料<input name="file" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.docx,.xlsx" required></label><button>追加する</button><p id="material-status" role="status"></p></form>
 <form id="replace-pdf" hidden><label>新しいPDF<input name="pdf" type="file" accept=".pdf,application/pdf" required></label><button type="submit">元のPDFを差し替える</button><button type="button" id="reanalyse-pdf">登録済みのPDFを再解析</button><p role="status"></p></form>
 <ul id="materials"></ul>
 <button id="remove-guide" hidden>共有を終了</button><p id="remove-status" role="status"></p>
+</dialog>
+<dialog id="read-translation" class="panel" aria-labelledby="read-translation-title">
+<header class="reader-heading"><h2 id="read-translation-title" tabindex="-1" autofocus>訳文</h2><form method="dialog"><button aria-label="訳文を閉じる">×</button></form></header>
+<p id="read-translation-text"></p>
 </dialog>
 <dialog id="points" class="panel" aria-labelledby="points-title">
 <header class="reader-heading"><h2 id="points-title" tabindex="-1" autofocus>要約</h2><form method="dialog"><button aria-label="要約を閉じる">×</button></form></header>
@@ -100,7 +104,7 @@
 <div class="pdf-zoom"><button id="qa-expand" type="button" aria-label="PDF全画面" hidden></button><button id="zoom-in" aria-label="拡大">＋</button><button id="zoom-out" aria-label="縮小">−</button><button id="zoom-fit" type="button" aria-label="ページ幅に戻す" title="ページ幅に戻す" hidden>幅</button></div>
 </div>
 <p id="pdf-english-progress" role="status" hidden></p>
-<nav class="pdf-navigation" aria-label="ページ送り"><button class="open-material pdf-add" type="button" aria-label="資料追加" hidden>資料追加</button><span id="pdf-language-picker"></span><button id="pdf-prev" aria-label="前のページ">←</button><select id="pdf-page" aria-label="ページ番号"></select><button id="pdf-next" aria-label="次のページ">→</button><div id="pdf-citation-navigation" role="group" aria-label="根拠を移動" hidden><button id="pdf-citation-previous" type="button" aria-label="前の根拠">‹</button><output aria-label="根拠番号"></output><button id="pdf-citation-next" type="button" aria-label="次の根拠">›</button></div></nav>
+<nav class="pdf-navigation" aria-label="ページ送り"><button class="open-material pdf-add" type="button" aria-label="資料追加" hidden>資料追加</button><span id="pdf-language-picker"></span><button id="pdf-answer-return" type="button" hidden>回答へ</button><button id="pdf-prev" aria-label="前のページ">←</button><select id="pdf-page" aria-label="ページ番号"></select><button id="pdf-next" aria-label="次のページ">→</button><div id="pdf-citation-navigation" role="group" aria-label="根拠を移動" hidden><button id="pdf-citation-previous" type="button" aria-label="前の根拠">‹</button><output aria-label="根拠番号"></output><button id="pdf-citation-next" type="button" aria-label="次の根拠">›</button></div></nav>
 </dialog>
 </template>
 </body>

@@ -202,7 +202,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '227');
+      guide.searchParams.set('v', '228');
       link.href = guide.href;
       if (typeof entry.shared==='boolean') append(body,'small',entry.shared?'共通保管庫に公開':'作成したブラウザーで閲覧');
       const remove = append(card,'button','','library-remove');
@@ -355,7 +355,7 @@ async function reader() {
   $('#pdf-summary').onclick=()=>points.showModal();
   askDialog.addEventListener('close',()=>{
     if (dialog.open) dialog.close();
-    location.replace('?v=227');
+    location.replace('?v=228');
   });
   const sourceType = doc.sourceType ?? 'pdf';
   let opened,originalUrl,officeText,officeRender = 0;
@@ -994,7 +994,7 @@ async function reader() {
       const frame=document.createElement('div');
       frame.className='pdf-page-view pdf-translation-layout';
       frame.dataset.page=number;
-      frame.style.width=(fitWidth || translatedPage.clientWidth)*zoom+'px';
+      frame.style.width=(fitWidth || preview.clientWidth)*zoom+'px';
       if (citation?.page===number && !ranges.length) frame.classList.add('pdf-citation-page');
       const canvas=append(frame,'canvas','');
       const renderViewport=page.getViewport({scale:Math.min(3,devicePixelRatio||1)});
@@ -1029,6 +1029,22 @@ async function reader() {
           }
         }
         const block=append(frame,'span',line,'pdf-layout-line'+(marked?' pdf-translated-citation':''));
+        if (size/viewport.width*(fitWidth || preview.clientWidth)*zoom<12) {
+          block.classList.add('pdf-readable-line');
+          block.setAttribute('role','button');
+          block.tabIndex=0;
+          const read=()=>{
+            $('#read-translation-text').textContent=line;
+            $('#read-translation-text').lang=translatedPage.lang;
+            $('#read-translation').showModal();
+          };
+          block.onclick=read;
+          block.onkeydown=event=>{
+            if (!['Enter',' '].includes(event.key)) return;
+            event.preventDefault();
+            read();
+          };
+        }
         if (vertical) block.style.writingMode='vertical-rl';
         block.style.left=x/unit+'%';
         block.style.top=top/viewport.height*100+'%';
@@ -1422,6 +1438,14 @@ async function reader() {
   const citationNavigation=document.getElementById('pdf-citation-navigation');
   const citationPrevious=document.getElementById('pdf-citation-previous');
   const citationNext=document.getElementById('pdf-citation-next');
+  const returnToAnswer=$('#pdf-answer-return');
+  let answerLink;
+  returnToAnswer.onclick=()=>{
+    if (!answerLink?.isConnected) return;
+    if (workspace.classList.contains('pdf-full')) expand.click();
+    answerLink.focus({preventScroll:true});
+    answerLink.scrollIntoView({block:'nearest',behavior:scrollBehavior()});
+  };
   let citationSequence=[];
   let citationIndex=0;
   async function openCitation(index) {
@@ -1439,6 +1463,8 @@ async function reader() {
   citationNext.onclick=()=>void openCitation(citationIndex+1);
   function clearCitation(keepSequence=false) {
     if (!keepSequence) {
+      answerLink=undefined;
+      returnToAnswer.hidden=true;
       citationSequence=[];
       citationNavigation.hidden=true;
     }
@@ -1462,6 +1488,10 @@ async function reader() {
       event.preventDefault();
       if (points.open) points.close();
       clearCitation();
+      if (link.closest('.answer-item')) {
+        answerLink=link;
+        returnToAnswer.hidden=false;
+      }
       const sequence=getSequence?.();
       if (sequence?.length && quote) {
         citationSequence=sequence;
@@ -1476,7 +1506,7 @@ async function reader() {
     const card = append($('#cards'),'div','','card');
     append(card,'h3',item.label);
     append(card,'p',item.text);
-    sourceLink(card,item.source.page);
+    sourceLink(card,item.source.page,item.source.quote || item.text);
   }
   const listMaterial = material=>append($('#materials'),'li',material.name);
   materials.forEach(listMaterial);
@@ -1981,7 +2011,7 @@ try {
         icon.append(localIcon('book-open'));
         const body = append(card,'div','','library-card-body');
         const link = append(body,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=227';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=228';
         }
       };
       $('#library-search').addEventListener('input',renderShared);
