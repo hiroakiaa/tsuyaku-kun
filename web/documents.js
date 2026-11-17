@@ -202,7 +202,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '226');
+      guide.searchParams.set('v', '227');
       link.href = guide.href;
       if (typeof entry.shared==='boolean') append(body,'small',entry.shared?'共通保管庫に公開':'作成したブラウザーで閲覧');
       const remove = append(card,'button','','library-remove');
@@ -259,6 +259,7 @@ function teacher() {
     const data = new FormData(event.currentTarget);
     const file = data.get('pdf');
     if (file.size > 5000000) { status.textContent = 'PDFは5 MBまでです。'; return; }
+    if (data.get('visibility')==='shared' && !window.confirm('共通保管庫では誰でも閲覧できます。\n公開するファイル：'+file.name+'\nこの資料を公開しますか？')) return;
     button.disabled = true;
     $('#result').hidden = true;
     button.setAttribute('aria-busy','true');
@@ -354,7 +355,7 @@ async function reader() {
   $('#pdf-summary').onclick=()=>points.showModal();
   askDialog.addEventListener('close',()=>{
     if (dialog.open) dialog.close();
-    location.replace('?v=226');
+    location.replace('?v=227');
   });
   const sourceType = doc.sourceType ?? 'pdf';
   let opened,originalUrl,officeText,officeRender = 0;
@@ -395,7 +396,18 @@ async function reader() {
     const queryInput = $('#pdf-find-query');
     const results = findPanel.querySelector('ul');
     const status = findPanel.querySelector('[role="status"]');
-    let pageText;
+    const matchNavigation=findPanel.querySelector('.pdf-find-navigation');
+    const [previousMatch,nextMatch]=matchNavigation.querySelectorAll('button');
+    const matchPosition=matchNavigation.querySelector('output');
+    let pageText, matchPages=[], matchIndex=-1;
+    function goToMatch(index) {
+      if (!matchPages.length) return;
+      matchIndex=(index+matchPages.length)%matchPages.length;
+      matchPosition.textContent=(matchIndex+1)+' / '+matchPages.length;
+      void showPdf(matchPages[matchIndex]);
+    }
+    previousMatch.onclick=()=>goToMatch(matchIndex-1);
+    nextMatch.onclick=()=>goToMatch(matchIndex+1);
     function setFindOpen(open) {
       findPanel.hidden=false;
       findPanel.inert=!open;
@@ -425,20 +437,23 @@ async function reader() {
       const submit = event.submitter;
       submit.disabled = true;
       results.replaceChildren();
+      matchPages=[];
+      matchIndex=-1;
+      matchNavigation.hidden=true;
       status.textContent = '検索しています…';
       try {
         pageText ??= await request(api+'/text');
         for (const [index,text] of pageText.entries()) {
           if (!normalize(text).includes(query)) continue;
+          const indexInResults=matchPages.push(index+1)-1;
           const item = append(results,'li','');
           const button = append(item,'button',(index+1)+'ページ');
           button.type = 'button';
           button.onclick = () => {
-            setFindOpen(false);
-            findToggle.focus();
-            void showPdf(index+1);
+            goToMatch(indexInResults);
           };
         }
+        if (matchPages.length) { matchNavigation.hidden=false; goToMatch(0); }
         status.textContent = results.children.length ? results.children.length+'ページに一致' : '一致するページがありません。';
       } catch (error) {
         status.textContent = error.message;
@@ -1642,6 +1657,10 @@ async function reader() {
     const log = $('#messages');
     if (button.disabled) return;
     button.disabled = true;
+    const controller=new AbortController();
+    const stop=$('#ask-stop');
+    stop.hidden=false;
+    stop.onclick=()=>controller.abort();
     clearCitation();
     let followedCitation = false;
     questionBubble ??= append(log,'div',question,'bubble user');
@@ -1708,7 +1727,8 @@ async function reader() {
           return;
         }
       }
-      const response = await fetch(config.api+api+'/ask',{method:'POST',
+      controller.signal.throwIfAborted();
+      const response = await fetch(config.api+api+'/ask',{method:'POST',signal:controller.signal,
         headers:await authHeaders({'Content-Type':'application/json',Accept:'application/x-ndjson'}),
         body:JSON.stringify({question,previousQuestion,answerLanguage:answerLanguage||undefined})});
       httpStatus = response.status;
@@ -1849,7 +1869,7 @@ async function reader() {
       status.textContent = '';
     } catch (error) {
       box?.remove();
-      status.textContent = error.message+'（'+stage+(httpStatus && httpStatus!==200?' / HTTP '+httpStatus:'')+'） ';
+      status.textContent = controller.signal.aborted ? '回答を停止しました。 ' : error.message+'（'+stage+(httpStatus && httpStatus!==200?' / HTTP '+httpStatus:'')+'） ';
       const retry = append(status,'button','再試行');
       retry.type = 'button';
       retry.onclick = () => void sendQuestion(question,previousQuestion,questionBubble);
@@ -1859,6 +1879,7 @@ async function reader() {
         const field = $('#question');
         if (!field.value.trim()) {
           field.value = question;
+          readingPosition(id,{draft:question});
           questionBubble.remove();
           status.textContent = '';
         }
@@ -1867,6 +1888,8 @@ async function reader() {
       };
     }
     finally {
+      stop.hidden=true;
+      stop.onclick=null;
       clearInterval(elapsedTimer);
       if (reviewStarted!==undefined) measureAnswer('full-review',reviewStarted);
       measureAnswer('finished');
@@ -1958,7 +1981,7 @@ try {
         icon.append(localIcon('book-open'));
         const body = append(card,'div','','library-card-body');
         const link = append(body,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=226';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=227';
         }
       };
       $('#library-search').addEventListener('input',renderShared);
