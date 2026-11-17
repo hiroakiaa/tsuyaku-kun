@@ -896,6 +896,18 @@ async function reader() {
             vertical:true,marked:ranges.some(range=>from>range.start && start<range.end)});
           continue;
         }
+        if (result.includesDiagram && first.ocrBox && matched.length===1) {
+          const [left,top,width,height]=first.ocrBox;
+          const boxWidth=width*viewport.width;
+          const boxHeight=height*viewport.height;
+          const line=result.lines[index].trim().replace(/\s+/gu,' ');
+          context.font=boxHeight+'px sans-serif';
+          const measured=Math.max(1,context.measureText(line).width);
+          const size=Math.min(boxHeight*.73,boxWidth/measured*boxHeight*.96);
+          blocks.push({x:left*viewport.width,top:top*viewport.height,boxHeight,width:boxWidth,size,line,
+            marked:ranges.some(range=>from>range.start && start<range.end)});
+          continue;
+        }
         const [x,y]=point(first);
         const height=Math.max(...matched.map(({item})=>item.height));
         if (!height || matched.some(({item})=>Math.abs(point(item)[1]-y)>height*.25 || item.transform[1] || item.transform[2])) return;
