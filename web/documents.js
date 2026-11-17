@@ -422,6 +422,7 @@ async function reader() {
       findPanel.classList.toggle('is-open',open);
       findToggle.setAttribute('aria-expanded',String(open));
     }
+    findToggle.replaceChildren(localIcon('magnifying-glass'));
     findToggle.hidden = false;
     findToggle.onclick = () => {
       const open = findToggle.getAttribute('aria-expanded')!=='true';
@@ -484,6 +485,7 @@ async function reader() {
       }
       syncContentsPage();
     }
+    tocButton.replaceChildren(localIcon('list'));
     tocButton.hidden = false;
     tocButton.onclick = async () => {
       const open = tocButton.getAttribute('aria-expanded')!=='true';

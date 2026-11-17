@@ -447,3 +447,15 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
   .pdf-navigation>.pdf-add .local-icon{font-size:1rem;margin:0}
 }
 @media(max-width:799px){.qa-workspace .ask-heading{display:none}}
+
+#pdf-dialog .pdf-bar :is(#pdf-toc-toggle,#pdf-find-toggle){
+  flex:none;width:44px;height:44px;min-height:44px;padding:0;
+  place-items:center;border-radius:.5rem;color:inherit;
+}
+#pdf-dialog .pdf-bar :is(#pdf-toc-toggle,#pdf-find-toggle):not([hidden]){display:grid}
+#pdf-dialog .pdf-bar :is(#pdf-toc-toggle,#pdf-find-toggle) svg{display:block;width:1.1rem;height:1.1rem}
+#pdf-dialog .pdf-bar form button{
+  width:48px;height:48px;min-height:48px;padding:0;
+  border:0;border-left:1px solid #3a3a3e;border-bottom:1px solid #3a3a3e;
+  border-radius:0 0 0 14px;background:transparent;color:inherit;box-shadow:none;
+}
