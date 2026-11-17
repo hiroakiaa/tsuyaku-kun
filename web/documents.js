@@ -919,6 +919,7 @@ async function reader() {
           const measured=Math.max(1,context.measureText(line).width);
           const size=Math.min(boxHeight*.73,boxWidth/measured*boxHeight*.96);
           blocks.push({x:left*viewport.width,top:top*viewport.height,boxHeight,width:boxWidth,size,line,
+            diagramText:true,
             marked:ranges.some(range=>from>range.start && start<range.end)});
           continue;
         }
@@ -975,7 +976,7 @@ async function reader() {
       if (revision!==translationRevision) return;
       const rendered=canvas.getContext('2d');
       const scale=renderViewport.scale;
-      for (const {x,top,boxHeight,width,size,line,marked,vertical} of blocks) {
+      for (const {x,top,boxHeight,width,size,line,marked,vertical,diagramText} of blocks) {
         const block=append(frame,'span',line,'pdf-layout-line'+(marked?' pdf-translated-citation':''));
         if (vertical) block.style.writingMode='vertical-rl';
         block.style.left=x/unit+'%';
@@ -987,7 +988,11 @@ async function reader() {
           const sampleX=Math.min(canvas.width-1,Math.max(0,Math.floor((x-.5)*scale)));
           const sampleY=Math.min(canvas.height-1,Math.max(0,Math.floor((top+boxHeight/2)*scale)));
           const [red,green,blue,alpha]=rendered.getImageData(sampleX,sampleY,1,1).data;
-          if (alpha===255 && Math.min(red,green,blue)>=180) block.style.backgroundColor='rgb('+red+' '+green+' '+blue+')';
+          if (alpha===255 && Math.min(red,green,blue)>=180) {
+            const background='rgb('+red+' '+green+' '+blue+')';
+            block.style.backgroundColor=background;
+            if (diagramText) block.style.outline=Math.min(boxHeight*.12,1.4)/unit+'cqw solid '+background;
+          }
         }
         if (line.includes('\n')) { block.style.whiteSpace='pre'; block.style.lineHeight='1.1'; }
       }
