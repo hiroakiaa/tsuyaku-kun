@@ -935,14 +935,15 @@ async function reader() {
         context.font=height+'px sans-serif';
         let line=result.lines[index].trim();
         let measured=Math.max(1,context.measureText(line).width);
-        let boxHeight=height*1.35;
         const top=y-height*1.08;
         const nextTop=Math.min(viewport.height,...runs.flatMap(({item})=>{
           const [nextLeft,nextBaseline]=point(item);
-          if (nextBaseline<=y+height*.5 || nextLeft>=x+available || nextLeft+item.width<=x) return [];
-          return [nextBaseline-item.height*1.08];
+          const nextLineTop=nextBaseline-item.height*1.08;
+          if (nextBaseline<=y+height*.5 || nextLineTop<=top || nextLeft>=x+available || nextLeft+item.width<=x) return [];
+          return [nextLineTop];
         }));
-        const availableHeight=Math.max(boxHeight,nextTop-top);
+        const availableHeight=nextTop-top;
+        let boxHeight=Math.min(height*1.35,availableHeight);
         if (measured>available && availableHeight>=height*1.75) {
           let bestWrap;
           for (const match of line.matchAll(/\s+/gu)) {
@@ -961,7 +962,7 @@ async function reader() {
             }
           }
         }
-        const size=Math.min(height,available/measured*height,line.includes('\n') ? boxHeight/2.2 : height);
+        const size=Math.min(height,available/measured*height,line.includes('\n') ? boxHeight/2.2 : boxHeight);
         if (!(size>0)) return;
         blocks.push({x,top,boxHeight,width:Math.max(width,measured*size/height),size,line,
           marked:ranges.some(range=>from>range.start && start<range.end)});
