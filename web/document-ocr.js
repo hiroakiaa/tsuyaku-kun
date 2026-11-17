@@ -150,7 +150,7 @@ export async function createPdfOcr(ops) {
                 while (continuesJapanese(group[last],group[last+1])) last++;
                 const words=group.slice(first,last+1);
                 return [{
-                  text:words.map(word=>word.text).join(' '),
+                  text:words.map(word=>word.text.trim()).join(' '),
                   bbox:{
                     x0:Math.min(...words.map(word=>word.bbox.x0)),
                     x1:Math.max(...words.map(word=>word.bbox.x1)),
@@ -189,6 +189,11 @@ export async function createPdfOcr(ops) {
             }
           }
           lines=merged.sort((a,b)=>a.bbox.y0-b.bbox.y0 || a.bbox.x0-b.bbox.x0);
+          // Sparse OCR tokenizes Japanese at arbitrary glyph boundaries. Keep word
+          // spacing for Latin text but restore continuous Japanese before translation.
+          for (const line of lines) {
+            line.text=line.text.replace(/([\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}「『])\s+(?=[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}、。』」])/gu,'$1');
+          }
         }
         if (!diagram) try {
           const pixels=context.getImageData(0,0,canvas.width,canvas.height);
