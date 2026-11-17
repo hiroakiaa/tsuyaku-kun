@@ -534,6 +534,20 @@ console.log('PASS PDF translation cache keys only change for edited pages or lan
     assert.equal(result.hasLayout,expected);
     assert.equal(result.text,expected ? reordered : stored);
   }
+  for (const [layoutText,diagramText,expected] of [
+    [reordered,'先生が話す',true],
+    [reordered.replace('1000 yen','1001 yen'),'先生が話す',false],
+    [reordered,'字'.repeat(4001),false],
+  ]) {
+    const response=await documents(new Request('https://test/documents/30000000-0000-0000-0000-000000000000/translate',{
+      method:'POST',body:JSON.stringify({page:1,language:'es',layoutText,diagramText}),
+    }),translationEnv,{uid:'author'});
+    const result=await response.json();
+    assert.equal(result.includesDiagram===true,expected);
+    assert.equal(result.text.includes('先生が話す'),expected);
+    if (diagramText.length>4000) assert.equal(result.text,reordered);
+  }
+
 }
 
 
