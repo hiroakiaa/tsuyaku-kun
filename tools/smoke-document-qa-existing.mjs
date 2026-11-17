@@ -77,6 +77,18 @@ try {
   assert.equal(secondPageRequests,savedRequestCount,'Retry must not request an already translated page again');
   console.log('Existing PDF: retry recovered page 1 and preserved the cached page 2.');
 
+  await language.selectOption('en');
+  await toggle.locator('[data-language="en"]').click();
+  await picker.selectOption('5');
+  const translatedDiagram=page.locator('.pdf-translation-layout[data-page="5"] .pdf-layout-line');
+  await translatedDiagram.filter({hasText:/teacher speaks/i}).first().waitFor({timeout:65_000});
+  const retries=await page.evaluate(()=>performance.getEntriesByName('document-ocr:diagram-line-retry')
+    .filter(entry=>entry.detail.page===5).map(({duration,detail})=>({
+      milliseconds:Math.round(duration),attempted:detail.attempted,accepted:detail.accepted,
+    })));
+  assert.ok(retries.length,'Diagram page must record its OCR retry outcome');
+  console.log('Existing PDF diagram OCR retries:',JSON.stringify(retries));
+
 } finally {
   await browser.close();
 }
