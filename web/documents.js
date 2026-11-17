@@ -808,7 +808,9 @@ async function reader() {
     scroller.scrollLeft+=page.left-view.left+page.width*position.x;
     scroller.scrollTop+=page.top-view.top+page.height*position.y;
   }
+  let visibleTranslationFailed=false;
   async function updatePageTranslation(retry=false) {
+    visibleTranslationFailed=false;
     const revision=++translationRevision;
     const language=translationMode.value;
     for (const button of translationToggle.children) button.setAttribute("aria-pressed",String(button.dataset.language===language));
@@ -829,7 +831,22 @@ async function reader() {
     translatedPage.textContent='翻訳しています…';
     foregroundTranslation++;
     try {
-      const result=await loadPageTranslation(page,language,retry,citation?.page===page ? 'citation' : 'visible');
+      const priority=citation?.page===page ? 'citation' : 'visible';
+      const load=async()=>{
+        for (const delay of [500,1500]) {
+          try {
+            return await loadPageTranslation(page,language,retry,priority);
+          } catch(error) {
+            const transient=error instanceof TypeError || error.name==='TimeoutError' ||
+              error.status===408 || error.status===429 || error.status>=500;
+            if (!transient || navigator.onLine===false || revision!==translationRevision) throw error;
+            await new Promise(resolve=>setTimeout(resolve,delay));
+            if (revision!==translationRevision) return;
+          }
+        }
+        return loadPageTranslation(page,language,false,priority);
+      };
+      const result=await load();
       if(revision===translationRevision) {
         if (result.reuse) translatedPage.dataset.translationReuse=result.reuse;
         if (['cache','in-flight','generated'].includes(result.reuse)) recordDocumentQaMetric(id,doc.title,{translation:result.reuse});
@@ -842,7 +859,8 @@ async function reader() {
             return;
           }
           if (!await renderTranslationOnPdf(result,page,revision,viewportPosition) && revision===translationRevision) {
-            throw Error('このページでは訳文を元の位置に配置できませんでした。');
+            // Older documents can return translated text without matching PDF coordinates.
+            renderTranslatedPage(result,page);
           }
         } else {
           renderTranslatedPage(result,page);
@@ -851,6 +869,7 @@ async function reader() {
       }
     } catch(error) {
       if(revision!==translationRevision) return;
+      visibleTranslationFailed=true;
       translatedPage.textContent=error.message+' ';
       append(translatedPage,'button','再試行').onclick=()=>void updatePageTranslation(true);
       append(translatedPage,'button','原文').onclick=()=>{
@@ -870,7 +889,7 @@ async function reader() {
       const nativeItems=await pageTextRuns(page);
       const items=result.includesDiagram ? [...nativeItems,...await diagramTextRuns(page,nativeItems)] : nativeItems;
       if (revision!==translationRevision) return;
-      const normalize=text=>text.normalize('NFKC').replace(/\s/gu,'');
+      const normalize=text=>text.normalize('NFKC').replace(/[\s|]/gu,'');
       let offset=0;
       const runs=items.filter(item=>item.str?.trim()).map(item=>{
         const start=offset;
@@ -890,8 +909,7 @@ async function reader() {
       const ranges=citation?.page===number ? citationRanges(pageText,citation.quote,normalize) : [];
       let from=0;
       for (const [index,original] of result.source.entries()) {
-        const literal=normalize(original);
-        const needle=pageText.startsWith(literal,from) ? literal : literal.replaceAll('|','');
+        const needle=normalize(original);
         if (!needle) continue;
         const start=pageText.indexOf(needle,from);
         if (start!==from) return;
@@ -1060,11 +1078,10 @@ async function reader() {
   }
   function renderTranslatedPage(result,page) {
     const normalize=text=>text.normalize('NFKC').replace(/[\s|]/gu,'');
-    const quote=citation?.page===page ? normalize(citation.quote) : '';
     const source=result.source?.map(normalize)??[];
-    const start=quote ? source.join('').indexOf(quote) : -1;
-    if (start<0 || !Array.isArray(result.lines)) {
-      translatedPage.textContent=result.text || 'このページに翻訳できる文字はありません。';
+    const ranges=citation?.page===page ? citationRanges(source.join(''),citation.quote,normalize) : [];
+    if (!ranges.length || !Array.isArray(result.lines) || result.lines.length!==source.length) {
+      translatedPage.textContent=result.text || result.lines?.join('\n') || 'このページに翻訳できる文字はありません。';
       return;
     }
     translatedPage.replaceChildren();
@@ -1082,7 +1099,12 @@ async function reader() {
   }
   translationMode.onchange=()=>void updatePageTranslation();
   document.addEventListener('visibilitychange',()=>void prefetchTranslations());
-  window.addEventListener('online',()=>{englishFailures.clear();prefetchFailures.clear();void prefetchTranslations();});
+  window.addEventListener('online',()=>{
+    englishFailures.clear();
+    prefetchFailures.clear();
+    if (visibleTranslationFailed && dialog.open && translationMode.value) void updatePageTranslation(true);
+    else void prefetchTranslations();
+  });
   window.addEventListener('document-language-change',syncTranslationOptions);
   syncTranslationOptions();
   const previewImage = $('#source-image');
