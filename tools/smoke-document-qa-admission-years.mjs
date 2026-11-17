@@ -4,6 +4,9 @@ import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 
 const browser = await chromium.launch();
+const checks = [];
+let stage = 'open library';
+let failure;
 try {
   const page = await browser.newPage();
   const checks = [];
@@ -20,12 +23,14 @@ try {
   await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
   assert.equal(await page.getByRole('link',{name:'資料チャット作成',exact:true}).count(),0);
   await page.locator('#upload input[name=title]').fill('自動公開確認');
+  stage = 'read workbook';
   await page.locator('#upload input[type=file]').setInputFiles(fileURLToPath(new URL('../tests/fixtures/document-qa-admission-years.xlsx',import.meta.url)));
   const sheets=await page.evaluate(async()=>{
     const {officePages}=await import('./web/document-office.js');
     return officePages(document.querySelector('#upload input[type=file]').files[0],{includeMerges:true});
   });
   assert.equal(sheets.length,2);
+  stage = 'register document';
   await page.locator('#upload button').click();
   const url = page.locator('#guide-url');
   await page.waitForFunction(()=>Boolean(document.querySelector('#guide-url')?.value),null,{timeout:120000}).catch(async e=>{throw Error(await page.locator('#upload-status').textContent(),{cause:e});});
@@ -46,12 +51,14 @@ try {
       return {bubble, elapsedMs:Math.round(performance.now()-started)};
     }
 
+    stage = 'verify year clarification';
     const clarification = await ask('青空高校の一般入試の基準は？');
     assert.match(await clarification.bubble.locator('.answer-text').textContent(),/令和8年度.*令和9年度.*どの年度/);
     assert.equal(await clarification.bubble.locator('.answer-source').count(),0);
     checks.push({kind:'clarification',elapsedMs:clarification.elapsedMs});
     console.log('clarification matched');
     for (const year of [9,8]) {
+      stage = 'verify academic year '+year;
       const school = '青空';
       const cell = 'J2';
       const expectedPage = year - 7;
@@ -89,9 +96,15 @@ try {
     },guide);
     assert.equal(removed,200);
   }
-  if (process.env.DOCUMENT_QA_REPORT) {
-    await writeFile(process.env.DOCUMENT_QA_REPORT, JSON.stringify({checks, browserVersion:browser.version()}, null, 2));
-  }
+} catch (error) {
+  failure = {stage,message:error.message};
+  throw error;
 } finally {
-  await browser.close();
+  try {
+    if (process.env.DOCUMENT_QA_REPORT) {
+      await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({checks,failure,browserVersion:browser.version()},null,2));
+    }
+  } finally {
+    await browser.close();
+  }
 }
