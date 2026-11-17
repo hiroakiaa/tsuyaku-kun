@@ -92,13 +92,16 @@ export async function createPdfOcr(ops) {
         const context=canvas.getContext('2d');
         context.fillStyle='#fff';
         for (const item of pageNumberItems) {
-          if (!item.str?.trim() || item.transform[1] || item.transform[2]) continue;
-          const [,,,,x,y]=item.transform;
-          const [x0,y0,x1,y1]=viewport.convertToViewportRectangle([
-            x,y-item.height*.2,x+item.width,y+item.height*1.2,
-          ]);
-          context.fillRect(Math.min(x0,x1)-2,Math.min(y0,y1)-2,
-            Math.abs(x1-x0)+4,Math.abs(y1-y0)+4);
+          if (!item.str?.trim()) continue;
+          const [a,b,c,d,x,y]=item.transform;
+          const horizontal=Math.hypot(a,b), vertical=Math.hypot(c,d);
+          if (!horizontal || !vertical) continue;
+          const corners=[0,item.width].flatMap(across=>[-item.height*.2,item.height*1.2].map(up=>
+            viewport.convertToViewportPoint(x+across*a/horizontal+up*c/vertical,
+              y+across*b/horizontal+up*d/vertical)));
+          const xs=corners.map(point=>point[0]), ys=corners.map(point=>point[1]);
+          const left=Math.min(...xs), top=Math.min(...ys);
+          context.fillRect(left-2,top-2,Math.max(...xs)-left+4,Math.max(...ys)-top+4);
         }
         let lines;
         try {
