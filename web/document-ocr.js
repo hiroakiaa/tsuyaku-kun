@@ -154,6 +154,7 @@ export async function createPdfOcr(ops) {
                 const words=group.slice(first,last+1);
                 return [{
                   text:words.map(word=>word.text.trim()).join(' '),
+                  confidence:words.reduce((total,word)=>total+word.confidence,0)/words.length,
                   bbox:{
                     x0:Math.min(...words.map(word=>word.bbox.x0)),
                     x1:Math.max(...words.map(word=>word.bbox.x1)),
@@ -189,6 +190,7 @@ export async function createPdfOcr(ops) {
             if (!previous) merged.push(line);
             else {
               previous.text+=' '+line.text;
+              previous.confidence=Math.min(previous.confidence,line.confidence);
               previous.bbox.x1=line.bbox.x1;
               previous.bbox.y0=Math.min(previous.bbox.y0,y0);
               previous.bbox.y1=Math.max(previous.bbox.y1,y1);
@@ -196,6 +198,19 @@ export async function createPdfOcr(ops) {
           }
           lines=merged.filter(line=>/[\p{L}\p{N}]/u.test(line.text))
             .sort((a,b)=>a.bbox.y0-b.bbox.y0 || a.bbox.x0-b.bbox.x0);
+          const worker=await standardWorker();
+          for (const line of lines.filter(line=>line.confidence<85 && japanese.test(line.text)).slice(0,12)) {
+            const {x0,x1,y0,y1}=line.bbox;
+            try {
+              const {data}=await worker.recognize(canvas,{
+                rectangle:{left:x0,top:y0,width:x1-x0,height:y1-y0},
+                tessedit_pageseg_mode:'7',
+              });
+              const candidate=data.text.trim().replace(/\s*\n\s*/gu,' ');
+              if (japanese.test(candidate) && candidate.length>=line.text.replace(/\s/gu,'').length*.85 &&
+                  data.confidence>=line.confidence+8) line.text=candidate;
+            } catch { /* Keep the original OCR result if line recognition fails. */ }
+          }
           // Sparse OCR tokenizes Japanese at arbitrary glyph boundaries. Keep word
           // spacing for Latin text but restore continuous Japanese before translation.
           for (const line of lines) {
