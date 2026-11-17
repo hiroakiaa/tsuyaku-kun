@@ -202,7 +202,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '39');
+      guide.searchParams.set('v', '226');
       link.href = guide.href;
       if (typeof entry.shared==='boolean') append(body,'small',entry.shared?'共通保管庫に公開':'作成したブラウザーで閲覧');
       const remove = append(card,'button','','library-remove');
@@ -354,7 +354,7 @@ async function reader() {
   $('#pdf-summary').onclick=()=>points.showModal();
   askDialog.addEventListener('close',()=>{
     if (dialog.open) dialog.close();
-    location.replace('?v=225');
+    location.replace('?v=226');
   });
   const sourceType = doc.sourceType ?? 'pdf';
   let opened,originalUrl,officeText,officeRender = 0;
@@ -803,15 +803,17 @@ async function reader() {
     const original=pageList.querySelector(pageSelector);
     const previous=translatedPage.querySelector('.pdf-translation-layout'+pageSelector);
     const position=pageViewportPosition(translatedPage,previous);
-    translatedPage.hidden=!language;
+    translatedPage.hidden=true;
     delete translatedPage.dataset.translationReuse;
     translatedPage.lang=language==='ja-easy'?'ja':language;
     if (!language) {
+      $('#pdf-translation-progress').hidden=true;
       restorePageViewport(preview,original,position);
       return;
     }
     const viewportPosition=position ?? pageViewportPosition(preview,original);
-    translatedPage.textContent='翻訳しています…';
+    const pending=$('#pdf-translation-progress');
+    pending.hidden=false;
     foregroundTranslation++;
     try {
       const priority=citation?.page===page ? 'citation' : 'visible';
@@ -843,15 +845,18 @@ async function reader() {
           }
           if (!await renderTranslationOnPdf(result,page,revision,viewportPosition) && revision===translationRevision) {
             // Older documents can return translated text without matching PDF coordinates.
-            renderTranslatedPage(result,page);
+            translatedPage.hidden=false;
+          renderTranslatedPage(result,page);
           }
         } else {
+          translatedPage.hidden=false;
           renderTranslatedPage(result,page);
         }
 
       }
     } catch(error) {
       if(revision!==translationRevision) return;
+      translatedPage.hidden=false;
       visibleTranslationFailed=true;
       translatedPage.textContent=error.message+' ';
       append(translatedPage,'button','再試行').onclick=()=>void updatePageTranslation(true);
@@ -860,6 +865,7 @@ async function reader() {
         void updatePageTranslation();
       };
     } finally {
+      if(revision===translationRevision) pending.hidden=true;
       foregroundTranslation--;
       void prefetchTranslations();
     }
@@ -1054,6 +1060,7 @@ async function reader() {
         }
         if (line.includes('\n')) { block.style.whiteSpace='pre'; block.style.lineHeight='1.1'; }
       }
+      translatedPage.hidden=false;
       translatedPage.replaceChildren(frame);
       restorePageViewport(translatedPage,frame,position);
       return true;
@@ -1200,6 +1207,7 @@ async function reader() {
     const before=surface.getBoundingClientRect();
     const previous=zoom;
     zoom=Math.min(4,Math.max(.5,value));
+    $('#zoom-fit').hidden=zoom===1;
     if (!fitWidth) return;
     surface.style.width=fitWidth*zoom+'px';
     const translated=translatedPage.querySelector('.pdf-translation-layout');
@@ -1216,6 +1224,7 @@ async function reader() {
   for (const control of [$('#pdf-prev'),$('#pdf-next'),pagePicker]) control.hidden=sourceType!=='pdf';
   $('#zoom-in').onclick=()=>setZoom(zoom*1.25);
   $('#zoom-out').onclick=()=>setZoom(zoom/1.25);
+  $('#zoom-fit').onclick=()=>setZoom(1);
   function measurePinch(event){
     const [a,b]=event.touches;
     const bounds=preview.getBoundingClientRect();
@@ -1866,12 +1875,16 @@ async function reader() {
       button.disabled = false;
     }
   }
+  const draftField=$('#question');
+  draftField.value=readingPosition(id).draft ?? '';
+  draftField.addEventListener('input',()=>readingPosition(id,{draft:draftField.value}));
   askForm.addEventListener('submit',event=>{
     event.preventDefault();
     const field = $('#question');
     const question = field.value.trim();
     if (!question || button.disabled) return;
     field.value = '';
+    readingPosition(id,{draft:''});
     if (!wide.matches) field.blur();
     void sendQuestion(question,lastQuestion);
   });
@@ -1914,7 +1927,23 @@ try {
         $('#'+inactive).setAttribute('aria-pressed','false');
       });
     }
+    let libraryView={};
+    try { libraryView=JSON.parse(sessionStorage.getItem('tsuyaku-library-view') || '{}'); } catch {}
+    if (libraryView.shared) $('#library-shared').click();
+    if (libraryView.viewed) $('#library-viewed').click();
+    if (libraryView.search) { searchToggle.click(); search.value=libraryView.search; search.blur(); }
     documentLibrary();
+    const rememberLibrary=()=>{
+      try {
+        sessionStorage.setItem('tsuyaku-library-view',JSON.stringify({
+          shared:!$('#library-shared-panel').hidden,
+          viewed:$('#library-viewed').getAttribute('aria-pressed')==='true',
+          search:search.value,
+          scroll:window.scrollY,
+        }));
+      } catch {}
+    };
+    window.addEventListener('pagehide',rememberLibrary,{once:true});
     try {
       const entries = await request('/documents/library');
       $('#shared-status').textContent = entries.length ? '' : '公開されている資料はありません。';
@@ -1929,13 +1958,14 @@ try {
         icon.append(localIcon('book-open'));
         const body = append(card,'div','','library-card-body');
         const link = append(body,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=39';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=226';
         }
       };
       $('#library-search').addEventListener('input',renderShared);
       $('#library-all').addEventListener('click',renderShared);
       $('#library-viewed').addEventListener('click',renderShared);
       renderShared();
+      window.scrollTo(0,libraryView.scroll || 0);
     } catch (error) {
       $('#shared-status').textContent = error.message;
     }
