@@ -219,8 +219,9 @@ try {
               await page.waitForFunction(number=>document.querySelector('#pdf-page')?.value===String(number),sourcePage);
               measurement.citationNavigation = true;
               if (fixture.printedPageNumbers) {
-                const marker=page.locator('[data-page="'+sourcePage+'"] .pdf-citation-mark').first();
+                const marker=page.locator('[data-page="'+sourcePage+'"] .pdf-citation-mark.pdf-citation-visible').first();
                 await marker.waitFor({state:'visible',timeout:60_000});
+                assert.equal(await page.locator('[data-page="'+sourcePage+'"].pdf-citation-page').count(),0);
                 measurement.scanLineMarker = true;
               }
             }
