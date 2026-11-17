@@ -1099,7 +1099,26 @@ function freshAppUrl(){
  url.searchParams.set('release-check',String(Date.now()));
  return url;
 }
-async function checkForAppUpdate(){if(checkingRelease||document.visibilityState!=='visible'||mic||$('#text-input').value.trim()||records.size||participants.some(p=>p.id!==selfId)||(room&&!room.local)||location.hash)return;checkingRelease=true;try{const url=freshAppUrl();const response=await fetch(url,{cache:'no-store',signal:AbortSignal.timeout(8000)});if(!response.ok)return;const doc=new DOMParser().parseFromString(await response.text(),'text/html'),incoming=doc.querySelector('script[type="module"][src*="app.js"]')?.getAttribute('src'),current=document.querySelector('script[type="module"][src*="app.js"]')?.getAttribute('src');const styleRelease=d=>Array.from(d.querySelectorAll('link[rel="stylesheet"][href^="web/"]')).map(e=>e.getAttribute('href')).join('|');if(!incoming||(incoming===current&&styleRelease(doc)===styleRelease(document))||document.visibilityState!=='visible'||location.hash||mic||$('#text-input').value.trim()||records.size||participants.some(p=>p.id!==selfId)||(room&&!room.local))return;location.replace(url);}catch{}finally{checkingRelease=false;}}
+function canAutoRefresh(){
+ return document.visibilityState==='visible' && !document.querySelector('dialog[open]') &&
+   !mic && !$('#text-input').value.trim() && !records.size &&
+   !participants.some(p=>p.id!==selfId) && (!room || room.local) && !location.hash;
+}
+async function checkForAppUpdate(){
+ if(checkingRelease || !canAutoRefresh())return;
+ checkingRelease=true;
+ try{
+  const url=freshAppUrl();
+  const response=await fetch(url,{cache:'no-store',signal:AbortSignal.timeout(8000)});
+  if(!response.ok)return;
+  const incomingDocument=new DOMParser().parseFromString(await response.text(),'text/html');
+  const appScript=d=>d.querySelector('script[type="module"][src*="app.js"]')?.getAttribute('src');
+  const styleRelease=d=>Array.from(d.querySelectorAll('link[rel="stylesheet"][href^="web/"]')).map(e=>e.getAttribute('href')).join('|');
+  const incoming=appScript(incomingDocument);
+  if(!incoming || (incoming===appScript(document) && styleRelease(incomingDocument)===styleRelease(document)))return;
+  if(canAutoRefresh())location.replace(url);
+ }catch{}finally{checkingRelease=false;}
+}
 setInterval(()=>void checkForAppUpdate(),60000);
 window.addEventListener('focus',()=>void checkForAppUpdate());
 window.addEventListener('pageshow',event=>{pageClosing=false;void resumeCallReception();if(event.persisted&&room?.mode==='lesson'&&socket?.readyState!==1&&!intentionalClose)void connect().then(()=>startConnectionTimers()).catch(e=>showConnectionError(e));void checkForAppUpdate();});

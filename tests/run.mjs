@@ -417,7 +417,35 @@ await test('一時保存ページでは退室せず通常の終了では解放�
 await test('復元した通話は招待エリアと対面用コントロールを表示しない',async()=>{const app=await readFile(new URL('../web/app.js',import.meta.url),'utf8');assert(app.includes("updateFace();$('#microphone').hidden=false"));const code=app.slice(app.indexOf('function renderCallInvite('),app.indexOf('function appendTranslationRetry('));for(const scenario of ['paused','started','waiting']){const n={hidden:false,dataset:{room:'room'},replaceChildren(){}};const scope={tab:'interpreter',room:{id:'room',mode:'interpreter',creator:true},backgroundCallPaused:scenario==='paused',callStarted:scenario==='started',$:()=>n};runInNewContext(code,scope);scope.renderCallInvite();assert.equal(n.hidden,scenario!=='waiting');}});
 
 await test('ブラウザーの一時中断と通常終了は一度だけ復旧通知し有料認識エラーにしない',async()=>{const {createBrowserRecognition}=await import('../web/caption-browser.js');let native;class Native{constructor(){native=this;}start(){}abort(){}}const R=createBrowserRecognition({language:'ja',Native}),r=new R();let ends=0,errors=0;r.onend=()=>ends++;r.onerror=()=>errors++;r.start();native.onerror({error:'aborted'});native.onend();assert.equal(ends,1);assert.equal(errors,0);r.start();native.onend();assert.equal(ends,2);r.start();const end=native.onend;r.abort();end();assert.equal(ends,2);});
-await test('通話ルームの更新確認は取得前と再読み込み直前に抑止する',async()=>{const app=await readFile(new URL('../web/app.js',import.meta.url),'utf8'),code=app.slice(app.indexOf('async function checkForAppUpdate('),app.indexOf('setInterval(()=>void checkForAppUpdate'));let requests=0;const scope={checkingRelease:false,document:{visibilityState:'visible'},mic:false,$:()=>({value:''}),records:new Map(),participants:[],selfId:'self',room:{local:false,creator:true},fetch:()=>requests++};runInNewContext(code,scope);await scope.checkForAppUpdate();assert.equal(requests,0);assert.equal((code.match(/room&&!room.local/g)||[]).length,2);});
+await test('通話中や資料QAを開いている間は自動更新しない',async()=>{
+ const app=await readFile(new URL('../web/app.js',import.meta.url),'utf8');
+ const code=app.slice(app.indexOf('function canAutoRefresh('),app.indexOf('setInterval(()=>void checkForAppUpdate'));
+ let requests=0,reloads=0,dialogOpen=false,finishFetch;
+ const scope={
+  checkingRelease:false,mic:false,$:()=>({value:''}),records:new Map(),participants:[],selfId:'self',
+  room:{local:false},location:{hash:'',replace:()=>reloads++},AbortSignal,freshAppUrl:()=>'/new',
+  document:{visibilityState:'visible',querySelector:selector=>selector==='dialog[open]' && dialogOpen ? {} : null},
+  DOMParser:class {parseFromString(){return {querySelector:()=>({getAttribute:()=>'/new.js'})};}},
+  fetch:()=>{requests++;return new Promise(resolve=>{finishFetch=()=>resolve({ok:true,text:async()=>''});});},
+ };
+ runInNewContext(code,scope);
+ await scope.checkForAppUpdate();
+ scope.room=null;
+ dialogOpen=true;
+ await scope.checkForAppUpdate();
+ assert.equal(requests,0);
+ dialogOpen=false;
+ const pending=scope.checkForAppUpdate();
+ dialogOpen=true;
+ finishFetch();
+ await pending;
+ assert.equal(reloads,0);
+ dialogOpen=false;
+ const idle=scope.checkForAppUpdate();
+ finishFetch();
+ await idle;
+ assert.equal(reloads,1);
+});
 
 
 await test('字幕成功や新しい空セッションがあっても直近の音声失敗を診断に出す',()=>{const now=1000000,sessions=[{startedAt:now-10000,updatedAt:now,events:[]},{startedAt:now-90000,updatedAt:now-20000,captionCount:6,latencies:[861],events:[{type:'rtc_failed',seconds:16},{type:'rtc_failed',seconds:71}]}];const r=explainConnection([{at:now-80000,stage:'turn',operation:'turn_credentials',code:'ok'}],{now,sessions,authentication:'ready'});assert(r.facts.some(s=>s.includes('音声通話の接続失敗 2回')));assert(r.candidates.some(s=>s.cause.includes('音声通話')));assert.equal(r.sessionResults[1].rtcFailureCount,2);const old=explainConnection([],{now:now+400000,sessions});assert(!old.candidates.some(s=>s.cause.includes('音声通話')));});
