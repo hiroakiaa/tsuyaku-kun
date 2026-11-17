@@ -199,7 +199,10 @@ export async function createPdfOcr(ops) {
           lines=merged.filter(line=>/[\p{L}\p{N}]/u.test(line.text))
             .sort((a,b)=>a.bbox.y0-b.bbox.y0 || a.bbox.x0-b.bbox.x0);
           const worker=await standardWorker();
-          for (const line of lines.filter(line=>line.confidence<85 && japanese.test(line.text)).slice(0,12)) {
+          const retryLines=lines.filter(line=>line.confidence<85 && japanese.test(line.text)).slice(0,12);
+          const retryStarted=performance.now();
+          let accepted=0;
+          for (const line of retryLines) {
             const {x0,x1,y0,y1}=line.bbox;
             try {
               const {data}=await worker.recognize(canvas,{
@@ -208,9 +211,15 @@ export async function createPdfOcr(ops) {
               });
               const candidate=data.text.trim().replace(/\s*\n\s*/gu,' ');
               if (japanese.test(candidate) && candidate.length>=line.text.replace(/\s/gu,'').length*.85 &&
-                  data.confidence>=line.confidence+8) line.text=candidate;
+                  data.confidence>=line.confidence+8 && candidate.replace(/\s/gu,'')!==line.text.replace(/\s/gu,'')) {
+                line.text=candidate;
+                accepted++;
+              }
             } catch { /* Keep the original OCR result if line recognition fails. */ }
           }
+          performance.measure('document-ocr:diagram-line-retry',{
+            start:retryStarted,detail:{page:page.pageNumber,attempted:retryLines.length,accepted},
+          });
           // Sparse OCR tokenizes Japanese at arbitrary glyph boundaries. Keep word
           // spacing for Latin text but restore continuous Japanese before translation.
           for (const line of lines) {
