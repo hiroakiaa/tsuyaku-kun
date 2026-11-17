@@ -1012,8 +1012,7 @@ export async function documents(request,env,auth) {
       if (!language || code==='ja') return fail('翻訳する言語を確認してください。');
       const rows=section==='toc'
         ? validatedToc(record,record.pages.slice(0,record.originalPageCount ?? record.pages.length)).map(item=>item.title)
-        : (record.summary?.revision===(record.revision ?? 0) && record.summary.items?.length
-          ? record.summary.items : record.items ?? []).flatMap(item=>[item.label,item.text]);
+        : (documentSummaryView(record).items ?? []).flatMap(item=>[item.label,item.text]);
       const text=rows.map(row=>row.replace(/\s+/gu,' ').trim()).join('\n');
       if (!text) return reply({source:[],lines:[]});
       const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([section,DOCUMENT_MODEL,code,text])));
@@ -1059,19 +1058,8 @@ export async function documents(request,env,auth) {
     return target.fetch('https://room/document/toc',{method:'POST',body:JSON.stringify(toc)});
   }
   if (!action) {
-    const summary=record.summary;
-    const ready=summary?.revision===(record.revision ?? 0) && summary.items?.length>0;
+    const {summary,ready,items}=documentSummaryView(record);
     if (!ready && (!summary || summary.revision!==(record.revision ?? 0) || summary.nextAttempt<=Date.now())) queueSummary(env,target);
-    const items=ready ? [...summary.items] : record.items;
-    if (ready) {
-      const labels=new Set(items.map(item=>normalized(item.label)));
-      for (const item of record.items ?? []) {
-        const label=normalized(item.label);
-        if (items.length>=10 || labels.has(label)) continue;
-        items.push(item);
-        labels.add(label);
-      }
-    }
     return reply({title:record.title,items,summaryReady:Boolean(ready),toc:validatedToc(record,record.pages.slice(0,record.originalPageCount ?? record.pages.length)),materials:record.materials ?? [],sourceType:record.sourceType ?? 'pdf',convertedWorksheet:record.convertedWorksheet===true,revision:record.revision ?? 0,pageCount:record.originalPageCount ?? record.pages.length,canRemove:record.owner===auth.uid});
   }
   if (Number(request.headers.get('content-length')) > 4096) return fail('質問は300文字までです。',413);
@@ -1656,4 +1644,20 @@ export async function evaluateDocumentQuestion(env,pages,question,mode,materials
   const timing = {retrievalMs:mode==='full' ? null : Math.round(generationStarted-retrievalStarted),generationMs:Math.round(performance.now()-generationStarted)};
   if (target) await recordUsage(env,usage,"benchmark").catch(()=>{});
   return {items:(result.items ?? []).map(item=>checkedAnswer(item,pages,question)).filter(Boolean),usage,timing,candidatePages:passages ? [...new Set(passages.map(({page})=>page))] : pages.map((_,index)=>index+1)};
+}
+
+function documentSummaryView(record) {
+  const summary=record.summary;
+  const ready=summary?.revision===(record.revision ?? 0) && summary.items?.length>0;
+  const items=ready ? [...summary.items] : record.items;
+  if (ready) {
+    const labels=new Set(items.map(item=>normalized(item.label)));
+    for (const item of record.items ?? []) {
+      const label=normalized(item.label);
+      if (items.length>=10 || labels.has(label)) continue;
+      items.push(item);
+      labels.add(label);
+    }
+  }
+  return {summary,ready,items};
 }
