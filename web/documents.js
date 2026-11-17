@@ -350,33 +350,11 @@ async function reader() {
     syncFullscreen();
     window.addEventListener('pagehide',()=>window.parent.postMessage({type:'document-fullscreen',open:false},location.origin));
   }
-  const tabs = [...document.querySelectorAll('.doc-tabs [role=tab]')];
-  function selectTab(tab) {
-    for (const t of tabs) {
-      t.setAttribute('aria-selected',String(t===tab));
-      t.tabIndex = t===tab ? 0 : -1;
-      document.getElementById(t.getAttribute('aria-controls')).hidden = t!==tab;
-    }
-  }
-  tabs.forEach((tab,i)=>{
-    tab.addEventListener('click',()=>{
-      selectTab(tab);
-      if (tab.id==='tab-ask') {
-        $('#ask-dialog').showModal();
-        syncWorkspace();
-      }
-    });
-    tab.addEventListener('keydown',event=>{
-      const index = {ArrowRight:(i+1)%tabs.length,ArrowLeft:(i+tabs.length-1)%tabs.length,Home:0,End:tabs.length-1}[event.key];
-      if (index===undefined) return;
-      event.preventDefault();
-      tabs[index].focus();
-    });
-  });
-  $('#ask-dialog').addEventListener('close',()=>{
+  const points=$('#points');
+  $('#pdf-summary').onclick=()=>points.showModal();
+  askDialog.addEventListener('close',()=>{
     if (dialog.open) dialog.close();
-    selectTab(tabs[0]);
-    tabs[0].focus();
+    location.replace('?v=225');
   });
   const sourceType = doc.sourceType ?? 'pdf';
   let opened,originalUrl,officeText,officeRender = 0;
@@ -1314,7 +1292,6 @@ async function reader() {
     $('#pdf-next').disabled = n===doc.pageCount;
     $('#pdf-heading').textContent = doc.title;
     if (!askDialog.open) {
-      selectTab($('#tab-ask'));
       askDialog.showModal();
     }
     if (!dialog.open) {
@@ -1456,9 +1433,10 @@ async function reader() {
       return;
     }
     const link = append(parent,'a',sourceType==='pdf' ? '元のPDF ' + n + 'ページ' : '資料データ'+(sourceType==='xlsx' ? ' · シート '+n : '')+' →','ref');
-    link.href = '#tab-ask';
+    link.href = '#ask-dialog';
     link.addEventListener('click',async event=>{
       event.preventDefault();
+      if (points.open) points.close();
       clearCitation();
       const sequence=getSequence?.();
       if (sequence?.length && quote) {
@@ -1897,7 +1875,7 @@ async function reader() {
     if (!wide.matches) field.blur();
     void sendQuestion(question,lastQuestion);
   });
-  void prefetchTranslations();
+  await showPdf(selectedPage || 1);
 }
 
 try {

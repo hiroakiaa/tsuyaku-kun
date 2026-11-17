@@ -69,7 +69,7 @@ try {
   try {
     assert.deepEqual(externalWrites,[]);
     await page.goto(guide);
-    await page.locator('#tab-ask').click();
+    await page.locator('#question').waitFor({state:'visible'});
     await page.waitForFunction(expected=>document.querySelectorAll('#pdf-page option').length===expected,scanPage);
     const pageCount = await page.locator('#pdf-page option').count();
     await page.locator('#question').fill('When does the library close?');
@@ -177,7 +177,7 @@ try {
     assert.match(quotesAt(combinedEvidence[0],2),/Library[\s\S]*3\s*(?::00)?\s*PM/i);
     assert.match(quotesAt(combinedEvidence[1],scanPage),/swimming pool[\s\S]*8\s*(?::00)?\s*AM/i);
     await page.reload();
-    await page.locator('#tab-ask').click();
+    await page.locator('#question').waitFor({state:'visible'});
     assert.deepEqual(await citationNames(librarySource),['元のPDF 1ページ','元のPDF 2ページ']);
     assert.deepEqual(await citationNames(poolSource),[scanCitation]);
     const missingQuestion = 'What is the annual parking permit fee?';

@@ -38,7 +38,7 @@ try {
   try {
     assert.deepEqual(externalWrites,[]);
     await page.goto(guide);
-    await page.locator('#tab-ask').click();
+    await page.locator('#question').waitFor({state:'visible'});
     const answers = page.locator('#messages .bubble:not(.user)');
     async function ask(question) {
       const index = await answers.count();

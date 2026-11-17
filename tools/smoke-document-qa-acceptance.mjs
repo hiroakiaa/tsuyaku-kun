@@ -196,7 +196,7 @@ try {
         }
         if (registration.elapsedMs>limits.registration) failures.push(Error(fixture.label+' registration exceeded '+limits.registration+' ms'));
         await page.goto(guide);
-        await page.locator('#tab-ask').click();
+        await page.locator('#question').waitFor({state:'visible'});
         const expectedPages = fixture.excel ? 2 : fixture.pages.length;
         await page.waitForFunction(count=>document.querySelectorAll('#pdf-page option').length===count,expectedPages);
         registration.pageCount = expectedPages;

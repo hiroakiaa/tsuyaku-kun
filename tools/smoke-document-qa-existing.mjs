@@ -11,7 +11,7 @@ const browser = await chromium.launch();
 try {
   const page = await browser.newPage({locale:'ja-JP'});
   await page.goto(url.href);
-  await page.locator('#tab-ask').click();
+  await page.locator('#question').waitFor({state:'visible'});
   const language = page.locator('select.document-language:visible');
   await language.selectOption('ja');
   await page.locator('#question').fill('ルームは何時間で失効しますか？');

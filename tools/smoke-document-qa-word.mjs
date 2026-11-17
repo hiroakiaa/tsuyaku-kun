@@ -55,7 +55,7 @@ try {
       await viewer.close();
     }
     await page.goto(guide);
-    await page.locator('#tab-ask').click();
+    await page.locator('#question').waitFor({state:'visible'});
     assert.equal(await page.locator('#pdf-page option').count(),2);
     await page.locator('#question').fill('What is the start time for the Blue group?');
     const questionStarted = performance.now();

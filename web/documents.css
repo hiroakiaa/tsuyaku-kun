@@ -479,3 +479,7 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
 .library-order{margin-top:.4rem}
 .library-order button{min-height:40px;background:transparent;border-color:transparent}
 .library-order button[aria-pressed=true]{background:transparent;color:var(--ink);border-bottom-color:var(--qa-accent);border-radius:0}
+
+#points[open]{width:min(44rem,calc(100% - 1.5rem));max-height:85dvh;overflow:auto}
+#points .reader-heading{margin-bottom:1rem}
+#pdf-dialog .pdf-bar #pdf-summary{width:auto;min-height:44px;padding:.25rem .55rem;border-radius:.5rem;white-space:nowrap}

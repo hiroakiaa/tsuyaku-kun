@@ -99,7 +99,7 @@ try {
       recoveryStarted = performance.now();
       await page.getByRole('button',{name:'再読み込み',exact:true}).click();
     }
-    await page.locator('#tab-ask').click().catch(async cause => {
+    await page.locator('#question').waitFor({state:'visible'}).catch(async cause => {
       throw Error('Worksheet question tab unavailable: '+JSON.stringify({
         fixture,pageStatus:navigation?.status(),metadataStatuses,metadataFailures:await Promise.all(metadataFailures),
       }),{cause});
@@ -144,7 +144,7 @@ try {
         if (!cell) {
           assert.equal(await answer.locator('.answer-source').count(),0);
           await page.reload();
-          await page.locator('#tab-ask').click();
+          await page.locator('#question').waitFor({state:'visible'});
           const restored = page.locator('#messages .bubble').last();
           await restored.getByText(expected,{exact:true}).waitFor();
           assert.equal(await restored.locator('.answer-source').count(),0);
@@ -178,7 +178,7 @@ try {
     for (const [question,value,source] of questions) {
       if (question==='子どもは？') {
         await page.reload();
-        await page.locator('#tab-ask').click();
+        await page.locator('#question').waitFor({state:'visible'});
       }
       await page.locator('#question').fill(question);
       await page.locator('#ask-form').evaluate(form => {

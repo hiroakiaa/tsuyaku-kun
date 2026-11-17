@@ -94,7 +94,7 @@ try {
     page.on('pageerror', error => browserErrors.push(error.name));
     const navigation = await page.goto(guide);
     try {
-      await page.locator('#tab-ask').click();
+      await page.locator('#question').waitFor({state:'visible'});
     } catch (cause) {
       throw Error('Image question tab unavailable: '+JSON.stringify({
         format, language, pageStatus:navigation?.status(), guideMetadataStatuses, browserErrors,
