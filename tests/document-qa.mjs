@@ -517,6 +517,27 @@ assert.equal(await translateFixture(1,'es'),'generated');
 console.log('PASS PDF translation cache keys only change for edited pages or languages');
 
 {
+  const reordered='Facility\nWeekday admission\nWeekend admission\nAdult\nChild\nAdult\nChild\nMuseum\n800 yen\n300 yen\n1000 yen\n500 yen';
+  const stored='Weekday admission | Weekend admission\nFacility\nAdult | Child | Adult | Child\nMuseum | 800 yen | 300 yen | 1000 yen | 500 yen';
+  const translationEnv={ROOMS:{idFromName:id=>id,get:()=>({
+    async fetch(url,options) {
+      if (url.endsWith('/data')) return Response.json({sourceType:'pdf',owner:'author',pages:[stored]});
+      return Response.json(JSON.parse(options.body));
+    },
+  })}};
+  for (const [layoutText,expected] of [[reordered,true],[reordered.replace('1000 yen','1001 yen'),false],
+    [reordered.replace('\nAdult\nChild\nMuseum','\nChild\nChild\nMuseum'),false]]) {
+    const response=await documents(new Request('https://test/documents/30000000-0000-0000-0000-000000000000/translate',{
+      method:'POST',body:JSON.stringify({page:1,language:'es',layoutText}),
+    }),translationEnv,{uid:'author'});
+    const result=await response.json();
+    assert.equal(result.hasLayout,expected);
+    assert.equal(result.text,expected ? reordered : stored);
+  }
+}
+
+
+{
   const pages=[[
     'Weekday admission | Weekend admission',
     'Facility',
