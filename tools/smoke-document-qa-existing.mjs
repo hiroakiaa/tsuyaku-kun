@@ -42,6 +42,41 @@ try {
   await waitForOriginalMark();
   assert.equal(await picker.inputValue(),'2');
   console.log('Existing PDF: grounded answer, English citation, and original citation restored.');
+
+  let blockFirstPage = true;
+  let blockedRequests = 0;
+  let secondPageRequests = 0;
+  await page.route(/\/documents\/[^/]+\/translate$/u, async route => {
+    const translation = route.request().postDataJSON();
+    if (translation.language==='es' && translation.page===2) secondPageRequests++;
+    if (translation.language==='es' && translation.page===1 && blockFirstPage) {
+      blockedRequests++;
+      await route.abort('failed');
+    } else await route.continue();
+  });
+  await language.selectOption('es');
+  await toggle.locator('[data-language="es"]').click();
+  const secondPage = page.locator('.pdf-translation-layout[data-page="2"]');
+  await secondPage.waitFor({timeout:65_000});
+  const secondPageText = await secondPage.innerText();
+  const savedRequestCount = secondPageRequests;
+  assert.ok(savedRequestCount>0);
+
+  await picker.selectOption('1');
+  const retry = page.locator('#pdf-translation').getByRole('button',{name:'再試行',exact:true});
+  await retry.waitFor({timeout:30_000});
+  assert.ok(blockedRequests>0);
+  assert.equal(await picker.inputValue(),'1');
+  blockFirstPage = false;
+  await retry.click();
+  await page.locator('.pdf-translation-layout[data-page="1"] .pdf-layout-line').first().waitFor({timeout:65_000});
+  assert.equal(await picker.inputValue(),'1');
+  await picker.selectOption('2');
+  await secondPage.waitFor({timeout:65_000});
+  assert.equal(await secondPage.innerText(),secondPageText);
+  assert.equal(secondPageRequests,savedRequestCount,'Retry must not request an already translated page again');
+  console.log('Existing PDF: retry recovered page 1 and preserved the cached page 2.');
+
 } finally {
   await browser.close();
 }
