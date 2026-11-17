@@ -202,13 +202,21 @@ export async function createPdfOcr(ops) {
           const retryLines=lines.filter(line=>line.confidence<85 && japanese.test(line.text)).slice(0,12);
           const retryStarted=performance.now();
           let accepted=0;
+          const lineCanvas=document.createElement('canvas');
           for (const line of retryLines) {
             const {x0,x1,y0,y1}=line.bbox;
             try {
-              const {data}=await worker.recognize(canvas,{
-                rectangle:{left:x0,top:y0,width:x1-x0,height:y1-y0},
-                tessedit_pageseg_mode:'7',
-              });
+              const cropHeight=y1-y0;
+              if (cropHeight<=0 || x1<=x0) continue;
+              const scale=Math.max(1,Math.min(3,48/cropHeight));
+              const padding=Math.ceil(cropHeight*scale*.3);
+              lineCanvas.width=Math.ceil((x1-x0)*scale)+padding*2;
+              lineCanvas.height=Math.ceil(cropHeight*scale)+padding*2;
+              const lineContext=lineCanvas.getContext('2d');
+              lineContext.fillStyle='#fff';
+              lineContext.fillRect(0,0,lineCanvas.width,lineCanvas.height);
+              lineContext.drawImage(canvas,x0,y0,x1-x0,cropHeight,padding,padding,(x1-x0)*scale,cropHeight*scale);
+              const {data}=await worker.recognize(lineCanvas,{tessedit_pageseg_mode:'7'});
               const candidate=data.text.trim().replace(/\s*\n\s*/gu,' ');
               if (japanese.test(candidate) && candidate.length>=line.text.replace(/\s/gu,'').length*.85 &&
                   data.confidence>=line.confidence+8 && candidate.replace(/\s/gu,'')!==line.text.replace(/\s/gu,'')) {
@@ -217,6 +225,7 @@ export async function createPdfOcr(ops) {
               }
             } catch { /* Keep the original OCR result if line recognition fails. */ }
           }
+          lineCanvas.width=lineCanvas.height=0;
           performance.measure('document-ocr:diagram-line-retry',{
             start:retryStarted,detail:{page:page.pageNumber,attempted:retryLines.length,accepted},
           });
