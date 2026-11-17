@@ -720,8 +720,15 @@ function checkedAnswer(item,pages,question='',language=null) {
         }
         if (headings.length!==1) continue;
         const quote = headings[0];
-        if (!quote.split(/ \| |\n/).some(cell=>normalized(cell).length>=2 &&
-          (terms.includes(normalized(cell).toLowerCase()) || (normalized(cell).toLowerCase()==='closing' && (/clos(?:e|es|ed|ing)|閉館|閉店|閉ま/u.test(terms) || /\bshut\b/iu.test(question))) || (normalized(cell).toLowerCase()==='opening' && /open|開館|開店|開く|開き/u.test(terms))))) continue;
+        const closing = /clos(?:e|es|ed|ing)|閉館|閉店|閉ま/u.test(terms) ||
+          /\b(?:shut|cierr[aeo]|cerrar|fechamento|fecha|fermeture|ferme)\b/iu.test(question);
+        const opening = /open|開館|開店|開く|開き/u.test(terms) ||
+          /\b(?:abre|abrir|apertura|abertura|ouverture|ouvre)\b/iu.test(question);
+        if (!quote.split(/ \| |\n/).some(cell=>{
+          const heading=normalized(cell).toLowerCase();
+          return heading.length>=2 && (terms.includes(heading) || (heading==='closing' && closing) ||
+            (heading==='opening' && opening));
+        })) continue;
         if (!evidence.some(item=>item.page===source.page-1 && item.quote===quote)) {
           evidence.push({page:source.page-1,quote});
         }
@@ -1188,7 +1195,7 @@ export async function documents(request,env,auth) {
       return reply({items,answer:items[0].answer,pages:[...new Set(items.flatMap(item=>item.evidence.map(source=>source.page)))]});
     }
   }
-  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([language ? 30 : 29,record.pages,record.materials ?? [],generationQuestion.trim()])));
+  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([language ? 31 : 29,record.pages,record.materials ?? [],generationQuestion.trim()])));
   const cacheKey = Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
   const cacheUrl = 'https://room/document/answer/'+cacheKey;
   const cached = await (await target.fetch(cacheUrl)).json();

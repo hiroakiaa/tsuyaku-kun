@@ -196,6 +196,9 @@ try {
   }),env,{uid:'author'})).json();
   assert.deepEqual((await ask('When does the library close?')).pages,[2,1]);
   assert.deepEqual((await ask('At what time does the library shut?')).pages,[2,1]);
+  assert.deepEqual((await ask('¿A qué hora cierra la biblioteca?')).pages,[2,1]);
+  assert.deepEqual((await ask('Qual é o horário de fechamento da biblioteca?')).pages,[2,1]);
+  assert.deepEqual((await ask('¿Cuál es la capacidad de la biblioteca?')).pages,[2]);
   assert.deepEqual((await ask('What is the Library capacity?')).pages,[2]);
   assert.deepEqual((await ask('図書館は何時に閉まりますか？')).pages,[2,1]);
   assert.deepEqual((await ask('図書館の定員は？')).pages,[2]);
