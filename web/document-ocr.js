@@ -116,7 +116,7 @@ export async function createPdfOcr(ops) {
           const left=Math.min(...xs), top=Math.min(...ys);
           context.fillRect(left-2,top-2,Math.max(...xs)-left+4,Math.max(...ys)-top+4);
         }
-        let lines;
+        let lines,verticalLayout=false;
         try {
           const pixels=context.getImageData(0,0,canvas.width,canvas.height);
           const {findVerticalScanRegion}=await import('./document-ocr-lines.js?v=3');
@@ -124,6 +124,7 @@ export async function createPdfOcr(ops) {
             const {data}=await (await verticalWorker()).recognize(canvas,{}, {blocks:true});
             if (data.confidence>=70) lines=(data.blocks ?? []).flatMap(block=>block.paragraphs)
               .flatMap(paragraph=>paragraph.lines).sort((a,b)=>b.bbox.x0-a.bbox.x0 || a.bbox.y0-b.bbox.y0);
+            verticalLayout=Boolean(lines?.length);
           }
           if (!lines?.length) {
             const {createHorizontalScanReader}=await import('./document-ocr-horizontal.js?v=2');
@@ -147,7 +148,7 @@ export async function createPdfOcr(ops) {
             const [x,y]=viewport.convertToPdfPoint(bbox.x0,bbox.y1);
             const ocrBox=[bbox.x0/viewport.width,bbox.y0/viewport.height,
               (bbox.x1-bbox.x0)/viewport.width,(bbox.y1-bbox.y0)/viewport.height];
-            return [{str,width,height,ocr:true,ocrBox,transform:[height,0,0,height,x,y]}];
+            return [{str,width,height,ocr:true,ocrBox,verticalLayout,transform:[height,0,0,height,x,y]}];
           });
       } finally {
         canvas.width=canvas.height=0;

@@ -120,7 +120,7 @@ async function extract(file, status) {
       const {requiresOcr,pageNumberOnly}=pdfPageTextStatus(text,n);
       if (requiresOcr) {
         status.textContent = 'スキャンページを端末で読んでいます… ' + n + ' / ' + pdf.numPages;
-        const {createPdfOcr} = await import('./document-ocr.js?v=99');
+        const {createPdfOcr} = await import('./document-ocr.js?v=100');
         ocr ??= await createPdfOcr((await pdfLibrary()).OPS);
         if (page.rotate) {
           const runs=await ocr.readLayout(page,pageNumberOnly ? parts : []).catch(()=>[]);
@@ -555,7 +555,7 @@ async function reader() {
     if (!requiresOcr) return items;
     if (!scanLayouts.has(number)) {
       scanLayouts.set(number,(async()=>{
-        const {createPdfOcr}=await import('./document-ocr.js?v=99');
+        const {createPdfOcr}=await import('./document-ocr.js?v=100');
         const reader=await createPdfOcr((await pdfLibrary()).OPS);
         try {
           const runs=await reader.readLayout(page,pageNumberOnly ? items : []);
@@ -860,6 +860,17 @@ async function reader() {
         const matched=runs.filter(run=>run.end>start && run.start<from);
         if (matched[0]?.start!==start || matched.at(-1)?.end!==from) return;
         const first=matched[0].item;
+        if (first.verticalLayout && matched.length===1) {
+          const [left,top,width,height]=first.ocrBox;
+          const boxWidth=width*viewport.width,boxHeight=height*viewport.height;
+          const line=result.lines[index].trim();
+          context.font=boxWidth+'px sans-serif';
+          const measured=Math.max(1,context.measureText(line).width);
+          const size=Math.min(boxWidth*.85,boxHeight/measured*boxWidth*.95);
+          blocks.push({x:left*viewport.width,top:top*viewport.height,boxHeight,width:boxWidth,size,line,
+            vertical:true,marked:ranges.some(range=>from>range.start && start<range.end)});
+          continue;
+        }
         const [x,y]=point(first);
         const height=Math.max(...matched.map(({item})=>item.height));
         if (!height || matched.some(({item})=>Math.abs(point(item)[1]-y)>height*.25 || item.transform[1] || item.transform[2])) return;
@@ -913,8 +924,9 @@ async function reader() {
       if (revision!==translationRevision) return;
       const rendered=canvas.getContext('2d');
       const scale=renderViewport.scale;
-      for (const {x,top,boxHeight,width,size,line,marked} of blocks) {
+      for (const {x,top,boxHeight,width,size,line,marked,vertical} of blocks) {
         const block=append(frame,'span',line,'pdf-layout-line'+(marked?' pdf-translated-citation':''));
+        if (vertical) block.style.writingMode='vertical-rl';
         block.style.left=x/unit+'%';
         block.style.top=top/viewport.height*100+'%';
         block.style.width=width/unit+'%';
