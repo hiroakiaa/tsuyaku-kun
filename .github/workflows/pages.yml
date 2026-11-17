@@ -73,6 +73,11 @@ jobs:
         env:
           DOCUMENT_QA_REPORT: document-qa-pdf-report.json
         run: node tools/smoke-document-qa.mjs
+      - name: Verify an existing document in the published app
+        if: ${{ vars.DOCUMENT_QA_EXISTING_FIXTURE != '' }}
+        env:
+          DOCUMENT_QA_EXISTING_FIXTURE: ${{ vars.DOCUMENT_QA_EXISTING_FIXTURE }}
+        run: node tools/smoke-document-qa-existing.mjs
       - name: Verify long PDF citations in the published app
         env:
           DOCUMENT_QA_REPORT: document-qa-long-pdf-report.json
