@@ -267,6 +267,25 @@ try {
         }
       }
     }
+    let denseTranslation;
+    if (dense) {
+      await page.locator('select.document-language:visible').selectOption('es');
+      await page.locator('#pdf-page').selectOption('3');
+      await page.locator('#pdf-language-toggle [data-language="es"]').click();
+      const translatedLines = page.locator('.pdf-translation-layout[data-page="3"] .pdf-layout-line');
+      await translatedLines.first().waitFor({timeout:65_000});
+      denseTranslation = await translatedLines.evaluateAll(lines => {
+        const rectangles = lines.map(line => line.getBoundingClientRect());
+        const overlaps = rectangles.reduce((count, first, index) => count +
+          rectangles.slice(index+1).filter(second =>
+            Math.min(first.right,second.right)-Math.max(first.left,second.left)>1 &&
+            Math.min(first.bottom,second.bottom)-Math.max(first.top,second.top)>1).length,0);
+        return {page:3,lines:lines.length,overlaps};
+      });
+      console.log('Dense PDF translation layout:',JSON.stringify(denseTranslation));
+      assert.ok(denseTranslation.lines>2,'Dense fixture must exercise multiple translated lines');
+      assert.equal(denseTranslation.overlaps,0,'Adjacent translated lines must not overlap');
+    }
     const releaseUrl = new URL('./web/release-checks.json',guide);
     releaseUrl.searchParams.set('check',String(Date.now()));
     const releaseResponse = await page.request.get(releaseUrl.href);
@@ -280,7 +299,7 @@ try {
       measuredAt:new Date().toISOString(), platform:process.platform,browserVersion:browser.version(),
       combinedEvidence,missingEvidence,groupVisitEvidence,
       answerStages:{library:libraryStages,missingEvidence:missingStages},
-      originalMarkerAfterTranslation,
+      originalMarkerAfterTranslation,denseTranslation,
     };
   } finally {
     const removed = await page.evaluate(async documentUrl=>{
