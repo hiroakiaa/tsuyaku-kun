@@ -701,10 +701,17 @@ async function reader() {
     }
     return pdfTranslationSources.get(key);
   }
-  function loadPageTranslation(page,language,retry=false) {
+  const translationTrace=[];
+  function recordTranslationTrace(page,language,priority,event) {
+    translationTrace.push({page,language,priority,event});
+    if (translationTrace.length>64) translationTrace.shift();
+    content.dataset.translationTrace=JSON.stringify(translationTrace);
+  }
+  function loadPageTranslation(page,language,retry=false,priority='visible') {
     const key=page+':'+language;
     if (retry) pageTranslations.delete(key);
     if (!pageTranslations.has(key)) {
+      recordTranslationTrace(page,language,priority,'start');
       pageTranslations.set(key,(async()=>{
         const layoutText=sourceType==='pdf' ? await pdfTranslationSource(page,retry) : undefined;
         const translate=(layout,diagramText)=>request(api+'/translate',{
@@ -727,7 +734,8 @@ async function reader() {
           }
           return result;
         })
-        .catch(error=>{pageTranslations.delete(key);throw error;}));
+        .catch(error=>{pageTranslations.delete(key);throw error;})
+        .finally(()=>recordTranslationTrace(page,language,priority,'finish')));
     }
     return pageTranslations.get(key);
   }
@@ -744,7 +752,7 @@ async function reader() {
     if (!next) return;
     prefetching=true;
     let delay=400;
-    try { await loadPageTranslation(next.page,next.language); }
+    try { await loadPageTranslation(next.page,next.language,false,'prefetch'); }
     catch {
       if (next.language==='en') englishFailures.set(next.page,(englishFailures.get(next.page)??0)+1);
       else prefetchFailures.add(next.page+':'+next.language);
@@ -812,7 +820,7 @@ async function reader() {
     translatedPage.textContent='翻訳しています…';
     foregroundTranslation++;
     try {
-      const result=await loadPageTranslation(page,language,retry);
+      const result=await loadPageTranslation(page,language,retry,citation?.page===page ? 'citation' : 'visible');
       if(revision===translationRevision) {
         if (result.reuse) translatedPage.dataset.translationReuse=result.reuse;
         if (['cache','in-flight','generated'].includes(result.reuse)) recordDocumentQaMetric(id,doc.title,{translation:result.reuse});
