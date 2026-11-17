@@ -124,19 +124,28 @@ export async function createPdfOcr(ops) {
             .flatMap(line=>{
               const groups=[];
               for (const word of line.words ?? []) {
-                const previous=groups.at(-1);
+                if (!word.text.trim() || word.bbox.x1<=word.bbox.x0) continue;
+                const group=groups.at(-1);
+                const previous=group?.at(-1);
                 const height=word.bbox.y1-word.bbox.y0;
-                if (word.confidence<45 || !/[\p{L}\p{N}]/u.test(word.text)) continue;
-                if (!previous || word.bbox.x0-previous.bbox.x1>height*1.6) {
-                  groups.push({text:word.text,bbox:{...word.bbox}});
-                } else {
-                  previous.text+=' '+word.text;
-                  previous.bbox.x1=word.bbox.x1;
-                  previous.bbox.y0=Math.min(previous.bbox.y0,word.bbox.y0);
-                  previous.bbox.y1=Math.max(previous.bbox.y1,word.bbox.y1);
-                }
+                if (!previous || word.bbox.x0-previous.bbox.x1>height*1.6) groups.push([word]);
+                else group.push(word);
               }
-              return groups;
+              return groups.flatMap(group=>{
+                const first=group.findIndex(word=>word.confidence>=45 && /[\p{L}\p{N}]/u.test(word.text));
+                if (first<0) return [];
+                const last=group.findLastIndex(word=>word.confidence>=45 && /[\p{L}\p{N}]/u.test(word.text));
+                const words=group.slice(first,last+1);
+                return [{
+                  text:words.map(word=>word.text).join(' '),
+                  bbox:{
+                    x0:Math.min(...words.map(word=>word.bbox.x0)),
+                    x1:Math.max(...words.map(word=>word.bbox.x1)),
+                    y0:Math.min(...words.map(word=>word.bbox.y0)),
+                    y1:Math.max(...words.map(word=>word.bbox.y1)),
+                  },
+                }];
+              });
             });
         }
 
