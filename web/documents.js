@@ -1559,7 +1559,7 @@ async function reader() {
             item=findTaggedTableCell(await taggedTables,question);
           }
           if (!item && !materials.length && (priceContext || /(?:時刻|利用料|料金|手数料|延長料)(?:はいくら(?:ですか)?|は)?[?？。]?$/.test(question))) {
-            const {lookupPdfTableValue}=await import('./document-pdf-table-value.js?v=8');
+            const {lookupPdfTableValue}=await import('./document-pdf-table-value.js?v=9');
             const pages=await request(api+'/text');
             item=lookupPdfTableValue(pages,question,previousQuestion);
           }
