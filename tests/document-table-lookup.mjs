@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {runInNewContext} from 'node:vm';
-import {lookupTableCell} from '../web/document-table-lookup.js';
+import {lookupTableCell,readPdfPageText} from '../web/document-table-lookup.js';
 
 const width=1200,height=400;
 const pixels=new Uint8ClampedArray(width*height*4).fill(255);
@@ -14,9 +14,10 @@ const items=[
   cell('北',60,115),cell('館',60,125),cell('15分',230,115),cell('500円',640,115),
   cell('南館',60,180),cell('30分',230,180),cell('900円',640,180),
 ];
+let pageReads=0;
 const page={
   getViewport:()=>({width,height,scale:1,convertToViewportPoint:(x,y)=>[x,y]}),
-  getTextContent:async()=>({items}),
+  getTextContent:async()=>{pageReads++; return {items};},
   render:()=>({promise:Promise.resolve()}),
 };
 globalThis.document={createElement:()=>({getContext:()=>({getImageData:()=>({data:pixels})})})};
@@ -28,6 +29,8 @@ items.push(cell('北館別棟',60,250),cell('45分',230,250));
 for (const y of [290]) for(let x=20;x<=1100;x++) mark(x,y);
 assert.equal((await lookupTableCell(pdf,'北館の所要時間の基準は？')).answer,'15分');
 assert.equal((await lookupTableCell(pdf,'北館別の所要時間は？')).answer,'45分');
+assert.equal((await readPdfPageText(page)).items,items);
+assert.equal(pageReads,1);
 console.log('PASS vertical row labels, duplicate headings and adjacent table cells');
 import {layoutPdfText} from '../web/document-table.js';
 const verticalGlyph = (str,x,y)=>({str,dir:'ttb',width:10,transform:[10,0,0,10,x,y]});

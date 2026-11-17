@@ -1,3 +1,4 @@
+import {readPdfPageText,lookupTableCell,lookupAlignedTableCell} from './document-table-lookup.js?v=87';
 import {recordDocumentQaMetric} from './document-qa-metrics.js?v=1';
 import {layoutPdfText} from './document-table.js?v=94';
 import {installLocalIcons,localIcon} from './icons.js?v=library';
@@ -541,15 +542,8 @@ async function reader() {
       .map(locate).filter(Boolean);
   }
   const scanLayouts=new Map();
-  const pdfTextLayers=new WeakMap();
   async function pageTextRuns(page) {
-    if (!pdfTextLayers.has(page)) {
-      pdfTextLayers.set(page,page.getTextContent().catch(error=>{
-        pdfTextLayers.delete(page);
-        throw error;
-      }));
-    }
-    const {items}=await pdfTextLayers.get(page);
+    const {items}=await readPdfPageText(page);
     const number=page.pageNumber;
     const {requiresOcr,pageNumberOnly}=pdfPageTextStatus(layoutPdfText(items),number);
     if (!requiresOcr) return items;
@@ -1588,7 +1582,6 @@ async function reader() {
       if (!answerLanguage && sourceType==='pdf' && (!doc.convertedWorksheet || materials.length) && (priceContext || /の/.test(question) || /^what is the .+ (?:for|of) /i.test(question))) {
         let item;
         try {
-          const {lookupTableCell,lookupAlignedTableCell}=await import('./document-table-lookup.js?v=86');
           const pdf=await getOriginalPdf();
           if (!materials.length) {
             const {readTaggedTables,findTaggedTableCell}=await import('./document-tagged-table.js?v=2');

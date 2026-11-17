@@ -1,16 +1,17 @@
 const compact = text => text.normalize('NFKC').replace(/\s/g,'');
 
 const pdfPageText = new WeakMap();
-function pageText(pdf, number) {
-  let pages=pdfPageText.get(pdf);
-  if (!pages) pdfPageText.set(pdf,pages=new Map());
-  if (!pages.has(number)) {
-    pages.set(number,pdf.getPage(number).then(async page=>({page,...await page.getTextContent()})).catch(error=>{
-      pages.delete(number);
-      throw error;
-    }));
-  }
-  return pages.get(number);
+export function readPdfPageText(page) {
+  if (!pdfPageText.has(page)) pdfPageText.set(page,page.getTextContent().catch(error=>{
+    pdfPageText.delete(page);
+    throw error;
+  }));
+  return pdfPageText.get(page);
+}
+
+async function pageText(pdf, number) {
+  const page = await pdf.getPage(number);
+  return {page,...await readPdfPageText(page)};
 }
 
 export async function lookupTableCell(pdf, question) {
