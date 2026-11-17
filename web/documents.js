@@ -202,7 +202,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '228');
+      guide.searchParams.set('v', '229');
       link.href = guide.href;
       if (typeof entry.shared==='boolean') append(body,'small',entry.shared?'共通保管庫に公開':'作成したブラウザーで閲覧');
       const remove = append(card,'button','','library-remove');
@@ -352,10 +352,33 @@ async function reader() {
     window.addEventListener('pagehide',()=>window.parent.postMessage({type:'document-fullscreen',open:false},location.origin));
   }
   const points=$('#points');
-  $('#pdf-summary').onclick=()=>points.showModal();
+  const summaryStatus=$('#summary-status');
+  let summaryReady=doc.summaryReady;
+  let summaryCheck;
+  $('#pdf-summary').onclick=()=>{
+    points.showModal();
+    if (summaryReady!==false || summaryCheck) return;
+    summaryStatus.hidden=false;
+    summaryStatus.textContent='詳しい要約を準備しています…';
+    summaryCheck=(async()=>{
+      for (let attempt=0;attempt<7 && points.open;attempt++) {
+        const latest=await request(api);
+        if (latest.summaryReady) {
+          renderSummary(latest.items);
+          summaryReady=true;
+          summaryStatus.hidden=true;
+          return;
+        }
+        await new Promise(resolve=>setTimeout(resolve,4000));
+      }
+      summaryStatus.textContent='準備ができると、次に開いたときに表示されます。';
+    })().catch(()=>{
+      summaryStatus.textContent='詳しい要約の準備状況を確認できませんでした。';
+    }).finally(()=>{summaryCheck=undefined;});
+  };
   askDialog.addEventListener('close',()=>{
     if (dialog.open) dialog.close();
-    location.replace('?v=228');
+    location.replace('?v=229');
   });
   const sourceType = doc.sourceType ?? 'pdf';
   let opened,originalUrl,officeText,officeRender = 0;
@@ -1502,12 +1525,17 @@ async function reader() {
       await showPdf(n);
     });
   }
-  for (const item of doc.items) {
-    const card = append($('#cards'),'div','','card');
-    append(card,'h3',item.label);
-    append(card,'p',item.text);
-    sourceLink(card,item.source.page,item.source.quote || item.text);
+  function renderSummary(items) {
+    const cards=$('#cards');
+    cards.replaceChildren();
+    for (const item of items ?? []) {
+      const card=append(cards,'div','','card');
+      append(card,'h3',item.label);
+      append(card,'p',item.text);
+      sourceLink(card,item.source.page,item.source.quote || item.text);
+    }
   }
+  renderSummary(doc.items);
   const listMaterial = material=>append($('#materials'),'li',material.name);
   materials.forEach(listMaterial);
   const addForm = $('#add-material');
@@ -2011,7 +2039,7 @@ try {
         icon.append(localIcon('book-open'));
         const body = append(card,'div','','library-card-body');
         const link = append(body,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=228';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=229';
         }
       };
       $('#library-search').addEventListener('input',renderShared);
