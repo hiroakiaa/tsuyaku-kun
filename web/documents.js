@@ -65,7 +65,11 @@ async function pdfLibrary() {
 
 async function openPdf(input) {
   const lib = await pdfLibrary();
-  return lib.getDocument({...input, isEvalSupported:false, stopAtErrors:true}).promise;
+  return lib.getDocument({
+    ...input,isEvalSupported:false,stopAtErrors:true,
+    cMapUrl:new URL('./pdf-resources/cmaps/',import.meta.url).href,cMapPacked:true,
+    standardFontDataUrl:new URL('./pdf-resources/standard_fonts/',import.meta.url).href,
+  }).promise;
 }
 
 async function request(url, options) {
