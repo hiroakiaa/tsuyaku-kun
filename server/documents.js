@@ -1115,7 +1115,7 @@ export async function documents(request,env,auth) {
       return reply({items,answer:items[0].answer,pages:[...new Set(items.flatMap(item=>item.evidence.map(source=>source.page)))]});
     }
   }
-  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([language ? 28 : 27,record.pages,record.materials ?? [],generationQuestion.trim()])));
+  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([language ? 30 : 29,record.pages,record.materials ?? [],generationQuestion.trim()])));
   const cacheKey = Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
   const cacheUrl = 'https://room/document/answer/'+cacheKey;
   const cached = await (await target.fetch(cacheUrl)).json();
