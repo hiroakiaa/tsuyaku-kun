@@ -76,6 +76,44 @@ export const documentUiLabels=[
   ['この項目の根拠は資料内で確認できませんでした。','No supporting passage was found in the document.','No se encontró un pasaje de respaldo en el documento.'],
   ['公開されている資料はありません。','No shared documents yet.','Aún no hay documentos compartidos.'],
   ['一致する資料がありません。','No matching documents.','No hay documentos coincidentes.'],
+  ['すべて','All','Todos'],
+  ['閲覧履歴','Recently viewed','Vistos recientemente'],
+  ['保管庫','Library','Biblioteca'],
+  ['表示する資料','Documents to show','Documentos que se muestran'],
+  ['作成したブラウザーで閲覧','Available in the browser that created it','Disponible en el navegador donde se creó'],
+  ['共通保管庫に公開','Shared in the library','Publicado en la biblioteca compartida'],
+  ['一覧から外す','Remove from list','Quitar de la lista'],
+  ['保管した資料はまだありません。','No saved documents yet.','Aún no hay documentos guardados.'],
+  ['閲覧履歴はまだありません。','No recently viewed documents.','Aún no hay documentos vistos recientemente.'],
+  ['閉じる','Close','Cerrar'],
+  ['要約','Summary','Resumen'],
+  ['要約を閉じる','Close summary','Cerrar resumen'],
+  ['資料から抜き出した要点','Key points from the document','Puntos clave del documento'],
+  ['詳しい要約を準備しています…','Preparing a detailed summary…','Preparando un resumen detallado…'],
+  ['準備ができると、次に開いたときに表示されます。','The detailed summary will appear when you reopen it.','El resumen detallado aparecerá cuando vuelvas a abrirlo.'],
+  ['詳しい要約の準備状況を確認できませんでした。','Could not check the summary status.','No se pudo comprobar el estado del resumen.'],
+  ['回答がここに表示されます','Answers will appear here','Las respuestas aparecerán aquí'],
+  ['回答へ','Back to answer','Volver a la respuesta'],
+  ['停止','Stop','Detener'],
+  ['回答を停止しました。','Answer stopped.','Se detuvo la respuesta.'],
+  ['質問を編集','Edit question','Editar pregunta'],
+  ['資料から答えを探しています…','Looking for an answer in the document…','Buscando una respuesta en el documento…'],
+  ['PDFを表示しています…','Loading the PDF…','Cargando el PDF…'],
+  ['資料を表示しています…','Loading the document…','Cargando el documento…'],
+  ['検索しています…','Searching…','Buscando…'],
+  ['一致するページがありません。','No matching pages.','No hay páginas coincidentes.'],
+  ['前の一致ページ','Previous matching page','Página coincidente anterior'],
+  ['次の一致ページ','Next matching page','Página coincidente siguiente'],
+  ['ページ幅に戻す','Fit to page width','Ajustar al ancho de la página'],
+  ['幅','Fit','Ajustar'],
+  ['上下表示に戻る','Return to split view','Volver a la vista dividida'],
+  ['訳文','Translation','Traducción'],
+  ['訳文を閉じる','Close translation','Cerrar traducción'],
+  ['根拠を移動','Navigate citations','Navegar por las citas'],
+  ['前の根拠','Previous citation','Cita anterior'],
+  ['次の根拠','Next citation','Cita siguiente'],
+  ['根拠番号','Citation number','Número de cita'],
+  ['ダウンロード','Download','Descargar'],
 ];
 
 export function createDocumentUiLocale(root,loadLanguage) {
@@ -103,7 +141,7 @@ export function createDocumentUiLocale(root,loadLanguage) {
   }
   function visit(node) {
     if(node.nodeType===Node.TEXT_NODE){
-      if(node.parentElement?.closest('blockquote,#pdf-translation,.answer-text,.answer-english,.bubble.user,#doc-title,#ask-heading,#pdf-heading,.library-card a,#cards'))return;
+      if(node.parentElement?.closest('blockquote,#pdf-translation,.pdf-inline-translation,#read-translation-text,.answer-text,.answer-english,.bubble.user,#doc-title,#ask-heading,#pdf-heading,.library-card a,#cards'))return;
       translateValue(node,'text',node.data,value=>{node.data=value;});
       return;
     }
@@ -133,7 +171,7 @@ export function createDocumentUiLocale(root,loadLanguage) {
     if (!pending.has(code)) pending.set(code,loadLanguage(code).finally(()=>pending.delete(code)));
     try {
       const {lines}=await pending.get(code);
-      if (lines.length!==documentUiLabels.length) return;
+      if (!Array.isArray(lines) || lines.length!==documentUiLabels.length) return;
       dictionaries[code]=new Map(documentUiLabels.map(([original],i)=>[original,lines[i]]));
       if (selected===code) apply(code);
     } catch {}

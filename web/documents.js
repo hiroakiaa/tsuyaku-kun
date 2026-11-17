@@ -4,7 +4,7 @@ import {layoutPdfText} from './document-table.js?v=94';
 import {installLocalIcons,localIcon} from './icons.js?v=pdf-controls';
 import {config} from './config.js';
 import {withEasyJapanese} from './core.js';
-import {createDocumentUiLocale} from './document-ui-locale.js?v=4';
+import {createDocumentUiLocale} from './document-ui-locale.js?v=5';
 const $ = (selector) => document.querySelector(selector);
 const content = $('#content');
 const id = new URLSearchParams(location.search).get('id');
@@ -202,7 +202,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '231');
+      guide.searchParams.set('v', '232');
       link.href = guide.href;
       if (typeof entry.shared==='boolean') append(body,'small',entry.shared?'共通保管庫に公開':'作成したブラウザーで閲覧');
       const remove = append(card,'button','','library-remove');
@@ -378,7 +378,7 @@ async function reader() {
   };
   askDialog.addEventListener('close',()=>{
     if (dialog.open) dialog.close();
-    location.replace('?v=231');
+    location.replace('?v=232');
   });
   const sourceType = doc.sourceType ?? 'pdf';
   let opened,originalUrl,officeText,officeRender = 0;
@@ -2072,7 +2072,7 @@ try {
         icon.append(localIcon('book-open'));
         const body = append(card,'div','','library-card-body');
         const link = append(body,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=231';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=232';
         }
       };
       $('#library-search').addEventListener('input',renderShared);

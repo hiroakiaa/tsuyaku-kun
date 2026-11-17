@@ -1357,7 +1357,7 @@ export async function documentStorage(request,storage,env) {
   const path = new URL(request.url).pathname;
   if (path.startsWith('/document/ui-locale/') && request.method==='POST') {
     const {language}=await request.json();
-    const key=path+':v3';
+    const key=path+':v4';
     if (!pendingPageTranslations.has(key)) {
       pendingPageTranslations.set(key,(async()=>{
         const cached=await storage.get(key);
