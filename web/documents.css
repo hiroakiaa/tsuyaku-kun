@@ -431,15 +431,18 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
 .pdf-zoom button{width:34px;height:34px;min-height:0;padding:0}
 .pdf-navigation>.pdf-add{margin-inline-end:auto;white-space:nowrap;min-height:44px}
 .pdf-navigation>.pdf-add .local-icon{margin-inline-end:.25rem}
+#pdf-dialog .pdf-bar{flex-wrap:nowrap}
+#pdf-dialog .pdf-bar #pdf-find-toggle{width:44px;min-height:44px}
+.pdf-stage-tools{
+  position:absolute;z-index:2;inset:.45rem auto auto .45rem;
+  display:flex;align-items:center;gap:.35rem;
+}
+.pdf-stage-tools #pdf-toc-toggle{width:38px;height:38px;padding:0}
+.pdf-stage-tools .pdf-language-toggle{background:#202020;color:#fff}
+.pdf-stage #qa-expand{border-radius:.5rem}
+#pdf-dialog .pdf-navigation #pdf-language-picker{margin-inline-end:auto}
+#pdf-dialog .pdf-navigation>.pdf-add{margin-inline-end:0}
 @media(max-width:799px){
-  #pdf-heading{flex-basis:100%}
-  #pdf-dialog .pdf-bar{position:relative;padding-inline-end:.5rem}
-  #pdf-heading{padding-inline-end:6rem}
-  #pdf-dialog .pdf-bar #qa-expand,#pdf-dialog .pdf-bar form{position:absolute;inset-block-start:.1rem}
-  #pdf-dialog .pdf-bar #qa-expand{inset-inline-end:3.25rem}
-  #pdf-dialog .pdf-bar form{inset-inline-end:.25rem}
-  #pdf-dialog .pdf-bar .pdf-language-toggle{order:1}
-  #pdf-dialog .pdf-bar #pdf-heading{min-height:2.35rem;align-content:center}
   .pdf-navigation>.pdf-add{font-size:0;width:44px;padding:0}
   .pdf-navigation>.pdf-add .local-icon{font-size:1rem;margin:0}
 }

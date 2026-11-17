@@ -39,7 +39,7 @@ export const documentUiLabels=[
   ['まず確認すること','What to check first','Qué revisar primero'],
   ['質問する','Ask questions','Hacer preguntas'],
   ['資料への質問','Question about the document','Pregunta sobre el documento'],
-  ['例：いつまでに だしますか？','Example: When is this due?','Ejemplo: ¿Cuándo hay que entregarlo?'],
+  ['質問を入力してください','Enter your question','Escribe tu pregunta'],
   ['送る','Send','Enviar'],
   ['列幅','Column width','Ancho de columna'],
   ['元のPDF','Original PDF','PDF original'],

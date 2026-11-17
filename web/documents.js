@@ -1,10 +1,10 @@
 import {readPdfPageText,lookupTableCell,lookupAlignedTableCell} from './document-table-lookup.js?v=88';
 import {recordDocumentQaMetric} from './document-qa-metrics.js?v=1';
 import {layoutPdfText} from './document-table.js?v=94';
-import {installLocalIcons,localIcon} from './icons.js?v=pdf-toolbar';
+import {installLocalIcons,localIcon} from './icons.js?v=pdf-controls';
 import {config} from './config.js';
 import {withEasyJapanese} from './core.js';
-import {createDocumentUiLocale} from './document-ui-locale.js?v=3';
+import {createDocumentUiLocale} from './document-ui-locale.js?v=4';
 const $ = (selector) => document.querySelector(selector);
 const content = $('#content');
 const id = new URLSearchParams(location.search).get('id');
@@ -1231,7 +1231,7 @@ async function reader() {
     preview.scrollTop+=after.top-bounds.top+(bounds.top+from.y-before.top)*zoom/previous-to.y;
   }
   $('.pdf-zoom').hidden=!zoomable;
-  $('.pdf-navigation').hidden=sourceType!=='pdf';
+  for (const control of [$('#pdf-prev'),$('#pdf-next'),pagePicker]) control.hidden=sourceType!=='pdf';
   $('#zoom-in').onclick=()=>setZoom(zoom*1.25);
   $('#zoom-out').onclick=()=>setZoom(zoom/1.25);
   function measurePinch(event){

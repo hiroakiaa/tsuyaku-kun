@@ -18,6 +18,7 @@ const paths={
  copy:'M8 8h12v13H8ZM4 16H2V2h13v2',camera:'M3 6h5l2-3h4l2 3h5v15H3ZM8 13a4 4 0 1 0 8 0 4 4 0 0 0-8 0',
  pen:'M4 16L16 4l4 4L8 20l-5 1 1-5M14 6l4 4',
  language:'M2 5h12M8 2v3M4 8c2 5 5 7 9 9M12 5c-1 5-4 9-9 12M13 21l4-11 4 11M15 17h4',
+ list:'M8 6h13M8 12h13M8 18h13M3 6h.1M3 12h.1M3 18h.1',
  'magnifying-glass':'M3 10a7 7 0 1 0 14 0 7 7 0 0 0-14 0M15 15l7 7',
  keyboard:'M2 5h20v14H2ZM5 9h1M9 9h1M13 9h1M17 9h1M5 13h1M9 13h1M13 13h1M17 13h1M7 16h10',
  'paper-plane':'M2 10L22 2l-8 20-3-9-9-3ZM11 13L22 2',
