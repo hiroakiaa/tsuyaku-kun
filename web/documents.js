@@ -1039,13 +1039,13 @@ async function reader() {
               if (end>start && lower>upper) {
                 const pixels=rendered.getImageData(start,upper,end-start,lower-upper).data;
                 for (let offset=0;offset<pixels.length;offset+=4) {
-                  if (pixels[offset]+pixels[offset+1]+pixels[offset+2]<red+green+blue-150)
+                  if (pixels[offset]+pixels[offset+1]+pixels[offset+2]<red+green+blue-45)
                     extension=Math.max(extension,(offset/4)%(end-start)+1);
                 }
               }
               if (extension) {
                 rendered.fillStyle=background;
-                rendered.fillRect(start,upper,extension,lower-upper);
+                rendered.fillRect(start,upper,Math.min(end-start,extension+1),lower-upper);
               }
               block.style.outline=Math.min(boxHeight*.12,1.4)/unit+'cqw solid '+background;
             }
