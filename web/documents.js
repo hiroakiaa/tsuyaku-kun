@@ -278,7 +278,11 @@ function teacher() {
         const pages = converted.image ? await extract(converted.file,document.createElement('span')) : converted.pages;
         data.set('pages',JSON.stringify(pages));
       }
-      const {id,createdAt} = await request('/documents',{method:'POST',body:data});
+      const signal=AbortSignal.timeout(60_000);
+      const {id,createdAt} = await request('/documents',{method:'POST',body:data,signal}).catch(error=>{
+        if (signal.aborted) throw new Error('資料の作成結果を確認できませんでした。保管庫を確認してから、もう一度お試しください。');
+        throw error;
+      });
       status.textContent = '作成が完了しました。';
       const url = '?id=' + id;
       $('#open-guide').href = url;

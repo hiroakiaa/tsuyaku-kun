@@ -153,7 +153,20 @@ try {
       let ocrStages = fixture.scan && !retryScan ? await readOcrStages() : null;
       const registrationStarted = performance.now();
       await page.locator('#upload button').click();
-      await page.waitForFunction(()=>Boolean(document.querySelector('#guide-url')?.value),null,{timeout:120_000});
+      const uploadResult=await page.waitForFunction(()=>{
+        const url=document.querySelector('#guide-url')?.value;
+        if (url) return {url};
+        const status=document.querySelector('#upload-status')?.textContent?.trim();
+        const busy=document.querySelector('#upload button')?.getAttribute('aria-busy');
+        return status && busy!=='true' ? {error:status} : null;
+      },null,{timeout:120_000}).then(handle=>handle.jsonValue()).catch(async error=>({
+        error:error.message+' '+(await page.locator('#upload-status').textContent()),
+      }));
+      if (uploadResult.error) {
+        registrations.push({fixture:fixture.label,failedStage:'submit',error:uploadResult.error,
+          elapsedMs:Math.round(performance.now()-uploadStarted),ocrDownloads,ocrStages});
+        throw Error(uploadResult.error);
+      }
       const guide = await page.locator('#guide-url').inputValue();
       const finished = performance.now();
       if (retryScan) ocrStages = await readOcrStages();
