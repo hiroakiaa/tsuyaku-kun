@@ -497,3 +497,8 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
 .answer-empty{color:var(--muted);text-align:center}
 #messages:has(>.bubble)>.answer-empty{display:none}
 #summary-status{margin-bottom:.75rem}
+
+.pdf-inline-translation[hidden]{display:none}
+.pdf-inline-translation.pdf-translation-layout{position:absolute;inset:0;z-index:2;width:100%}
+.pdf-inline-text{position:relative;z-index:2;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere}
+.pdf-page-view:has(>.pdf-inline-text:not([hidden]))>.pdf-original-canvas{display:none}

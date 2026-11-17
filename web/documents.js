@@ -202,7 +202,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '229');
+      guide.searchParams.set('v', '230');
       link.href = guide.href;
       if (typeof entry.shared==='boolean') append(body,'small',entry.shared?'共通保管庫に公開':'作成したブラウザーで閲覧');
       const remove = append(card,'button','','library-remove');
@@ -378,7 +378,7 @@ async function reader() {
   };
   askDialog.addEventListener('close',()=>{
     if (dialog.open) dialog.close();
-    location.replace('?v=229');
+    location.replace('?v=230');
   });
   const sourceType = doc.sourceType ?? 'pdf';
   let opened,originalUrl,officeText,officeRender = 0;
@@ -644,7 +644,8 @@ async function reader() {
       canvas.width = Math.ceil(viewport.width);
       canvas.height = Math.ceil(viewport.height);
       await page.render({canvas,viewport}).promise;
-      slot.replaceChildren(canvas);
+      canvas.className='pdf-original-canvas';
+      slot.prepend(canvas);
       void highlightCitation(slot,page,viewport).catch(()=>{});
     } catch {
       const retry = document.createElement('button');
@@ -654,7 +655,7 @@ async function reader() {
         retry.remove();
         void renderPage(slot);
       };
-      slot.replaceChildren(retry);
+      slot.prepend(retry);
     }
   }
   const pagePicker = $('#pdf-page');
@@ -839,6 +840,17 @@ async function reader() {
     const page=Number(pagePicker.value)||1;
     const pageSelector='[data-page="'+page+'"]';
     const original=pageList.querySelector(pageSelector);
+    const inline=sourceType==='pdf';
+    for (const frame of pageList.querySelectorAll('.pdf-inline-translation')) {
+      frame.hidden=frame.dataset.language!==language;
+    }
+    if (inline && !retry && citation?.page!==page &&
+        original?.querySelector('.pdf-inline-translation:not([hidden])')) {
+      translatedPage.hidden=true;
+      translatedPage.dataset.translationReuse='cache';
+      $('#pdf-translation-progress').hidden=true;
+      return;
+    }
     const previous=translatedPage.querySelector('.pdf-translation-layout'+pageSelector);
     const position=pageViewportPosition(translatedPage,previous);
     translatedPage.hidden=true;
@@ -881,10 +893,16 @@ async function reader() {
             restorePageViewport(preview,original,viewportPosition);
             return;
           }
-          if (!await renderTranslationOnPdf(result,page,revision,viewportPosition) && revision===translationRevision) {
+          if (!await renderTranslationOnPdf(result,page,revision,language) && revision===translationRevision) {
             // Older documents can return translated text without matching PDF coordinates.
-            translatedPage.hidden=false;
-          renderTranslatedPage(result,page);
+            const slot=pageList.querySelector(pageSelector);
+            if (slot) {
+              const frame=document.createElement('div');
+              frame.className='pdf-inline-translation pdf-inline-text';
+              frame.lang=translatedPage.lang;
+              renderTranslatedPage(result,page,frame);
+              installInlineTranslation(slot,frame,language);
+            }
           }
         } else {
           translatedPage.hidden=false;
@@ -908,7 +926,19 @@ async function reader() {
       void prefetchTranslations();
     }
   }
-  async function renderTranslationOnPdf(result,number,revision,position) {
+  function installInlineTranslation(slot,frame,language) {
+    slot.querySelector('.pdf-inline-translation')?.remove();
+    frame.dataset.language=language;
+    slot.append(frame);
+    const cached=[...pageList.querySelectorAll('.pdf-inline-translation')];
+    if (cached.length>8) {
+      const farthest=cached.filter(item=>item!==frame).sort((a,b)=>
+        Math.abs(Number(b.parentElement.dataset.page)-selectedPage)-
+        Math.abs(Number(a.parentElement.dataset.page)-selectedPage))[0];
+      farthest?.remove();
+    }
+  }
+  async function renderTranslationOnPdf(result,number,revision,language) {
     try {
       const pdf=await getOriginalPdf();
       const page=await pdf.getPage(number);
@@ -1015,9 +1045,10 @@ async function reader() {
       }
       if (!blocks.length || from!==pageText.length) return;
       const frame=document.createElement('div');
-      frame.className='pdf-page-view pdf-translation-layout';
+      frame.className='pdf-page-view pdf-translation-layout pdf-inline-translation';
+      frame.lang=translatedPage.lang;
       frame.dataset.page=number;
-      frame.style.width=(fitWidth || preview.clientWidth)*zoom+'px';
+
       if (citation?.page===number && !ranges.length) frame.classList.add('pdf-citation-page');
       const canvas=append(frame,'canvas','');
       const renderViewport=page.getViewport({scale:Math.min(3,devicePixelRatio||1)});
@@ -1114,32 +1145,32 @@ async function reader() {
         }
         if (line.includes('\n')) { block.style.whiteSpace='pre'; block.style.lineHeight='1.1'; }
       }
-      translatedPage.hidden=false;
-      translatedPage.replaceChildren(frame);
-      restorePageViewport(translatedPage,frame,position);
+      const slot=pageList.querySelector('[data-page="'+number+'"]');
+      if (!slot) return false;
+      installInlineTranslation(slot,frame,language);
       return true;
     } catch {}
   }
-  function renderTranslatedPage(result,page) {
+  function renderTranslatedPage(result,page,target=translatedPage) {
     const normalize=text=>text.normalize('NFKC').replace(/[\s|]/gu,'');
     const source=result.source?.map(normalize)??[];
     const ranges=citation?.page===page ? citationRanges(source.join(''),citation.quote,normalize) : [];
     if (!ranges.length || !Array.isArray(result.lines) || result.lines.length!==source.length) {
-      translatedPage.textContent=result.text || result.lines?.join('\n') || 'このページに翻訳できる文字はありません。';
+      target.textContent=result.text || result.lines?.join('\n') || 'このページに翻訳できる文字はありません。';
       return;
     }
-    translatedPage.replaceChildren();
+    target.replaceChildren();
     let offset=0, firstMark;
     result.lines.forEach((line,index)=>{
       const end=offset+source[index].length;
       if (ranges.some(range=>end>range.start && offset<range.end)) {
-        const mark=append(translatedPage,'mark',line,'pdf-translated-citation');
+        const mark=append(target,'mark',line,'pdf-translated-citation');
         firstMark??=mark;
-      } else translatedPage.append(line);
-      if(index<result.lines.length-1) translatedPage.append('\n');
+      } else target.append(line);
+      if(index<result.lines.length-1) target.append('\n');
       offset=end;
     });
-    firstMark?.scrollIntoView({block:'center',behavior:'smooth'});
+    if (target===translatedPage) firstMark?.scrollIntoView({block:'center',behavior:'smooth'});
   }
   translationMode.onchange=()=>void updatePageTranslation();
   document.addEventListener('visibilitychange',()=>void prefetchTranslations());
@@ -1334,13 +1365,14 @@ async function reader() {
       if (!pageViews || performance.now()-lastNavigation < 650) return;
       const top = preview.getBoundingClientRect().top;
       const index = pageViews.findIndex(slot => slot.getBoundingClientRect().bottom > top+1);
-      if (index < 0) return;
+      if (index < 0 || selectedPage===index+1) return;
       selectedPage = index+1;
       readingPosition(id,{page:selectedPage});
       syncContentsPage();
       pagePicker.value = selectedPage;
       $('#pdf-prev').disabled = selectedPage===1;
       $('#pdf-next').disabled = selectedPage===doc.pageCount;
+      if (translationMode.value) void updatePageTranslation();
     });
   }, {passive:true});
   const scrollBehavior = ()=>matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
@@ -1350,7 +1382,7 @@ async function reader() {
     readingPosition(id,{page:n});
     syncContentsPage();
     pagePicker.value = n;
-    if (translationMode.value) void updatePageTranslation();
+    if (sourceType!=='pdf' && translationMode.value) void updatePageTranslation();
     $('#pdf-prev').disabled = n===1;
     $('#pdf-next').disabled = n===doc.pageCount;
     $('#pdf-heading').textContent = doc.title;
@@ -1448,6 +1480,7 @@ async function reader() {
       preview.scrollTo({top:preview.scrollTop+slot.getBoundingClientRect().top-preview.getBoundingClientRect().top,behavior:scrollBehavior()});
       if (citation?.page===n && slot.querySelector('canvas')) void pdf.getPage(n).then(page=>highlightCitation(slot,page,page.getViewport({scale:1}))).catch(()=>{});
       $('#pdf-status').textContent = '';
+      if (translationMode.value) void updatePageTranslation();
     } catch (error) {
       if (error.name === 'RenderingCancelledException' || selectedPage !== n) return;
       $('#pdf-status').textContent = ['PDF取得に失敗しました。','PDFの解析に失敗しました。'].includes(error.message)
@@ -1494,7 +1527,7 @@ async function reader() {
     citation = undefined;
     removeCitationMarks(preview);
     for (const slot of document.querySelectorAll(".pdf-citation-page")) slot.classList.remove("pdf-citation-page");
-    for (const mark of translatedPage.querySelectorAll('.pdf-translated-citation')) {
+    for (const mark of dialog.querySelectorAll('.pdf-translated-citation')) {
       if (mark.classList.contains('pdf-layout-line')) mark.classList.remove('pdf-translated-citation');
       else mark.replaceWith(mark.textContent);
     }
@@ -2039,7 +2072,7 @@ try {
         icon.append(localIcon('book-open'));
         const body = append(card,'div','','library-card-body');
         const link = append(body,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=229';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=230';
         }
       };
       $('#library-search').addEventListener('input',renderShared);
