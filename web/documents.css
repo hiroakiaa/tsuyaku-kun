@@ -543,3 +543,20 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
 #material-dialog form > button { min-height: 44px; }
 #material-dialog [role="status"]:empty,
 #material-dialog #materials:empty { display: none; }
+
+#summary-translation-status[data-loading="true"]::before {
+  content: "";
+  display: inline-block;
+  width: .85em;
+  height: .85em;
+  margin-inline-end: .6em;
+  border: 2px solid currentColor;
+  border-inline-end-color: transparent;
+  border-radius: 50%;
+  vertical-align: -.1em;
+  animation: summary-translation-spin .8s linear infinite;
+}
+@keyframes summary-translation-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  #summary-translation-status[data-loading="true"]::before { animation: none; }
+}

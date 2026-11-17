@@ -351,6 +351,7 @@ async function reader() {
   }
   const points=$('#points');
   const summaryStatus=$('#summary-status');
+  const summaryTranslationStatus=$('#summary-translation-status');
   let summaryReady=doc.summaryReady;
   let summaryCheck;
   let summaryItems=doc.items;
@@ -370,15 +371,27 @@ async function reader() {
     const translation=await translatedSection(section,language);
     if (language!==selectedLanguage || !translation?.lines || !translation.source) return;
     const bySource=new Map(translation.source.map((value,i)=>[value,translation.lines[i]]));
+    let applied=0;
     for (const element of labels) {
       const translated=bySource.get(element.textContent.replace(/\s+/gu,' ').trim());
       if (element.isConnected && translated) {
         element.textContent=translated;
+        applied++;
         if (element.classList.contains('pdf-toc-title')) element.parentElement.title=translated;
       }
     }
+    return applied===labels.length;
   }
-  window.addEventListener('document-language-change',()=>renderSummary(summaryItems));
+  function prepareSummaryTranslation() {
+    if (selectedLanguage && selectedLanguage!=='ja' && summaryItems?.length) {
+      void translatedSection('summary',selectedLanguage);
+    }
+  }
+  window.addEventListener('document-language-change',()=>{
+    prepareSummaryTranslation();
+    renderSummary(summaryItems);
+  });
+  prepareSummaryTranslation();
   $('#pdf-summary').onclick=()=>{
     points.showModal();
     renderSummary(summaryItems);
@@ -391,6 +404,7 @@ async function reader() {
         if (latest.summaryReady) {
           summaryItems=latest.items;
           for (const key of sectionTranslations.keys()) if (key.startsWith('summary:')) sectionTranslations.delete(key);
+          prepareSummaryTranslation();
           renderSummary(summaryItems);
           summaryReady=true;
           summaryStatus.hidden=true;
@@ -1596,7 +1610,17 @@ async function reader() {
       labels.push(append(card,'h3',item.label),append(card,'p',item.text));
       sourceLink(card,item.source.page,item.source.quote || item.text);
     }
-    if (points.open) void translateSectionLabels('summary',labels);
+    summaryTranslationStatus.hidden=true;
+    if (!points.open || !selectedLanguage || selectedLanguage==='ja' || !labels.length) return;
+    summaryTranslationStatus.hidden=false;
+    summaryTranslationStatus.dataset.loading='true';
+    summaryTranslationStatus.textContent='要約を翻訳しています…';
+    void translateSectionLabels('summary',labels).then(translated=>{
+      if (!labels[0].isConnected) return;
+      summaryTranslationStatus.hidden=Boolean(translated);
+      summaryTranslationStatus.dataset.loading='false';
+      if (!translated) summaryTranslationStatus.textContent='要約を翻訳できませんでした。原文を表示しています。';
+    });
   }
   renderSummary(doc.items);
   const listMaterial = material=>append($('#materials'),'li',material.name);
