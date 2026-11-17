@@ -771,7 +771,7 @@ async function reader() {
     finally { prefetching=false; }
     setTimeout(prefetchTranslations,delay);
   }
-  function syncTranslationOptions() {
+  function syncTranslationOptions({selectLanguage=false}={}) {
     const language=documentLanguages.find(option=>option.code===selectedLanguage);
     translationMode.replaceChildren(new Option('原文',''));
     if(language && language.code!=='ja') translationMode.add(new Option(language.labelNative,language.code));
@@ -790,7 +790,9 @@ async function reader() {
     }
     const savedMode=readingPosition(id).translationMode;
     const hasSavedMode=[...translationMode.options].some(option=>option.value===savedMode);
-    translationMode.value=hasSavedMode ? savedMode : language && language.code!=='ja' ? language.code : '';
+    const preferredMode=language && language.code!=='ja' ? language.code : '';
+    translationMode.value=!selectLanguage && hasSavedMode ? savedMode : preferredMode;
+    if (selectLanguage) readingPosition(id,{translationMode:translationMode.value});
     for (const button of translationToggle.children) button.setAttribute("aria-pressed", String(button.dataset.language===translationMode.value));
     renderEnglishProgress();
     if (translatedPage.getClientRects().length || translationToggle.getClientRects().length) void updatePageTranslation();
@@ -1105,7 +1107,7 @@ async function reader() {
     if (visibleTranslationFailed && dialog.open && translationMode.value) void updatePageTranslation(true);
     else void prefetchTranslations();
   });
-  window.addEventListener('document-language-change',syncTranslationOptions);
+  window.addEventListener('document-language-change',()=>syncTranslationOptions({selectLanguage:true}));
   syncTranslationOptions();
   const previewImage = $('#source-image');
   const imageType = /^(png|jpe?g|webp)$/.test(sourceType);
