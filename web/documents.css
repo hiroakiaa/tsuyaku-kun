@@ -391,3 +391,18 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
   .qa-workspace .qa-actions select{max-width:8rem;min-width:0}
   .qa-workspace .pdf-navigation{gap:.35rem;padding-block:.2rem}
 }
+
+.qa-actions .local-icon{display:none}
+@media(max-width:799px){
+  .ask-heading #ask-heading{
+    position:absolute;width:1px;height:1px;clip-path:inset(50%);overflow:hidden;
+  }
+  .ask-heading:has(>.qa-actions){display:flex;justify-content:flex-end}
+  .ask-heading:not(:has(>.qa-actions)){display:none}
+  .pdf-navigation{flex-wrap:wrap}
+  .pdf-navigation>.qa-actions{justify-content:center;flex:1 1 auto}
+  .qa-actions #qa-source,.qa-actions .open-material{font-size:0;min-width:44px}
+  .qa-actions :is(#qa-source,.open-material) .local-icon{display:inline-flex;font-size:1rem}
+  .qa-workspace.pdf-full:has(>#pdf-dialog[open]){grid-template-rows:minmax(0,1fr)}
+  .qa-workspace.pdf-full .ask-layout{display:none}
+}

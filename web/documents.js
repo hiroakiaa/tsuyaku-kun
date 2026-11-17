@@ -1133,10 +1133,24 @@ async function reader() {
   const wide = matchMedia('(min-width: 800px)');
   const expand = $('#qa-expand');
   const sourceButton = $('#qa-source');
+  const actions=$('.qa-actions');
+  const chatHeading=$('.ask-heading');
+  const pdfNavigation=$('.pdf-navigation');
+  const closeQuestions=actions.querySelector('form');
+  closeQuestions.addEventListener('submit',event=>{
+    event.preventDefault();
+    askDialog.close();
+  });
+  const materialButton=actions.querySelector('.open-material');
+  materialButton.prepend(localIcon('plus'));
   const updateMobileControls = () => {
+    const destination=!wide.matches && dialog.open && dialog.parentElement===workspace ? pdfNavigation : chatHeading;
+    if (actions.parentElement!==destination) destination.append(actions);
     expand.hidden = wide.matches || !dialog.open;
     sourceButton.setAttribute('aria-expanded', String(dialog.open));
-    sourceButton.textContent = dialog.open && !wide.matches ? '資料を折りたたむ' : sourceType==='pdf' ? '元のPDF' : '資料データを表示';
+    const label=dialog.open && !wide.matches ? '資料を折りたたむ' : sourceType==='pdf' ? '元のPDF' : '資料データを表示';
+    sourceButton.setAttribute('aria-label',label);
+    sourceButton.replaceChildren(localIcon(dialog.open && !wide.matches ? 'chevron-down' : 'book-open'),label);
   };
   expand.onclick = () => {
     const full = workspace.classList.toggle('pdf-full');
