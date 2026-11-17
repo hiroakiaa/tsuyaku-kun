@@ -12,17 +12,24 @@ try {
   const page = await browser.newPage({locale:'ja-JP'});
   await page.goto(url.href);
   await page.locator('#tab-ask').click();
+  const language = page.locator('select.document-language:visible');
+  await language.selectOption('ja');
   await page.locator('#question').fill('ルームは何時間で失効しますか？');
   await page.locator('#ask-form button').click();
   const answer = page.locator('#messages .answer-item').filter({hasText:/24\s*時間/});
   const citation = answer.getByRole('link',{name:'元のPDF 2ページ',exact:true});
   await citation.click({timeout:60_000});
   const picker=page.locator('#pdf-page');
-  const originalMark=page.locator('[data-page="2"] .pdf-citation-mark:visible').first();
-  await originalMark.waitFor();
+  const waitForOriginalMark = () => page.waitForFunction(() =>
+    [...document.querySelectorAll('[data-page="2"] .pdf-citation-visible')].some(mark => {
+      const fill = getComputedStyle(mark, '::after');
+      return mark.getBoundingClientRect().width > 0 && fill.backgroundColor === 'rgb(245, 217, 117)' &&
+        fill.transform === 'matrix(1, 0, 0, 1, 0, 0)';
+    }), null, {timeout:15_000});
+  await waitForOriginalMark();
   assert.equal(await picker.inputValue(),'2');
 
-  await page.locator('select.document-language:visible').selectOption('en');
+  await language.selectOption('en');
   const toggle=page.locator('#pdf-language-toggle');
   await toggle.locator('[data-language="en"]').click();
   const translatedMark=page.locator('.pdf-translation-layout[data-page="2"] .pdf-translated-citation:visible')
@@ -32,7 +39,7 @@ try {
 
   await toggle.locator('[data-language=""]').click();
   await page.locator('#pdf-translation').waitFor({state:'hidden'});
-  await originalMark.waitFor();
+  await waitForOriginalMark();
   assert.equal(await picker.inputValue(),'2');
   console.log('Existing PDF: grounded answer, English citation, and original citation restored.');
 } finally {
