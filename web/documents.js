@@ -353,8 +353,36 @@ async function reader() {
   const summaryStatus=$('#summary-status');
   let summaryReady=doc.summaryReady;
   let summaryCheck;
+  let summaryItems=doc.items;
+  const sectionTranslations=new Map();
+  function translatedSection(section,language) {
+    const key=section+':'+language;
+    if (!sectionTranslations.has(key)) {
+      const result=request(api+'/translate',{method:'POST',body:JSON.stringify({section,language})})
+        .catch(()=>{sectionTranslations.delete(key);return null;});
+      sectionTranslations.set(key,result);
+    }
+    return sectionTranslations.get(key);
+  }
+  async function translateSectionLabels(section,labels) {
+    const language=selectedLanguage;
+    if (!language || language==='ja' || !labels.length) return;
+    const translation=await translatedSection(section,language);
+    if (language!==selectedLanguage || !translation?.lines || !translation.source) return;
+    const bySource=new Map(translation.source.map((value,i)=>[value,translation.lines[i]]));
+    for (const element of labels) {
+      const translated=bySource.get(element.textContent.replace(/\s+/gu,' ').trim());
+      if (element.isConnected && translated) {
+        element.textContent=translated;
+        if (element.classList.contains('pdf-toc-title')) element.parentElement.title=translated;
+      }
+    }
+  }
+  points.addEventListener('close',()=>renderSummary(summaryItems));
+  window.addEventListener('document-language-change',()=>renderSummary(summaryItems));
   $('#pdf-summary').onclick=()=>{
     points.showModal();
+    renderSummary(summaryItems);
     if (summaryReady!==false || summaryCheck) return;
     summaryStatus.hidden=false;
     summaryStatus.textContent='詳しい要約を準備しています…';
@@ -362,7 +390,9 @@ async function reader() {
       for (let attempt=0;attempt<7 && points.open;attempt++) {
         const latest=await request(api);
         if (latest.summaryReady) {
-          renderSummary(latest.items);
+          summaryItems=latest.items;
+          for (const key of sectionTranslations.keys()) if (key.startsWith('summary:')) sectionTranslations.delete(key);
+          renderSummary(summaryItems);
           summaryReady=true;
           summaryStatus.hidden=true;
           return;

@@ -1006,8 +1006,22 @@ export async function documents(request,env,auth) {
   if (action==='translate') {
     const input=await request.text();
     if (input.length>MAX_TEXT*2) return fail('翻訳するページと言語を確認してください。',413);
-    const {page,language:code,layoutText,diagramText}=JSON.parse(input);
+    const {page,language:code,layoutText,diagramText,section}=JSON.parse(input);
     const language=answerLanguages.get(code);
+    if (section==='summary' || section==='toc') {
+      if (!language || code==='ja') return fail('翻訳する言語を確認してください。');
+      const rows=section==='toc'
+        ? validatedToc(record,record.pages.slice(0,record.originalPageCount ?? record.pages.length)).map(item=>item.title)
+        : (record.summary?.revision===(record.revision ?? 0) && record.summary.items?.length
+          ? record.summary.items : record.items ?? []).flatMap(item=>[item.label,item.text]);
+      const text=rows.map(row=>row.replace(/\s+/gu,' ').trim()).join('\n');
+      if (!text) return reply({source:[],lines:[]});
+      const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([section,DOCUMENT_MODEL,code,text])));
+      const key=Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
+      return target.fetch('https://room/document/page-translation/'+key,{
+        method:'POST',body:JSON.stringify({id,text,language,hasLayout:false})
+      });
+    }
     const storedText=Number.isInteger(page) && page>0 && page<=(record.originalPageCount ?? record.pages.length) ? record.pages[page-1] : null;
     if (!language || typeof storedText!=='string') return fail('翻訳するページと言語を確認してください。');
     const plain = value=>normalized(value).replaceAll('|','');
