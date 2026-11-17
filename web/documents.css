@@ -493,9 +493,9 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
 .pdf-readable-line{cursor:pointer}
 #pdf-answer-return{min-height:40px;padding:.25rem .5rem;white-space:nowrap}
 
-#messages:has(>.answer-empty:only-child){display:grid;place-items:center}
-.answer-empty{color:var(--muted);text-align:center}
-#messages:has(>.bubble)>.answer-empty{display:none}
+#messages>.bubble:not(.user){margin-inline:0 auto;text-align:left}
+#messages>.answer-empty{display:grid;place-items:center;min-height:100%;color:var(--muted);text-align:center}
+#messages>.answer-empty:not(:only-child){display:none}
 #summary-status{margin-bottom:.75rem}
 
 .pdf-inline-translation[hidden]{display:none}
