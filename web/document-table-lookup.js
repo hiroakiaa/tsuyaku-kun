@@ -1,12 +1,18 @@
 const compact = text => text.normalize('NFKC').replace(/\s/g,'');
 
 const pdfPageText = new WeakMap();
-export function readPdfPageText(page) {
-  if (!pdfPageText.has(page)) pdfPageText.set(page,page.getTextContent().catch(error=>{
+export async function readPdfPageText(page) {
+  const started=performance.now();
+  const reused=pdfPageText.has(page);
+  if (!reused) pdfPageText.set(page,page.getTextContent().catch(error=>{
     pdfPageText.delete(page);
     throw error;
   }));
-  return pdfPageText.get(page);
+  const result=await pdfPageText.get(page);
+  const metric=reused ? 'document-qa:pdf-text-reuse' : 'document-qa:pdf-text-extraction';
+  if (performance.getEntriesByName(metric).length>=20) performance.clearMeasures(metric);
+  performance.measure(metric,{start:started,end:performance.now()});
+  return result;
 }
 
 async function pageText(pdf, number) {

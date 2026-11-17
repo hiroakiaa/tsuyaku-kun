@@ -1,4 +1,4 @@
-import {readPdfPageText,lookupTableCell,lookupAlignedTableCell} from './document-table-lookup.js?v=87';
+import {readPdfPageText,lookupTableCell,lookupAlignedTableCell} from './document-table-lookup.js?v=88';
 import {recordDocumentQaMetric} from './document-qa-metrics.js?v=1';
 import {layoutPdfText} from './document-table.js?v=94';
 import {installLocalIcons,localIcon} from './icons.js?v=library';

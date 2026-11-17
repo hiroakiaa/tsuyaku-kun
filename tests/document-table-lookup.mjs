@@ -31,6 +31,8 @@ assert.equal((await lookupTableCell(pdf,'北館の所要時間の基準は？'))
 assert.equal((await lookupTableCell(pdf,'北館別の所要時間は？')).answer,'45分');
 assert.equal((await readPdfPageText(page)).items,items);
 assert.equal(pageReads,1);
+assert.equal(performance.getEntriesByName('document-qa:pdf-text-extraction').length,1);
+assert.ok(performance.getEntriesByName('document-qa:pdf-text-reuse').length>=2);
 console.log('PASS vertical row labels, duplicate headings and adjacent table cells');
 import {layoutPdfText} from '../web/document-table.js';
 const verticalGlyph = (str,x,y)=>({str,dir:'ttb',width:10,transform:[10,0,0,10,x,y]});
