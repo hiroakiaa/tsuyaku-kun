@@ -45,8 +45,3 @@ export function captionParticipant(room,a,data){if(room.mode!=='face')return a;i
 
 // Repair old offline caches only when the Japanese meaning still matches.
 export function supplementCatalog(saved,bundled){const out={...saved};for(const key of ['terms','phrases','glossary']){const index=new Map((bundled[key]||[]).map(row=>[row.id,row]));out[key]=(saved[key]||[]).map(row=>{const fallback=index.get(row.id),source=r=>r.jaText||r.descriptionJa||r.ja||r.title;if(row.deText||!fallback?.deText||source(row)!==source(fallback))return row;return {...row,deText:fallback.deText};});}return out;}
-
-export function selectableCatalog(data){
- const catalog=withEasyJapanese(data);
- return {...catalog,languages:catalog.languages.filter(language=>LANGUAGE_ORDER.includes(language.code))};
-}

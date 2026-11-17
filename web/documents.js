@@ -3,7 +3,7 @@ import {recordDocumentQaMetric} from './document-qa-metrics.js?v=1';
 import {layoutPdfText} from './document-table.js?v=94';
 import {installLocalIcons,localIcon} from './icons.js?v=pdf-controls';
 import {config} from './config.js';
-import {selectableCatalog} from './core.js?v=visible-languages-1';
+import {selectableCatalog} from './selectable-catalog.js';
 import {createDocumentUiLocale} from './document-ui-locale.js?v=5';
 const $ = (selector) => document.querySelector(selector);
 const content = $('#content');
