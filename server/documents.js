@@ -1048,7 +1048,17 @@ export async function documents(request,env,auth) {
     const summary=record.summary;
     const ready=summary?.revision===(record.revision ?? 0) && summary.items?.length>0;
     if (!ready && (!summary || summary.revision!==(record.revision ?? 0) || summary.nextAttempt<=Date.now())) queueSummary(env,target);
-    return reply({title:record.title,items:ready ? summary.items : record.items,summaryReady:Boolean(ready),toc:validatedToc(record,record.pages.slice(0,record.originalPageCount ?? record.pages.length)),materials:record.materials ?? [],sourceType:record.sourceType ?? 'pdf',convertedWorksheet:record.convertedWorksheet===true,revision:record.revision ?? 0,pageCount:record.originalPageCount ?? record.pages.length,canRemove:record.owner===auth.uid});
+    const items=ready ? [...summary.items] : record.items;
+    if (ready) {
+      const labels=new Set(items.map(item=>normalized(item.label)));
+      for (const item of record.items ?? []) {
+        const label=normalized(item.label);
+        if (items.length>=10 || labels.has(label)) continue;
+        items.push(item);
+        labels.add(label);
+      }
+    }
+    return reply({title:record.title,items,summaryReady:Boolean(ready),toc:validatedToc(record,record.pages.slice(0,record.originalPageCount ?? record.pages.length)),materials:record.materials ?? [],sourceType:record.sourceType ?? 'pdf',convertedWorksheet:record.convertedWorksheet===true,revision:record.revision ?? 0,pageCount:record.originalPageCount ?? record.pages.length,canRemove:record.owner===auth.uid});
   }
   if (Number(request.headers.get('content-length')) > 4096) return fail('質問は300文字までです。',413);
   const input = await request.text();
