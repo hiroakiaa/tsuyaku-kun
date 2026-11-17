@@ -13,7 +13,7 @@ const languagePreference='tsuyaku-document-language';
 const defaultDocumentLanguage='ja';
 let selectedLanguage=defaultDocumentLanguage;
 try { selectedLanguage=localStorage.getItem(languagePreference)??defaultDocumentLanguage; } catch {}
-if (selectedLanguage && !documentLanguages.some(language=>language.code===selectedLanguage)) selectedLanguage=defaultDocumentLanguage;
+if (!documentLanguages.some(language=>language.code===selectedLanguage)) selectedLanguage=defaultDocumentLanguage;
 const setUiLanguage=createDocumentUiLocale(content,language=>request('/documents/ui-language/'+encodeURIComponent(language)));
 setUiLanguage(selectedLanguage);
 window.addEventListener('document-language-change',()=>setUiLanguage(selectedLanguage));
@@ -22,7 +22,6 @@ function addLanguagePicker(parent) {
   select.className='document-language';
   select.setAttribute('aria-label','資料QAの利用言語');
   select.title='母国語を選ぶと、資料と回答をその言語で表示します';
-  select.add(new Option('母国語：自動',''));
   for (const language of documentLanguages) {
     select.add(new Option(language.labelNative,language.code));
   }
@@ -34,7 +33,7 @@ function addLanguagePicker(parent) {
   });
   window.addEventListener('storage',event=>{
     if(event.key!==languagePreference) return;
-    select.value=event.newValue??defaultDocumentLanguage;
+    select.value=documentLanguages.some(language=>language.code===event.newValue)?event.newValue:defaultDocumentLanguage;
     selectedLanguage=select.value;
     window.dispatchEvent(new Event('document-language-change'));
   });
