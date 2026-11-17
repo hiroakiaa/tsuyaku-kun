@@ -46,8 +46,16 @@ try {
   let blockFirstPage = true;
   let blockedRequests = 0;
   let secondPageRequests = 0;
+  let diagramSourceCheck;
   await page.route(/\/documents\/[^/]+\/translate$/u, async route => {
     const translation = route.request().postDataJSON();
+    if (translation.language==='en' && translation.page===5 && translation.diagramText) {
+      const source=translation.diagramText.normalize('NFKC').replace(/\s/gu,'');
+      diagramSourceCheck={
+        speechConversion:source.includes('話した日本語を文章にします'),
+        languageChoice:source.includes('生徒が選んだ言葉ごとに訳を作ります'),
+      };
+    }
     if (translation.language==='es' && translation.page===2) secondPageRequests++;
     if (translation.language==='es' && translation.page===1 && blockFirstPage) {
       blockedRequests++;
@@ -88,6 +96,8 @@ try {
     })));
   assert.ok(retries.length,'Diagram page must record its OCR retry outcome');
   console.log('Existing PDF diagram OCR retries:',JSON.stringify(retries));
+  assert.ok(diagramSourceCheck,'Diagram page must submit its recognized text for translation');
+  console.log('Existing PDF diagram source matches:',JSON.stringify(diagramSourceCheck));
 
 } finally {
   await browser.close();
