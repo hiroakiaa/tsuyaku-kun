@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {documentQaMetrics,recordDocumentQaMetric} from '../web/document-qa-metrics.js';
+import {documentQaMetricCells,documentQaMetrics,recordDocumentQaMetric} from '../web/document-qa-metrics.js';
 
 const records = new Map();
 Object.defineProperty(globalThis,'localStorage',{
@@ -17,6 +17,11 @@ for (const translation of ['generated','cache','in-flight']) {
 assert.deepEqual(documentQaMetrics(),[
   {id:'one',title:'案内',answers:2,answerMs:3000,items:3,unsupported:1,translations:3,reused:2},
   {id:'two',title:'案内',answers:1,answerMs:900,items:1,unsupported:0,translations:0,reused:0},
+]);
+
+assert.deepEqual(documentQaMetrics().map(documentQaMetricCells),[
+  ['案内','1.50秒','67％（2/3）','33％（1/3）'],
+  ['案内','0.90秒','未計測','0％（0/1）'],
 ]);
 
 for (let i=0;i<100;i++) recordDocumentQaMetric(String(i),'資料',{translation:'cache'});

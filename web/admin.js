@@ -1,4 +1,4 @@
-import {documentQaMetrics} from './document-qa-metrics.js?v=1';
+import {documentQaMetrics,documentQaMetricCells} from './document-qa-metrics.js?v=2';
 import {createLiveSummarySetting} from './live-summary.js?v=20261113-summary-dialog-1';
 import {createLiveTranslationSetting} from './live-translation-setting.js?v=20261112-display-benchmark-1';
 import {improvementReport} from './analysis-focus.js?v=20261115-qa-yen-display';
@@ -152,9 +152,7 @@ function documentQaMetricsView(el) {
   thead.append(head);
   for (const row of rows) {
    const tr=el('tr');
-   const ratio=(n,total)=>total ? Math.round(n/total*100)+'％（'+n+'/'+total+'）' : '未計測';
-   for (const value of [row.title,row.answers ? (row.answerMs/row.answers/1000).toFixed(2)+'秒' : '未計測',
-    ratio(row.reused,row.translations),ratio(row.unsupported,row.items)]) tr.append(el('td',value));
+   for (const value of documentQaMetricCells(row)) tr.append(el('td',value));
    tbody.append(tr);
   }
   table.append(thead,tbody);

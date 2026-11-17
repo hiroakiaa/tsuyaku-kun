@@ -25,3 +25,9 @@ export function recordDocumentQaMetric(id,title,sample) {
   }
   try { localStorage.setItem(key,JSON.stringify([row,...rows.filter(entry=>entry.id!==id)].slice(0,100))); } catch {}
 }
+
+export function documentQaMetricCells(row) {
+  const ratio=(count,total)=>total ? Math.round(count/total*100)+'％（'+count+'/'+total+'）' : '未計測';
+  return [row.title,row.answers ? (row.answerMs/row.answers/1000).toFixed(2)+'秒' : '未計測',
+    ratio(row.reused,row.translations),ratio(row.unsupported,row.items)];
+}
