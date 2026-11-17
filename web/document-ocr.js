@@ -163,6 +163,7 @@ export async function createPdfOcr(ops) {
         }
 
         if (diagram && lines?.length) {
+          const japanese=/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u;
           const merged=[];
           for (const line of lines.sort((a,b)=>a.bbox.x0-b.bbox.x0)) {
             const {x0,y0,y1}=line.bbox;
@@ -172,9 +173,12 @@ export async function createPdfOcr(ops) {
               const otherHeight=box.y1-box.y0;
               const overlap=Math.min(y1,box.y1)-Math.max(y0,box.y0);
               const gap=x0-box.x1;
+              const japaneseContinuation=japanese.test(entry.text) && japanese.test(line.text) &&
+                !/[。！？]\s*$/u.test(entry.text) && Math.abs(y1-box.y1)<=Math.min(height,otherHeight)*.35;
+              const maxGap=height*(japaneseContinuation ? 2.1 : 1.35);
               return overlap>=Math.min(height,otherHeight)*.65 &&
                 height>=otherHeight*.55 && otherHeight>=height*.55 &&
-                gap>=-height*.2 && gap<=height*1.35;
+                gap>=-height*.2 && gap<=maxGap;
             });
             if (!previous) merged.push(line);
             else {
