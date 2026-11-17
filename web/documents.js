@@ -803,6 +803,13 @@ async function reader() {
         if (result.reuse) translatedPage.dataset.translationReuse=result.reuse;
         if (['cache','in-flight','generated'].includes(result.reuse)) recordDocumentQaMetric(id,doc.title,{translation:result.reuse});
         if (sourceType==='pdf') {
+          const sameText=text=>text.normalize('NFC').replace(/\s+/gu,' ').trim();
+          if (Array.isArray(result.source) && result.source.length && result.source.length===result.lines?.length
+              && result.source.every((line,index)=>sameText(line)===sameText(result.lines[index]))) {
+            translatedPage.hidden=true;
+            restorePageViewport(preview,original,viewportPosition);
+            return;
+          }
           if (!await renderTranslationOnPdf(result,page,revision,viewportPosition) && revision===translationRevision) {
             throw Error('このページでは訳文を元の位置に配置できませんでした。');
           }
