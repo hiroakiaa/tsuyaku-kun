@@ -983,13 +983,36 @@ async function reader() {
       const rendered=canvas.getContext('2d');
       const scale=renderViewport.scale;
       for (const {x,top,boxHeight,width,size,line,marked,vertical,diagramText,sourceWidth,sourceHeight} of blocks) {
+        let displayWidth=width;
+        if (rendered && sourceWidth && width>sourceWidth+2) {
+          const left=Math.max(0,Math.ceil((x+sourceWidth+1)*scale));
+          const right=Math.min(canvas.width,Math.floor((x+width)*scale));
+          const upper=Math.max(0,Math.floor(top*scale));
+          const lower=Math.min(canvas.height,Math.ceil((top+boxHeight)*scale));
+          const rows=lower-upper;
+          if (right>left && rows>=4) {
+            const columns=right-left;
+            const pixels=rendered.getImageData(left,upper,columns,rows).data;
+            for (let column=0;column<columns;column++) {
+              let dark=0;
+              for (let row=0;row<rows;row++) {
+                const offset=(row*columns+column)*4;
+                if (pixels[offset]+pixels[offset+1]+pixels[offset+2]<420) dark++;
+              }
+              if (dark>=rows*.85) {
+                displayWidth=Math.max(sourceWidth,(left+column-1)/scale-x);
+                break;
+              }
+            }
+          }
+        }
         const block=append(frame,'span',line,'pdf-layout-line'+(marked?' pdf-translated-citation':''));
         if (vertical) block.style.writingMode='vertical-rl';
         block.style.left=x/unit+'%';
         block.style.top=top/viewport.height*100+'%';
-        block.style.width=width/unit+'%';
+        block.style.width=displayWidth/unit+'%';
         block.style.height=boxHeight/viewport.height*100+'%';
-        block.style.fontSize=size/unit+'cqw';
+        block.style.fontSize=size*(displayWidth/width)/unit+'cqw';
         if (!marked && rendered) {
           const sampleX=Math.min(canvas.width-1,Math.max(0,Math.floor((x-.5)*scale)));
           const sampleY=Math.min(canvas.height-1,Math.max(0,Math.floor((top+boxHeight/2)*scale)));
