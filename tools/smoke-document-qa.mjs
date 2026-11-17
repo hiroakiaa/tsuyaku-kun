@@ -38,6 +38,9 @@ try {
   });
   await page.setContent(`<table style="width:600px;text-align:left"><tr><th rowspan="2">Facility</th><th colspan="2">Hours</th></tr><tr><th>Opening</th><th>Closing</th></tr></table><table style="break-before:page;width:600px"><tr><td>Library</td><td>9 AM</td><td>3 PM</td></tr><tr><td>Museum</td><td>10 AM</td><td>5 PM</td></tr></table>${padding}<div style="break-before:page"><img width="550" src="${scan}"></div>`);
   let pdf = await page.pdf();
+  if (dense && process.env.DOCUMENT_QA_DENSE_FIXTURE) {
+    await writeFile(process.env.DOCUMENT_QA_DENSE_FIXTURE,pdf);
+  }
   if (atSizeLimit) {
     // Preserve PDF offsets and keep the end-of-file marker at the end.
     const marker = pdf.lastIndexOf(Buffer.from('%%EOF'));
