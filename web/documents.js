@@ -944,11 +944,15 @@ async function reader() {
         }));
         const availableHeight=Math.max(boxHeight,nextTop-top);
         if (measured>available && availableHeight>=height*1.75) {
-          const breaks=[...line.matchAll(/\s+/gu)].map(match=>match.index);
-          const midpoint=breaks.reduce((best,offset)=>Math.abs(offset-line.length/2)<Math.abs(best-line.length/2) ? offset : best,Infinity);
-          if (Number.isFinite(midpoint)) {
-            const parts=[line.slice(0,midpoint),line.slice(midpoint).trimStart()];
-            const wrappedWidth=Math.max(...parts.map(part=>context.measureText(part).width));
+          let bestWrap;
+          for (const match of line.matchAll(/\s+/gu)) {
+            const parts=[line.slice(0,match.index),line.slice(match.index+match[0].length)];
+            if (!parts.every(Boolean)) continue;
+            const width=Math.max(...parts.map(part=>context.measureText(part).width));
+            if (!bestWrap || width<bestWrap.width) bestWrap={parts,width};
+          }
+          if (bestWrap) {
+            const {parts,width:wrappedWidth}=bestWrap;
             const wrappedSize=Math.min(height,available/wrappedWidth*height,availableHeight/2.2);
             if (wrappedSize>available/measured*height*1.15) {
               line=parts.join('\n');
