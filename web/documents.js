@@ -3,12 +3,14 @@ import {recordDocumentQaMetric} from './document-qa-metrics.js?v=1';
 import {layoutPdfText} from './document-table.js?v=94';
 import {installLocalIcons,localIcon} from './icons.js?v=pdf-controls';
 import {config} from './config.js';
+import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
+import {fillLanguageOptions} from './language-picker.js?v=20261103-analysis-stages-1';
 import {selectableCatalog} from './selectable-catalog.js';
 import {createDocumentUiLocale} from './document-ui-locale.js?v=5';
 const $ = (selector) => document.querySelector(selector);
 const content = $('#content');
 const id = new URLSearchParams(location.search).get('id');
-const documentLanguages=selectableCatalog({languages:[]}).languages;
+const documentLanguages=selectableCatalog(seed).languages;
 const languagePreference='tsuyaku-document-language';
 const defaultDocumentLanguage='ja';
 let selectedLanguage=defaultDocumentLanguage;
@@ -22,10 +24,7 @@ function addLanguagePicker(parent) {
   select.className='document-language';
   select.setAttribute('aria-label','資料QAの利用言語');
   select.title='母国語を選ぶと、資料と回答をその言語で表示します';
-  for (const language of documentLanguages) {
-    select.add(new Option(language.labelNative,language.code));
-  }
-  select.value=selectedLanguage;
+  fillLanguageOptions(select,documentLanguages,selectedLanguage);
   select.addEventListener('change',()=>{
     selectedLanguage=select.value;
     try { localStorage.setItem(languagePreference,selectedLanguage); } catch {}
