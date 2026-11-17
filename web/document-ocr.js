@@ -80,6 +80,19 @@ export async function createPdfOcr(ops) {
     })();
     return standard;
   }
+  async function verticalWorker() {
+    if (!vertical) {
+      const started=performance.now();
+      const {default:{createWorker}}=await import('https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/tesseract.esm.min.js');
+      vertical=await createWorker('jpn_vert',1,{
+        workerPath:'https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/worker.min.js',
+        corePath:'https://cdn.jsdelivr.net/npm/tesseract.js-core@6.0.0',
+      });
+      await vertical.setParameters({tessedit_pageseg_mode:'5'});
+      if (!standard && !horizontal) recordTiming(timingNames[0],started);
+    }
+    return vertical;
+  }
   return {
     async readLayout(page,pageNumberItems=[]) {
       const size=page.getViewport({scale:1});
@@ -105,10 +118,19 @@ export async function createPdfOcr(ops) {
         }
         let lines;
         try {
-          const {createHorizontalScanReader}=await import('./document-ocr-horizontal.js?v=2');
-          horizontal ??= await createHorizontalScanReader(new URL('./ocr/assets/recognition.worker-CFphUR-D.js?v=2',import.meta.url));
-          const recognized=await horizontal.read(context.getImageData(0,0,canvas.width,canvas.height),{withLayout:true});
-          lines=recognized?.map(({text,box:{x,y,width,height}})=>({text,bbox:{x0:x,y0:y,x1:x+width,y1:y+height}}));
+          const pixels=context.getImageData(0,0,canvas.width,canvas.height);
+          const {findVerticalScanRegion}=await import('./document-ocr-lines.js?v=3');
+          if (findVerticalScanRegion(pixels)?.wholePage) {
+            const {data}=await (await verticalWorker()).recognize(canvas,{}, {blocks:true});
+            if (data.confidence>=70) lines=(data.blocks ?? []).flatMap(block=>block.paragraphs)
+              .flatMap(paragraph=>paragraph.lines).sort((a,b)=>b.bbox.x0-a.bbox.x0 || a.bbox.y0-b.bbox.y0);
+          }
+          if (!lines?.length) {
+            const {createHorizontalScanReader}=await import('./document-ocr-horizontal.js?v=2');
+            horizontal ??= await createHorizontalScanReader(new URL('./ocr/assets/recognition.worker-CFphUR-D.js?v=2',import.meta.url));
+            const recognized=await horizontal.read(pixels,{withLayout:true});
+            lines=recognized?.map(({text,box:{x,y,width,height}})=>({text,bbox:{x0:x,y0:y,x1:x+width,y1:y+height}}));
+          }
         } catch { /* Fall back to the general OCR reader. */ }
         if (!lines?.length) {
           const {data}=await (await standardWorker()).recognize(canvas,{}, {blocks:true});
@@ -150,17 +172,7 @@ export async function createPdfOcr(ops) {
         const layout=findVerticalScanRegion(context.getImageData(0,0,canvas.width,canvas.height));
         if (layout) {
           try {
-            if (!vertical) {
-              const started=performance.now();
-              const {default:{createWorker}}=await import('https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/tesseract.esm.min.js');
-              vertical=await createWorker('jpn_vert',1,{
-                workerPath:'https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/worker.min.js',
-                corePath:'https://cdn.jsdelivr.net/npm/tesseract.js-core@6.0.0',
-              });
-              await vertical.setParameters({tessedit_pageseg_mode:'5'});
-              if (!standard && !horizontal) recordTiming(timingNames[0],started);
-            }
-            const {data}=await vertical.recognize(canvas,layout.vertical ? {rectangle:layout.vertical} : {});
+            const {data}=await (await verticalWorker()).recognize(canvas,layout.vertical ? {rectangle:layout.vertical} : {});
             if (data.confidence>=70 && data.text.replace(/\s/gu,'').length>=8) {
               recordTiming(timingNames[2],recognitionStarted);
               if (layout.wholePage) return data.text.trim();
