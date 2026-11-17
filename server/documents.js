@@ -269,6 +269,42 @@ function monthlyDismissal(evidence) {
   return null;
 }
 
+function lookupGroupedAdmissionFee(pages,question) {
+  const query = question.normalize('NFKC').toLowerCase();
+  if (!/\b(?:admission|entry|entrance)\b/u.test(query) || !/\b(?:fee|price|cost|how much)\b/u.test(query)) return null;
+  const audience = query.match(/\b(?:adult|child)\b/gu);
+  if (new Set(audience).size!==1) return null;
+  const days = new Set([...query.matchAll(/\b(weekdays?|weekends?)\b/gu)].map(match=>match[1].replace(/s$/u,'')));
+  const day = days.size===1 ? days.values().next().value : undefined;
+  const amount = /^\d[\d,]*(?:\.\d+)?\s+(?:yen|dollars?|euros?)$/iu;
+  const matches = [];
+  for (const [index,page] of pages.entries()) {
+    const lines = page.split('\n').filter(line=>line.trim());
+    for (let i=1;i<lines.length-1;i++) {
+      const upperIndex = i>=2 && !lines[i-1].includes('|') ? i-2 : i-1;
+      const upper = lines[upperIndex].split(/\s*\|\s*|\s{2,}/u).map(value=>value.trim());
+      const lower = lines[i].split(/\s*\|\s*|\s{2,}/u).map(value=>value.trim().toLowerCase()).filter(Boolean);
+      const groups = upper.flatMap(value=>value.match(/\b(?:weekday|weekend)\b/iu)?.[0].toLowerCase() ?? []);
+      if (groups.length!==2 || new Set(groups).size!==2 ||
+          lower.slice(-4).join('|')!=='adult|child|adult|child') continue;
+      for (const row of lines.slice(i+1)) {
+        const [name,...values] = row.split(' | ');
+        if (values.length!==4 || !values.every(value=>amount.test(value))) break;
+        const entity = name.normalize('NFKC').trim().toLowerCase();
+        if (entity.length<3 || !query.includes(entity)) continue;
+        const evidence = [{page:index+1,quote:row},{page:index+1,quote:lines.slice(upperIndex,i+1).join('\n')}];
+        const prices = groups.map((group,column)=>({group,value:values[column*2+(audience[0]==='child' ? 1 : 0)]}));
+        const selected = prices.find(price=>price.group===day);
+        const answer = selected?.value ?? (/\b(?:single|one)\b/u.test(query)
+          ? 'Are you visiting on a weekday or a weekend?'
+          : prices.map(({group,value})=>value+' on '+group+'s').join(', '));
+        matches.push({label:name+' admission',answer,evidence});
+      }
+    }
+  }
+  return matches.length===1 ? matches[0] : null;
+}
+
 function lookupFeeTableCell(pages,question) {
   const query=question.normalize('NFKC').trim().toLowerCase();
   if (!/^what is the .+ fee\??$/u.test(query)) return null;
@@ -1059,7 +1095,7 @@ export async function documents(request,env,auth) {
       const worksheetItem = lookupWorksheetCell(record.pages,text);
       return worksheetItem
         ? {...worksheetItem,worksheetContext:text}
-        : lookupAdmissionCell(record.pages,text) ?? (record.sourceType==='pdf' ? lookupTimetableCell(record.pages,text) ?? lookupFeeTableCell(record.pages,text) ?? lookupExplicitYenFee(record.pages,text) : null);
+        : lookupAdmissionCell(record.pages,text) ?? (record.sourceType==='pdf' ? lookupTimetableCell(record.pages,text) ?? lookupGroupedAdmissionFee(record.pages,text) ?? lookupFeeTableCell(record.pages,text) ?? lookupExplicitYenFee(record.pages,text) : null);
     };
     const lookupItems = worksheetQuestion => {
       const sharedQuestion = /^(.+?)について[、,]?\s*それぞれ(?:の|[、,])?\s*(.+)$/u.exec(normalized(worksheetQuestion));
@@ -1105,6 +1141,10 @@ export async function documents(request,env,auth) {
             JSON.stringify(headings(priorItems))===JSON.stringify(headings(nextItems))) worksheetQuestion = candidate;
       }
     }
+    const dayReply = /^(?:on (?:a |the )?)?(?:weekdays?|weekends?)[.!?]?$/iu.test(currentQuestion.trim());
+    const priorFee = dayReply && record.sourceType==='pdf' && typeof previousQuestion==='string' && previousQuestion.length<=300
+      ? lookupGroupedAdmissionFee(record.pages,previousQuestion) : null;
+    if (priorFee?.answer==='Are you visiting on a weekday or a weekend?') worksheetQuestion=previousQuestion+' '+currentQuestion;
     const items = lookupItems(worksheetQuestion);
     if (items.length) {
       if (request.headers.get('Accept')==='application/x-ndjson') {

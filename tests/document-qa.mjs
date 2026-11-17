@@ -515,3 +515,33 @@ assert.equal(await translateFixture(2),'generated');
 assert.equal(await translateFixture(2),'cache');
 assert.equal(await translateFixture(1,'es'),'generated');
 console.log('PASS PDF translation cache keys only change for edited pages or languages');
+
+{
+  const pages=[[
+    'Weekday admission | Weekend admission',
+    'Facility',
+    'Adult | Child | Adult | Child',
+    'Science museum | 500 yen | 200 yen | 800 yen | 300 yen',
+    'Art museum | 800 yen | 300 yen | 1000 yen | 500 yen',
+  ].join('\n')];
+  const environment={ROOMS:{idFromName:id=>id,get:()=>({
+    fetch:async url=>{
+      assert.ok(url.endsWith('/data'),'Grouped fee must use table lookup');
+      return Response.json({pages,sourceType:'pdf',owner:'author'});
+    },
+  })}};
+  const ambiguous='I am visiting the art museum. What single adult admission price applies to my visit?';
+  for (const [question,previousQuestion,expected] of [
+    [ambiguous,undefined,'Are you visiting on a weekday or a weekend?'],
+    ['On a weekend.',ambiguous,'1000 yen'],
+    ['How much is adult admission at the art museum?',undefined,'800 yen on weekdays, 1000 yen on weekends'],
+  ]) {
+    const response=await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+      method:'POST',body:JSON.stringify({question,previousQuestion}),
+    }),environment,{uid:'author'});
+    const [item]=(await response.json()).items;
+    assert.equal(item.answer,expected);
+    assert.match(item.evidence[0].quote,/^Art museum \|/);
+    assert.match(item.evidence[1].quote,/Weekday admission.*Weekend admission/);
+  }
+}
