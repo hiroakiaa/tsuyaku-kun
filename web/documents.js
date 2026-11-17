@@ -965,6 +965,7 @@ async function reader() {
         const size=Math.min(height,available/measured*height,line.includes('\n') ? boxHeight/2.2 : boxHeight);
         if (!(size>0)) return;
         blocks.push({x,top,boxHeight,width:Math.max(width,measured*size/height),size,line,
+          sourceWidth:width,sourceHeight:height*1.26,
           marked:ranges.some(range=>from>range.start && start<range.end)});
       }
       if (!blocks.length || from!==pageText.length) return;
@@ -981,7 +982,7 @@ async function reader() {
       if (revision!==translationRevision) return;
       const rendered=canvas.getContext('2d');
       const scale=renderViewport.scale;
-      for (const {x,top,boxHeight,width,size,line,marked,vertical,diagramText} of blocks) {
+      for (const {x,top,boxHeight,width,size,line,marked,vertical,diagramText,sourceWidth,sourceHeight} of blocks) {
         const block=append(frame,'span',line,'pdf-layout-line'+(marked?' pdf-translated-citation':''));
         if (vertical) block.style.writingMode='vertical-rl';
         block.style.left=x/unit+'%';
@@ -996,6 +997,12 @@ async function reader() {
           if (alpha===255 && Math.min(red,green,blue)>=180) {
             const background='rgb('+red+' '+green+' '+blue+')';
             block.style.backgroundColor=background;
+            if (sourceHeight>boxHeight) {
+              // Hide the descenders of the original glyphs without enlarging the translation box.
+              const start=Math.floor((top+boxHeight)*scale);
+              rendered.fillStyle=background;
+              rendered.fillRect(x*scale,start,sourceWidth*scale,Math.ceil((top+sourceHeight)*scale)-start);
+            }
             if (diagramText) {
               const right=x+width;
               const neighbor=Math.min(viewport.width,...blocks
