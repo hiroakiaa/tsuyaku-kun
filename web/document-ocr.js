@@ -149,6 +149,30 @@ export async function createPdfOcr(ops) {
             });
         }
 
+        if (diagram && lines?.length) {
+          const merged=[];
+          for (const line of lines.sort((a,b)=>a.bbox.x0-b.bbox.x0)) {
+            const {x0,y0,y1}=line.bbox;
+            const height=y1-y0;
+            const previous=merged.findLast(entry=>{
+              const box=entry.bbox;
+              const otherHeight=box.y1-box.y0;
+              const overlap=Math.min(y1,box.y1)-Math.max(y0,box.y0);
+              const gap=x0-box.x1;
+              return overlap>=Math.min(height,otherHeight)*.65 &&
+                height>=otherHeight*.55 && otherHeight>=height*.55 &&
+                gap>=-height*.2 && gap<=height*1.35;
+            });
+            if (!previous) merged.push(line);
+            else {
+              previous.text+=' '+line.text;
+              previous.bbox.x1=line.bbox.x1;
+              previous.bbox.y0=Math.min(previous.bbox.y0,y0);
+              previous.bbox.y1=Math.max(previous.bbox.y1,y1);
+            }
+          }
+          lines=merged.sort((a,b)=>a.bbox.y0-b.bbox.y0 || a.bbox.x0-b.bbox.x0);
+        }
         if (!diagram) try {
           const pixels=context.getImageData(0,0,canvas.width,canvas.height);
           const {findVerticalScanRegion}=await import('./document-ocr-lines.js?v=3');
