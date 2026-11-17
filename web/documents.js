@@ -853,7 +853,8 @@ async function reader() {
       const pdf=await getOriginalPdf();
       const page=await pdf.getPage(number);
       const viewport=page.getViewport({scale:1});
-      const items=await pageTextRuns(page);
+      const nativeItems=await pageTextRuns(page);
+      const items=result.includesDiagram ? [...nativeItems,...await diagramTextRuns(page,nativeItems)] : nativeItems;
       if (revision!==translationRevision) return;
       const normalize=text=>text.normalize('NFKC').replace(/\s/gu,'');
       let offset=0;
