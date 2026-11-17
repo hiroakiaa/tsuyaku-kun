@@ -9,7 +9,7 @@ export function lookupPdfTableValue(pages,question,previousQuestion) {
   const isFollowup=isPdfTablePriceQuestion(previousQuestion) && /^[^の、?？。\r\n]{2,32}$/u.test(question?.trim());
   if (isFollowup && !isPdfTablePriceQuestion(question)) question=question.trim()+'の料金';
   const query=question.normalize('NFKC').trim().toLowerCase().replace(/[?。]$/u,'');
-  const verb=/^when does (?:the )?(.+?) (open|close)$/u.exec(query);
+  const verb=/^(?:when|(?:at )?what time) does (?:the )?(.+?) (open|close|shut(?: down)?)$/u.exec(query);
   const field=/^when is the (.+?) for (?:the )?(.+)$/u.exec(query);
   const japanese=/^([^の、]+)の([^の、]+?時刻)(?:は(?:何時(?:ですか)?)?)?$/u.exec(query);
   const fee=/^([^の、]+)の([^、]*?(?:利用料|料金|手数料|延長料))(?:はいくら(?:ですか)?|は)?$/u.exec(query);

@@ -156,6 +156,7 @@ try {
     method:'POST',body:JSON.stringify({question}),
   }),env,{uid:'author'})).json();
   assert.deepEqual((await ask('When does the library close?')).pages,[2,1]);
+  assert.deepEqual((await ask('At what time does the library shut?')).pages,[2,1]);
   assert.deepEqual((await ask('What is the Library capacity?')).pages,[2]);
   assert.deepEqual((await ask('図書館は何時に閉まりますか？')).pages,[2,1]);
   assert.deepEqual((await ask('図書館の定員は？')).pages,[2]);

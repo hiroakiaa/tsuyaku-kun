@@ -319,7 +319,7 @@ function lookupExplicitYenFee(pages,question) {
 
 function lookupTimetableCell(pages,question) {
   const query=question.normalize('NFKC').trim().toLowerCase().replace(/[?。]$/u,'');
-  const verb=/^when does (?:the )?(.+?) (open|close)$/u.exec(query);
+  const verb=/^(?:when|(?:at )?what time) does (?:the )?(.+?) (open|close|shut(?: down)?)$/u.exec(query);
   const field=/^when is the (.+?) for (?:the )?(.+)$/u.exec(query);
   const japanese=/^([^の、]+)の([^の、]+?時刻)(?:は(?:何時(?:ですか)?)?)?$/u.exec(query);
   if (!verb && !field && !japanese) return null;
@@ -626,7 +626,7 @@ function checkedAnswer(item,pages,question='',language=null) {
           const onlyTimes = cells.every(cell=>/^(?:(?:午前|午後)?\s*\d{1,2}\s*時(?:\s*\d{1,2}\s*分)?|\d{1,2}(?::\d{2})?\s*[ap]\.?m\.?|\d{1,2}:\d{2})$/iu.test(cell.normalize('NFKC').trim()));
           return values.length ? [{source,label:normalized(label).toLowerCase(),values,onlyTimes}] : [];
         });
-        const singularTimeQuestion = /^when does [^?]+ (?:open|close)\??$/iu.test(question.trim())
+        const singularTimeQuestion = /^(?:when|(?:at )?what time) does [^?]+ (?:open|close|shut(?: down)?)\??$/iu.test(question.trim())
           || /^when is the [^?]+ for [^?]+\??$/iu.test(question.trim())
           || /^[^、？?]+の(?:開館|閉館|開店|閉店|最終入館)時刻は[？?。]?$/u.test(question.trim());
         if (singularTimeQuestion && answerTimes.length>1 && tableRows.some((row,index)=>
@@ -667,7 +667,7 @@ function checkedAnswer(item,pages,question='',language=null) {
         if (headings.length!==1) continue;
         const quote = headings[0];
         if (!quote.split(/ \| |\n/).some(cell=>normalized(cell).length>=2 &&
-          (terms.includes(normalized(cell).toLowerCase()) || (normalized(cell).toLowerCase()==='closing' && /clos(?:e|es|ed)|閉館|閉店|閉ま/u.test(terms)) || (normalized(cell).toLowerCase()==='opening' && /open|開館|開店|開く|開き/u.test(terms))))) continue;
+          (terms.includes(normalized(cell).toLowerCase()) || (normalized(cell).toLowerCase()==='closing' && (/clos(?:e|es|ed|ing)|閉館|閉店|閉ま/u.test(terms) || /\bshut\b/iu.test(question))) || (normalized(cell).toLowerCase()==='opening' && /open|開館|開店|開く|開き/u.test(terms))))) continue;
         if (!evidence.some(item=>item.page===source.page-1 && item.quote===quote)) {
           evidence.push({page:source.page-1,quote});
         }
