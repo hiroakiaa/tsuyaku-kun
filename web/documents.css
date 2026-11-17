@@ -359,3 +359,35 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
   .ask-heading h2{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .ask-heading .qa-actions{justify-content:flex-end;flex-wrap:wrap;min-width:0}
 }
+
+@media(max-width:799px){
+  #pdf-dialog .pdf-bar{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:.35rem;
+    padding:.35rem .5rem;
+  }
+  #pdf-heading{
+    flex:1 0 100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  #pdf-dialog .pdf-bar .pdf-language-toggle{
+    flex:0 0 auto;
+    margin:0;
+  }
+  #pdf-dialog .pdf-bar :is(#pdf-find-toggle,#pdf-toc-toggle,#pdf-file){
+    font-size:.82rem;
+    padding:.3rem .4rem;
+    white-space:nowrap;
+  }
+  #pdf-dialog .pdf-bar form{margin-inline-start:auto}
+  #pdf-dialog .pdf-bar form button{width:2.75rem;min-height:2.75rem;border-radius:.5rem}
+  .qa-workspace .ask-heading{gap:.3rem;padding-bottom:.35rem}
+  .qa-workspace .qa-actions{gap:.3rem}
+  .qa-workspace .qa-actions :is(button,select){min-height:2.75rem;padding:.35rem .5rem;font-size:.85rem}
+  .qa-workspace .qa-actions select{max-width:8rem;min-width:0}
+  .qa-workspace .pdf-navigation{gap:.35rem;padding-block:.2rem}
+}
