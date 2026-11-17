@@ -981,7 +981,14 @@ export async function documents(request,env,auth) {
     if (!language || typeof storedText!=='string') return fail('翻訳するページと言語を確認してください。');
     const plain = value=>normalized(value).replaceAll('|','');
     const hasLayout=(record.sourceType ?? 'pdf')==='pdf' && typeof layoutText==='string' &&
-      layoutText.length<=MAX_TEXT && plain(layoutText)===plain(storedText);
+      layoutText.length<=MAX_TEXT && (plain(layoutText)===plain(storedText) || (() => {
+        // Table extraction can move merged headings ahead of other cells.
+        // Only accept the same complete cell strings, including duplicates.
+        const cells = value => value.split(/[|\n]/u).map(plain).filter(Boolean).sort();
+        const storedCells = cells(storedText);
+        return storedText.includes(' | ') && storedCells.length>=3 &&
+          JSON.stringify(storedCells)===JSON.stringify(cells(layoutText));
+      })());
     const text=hasLayout ? layoutText : storedText;
     if (!text.trim()) return reply({text:'',source:[],lines:[],reuse:'empty'});
     const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([hasLayout ? 6 : 2,DOCUMENT_MODEL,code,text])));
