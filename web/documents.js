@@ -378,7 +378,6 @@ async function reader() {
       }
     }
   }
-  points.addEventListener('close',()=>renderSummary(summaryItems));
   window.addEventListener('document-language-change',()=>renderSummary(summaryItems));
   $('#pdf-summary').onclick=()=>{
     points.showModal();
@@ -530,7 +529,9 @@ async function reader() {
         };
       }
       syncContentsPage();
+      if (tocButton.getAttribute('aria-expanded')==='true') void translateSectionLabels('toc',[...toc.querySelectorAll('.pdf-toc-title')]);
     }
+    window.addEventListener('document-language-change',()=>{if (tocButton.getAttribute('aria-expanded')==='true' && entries.length) renderContents();});
     tocButton.replaceChildren(localIcon('list'));
     tocButton.hidden = false;
     tocButton.onclick = async () => {
@@ -1589,12 +1590,13 @@ async function reader() {
   function renderSummary(items) {
     const cards=$('#cards');
     cards.replaceChildren();
+    const labels=[];
     for (const item of items ?? []) {
       const card=append(cards,'div','','card');
-      append(card,'h3',item.label);
-      append(card,'p',item.text);
+      labels.push(append(card,'h3',item.label),append(card,'p',item.text));
       sourceLink(card,item.source.page,item.source.quote || item.text);
     }
+    if (points.open) void translateSectionLabels('summary',labels);
   }
   renderSummary(doc.items);
   const listMaterial = material=>append($('#materials'),'li',material.name);
