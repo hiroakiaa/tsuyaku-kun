@@ -140,7 +140,7 @@ export async function createPdfOcr(ops) {
                 const continuesJapanese=(left,right)=>{
                   if (!left || !right) return false;
                   const edge=/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u;
-                  const japaneseText=/^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー、。]+$/u;
+                  const japaneseText=/^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{N}ー、。！？「」『』]+$/u;
                   const height=Math.min(left.bbox.y1-left.bbox.y0,right.bbox.y1-right.bbox.y0);
                   return height>0 && right.bbox.x0-left.bbox.x1<=height*.55 &&
                     japaneseText.test(left.text.trim()) && japaneseText.test(right.text.trim()) &&
