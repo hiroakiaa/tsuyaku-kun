@@ -132,9 +132,22 @@ export async function createPdfOcr(ops) {
                 else group.push(word);
               }
               return groups.flatMap(group=>{
-                const first=group.findIndex(word=>word.confidence>=45 && /[\p{L}\p{N}]/u.test(word.text));
+                let first=group.findIndex(word=>word.confidence>=45 && /[\p{L}\p{N}]/u.test(word.text));
                 if (first<0) return [];
-                const last=group.findLastIndex(word=>word.confidence>=45 && /[\p{L}\p{N}]/u.test(word.text));
+                let last=group.findLastIndex(word=>word.confidence>=45 && /[\p{L}\p{N}]/u.test(word.text));
+                // Keep contiguous Japanese text at the edge of a recognized line.
+                // Sparse OCR often gives particles and punctuation lower confidence.
+                const continuesJapanese=(left,right)=>{
+                  if (!left || !right) return false;
+                  const edge=/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u;
+                  const japaneseText=/^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー、。]+$/u;
+                  const height=Math.min(left.bbox.y1-left.bbox.y0,right.bbox.y1-right.bbox.y0);
+                  return height>0 && right.bbox.x0-left.bbox.x1<=height*.55 &&
+                    japaneseText.test(left.text.trim()) && japaneseText.test(right.text.trim()) &&
+                    (edge.test(left.text) || edge.test(right.text));
+                };
+                while (continuesJapanese(group[first-1],group[first])) first--;
+                while (continuesJapanese(group[last],group[last+1])) last++;
                 const words=group.slice(first,last+1);
                 return [{
                   text:words.map(word=>word.text).join(' '),
