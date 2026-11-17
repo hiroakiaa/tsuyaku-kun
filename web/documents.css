@@ -218,7 +218,8 @@ dialog [tabindex="-1"][autofocus]:focus {
 .answer-source {margin-block:.75rem}
 .answer-source blockquote {margin-block:.35rem .65rem}
 
-.answer-text{white-space:pre-wrap;line-height:1.75}
+.answer-text,.answer-english{line-height:1.5}
+.answer-text{white-space:pre-wrap}
 #messages #answer-status{width:fit-content;margin:.6rem 0;padding:.5rem .75rem}
 #answer-status:empty{display:none}
 .answer-quote summary{cursor:pointer;margin-block:.4rem}
