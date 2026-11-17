@@ -544,6 +544,9 @@ async function reader() {
   const scanLayouts=new Map();
   async function pageTextRuns(page) {
     const {items}=await readPdfPageText(page);
+    content.dataset.pdfTextTimings=JSON.stringify(Object.fromEntries(['extraction','reuse'].map(stage=>[
+      stage,performance.getEntriesByName('document-qa:pdf-text-'+stage).map(entry=>Math.round(entry.duration*100)/100),
+    ])));
     const number=page.pageNumber;
     const {requiresOcr,pageNumberOnly}=pdfPageTextStatus(layoutPdfText(items),number);
     if (!requiresOcr) return items;
