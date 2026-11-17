@@ -1,7 +1,7 @@
 import {readPdfPageText,lookupTableCell,lookupAlignedTableCell} from './document-table-lookup.js?v=88';
 import {recordDocumentQaMetric} from './document-qa-metrics.js?v=1';
 import {layoutPdfText} from './document-table.js?v=94';
-import {installLocalIcons,localIcon} from './icons.js?v=library';
+import {installLocalIcons,localIcon} from './icons.js?v=pdf-toolbar';
 import {config} from './config.js';
 import {withEasyJapanese} from './core.js';
 import {createDocumentUiLocale} from './document-ui-locale.js?v=3';
@@ -329,7 +329,7 @@ async function reader() {
     return;
   }
   show('#reader');
-  addLanguagePicker($('.qa-actions'));
+  addLanguagePicker($('#pdf-language-picker'));
   document.title = doc.title + '｜資料QA君';
   $('#doc-title').textContent = doc.title;
   $('#ask-heading').textContent = doc.title;
@@ -376,14 +376,7 @@ async function reader() {
     selectTab(tabs[0]);
     tabs[0].focus();
   });
-  $('#qa-source').addEventListener('click',()=>{
-    if (!wide.matches && dialog.open) dialog.close();
-    else void showPdf(citation?.page || selectedPage || 1);
-  });
   const sourceType = doc.sourceType ?? 'pdf';
-  if (sourceType!=='pdf') {
-    $('#qa-source').textContent = '資料データを表示';
-  }
   let opened,originalUrl,officeText,officeRender = 0;
   function getOriginalPdf() {
     return opened ??= (async()=>{
@@ -424,18 +417,24 @@ async function reader() {
     const status = findPanel.querySelector('[role="status"]');
     let pageText;
     function setFindOpen(open) {
-      findPanel.hidden = !open;
+      findPanel.hidden=false;
+      findPanel.inert=!open;
+      findPanel.classList.toggle('is-open',open);
       findToggle.setAttribute('aria-expanded',String(open));
     }
     findToggle.hidden = false;
     findToggle.onclick = () => {
-      const open = findPanel.hidden;
+      const open = findToggle.getAttribute('aria-expanded')!=='true';
       setFindOpen(open);
       if (open) {
         showContents(false);
         queryInput.focus();
       }
     };
+    askDialog.addEventListener('click',event=>{
+      if (findToggle.getAttribute('aria-expanded')==='true' &&
+          !findPanel.contains(event.target) && !findToggle.contains(event.target)) setFindOpen(false);
+    });
     dialog.addEventListener('close',()=>setFindOpen(false));
     findPanel.querySelector('form').onsubmit = async event => {
       event.preventDefault();
@@ -1132,34 +1131,26 @@ async function reader() {
   const divider = $('#qa-divider');
   const wide = matchMedia('(min-width: 800px)');
   const expand = $('#qa-expand');
-  const sourceButton = $('#qa-source');
-  const actions=$('.qa-actions');
-  const chatHeading=$('.ask-heading');
-  const pdfNavigation=$('.pdf-navigation');
-  const closeQuestions=actions.querySelector('form');
-  closeQuestions.addEventListener('submit',event=>{
+  const setFullscreenControl = full => {
+    const label=full ? '上下表示に戻る' : 'PDF全画面';
+    expand.setAttribute('aria-label',label);
+    expand.title=label;
+    expand.replaceChildren(localIcon(full ? 'compress' : 'expand'));
+  };
+  const updateMobileControls = () => {
+    expand.hidden = wide.matches || !dialog.open;
+    setFullscreenControl(workspace.classList.contains('pdf-full'));
+  };
+  expand.onclick = () => {
+    setFullscreenControl(workspace.classList.toggle('pdf-full'));
+  };
+  dialog.querySelector('.pdf-bar form').addEventListener('submit',event=>{
     event.preventDefault();
     askDialog.close();
   });
-  const materialButton=actions.querySelector('.open-material');
-  materialButton.prepend(localIcon('plus'));
-  const updateMobileControls = () => {
-    const destination=!wide.matches && dialog.open && dialog.parentElement===workspace ? pdfNavigation : chatHeading;
-    if (actions.parentElement!==destination) destination.append(actions);
-    expand.hidden = wide.matches || !dialog.open;
-    sourceButton.setAttribute('aria-expanded', String(dialog.open));
-    const label=dialog.open && !wide.matches ? '資料を折りたたむ' : sourceType==='pdf' ? '元のPDF' : '資料データを表示';
-    sourceButton.setAttribute('aria-label',label);
-    sourceButton.replaceChildren(localIcon(dialog.open && !wide.matches ? 'chevron-down' : 'book-open'),label);
-  };
-  expand.onclick = () => {
-    const full = workspace.classList.toggle('pdf-full');
-    expand.textContent = full ? '上下表示に戻る' : 'PDF全画面';
-  };
   dialog.addEventListener('close', () => {
     if (dialog.open) return;
     workspace.classList.remove('pdf-full');
-    expand.textContent = 'PDF全画面';
     updateMobileControls();
   });
   const viewport = window.visualViewport;
@@ -1209,12 +1200,9 @@ async function reader() {
     divider.setAttribute('aria-orientation', wide.matches ? 'vertical' : 'horizontal');
     divider.setAttribute('aria-label', wide.matches ? '列幅' : 'PDFの高さ');
     workspace.classList.remove('pdf-full');
-    expand.textContent = 'PDF全画面';
     updateMobileControls();
     if (!askDialog.open) return;
-    if (wide.matches && dialog.open && dialog.parentElement === workspace) return;
-    if (dialog.open) dialog.close();
-    if (wide.matches) void showPdf(selectedPage || 1);
+    if (!dialog.open) void showPdf(selectedPage || 1);
   }
   wide.addEventListener('change',syncWorkspace);
   new ResizeObserver(() => {
@@ -1308,7 +1296,6 @@ async function reader() {
       pagePicker.value = selectedPage;
       $('#pdf-prev').disabled = selectedPage===1;
       $('#pdf-next').disabled = selectedPage===doc.pageCount;
-      $('#pdf-file').href = originalUrl+'#page='+selectedPage;
     });
   }, {passive:true});
   const scrollBehavior = ()=>matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
@@ -1368,7 +1355,7 @@ async function reader() {
           return;
         }
       }
-      if (!imageType) $('#pdf-file').textContent = 'ダウンロード';
+      $('#pdf-file').hidden=imageType;
       $('#pdf-file').removeAttribute('href');
       for (const node of ['#pdf-prev','#pdf-next','#pdf-page','#pdf-pages']) $(node).hidden=true;
       try {
@@ -1393,7 +1380,6 @@ async function reader() {
 
     try {
       const pdf = await getOriginalPdf();
-      if (selectedPage === n) document.querySelector('#pdf-file').href = originalUrl + '#page=' + n;
       if (selectedPage !== n || !dialog.open) return;
       if (!pageViews) {
         const sizes = await Promise.all(Array.from({length:pdf.numPages},async (_,index) => {
@@ -1490,6 +1476,7 @@ async function reader() {
   materials.forEach(listMaterial);
   const addForm = $('#add-material');
   for (const button of document.querySelectorAll('.open-material')) {
+    if (button.classList.contains('pdf-add')) button.prepend(localIcon('plus'));
     button.hidden = !doc.canRemove;
     button.onclick = () => $('#material-dialog').showModal();
   }

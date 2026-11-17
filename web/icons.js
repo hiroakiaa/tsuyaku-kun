@@ -11,6 +11,8 @@ const paths={
  'chalkboard-user':'M9 3h12v12h-6M5 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6M1 22v-2a4 4 0 0 1 8 0v2M12 8h5M12 11h3',
  'arrow-right-arrow-left':'M3 7h18M17 3l4 4-4 4M21 17H3M7 13l-4 4 4 4',
  'arrow-left':'M20 12H4M10 6l-6 6 6 6','arrow-right':'M4 12h16M14 6l6 6-6 6',
+ expand:'M9 3H3v6M15 3h6v6M21 15v6h-6M3 15v6h6',
+ compress:'M3 9h6V3M21 9h-6V3M15 21v-6h6M9 21v-6H3',
  'chevron-down':'M5 9l7 7 7-7','chevron-right':'M9 5l7 7-7 7',
  'xmark':'M6 6l12 12M18 6L6 18',check:'M4 12l5 5L20 6',plus:'M12 4v16M4 12h16',
  copy:'M8 8h12v13H8ZM4 16H2V2h13v2',camera:'M3 6h5l2-3h4l2 3h5v15H3ZM8 13a4 4 0 1 0 8 0 4 4 0 0 0-8 0',
