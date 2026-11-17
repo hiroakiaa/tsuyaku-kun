@@ -88,3 +88,4 @@
 - v189 / 項目5。右側ブラウザで見出しが1ページ、値が2ページの罫線付き合成PDFを新規登録。「When does the library close?」に3 PM。根拠は2ページ「Library | 9 AM | 3 PM」と1ページ「Facility | Opening | Closing」。両リンクでそれぞれ2・1ページへ移動することも確認。
 - v189 / 項目2・5。右側ブラウザで既存のページまたぎ表に Library closing time? と At what time does the library shut? を質問。どちらも3 PM。短文は2・1ページ、shut の表現では値の2ページのみで見出し1ページが欠落。言い換え時に根拠範囲が変わる不具合として記録。
 - 665aaf6 / 本番Worker 41f91c0f / 項目2・5。右側ブラウザで公開版の同じ表に At what time does the library shut? と When does the library close? を送信。両方3 PM、根拠2・1ページ。言い換えで見出しが欠ける症状は再現せず。
+- a051c1c / v190 / 項目13・16・18。右側ブラウザで縦書き資料を操作。体育館18時の英訳は左列だけ黄色。英訳2列の幅はいずれも4.59259%、列の間隔は13.3334%で重なりなし。原文に戻すと1ページ、左66.5185%に可視マーカーが復元。
