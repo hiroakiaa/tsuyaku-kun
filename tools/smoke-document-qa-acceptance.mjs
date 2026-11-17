@@ -143,13 +143,25 @@ try {
       await page.locator('#upload input[name=title]').fill('自動受入確認 '+fixture.label);
       const uploadStarted = performance.now();
       await page.locator('#upload input[type=file]').setInputFiles(file);
-      if (retryScan) await page.getByText('OCRの一時エラー',{exact:true}).waitFor({timeout:120_000});
-      else if (!fixture.excel) await page.getByText('PDFの文字を確認しました。',{exact:true}).waitFor({timeout:120_000});
       const readOcrStages = ()=>page.evaluate(()=>Object.fromEntries(
         ['initialization','render','recognition','native-recognition','full-recognition','horizontal-recognition'].map(stage=>[
           stage,performance.getEntriesByName('document-ocr:'+stage,'measure').map(entry=>Math.round(entry.duration)),
         ]),
       ));
+      if (!fixture.excel) {
+        const expectedStatus = retryScan ? 'OCRの一時エラー' : 'PDFの文字を確認しました。';
+        try {
+          await page.getByText(expectedStatus,{exact:true}).waitFor({timeout:120_000});
+        } catch (cause) {
+          const status = await page.locator('#upload-status').textContent({timeout:5_000}).catch(()=>null);
+          registrations.push({
+            fixture:fixture.label,failedStage:'preflight',status,error:cause.message,
+            elapsedMs:Math.round(performance.now()-uploadStarted),ocrDownloads,
+            ocrStages:fixture.scan ? await readOcrStages().catch(()=>null) : null,
+          });
+          throw cause;
+        }
+      }
       let ocrStages = fixture.scan && !retryScan ? await readOcrStages() : null;
       const registrationStarted = performance.now();
       await page.locator('#upload button').click();
