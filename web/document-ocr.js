@@ -133,8 +133,11 @@ export async function createPdfOcr(ops) {
               }
               return groups.flatMap(group=>{
                 let first=group.findIndex(word=>word.confidence>=45 && /[\p{L}\p{N}]/u.test(word.text));
-                if (first<0) return [];
-                let last=group.findLastIndex(word=>word.confidence>=45 && /[\p{L}\p{N}]/u.test(word.text));
+                const punctuationOnly=group.every(word=>/^[、。！？「」『』]+$/u.test(word.text.trim()));
+                if (first<0 && !punctuationOnly) return [];
+                let last=punctuationOnly ? group.length-1 :
+                  group.findLastIndex(word=>word.confidence>=45 && /[\p{L}\p{N}]/u.test(word.text));
+                if (punctuationOnly) first=0;
                 // Keep contiguous Japanese text at the edge of a recognized line.
                 // Sparse OCR often gives particles and punctuation lower confidence.
                 const continuesJapanese=(left,right)=>{
@@ -173,6 +176,9 @@ export async function createPdfOcr(ops) {
               const otherHeight=box.y1-box.y0;
               const overlap=Math.min(y1,box.y1)-Math.max(y0,box.y0);
               const gap=x0-box.x1;
+              if (/^[、。！？」』]+$/u.test(line.text) && japanese.test(entry.text)) {
+                return overlap>=height*.5 && gap>=-height*.2 && gap<=otherHeight*1.6;
+              }
               const japaneseContinuation=japanese.test(entry.text) && japanese.test(line.text) &&
                 !/[。！？]\s*$/u.test(entry.text) && Math.abs(y1-box.y1)<=Math.min(height,otherHeight)*.35;
               const maxGap=height*(japaneseContinuation ? 2.1 : 1.35);
@@ -188,7 +194,8 @@ export async function createPdfOcr(ops) {
               previous.bbox.y1=Math.max(previous.bbox.y1,y1);
             }
           }
-          lines=merged.sort((a,b)=>a.bbox.y0-b.bbox.y0 || a.bbox.x0-b.bbox.x0);
+          lines=merged.filter(line=>/[\p{L}\p{N}]/u.test(line.text))
+            .sort((a,b)=>a.bbox.y0-b.bbox.y0 || a.bbox.x0-b.bbox.x0);
           // Sparse OCR tokenizes Japanese at arbitrary glyph boundaries. Keep word
           // spacing for Latin text but restore continuous Japanese before translation.
           for (const line of lines) {
