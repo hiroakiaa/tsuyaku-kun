@@ -68,8 +68,16 @@ try {
   documentPages[3]='施設の受付は入口の右にあります。';
   documentPages[15]='施設の休館日は火曜日です。';
   let calls=0;
+  const translatedTexts=[];
   globalThis.fetch=async (_url,{body})=>{
-    const passages=JSON.parse(JSON.parse(body).messages.at(-1).content).資料;
+    const messages=JSON.parse(body).messages;
+    if (messages[0].content.startsWith('Translate the input into ')) {
+      const text=messages.at(-1).content;
+      translatedTexts.push(text);
+      const translation=text==='入口の右です。' ? 'To the right of the entrance.' : 'Tuesday.';
+      return Response.json({choices:[{finish_reason:'stop',message:{content:translation}}]});
+    }
+    const passages=JSON.parse(messages.at(-1).content).資料;
     calls++;
     const items=passages.length<documentPages.length
       ? [{label:'受付',answer:'入口の右です。',sources:[{page:4,quote:documentPages[3]}]},
@@ -107,6 +115,19 @@ try {
   assert.ok(events.slice(0,replacement).every(event=>!event.item || event.item.answer));
   assert.deepEqual(events[replacement].replaceItems.map(item=>item.evidence[0].page),[4,16]);
   assert.equal(events.at(-1).done,true);
+
+  const english=await documents(new Request('https://test/documents/20000000-0000-0000-0000-000000000000/ask',{
+    method:'POST',headers:{Accept:'application/x-ndjson'},
+    body:JSON.stringify({question:'受付の場所と休館日を教えてください。',answerLanguage:'en'}),
+  }),environment,{uid:'author'});
+  const translatedEvents=(await english.text()).trim().split('\n').map(JSON.parse);
+  const firstTranslation=translatedEvents.findIndex(event=>event.item?.answer==='To the right of the entrance.');
+  const fullReview=translatedEvents.findIndex(event=>event.status==='資料全体を確認しています…');
+  const allTranslations=translatedEvents.findIndex(event=>event.replaceItems?.some(item=>item.answer==='Tuesday.'));
+  assert.ok(firstTranslation>=0 && firstTranslation<fullReview && fullReview<allTranslations,JSON.stringify(translatedEvents));
+  assert.deepEqual(translatedEvents[allTranslations].replaceItems.map(item=>item.evidence[0].page),[4,16]);
+  assert.deepEqual(translatedTexts,['入口の右です。','火曜日です。']);
+  assert.equal(translatedEvents.at(-1).done,true);
 } finally {
   globalThis.fetch=originalFetch;
 }

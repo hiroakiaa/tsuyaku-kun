@@ -1251,43 +1251,42 @@ export async function documents(request,env,auth) {
         const passages = await findPassages();
         const usesPassages = Boolean(passages);
         await send({status:'資料を参照して回答を作成しています…'});
-        if (language) {
-          let items=checkedItems(await generate(env,record.pages,question,record.materials,undefined,passages,undefined,'answer',language,bilingual));
-          if (usesPassages && needsFullDocument(items)) {
-            await send({status:'資料全体を確認しています…'});
-            items=await readFullDocument(items);
-          }
-          items=await localize(items);
-          for (const item of items) await send({item});
-          if (items.length && items.every(item=>item.answer)) await saveAnswer(items);
-          await send({done:true,answer:items.length ? undefined : noAnswer});
-          return;
-        }
         let answers = [];
-        const writes = [];
+        let writes = Promise.resolve();
+        const localized = new Map();
+        const localizeItem = item => {
+          if (!language || !item.answer) return Promise.resolve(item);
+          if (!localized.has(item)) localized.set(item,localize([item]).then(([result])=>result));
+          return localized.get(item);
+        };
+        const queueGrounded = item => {
+          if (!item.answer) return;
+          const ready=localizeItem(item);
+          void ready.catch(()=>{});
+          writes=writes.then(async()=>send({item:await ready}));
+          void writes.catch(()=>{});
+        };
         const result = await generate(env,record.pages,question,record.materials,raw=>{
           const item = checkedAnswer(raw,record.pages,currentQuestion,language);
           if (!item) return;
           answers.push(item);
-          if (item.answer) writes.push(send({item}).catch(()=>{}));
+          queueGrounded(item);
         },passages,undefined,'answer',language,bilingual);
-        await Promise.all(writes);
         if (!answers.length) {
           answers = checkedItems(result);
-          for (const item of answers) if (item.answer) await send({item});
+          for (const item of answers) queueGrounded(item);
         }
+        await writes;
         if (usesPassages && needsFullDocument(answers)) {
           await send({status:'資料全体を確認しています…'});
           const reviewed = await readFullDocument(answers);
-          if (reviewed !== answers) await send({replaceItems:reviewed});
-          if (reviewed === answers) {
-            for (const item of answers) if (!item.answer) await send({item});
-          }
+          if (reviewed !== answers) await send({replaceItems:await Promise.all(reviewed.map(localizeItem))});
+          else for (const item of answers) if (!item.answer) await send({item});
           answers = reviewed;
         } else {
           for (const item of answers) if (!item.answer) await send({item});
         }
-        if (answers.length && answers.every(item=>item.answer)) await saveAnswer(answers);
+        if (answers.length && answers.every(item=>item.answer)) await saveAnswer(await Promise.all(answers.map(localizeItem)));
         await send({done:true,answer:answers.length ? undefined : noAnswer});
       } catch(error) {
         await send({error:error.message}).catch(()=>{});
