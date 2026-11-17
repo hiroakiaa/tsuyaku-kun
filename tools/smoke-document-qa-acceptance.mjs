@@ -53,9 +53,11 @@ const network = process.argv.includes('--limited-network') ? {
 } : null;
 const limits = network ? {registration:30_000,firstAnswer:15_000} : {registration:15_000,firstAnswer:8_000};
 const retryScan = process.argv.includes('--retry-scan');
-const selectedFixtures = retryScan ? fixtures.filter(fixture=>fixture.label==='スキャンPDF') : fixtures;
+const rotatedFixture=process.env.DOCUMENT_QA_ROTATED_SCAN_FIXTURE;
+const selectedFixtures = rotatedFixture ? fixtures.filter(fixture=>fixture.printedPageNumbers)
+  : retryScan ? fixtures.filter(fixture=>fixture.label==='スキャンPDF') : fixtures;
 const total = selectedFixtures.reduce((count,fixture)=>count+fixture.questions.length,0);
-assert.equal(total,retryScan ? 2 : 13,'Unexpected acceptance question count');
+assert.equal(total,retryScan || rotatedFixture ? 2 : 13,'Unexpected acceptance question count');
 const scanFixturePath = process.env.DOCUMENT_QA_EXPORT_SCAN_FIXTURE;
 const browser = await chromium.launch();
 const failures = [];
@@ -100,7 +102,7 @@ try {
       const file = fixture.excel ? {
         name:'acceptance.xlsx',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         buffer:await readFile(new URL('../tests/fixtures/document-qa-acceptance.xlsx',import.meta.url)),
-      } : {name:'acceptance.pdf',mimeType:'application/pdf',buffer:await page.pdf()};
+      } : {name:'acceptance.pdf',mimeType:'application/pdf',buffer:rotatedFixture ? await readFile(rotatedFixture) : await page.pdf()};
       if (fixture.printedPageNumbers && process.env.DOCUMENT_QA_SAVE_SYNTHETIC_PDF) {
         await writeFile(process.env.DOCUMENT_QA_SAVE_SYNTHETIC_PDF,file.buffer);
       }
@@ -223,6 +225,18 @@ try {
                 await marker.waitFor({state:'visible',timeout:60_000});
                 assert.equal(await page.locator('[data-page="'+sourcePage+'"].pdf-citation-page').count(),0);
                 measurement.scanLineMarker = true;
+                if (rotatedFixture) {
+                  assert.ok(quotes.some(quote=>normalize(quote).includes('初級講習')));
+                  const language=page.locator('select.document-language:visible');
+                  await language.selectOption('en');
+                  const toggle=page.locator('#pdf-language-toggle');
+                  await toggle.locator('[data-language="en"]').click();
+                  const translated=page.locator('.pdf-translated-citation').first();
+                  await translated.waitFor({state:'visible',timeout:60_000});
+                  assert.match(await translated.innerText(),/beginner|introductory/i);
+                  await toggle.locator('[data-language=""]').click();
+                  await language.selectOption('ja');
+                }
               }
             }
             if (before===0 && elapsedMs>limits.firstAnswer) failures.push(Error(fixture.label+' first answer exceeded '+limits.firstAnswer+' ms'));
