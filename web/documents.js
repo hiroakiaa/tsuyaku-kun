@@ -673,7 +673,7 @@ async function reader() {
           if (!item.str?.trim()) continue;
           const [, , , ,x,y]=item.transform;
           const gap=last ? x-last.transform[4]-last.width : 0;
-          if (!last || Math.abs(y-last.transform[5])>Math.max(1,item.height*.2) ||
+          if (item.ocr || !last || Math.abs(y-last.transform[5])>Math.max(1,item.height*.2) ||
               gap>item.height*(compact ? .4 : 1) || x<last.transform[4]) lines.push(item.str);
           else lines[lines.length-1]+=(gap>item.height*.22?' ':'')+item.str;
           last=item;
@@ -826,7 +826,7 @@ async function reader() {
       const page=await pdf.getPage(number);
       const viewport=page.getViewport({scale:1});
       const items=await pageTextRuns(page);
-      if (revision!==translationRevision || (page.rotate && items.some(item=>item.ocr))) return;
+      if (revision!==translationRevision) return;
       const normalize=text=>text.normalize('NFKC').replace(/\s/gu,'');
       let offset=0;
       const runs=items.filter(item=>item.str?.trim()).map(item=>{
@@ -835,6 +835,11 @@ async function reader() {
         return {item,start,end:offset};
       });
       const pageText=runs.map(({item})=>normalize(item.str)).join('');
+      const point=item=>{
+        if (!item.ocrBox) return viewport.convertToViewportPoint(item.transform[4],item.transform[5]);
+        const [left,top,,height]=item.ocrBox;
+        return [left*viewport.width,(top+height)*viewport.height];
+      };
       const blocks=[];
       const measuringCanvas=document.createElement('canvas');
       const context=measuringCanvas.getContext('2d');
@@ -851,13 +856,13 @@ async function reader() {
         const matched=runs.filter(run=>run.end>start && run.start<from);
         if (matched[0]?.start!==start || matched.at(-1)?.end!==from) return;
         const first=matched[0].item;
-        const [x,y]=viewport.convertToViewportPoint(first.transform[4],first.transform[5]);
+        const [x,y]=point(first);
         const height=Math.max(...matched.map(({item})=>item.height));
-        if (!height || matched.some(({item})=>Math.abs(item.transform[5]-first.transform[5])>height*.25 || item.transform[1] || item.transform[2])) return;
-        const width=Math.max(...matched.map(({item})=>viewport.convertToViewportPoint(item.transform[4],item.transform[5])[0]+item.width))-x;
+        if (!height || matched.some(({item})=>Math.abs(point(item)[1]-y)>height*.25 || item.transform[1] || item.transform[2])) return;
+        const width=Math.max(...matched.map(({item})=>point(item)[0]+item.width))-x;
         if (!(width>0)) return;
-        const nextX=runs.filter(({item})=>Math.abs(item.transform[5]-first.transform[5])<height*.5)
-          .map(({item})=>viewport.convertToViewportPoint(item.transform[4],item.transform[5])[0])
+        const nextX=runs.filter(({item})=>Math.abs(point(item)[1]-y)<height*.5)
+          .map(({item})=>point(item)[0])
           .filter(value=>value>=x+width-.1);
         const available=Math.max(width,Math.min(viewport.width-8,...nextX)-x-2);
         context.font=height+'px sans-serif';
@@ -866,7 +871,7 @@ async function reader() {
         let boxHeight=height*1.35;
         const top=y-height*1.08;
         const nextTop=Math.min(viewport.height,...runs.flatMap(({item})=>{
-          const [nextLeft,nextBaseline]=viewport.convertToViewportPoint(item.transform[4],item.transform[5]);
+          const [nextLeft,nextBaseline]=point(item);
           if (nextBaseline<=y+height*.5 || nextLeft>=x+available || nextLeft+item.width<=x) return [];
           return [nextBaseline-item.height*1.08];
         }));
