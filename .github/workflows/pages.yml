@@ -88,6 +88,12 @@ jobs:
           DOCUMENT_QA_REPORT: document-qa-dense-pdf-report.json
           DOCUMENT_QA_DENSE_FIXTURE: document-qa-dense-fixture.pdf
         run: node tools/smoke-document-qa.mjs --dense
+      - name: Save dense PDF for browser verification
+        if: ${{ !cancelled() && hashFiles('document-qa-dense-fixture.pdf') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: document-qa-dense-fixture
+          path: document-qa-dense-fixture.pdf
       - name: Verify worksheet answers and citations in the published app
         env:
           DOCUMENT_QA_REPORT: document-qa-tables-report.json
@@ -172,7 +178,6 @@ jobs:
             document-qa-long-pdf-report.json
             document-qa-long-pdf-report-comparison.md
             document-qa-dense-pdf-report.json
-            document-qa-dense-fixture.pdf
             document-qa-pdf-limits-report.json
             document-qa-tables-report.json
             document-qa-merged-report.json
