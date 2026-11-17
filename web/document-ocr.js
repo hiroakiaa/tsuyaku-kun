@@ -82,7 +82,6 @@ export async function createPdfOcr(ops) {
   }
   return {
     async readLayout(page,pageNumberItems=[]) {
-      if (page.rotate) return [];
       const size=page.getViewport({scale:1});
       const viewport=page.getViewport({scale:Math.min(3,2400/Math.max(size.width,size.height))});
       const canvas=document.createElement('canvas');
@@ -118,7 +117,9 @@ export async function createPdfOcr(ops) {
             const height=(bbox.y1-bbox.y0)/viewport.scale;
             if (width<=0 || height<=0) return [];
             const [x,y]=viewport.convertToPdfPoint(bbox.x0,bbox.y1);
-            return [{str,width,height,ocr:true,transform:[height,0,0,height,x,y]}];
+            const ocrBox=[bbox.x0/viewport.width,bbox.y0/viewport.height,
+              (bbox.x1-bbox.x0)/viewport.width,(bbox.y1-bbox.y0)/viewport.height];
+            return [{str,width,height,ocr:true,ocrBox,transform:[height,0,0,height,x,y]}];
           });
       } finally {
         canvas.width=canvas.height=0;
