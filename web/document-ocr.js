@@ -94,7 +94,7 @@ export async function createPdfOcr(ops) {
     return vertical;
   }
   return {
-    async readLayout(page,pageNumberItems=[]) {
+    async readLayout(page,pageNumberItems=[],{diagram=false}={}) {
       const size=page.getViewport({scale:1});
       const viewport=page.getViewport({scale:Math.min(3,2400/Math.max(size.width,size.height))});
       const canvas=document.createElement('canvas');
@@ -117,7 +117,30 @@ export async function createPdfOcr(ops) {
           context.fillRect(left-2,top-2,Math.max(...xs)-left+4,Math.max(...ys)-top+4);
         }
         let lines,verticalLayout=false;
-        try {
+        if (diagram) {
+          const worker=await standardWorker();
+          const {data}=await worker.recognize(canvas,{tessedit_pageseg_mode:'11'},{blocks:true});
+          lines=(data.blocks ?? []).flatMap(block=>block.paragraphs).flatMap(paragraph=>paragraph.lines)
+            .flatMap(line=>{
+              const groups=[];
+              for (const word of line.words ?? []) {
+                const previous=groups.at(-1);
+                const height=word.bbox.y1-word.bbox.y0;
+                if (word.confidence<45 || !/[\p{L}\p{N}]/u.test(word.text)) continue;
+                if (!previous || word.bbox.x0-previous.bbox.x1>height*1.6) {
+                  groups.push({text:word.text,bbox:{...word.bbox}});
+                } else {
+                  previous.text+=' '+word.text;
+                  previous.bbox.x1=word.bbox.x1;
+                  previous.bbox.y0=Math.min(previous.bbox.y0,word.bbox.y0);
+                  previous.bbox.y1=Math.max(previous.bbox.y1,word.bbox.y1);
+                }
+              }
+              return groups;
+            });
+        }
+
+        if (!diagram) try {
           const pixels=context.getImageData(0,0,canvas.width,canvas.height);
           const {findVerticalScanRegion}=await import('./document-ocr-lines.js?v=3');
           if (findVerticalScanRegion(pixels)?.wholePage) {
