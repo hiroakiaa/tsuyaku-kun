@@ -459,3 +459,23 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
   border:0;border-left:1px solid #3a3a3e;border-bottom:1px solid #3a3a3e;
   border-radius:0 0 0 14px;background:transparent;color:inherit;box-shadow:none;
 }
+
+.shell:has(.document-library){max-width:none;padding:0}
+.document-library.panel{min-height:100dvh;margin:0;border:0;border-radius:0;box-shadow:none}
+.document-library .library-heading{flex-wrap:nowrap;justify-content:flex-start;gap:.5rem;margin-bottom:1rem}
+.library-heading h1{font-size:clamp(.95rem,4vw,1.3rem);min-width:0}
+#library-language select{
+  max-width:7rem;min-height:44px;padding:.2rem;color:inherit;
+  border:0;border-bottom:1px solid currentColor;border-radius:0;background:transparent;
+}
+.library-tools{margin-inline-start:auto;display:flex;gap:.25rem;flex:none}
+.library-tools button{width:44px;height:44px;padding:0}
+.library-tools button[hidden]{display:none}
+#library-close{border:0;border-left:1px solid #3a3a3e;border-bottom:1px solid #3a3a3e;border-radius:0 0 0 14px;background:transparent}
+#library-search{width:100%;margin-bottom:.75rem}
+.library-tabs{display:flex;gap:.35rem;margin:.85rem 0 .5rem}
+.library-tabs button{flex:1;padding:.3rem .5rem}
+.library-tabs button[aria-pressed=true]{background:var(--qa-accent);color:#251d30}
+.library-order{margin-top:.4rem}
+.library-order button{min-height:40px;background:transparent;border-color:transparent}
+.library-order button[aria-pressed=true]{background:transparent;color:var(--ink);border-bottom-color:var(--qa-accent);border-radius:0}

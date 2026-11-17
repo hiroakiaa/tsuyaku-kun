@@ -160,15 +160,16 @@ function filterLibrary(entries) {
   const normalize = value => value.normalize('NFKC').toLowerCase();
   const term = normalize($('#library-search').value.trim());
   const createdAt = entry => entry.createdAt ?? (entry.expires ? entry.expires-30*86400000 : 0);
-  const sort = $('#library-sort').value;
-  return entries.filter(entry=>normalize(entry.title).includes(term)).sort((a,b)=>{
-    if (sort==='title') return a.title.localeCompare(b.title,'ja');
-    if (sort==='recent') {
-      const difference = (readingPosition(b.id).opened ?? 0)-(readingPosition(a.id).opened ?? 0);
-      if (difference) return difference;
-    }
-    return createdAt(b)-createdAt(a);
-  });
+  const viewedOnly=$('#library-viewed').getAttribute('aria-pressed')==='true';
+  return entries.filter(entry=>normalize(entry.title).includes(term))
+    .map(entry=>({entry,opened:readingPosition(entry.id).opened ?? 0}))
+    .filter(({opened})=>!viewedOnly || opened>0)
+    .sort((a,b)=>(viewedOnly ? b.opened-a.opened : 0) || createdAt(b.entry)-createdAt(a.entry))
+    .map(({entry})=>entry);
+}
+
+function emptyLibraryMessage() {
+  return $('#library-search').value.trim() ? '一致する資料がありません。' : '閲覧履歴はまだありません。';
 }
 
 function documentLibrary() {
@@ -190,7 +191,7 @@ function documentLibrary() {
   function render() {
     list.replaceChildren();
     const matches = filterLibrary(entries);
-    if (!matches.length) append(list,'li',entries.length ? '一致する資料がありません。' : '保管した資料はまだありません。','fine');
+    if (!matches.length) append(list,'li',entries.length ? emptyLibraryMessage() : '保管した資料はまだありません。','fine');
     for (const entry of matches) {
       const card = append(list,'li','','library-card');
       const icon = append(card,'span','','library-icon');
@@ -218,7 +219,8 @@ function documentLibrary() {
   }
   if (list) {
     $('#library-search').addEventListener('input',render);
-    $('#library-sort').addEventListener('change',render);
+    $('#library-all').addEventListener('click',render);
+    $('#library-viewed').addEventListener('click',render);
     render();
   }
   return add;
@@ -340,7 +342,7 @@ async function reader() {
     const syncFullscreen=()=>{
       const open=dialog.open||askDialog.open;
       const host=window.frameElement?.closest('dialog.documents-dialog');
-      if (host) host.classList.toggle('document-fullscreen',open);
+      if (host && host.id!=='documents-dialog') host.classList.toggle('document-fullscreen',open);
       else window.parent.postMessage({type:'document-fullscreen',open},location.origin);
     };
     const observer=new MutationObserver(syncFullscreen);
@@ -1901,8 +1903,39 @@ async function reader() {
 try {
   if (!id && !new URLSearchParams(location.search).has('create')) {
     show('#library');
-    addLanguagePicker($('.library-filters'));
-    installLocalIcons($('#content'));
+    addLanguagePicker($('#library-language'));
+    installLocalIcons(content);
+    const search=$('#library-search'), searchToggle=$('#library-search-toggle');
+    searchToggle.append(localIcon('magnifying-glass'));
+    searchToggle.onclick=()=>{
+      const panel=$('#library-search-panel');
+      panel.hidden=!panel.hidden;
+      searchToggle.setAttribute('aria-expanded',String(!panel.hidden));
+      if (panel.hidden) {
+        search.value='';
+        search.dispatchEvent(new Event('input'));
+      } else search.focus();
+    };
+    search.addEventListener('keydown',event=>{
+      if (event.key==='Escape') { event.preventDefault(); searchToggle.click(); searchToggle.focus(); }
+    });
+    const close=$('#library-close');
+    close.hidden=window.parent===window;
+    close.onclick=()=>window.parent.postMessage({type:'document-library-close'},location.origin);
+    for (const [active,inactive] of [['library-device','library-shared'],['library-shared','library-device']]) {
+      $('#'+active).onclick=()=>{
+        $('#'+active).setAttribute('aria-pressed','true');
+        $('#'+inactive).setAttribute('aria-pressed','false');
+        $('#'+active+'-panel').hidden=false;
+        $('#'+inactive+'-panel').hidden=true;
+      };
+    }
+    for (const [active,inactive] of [['library-all','library-viewed'],['library-viewed','library-all']]) {
+      $('#'+active).addEventListener('click',()=>{
+        $('#'+active).setAttribute('aria-pressed','true');
+        $('#'+inactive).setAttribute('aria-pressed','false');
+      });
+    }
     documentLibrary();
     try {
       const entries = await request('/documents/library');
@@ -1911,7 +1944,7 @@ try {
         const list = $('#shared-list');
         list.replaceChildren();
         const matches = filterLibrary(entries);
-        $('#shared-status').textContent = matches.length ? '' : entries.length ? '一致する資料がありません。' : '公開されている資料はありません。';
+        $('#shared-status').textContent = matches.length ? '' : entries.length ? emptyLibraryMessage() : '公開されている資料はありません。';
         for (const entry of matches) {
         const card = append(list,'li','','library-card');
         const icon = append(card,'span','','library-icon');
@@ -1922,7 +1955,8 @@ try {
         }
       };
       $('#library-search').addEventListener('input',renderShared);
-      $('#library-sort').addEventListener('change',renderShared);
+      $('#library-all').addEventListener('click',renderShared);
+      $('#library-viewed').addEventListener('click',renderShared);
       renderShared();
     } catch (error) {
       $('#shared-status').textContent = error.message;
