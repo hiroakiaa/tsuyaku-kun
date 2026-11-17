@@ -75,6 +75,10 @@ try {
       ? [{label:'受付',answer:'入口の右です。',sources:[{page:4,quote:documentPages[3]}]},
          {label:'休館日',answer:null,sources:[]}]
       : [{label:'休館日',answer:'火曜日です。',sources:[{page:16,quote:documentPages[15]}]}];
+    if (JSON.parse(body).stream) {
+      const data = {choices:[{delta:{content:JSON.stringify({items})},finish_reason:'stop'}]};
+      return new Response('data: '+JSON.stringify(data)+'\n\ndata: [DONE]\n\n');
+    }
     return Response.json({choices:[{finish_reason:'stop',message:{content:JSON.stringify({items})}}]});
   };
   const environment={...env,AI:undefined,ROOMS:{...env.ROOMS,get:()=>({
@@ -89,6 +93,20 @@ try {
     ['受付','入口の右です。',4],
     ['休館日','火曜日です。',16],
   ]);
+  calls=0;
+  const streamed=await documents(new Request('https://test/documents/20000000-0000-0000-0000-000000000000/ask',{
+    method:'POST',headers:{Accept:'application/x-ndjson'},
+    body:JSON.stringify({question:'受付の場所と休館日を教えてください。'}),
+  }),environment,{uid:'author'});
+  const events=(await streamed.text()).trim().split('\n').map(JSON.parse);
+  const first=events.findIndex(event=>event.item?.answer==='入口の右です。');
+  const review=events.findIndex(event=>event.status==='資料全体を確認しています…');
+  const replacement=events.findIndex(event=>event.replaceItems?.some(item=>item.answer==='火曜日です。'));
+  assert.equal(calls,2);
+  assert.ok(first>=0 && first<review && review<replacement,JSON.stringify(events));
+  assert.ok(events.slice(0,replacement).every(event=>!event.item || event.item.answer));
+  assert.deepEqual(events[replacement].replaceItems.map(item=>item.evidence[0].page),[4,16]);
+  assert.equal(events.at(-1).done,true);
 } finally {
   globalThis.fetch=originalFetch;
 }
