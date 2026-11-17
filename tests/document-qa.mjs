@@ -545,3 +545,25 @@ console.log('PASS PDF translation cache keys only change for edited pages or lan
     assert.match(item.evidence[1].quote,/Weekday admission.*Weekend admission/);
   }
 }
+
+{
+  const pages=['初級講習の受講料は320円です。','上級講習の受講料は760円です。'];
+  const environment={ROOMS:{idFromName:id=>id,get:()=>({
+    fetch:async url=>{
+      assert.ok(url.endsWith('/data'),'Course fees must use their verified source');
+      return Response.json({pages,sourceType:'pdf',owner:'author'});
+    },
+  })}};
+  const question='受講料を一つ教えてください。';
+  for (const [text,previousQuestion,answer,citations] of [
+    [question,undefined,'初級講習・上級講習のうち、どれですか？',[1,2]],
+    ['上級講習です。',question,'760円',[2]],
+  ]) {
+    const response=await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
+      method:'POST',body:JSON.stringify({question:text,previousQuestion}),
+    }),environment,{uid:'author'});
+    const [item]=(await response.json()).items;
+    assert.equal(item.answer,answer);
+    assert.deepEqual(item.evidence.map(source=>source.page),citations);
+  }
+}

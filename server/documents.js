@@ -327,6 +327,24 @@ function lookupFeeTableCell(pages,question) {
   }
   return matches.length===1 ? matches[0] : null;
 }
+function lookupCourseFee(pages,question,previousQuestion) {
+  const bareFee = /^(?:受講料|参加費)(?:を(?:一つ|ひとつ)?教えて(?:ください)?|は(?:いくら|何円)(?:ですか)?)?[。？?]?$/u;
+  const current = normalized(question);
+  const following = typeof previousQuestion==='string' && bareFee.test(normalized(previousQuestion));
+  if (!following && !bareFee.test(current)) return null;
+  const candidates=pages.flatMap((page,index)=>{
+    const quote=page.trim();
+    const match=/^([\p{L}\p{N}]{2,24}(?:講習|講座|コース))の(受講料|参加費)は([0-9][0-9,]*円)です。?$/u.exec(normalized(quote));
+    return match ? [{name:match[1],field:match[2],amount:match[3],page:index+1,quote}] : [];
+  }).filter(item=>(following ? normalized(previousQuestion) : current).startsWith(item.field));
+  if (candidates.length<2 || candidates.length>4 || new Set(candidates.map(item=>item.name)).size!==candidates.length) return null;
+  const selected=following ? candidates.find(item=>current.replace(/(?:です)?[。？?]?$/u,'')===item.name) : null;
+  if (following && !selected) return null;
+  if (selected) return {label:selected.name+'の'+selected.field,answer:selected.amount,evidence:[{page:selected.page,quote:selected.quote}]};
+  return {label:'講習の確認',answer:candidates.map(item=>item.name).join('・')+'のうち、どれですか？',
+    evidence:candidates.map(({page,quote})=>({page,quote}))};
+}
+
 function lookupExplicitYenFee(pages,question) {
   const query=question.normalize('NFKC').replace(/\s/gu,'').replace(/[?？。]$/u,'');
   const match=/^([\p{L}\p{N}]{2,30}の[\p{L}]{1,16}(?:費|料|料金|手数料))は(?:いくら|何円)(?:ですか)?$/u.exec(query);
@@ -1147,7 +1165,9 @@ export async function documents(request,env,auth) {
             JSON.stringify(headings(priorItems))===JSON.stringify(headings(nextItems))) worksheetQuestion = candidate;
       }
     }
-    const items = groupedFee ? [groupedFee] : lookupItems(worksheetQuestion);
+    const courseFee = !language && record.sourceType==='pdf' ? lookupCourseFee(record.pages,currentQuestion,previousQuestion) : null;
+    const directFee = groupedFee ?? courseFee;
+    const items = directFee ? [directFee] : lookupItems(worksheetQuestion);
     if (items.length) {
       if (request.headers.get('Accept')==='application/x-ndjson') {
         return new Response([...items.map(item=>JSON.stringify({item})),JSON.stringify({done:true})].join('\n')+'\n',{
