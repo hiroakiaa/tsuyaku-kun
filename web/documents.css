@@ -481,7 +481,20 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
 .library-order button{min-height:40px;background:transparent;border-color:transparent}
 .library-order button[aria-pressed=true]{background:transparent;color:var(--ink);border-bottom-color:var(--qa-accent);border-radius:0}
 
-#points[open]{width:min(44rem,calc(100% - 1.5rem));max-height:85dvh;overflow:auto}
+#points{
+  position:fixed;inset:0 auto 0 0;margin:0;
+  width:min(32rem,calc(100% - 1.5rem));max-width:none;
+  height:100dvh;max-height:none;overflow:auto;
+  border-radius:0 1rem 1rem 0;
+}
+@media(prefers-reduced-motion:no-preference){
+  #points{
+    transform:translateX(-100%);
+    transition:transform .24s ease,display .24s allow-discrete,overlay .24s allow-discrete;
+  }
+  #points[open]{transform:translateX(0)}
+  @starting-style{#points[open]{transform:translateX(-100%)}}
+}
 #points .reader-heading{margin-bottom:1rem}
 #pdf-dialog .pdf-bar #pdf-summary{width:auto;min-height:44px;padding:.25rem .55rem;border-radius:.5rem;white-space:nowrap}
 
