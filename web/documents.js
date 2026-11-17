@@ -664,6 +664,23 @@ async function reader() {
       };
     }
   }
+  const diagramTextLayers=new WeakMap();
+  async function diagramTextRuns(page,items) {
+    if (!items.some(item=>item.str?.trim()) || items.some(item=>item.ocr)) return [];
+    if (!diagramTextLayers.has(page)) diagramTextLayers.set(page,(async()=>{
+      const {OPS}=await pdfLibrary();
+      const {fnArray,argsArray}=await page.getOperatorList();
+      if (!fnArray.some((op,index)=>op===OPS.paintImageXObject &&
+          argsArray[index]?.[1]>=300 && argsArray[index]?.[2]>=150)) return [];
+      const {createPdfOcr}=await import('./document-ocr.js?v=100');
+      const reader=await createPdfOcr(OPS);
+      try {
+        const runs=await reader.readLayout(page,items);
+        return runs.filter(run=>/[\p{L}\p{N}]{2}/u.test(run.str.replace(/\s/gu,''))).slice(0,80);
+      } finally { await reader.close(); }
+    })().catch(()=>[]));
+    return diagramTextLayers.get(page);
+  }
   const pdfTranslationSources=new Map();
   function pdfTranslationSource(number,compact=false) {
     const key=number+":"+compact;
@@ -682,7 +699,7 @@ async function reader() {
           else lines[lines.length-1]+=(gap>item.height*.22?' ':'')+item.str;
           last=item;
         }
-        return lines.join('\n');
+        return {layout:lines.join('\n'),diagram:(await diagramTextRuns(page,items)).map(item=>item.str).join('\n')};
       })().catch(()=>undefined));
     }
     return pdfTranslationSources.get(key);
@@ -693,14 +710,14 @@ async function reader() {
     if (!pageTranslations.has(key)) {
       pageTranslations.set(key,(async()=>{
         const layoutText=sourceType==='pdf' ? await pdfTranslationSource(page,retry) : undefined;
-        const translate=layout=>request(api+'/translate',{
+        const translate=(layout,diagramText)=>request(api+'/translate',{
           method:'POST',
           signal:AbortSignal.timeout(60_000),
           headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({page,language,layoutText:layout}),
+          body:JSON.stringify({page,language,layoutText:layout,diagramText}),
         });
         if (layoutText) {
-          try { return await translate(layoutText); }
+          try { return await translate(layoutText.layout,layoutText.diagram); }
           catch { return translate(); }
         }
         return translate();

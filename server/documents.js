@@ -975,7 +975,7 @@ export async function documents(request,env,auth) {
   if (action==='translate') {
     const input=await request.text();
     if (input.length>MAX_TEXT*2) return fail('翻訳するページと言語を確認してください。',413);
-    const {page,language:code,layoutText}=JSON.parse(input);
+    const {page,language:code,layoutText,diagramText}=JSON.parse(input);
     const language=answerLanguages.get(code);
     const storedText=Number.isInteger(page) && page>0 && page<=(record.originalPageCount ?? record.pages.length) ? record.pages[page-1] : null;
     if (!language || typeof storedText!=='string') return fail('翻訳するページと言語を確認してください。');
@@ -989,12 +989,16 @@ export async function documents(request,env,auth) {
         return storedText.includes(' | ') && storedCells.length>=3 &&
           JSON.stringify(storedCells)===JSON.stringify(cells(layoutText));
       })());
-    const text=hasLayout ? layoutText : storedText;
+    const includesDiagram=hasLayout && typeof diagramText==='string' && diagramText.length>0 &&
+      diagramText.length<=4000 && diagramText.split('\n').length<=80 && layoutText.length+diagramText.length+1<=MAX_TEXT;
+    const text=hasLayout ? (includesDiagram ? layoutText+'\n'+diagramText : layoutText) : storedText;
     if (!text.trim()) return reply({text:'',source:[],lines:[],reuse:'empty'});
     const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([hasLayout ? 6 : 2,DOCUMENT_MODEL,code,text])));
     const key=Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
     const url='https://room/document/page-translation/'+key;
-    return target.fetch(url,{method:'POST',body:JSON.stringify({id,text,language,hasLayout})});
+    const translated=await target.fetch(url,{method:'POST',body:JSON.stringify({id,text,language,hasLayout})});
+    if (!includesDiagram || !translated.ok) return translated;
+    return reply({...await translated.json(),includesDiagram:true});
   }
   if (action==='text' && request.method==='GET') {
     if (!['pdf','xlsx','docx'].includes(record.sourceType ?? 'pdf')) return fail('資料の本文が見つかりません。',404);
