@@ -93,9 +93,12 @@ export async function createPdfOcr(ops) {
         context.fillStyle='#fff';
         for (const item of pageNumberItems) {
           if (!item.str?.trim() || item.transform[1] || item.transform[2]) continue;
-          const [x,y]=viewport.convertToViewportPoint(item.transform[4],item.transform[5]);
-          const height=item.height*viewport.scale;
-          context.fillRect(x-2,y-height*1.2-2,item.width*viewport.scale+4,height*1.4+4);
+          const [,,,,x,y]=item.transform;
+          const [x0,y0,x1,y1]=viewport.convertToViewportRectangle([
+            x,y-item.height*.2,x+item.width,y+item.height*1.2,
+          ]);
+          context.fillRect(Math.min(x0,x1)-2,Math.min(y0,y1)-2,
+            Math.abs(x1-x0)+4,Math.abs(y1-y0)+4);
         }
         let lines;
         try {

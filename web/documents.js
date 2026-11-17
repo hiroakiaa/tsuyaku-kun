@@ -120,7 +120,7 @@ async function extract(file, status) {
       const {requiresOcr,pageNumberOnly}=pdfPageTextStatus(text,n);
       if (requiresOcr) {
         status.textContent = 'スキャンページを端末で読んでいます… ' + n + ' / ' + pdf.numPages;
-        const {createPdfOcr} = await import('./document-ocr.js?v=97');
+        const {createPdfOcr} = await import('./document-ocr.js?v=98');
         ocr ??= await createPdfOcr((await pdfLibrary()).OPS);
         if (page.rotate) {
           const runs=await ocr.readLayout(page,pageNumberOnly ? parts : []).catch(()=>[]);
@@ -555,7 +555,7 @@ async function reader() {
     if (!requiresOcr) return items;
     if (!scanLayouts.has(number)) {
       scanLayouts.set(number,(async()=>{
-        const {createPdfOcr}=await import('./document-ocr.js?v=97');
+        const {createPdfOcr}=await import('./document-ocr.js?v=98');
         const reader=await createPdfOcr((await pdfLibrary()).OPS);
         try {
           const runs=await reader.readLayout(page,pageNumberOnly ? items : []);
