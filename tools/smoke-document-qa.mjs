@@ -100,7 +100,11 @@ try {
       await language.selectOption('en');
       const toggle=page.locator('#pdf-language-toggle');
       await toggle.locator('[data-language="en"]').click();
-      await page.locator('.pdf-translation-layout[data-page="2"] .pdf-layout-line').first().waitFor({timeout:65_000});
+      await page.waitForFunction(() => {
+        const translation = document.querySelector('#pdf-translation');
+        return translation.hidden && Boolean(translation.dataset.translationReuse);
+      }, null, {timeout:65_000});
+      await waitForOriginalMarker();
       assert.equal(await page.locator('#pdf-page').inputValue(),'2');
       await toggle.locator('[data-language=""]').click();
       await page.locator('#pdf-translation').waitFor({state:'hidden'});
