@@ -591,10 +591,13 @@ async function reader() {
         const [x,y] = viewport.convertToViewportPoint(item.transform[4],item.transform[5]);
         const mark = append(slot,'span','','pdf-citation-mark');
         firstMark ??= mark;
-        mark.style.left = x/viewport.width*100+'%';
-        mark.style.top = (y-item.height*viewport.scale)/viewport.height*100+'%';
-        mark.style.width = item.width*viewport.scale/viewport.width*100+'%';
-        mark.style.height = item.height*viewport.scale/viewport.height*100+'%';
+        const [left,top,width,height]=item.ocrBox ?? [x/viewport.width,
+          (y-item.height*viewport.scale)/viewport.height,item.width*viewport.scale/viewport.width,
+          item.height*viewport.scale/viewport.height];
+        mark.style.left=left*100+'%';
+        mark.style.top=top*100+'%';
+        mark.style.width=width*100+'%';
+        mark.style.height=height*100+'%';
         visibleCitationMarks.observe(mark);
       }
       offset = end;
@@ -823,7 +826,7 @@ async function reader() {
       const page=await pdf.getPage(number);
       const viewport=page.getViewport({scale:1});
       const items=await pageTextRuns(page);
-      if (revision!==translationRevision) return;
+      if (revision!==translationRevision || (page.rotate && items.some(item=>item.ocr))) return;
       const normalize=text=>text.normalize('NFKC').replace(/\s/gu,'');
       let offset=0;
       const runs=items.filter(item=>item.str?.trim()).map(item=>{
