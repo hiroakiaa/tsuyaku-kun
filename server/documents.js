@@ -1055,7 +1055,13 @@ export async function documents(request,env,auth) {
       return reply({items:[item],answer:item.answer,pages:[...new Set(item.evidence.map(source=>source.page))]});
     }
   }
-  if (!language && (record.sourceType==='pdf' || record.sourceType==='xlsx')) {
+  const groupedFeeLanguage = record.sourceType==='pdf' && (!language || answerLanguage==='en');
+  const dayReply = /^(?:on (?:a |the )?)?(?:weekdays?|weekends?)[.!?]?$/iu.test(currentQuestion.trim());
+  const priorFee = dayReply && groupedFeeLanguage && typeof previousQuestion==='string' && previousQuestion.length<=300
+    ? lookupGroupedAdmissionFee(record.pages,previousQuestion) : null;
+  const feeQuestion = priorFee?.answer==='Are you visiting on a weekday or a weekend?' ? previousQuestion+' '+currentQuestion : currentQuestion;
+  const groupedFee = groupedFeeLanguage ? lookupGroupedAdmissionFee(record.pages,feeQuestion) : null;
+  if (groupedFee || !language && (record.sourceType==='pdf' || record.sourceType==='xlsx')) {
     const yearReply = /^(?:令和|R)(\d+)(?:年度?)?(?:です)?[。.]?$/iu.exec(normalized(currentQuestion));
     const previous = yearReply && typeof previousQuestion==='string' && previousQuestion.length<=300
       ? lookupWorksheetCell(record.pages,previousQuestion) ?? lookupAdmissionCell(record.pages,previousQuestion) : null;
@@ -1095,7 +1101,7 @@ export async function documents(request,env,auth) {
       const worksheetItem = lookupWorksheetCell(record.pages,text);
       return worksheetItem
         ? {...worksheetItem,worksheetContext:text}
-        : lookupAdmissionCell(record.pages,text) ?? (record.sourceType==='pdf' ? lookupTimetableCell(record.pages,text) ?? lookupGroupedAdmissionFee(record.pages,text) ?? lookupFeeTableCell(record.pages,text) ?? lookupExplicitYenFee(record.pages,text) : null);
+        : lookupAdmissionCell(record.pages,text) ?? (record.sourceType==='pdf' ? lookupTimetableCell(record.pages,text) ?? lookupFeeTableCell(record.pages,text) ?? lookupExplicitYenFee(record.pages,text) : null);
     };
     const lookupItems = worksheetQuestion => {
       const sharedQuestion = /^(.+?)について[、,]?\s*それぞれ(?:の|[、,])?\s*(.+)$/u.exec(normalized(worksheetQuestion));
@@ -1141,11 +1147,7 @@ export async function documents(request,env,auth) {
             JSON.stringify(headings(priorItems))===JSON.stringify(headings(nextItems))) worksheetQuestion = candidate;
       }
     }
-    const dayReply = /^(?:on (?:a |the )?)?(?:weekdays?|weekends?)[.!?]?$/iu.test(currentQuestion.trim());
-    const priorFee = dayReply && record.sourceType==='pdf' && typeof previousQuestion==='string' && previousQuestion.length<=300
-      ? lookupGroupedAdmissionFee(record.pages,previousQuestion) : null;
-    if (priorFee?.answer==='Are you visiting on a weekday or a weekend?') worksheetQuestion=previousQuestion+' '+currentQuestion;
-    const items = lookupItems(worksheetQuestion);
+    const items = groupedFee ? [groupedFee] : lookupItems(worksheetQuestion);
     if (items.length) {
       if (request.headers.get('Accept')==='application/x-ndjson') {
         return new Response([...items.map(item=>JSON.stringify({item})),JSON.stringify({done:true})].join('\n')+'\n',{

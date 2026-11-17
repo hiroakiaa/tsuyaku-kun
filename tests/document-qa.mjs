@@ -316,7 +316,7 @@ const yearlyAdmissionEnv = {ROOMS:{idFromName:name=>name,get:()=>({
   fetch:async url=>Response.json(url.endsWith('/data') ? {pages:yearlyAdmissionPages,owner:'author',sourceType:'xlsx'} : null),
 })}};
 const askAdmission = async (question,previousQuestion)=>(await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{
-  method:'POST',body:JSON.stringify({question,previousQuestion}),
+  method:'POST',body:JSON.stringify({question,previousQuestion,answerLanguage:'en'}),
 }),yearlyAdmissionEnv,{uid:'author'})).json();
 const ambiguousAdmission = '青空高校の一般入試の基準は？';
 const clarification = await askAdmission(ambiguousAdmission);
