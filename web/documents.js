@@ -991,7 +991,29 @@ async function reader() {
           if (alpha===255 && Math.min(red,green,blue)>=180) {
             const background='rgb('+red+' '+green+' '+blue+')';
             block.style.backgroundColor=background;
-            if (diagramText) block.style.outline=Math.min(boxHeight*.12,1.4)/unit+'cqw solid '+background;
+            if (diagramText) {
+              const right=x+width;
+              const neighbor=Math.min(viewport.width,...blocks
+                .filter(other=>other.x>=right && other.top<top+boxHeight && other.top+other.boxHeight>top)
+                .map(other=>other.x));
+              const start=Math.ceil(right*scale);
+              const end=Math.floor(Math.min(neighbor-1,right+boxHeight*2)*scale);
+              const upper=Math.max(0,Math.floor(top*scale));
+              const lower=Math.min(canvas.height,Math.ceil((top+boxHeight*1.15)*scale));
+              let extension=0;
+              if (end>start && lower>upper) {
+                const pixels=rendered.getImageData(start,upper,end-start,lower-upper).data;
+                for (let offset=0;offset<pixels.length;offset+=4) {
+                  if (pixels[offset]+pixels[offset+1]+pixels[offset+2]<red+green+blue-150)
+                    extension=Math.max(extension,(offset/4)%(end-start)+1);
+                }
+              }
+              if (extension) {
+                rendered.fillStyle=background;
+                rendered.fillRect(start,upper,extension,lower-upper);
+              }
+              block.style.outline=Math.min(boxHeight*.12,1.4)/unit+'cqw solid '+background;
+            }
           }
         }
         if (line.includes('\n')) { block.style.whiteSpace='pre'; block.style.lineHeight='1.1'; }
