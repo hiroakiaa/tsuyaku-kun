@@ -211,7 +211,7 @@ async function retrievalPassages(env,pages,question,index,target,onSemantic) {
 }
 
 const summaryLevelInstructions={
-  beginner:'初学者向けに、難しい言葉を平易に説明してください。理解を助ける場合に限り生活やスポーツの短いたとえを analogy に入れてください。たとえと資料の事実は混ぜないでください。',
+  beginner:'初学者向けに、難しい言葉を平易に説明してください。少なくとも1項目に、生活やスポーツの短いたとえを追加してください。その項目の JSON に "analogy":"たとえの文" を必ず入れてください。たとえと資料の事実は混ぜないでください。',
   expert:'専門家向けに、前提、判断基準、例外、数値、単位、表の注記まで資料に沿って具体的に示してください。',
 };
 const pendingSummaries=new Map();
@@ -1450,7 +1450,7 @@ export async function documentStorage(request,storage,env) {
   if (level && request.method==='POST') {
     const revision=record.revision ?? 0;
     const existing=record.levelSummaries?.[level];
-    if (existing?.revision===revision) return reply(existing.items);
+    if (existing?.revision===revision && (level!=='beginner' || existing.items.some(item=>item.analogy))) return reply(existing.items);
     const key=[await request.text(),revision,level].join(':');
     if (!pendingSummaries.has(key)) pendingSummaries.set(key,(async()=>{
       const keys=Array.from({length:record.textParts ?? 0},(_,index)=>'document-text:'+index);
@@ -1458,7 +1458,7 @@ export async function documentStorage(request,storage,env) {
       const pages=chunks ? JSON.parse(keys.map(key=>chunks.get(key)).join('')) : record.pages;
       const result=await generate(env,pages,undefined,record.materials ?? [],undefined,summaryPassages(pages),undefined,'summary',undefined,false,level);
       const items=summaryItems(result,pages,10,level);
-      if (!items.length) throw Error('要約を確認できませんでした。');
+      if (!items.length || (level==='beginner' && !items.some(item=>item.analogy))) throw Error('要約を確認できませんでした。');
       await storage.transaction(async tx=>{
         const current=await tx.get('document');
         if (current && (current.revision ?? 0)===revision) {
