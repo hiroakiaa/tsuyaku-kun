@@ -610,3 +610,18 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
   #pdf-language-picker:focus-within .pdf-language-native { outline: 2px solid currentColor; }
   .pdf-navigation > :is(#pdf-prev,#pdf-next) { min-width: 44px; padding-inline: .4rem; }
 }
+
+@media (prefers-reduced-motion: no-preference) {
+  .document-library,
+  #ask-dialog[open],
+  #material-dialog[open] {
+    animation: document-view-enter .16s ease-out both;
+  }
+  #material-dialog[open]::backdrop {
+    animation: document-view-enter .16s ease-out both;
+  }
+}
+@keyframes document-view-enter {
+  from { opacity: .3; }
+  to { opacity: 1; }
+}
