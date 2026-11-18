@@ -573,3 +573,40 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
   #pdf-dialog .pdf-navigation > .pdf-add { display: none; }
   .ask-heading form { margin-inline-start: auto; }
 }
+
+.pdf-language-native { display: none; }
+@media (max-width:799px) {
+  #pdf-language-picker {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 3.5rem;
+  }
+  #pdf-language-picker .pdf-language-native {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .25rem;
+    width: 100%;
+    min-height: 44px;
+    padding-inline: .25rem;
+    border-bottom: 1px solid currentColor;
+    overflow-wrap: anywhere;
+  }
+  #pdf-language-picker .pdf-language-native::after {
+    content: "";
+    flex: 0 0 .38rem;
+    height: .38rem;
+    border: solid currentColor;
+    border-width: 0 1px 1px 0;
+    transform: rotate(45deg);
+  }
+  #pdf-language-picker select {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+  }
+  #pdf-language-picker:focus-within .pdf-language-native { outline: 2px solid currentColor; }
+  .pdf-navigation > :is(#pdf-prev,#pdf-next) { min-width: 44px; padding-inline: .4rem; }
+}

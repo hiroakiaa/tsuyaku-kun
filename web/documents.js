@@ -37,6 +37,16 @@ function addLanguagePicker(parent) {
     window.dispatchEvent(new Event('document-language-change'));
   });
   parent.prepend(select);
+  if (parent.id==='pdf-language-picker') {
+    const label=append(parent,'span','','pdf-language-native');
+    label.setAttribute('aria-hidden','true');
+    const syncLabel=()=>{
+      label.textContent=documentLanguages.find(language=>language.code===select.value)?.labelNative ?? '';
+    };
+    select.addEventListener('change',syncLabel);
+    window.addEventListener('storage',syncLabel);
+    syncLabel();
+  }
 }
 let pdfModule;
 let authModule, session;
