@@ -365,11 +365,42 @@ async function reader() {
   let summaryReady=doc.summaryReady;
   let summaryCheck;
   let summaryItems=doc.items;
+  let summaryLevel='standard';
+  const summaryLevels=new Map();
+  const summaryLevelStatus=$('#summary-level-status');
+  function currentSummary() {
+    return summaryLevel==='standard' ? summaryItems : summaryLevels.get(summaryLevel);
+  }
+  async function openSummaryLevel(level) {
+    summaryLevel=level;
+    for (const button of points.querySelectorAll('[data-summary-level]')) {
+      button.setAttribute('aria-pressed',String(button.dataset.summaryLevel===level));
+    }
+    summaryLevelStatus.hidden=true;
+    renderSummary(currentSummary());
+    if (level==='standard' || summaryLevels.has(level)) return;
+    summaryLevelStatus.hidden=false;
+    summaryLevelStatus.textContent='要約を準備しています…';
+    try {
+      const items=await request(api+'/summary?level='+level,{method:'POST'});
+      summaryLevels.set(level,items);
+      if (summaryLevel===level) {
+        summaryLevelStatus.hidden=true;
+        renderSummary(items);
+      }
+    } catch {
+      if (summaryLevel===level) summaryLevelStatus.textContent='要約を準備できませんでした。同じタブを押すと再試行できます。';
+    }
+  }
+  for (const button of points.querySelectorAll('[data-summary-level]')) {
+    button.onclick=()=>void openSummaryLevel(button.dataset.summaryLevel);
+  }
   const sectionTranslations=new Map();
   function translatedSection(section,language) {
-    const key=section+':'+language;
+    const level=section==='summary' ? summaryLevel : undefined;
+    const key=section+':'+language+':'+(level ?? '');
     if (!sectionTranslations.has(key)) {
-      const result=request(api+'/translate',{method:'POST',body:JSON.stringify({section,language})})
+      const result=request(api+'/translate',{method:'POST',body:JSON.stringify({section,language,level})})
         .catch(()=>{sectionTranslations.delete(key);return null;});
       sectionTranslations.set(key,result);
     }
@@ -393,18 +424,19 @@ async function reader() {
     return applied===labels.length;
   }
   function prepareSummaryTranslation() {
-    if (selectedLanguage && selectedLanguage!=='ja' && summaryItems?.length) {
+    if (selectedLanguage && selectedLanguage!=='ja' && currentSummary()?.length) {
       void translatedSection('summary',selectedLanguage);
     }
   }
   window.addEventListener('document-language-change',()=>{
     prepareSummaryTranslation();
-    renderSummary(summaryItems);
+    renderSummary(currentSummary());
   });
   prepareSummaryTranslation();
   $('#pdf-summary').onclick=()=>{
     points.showModal();
-    renderSummary(summaryItems);
+    renderSummary(currentSummary());
+    if (summaryLevel!=='standard') { void openSummaryLevel(summaryLevel); return; }
     if (summaryReady!==false || summaryCheck) return;
     summaryStatus.hidden=false;
     summaryStatus.textContent='詳しい要約を準備しています…';
@@ -415,7 +447,7 @@ async function reader() {
           summaryItems=latest.items;
           for (const key of sectionTranslations.keys()) if (key.startsWith('summary:')) sectionTranslations.delete(key);
           prepareSummaryTranslation();
-          renderSummary(summaryItems);
+          renderSummary(currentSummary());
           summaryReady=true;
           summaryStatus.hidden=true;
           return;
@@ -1613,6 +1645,11 @@ async function reader() {
     for (const item of items ?? []) {
       const card=append(cards,'div','','card');
       labels.push(append(card,'h3',item.label),append(card,'p',item.text));
+      if (item.analogy) {
+        const example=append(card,'div','','summary-example');
+        append(example,'strong','たとえ');
+        labels.push(append(example,'p',item.analogy));
+      }
       sourceLink(card,item.source.page,item.source.quote || item.text);
     }
     summaryTranslationStatus.hidden=true;
