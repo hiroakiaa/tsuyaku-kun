@@ -212,7 +212,7 @@ async function retrievalPassages(env,pages,question,index,target,onSemantic) {
 
 const summaryLevelInstructions={
   beginner:'初学者向けに、難しい言葉を平易に説明してください。少なくとも1項目に、生活やスポーツの短いたとえを追加してください。その項目の JSON に "analogy":"たとえの文" を必ず入れてください。たとえと資料の事実は混ぜないでください。',
-  expert:'専門家向けに、前提、判断基準、例外、数値、単位、表の注記まで資料に沿って具体的に示してください。',
+  expert:'専門家向けに、前提、判断基準、例外、数値、単位、表の注記まで資料に沿って示してください。最重要の論点を最大5項目にまとめ、各項目は180字以内としてください。根拠は本文からそのままコピーした短い一節にしてください。',
 };
 const pendingSummaries=new Map();
 
