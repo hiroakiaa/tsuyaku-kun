@@ -1284,24 +1284,19 @@ async function reader() {
   window.addEventListener('pagehide',()=>window.parent !== window && window.parent.visualViewport?.removeEventListener('resize',syncKeyboard));
   $('#question').addEventListener('focus',syncKeyboard);
   $('#question').addEventListener('blur',syncKeyboard);
-  let reversed = false;
   let split = 50;
   function setSplit(value) {
     split = Math.max(25, Math.min(75, value));
     workspace.style.setProperty('--pdf-share', split + '%');
     divider.setAttribute('aria-valuenow', String(Math.round(split)));
   }
-  $('#qa-swap').onclick = () => {
-    reversed = !reversed;
-    workspace.classList.toggle('pdf-right', reversed);
-  };
   divider.onpointerdown = event => divider.setPointerCapture(event.pointerId);
   divider.onpointermove = event => {
     if (!divider.hasPointerCapture(event.pointerId)) return;
     const {left,width,top,height} = workspace.getBoundingClientRect();
     if (!wide.matches) { setSplit((event.clientY-top)/height*100); return; }
     const percent = (event.clientX-left)/width*100;
-    setSplit(reversed ? 100-percent : percent);
+    setSplit(percent);
   };
   divider.onkeydown = event => {
     if (!wide.matches && ['ArrowUp','ArrowDown'].includes(event.key)) {
@@ -1311,7 +1306,7 @@ async function reader() {
     }
     if (!wide.matches || !['ArrowLeft','ArrowRight'].includes(event.key)) return;
     event.preventDefault();
-    setSplit(split + (event.key==='ArrowRight' ? 2 : -2)*(reversed ? -1 : 1));
+    setSplit(split + (event.key==='ArrowRight' ? 2 : -2));
   };
   function syncWorkspace() {
     divider.setAttribute('aria-orientation', wide.matches ? 'vertical' : 'horizontal');
