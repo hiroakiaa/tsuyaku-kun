@@ -1324,20 +1324,35 @@ async function reader() {
     workspace.classList.remove('pdf-full');
     updateMobileControls();
   });
-  const viewport = window.visualViewport;
+  const frame = window.frameElement;
+  const viewport = (frame ? window.parent : window).visualViewport;
+  const questionInput = $('#question');
   function syncKeyboard() {
-    const editing = document.activeElement === $('#question');
-    const available = window.parent === window ? viewport?.height : window.parent.visualViewport?.height;
-    const keyboard = editing && !wide.matches && available && available < window.innerHeight - 90;
+    const frameBounds = frame?.getBoundingClientRect();
+    const layoutHeight = frameBounds?.height ?? window.innerHeight;
+    const keyboard = document.activeElement === questionInput && !wide.matches &&
+      viewport && layoutHeight - viewport.height > 90;
     workspace.classList.toggle('qa-keyboard', Boolean(keyboard));
-    if (keyboard) askDialog.style.height = available + 'px';
-    else askDialog.style.removeProperty('height');
+    if (!keyboard) {
+      askDialog.style.removeProperty('--qa-visible-top');
+      askDialog.style.removeProperty('--qa-visible-height');
+      return;
+    }
+    // Safari can pan the visual viewport when the keyboard focuses an input.
+    const frameTop = frameBounds?.top ?? 0;
+    const top = Math.max(0, viewport.offsetTop - frameTop);
+    const bottom = Math.min(layoutHeight, viewport.offsetTop + viewport.height - frameTop);
+    askDialog.style.setProperty('--qa-visible-top',top+'px');
+    askDialog.style.setProperty('--qa-visible-height',Math.max(0,bottom-top)+'px');
   }
   viewport?.addEventListener('resize',syncKeyboard);
-  if (window.parent !== window) window.parent.visualViewport?.addEventListener('resize',syncKeyboard);
-  window.addEventListener('pagehide',()=>window.parent !== window && window.parent.visualViewport?.removeEventListener('resize',syncKeyboard));
-  $('#question').addEventListener('focus',syncKeyboard);
-  $('#question').addEventListener('blur',syncKeyboard);
+  viewport?.addEventListener('scroll',syncKeyboard);
+  window.addEventListener('pagehide',()=>{
+    viewport?.removeEventListener('resize',syncKeyboard);
+    viewport?.removeEventListener('scroll',syncKeyboard);
+  });
+  questionInput.addEventListener('focus',syncKeyboard);
+  questionInput.addEventListener('blur',syncKeyboard);
   let split = 50;
   function setSplit(value) {
     split = Math.max(25, Math.min(75, value));

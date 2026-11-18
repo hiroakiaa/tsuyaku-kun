@@ -632,3 +632,12 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
 .summary-example { border-inline-start:2px solid #a88bc0; padding-inline-start:.65rem; margin-block:.65rem; }
 .summary-example p { margin-block:.25rem 0; }
 #points:has([data-summary-level="standard"][aria-pressed="false"]) #summary-status { display:none; }
+
+@media (max-width:799px) {
+  #ask-dialog {
+    top: var(--qa-visible-top, 0px);
+    bottom: auto;
+    height: var(--qa-visible-height, 100dvh);
+  }
+  #ask-form #question { font-size: max(16px, 1em); }
+}
