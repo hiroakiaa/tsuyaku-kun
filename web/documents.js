@@ -366,30 +366,41 @@ async function reader() {
   let summaryCheck;
   let summaryItems=doc.items;
   let summaryLevel='standard';
+  const summaryScope=$('#summary-scope');
+  for (let page=1;page<=doc.pageCount;page++) {
+    summaryScope.add(new Option(page+'ページ',String(page)));
+  }
+  summaryScope.onchange=()=>void openSummaryLevel(summaryLevel);
   const summaryLevels=new Map();
   const summaryLevelStatus=$('#summary-level-status');
   function currentSummary() {
-    return summaryLevel==='standard' ? summaryItems : summaryLevels.get(summaryLevel);
+    return summaryLevel==='standard' && !summaryScope.value ? summaryItems : summaryLevels.get(summaryLevel+':'+summaryScope.value);
   }
   async function openSummaryLevel(level) {
     summaryLevel=level;
+    const page=summaryScope.value;
+    const key=level+':'+page;
     for (const button of points.querySelectorAll('[data-summary-level]')) {
       button.setAttribute('aria-pressed',String(button.dataset.summaryLevel===level));
     }
     summaryLevelStatus.hidden=true;
     renderSummary(currentSummary());
-    if (level==='standard' || summaryLevels.has(level)) return;
+    if ((level==='standard' && !page) || summaryLevels.has(key)) return;
     summaryLevelStatus.hidden=false;
     summaryLevelStatus.textContent='要約を準備しています…';
     try {
-      const items=await request(api+'/summary?level='+level,{method:'POST'});
-      summaryLevels.set(level,items);
-      if (summaryLevel===level) {
+      const items=await request(api+'/summary?level='+level+(page?'&page='+page:''),{method:'POST'});
+      summaryLevels.set(key,items);
+      if (summaryLevel===level && summaryScope.value===page) {
         summaryLevelStatus.hidden=true;
         renderSummary(items);
+        if (!items.length) {
+          summaryLevelStatus.hidden=false;
+          summaryLevelStatus.textContent='このページには要約できる本文がありません。';
+        }
       }
     } catch {
-      if (summaryLevel===level) summaryLevelStatus.textContent='要約を準備できませんでした。同じタブを押すと再試行できます。';
+      if (summaryLevel===level && summaryScope.value===page) summaryLevelStatus.textContent='要約を準備できませんでした。同じタブを押すと再試行できます。';
     }
   }
   for (const button of points.querySelectorAll('[data-summary-level]')) {
@@ -398,9 +409,10 @@ async function reader() {
   const sectionTranslations=new Map();
   function translatedSection(section,language) {
     const level=section==='summary' ? summaryLevel : undefined;
-    const key=section+':'+language+':'+(level ?? '');
+    const page=section==='summary' ? Number(summaryScope.value)||undefined : undefined;
+    const key=[section,language,level,page].join(':');
     if (!sectionTranslations.has(key)) {
-      const result=request(api+'/translate',{method:'POST',body:JSON.stringify({section,language,level})})
+      const result=request(api+'/translate',{method:'POST',body:JSON.stringify({section,language,level,page})})
         .catch(()=>{sectionTranslations.delete(key);return null;});
       sectionTranslations.set(key,result);
     }
@@ -436,7 +448,7 @@ async function reader() {
   $('#pdf-summary').onclick=()=>{
     points.showModal();
     renderSummary(currentSummary());
-    if (summaryLevel!=='standard') { void openSummaryLevel(summaryLevel); return; }
+    if (summaryLevel!=='standard' || summaryScope.value) { void openSummaryLevel(summaryLevel); return; }
     if (summaryReady!==false || summaryCheck) return;
     summaryStatus.hidden=false;
     summaryStatus.textContent='詳しい要約を準備しています…';

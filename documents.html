@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#1d1d1d">
 <title>資料QA君</title>
 <link rel="stylesheet" href="web/documents.css?v=98">
-<script type="module" src="web/documents.js?v=247"></script>
+<script type="module" src="web/documents.js?v=248"></script>
 </head>
 <body><div class="shell">
 
@@ -72,7 +72,7 @@
 </dialog>
 <dialog id="points" class="panel" aria-labelledby="points-title">
 <header class="reader-heading"><h2 id="points-title" tabindex="-1" autofocus>要約</h2><form method="dialog"><button aria-label="要約を閉じる">×</button></form></header>
-<div class="summary-levels" role="group" aria-label="要約レベル"><button type="button" data-summary-level="beginner" aria-pressed="false">入門</button><button type="button" data-summary-level="standard" aria-pressed="true">標準</button><button type="button" data-summary-level="expert" aria-pressed="false">専門</button></div><p id="summary-level-status" class="fine" role="status" hidden></p><p id="summary-status" class="fine" role="status" hidden></p><p id="summary-translation-status" class="fine" role="status" hidden></p><div id="cards" class="cards"></div>
+<div class="summary-levels" role="group" aria-label="要約レベル"><button type="button" data-summary-level="beginner" aria-pressed="false">入門</button><button type="button" data-summary-level="standard" aria-pressed="true">標準</button><button type="button" data-summary-level="expert" aria-pressed="false">専門</button></div><label>要約する範囲 <select id="summary-scope"><option value="">資料全体</option></select></label><p id="summary-level-status" class="fine" role="status" hidden></p><p id="summary-status" class="fine" role="status" hidden></p><p id="summary-translation-status" class="fine" role="status" hidden></p><div id="cards" class="cards"></div>
 </dialog>
 <dialog id="ask-dialog" aria-labelledby="ask-heading"><div class="qa-workspace"><div id="qa-divider" role="separator" aria-label="列幅" aria-orientation="vertical" aria-valuemin="25" aria-valuemax="75" aria-valuenow="50" tabindex="0"></div><div class="ask-heading"><h2 id="ask-heading" tabindex="-1" autofocus></h2><div class="qa-actions"><button class="open-material qa-add" type="button" hidden>資料追加</button><form method="dialog"><button aria-label="資料を閉じる">×</button></form></div></div><div class="ask-layout">
 <div id="messages" role="log" aria-live="polite"><p class="answer-empty">回答がここに表示されます</p></div>

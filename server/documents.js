@@ -212,6 +212,7 @@ async function retrievalPassages(env,pages,question,index,target,onSemantic) {
 
 const summaryLevelInstructions={
   beginner:'初学者向けに、難しい言葉を平易に説明してください。少なくとも1項目に、生活やスポーツの短いたとえを追加してください。その項目の JSON に "analogy":"たとえの文" を必ず入れてください。たとえと資料の事実は混ぜないでください。',
+  standard:'一般の読み手に向け、重要な内容を簡潔にまとめてください。',
   expert:'専門家向けに、前提、判断基準、例外、数値、単位、表の注記まで資料に沿って示してください。最重要の論点を最大5項目にまとめ、各項目は180字以内としてください。根拠は本文からそのままコピーした短い一節にしてください。',
 };
 const pendingSummaries=new Map();
@@ -260,7 +261,7 @@ async function generate(env,pages,question,materials=[],emit,selectedPassages,me
         (operation==='summary' ? '資料全体の目的と対象者を最初にまとめ、主要な話題を読み手が行動しやすい順に最大10件に整理してください。資料にある場合は日時・手順・締切・持ち物・費用・条件を見出しごとに短くまとめてください。各項目にその内容を裏づけるページと原文の短い引用を付けてください。形式は {"items":[{"label":"見出し","text":"要約","source":{"page":1,"quote":"原文"}}]}。' :
         question ? '縦書き見出し候補がある場合は、その前後の原文を読んで該当する行を確認してください。「何を勉強するか」のような質問には、資料に示された学習目標と具体的な取組を使い、科目名直後に説明がないことだけで根拠なしと判断しないでください。今回尋ねられた情報に回答を絞り、その情報を直接裏づける原文を引用してください。場所だけを尋ねられた場合は場所や行き先を答え、持ち物や手続きの詳細は、その場所を使う条件として不可欠な場合に含めてください。複数項目を尋ねられた場合や、回答の意味を左右する条件・例外がある場合は、それぞれの根拠を残してください。対象者や参加条件を聞かれたときは、資料に明記された対象者と対象外の人の両方を確認してください。両方がある場合は回答に含め、それぞれの原文とページを引用してください。回答言語の指定がない場合は、質問文で求められた言語、なければ質問文の言語で、label と answer の両方を書いてください。金額の通貨名や「1食」「月額」のような単位・頻度もその言語で表してください。sources の quote には資料の言語の原文を入れてください。前の質問が渡された場合は、今回の質問が指す対象を特定するために使ってください。回答する対象は今回の質問です。「1年間でいくらかかる」のような質問も年間費用として扱ってください。総額を算出できない場合も、確認できた金額と単位、金額が未記載の費目、算出に必要な不足情報を、それぞれ対応する原文付きで答えてください。口座振替の回数を各費目の徴収回数とみなさないでください。「学年費は？」のような費目名だけの質問では、その費目の備考や内訳を答え、金額の記載がなければその旨を伝えてください。引用は費目の一覧だけで済ませず、備考を含む行を選んでください。合計費用の質問で、資料に金額と回数が明記されていれば、回答欄に内訳と計算式（例：月額×徴収回数＋一度だけの必須費用）を示してください。任意の費用は別に示し、回数や必須かどうかが不明な費用を推測で合計に加えないでください。計算式は「400円×10回＋100円＝4,100円」のように金額・回数・合計を記載してください。繰り返し徴収される費用は、金額と回数の対応がわかる連続した原文を引用してください。引用は翻訳しないでください。金額を「万を使わず円で」「数字だけの円表記で」などと指定された場合は、回答だけを指定の表記に換算してください（1.2万円は12,000円）。引用には換算前の原文を残してください。ひらがなの語は資料にある漢字の語と照合してください。目次や別紙への案内だけでは、別紙にしかない日時などは確認できません。複数の質問には確認できた項目だけ答え、確認できない項目を明示してください。数字・単位・予定などの条件ごとに裏づける引用を付けてください。答えを含む一文を途中で言い換えず、そのまま引用してください。質問された項目ごとに必ず別の行を作る（例：給食費・生徒会費・PTA会費なら3行）。各行の引用はその項目名と値を直接含む資料の一節。別項目の引用を流用しない。形式は {"items":[{"label":"項目名","answer":"その項目だけの回答","sources":[{"page":1,"quote":"原文"}]}]}。根拠なしの行も項目名を返し sources は空配列。' :
           '締切、提出物、持ち物、日時を優先し、最大6件。資料の構成に沿った見出しを最大24件、toc に title と page で追加してください。見出しは章の内容が分かる短い題名にし、ページ番号だけの題名は禁止です。各章が始まる実際のページを付け、ページ順に並べてください。形式は {"items":[{"label":"項目","text":"要点","source":{"page":1,"quote":"原文"}}],"toc":[{"title":"見出し","page":1}]}。')},
-      ...(summaryLevel ? [{role:'system',content:summaryLevelInstructions[summaryLevel]}] : []),
+      ...(summaryLevel ? [{role:'system',content:summaryLevelInstructions[summaryLevel]+(passages.length===1?' このページの要点を最大2件、実際のページ番号と引用を付けて返してください。':' 最大5件、要約と引用はそれぞれ短くしてください。')}] : []),
       ...(language ? [{role:'system',content:`Write every answer and label in ${language}, regardless of the question or source language. Keep all source quotations in the original language and preserve their page numbers.${bilingual?' Include an englishAnswer field in each item with an English translation of its answer.':''}`}] : []),
       {role:'user',content:JSON.stringify({資料:passages.map(({page,text,verticalLabel})=>({page,縦書き見出し候補:verticalLabel,資料名:materials.find(file=>page>=file.start && page<file.start+file.count)?.name,text:text.normalize('NFKC')})),質問:question})},
     ],
@@ -1013,8 +1014,10 @@ export async function documents(request,env,auth) {
   const record = await info.json();
   if (action==='summary') {
     const level=new URL(request.url).searchParams.get('level');
-    if (!Object.hasOwn(summaryLevelInstructions,level)) return fail('要約レベルを確認してください。');
-    return target.fetch('https://room/document/summary/'+level,{method:'POST',body:id});
+    const page=new URL(request.url).searchParams.get('page');
+    if (page!==null && (!/^[1-9]\d*$/.test(page) || Number(page)>(record.originalPageCount ?? record.pages.length))) return fail('ページ番号を確認してください。');
+    if ((!page && level==='standard') || !Object.hasOwn(summaryLevelInstructions,level)) return fail('要約レベルを確認してください。');
+    return target.fetch('https://room/document/summary/'+level+(page?'/'+page:''),{method:'POST',body:id});
   }
   if (action==='translate') {
     const input=await request.text();
@@ -1023,11 +1026,17 @@ export async function documents(request,env,auth) {
     const language=answerLanguages.get(code);
     if (section==='summary' || section==='toc') {
       if (!language || code==='ja') return fail('翻訳する言語を確認してください。');
+      let pageItems;
+      if (section==='summary' && Number.isInteger(page) && page>0 && page<=(record.originalPageCount ?? record.pages.length) && Object.hasOwn(summaryLevelInstructions,level)) {
+        const response=await target.fetch('https://room/document/summary/'+level+'/'+page,{method:'POST',body:id});
+        if (!response.ok) return response;
+        pageItems=await response.json();
+      }
       const rows=section==='toc'
         ? validatedToc(record,record.pages.slice(0,record.originalPageCount ?? record.pages.length)).map(item=>item.title)
-        : ((Object.hasOwn(summaryLevelInstructions,level)
+        : (pageItems ?? ((level!=='standard' && Object.hasOwn(summaryLevelInstructions,level)
           ? record.levelSummaries?.[level]?.revision===(record.revision ?? 0) && record.levelSummaries[level].items
-          : documentSummaryView(record).items) || []).flatMap(item=>[item.label,item.text,...(item.analogy?[item.analogy]:[])]);
+          : documentSummaryView(record).items) || [])).flatMap(item=>[item.label,item.text,...(item.analogy?[item.analogy]:[])]);
       const text=rows.map(row=>row.replace(/\s+/gu,' ').trim()).join('\n');
       if (!text) return reply({source:[],lines:[]});
       const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([section,DOCUMENT_MODEL,code,text])));
@@ -1068,8 +1077,16 @@ export async function documents(request,env,auth) {
     const pages = record.pages.slice(0,record.originalPageCount ?? record.pages.length);
     const existing = validatedToc(record,pages);
     if (existing.length) return reply(existing);
-    const toc = validatedToc(await generate(env,pages,undefined,[],undefined,undefined,undefined,"toc"),pages);
-    if (!toc.length) return fail('本文から目次を作れませんでした。',502);
+    const generated=await generate(env,pages,undefined,[],undefined,summaryPassages(pages),undefined,'toc').catch(()=>null);
+    const toc=validatedToc(generated,pages);
+    if (!toc.length) {
+      const fallback=pages.flatMap((text,index)=>{
+        const title=text.split(/\n/u).map(line=>line.trim()).find(line=>/\p{L}/u.test(line) && line.length>=4);
+        return title ? [{title:title.slice(0,60),page:index+1}] : [];
+      }).slice(0,40);
+      return fallback.length ? target.fetch('https://room/document/toc',{method:'POST',body:JSON.stringify(fallback)}) : fail('本文から目次を作れませんでした。',502);
+    }
+
     return target.fetch('https://room/document/toc',{method:'POST',body:JSON.stringify(toc)});
   }
   if (!action) {
@@ -1446,23 +1463,29 @@ export async function documentStorage(request,storage,env) {
   }
   const record = await storage.get('document');
   if (!record) return fail('資料が見つからないか、共有が終了しました。',404);
-  const level=/^\/document\/summary\/(beginner|expert)$/.exec(path)?.[1];
+  const [,level,pageNumber]=/^\/document\/summary\/(beginner|standard|expert)(?:\/(\d+))?$/.exec(path) ?? [];
+  const page=Number(pageNumber);
   if (level && request.method==='POST') {
     const revision=record.revision ?? 0;
-    const existing=record.levelSummaries?.[level];
+    const pageKey='document-summary:'+revision+':'+level+':'+page;
+    const existing=page ? await storage.get(pageKey) : record.levelSummaries?.[level];
     if (existing?.revision===revision && (level!=='beginner' || existing.items.some(item=>item.analogy))) return reply(existing.items);
-    const key=[await request.text(),revision,level].join(':');
+    const key=[await request.text(),revision,level,page].join(':');
     if (!pendingSummaries.has(key)) pendingSummaries.set(key,(async()=>{
       const keys=Array.from({length:record.textParts ?? 0},(_,index)=>'document-text:'+index);
       const chunks=keys.length ? await storage.get(keys) : null;
       const pages=chunks ? JSON.parse(keys.map(key=>chunks.get(key)).join('')) : record.pages;
-      const result=await generate(env,pages,undefined,record.materials ?? [],undefined,summaryPassages(pages),undefined,'summary',undefined,false,level);
-      const items=summaryItems(result,pages,10,level);
+      if (page && !pages[page-1]?.trim()) return [];
+      const passages=page ? [{page,text:pages[page-1].slice(0,8000)}] :
+        summaryPassages(pages).map(passage=>({...passage,text:passage.text.slice(0,950)}));
+      const result=await generate(env,pages,undefined,record.materials ?? [],undefined,passages,undefined,'summary',undefined,false,level);
+      const items=summaryItems(result,pages,10,level).filter(item=>!page || item.source.page===page);
       if (!items.length || (level==='beginner' && !items.some(item=>item.analogy))) throw Error('要約を確認できませんでした。');
       await storage.transaction(async tx=>{
         const current=await tx.get('document');
         if (current && (current.revision ?? 0)===revision) {
-          await tx.put('document',{...current,levelSummaries:{...current.levelSummaries,[level]:{revision,items}}});
+          if (page) await tx.put(pageKey,{revision,items});
+          else await tx.put('document',{...current,levelSummaries:{...current.levelSummaries,[level]:{revision,items}}});
         }
       });
       return items;
