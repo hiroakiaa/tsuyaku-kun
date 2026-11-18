@@ -344,7 +344,6 @@ async function reader() {
   document.title = doc.title + '｜資料QA君';
   $('#doc-title').textContent = doc.title;
   $('#ask-heading').textContent = doc.title;
-  if (!doc.items.length) $('#points-title').textContent = '資料から抜き出した要点';
   const dialog = $('#pdf-dialog');
   const askDialog=$('#ask-dialog');
   if(window.parent!==window){
@@ -365,54 +364,11 @@ async function reader() {
   let summaryReady=doc.summaryReady;
   let summaryCheck;
   let summaryItems=doc.items;
-  let summaryLevel='standard';
-  const summaryScope=$('#summary-scope');
-  for (let page=1;page<=doc.pageCount;page++) {
-    summaryScope.add(new Option(page+'ページ',String(page)));
-  }
-  summaryScope.onchange=()=>void openSummaryLevel(summaryLevel);
-  const summaryLevels=new Map();
-  const summaryLevelStatus=$('#summary-level-status');
-  function currentSummary() {
-    return summaryLevel==='standard' && !summaryScope.value ? summaryItems : summaryLevels.get(summaryLevel+':'+summaryScope.value);
-  }
-  async function openSummaryLevel(level) {
-    summaryLevel=level;
-    const page=summaryScope.value;
-    const key=level+':'+page;
-    for (const button of points.querySelectorAll('[data-summary-level]')) {
-      button.setAttribute('aria-pressed',String(button.dataset.summaryLevel===level));
-    }
-    summaryLevelStatus.hidden=true;
-    renderSummary(currentSummary());
-    if ((level==='standard' && !page) || summaryLevels.has(key)) return;
-    summaryLevelStatus.hidden=false;
-    summaryLevelStatus.textContent='要約を準備しています…';
-    try {
-      const items=await request(api+'/summary?level='+level+(page?'&page='+page:''),{method:'POST'});
-      summaryLevels.set(key,items);
-      if (summaryLevel===level && summaryScope.value===page) {
-        summaryLevelStatus.hidden=true;
-        renderSummary(items);
-        if (!items.length) {
-          summaryLevelStatus.hidden=false;
-          summaryLevelStatus.textContent='このページには要約できる本文がありません。';
-        }
-      }
-    } catch {
-      if (summaryLevel===level && summaryScope.value===page) summaryLevelStatus.textContent='要約を準備できませんでした。同じタブを押すと再試行できます。';
-    }
-  }
-  for (const button of points.querySelectorAll('[data-summary-level]')) {
-    button.onclick=()=>void openSummaryLevel(button.dataset.summaryLevel);
-  }
   const sectionTranslations=new Map();
   function translatedSection(section,language) {
-    const level=section==='summary' ? summaryLevel : undefined;
-    const page=section==='summary' ? Number(summaryScope.value)||undefined : undefined;
-    const key=[section,language,level,page].join(':');
+    const key=[section,language].join(':');
     if (!sectionTranslations.has(key)) {
-      const result=request(api+'/translate',{method:'POST',body:JSON.stringify({section,language,level,page})})
+      const result=request(api+'/translate',{method:'POST',body:JSON.stringify({section,language})})
         .catch(()=>{sectionTranslations.delete(key);return null;});
       sectionTranslations.set(key,result);
     }
@@ -436,19 +392,18 @@ async function reader() {
     return applied===labels.length;
   }
   function prepareSummaryTranslation() {
-    if (selectedLanguage && selectedLanguage!=='ja' && currentSummary()?.length) {
+    if (selectedLanguage && selectedLanguage!=='ja' && summaryItems?.length) {
       void translatedSection('summary',selectedLanguage);
     }
   }
   window.addEventListener('document-language-change',()=>{
     prepareSummaryTranslation();
-    renderSummary(currentSummary());
+    renderSummary(summaryItems);
   });
   prepareSummaryTranslation();
   $('#pdf-summary').onclick=()=>{
     points.showModal();
-    renderSummary(currentSummary());
-    if (summaryLevel!=='standard' || summaryScope.value) { void openSummaryLevel(summaryLevel); return; }
+    renderSummary(summaryItems);
     if (summaryReady!==false || summaryCheck) return;
     summaryStatus.hidden=false;
     summaryStatus.textContent='詳しい要約を準備しています…';
@@ -459,7 +414,7 @@ async function reader() {
           summaryItems=latest.items;
           for (const key of sectionTranslations.keys()) if (key.startsWith('summary:')) sectionTranslations.delete(key);
           prepareSummaryTranslation();
-          renderSummary(currentSummary());
+          renderSummary(summaryItems);
           summaryReady=true;
           summaryStatus.hidden=true;
           return;
@@ -494,6 +449,12 @@ async function reader() {
   let selectedPage = Number.isInteger(previousPage) && previousPage>=1 && previousPage<=doc.pageCount ? previousPage : 0;
   const tocButton = $('#pdf-toc-toggle');
   const toc = $('#pdf-toc');
+  const tocStage=toc.parentElement;
+  const tocWorkspace=askDialog.querySelector('.qa-workspace');
+  const stackedToc=matchMedia('(max-width:799px)');
+  const placeToc=()=> (stackedToc.matches ? tocWorkspace : tocStage).append(toc);
+  placeToc();
+  stackedToc.addEventListener('change',placeToc);
   function syncContentsPage() {
     const rows = [...toc.querySelectorAll('.pdf-toc-entry')];
     const start = Math.max(0,...rows.map(row=>Number(row.dataset.page)).filter(page=>page<=selectedPage));

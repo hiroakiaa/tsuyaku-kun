@@ -626,13 +626,6 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
   to { opacity: 1; }
 }
 
-.summary-levels { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.35rem; margin-block:.5rem 1rem; }
-.summary-levels button { min-height:44px; }
-.summary-levels [aria-pressed="true"] { background:#e6d5f7; color:#21192a; }
-.summary-example { border-inline-start:2px solid #a88bc0; padding-inline-start:.65rem; margin-block:.65rem; }
-.summary-example p { margin-block:.25rem 0; }
-#points:has([data-summary-level="standard"][aria-pressed="false"]) #summary-status { display:none; }
-
 @media (max-width:799px) {
   #ask-dialog {
     top: var(--qa-visible-top, 0px);
@@ -640,4 +633,19 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
     height: var(--qa-visible-height, 100dvh);
   }
   #ask-form #question { font-size: max(16px, 1em); }
+}
+
+#points #cards { display: block; }
+#points #cards .card { background: none; border: 0; border-radius: 0; margin: 0; padding: .85rem 0; }
+#points #cards .card + .card { border-block-start: 1px solid color-mix(in srgb, currentColor 20%, transparent); }
+#points #cards .card h3 { margin: 0 0 .35rem; }
+#points #cards .card p { margin-block: 0 .4rem; line-height: 1.55; }
+.summary-example { border-inline-start: 2px solid #a88bc0; padding-inline-start: .65rem; }
+@media (max-width:799px) {
+  .qa-workspace { position: relative; }
+  .qa-workspace > #pdf-toc {
+    z-index: 10;
+    inset-block-start: 3.5rem;
+    max-height: min(65dvh, calc(100% - 4rem));
+  }
 }
