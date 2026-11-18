@@ -2080,7 +2080,11 @@ try {
     });
     const close=$('#library-close');
     close.hidden=window.parent===window;
-    close.onclick=()=>window.parent.postMessage({type:'document-library-close'},location.origin);
+    close.onclick=()=>{
+      const host=window.frameElement?.closest('dialog.documents-dialog');
+      if (host?.open) host.close();
+      else window.parent.postMessage({type:'document-library-close'},location.origin);
+    };
     for (const [active,inactive] of [['library-device','library-shared'],['library-shared','library-device']]) {
       $('#'+active).onclick=()=>{
         $('#'+active).setAttribute('aria-pressed','true');
