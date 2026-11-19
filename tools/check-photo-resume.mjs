@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import {createUiFixture} from './browser-fixture.mjs';
+const fixture=await createUiFixture(),{browser,setup,origin}=fixture,calls=new Map();
+const blocks=['A','B','C'].map((letter,i)=>({id:'b'+i,text:letter.repeat(200),box:{x:.05,y:.1+i*.25,width:.8,height:.18}}));
+fixture.setApiHandler(request=>{
+ const path=new URL(request.url()).pathname;
+ if(path==='/photo/recognize')return {json:{text:blocks.map(b=>b.text).join('\n'),blocks}};
+ if(path==='/photo/translate'){
+  const body=request.postDataJSON(),text=body.blocks[0].text;calls.set(text,(calls.get(text)||0)+1);
+  if(text.startsWith('B')&&calls.get(text)===1)return {status:504,json:{error:'翻訳が時間切れになりました。'}};
+  return {json:{blocks:body.blocks.map(b=>({id:b.id,translations:{[body.targets[0]]:'Translated '+b.text}}))}};
+ }
+});
+try{
+ const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+ await setup(context);if(process.env.LIVE_PHOTO_PREVIEW)await context.route('https://hiroakiaa.github.io/**',route=>route.continue());
+ const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(process.env.LIVE_PHOTO_PREVIEW?'https://hiroakiaa.github.io/tsuyaku-kun/?resume-check='+Date.now():origin);
+ await page.locator('#photo-translate-open').click();
+ const sample=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=800;c.height=1200;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,800,1200);return c.toDataURL('image/jpeg').split(',')[1]});
+ await page.locator('.photo-simple input[type=file]').setInputFiles({name:'synthetic.jpg',mimeType:'image/jpeg',buffer:Buffer.from(sample,'base64')});
+ await page.locator('.photo-source-viewport').waitFor({state:'visible'});
+ await page.locator('.photo-simple > button:not(.photo-pick)').click();
+ await page.locator('.photo-notice').filter({hasText:'未完了の部分から'}).waitFor({state:'visible'});
+ await page.waitForFunction(()=>document.querySelector('.photo-simple')?.getAttribute('aria-busy')==='false');
+ assert.equal(calls.get('A'.repeat(200)),1);assert.equal(calls.get('B'.repeat(200)),2);assert.equal(calls.get('C'.repeat(200)),1);
+ assert.ok((await page.locator('.photo-results').textContent()).includes('C'.repeat(200)));
+ assert.equal(await page.locator('.photo-overlay').isVisible(),true);assert.deepEqual(errors,[]);
+ console.log((process.env.LIVE_PHOTO_PREVIEW?'Published assets':'Local fixture')+': PASS automatic continuation after timeout; no user retry; finished A/C not translated again; image preview remains');
+ await context.close();
+}finally{await browser.close();}

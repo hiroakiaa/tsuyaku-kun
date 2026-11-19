@@ -15,3 +15,17 @@ const longResult=await translatePhotoProgressively({blocks:longBlocks,source:'ja
 assert.equal(longResult.blocks.length,100);
 for(let i=0;i<longBlocks.length;i++)assert.equal(longResult.blocks[i].translations.en.replace(/\s/gu,''),longBlocks[i].text.replace(/\s/gu,''),'No text is dropped after 1200 or 12000 characters');
 console.log('PASS long photo: '+longBlocks.reduce((n,b)=>n+b.text.length,0)+' characters, 100 paragraphs, no truncation');
+
+const attempts=new Map(),resumed=[];
+const retryBlocks=[{id:'b0',text:'A'.repeat(260)},{id:'b1',text:'B'.repeat(260)},{id:'b2',text:'C'.repeat(260)}];
+const recovered=await translatePhotoProgressively({blocks:retryBlocks,source:'ja',target:'en',cache:new Map(),wait:async()=>{},onResume:event=>resumed.push(event),request:async body=>{
+ const text=body.blocks[0].text;attempts.set(text,(attempts.get(text)||0)+1);
+ if(text.startsWith('B')&&attempts.get(text)<=2)throw Object.assign(Error('timeout'),{name:'TimeoutError'});
+ return {blocks:body.blocks.map(b=>({id:b.id,translations:{en:b.text}}))};
+}});
+assert.equal(recovered.blocks.length,3);assert.equal(attempts.get('A'.repeat(260)),1);assert.equal(attempts.get('B'.repeat(260)),3);assert.equal(attempts.get('C'.repeat(260)),1);assert.equal(resumed.length,2);
+const {resumeTranslation}=await import('../web/translation-resume.js');
+let valid=true,abortCalls=0;
+await assert.rejects(()=>resumeTranslation(async()=>{abortCalls++;throw new DOMException('Timed out','TimeoutError');},{valid:()=>valid,wait:async()=>{valid=false;}}),error=>error.name==='AbortError');assert.equal(abortCalls,1);
+let permanentCalls=0;await assert.rejects(()=>resumeTranslation(async()=>{permanentCalls++;throw Object.assign(Error('denied'),{status:403});},{wait:async()=>{}}));assert.equal(permanentCalls,1);
+console.log('PASS timeout continuation: only failed chunks retry; successful chunks remain; cancellation and permanent failures stop');

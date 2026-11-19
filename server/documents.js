@@ -1,3 +1,4 @@
+import {translationCheckpoints} from './translation-checkpoint.js';
 import {mergeLanguages} from '../web/language-registry.js';
 import {documentUiLabels} from '../web/document-ui-locale.js';
 
@@ -1566,7 +1567,7 @@ export async function documentStorage(request,storage,env) {
               : translateDocumentText(env,original,language,false,captureUsage);
           }));
         };
-        translations=(await Promise.all(batches.map(translateBatch))).flat();
+        translations=await translationCheckpoints(storage,translationKey,batches,translateBatch);
       } else {
         const aligned=await translateDocumentText(env,JSON.stringify(nonempty),language,true,captureUsage);
         try { translations=JSON.parse(aligned)?.lines; } catch {}

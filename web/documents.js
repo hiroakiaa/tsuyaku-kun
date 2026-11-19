@@ -1,3 +1,4 @@
+import {resumeTranslation,transientTranslationError} from './translation-resume.js?v=20261119-resume-1';
 import {readPdfPageText,lookupTableCell,lookupAlignedTableCell} from './document-table-lookup.js?v=88';
 import {recordDocumentQaMetric} from './document-qa-metrics.js?v=1';
 import {layoutPdfText} from './document-table.js?v=94';
@@ -801,15 +802,18 @@ async function reader() {
       recordTranslationTrace(page,language,priority,'start');
       pageTranslations.set(key,(async()=>{
         const layoutText=sourceType==='pdf' ? await pdfTranslationSource(page,retry) : undefined;
-        const translate=(layout,diagramText)=>request(api+'/translate',{
+        const translate=(layout,diagramText)=>resumeTranslation(()=>request(api+'/translate',{
           method:'POST',
           signal:AbortSignal.timeout(60_000),
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify({page,language,layoutText:layout,diagramText}),
-        });
+        }),{valid:()=>askDialog.open||dialog.open,onResume:()=>{
+          recordTranslationTrace(page,language,priority,'resume');
+          if(language===translationMode.value && page===Number(pagePicker.value)) $('#pdf-translation-progress').textContent='未完了の部分から翻訳を続けています…';
+        }});
         if (layoutText) {
           try { return await translate(layoutText.layout,layoutText.diagram); }
-          catch { return translate(); }
+          catch(error) { if(transientTranslationError(error))throw error;return translate(); }
         }
         return translate();
       })()
@@ -921,24 +925,12 @@ async function reader() {
     }
     const viewportPosition=position ?? pageViewportPosition(preview,original);
     const pending=$('#pdf-translation-progress');
+    pending.textContent='翻訳しています…';
     pending.hidden=false;
     foregroundTranslation++;
     try {
       const priority=citation?.page===page ? 'citation' : 'visible';
-      const load=async()=>{
-        for (const delay of [500,1500]) {
-          try {
-            return await loadPageTranslation(page,language,retry,priority);
-          } catch(error) {
-            const transient=error instanceof TypeError || error.name==='TimeoutError' ||
-              error.status===408 || error.status===429 || error.status>=500;
-            if (!transient || navigator.onLine===false || revision!==translationRevision) throw error;
-            await new Promise(resolve=>setTimeout(resolve,delay));
-            if (revision!==translationRevision) return;
-          }
-        }
-        return loadPageTranslation(page,language,false,priority);
-      };
+      const load=()=>loadPageTranslation(page,language,retry,priority);
       const result=await load();
       if(revision===translationRevision) {
         if (result.reuse) translatedPage.dataset.translationReuse=result.reuse;

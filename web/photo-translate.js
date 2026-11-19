@@ -1,5 +1,5 @@
 import {installPhotoZoom} from './photo-zoom.js?v=20261119-pinch-1';
-import {translatePhotoProgressively} from './photo-progress.js?v=20261020-photo-unlimited-2';
+import {translatePhotoProgressively} from './photo-progress.js?v=20261020-photo-resume-3';
 import {matchingPhotoBlocks,drawPhotoOverlay} from './photo-overlay.js?v=20261020-photo-overlay-4';
 export function photoReadResult(value){
  if(!value||typeof value.text!=='string')throw Error('写真の読み取り結果を確認できませんでした。もう一度お試しください。');
@@ -43,7 +43,7 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
    finally{if(!closed&&version===epoch){busy=false;buttons();}}
   };
   const controllers=new Set();
-  async function bounded(operation){const active=new AbortController();controllers.add(active);controller=active;let timer;try{return await Promise.race([operation(active.signal),new Promise((_,reject)=>{timer=setTimeout(()=>{active.abort();reject(Error('翻訳が時間内に完了しませんでした。表示済みの訳は残しています。もう一度押すと未完了の部分を再試行します。'));},22000);})]);}finally{clearTimeout(timer);controllers.delete(active);}}
+  async function bounded(operation){const active=new AbortController();controllers.add(active);controller=active;let timer;try{return await Promise.race([operation(active.signal),new Promise((_,reject)=>{timer=setTimeout(()=>{active.abort();reject(Object.assign(Error('翻訳に時間がかかっています。'),{name:'TimeoutError'}));},22000);})]);}finally{clearTimeout(timer);controllers.delete(active);}}
   async function readPhoto(){
    const base64=preview.toDataURL('image/jpeg',.9).split(',')[1];if(base64.length>2800000)throw Error('画像が大きすぎます。小さい画像を選んでください。');
    const bytes=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(base64)));currentHash=[...bytes].map(b=>b.toString(16).padStart(2,'0')).join('');let data=images.get(currentHash);
@@ -66,7 +66,7 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
     }
     say('翻訳しています…');let data=translations.get(key);
     if(!data&&from===to){data={blocks:inputBlocks.map(b=>({id:b.id,translations:{[from]:b.text},quality:{warnings:[]}}))};remember(translations,key,data);}
-    if(!data){data=await translatePhotoProgressively({blocks:inputBlocks,source:from,target:to,cache:segments,valid:()=>!closed&&version===epoch,request:body=>bounded(signal=>api('/photo/translate',body,{signal})),onProgress:(partial,done,total)=>{show(partial);say('翻訳しています… '+done+' / '+total);}});remember(translations,key,data);}
+    if(!data){data=await translatePhotoProgressively({blocks:inputBlocks,source:from,target:to,cache:segments,valid:()=>!closed&&version===epoch,onResume:()=>say('未完了の部分から翻訳を続けています…'),request:body=>bounded(signal=>api('/photo/translate',body,{signal})),onProgress:(partial,done,total)=>{show(partial);say('翻訳しています… '+done+' / '+total);}});remember(translations,key,data);}
     if(closed||version!==epoch)return;show(data);say(data.blocks.some(b=>b.quality?.warnings?.length)?'数字・日付など、訳の確認が必要な箇所があります。':'');
    }catch(e){if(!closed&&version===epoch)say((e.message||'翻訳できませんでした。')+(result.childElementCount?' 完成した部分は残しています。もう一度押すと未完了の部分を再試行します。':''));}
    finally{if(!closed&&version===epoch){busy=false;buttons();}}
