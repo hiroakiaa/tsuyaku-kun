@@ -1,8 +1,9 @@
+import {previewFitScale} from './preview-fit.js?v=20261119-fit-1';
 // Keep the image point between the fingers fixed while scaling.
 export function photoZoomAnchor(scroll,from,to,previous,next){
  return {left:Math.max(0,(scroll.left+from.x)*next/previous-to.x),top:Math.max(0,(scroll.top+from.y)*next/previous-to.y)};
 }
-export function installPhotoZoom(viewport,canvas,{onChange=()=>{},fitHeight=false}={}){
+export function installPhotoZoom(viewport,canvas,{onChange=()=>{},fitHeight=false,fitWithinMaxHeight=false}={}){
  const surface=document.createElement('div');surface.className='photo-zoom-surface';canvas.replaceWith(surface);surface.append(canvas);if(fitHeight){surface.style.minWidth='0';surface.style.marginInline='auto';}
  let scale=1,baseWidth=0,baseHeight=0,pinch=null,frame=0,pending=null,destroyed=false;
  const controller=new AbortController(),options={signal:controller.signal};
@@ -19,10 +20,13 @@ export function installPhotoZoom(viewport,canvas,{onChange=()=>{},fitHeight=fals
   const width=viewport.clientWidth,oldWidth=baseWidth,oldHeight=baseHeight;
   const center={x:viewport.clientWidth/2,y:viewport.clientHeight/2};
   const point={x:oldWidth?(viewport.scrollLeft+center.x)/(oldWidth*scale):0,y:oldHeight?(viewport.scrollTop+center.y)/(oldHeight*scale):0};
-  baseWidth=fitHeight?Math.min(width,viewport.clientHeight*canvas.width/canvas.height):width;baseHeight=baseWidth*canvas.height/canvas.width;
-  const limit=parseFloat(getComputedStyle(viewport).maxHeight);
+  const styles=getComputedStyle(viewport);
+  const border=styles.boxSizing==='border-box'?(parseFloat(styles.borderTopWidth)||0)+(parseFloat(styles.borderBottomWidth)||0):0;
+  const limit=parseFloat(styles.maxHeight);
   const max=Number.isFinite(limit)?limit:Infinity;
-  viewport.style.height=Math.min(baseHeight,max)+'px';
+  const height=fitWithinMaxHeight&&Number.isFinite(max)?max-border:viewport.clientHeight || (Number.isFinite(max)?max-border:window.innerHeight);
+  baseWidth=fitHeight?canvas.width*previewFitScale(canvas.width,canvas.height,width,height):width;baseHeight=baseWidth*canvas.height/canvas.width;
+  viewport.style.height=Math.min(baseHeight+border,max)+'px';
   draw();
   if(oldWidth){viewport.scrollLeft=point.x*baseWidth*scale-center.x;viewport.scrollTop=point.y*baseHeight*scale-center.y;}
  }

@@ -1,9 +1,9 @@
-import {installPhotoZoom} from './photo-zoom.js?v=20261119-dialog-fit-3';
+import {installPhotoZoom} from './photo-zoom.js?v=20261119-minimum-fit';
 import qrcode from './qrcode.mjs';
 export function drawQr(canvas,text){const qr=qrcode(0,'M');qr.addData(text);qr.make();const count=qr.getModuleCount(),scale=4,margin=4;canvas.width=canvas.height=(count+margin*2)*scale;const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#000';for(let y=0;y<count;y++)for(let x=0;x<count;x++)if(qr.isDark(y,x))ctx.fillRect((x+margin)*scale,(y+margin)*scale,scale,scale);canvas.setAttribute('aria-label','参加用QRコード');canvas.setAttribute('role','img');
  if(canvas.classList?.contains('chat-qr-large')&&canvas.isConnected&&!canvas.closest('.qr-preview-viewport')){
   const frame=document.createElement('div');frame.className='qr-preview-viewport photo-overlay-viewport';frame.setAttribute('aria-label','QRコードのプレビュー');frame.tabIndex=0;canvas.replaceWith(frame);frame.append(canvas);
-  const viewer=installPhotoZoom(frame,canvas);requestAnimationFrame(()=>viewer.refresh());
+  const viewer=installPhotoZoom(frame,canvas,{fitHeight:true,fitWithinMaxHeight:true});requestAnimationFrame(()=>viewer.refresh());
   frame.closest('dialog')?.addEventListener('close',()=>viewer.destroy(),{once:true});
  }
 }

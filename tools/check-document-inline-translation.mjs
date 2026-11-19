@@ -36,6 +36,11 @@ try{
    await page.locator('#pdf-scroll').dispatchEvent('wheel',{ctrlKey:true,deltaY:-40,clientX:150,clientY:180});
    assert.ok(await page.locator('#pdf-pages').evaluate(e=>e.getBoundingClientRect().width)>wheelBefore*1.2,'Trackpad pinch zooms the PDF only');
    await page.locator('#zoom-fit').click();
+   await touchPinch(page,cdp,'#pdf-scroll',.15);
+   const minimum=await page.locator('#pdf-scroll').evaluate(v=>{const p=v.querySelector('.pdf-page-view').getBoundingClientRect();return {w:p.width,h:p.height,vw:v.clientWidth,vh:v.clientHeight};});
+   assert.ok(minimum.w<=minimum.vw+2&&minimum.h<=minimum.vh+2,'Smallest PDF fits in both directions');
+   assert.ok(Math.min(Math.abs(minimum.w-minimum.vw),Math.abs(minimum.h-minimum.vh))<3,'Smallest PDF touches one inner edge');
+   await page.locator('#zoom-fit').click();
   }
   await page.locator('select.document-language:visible').selectOption('en');
   const frame=page.locator('.pdf-translation-layout[data-page="1"]:visible');await frame.waitFor({timeout:30000});

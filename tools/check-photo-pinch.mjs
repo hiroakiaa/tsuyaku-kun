@@ -1,4 +1,4 @@
-import {checkPagePinchBlocked} from './gesture-test-helpers.mjs';
+import {checkPagePinchBlocked,touchPinch} from './gesture-test-helpers.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {createUiFixture} from './browser-fixture.mjs';
@@ -58,6 +58,10 @@ try{
  
  await page.locator('.photo-display-settings input[type=range]').fill('1');
  assert.equal((await metrics()).scale,1);
+ await touchPinch(page,cdp,'.photo-preview-dialog .photo-overlay-viewport',.2);
+ const smallest=await viewport.evaluate(v=>{const b=v.querySelector('canvas').getBoundingClientRect();return {width:b.width,height:b.height,viewWidth:v.clientWidth,viewHeight:v.clientHeight};});
+ assert.equal((await metrics()).scale,1,'Pinch cannot shrink below fit-to-preview');
+ assert.ok(Math.min(Math.abs(smallest.width-smallest.viewWidth),Math.abs(smallest.height-smallest.viewHeight))<3,'At minimum one image edge touches the preview');
  const compact=await page.locator('.photo-preview-dialog').evaluate(d=>({header:d.querySelector('.photo-preview-heading').getBoundingClientRect().height,footer:d.querySelector('.photo-display-settings').getBoundingClientRect().height,unused:d.querySelector('.photo-overlay-viewport').clientHeight-d.querySelector('.photo-overlay-viewport canvas').getBoundingClientRect().height}));
  assert.equal(compact.header,64,'Header spacing matches the other app modes');assert.equal(compact.footer,64,'Footer spacing matches the other app modes');
  const touch=await page.locator('.photo-preview-dialog button').evaluateAll(buttons=>buttons.every(b=>b.getBoundingClientRect().height>=48));assert.ok(touch,'All buttons have comfortable 48px touch targets');

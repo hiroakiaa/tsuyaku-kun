@@ -1,3 +1,4 @@
+import {previewFitScale} from './preview-fit.js?v=20261119-fit-1';
 import {installPreviewOnlyGestures} from './preview-only-gestures.js?v=20261119-preview-only-1';
 installPreviewOnlyGestures();
 import {alignPdfTranslation} from './pdf-translation-alignment.js?v=20261119-layout-1';
@@ -1341,10 +1342,19 @@ async function reader() {
     if (!dialog.open) void showPdf(selectedPage || 1);
   }
   wide.addEventListener('change',syncWorkspace);
+  function minimumZoom(){
+    if(!fitWidth||!preview.clientHeight)return 1;
+    const slot=pageViews[selectedPage-1];
+    const aspect=slot?.style.aspectRatio.split('/').map(Number);
+    const width=imageType?previewImage.naturalWidth:aspect?.[0],height=imageType?previewImage.naturalHeight:aspect?.[1];
+    if(!width||!height)return 1;
+    return Math.min(1,previewFitScale(fitWidth,fitWidth*height/width,preview.clientWidth,preview.clientHeight));
+  }
   new ResizeObserver(() => {
-    if (!fitWidth || !preview.clientWidth || fitWidth===preview.clientWidth) return;
-    fitWidth = preview.clientWidth;
-    setZoom(zoom);
+    if(!fitWidth||!preview.clientWidth)return;
+    const widthChanged=fitWidth!==preview.clientWidth;
+    fitWidth=preview.clientWidth;
+    if(widthChanged||zoom<minimumZoom())setZoom(zoom);
   }).observe(preview);
   function setZoom(value, from, to=from) {
     const bounds=preview.getBoundingClientRect();
@@ -1353,7 +1363,7 @@ async function reader() {
     const surface=imageType ? previewImage : pageList;
     const before=surface.getBoundingClientRect();
     const previous=zoom;
-    zoom=Math.min(4,Math.max(.5,value));
+    zoom=Math.min(4,Math.max(minimumZoom(),Number(value)||1));
     $('#zoom-fit').hidden=zoom===1;
     if (!fitWidth) return;
     surface.style.width=fitWidth*zoom+'px';

@@ -1,5 +1,5 @@
 import {localIcon} from './icons.js?v=photo-viewer-1';
-import {installPhotoZoom} from './photo-zoom.js?v=20261119-dialog-fit-3';
+import {installPhotoZoom} from './photo-zoom.js?v=20261119-minimum-fit';
 import {translatePhotoProgressively} from './photo-progress.js?v=20261020-photo-reuse-4';
 import {matchingPhotoBlocks,drawPhotoOverlay} from './photo-overlay.js?v=20261020-photo-overlay-4';
 export function photoReadResult(value){

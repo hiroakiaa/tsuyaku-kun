@@ -17,6 +17,9 @@ try{
  await touchPinch(page,cdp,'.qr-preview-viewport');
  const after=await page.locator('.qr-preview-viewport canvas').evaluate(e=>e.getBoundingClientRect().width);
  assert.ok(after>before*1.3);assert.equal(await page.evaluate(()=>visualViewport.scale),1);
+ await touchPinch(page,cdp,'.qr-preview-viewport',.1);
+ const fit=await page.locator('.qr-preview-viewport').evaluate(v=>{const c=v.querySelector('canvas').getBoundingClientRect();return Math.min(Math.abs(c.width-v.clientWidth),Math.abs(c.height-v.clientHeight));});
+ assert.ok(fit<3,'QR cannot shrink below one fitted edge');
  await page.evaluate(()=>document.querySelector('#qr-gesture-fixture').close());
  console.log((process.env.LIVE_PHOTO_PREVIEW?'Published assets':'Local fixture')+': PASS QR preview zooms internally while the app stays at scale 1');
  await context.close();
