@@ -447,3 +447,8 @@ body.phone-home[data-active-mode="lesson"] #live:has(.live-summary-toggle:not([h
   body.phone-home #live:has(.live-summary-toggle:not([hidden]))>.live-summary-dialog{bottom:50px;}
  }
 }
+
+html{touch-action:pan-x pan-y}
+
+.qr-preview-viewport{width:min(100%,360px);max-height:60dvh;margin:12px auto;touch-action:pan-x pan-y;overscroll-behavior:auto}
+.qr-preview-viewport canvas.chat-qr-large{margin:0!important;padding:0!important;max-width:none!important;max-height:none!important}

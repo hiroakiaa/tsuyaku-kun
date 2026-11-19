@@ -1,3 +1,4 @@
+import {checkPagePinchBlocked,touchPinch} from './gesture-test-helpers.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {createUiFixture} from './browser-fixture.mjs';
@@ -23,6 +24,19 @@ try{
   const base=process.env.LIVE_DOCUMENT_LAYOUT?'https://hiroakiaa.github.io/tsuyaku-kun':origin;
   await page.goto(base+'/documents.html?id='+id);
   await page.locator('#pdf-pages canvas').first().waitFor({timeout:30000});
+  if(width<800){
+   const cdp=await context.newCDPSession(page);await checkPagePinchBlocked(page,cdp,'#ask-form');
+   const before=await page.locator('#pdf-pages').evaluate(e=>e.getBoundingClientRect().width);
+   await touchPinch(page,cdp,'#pdf-scroll');
+   const after=await page.locator('#pdf-pages').evaluate(e=>e.getBoundingClientRect().width);
+   assert.ok(after>before*1.3,'PDF magnifies inside its preview');
+   assert.equal(await page.evaluate(()=>visualViewport.scale),1,'PDF zoom does not magnify the app');
+   await page.locator('#zoom-fit').click();
+   const wheelBefore=await page.locator('#pdf-pages').evaluate(e=>e.getBoundingClientRect().width);
+   await page.locator('#pdf-scroll').dispatchEvent('wheel',{ctrlKey:true,deltaY:-40,clientX:150,clientY:180});
+   assert.ok(await page.locator('#pdf-pages').evaluate(e=>e.getBoundingClientRect().width)>wheelBefore*1.2,'Trackpad pinch zooms the PDF only');
+   await page.locator('#zoom-fit').click();
+  }
   await page.locator('select.document-language:visible').selectOption('en');
   const frame=page.locator('.pdf-translation-layout[data-page="1"]:visible');await frame.waitFor({timeout:30000});
   assert.ok(await frame.locator('canvas').count()>0,'Original PDF page remains in the translated view');

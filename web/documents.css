@@ -649,3 +649,5 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
     max-height: min(65dvh, calc(100% - 4rem));
   }
 }
+
+html{touch-action:pan-x pan-y}

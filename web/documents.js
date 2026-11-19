@@ -1,3 +1,5 @@
+import {installPreviewOnlyGestures} from './preview-only-gestures.js?v=20261119-preview-only-1';
+installPreviewOnlyGestures();
 import {alignPdfTranslation} from './pdf-translation-alignment.js?v=20261119-layout-1';
 import {resumeTranslation,transientTranslationError} from './translation-resume.js?v=20261119-resume-1';
 import {readPdfPageText,lookupTableCell,lookupAlignedTableCell} from './document-table-lookup.js?v=88';
@@ -1376,6 +1378,11 @@ async function reader() {
     return {x:(a.clientX+b.clientX)/2-bounds.left,y:(a.clientY+b.clientY)/2-bounds.top,
       distance:Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)};
   }
+  preview.addEventListener('wheel',event=>{
+    if(!event.ctrlKey||!zoomable)return;
+    event.preventDefault();const bounds=preview.getBoundingClientRect();
+    setZoom(zoom*Math.exp(-event.deltaY*.01),{x:event.clientX-bounds.left,y:event.clientY-bounds.top});
+  },{passive:false});
   preview.addEventListener('touchstart',event=>{
     if (!zoomable) return;
     cancelAnimationFrame(coastFrame);
