@@ -32,13 +32,15 @@ try{
   const mid={x:r.x+r.width*.55,y:(Math.max(r.y,100)+Math.min(r.y+r.height,800))/2};
   const points=d=>[{x:mid.x-d/2,y:mid.y,id:1},{x:mid.x+d/2,y:mid.y,id:2}];
   const before=await metrics();const anchor={x:mid.x-r.x-1,y:mid.y-r.y-1};
-  const imagePoint={x:(before.left+anchor.x)/before.scale,y:(before.top+anchor.y)/before.scale};
+  const originalBox=await viewport.locator('canvas').boundingBox();
+  const imagePoint={x:(mid.x-originalBox.x)/before.scale,y:(mid.y-originalBox.y)/before.scale};
   await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:points(from)});
   for(let i=1;i<=8;i++){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:points(from+(to-from)*i/8)});await page.evaluate(()=>new Promise(requestAnimationFrame));}
   await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
   const after=await metrics();assert.ok(Math.abs(after.scale-before.scale*to/from)<.08,'Pinch scale follows fingers');
-  assert.ok(Math.abs((after.left+anchor.x)/after.scale-imagePoint.x)<3,'Horizontal point under fingers stays fixed');
-  assert.ok(Math.abs((after.top+anchor.y)/after.scale-imagePoint.y)<3,'Vertical point under fingers stays fixed');
+  const afterBox=await viewport.locator('canvas').boundingBox();
+  assert.ok(Math.abs((mid.x-afterBox.x)/after.scale-imagePoint.x)<3,'Horizontal point under fingers stays fixed');
+  assert.ok(Math.abs((mid.y-afterBox.y)/after.scale-imagePoint.y)<3,'Vertical point under fingers stays fixed');
   return after;
  }
  await pinch(60,120);
@@ -56,14 +58,16 @@ try{
  assert.equal((await metrics()).scale,1);
  const compact=await page.locator('.photo-preview-dialog').evaluate(d=>({header:d.querySelector('.photo-preview-heading').getBoundingClientRect().height,footer:d.querySelector('.photo-display-settings').getBoundingClientRect().height,unused:d.querySelector('.photo-overlay-viewport').clientHeight-d.querySelector('.photo-overlay-viewport canvas').getBoundingClientRect().height}));
  assert.ok(compact.header+compact.footer<=100,'Viewer controls use compact single rows');
- assert.ok(compact.unused<=3,'No empty strip below the fitted image');
+ const screen=await page.locator('.photo-preview-dialog').evaluate(d=>{const b=d.getBoundingClientRect(),v=d.querySelector('.photo-overlay-viewport').getBoundingClientRect(),c=d.querySelector('.photo-overlay-viewport canvas').getBoundingClientRect();return {top:b.top,bottom:innerHeight-b.bottom,topGap:c.top-v.top,bottomGap:v.bottom-c.bottom};});
+ assert.ok(Math.abs(screen.top)<1&&Math.abs(screen.bottom)<1,'No unused area outside the preview');
+ assert.ok(Math.abs(screen.topGap-screen.bottomGap)<3,'Image aspect-ratio space is balanced in the viewport');
  const placement=await page.locator('.photo-preview-dialog').evaluate(d=>{
   const bounds=d.getBoundingClientRect(),header=d.querySelector('.photo-preview-heading').getBoundingClientRect(),modes=d.querySelector('.photo-preview-modes').getBoundingClientRect();
   const buttons=[...d.querySelector('.photo-display-settings').querySelectorAll('button')].map(b=>b.getBoundingClientRect());
   const close=d.querySelector('.photo-preview-close').getBoundingClientRect();
   return {headerContainsClose:close.right<=bounds.right&&close.left>=bounds.left,footerGap:bounds.bottom-Math.max(...buttons.map(b=>b.bottom)),headerContainsModes:modes.top>=header.top&&modes.bottom<=header.bottom,titleVisible:d.querySelector('h2').getBoundingClientRect().width>30};
  });
- if(process.env.PHOTO_STYLE_DEBUG)console.log('close',await page.locator('.photo-preview-close').evaluate(e=>({html:e.outerHTML,color:getComputedStyle(e).color,font:getComputedStyle(e).fontSize,display:getComputedStyle(e).display,visibility:getComputedStyle(e).visibility})));
+ if(process.env.PHOTO_STYLE_DEBUG)console.log('close',await page.locator('.photo-preview-close').evaluate(e=>({html:e.outerHTML,color:getComputedStyle(e).color,font:getComputedStyle(e).fontSize,before:getComputedStyle(e,'::before').backgroundImage,beforeContent:getComputedStyle(e,'::before').content,display:getComputedStyle(e).display,visibility:getComputedStyle(e).visibility})));
  if(process.env.PHOTO_STYLE_DEBUG)console.log('placement',placement,await page.locator('.photo-preview-heading').evaluate(h=>[...h.children].map(e=>({tag:e.tagName,width:e.getBoundingClientRect().width,x:e.getBoundingClientRect().x,margin:getComputedStyle(e).margin,flex:getComputedStyle(e).flex}))));
  assert.ok(placement.headerContainsClose,'Close button stays inside the header');
  assert.ok(placement.footerGap<=4,'Buttons end at the modal bottom without a home-indicator spacer');

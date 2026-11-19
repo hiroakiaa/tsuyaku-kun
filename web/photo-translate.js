@@ -1,3 +1,4 @@
+import {localIcon} from './icons.js?v=photo-viewer-1';
 import {installPhotoZoom} from './photo-zoom.js?v=20261119-dialog-fit-3';
 import {translatePhotoProgressively} from './photo-progress.js?v=20261020-photo-reuse-4';
 import {matchingPhotoBlocks,drawPhotoOverlay} from './photo-overlay.js?v=20261020-photo-overlay-4';
@@ -24,14 +25,14 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
   const text=el('textarea');text.rows=5;text.setAttribute('aria-label','読み取った原文');const textLabel=el('label','原文を確認・修正');textLabel.append(text);
   const result=el('div',undefined,'photo-results'),details=el('details',undefined,'photo-text-details');details.hidden=true;details.append(el('summary','原文・訳文を見る'),textLabel,el('p','写真の文字の位置に訳を表示します。読み取りを修正すると、位置を対応づけられない場合があります。','photo-help'),result,el('p','写真そのものは保存しません。読取結果と訳文は同じ利用者の次回の翻訳でも再利用します。','photo-help'));
   const overlay=el('section',undefined,'photo-overlay');overlay.hidden=true;const viewport=el('div',undefined,'photo-overlay-viewport'),overlayCanvas=el('canvas');viewport.tabIndex=0;viewport.setAttribute('role','region');viewport.setAttribute('aria-label','翻訳画像。ピンチで拡大縮小、指や矢印キーで移動できます。');viewport.append(overlayCanvas);overlayCanvas.setAttribute('aria-label','写真に重ねた翻訳。全文は原文・訳文を見るで確認できます。');
-  const settings=el('div',undefined,'photo-display-settings');const overlayMode=el('input');overlayMode.type='checkbox';overlayMode.checked=true;const overlayLabel=el('label','画像に訳を重ねる');overlayLabel.prepend(overlayMode);const zoom=el('input');zoom.type='range';zoom.min='1';zoom.max='6';zoom.step='.01';zoom.value='1';zoom.setAttribute('aria-label','翻訳画像の拡大');const zoomLabel=el('label','拡大');zoomLabel.append(zoom);const modes=el('div',undefined,'photo-preview-modes');modes.setAttribute('role','group');modes.setAttribute('aria-label','写真の表示');
+  const settings=el('div',undefined,'photo-display-settings');const overlayMode=el('input');overlayMode.type='checkbox';overlayMode.checked=true;const overlayLabel=el('label','画像に訳を重ねる');overlayLabel.prepend(overlayMode);const zoom=el('input');zoom.type='range';zoom.min='1';zoom.max='6';zoom.step='.01';zoom.value='1';zoom.setAttribute('aria-label','翻訳画像の拡大');const zoomLabel=el('label','拡大');zoomLabel.append(zoom);const modes=el('div',undefined,'photo-preview-modes');modes.setAttribute('role','group');modes.setAttribute('aria-label','写真の表示');modes.setAttribute('data-ui-ignore','');
   const originalMode=el('button','原文'),translationMode=el('button','翻訳');originalMode.type=translationMode.type='button';
   function setMode(translated){overlayMode.checked=translated;originalMode.setAttribute('aria-pressed',String(!translated));translationMode.setAttribute('aria-pressed',String(translated));paintOverlay();}
   originalMode.onclick=()=>setMode(false);translationMode.onclick=()=>setMode(true);originalMode.setAttribute('aria-pressed','false');translationMode.setAttribute('aria-pressed','true');modes.append(originalMode,translationMode);settings.append(zoomLabel);const overlayNote=el('p',undefined,'photo-help');overlayNote.hidden=true;const previewDialog=el('dialog',undefined,'photo-preview-dialog');previewDialog.setAttribute('aria-label','画像プレビュー');
-  const previewHeader=el('header',undefined,'photo-preview-heading'),previewTitle=el('h2','画像プレビュー'),previewClose=el('button','×','photo-preview-close');
-  previewTitle.tabIndex=-1;previewTitle.autofocus=true;previewClose.type='button';previewClose.setAttribute('aria-label','プレビューを閉じる');previewHeader.append(previewTitle,previewClose);
-  const fit=el('button','全体表示');fit.type='button';fit.onclick=()=>overlayZoom.setScale(1);
-  const plus=el('button','＋'),minus=el('button','−');plus.type=minus.type='button';plus.setAttribute('aria-label','拡大');minus.setAttribute('aria-label','縮小');
+  const previewHeader=el('header',undefined,'photo-preview-heading'),previewTitle=el('h2','プレビュー'),previewClose=el('button','×','photo-preview-close');
+  previewTitle.tabIndex=-1;previewTitle.autofocus=true;previewClose.type='button';previewClose.setAttribute('aria-label','プレビューを閉じる');previewClose.replaceChildren(localIcon('xmark'));previewHeader.append(previewTitle,previewClose);
+  const fit=el('button');fit.type='button';fit.className='photo-fit';fit.setAttribute('aria-label','全体表示');fit.title='全体表示';fit.append(localIcon('expand'));fit.onclick=()=>overlayZoom.setScale(1);
+  const plus=el('button','＋'),minus=el('button','−');plus.type=minus.type='button';plus.setAttribute('aria-label','拡大');plus.replaceChildren(localIcon('plus'));minus.setAttribute('aria-label','縮小');
   plus.onclick=()=>overlayZoom.setScale(overlayZoom.scale*1.25);minus.onclick=()=>overlayZoom.setScale(overlayZoom.scale/1.25);
   settings.replaceChildren(minus,zoom,plus,fit);
   previewHeader.prepend(modes);previewDialog.append(previewHeader,viewport,overlayNote,settings);document.body.append(previewDialog);
@@ -49,11 +50,8 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
   function fitPreviewDialog(){
     if(!previewDialog.open||!preview.width||!preview.height)return;
     const availableWidth=window.visualViewport?.width||innerWidth,availableHeight=window.visualViewport?.height||innerHeight;
-    const controls=previewHeader.getBoundingClientRect().height+settings.getBoundingClientRect().height+(!overlayNote.hidden?overlayNote.getBoundingClientRect().height:0);
-    const ratio=preview.width/preview.height;
-    const width=Math.min(availableWidth,Math.max(Math.min(availableWidth,300),(availableHeight-controls)*ratio));
-    previewDialog.style.setProperty('--photo-preview-width',width+'px');
-    previewDialog.style.setProperty('--photo-preview-height',Math.min(availableHeight,width/ratio+controls)+'px');
+    previewDialog.style.setProperty('--photo-preview-width',availableWidth+'px');
+    previewDialog.style.setProperty('--photo-preview-height',availableHeight+'px');
   }
   window.addEventListener('resize',fitPreviewDialog);window.visualViewport?.addEventListener('resize',fitPreviewDialog);
   function say(value=''){notice.textContent=value;notice.hidden=!value;}
