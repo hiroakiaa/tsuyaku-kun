@@ -92,7 +92,7 @@ body.phone-home #modal .photo-selection-remove{position:absolute;right:8px;top:8
 @media(prefers-reduced-motion:reduce){.photo-selection,.photo-simple .photo-languages,.photo-simple .photo-translate-run{animation:none}}
 
 /* Clearly distinguish the currently displayed image without changing button size. */
-body.phone-home .photo-preview-heading .photo-preview-modes button{border:1px solid transparent!important;transition:background-color .16s ease,color .16s ease,border-color .16s ease}
-body.phone-home .photo-preview-heading .photo-preview-modes button[aria-pressed="true"]{background:#e6d5f7!important;color:#211b29!important;border-color:#e6d5f7!important;font-weight:700!important}
-body.phone-home .photo-preview-heading .photo-preview-modes button[aria-pressed="false"]{background:transparent!important;color:#b9b9c2!important;border-color:#ffffff24!important}
-@media(prefers-reduced-motion:reduce){body.phone-home .photo-preview-heading .photo-preview-modes button{transition:none}}
+body.phone-home .photo-preview-dialog[open] .photo-preview-heading .photo-preview-modes button{border:1px solid transparent!important;transition:background-color .16s ease,color .16s ease,border-color .16s ease}
+body.phone-home .photo-preview-dialog[open] .photo-preview-heading .photo-preview-modes button[aria-pressed="true"]{background:#e6d5f7!important;color:#211b29!important;border-color:#e6d5f7!important;font-weight:700!important}
+body.phone-home .photo-preview-dialog[open] .photo-preview-heading .photo-preview-modes button[aria-pressed="false"]{background:transparent!important;color:#b9b9c2!important;border-color:#ffffff24!important}
+@media(prefers-reduced-motion:reduce){body.phone-home .photo-preview-dialog[open] .photo-preview-heading .photo-preview-modes button{transition:none}}
