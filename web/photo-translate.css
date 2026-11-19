@@ -6,3 +6,8 @@ body.phone-home #photo-translate-open,body.phone-home #photo-translate-open:hove
 .photo-preview-modes button{min-width:6rem;border-radius:0;border:0;border-bottom:2px solid transparent;background:transparent;color:inherit}
 .photo-preview-modes button[aria-pressed="true"]{border-bottom-color:#e6d5f7;color:#e6d5f7}
 .photo-overlay-viewport{border-radius:8px;background:#161616;touch-action:pan-x pan-y}
+
+.photo-overlay-viewport{position:relative;overflow:auto;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;overflow-anchor:none;scroll-behavior:auto}
+.photo-zoom-surface{position:relative;min-width:100%}
+.photo-overlay-viewport .photo-zoom-surface canvas{position:absolute;inset:0 auto auto 0;display:block;max-width:none;max-height:none;transform-origin:0 0;object-fit:fill;user-select:none;-webkit-user-select:none}
+.photo-source-viewport{max-height:40vh}

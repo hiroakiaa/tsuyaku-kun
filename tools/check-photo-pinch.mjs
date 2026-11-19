@@ -1,0 +1,54 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {createUiFixture} from './browser-fixture.mjs';
+const fixture=await createUiFixture(),{browser,setup,origin}=fixture;
+let ocrCalls=0,translationCalls=0;
+fixture.setApiHandler(request=>{
+ const path=new URL(request.url()).pathname;
+ if(path==='/photo/recognize'){ocrCalls++;return {json:{text:'提出日は10月20日です。',blocks:[{id:'b0',text:'提出日は10月20日です。',box:{x:.04,y:.17,width:.8,height:.08}}]}};}
+ if(path==='/photo/translate'){translationCalls++;const body=request.postDataJSON();return {json:{blocks:body.blocks.map(b=>({id:b.id,translations:{[body.targets[0]]:'Due October 20.'}}))}};}
+});
+const errors=[];
+try{
+ const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1});
+ await setup(context);if(process.env.LIVE_PHOTO_PREVIEW)await context.route('https://hiroakiaa.github.io/**',route=>route.continue());const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(process.env.LIVE_PHOTO_PREVIEW?'https://hiroakiaa.github.io/tsuyaku-kun/?photo-pinch-check='+Date.now():origin);await page.locator('#photo-translate-open').click();
+ const sample=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=1400;c.height=1200;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.fillStyle='#111';g.font='42px sans-serif';g.fillText('提出日は10月20日です。',56,245);g.strokeStyle='#ddd';g.strokeRect(40,180,1300,120);return c.toDataURL('image/jpeg').split(',')[1];});
+ await page.locator('.photo-simple input[type=file]').setInputFiles({name:'synthetic-photo.jpg',mimeType:'image/jpeg',buffer:Buffer.from(sample,'base64')});
+ const source=page.locator('.photo-source-viewport');await source.waitFor({state:'visible'});
+ await page.locator('.photo-simple > button:not(.photo-pick)').click();
+ const viewport=page.locator('.photo-overlay > .photo-overlay-viewport');await viewport.waitFor({state:'visible'});
+ const cdp=await context.newCDPSession(page);
+ async function metrics(){return viewport.evaluate(v=>({left:v.scrollLeft,top:v.scrollTop,width:v.clientWidth,height:v.clientHeight,scale:Number(v.querySelector('canvas').style.transform.match(/scale\(([^)]+)/)[1])}));}
+ async function pinch(from,to){
+  await viewport.scrollIntoViewIfNeeded();const r=await viewport.boundingBox();
+  const mid={x:r.x+r.width*.55,y:r.y+Math.min(r.height*.5,120)};
+  const points=d=>[{x:mid.x-d/2,y:mid.y,id:1},{x:mid.x+d/2,y:mid.y,id:2}];
+  const before=await metrics();const anchor={x:mid.x-r.x-1,y:mid.y-r.y-1};
+  const imagePoint={x:(before.left+anchor.x)/before.scale,y:(before.top+anchor.y)/before.scale};
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:points(from)});
+  for(let i=1;i<=8;i++){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:points(from+(to-from)*i/8)});await page.evaluate(()=>new Promise(requestAnimationFrame));}
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  const after=await metrics();assert.ok(Math.abs(after.scale-before.scale*to/from)<.08,'Pinch scale follows fingers');
+  assert.ok(Math.abs((after.left+anchor.x)/after.scale-imagePoint.x)<3,'Horizontal point under fingers stays fixed');
+  assert.ok(Math.abs((after.top+anchor.y)/after.scale-imagePoint.y)<3,'Vertical point under fingers stays fixed');
+  return after;
+ }
+ await pinch(60,120);
+ await viewport.evaluate(v=>{v.scrollLeft+=25;v.scrollTop+=30;});
+ await pinch(60,90);
+ const before=await metrics();await page.locator('.photo-preview-modes button').nth(0).click();
+ const after=await metrics();assert.deepEqual(after,before,'Switching original keeps zoom and position');
+ await page.locator('.photo-preview-modes button').nth(1).click();
+ assert.deepEqual(await metrics(),before);assert.equal(ocrCalls,1);assert.equal(translationCalls,1,'Pinch and toggles never call AI again');
+ await pinch(100,60);
+ await fs.mkdir('checks/photo-pinch',{recursive:true});
+ await page.screenshot({path:'checks/photo-pinch/mobile-translated.png',fullPage:true});
+ await page.locator('.photo-display-settings summary').click();
+ await page.locator('.photo-display-settings input[type=range]').fill('1');
+ assert.equal((await metrics()).scale,1);
+ await page.screenshot({path:'checks/photo-pinch/mobile-fit.png',fullPage:true});
+ assert.deepEqual(errors,[]);
+ console.log((process.env.LIVE_PHOTO_PREVIEW?'Published assets (synthetic OCR/translation responses): ':'Local fixture: ')+'PASS mobile touch pinch: focus point, continued zoom after scroll, original toggle, zoom slider, no added API calls');
+ await context.close();
+}finally{await browser.close();}
