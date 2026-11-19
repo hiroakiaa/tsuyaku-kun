@@ -24,8 +24,8 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
   const targetLabel=el('label','翻訳する言語');targetLabel.append(target);const languageRow=el('div',undefined,'photo-languages');languageRow.append(targetLabel);languageRow.hidden=true;
   const translate=el('button','翻訳する');translate.type='button';translate.className='photo-translate-run';translate.disabled=true;translate.hidden=true;translate.title='選んだ画像をGoogleで読み取り、翻訳します';
   const notice=el('p',undefined,'photo-notice');notice.hidden=true;notice.setAttribute('role','status');notice.setAttribute('aria-live','polite');
-  const text=el('textarea');text.rows=5;text.setAttribute('aria-label','読み取った原文');const textLabel=el('label','原文を確認・修正');textLabel.append(text);
-  const result=el('div',undefined,'photo-results'),details=el('details',undefined,'photo-text-details');details.hidden=true;details.append(el('summary','原文・訳文を見る'),textLabel,el('p','写真の文字の位置に訳を表示します。読み取りを修正すると、位置を対応づけられない場合があります。','photo-help'),result,el('p','写真そのものは保存しません。読取結果と訳文は同じ利用者の次回の翻訳でも再利用します。','photo-help'));
+  const text=el('textarea');text.rows=5;text.setAttribute('aria-label','読み取った原文');let textView='translated';
+  const result=el('div',undefined,'photo-results'),details=el('details',undefined,'photo-text-details');details.hidden=true;details.append(el('summary','原文・訳文を見る'),result,el('p','写真そのものは保存しません。読取結果と訳文は同じ利用者の次回の翻訳でも再利用します。','photo-help'));
   const overlay=el('section',undefined,'photo-overlay');overlay.hidden=true;const viewport=el('div',undefined,'photo-overlay-viewport'),overlayCanvas=el('canvas');viewport.tabIndex=0;viewport.setAttribute('role','region');viewport.setAttribute('aria-label','翻訳画像。ピンチで拡大縮小、指や矢印キーで移動できます。');const loading=el('div',undefined,'photo-preview-loading'),loadingSpinner=el('span',undefined,'photo-preview-spinner'),loadingText=el('span'),previewRetry=el('button','再試行');
   loadingSpinner.append(localIcon('spinner'));loading.setAttribute('data-ui-ignore','');loading.setAttribute('role','status');loading.setAttribute('aria-live','polite');loading.hidden=true;previewRetry.type='button';previewRetry.hidden=true;
   loading.append(loadingSpinner,loadingText,previewRetry);viewport.append(overlayCanvas,loading);overlayCanvas.setAttribute('aria-label','写真に重ねた翻訳');
@@ -99,10 +99,19 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
     let original;try{original=photoTranslationText(text.value,text.selectionStart,text.selectionEnd);}catch(e){details.hidden=false;details.open=true;throw e;}
     const from=source.value,to=target.value,blocks=matchingPhotoBlocks(original,ocrText,ocrBlocks),inputBlocks=blocks||[{id:'b0',text:original}],key=JSON.stringify([original,from,to,inputBlocks.map(b=>b.text)]);
     function show(data){
-     result.replaceChildren();const incomplete=data.blocks.length<inputBlocks.length||data.blocks.some(b=>b.partial);if(incomplete)result.append(el('p','翻訳途中です。まだ訳されていない部分があります。','photo-help'));
+     result.replaceChildren();const incomplete=data.blocks.length<inputBlocks.length||data.blocks.some(b=>b.partial);
      if(data.blocks.length){translationMode.disabled=false;overlayData={blocks:blocks||[],translated:data.blocks,to};overlay.hidden=false;previewViewport.hidden=true;paintOverlay();if(!blocks){overlayNote.textContent='文字の位置を対応づけられなかったため原文画像を表示しています。訳文は下の「原文・訳文を見る」で確認できます。';overlayNote.hidden=false;}details.open=!blocks;}else details.open=true;
      const translated=data.blocks.map(b=>b.translations[to]).join('\n\n');
-     for(const [code,value] of from===to?[[from,original]]:[[from,original],[to,translated]]){if(!value)continue;const section=el('section',undefined,'reference-language'),name=languages().find(l=>l.code===code)?.labelJa||(code==='auto'?'原文':code);section.setAttribute('aria-label',name);const paragraph=el('p',value,'reference-language-text');paragraph.lang=code==='auto'?'':code==='ja-easy'?'ja':code;section.append(el('h3',name),paragraph,...(code==='auto'?[]:[speechControls(value,code,'photo:'+crypto.randomUUID()+':'+code)]));if(incomplete&&code===to)for(const button of section.querySelectorAll('[data-play]'))button.disabled=true;result.append(section);}
+     const tabs=el('div',undefined,'photo-text-tabs');tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','原文と訳文');result.append(tabs);const views=[];
+     for(const [kind,label,code,value] of [['original','原文',from,original],['translated','訳文',to,translated]]){
+      const tab=el('button',label),section=el('section',undefined,'reference-language photo-text-panel'),paragraph=el('p',value,'reference-language-text');
+      tab.type='button';tab.setAttribute('role','tab');tab.id='photo-text-tab-'+kind;tab.setAttribute('aria-controls','photo-text-panel-'+kind);section.id='photo-text-panel-'+kind;section.setAttribute('role','tabpanel');section.setAttribute('aria-labelledby',tab.id);paragraph.lang=code==='auto'?'':code==='ja-easy'?'ja':code;paragraph.dir='auto';
+      if(code!=='auto'){const playback=speechControls(value,code,'photo:'+crypto.randomUUID()+':'+kind);playback.classList.add('photo-text-playback');if(incomplete&&kind==='translated')for(const button of playback.querySelectorAll('[data-play]'))button.disabled=true;section.append(playback);}
+      section.append(paragraph);tabs.append(tab);result.append(section);views.push({kind,tab,section});
+     }
+     function selectView(kind,focus=false){textView=kind;for(const view of views){const selected=view.kind===kind;if(!selected&&!view.section.hidden){const stop=view.section.querySelector('[data-stop]:not([hidden])');stop?.click();}view.section.hidden=!selected;view.tab.setAttribute('aria-selected',String(selected));view.tab.tabIndex=selected?0:-1;if(selected&&focus)view.tab.focus();}}
+     for(const view of views){view.tab.onclick=()=>selectView(view.kind);view.tab.onkeydown=event=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(event.key)){event.preventDefault();selectView(event.key==='Home'?'original':event.key==='End'?'translated':view.kind==='original'?'translated':'original',true);}};}
+     selectView(textView);if(incomplete)result.append(el('p','翻訳途中です。まだ訳されていない部分があります。','photo-help'));
      details.hidden=false;updateSpeechControls();
     }
     say('翻訳しています…');let data=translations.get(key);if(data)data={...data,reuse:{...data.reuse,reused:Math.max(1,data.reuse?.total||1)}};

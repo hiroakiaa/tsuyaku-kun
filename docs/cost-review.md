@@ -556,3 +556,6 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 
 ### 2026-11-19 Preview selected state
 - CSS-only original/translation selection emphasis. No added model calls, translation, cache changes or usage costs. Existing toggle test checks zero additional API calls.
+
+### 2026-11-19 Photo original/translation text tabs
+- Removed duplicate editable OCR display; original and translation share tabs with nearby existing opt-in playback. Tabs reuse existing text and never call OCR/translation. Switching away from a playing panel stops its playback. No automatic audio or added model requests.

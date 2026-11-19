@@ -96,3 +96,13 @@ body.phone-home .photo-preview-dialog[open] .photo-preview-heading .photo-previe
 body.phone-home .photo-preview-dialog[open] .photo-preview-heading .photo-preview-modes button[aria-pressed="true"]{background:#e6d5f7!important;color:#211b29!important;border-color:#e6d5f7!important;font-weight:700!important}
 body.phone-home .photo-preview-dialog[open] .photo-preview-heading .photo-preview-modes button[aria-pressed="false"]{background:transparent!important;color:#b9b9c2!important;border-color:#ffffff24!important}
 @media(prefers-reduced-motion:reduce){body.phone-home .photo-preview-dialog[open] .photo-preview-heading .photo-preview-modes button{transition:none}}
+
+/* Original and translated text share a compact tab and audio toolbar. */
+.photo-results{position:relative;display:block}
+.photo-text-tabs{display:flex;gap:6px;min-height:48px;padding-inline-end:112px;margin-bottom:16px;align-items:center}
+body.phone-home #modal .photo-text-tabs button{min-height:44px;padding:8px 14px;border:1px solid #ffffff24;border-radius:10px;background:transparent!important;color:#b9b9c2}
+body.phone-home #modal .photo-text-tabs button[aria-selected="true"]{background:#e6d5f7!important;border-color:#e6d5f7;color:#211b29!important;font-weight:700}
+.photo-text-panel .photo-text-playback{position:absolute;top:0;right:0;display:flex;gap:4px;align-items:center;min-height:48px;margin:0}
+body.phone-home #modal .photo-text-playback button{width:44px;height:44px;min-height:44px;min-width:44px;padding:10px;margin:0}
+.photo-text-playback svg{width:20px;height:20px}
+.photo-text-panel .reference-language-text{margin:0;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}

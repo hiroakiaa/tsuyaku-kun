@@ -7,8 +7,8 @@ function reset(){readGate=new Promise(r=>{read=r});translateGate=new Promise(r=>
 reset();
 setApiHandler(async request=>{
  const path=new URL(request.url()).pathname;
- if(path==='/photo/recognize'){await readGate;return {json:{text:'検証用の文章です。',blocks:[{id:'b0',text:'検証用の文章です。',box:{x:.1,y:.1,width:.8,height:.1}}]}};}
- if(path==='/photo/translate'){await translateGate;const b=request.postDataJSON();assert.equal(b.source,'auto');return {json:{blocks:b.blocks.map(part=>({id:part.id,translations:{[b.targets[0]]:'Test translation.'}}))}};}
+ if(path==='/photo/recognize'){await readGate;return {json:{text:'検証用の文章です。',sourceLanguage:'ja',blocks:[{id:'b0',text:'検証用の文章です。',box:{x:.1,y:.1,width:.8,height:.1}}]}};}
+ if(path==='/photo/translate'){await translateGate;const b=request.postDataJSON();assert.equal(b.source,'ja');return {json:{blocks:b.blocks.map(part=>({id:part.id,translations:{[b.targets[0]]:'Test translation.'}}))}};}
 });
 try{
  for(const leaveEarly of [false,true]){
@@ -45,6 +45,16 @@ try{
   assert.equal(await loading.isVisible(),false,'Loading disappears when finished');
   assert.equal(await page.locator('.photo-preview-dialog').getAttribute('open'),leaveEarly?null:'','Completion never reopens a preview the user dismissed');
   if(!leaveEarly){assert.ok((await page.locator('.photo-results').textContent()).includes('Test translation'));await page.screenshot({path:'checks/photo-loading/complete.png'});}
+  if(!leaveEarly)await page.locator('.photo-preview-close').click();
+  await page.locator('.photo-text-details summary').click();
+  assert.equal(await page.locator('.photo-text-details textarea').count(),0,'Duplicate editable OCR field removed');
+  const tabs=page.locator('.photo-text-tabs [role=tab]');assert.equal(await tabs.count(),2);
+  assert.equal(await tabs.nth(1).getAttribute('aria-selected'),'true');
+  assert.equal(await page.locator('#photo-text-panel-translated').isVisible(),true);
+  assert.equal(await page.locator('#photo-text-panel-original').isVisible(),false);
+  for(const index of [0,1]){await tabs.nth(index).click();const panel=page.locator(index?'#photo-text-panel-translated':'#photo-text-panel-original');assert.equal(await panel.isVisible(),true);const play=panel.locator('[data-play]');assert.equal(await play.isVisible(),true);const tb=await tabs.nth(index).boundingBox(),pb=await play.boundingBox();assert.ok(Math.abs(tb.y-pb.y)<12,'Playback sits beside the tabs');}
+  await fs.mkdir('checks/photo-text-tabs',{recursive:true});await page.screenshot({path:'checks/photo-text-tabs/translated.png'});
+  await tabs.nth(0).click();await page.screenshot({path:'checks/photo-text-tabs/original.png'});
   assert.deepEqual(errors,[]);await context.close();
  }
  console.log((process.env.LIVE_PHOTO_PREVIEW?'Published assets':'Local fixture')+': PASS direct preview transition, OCR/translation loading, completion without another click and user-dismissal preservation');
