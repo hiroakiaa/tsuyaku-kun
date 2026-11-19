@@ -26,7 +26,7 @@ try{
  await page.waitForFunction(()=>document.querySelector('.photo-simple')?.getAttribute('aria-busy')==='false');
  assert.equal(calls.get('A'.repeat(200)),1);assert.equal(calls.get('B'.repeat(200)),2);assert.equal(calls.get('C'.repeat(200)),1);
  assert.ok((await page.locator('.photo-results').textContent()).includes('C'.repeat(200)));
- assert.equal(await page.locator('.photo-overlay').isVisible(),true);assert.deepEqual(errors,[]);
+ assert.equal(await page.locator('.photo-overlay').isVisible(),true);assert.equal(await page.locator('.photo-preview-dialog').getAttribute('open'),'');assert.equal(await page.locator('.photo-preview-loading').isVisible(),false);assert.deepEqual(errors,[]);
  console.log((process.env.LIVE_PHOTO_PREVIEW?'Published assets':'Local fixture')+': PASS automatic continuation after timeout; no user retry; finished A/C not translated again; image preview remains');
  await context.close();
 }finally{await browser.close();}

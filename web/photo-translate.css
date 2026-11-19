@@ -70,3 +70,15 @@ body.phone-home .photo-preview-heading .photo-preview-close{order:2}
 body.phone-home .photo-preview-dialog .photo-display-settings input[type=range]{border:0!important;box-shadow:none!important;border-radius:0!important;padding:0!important;min-height:24px!important;background:transparent!important}
 
 body.phone-home .photo-preview-dialog .photo-display-settings>button:first-child{font-size:24px!important}
+
+body.phone-home .photo-preview-dialog[open]{animation:photo-preview-enter .18s ease-out}
+.photo-preview-loading{position:absolute;z-index:5;left:50%;bottom:16px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;max-width:calc(100% - 32px);box-sizing:border-box;padding:10px 14px;border:1px solid #ffffff20;border-radius:12px;background:#19191df2;color:#ededf0;font:14px/1.5 system-ui,sans-serif}
+.photo-preview-spinner{display:grid;place-items:center;flex:none;width:20px;height:20px;animation:photo-preview-spin .9s linear infinite}
+.photo-preview-spinner svg{width:20px;height:20px}
+.photo-preview-loading>span:not(.photo-preview-spinner){min-width:0;overflow-wrap:anywhere}
+.photo-preview-loading button{flex:none}
+@keyframes photo-preview-enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes photo-preview-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){body.phone-home .photo-preview-dialog[open],.photo-preview-spinner{animation:none}}
+
+body.phone-home .photo-preview-dialog [hidden]{display:none!important}

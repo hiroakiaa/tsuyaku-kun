@@ -24,7 +24,9 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
   const notice=el('p',undefined,'photo-notice');notice.hidden=true;notice.setAttribute('role','status');notice.setAttribute('aria-live','polite');
   const text=el('textarea');text.rows=5;text.setAttribute('aria-label','読み取った原文');const textLabel=el('label','原文を確認・修正');textLabel.append(text);
   const result=el('div',undefined,'photo-results'),details=el('details',undefined,'photo-text-details');details.hidden=true;details.append(el('summary','原文・訳文を見る'),textLabel,el('p','写真の文字の位置に訳を表示します。読み取りを修正すると、位置を対応づけられない場合があります。','photo-help'),result,el('p','写真そのものは保存しません。読取結果と訳文は同じ利用者の次回の翻訳でも再利用します。','photo-help'));
-  const overlay=el('section',undefined,'photo-overlay');overlay.hidden=true;const viewport=el('div',undefined,'photo-overlay-viewport'),overlayCanvas=el('canvas');viewport.tabIndex=0;viewport.setAttribute('role','region');viewport.setAttribute('aria-label','翻訳画像。ピンチで拡大縮小、指や矢印キーで移動できます。');viewport.append(overlayCanvas);overlayCanvas.setAttribute('aria-label','写真に重ねた翻訳');
+  const overlay=el('section',undefined,'photo-overlay');overlay.hidden=true;const viewport=el('div',undefined,'photo-overlay-viewport'),overlayCanvas=el('canvas');viewport.tabIndex=0;viewport.setAttribute('role','region');viewport.setAttribute('aria-label','翻訳画像。ピンチで拡大縮小、指や矢印キーで移動できます。');const loading=el('div',undefined,'photo-preview-loading'),loadingSpinner=el('span',undefined,'photo-preview-spinner'),loadingText=el('span'),previewRetry=el('button','再試行');
+  loadingSpinner.append(localIcon('spinner'));loading.setAttribute('data-ui-ignore','');loading.setAttribute('role','status');loading.setAttribute('aria-live','polite');loading.hidden=true;previewRetry.type='button';previewRetry.hidden=true;
+  loading.append(loadingSpinner,loadingText,previewRetry);viewport.append(overlayCanvas,loading);overlayCanvas.setAttribute('aria-label','写真に重ねた翻訳');
   const settings=el('div',undefined,'photo-display-settings');const overlayMode=el('input');overlayMode.type='checkbox';overlayMode.checked=true;const overlayLabel=el('label','画像に訳を重ねる');overlayLabel.prepend(overlayMode);const zoom=el('input');zoom.type='range';zoom.min='1';zoom.max='6';zoom.step='.01';zoom.value='1';zoom.setAttribute('aria-label','翻訳画像の拡大');const zoomLabel=el('label','拡大');zoomLabel.append(zoom);const modes=el('div',undefined,'photo-preview-modes');modes.setAttribute('role','group');modes.setAttribute('aria-label','写真の表示');modes.setAttribute('data-ui-ignore','');
   const originalMode=el('button','原文'),translationMode=el('button','翻訳');originalMode.type=translationMode.type='button';
   function setMode(translated){overlayMode.checked=translated;originalMode.setAttribute('aria-pressed',String(!translated));translationMode.setAttribute('aria-pressed',String(translated));paintOverlay();}
@@ -39,13 +41,19 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
   const openPreview=el('button',undefined,'photo-open-preview photo-image-card'),thumbnail=el('canvas');openPreview.type='button';openPreview.setAttribute('aria-label','翻訳画像を開く');openPreview.append(thumbnail,el('span','翻訳画像を開く ↗'));overlay.append(openPreview);
   previewViewport.append(el('span','原文画像を開く ↗'));
   let previewReturn=null,readerScroll=0;
-  function openImage(translated,trigger){if(!image)return;previewReturn=trigger;readerScroll=root.closest('dialog').scrollTop;setMode(translated&&Boolean(overlayData));translationMode.disabled=!overlayData;previewDialog.showModal();fitPreviewDialog();paintOverlay();}
+  function openImage(translated,trigger){
+    if(!image)return;
+    if(!previewDialog.open){previewReturn=trigger;readerScroll=root.closest('dialog').scrollTop;}
+    setMode(translated);translationMode.disabled=!overlayData&&!busy;
+    if(!previewDialog.open)previewDialog.showModal();
+    fitPreviewDialog();paintOverlay();renderPreviewStatus();
+  }
   previewViewport.onclick=()=>openImage(false,previewViewport);openPreview.onclick=()=>openImage(true,openPreview);
   previewClose.onclick=()=>previewDialog.close();
-  previewDialog.addEventListener('close',()=>{const host=root.closest('dialog');if(host?.open){host.scrollTop=readerScroll;previewReturn?.focus({preventScroll:true});}});
+  previewDialog.addEventListener('close',()=>{notice.setAttribute('aria-live','polite');const host=root.closest('dialog');if(host?.open){host.scrollTop=readerScroll;previewReturn?.focus({preventScroll:true});}});
   overlayMode.onchange=paintOverlay;const overlayZoom=installPhotoZoom(viewport,overlayCanvas,{fitHeight:true,onChange:value=>{zoom.value=String(value);}});zoom.oninput=()=>overlayZoom.setScale(zoom.value);
   root.append(file,pick,previewViewport,languageRow,translate,notice,overlay,details);modal('写真を翻訳',root);
-  let image=null,objectURL=null,busy=false,closed=false,epoch=0,controller=null,requestId=null,currentHash=null,ocrText='',ocrBlocks=[],overlayData=null;
+  let image=null,objectURL=null,busy=false,closed=false,epoch=0,controller=null,requestId=null,currentHash=null,ocrText='',ocrBlocks=[],overlayData=null,translationError='';
   root.closest('dialog').addEventListener('close',()=>{closed=true;epoch++;overlayZoom.destroy();window.removeEventListener('resize',fitPreviewDialog);window.visualViewport?.removeEventListener('resize',fitPreviewDialog);if(previewDialog.open)previewDialog.close();previewDialog.remove();controller?.abort();for(const active of controllers)active.abort();if(objectURL)URL.revokeObjectURL(objectURL);image=null;preview.width=preview.height=overlayCanvas.width=overlayCanvas.height=1;},{once:true});
   function fitPreviewDialog(){
     if(!previewDialog.open||!preview.width||!preview.height)return;
@@ -54,9 +62,16 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
     previewDialog.style.setProperty('--photo-preview-height',availableHeight+'px');
   }
   window.addEventListener('resize',fitPreviewDialog);window.visualViewport?.addEventListener('resize',fitPreviewDialog);
-  function say(value=''){notice.textContent=value;notice.hidden=!value;}
-  function buttons(){pick.disabled=busy;file.disabled=busy;translate.disabled=busy||!image;source.disabled=target.disabled=text.disabled=busy;translate.textContent=busy?'翻訳しています…':'翻訳する';root.setAttribute('aria-busy',String(busy));}
-  function clearTranslation(){overlayMode.checked=true;originalMode.setAttribute('aria-pressed','false');translationMode.setAttribute('aria-pressed','true');result.replaceChildren();overlay.hidden=true;overlayData=null;previewViewport.hidden=!image;say();}
+  function renderPreviewStatus(){
+    const working=busy&&Boolean(image);
+    loading.hidden=!working&&!translationError;loadingSpinner.hidden=!working;previewRetry.hidden=working||!translationError;
+    loadingText.textContent=working?(notice.textContent||'翻訳を準備しています…'):translationError;
+    previewDialog.setAttribute('aria-busy',String(working));
+  }
+  previewRetry.onclick=()=>void translate.onclick();
+  function say(value=''){notice.textContent=value;notice.hidden=!value;notice.setAttribute('aria-live',previewDialog.open?'off':'polite');renderPreviewStatus();}
+  function buttons(){pick.disabled=busy;file.disabled=busy;translate.disabled=busy||!image;source.disabled=target.disabled=text.disabled=busy;translate.textContent=busy?'翻訳しています…':'翻訳する';root.setAttribute('aria-busy',String(busy));renderPreviewStatus();}
+  function clearTranslation(){translationError='';overlayMode.checked=true;originalMode.setAttribute('aria-pressed','false');translationMode.setAttribute('aria-pressed','true');result.replaceChildren();overlay.hidden=true;overlayData=null;previewViewport.hidden=!image;say();}
   function paintOverlay(){if(!image)return;drawPhotoOverlay(overlayCanvas,preview,overlayMode.checked?(overlayData?.blocks||[]):[],overlayData?.translated||[],overlayData?.to||source.value);thumbnail.width=overlayCanvas.width;thumbnail.height=overlayCanvas.height;if(overlayData)drawPhotoOverlay(thumbnail,preview,overlayData.blocks,overlayData.translated,overlayData.to);else thumbnail.getContext('2d').drawImage(overlayCanvas,0,0);overlayCanvas.setAttribute('aria-label',overlayMode.checked?'写真に重ねた翻訳':'原文の写真');overlayNote.textContent='';overlayNote.hidden=true;fitPreviewDialog();overlayZoom.refresh();}
   text.oninput=()=>{clearTranslation();buttons();};source.onchange=clearTranslation;target.onchange=()=>{clearTranslation();if(image&&text.value.trim()&&!busy)void translate.onclick();};
   file.onchange=async()=>{
@@ -75,7 +90,7 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
    if(!data.text)throw Error('文字が見つかりませんでした。写真を選び直してください。');if(data.truncated){details.open=true;throw Error('文字が多いため一部だけ読み取りました。原文を確認し、訳す部分を選択してください。');}
   }
   translate.onclick=async()=>{
-   if(busy||!image)return;busy=true;buttons();clearTranslation();const version=epoch;
+   if(busy||!image)return;const resuming=Boolean(translationError);translationError='';busy=true;buttons();if(!resuming)clearTranslation();const version=epoch;openImage(true,translate);
    try{
     if(!text.value.trim()){say('文字を読み取っています…');await readPhoto();}if(closed||version!==epoch)return;
     let original;try{original=photoTranslationText(text.value,text.selectionStart,text.selectionEnd);}catch(e){details.hidden=false;details.open=true;throw e;}
@@ -91,7 +106,7 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
     if(!data&&from===to){data={blocks:inputBlocks.map(b=>({id:b.id,translations:{[from]:b.text},quality:{warnings:[]}}))};remember(translations,key,data);}
     if(!data){data=await translatePhotoProgressively({blocks:inputBlocks,source:from,target:to,cache:segments,valid:()=>!closed&&version===epoch,onResume:()=>say('未完了の部分から翻訳を続けています…'),request:body=>bounded(signal=>api('/photo/translate',body,{signal})),onProgress:(partial,done,total)=>{show(partial);say('翻訳しています… '+done+' / '+total);}});remember(translations,key,data);}
     if(closed||version!==epoch)return;show(data);say(data.blocks.some(b=>b.quality?.warnings?.length)?'数字・日付など、訳の確認が必要な箇所があります。':data.reuse?.reused?'保存済みの翻訳を再利用しました。':'');
-   }catch(e){if(!closed&&version===epoch)say((e.message||'翻訳できませんでした。')+(result.childElementCount?' 完成した部分は残しています。もう一度押すと未完了の部分を再試行します。':''));}
+   }catch(e){if(!closed&&version===epoch){translationError=e.message||'翻訳できませんでした。';say(translationError+(result.childElementCount?' 完成した部分は残しています。':''));}}
    finally{if(!closed&&version===epoch){busy=false;buttons();}}
   };
  };

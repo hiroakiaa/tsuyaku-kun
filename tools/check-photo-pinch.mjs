@@ -21,9 +21,9 @@ try{
  const full=await source.evaluate(v=>({width:v.clientWidth,height:v.clientHeight,ratio:v.querySelector('canvas').height/v.querySelector('canvas').width}));
  assert.ok(full.height<=230,'The form only shows a compact thumbnail');
  await source.click();await page.locator('.photo-preview-dialog[open]').waitFor();await page.locator('.photo-preview-close').click();
- await page.locator('.photo-translate-run').click();
+ await page.locator('.photo-translate-run').click();await page.locator('.photo-preview-dialog[open]').waitFor();await page.waitForFunction(()=>document.querySelector('.photo-simple')?.getAttribute('aria-busy')==='false');
  if(process.env.PHOTO_REUSE_UI_TEST){await page.waitForFunction(()=>document.querySelector('.photo-simple')?.getAttribute('aria-busy')==='false');assert.ok((await page.locator('.photo-notice').textContent()).includes('再利用'));}
- await page.locator('.photo-open-preview').click();
+
  const viewport=page.locator('.photo-preview-dialog .photo-overlay-viewport');await viewport.waitFor({state:'visible'});
  const fitBox=await viewport.evaluate(v=>{const c=v.querySelector('canvas').getBoundingClientRect();return {imageWidth:c.width,imageHeight:c.height,width:v.clientWidth,height:v.clientHeight};});
  assert.ok(fitBox.imageWidth<=fitBox.width+2 && fitBox.imageHeight<=fitBox.height+2,'Dedicated preview initially fits the whole image');
@@ -64,7 +64,7 @@ try{
  assert.ok(Math.min(Math.abs(smallest.width-smallest.viewWidth),Math.abs(smallest.height-smallest.viewHeight))<3,'At minimum one image edge touches the preview');
  const compact=await page.locator('.photo-preview-dialog').evaluate(d=>({header:d.querySelector('.photo-preview-heading').getBoundingClientRect().height,footer:d.querySelector('.photo-display-settings').getBoundingClientRect().height,unused:d.querySelector('.photo-overlay-viewport').clientHeight-d.querySelector('.photo-overlay-viewport canvas').getBoundingClientRect().height}));
  assert.equal(compact.header,64,'Header spacing matches the other app modes');assert.equal(compact.footer,64,'Footer spacing matches the other app modes');
- const touch=await page.locator('.photo-preview-dialog button').evaluateAll(buttons=>buttons.every(b=>b.getBoundingClientRect().height>=48));assert.ok(touch,'All buttons have comfortable 48px touch targets');
+ const touch=await page.locator('.photo-preview-dialog button:visible').evaluateAll(buttons=>buttons.every(b=>b.getBoundingClientRect().height>=48));assert.ok(touch,'All buttons have comfortable 48px touch targets');
  const screen=await page.locator('.photo-preview-dialog').evaluate(d=>{const b=d.getBoundingClientRect(),v=d.querySelector('.photo-overlay-viewport').getBoundingClientRect(),c=d.querySelector('.photo-overlay-viewport canvas').getBoundingClientRect();return {top:b.top,bottom:innerHeight-b.bottom,topGap:c.top-v.top,bottomGap:v.bottom-c.bottom};});
  assert.ok(Math.abs(screen.top)<1&&Math.abs(screen.bottom)<1,'No unused area outside the preview');
  assert.ok(Math.abs(screen.topGap-screen.bottomGap)<3,'Image aspect-ratio space is balanced in the viewport');
