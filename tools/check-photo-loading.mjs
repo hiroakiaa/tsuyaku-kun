@@ -12,7 +12,7 @@ setApiHandler(async request=>{
 });
 try{
  for(const leaveEarly of [false,true]){
-  reset();const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});await setup(context);await context.addInitScript(()=>{
+  reset();const context=await browser.newContext({viewport:leaveEarly?{width:1280,height:900}:{width:390,height:844},isMobile:!leaveEarly,hasTouch:!leaveEarly});await setup(context);await context.addInitScript(()=>{
  window.__photoSpoken=[];Object.defineProperty(window,'SpeechSynthesisUtterance',{value:class{constructor(text){this.text=text;}}});Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>['ja-JP','en-US','pt-BR'].map(lang=>({lang,name:lang,localService:true})),cancel(){},pause(){},resume(){},speak(u){window.__photoSpoken.push({text:u.text,lang:u.lang});queueMicrotask(()=>u.onstart?.());}}});
  });
   if(process.env.LIVE_PHOTO_PREVIEW)await context.route('https://hiroakiaa.github.io/**',route=>route.continue());
@@ -60,8 +60,8 @@ try{
   assert.equal(await page.locator('#photo-text-panel-original').isVisible(),false);
   for(const index of [0,1]){await tabs.nth(index).click();await page.waitForFunction(()=>{const a=document.querySelector('.photo-text-tabs [aria-selected="true"]'),b=document.querySelector('.photo-text-tabs [aria-selected="false"]');return getComputedStyle(a).backgroundColor==='rgb(230, 213, 247)'&&getComputedStyle(b).backgroundColor==='rgb(36, 36, 38)';});const panel=page.locator(index?'#photo-text-panel-translated':'#photo-text-panel-original');assert.equal(await panel.isVisible(),true);const play=panel.locator('[data-play]');assert.equal(await play.isVisible(),true);assert.equal(await play.isEnabled(),true);const count=await page.evaluate(()=>window.__photoSpoken.length);await play.click();await page.waitForFunction(n=>window.__photoSpoken.length===n+1,count);assert.equal(await panel.locator('[data-stop]').isVisible(),true);await panel.locator('[data-stop]').click();const tb=await tabs.nth(index).boundingBox(),pb=await play.boundingBox();assert.ok(Math.abs(tb.y-pb.y)<12,'Playback sits beside the tabs');}
   await page.locator('.photo-text-details').scrollIntoViewIfNeeded();
-  await fs.mkdir('checks/photo-text-tabs',{recursive:true});await page.screenshot({path:'checks/photo-text-tabs/translated.png'});
-  await tabs.nth(0).click();await page.waitForFunction(()=>getComputedStyle(document.querySelector('.photo-text-tabs [aria-selected="true"]')).backgroundColor==='rgb(230, 213, 247)');await page.screenshot({path:'checks/photo-text-tabs/original.png'});
+  await fs.mkdir('checks/photo-text-tabs',{recursive:true});await page.screenshot({path:'checks/photo-text-tabs/translated-'+(leaveEarly?'desktop':'mobile')+'.png'});
+  await tabs.nth(0).click();await page.waitForFunction(()=>getComputedStyle(document.querySelector('.photo-text-tabs [aria-selected="true"]')).backgroundColor==='rgb(230, 213, 247)');await page.screenshot({path:'checks/photo-text-tabs/original-'+(leaveEarly?'desktop':'mobile')+'.png'});
   assert.deepEqual(errors,[]);await context.close();
  }
  console.log((process.env.LIVE_PHOTO_PREVIEW?'Published assets':'Local fixture')+': PASS direct preview transition, OCR/translation loading, completion without another click and user-dismissal preservation');
