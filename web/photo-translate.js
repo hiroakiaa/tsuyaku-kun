@@ -1,6 +1,6 @@
 import {localIcon} from './icons.js?v=photo-viewer-1';
 import {installPhotoZoom} from './photo-zoom.js?v=20261119-minimum-fit';
-import {translatePhotoProgressively} from './photo-progress.js?v=20261020-photo-reuse-4';
+import {translatePhotoProgressively} from './photo-progress.js?v=20261119-photo-recovery';
 import {matchingPhotoBlocks,drawPhotoOverlay} from './photo-overlay.js?v=20261020-photo-overlay-4';
 export function photoReadResult(value){
  if(!value||typeof value.text!=='string')throw Error('写真の読み取り結果を確認できませんでした。もう一度お試しください。');
@@ -116,7 +116,7 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
     }
     say('翻訳しています…');let data=translations.get(key);if(data)data={...data,reuse:{...data.reuse,reused:Math.max(1,data.reuse?.total||1)}};
     if(!data&&from===to){data={blocks:inputBlocks.map(b=>({id:b.id,translations:{[from]:b.text},quality:{warnings:[]}}))};remember(translations,key,data);}
-    if(!data){data=await translatePhotoProgressively({blocks:inputBlocks,source:from,target:to,cache:segments,valid:()=>!closed&&version===epoch,onResume:()=>say('未完了の部分から翻訳を続けています…'),request:body=>bounded(signal=>api('/photo/translate',body,{signal})),onProgress:(partial,done,total)=>{show(partial);say('翻訳しています… '+done+' / '+total);}});remember(translations,key,data);}
+    if(!data){data=await translatePhotoProgressively({blocks:inputBlocks,source:from,target:to,cache:segments,valid:()=>!closed&&version===epoch,onResume:event=>say(event.split?'読み取り範囲を細かく分けて翻訳を続けています…':'接続を回復して、未完了の部分から翻訳を続けています…'),request:body=>bounded(signal=>api('/photo/translate',body,{signal})),onProgress:(partial,done,total)=>{show(partial);say('翻訳しています… '+done+' / '+total);}});remember(translations,key,data);}
     if(closed||version!==epoch)return;show(data);say(data.blocks.some(b=>b.quality?.warnings?.length)?'数字・日付など、訳の確認が必要な箇所があります。':data.reuse?.reused?'保存済みの翻訳を再利用しました。':'');
    }catch(e){if(!closed&&version===epoch){translationError=e.message||'翻訳できませんでした。';say(translationError+(result.childElementCount?' 完成した部分は残しています。':''));}}
    finally{if(!closed&&version===epoch){busy=false;buttons();}}

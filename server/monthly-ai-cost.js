@@ -1,5 +1,5 @@
 // Counts and conservative app budget consumption only. No identity or text is stored.
-const MODELS=new Set(['@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
+const MODELS=new Set(['gpt-4.1-mini','@cf/google/gemma-4-26b-a4b-it','@cf/openai/whisper-large-v3-turbo','@cf/openai/whisper','@cf/deepgram/nova-3']);
 const bucket=model=>MODELS.has(model)?model:'legacy-unclassified';
 export function monthlyAiState(previous,now){
  const month=new Date(now).toISOString().slice(0,7),existing=previous?.monthly;

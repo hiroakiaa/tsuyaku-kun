@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {translatePhotoWithRecovery} from '../server/photo-translation.js';
+import {recoverablePhotoFailure,runPhotoRecovery} from '../server/photo-recovery.js';
+import {reserveCost} from '../server/ai-budget.js';
+import {PHOTO_RECOVERY_POLICY as P} from '../web/cost-policy.js';
+const catalog={languages:[{code:'ja'},{code:'en'}],bank:[],phrases:[],glossary:[]};
+const data={source:'ja',targets:['en'],blocks:[{id:'b0',text:'参加費は1200円です。'}]};
+let primary=0,recovery=0;const good=async()=>{recovery++;return {choices:[{finish_reason:'stop',message:{content:JSON.stringify({blocks:[{id:'b0',translations:{en:'The fee is 1200 yen.'}}]})}}],usage:{prompt_tokens:30,completion_tokens:20}};};
+const first=await translatePhotoWithRecovery(data,catalog,async()=>{primary++;throw Error('AI response error');},good);
+assert.equal(first.blocks[0].translations.en,'The fee is 1200 yen.');assert.equal(first.recovery,'alternate-provider');assert.equal(primary,1);assert.equal(recovery,1);
+await translatePhotoWithRecovery(data,catalog,async()=>({response:'bad JSON'}),good);assert.equal(recovery,2,'Invalid output also uses a different provider');
+for(const error of [{status:403},{appBudget:true},{aiFailure:{reason:'quota'}},{cause:{errors:[{code:3036}]}}])assert.equal(recoverablePhotoFailure(error),false);
+await assert.rejects(()=>translatePhotoWithRecovery(data,catalog,async()=>{throw Object.assign(Error('denied'),{status:403});},good));assert.equal(recovery,2);
+const result=await runPhotoRecovery({OPENAI_DOCUMENT_QA_KEY:'synthetic-secret'},{messages:[{role:'user',content:'test text'}]},async(url,input)=>{assert.equal(url,'https://api.openai.com/v1/chat/completions');const body=JSON.parse(input.body);assert.equal(body.store,false);assert.equal(body.model,P.model);assert.equal(body.max_completion_tokens,P.maxOutputTokens);assert.deepEqual(body.response_format,{type:'json_object'});return Response.json(await good());});assert.equal(result.usage.prompt_tokens,30);
+assert.ok(reserveCost(P.model,{messages:[{role:'user',content:'test'}],max_completion_tokens:100})>0);
+console.log('PASS alternate provider on service/malformed failures; no auth/quota/budget bypass; bounded private-text request and centralized cost reservation');

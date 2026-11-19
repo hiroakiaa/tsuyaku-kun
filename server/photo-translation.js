@@ -1,3 +1,4 @@
+import {recoverablePhotoFailure} from './photo-recovery.js';
 import {glossaryFor} from '../web/core.js';
 import {storedTranslations} from './dictionary.js';
 import {inspectTranslations} from '../web/translation-quality.js';
@@ -24,4 +25,10 @@ export async function translatePhotoBlocks(data,catalog,run){
   const u=result.usage;usage={inputTokens:Number.isFinite(u?.prompt_tokens)?u.prompt_tokens:Math.ceil(JSON.stringify(messages).length/2),outputTokens:Number.isFinite(u?.completion_tokens)?u.completion_tokens:Math.ceil(raw.length/2),estimated:!Number.isFinite(u?.prompt_tokens),cacheHit:false};
  }
  return {blocks:blocks.map(b=>({id:b.id,translations:out.get(b.id),quality:inspectTranslations(b.text,source,targets,out.get(b.id))})),usage};
+}
+
+export async function translatePhotoWithRecovery(data,catalog,run,recover){
+ try{return await translatePhotoBlocks(data,catalog,run);}catch(error){if(!recover||!recoverablePhotoFailure(error))throw error;
+ const result=await translatePhotoBlocks(data,catalog,recover);return {...result,recovery:'alternate-provider'};
+ }
 }

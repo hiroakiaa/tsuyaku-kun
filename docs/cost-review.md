@@ -559,3 +559,9 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 
 ### 2026-11-19 Photo original/translation text tabs
 - Removed duplicate editable OCR display; original and translation share tabs with nearby existing opt-in playback. Tabs reuse existing text and never call OCR/translation. Switching away from a playing panel stops its playback. No automatic audio or added model requests.
+
+### 2026-11-19 Photo automatic recovery
+- Primary Cloudflare translation remains first. For temporary/provider/invalid-result failures only, reuse existing OPENAI_DOCUMENT_QA_KEY with gpt-4.1-mini, JSON output and store:false; OCR text only, never photo pixels. Authentication, quota, billing and app-budget failures do not trigger provider switching.
+- Recovery model prices centralized in PHOTO_RECOVERY_POLICY: input $0.40/output $1.60 per million tokens; verified 2026-11-19 at https://developers.openai.com/api/docs/models/gpt-4.1-mini . Maximum recovery output 1536 tokens, 12-second provider timeout.
+- Each provider attempt uses guardedAi reservations/settlement; actual recovery usage and model are included in monthly totals. Existing app/monthly limits are unchanged. Primary failed reservations remain conservative consumed cost; not misrepresented as actual bills.
+- Client validates missing translations inside retry, then splits only failing groups (two split levels, at most eight network attempts per original group). Completed groups/subgroups stay cached; cancellation and permanent failures stop. No unlimited background loop. Normal successful/cache paths add no calls.

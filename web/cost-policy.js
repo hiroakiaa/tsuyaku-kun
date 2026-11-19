@@ -13,3 +13,6 @@ export function translationScenario(source,targets){const clean=c=>typeof c==='s
 export function scenarioKey(source,targets){const s=translationScenario(source,targets);return s?JSON.stringify([s.source,s.targets]):null;}
 
 export const LIVE_TRANSLATION_USD_PER_MINUTE = 0.034;
+
+// Existing document-QA provider is used only to recover failed photo translation.
+export const PHOTO_RECOVERY_POLICY={checkedAt:'2026-11-19',model:'gpt-4.1-mini',inputPerMillion:.40,outputPerMillion:1.60,maxOutputTokens:1536,timeoutMs:12000,source:'https://developers.openai.com/api/docs/models/gpt-4.1-mini'};

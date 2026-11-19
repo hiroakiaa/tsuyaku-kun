@@ -1,4 +1,5 @@
-import {photoTranslationInput,translatePhotoBlocks} from './photo-translation.js';
+import {runPhotoRecovery} from './photo-recovery.js';
+import {photoTranslationInput,translatePhotoWithRecovery} from './photo-translation.js';
 import {photoInput,photoUid,recognizePhoto} from './photo-ocr.js';
 import {glossaryFor} from '../web/core.js';
 import {storedTranslations} from './dictionary.js';
@@ -29,7 +30,7 @@ export async function photoReuseStorage(storage,env,input,catalog,run){
  const pendingKey=scope+':'+cacheKey;
  if(pending.has(pendingKey))return reused(await pending.get(pendingKey),'in-flight');
  const work=(async()=>{
-  const result=kind==='ocr'?await recognizePhoto({...env,budgetUid:uid},data):await translatePhotoBlocks(data,catalog,input=>run(input,uid));
+  const result=kind==='ocr'?await recognizePhoto({...env,budgetUid:uid},data):await translatePhotoWithRecovery(data,catalog,input=>run(input,uid),env.OPENAI_DOCUMENT_QA_KEY?input=>runPhotoRecovery({...env,budgetUid:uid,photoUnlimited:true},input):null);
   const safe=(kind==='ocr'?Boolean(result.text):result.blocks.every(block=>!block.quality?.warnings?.length)) && new TextEncoder().encode(JSON.stringify(result)).length<120000;
   if(safe)await storage.transaction(async tx=>{
    const manifest=kind+':entries',entries=(await tx.get(manifest)||[]).filter(value=>value!==cacheKey);

@@ -1,6 +1,6 @@
 import {completeBudgetCleanup} from './budget-cleanup.js';
 import {monthlyAiState,monthlyReserve,monthlySettle,monthlyAiReport,monthlyExtend} from './monthly-ai-cost.js';
-import {AI_LIMITS,TRANSLATION_PRICE,RECOGNITION_PRICE,LIVE_TRANSLATION_USD_PER_MINUTE} from '../web/cost-policy.js';
+import {AI_LIMITS,PHOTO_RECOVERY_POLICY,TRANSLATION_PRICE,RECOGNITION_PRICE,LIVE_TRANSLATION_USD_PER_MINUTE} from '../web/cost-policy.js';
 // Conservative app-local variable-cost budget, not Cloudflare account billing.
 const DAY=86400000;
 export function budgetError(reason='budget'){
@@ -13,6 +13,7 @@ export function reserveCost(model,input){
   if(!Number.isFinite(input.seconds)||input.seconds<=0||input.seconds>15)throw budgetError();
   return Math.ceil(input.seconds*LIVE_TRANSLATION_USD_PER_MINUTE*1e6/60);
  }
+ if(model===PHOTO_RECOVERY_POLICY.model)return Math.ceil((new TextEncoder().encode(JSON.stringify(input.messages||[])).length*PHOTO_RECOVERY_POLICY.inputPerMillion+Math.min(PHOTO_RECOVERY_POLICY.maxOutputTokens,input.max_completion_tokens||PHOTO_RECOVERY_POLICY.maxOutputTokens)*PHOTO_RECOVERY_POLICY.outputPerMillion)*1.1);
  if(model==='@cf/google/gemma-4-26b-a4b-it')return Math.ceil((new TextEncoder().encode(JSON.stringify(input.messages||[])).length*TRANSLATION_PRICE.inputPerMillion+Math.min(4096,input.max_completion_tokens||4096)*TRANSLATION_PRICE.outputPerMillion)*1.1);
  if(model===RECOGNITION_PRICE.streamModel){if(!Number.isFinite(input.seconds)||input.seconds<=0||input.seconds>30)throw budgetError();return Math.ceil(input.seconds/60*RECOGNITION_PRICE.streamPerMinute*1e6*1.1);}
  if(model==='@cf/openai/whisper-large-v3-turbo')return Math.ceil((input.audio?.length||0)*.75/32000/60*RECOGNITION_PRICE.whisperPerMinute*1e6*1.1);
@@ -65,7 +66,7 @@ export async function guardedAi(env,model,input,run){
  const call=async data=>{const r=await budget.fetch(new Request('https://budget/budget',{method:'POST',body:JSON.stringify(data)}));const result=await r.json();if(!r.ok)throw budgetError(result.reason);return result;};
  const reserveStarted=Date.now();let reservation;try{reservation=await call({action:'reserve',uid:env.budgetUid||'unknown',model,cost:reserveCost(model,input),...(env.photoUnlimited?{photoUnlimited:true}:{})});}finally{if(env.translationTiming)env.translationTiming.budgetWaitMs=(env.translationTiming.budgetWaitMs||0)+Date.now()-reserveStarted;}
  let actual;
- try{const result=await run();const u=result?.usage;if(model.includes('gemma')&&Number.isFinite(u?.prompt_tokens)&&Number.isFinite(u?.completion_tokens))actual=Math.ceil(u.prompt_tokens*TRANSLATION_PRICE.inputPerMillion+u.completion_tokens*TRANSLATION_PRICE.outputPerMillion);return result;}
+ try{const result=await run();const u=result?.usage;if(model===PHOTO_RECOVERY_POLICY.model&&Number.isFinite(u?.prompt_tokens)&&Number.isFinite(u?.completion_tokens))actual=Math.ceil(u.prompt_tokens*PHOTO_RECOVERY_POLICY.inputPerMillion+u.completion_tokens*PHOTO_RECOVERY_POLICY.outputPerMillion);if(model.includes('gemma')&&Number.isFinite(u?.prompt_tokens)&&Number.isFinite(u?.completion_tokens))actual=Math.ceil(u.prompt_tokens*TRANSLATION_PRICE.inputPerMillion+u.completion_tokens*TRANSLATION_PRICE.outputPerMillion);return result;}
  catch(e){if([e,...(e?.errors||[]),e?.cause].some(v=>[3036,5035,3023,3041,5016,5018].includes(Number(v?.code))))await call({action:'block'}).catch(()=>{});throw e;}
  finally{await completeBudgetCleanup(env,()=>call({action:'settle',...reservation,...(actual!==undefined?{actual}:{})}),env.translationTiming);}
 }

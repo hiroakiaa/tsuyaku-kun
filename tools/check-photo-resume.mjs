@@ -7,7 +7,7 @@ fixture.setApiHandler(request=>{
  if(path==='/photo/recognize')return {json:{text:blocks.map(b=>b.text).join('\n'),blocks}};
  if(path==='/photo/translate'){
   const body=request.postDataJSON(),text=body.blocks[0].text;calls.set(text,(calls.get(text)||0)+1);
-  if(text.startsWith('B')&&calls.get(text)===1)return {status:504,json:{error:'翻訳が時間切れになりました。'}};
+  if(text.startsWith('B')&&((process.env.PHOTO_SERVICE_FAILURE&&text.length>130)||(!process.env.PHOTO_SERVICE_FAILURE&&calls.get(text)===1)))return {status:process.env.PHOTO_SERVICE_FAILURE?502:504,json:{error:process.env.PHOTO_SERVICE_FAILURE?'AIサービスが処理できませんでした。':'翻訳が時間切れになりました。',aiFailure:{reason:'service'}}};
   return {json:{blocks:body.blocks.map(b=>({id:b.id,translations:{[body.targets[0]]:'Translated '+b.text}}))}};
  }
 });
@@ -24,8 +24,8 @@ try{
  // Another completed group can update the progress label during the retry delay.
  await page.waitForFunction(()=>document.querySelector('.photo-simple')?.getAttribute('aria-busy')==='true'||document.querySelector('.photo-results')?.textContent?.includes('Translated'));
  await page.waitForFunction(()=>document.querySelector('.photo-simple')?.getAttribute('aria-busy')==='false');
- assert.equal(calls.get('A'.repeat(200)),1);assert.equal(calls.get('B'.repeat(200)),2);assert.equal(calls.get('C'.repeat(200)),1);
- assert.ok((await page.locator('.photo-results').textContent()).includes('C'.repeat(200)));
+ assert.equal(calls.get('A'.repeat(200)),1);assert.equal(calls.get('B'.repeat(200)),process.env.PHOTO_SERVICE_FAILURE?3:2);assert.equal(calls.get('C'.repeat(200)),1);
+ assert.ok((await page.locator('.photo-results').textContent()).includes('C'.repeat(200)));assert.ok((await page.locator('.photo-results').textContent()).includes('B'.repeat(process.env.PHOTO_SERVICE_FAILURE?100:200)));if(process.env.PHOTO_SERVICE_FAILURE)assert.equal(calls.get('B'.repeat(100)),1);assert.equal((await page.locator('.photo-notice').textContent()).includes('AIサービスが処理できませんでした'),false);
  assert.equal(await page.locator('.photo-overlay').isVisible(),true);assert.equal(await page.locator('.photo-preview-dialog').getAttribute('open'),'');assert.equal(await page.locator('.photo-preview-loading').isVisible(),false);assert.deepEqual(errors,[]);
  console.log((process.env.LIVE_PHOTO_PREVIEW?'Published assets':'Local fixture')+': PASS automatic continuation after timeout; no user retry; finished A/C not translated again; image preview remains');
  await context.close();

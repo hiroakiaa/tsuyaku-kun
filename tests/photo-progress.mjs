@@ -29,3 +29,9 @@ let valid=true,abortCalls=0;
 await assert.rejects(()=>resumeTranslation(async()=>{abortCalls++;throw new DOMException('Timed out','TimeoutError');},{valid:()=>valid,wait:async()=>{valid=false;}}),error=>error.name==='AbortError');assert.equal(abortCalls,1);
 let permanentCalls=0;await assert.rejects(()=>resumeTranslation(async()=>{permanentCalls++;throw Object.assign(Error('denied'),{status:403});},{wait:async()=>{}}));assert.equal(permanentCalls,1);
 console.log('PASS timeout continuation: only failed chunks retry; successful chunks remain; cancellation and permanent failures stop');
+
+let splitCalls=0;const splitEvents=[];const adaptive=await translatePhotoProgressively({blocks:[{id:'b0',text:'X'.repeat(240)}],source:'ja',target:'en',cache:new Map(),wait:async()=>{},onResume:e=>splitEvents.push(e),request:async body=>{splitCalls++;if(body.blocks[0].text.length>130)throw Object.assign(Error('AI service unavailable'),{status:502});return {blocks:body.blocks.map(b=>({id:b.id,translations:{en:b.text}}))};}});
+assert.equal(adaptive.blocks[0].translations.en.replace(/\s/g,''),'X'.repeat(240));assert.equal(splitCalls,4);assert.ok(splitEvents.some(e=>e.split));
+let malformed=0;await translatePhotoProgressively({blocks:[{id:'b0',text:'test'}],source:'ja',target:'en',cache:new Map(),wait:async()=>{},request:async body=>++malformed===1?{blocks:[]}:{blocks:body.blocks.map(b=>({id:b.id,translations:{en:'complete'}}))}});assert.equal(malformed,2);
+let exhausted=0;await assert.rejects(()=>translatePhotoProgressively({blocks:[{id:'b0',text:'Q'.repeat(240)}],source:'ja',target:'en',cache:new Map(),wait:async()=>{},request:async()=>{exhausted++;throw Object.assign(Error('service down'),{status:502});}}));assert.ok(exhausted<=8);
+console.log('PASS adaptive split recovery, missing-output recovery and finite retry cost');
