@@ -109,3 +109,13 @@ body.phone-home #modal .photo-text-playback button{width:44px;height:44px;min-he
 
 .photo-overlay{position:relative}
 body.phone-home #modal .photo-text-tabs button[aria-selected="false"]{background:#242426!important;color:#b9b9c2!important}
+
+/* One stage at a time; photo actions stay on the image instead of above it. */
+body.phone-home #modal .photo-simple .photo-selection-remove{background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important;color:#ddd!important}
+body.phone-home #modal .photo-simple .photo-pick-compact{position:absolute;right:10px;bottom:8px;width:auto;min-width:0;margin:0;padding:8px 10px!important;min-height:44px;background:transparent!important;border:0!important;box-shadow:none!important;font-size:14px}
+.photo-selection .photo-image-card,.photo-overlay .photo-image-card{padding-bottom:58px}
+body.phone-home #modal .photo-change-language{justify-self:end;width:auto;min-height:44px;padding:8px 4px!important;background:transparent!important;border:0!important;box-shadow:none!important;font-size:14px;color:#c7bad5}
+.photo-text-panel .photo-text-playback{z-index:3;pointer-events:auto}
+.photo-text-panel .photo-text-playback button{pointer-events:auto;touch-action:manipulation}
+
+.photo-open-preview>span{box-sizing:border-box;width:100%;padding-inline-end:110px;text-align:start}

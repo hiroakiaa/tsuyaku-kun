@@ -12,7 +12,9 @@ setApiHandler(async request=>{
 });
 try{
  for(const leaveEarly of [false,true]){
-  reset();const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});await setup(context);
+  reset();const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});await setup(context);await context.addInitScript(()=>{
+ window.__photoSpoken=[];Object.defineProperty(window,'SpeechSynthesisUtterance',{value:class{constructor(text){this.text=text;}}});Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>['ja-JP','en-US','pt-BR'].map(lang=>({lang,name:lang,localService:true})),cancel(){},pause(){},resume(){},speak(u){window.__photoSpoken.push({text:u.text,lang:u.lang});queueMicrotask(()=>u.onstart?.());}}});
+ });
   if(process.env.LIVE_PHOTO_PREVIEW)await context.route('https://hiroakiaa.github.io/**',route=>route.continue());
   const page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));
   await page.goto(process.env.LIVE_PHOTO_PREVIEW?'https://hiroakiaa.github.io/tsuyaku-kun/?photo-loading-check='+Date.now():origin);await page.locator('#photo-translate-open').click();
@@ -31,6 +33,8 @@ try{
   await page.locator('.photo-simple input[type=file]').setInputFiles({name:'synthetic.jpg',mimeType:'image/jpeg',buffer:Buffer.from(sample,'base64')});
   await page.locator('.photo-source-viewport').waitFor({state:'visible'});
   await page.locator('.photo-selection,.photo-languages,.photo-translate-run').evaluateAll(nodes=>Promise.all(nodes.flatMap(n=>n.getAnimations()).map(a=>a.finished.catch(()=>{}))));await fs.mkdir('checks/photo-loading',{recursive:true});await page.screenshot({path:'checks/photo-loading/selected.png'});
+  assert.equal(await page.locator('.photo-source-viewport span').count(),0);
+  const positions=await page.locator('.photo-pick').evaluate(p=>{const b=p.getBoundingClientRect(),v=p.closest('.photo-selection').getBoundingClientRect();return {inside:b.right<=v.right+1&&b.bottom<=v.bottom+1,bottom:v.bottom-b.bottom,right:v.right-b.right};});assert.ok(positions.inside&&positions.bottom<20&&positions.right<20);
   await page.locator('.photo-translate-run').click();
   await page.locator('.photo-preview-dialog[open]').waitFor({timeout:2000});
   const loading=page.locator('.photo-preview-loading');await loading.waitFor({state:'visible'});
@@ -46,13 +50,15 @@ try{
   assert.equal(await page.locator('.photo-preview-dialog').getAttribute('open'),leaveEarly?null:'','Completion never reopens a preview the user dismissed');
   if(!leaveEarly){assert.ok((await page.locator('.photo-results').textContent()).includes('Test translation'));await page.screenshot({path:'checks/photo-loading/complete.png'});}
   if(!leaveEarly)await page.locator('.photo-preview-close').click();
+  assert.equal(await page.locator('.photo-simple').getAttribute('data-step'),'result');assert.equal(await page.locator('.photo-languages').isVisible(),false);assert.equal(await page.locator('.photo-translate-run').isVisible(),false);assert.equal(await page.locator('.photo-overlay .photo-pick').isVisible(),true);
+  await page.locator('.photo-change-language').click();assert.equal(await page.locator('.photo-languages').isVisible(),true);await page.locator('.photo-change-language').click();assert.equal(await page.locator('.photo-languages').isVisible(),false);
   await page.locator('.photo-text-details summary').click();
   assert.equal(await page.locator('.photo-text-details textarea').count(),0,'Duplicate editable OCR field removed');
   const tabs=page.locator('.photo-text-tabs [role=tab]');assert.equal(await tabs.count(),2);
   assert.equal(await tabs.nth(1).getAttribute('aria-selected'),'true');
   assert.equal(await page.locator('#photo-text-panel-translated').isVisible(),true);
   assert.equal(await page.locator('#photo-text-panel-original').isVisible(),false);
-  for(const index of [0,1]){await tabs.nth(index).click();await page.waitForFunction(()=>{const a=document.querySelector('.photo-text-tabs [aria-selected="true"]'),b=document.querySelector('.photo-text-tabs [aria-selected="false"]');return getComputedStyle(a).backgroundColor==='rgb(230, 213, 247)'&&getComputedStyle(b).backgroundColor==='rgb(36, 36, 38)';});const panel=page.locator(index?'#photo-text-panel-translated':'#photo-text-panel-original');assert.equal(await panel.isVisible(),true);const play=panel.locator('[data-play]');assert.equal(await play.isVisible(),true);const tb=await tabs.nth(index).boundingBox(),pb=await play.boundingBox();assert.ok(Math.abs(tb.y-pb.y)<12,'Playback sits beside the tabs');}
+  for(const index of [0,1]){await tabs.nth(index).click();await page.waitForFunction(()=>{const a=document.querySelector('.photo-text-tabs [aria-selected="true"]'),b=document.querySelector('.photo-text-tabs [aria-selected="false"]');return getComputedStyle(a).backgroundColor==='rgb(230, 213, 247)'&&getComputedStyle(b).backgroundColor==='rgb(36, 36, 38)';});const panel=page.locator(index?'#photo-text-panel-translated':'#photo-text-panel-original');assert.equal(await panel.isVisible(),true);const play=panel.locator('[data-play]');assert.equal(await play.isVisible(),true);assert.equal(await play.isEnabled(),true);const count=await page.evaluate(()=>window.__photoSpoken.length);await play.click();await page.waitForFunction(n=>window.__photoSpoken.length===n+1,count);assert.equal(await panel.locator('[data-stop]').isVisible(),true);await panel.locator('[data-stop]').click();const tb=await tabs.nth(index).boundingBox(),pb=await play.boundingBox();assert.ok(Math.abs(tb.y-pb.y)<12,'Playback sits beside the tabs');}
   await page.locator('.photo-text-details').scrollIntoViewIfNeeded();
   await fs.mkdir('checks/photo-text-tabs',{recursive:true});await page.screenshot({path:'checks/photo-text-tabs/translated.png'});
   await tabs.nth(0).click();await page.waitForFunction(()=>getComputedStyle(document.querySelector('.photo-text-tabs [aria-selected="true"]')).backgroundColor==='rgb(230, 213, 247)');await page.screenshot({path:'checks/photo-text-tabs/original.png'});

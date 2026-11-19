@@ -19,7 +19,7 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
   file.type='file';file.accept='image/*';file.hidden=true;file.setAttribute('aria-label','撮影した写真・画像を選ぶ');pick.type='button';pick.className='photo-pick';pick.onclick=()=>{file.value='';file.click();};
   const previewViewport=el('button',undefined,'photo-source-viewport photo-image-card');previewViewport.type='button';previewViewport.setAttribute('aria-label','原文画像を開く');previewViewport.hidden=true;const preview=el('canvas');previewViewport.append(preview);preview.className='photo-preview';preview.setAttribute('aria-label','選択した写真');
   const selection=el('div',undefined,'photo-selection');selection.hidden=true;
-  const remove=el('button',undefined,'photo-selection-remove');remove.type='button';remove.setAttribute('aria-label','選択した写真を削除');remove.title='選択した写真を削除';remove.append(localIcon('xmark'));selection.append(previewViewport,remove);
+  const remove=el('button',undefined,'photo-selection-remove');remove.type='button';remove.setAttribute('aria-label','選択した写真を削除');remove.title='選択した写真を削除';remove.append(localIcon('trash'));selection.append(previewViewport,remove);
   const source={value:'auto'},target=el('select');for(const language of languages().filter(l=>l.code!=='ja-easy')){const o=el('option',language.labelJa+(language.labelNative&&language.labelNative!==language.labelJa?' / '+language.labelNative:''));o.value=language.code;target.append(o);}target.value=['ja','ja-easy'].includes(viewLanguage())?'en':viewLanguage();
   const targetLabel=el('label','翻訳する言語');targetLabel.append(target);const languageRow=el('div',undefined,'photo-languages');languageRow.append(targetLabel);languageRow.hidden=true;
   const translate=el('button','翻訳する');translate.type='button';translate.className='photo-translate-run';translate.disabled=true;translate.hidden=true;translate.title='選んだ画像をGoogleで読み取り、翻訳します';
@@ -41,7 +41,7 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
   settings.replaceChildren(minus,zoom,plus,fit);
   previewHeader.prepend(modes);previewDialog.append(previewHeader,viewport,overlayNote,settings);document.body.append(previewDialog);
   const openPreview=el('button',undefined,'photo-open-preview photo-image-card'),thumbnail=el('canvas');openPreview.type='button';openPreview.setAttribute('aria-label','翻訳画像を開く');openPreview.append(thumbnail,el('span','翻訳画像を開く ↗'));overlay.append(openPreview);
-  previewViewport.append(el('span','原文画像を開く ↗'));
+
   let previewReturn=null,readerScroll=0;
   function openImage(translated,trigger){
     if(!image)return;
@@ -54,8 +54,9 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
   previewClose.onclick=()=>previewDialog.close();
   previewDialog.addEventListener('close',()=>{notice.setAttribute('aria-live','polite');const host=root.closest('dialog');if(host?.open){host.scrollTop=readerScroll;previewReturn?.focus({preventScroll:true});}});
   overlayMode.onchange=paintOverlay;const overlayZoom=installPhotoZoom(viewport,overlayCanvas,{fitHeight:true,onChange:value=>{zoom.value=String(value);}});zoom.oninput=()=>overlayZoom.setScale(zoom.value);
-  root.append(file,pick,selection,languageRow,translate,notice,overlay,details);modal('写真を翻訳',root);
-  let image=null,objectURL=null,busy=false,closed=false,epoch=0,controller=null,requestId=null,currentHash=null,ocrText='',ocrBlocks=[],overlayData=null,translationError='';
+  const changeLanguage=el('button','言語を変更','photo-change-language');changeLanguage.type='button';changeLanguage.hidden=true;changeLanguage.onclick=()=>{settingsOpen=!settingsOpen;buttons();if(settingsOpen)target.focus({preventScroll:true});};
+  root.append(file,pick,selection,languageRow,translate,notice,overlay,changeLanguage,details);modal('写真を翻訳',root);
+  let image=null,objectURL=null,busy=false,closed=false,epoch=0,controller=null,requestId=null,currentHash=null,ocrText='',ocrBlocks=[],overlayData=null,translationError='',settingsOpen=false;
   root.closest('dialog').addEventListener('close',()=>{closed=true;epoch++;overlayZoom.destroy();window.removeEventListener('resize',fitPreviewDialog);window.visualViewport?.removeEventListener('resize',fitPreviewDialog);if(previewDialog.open)previewDialog.close();previewDialog.remove();controller?.abort();for(const active of controllers)active.abort();if(objectURL)URL.revokeObjectURL(objectURL);image=null;preview.width=preview.height=overlayCanvas.width=overlayCanvas.height=1;},{once:true});
   function fitPreviewDialog(){
     if(!previewDialog.open||!preview.width||!preview.height)return;
@@ -72,8 +73,12 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
   }
   previewRetry.onclick=()=>void translate.onclick();
   function say(value=''){notice.textContent=value;notice.hidden=!value;notice.setAttribute('aria-live',previewDialog.open?'off':'polite');renderPreviewStatus();}
-  function buttons(){selection.hidden=!image||Boolean(overlayData);languageRow.hidden=translate.hidden=!image;remove.disabled=busy;pick.disabled=busy;file.disabled=busy;translate.disabled=busy||!image;target.disabled=text.disabled=busy;translate.textContent=busy?'翻訳しています…':'翻訳する';root.setAttribute('aria-busy',String(busy));renderPreviewStatus();}
-  function clearTranslation(){selection.append(remove);selection.hidden=!image;translationError='';overlayMode.checked=true;originalMode.setAttribute('aria-pressed','false');translationMode.setAttribute('aria-pressed','true');result.replaceChildren();overlay.hidden=true;overlayData=null;previewViewport.hidden=!image;say();}
+  function buttons(){const hasResult=Boolean(overlayData);root.dataset.step=busy?'working':hasResult?'result':image?'ready':'select';
+   if(image)(hasResult?overlay:selection).append(pick,remove);else root.insertBefore(pick,selection);
+   pick.classList.toggle('photo-pick-compact',Boolean(image));pick.hidden=busy;selection.hidden=!image||hasResult;
+   languageRow.hidden=!image||busy||(hasResult&&!settingsOpen);translate.hidden=!image||busy||(hasResult&&!translationError&&!settingsOpen);changeLanguage.hidden=!hasResult||busy;changeLanguage.textContent=settingsOpen?'言語選択を閉じる':'言語を変更';
+   remove.disabled=busy;pick.disabled=busy;file.disabled=busy;translate.disabled=busy||!image;target.disabled=text.disabled=busy;translate.textContent=translationError?'残りの翻訳を続ける':'翻訳する';root.setAttribute('aria-busy',String(busy));renderPreviewStatus();}
+  function clearTranslation(){settingsOpen=false;selection.append(remove);selection.hidden=!image;translationError='';overlayMode.checked=true;originalMode.setAttribute('aria-pressed','false');translationMode.setAttribute('aria-pressed','true');result.replaceChildren();overlay.hidden=true;overlayData=null;previewViewport.hidden=!image;say();}
   function paintOverlay(){if(!image)return;drawPhotoOverlay(overlayCanvas,preview,overlayMode.checked?(overlayData?.blocks||[]):[],overlayData?.translated||[],overlayData?.to||source.value);thumbnail.width=overlayCanvas.width;thumbnail.height=overlayCanvas.height;if(overlayData)drawPhotoOverlay(thumbnail,preview,overlayData.blocks,overlayData.translated,overlayData.to);else thumbnail.getContext('2d').drawImage(overlayCanvas,0,0);overlayCanvas.setAttribute('aria-label',overlayMode.checked?'写真に重ねた翻訳':'原文の写真');overlayNote.textContent='';overlayNote.hidden=true;fitPreviewDialog();overlayZoom.refresh();}
   text.oninput=()=>{clearTranslation();buttons();};target.onchange=()=>{clearTranslation();if(image&&text.value.trim()&&!busy)void translate.onclick();};
   remove.onclick=()=>{if(busy)return;epoch++;image=null;source.value='auto';file.value='';text.value='';ocrText='';ocrBlocks=[];requestId=currentHash=null;details.hidden=true;details.open=false;pick.textContent='写真を選択';pick.removeAttribute('title');if(objectURL){URL.revokeObjectURL(objectURL);objectURL=null;}preview.width=preview.height=1;clearTranslation();buttons();pick.focus({preventScroll:true});};
@@ -99,20 +104,20 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
     let original;try{original=photoTranslationText(text.value,text.selectionStart,text.selectionEnd);}catch(e){details.hidden=false;details.open=true;throw e;}
     const from=source.value,to=target.value,blocks=matchingPhotoBlocks(original,ocrText,ocrBlocks),inputBlocks=blocks||[{id:'b0',text:original}],key=JSON.stringify([original,from,to,inputBlocks.map(b=>b.text)]);
     function show(data){
-     result.replaceChildren();const incomplete=data.blocks.length<inputBlocks.length||data.blocks.some(b=>b.partial);
+     result.querySelector('[data-stop]:not([hidden])')?.click();result.replaceChildren();const incomplete=data.blocks.length<inputBlocks.length||data.blocks.some(b=>b.partial);
      if(data.blocks.length){translationMode.disabled=false;overlayData={blocks:blocks||[],translated:data.blocks,to};overlay.hidden=false;overlay.append(remove);selection.hidden=true;previewViewport.hidden=true;paintOverlay();if(!blocks){overlayNote.textContent='文字の位置を対応づけられなかったため原文画像を表示しています。訳文は下の「原文・訳文を見る」で確認できます。';overlayNote.hidden=false;}details.open=!blocks;}else details.open=true;
      const translated=data.blocks.map(b=>b.translations[to]).join('\n\n');
      const tabs=el('div',undefined,'photo-text-tabs');tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','原文と訳文');result.append(tabs);const views=[];
      for(const [kind,label,code,value] of [['original','原文',from,original],['translated','訳文',to,translated]]){
       const tab=el('button',label),section=el('section',undefined,'reference-language photo-text-panel'),paragraph=el('p',value,'reference-language-text');
       tab.type='button';tab.setAttribute('role','tab');tab.id='photo-text-tab-'+kind;tab.setAttribute('aria-controls','photo-text-panel-'+kind);section.id='photo-text-panel-'+kind;section.setAttribute('role','tabpanel');section.setAttribute('aria-labelledby',tab.id);paragraph.lang=code==='auto'?'':code==='ja-easy'?'ja':code;paragraph.dir='auto';
-      if(code!=='auto'){const playback=speechControls(value,code,'photo:'+crypto.randomUUID()+':'+kind);playback.classList.add('photo-text-playback');if(incomplete&&kind==='translated')for(const button of playback.querySelectorAll('[data-play]'))button.disabled=true;section.append(playback);}
+      if(code!=='auto'){const playback=speechControls(value,code,'photo:'+crypto.randomUUID()+':'+kind);playback.classList.add('photo-text-playback');section.append(playback);}
       section.append(paragraph);tabs.append(tab);result.append(section);views.push({kind,tab,section});
      }
      function selectView(kind,focus=false){textView=kind;for(const view of views){const selected=view.kind===kind;if(!selected&&!view.section.hidden){const stop=view.section.querySelector('[data-stop]:not([hidden])');stop?.click();}view.section.hidden=!selected;view.tab.setAttribute('aria-selected',String(selected));view.tab.tabIndex=selected?0:-1;if(selected&&focus)view.tab.focus();}}
      for(const view of views){view.tab.onclick=()=>selectView(view.kind);view.tab.onkeydown=event=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(event.key)){event.preventDefault();selectView(event.key==='Home'?'original':event.key==='End'?'translated':view.kind==='original'?'translated':'original',true);}};}
      selectView(textView);if(incomplete)result.append(el('p','翻訳途中です。まだ訳されていない部分があります。','photo-help'));
-     details.hidden=false;updateSpeechControls();
+     details.hidden=false;buttons();updateSpeechControls();
     }
     say('翻訳しています…');let data=translations.get(key);if(data)data={...data,reuse:{...data.reuse,reused:Math.max(1,data.reuse?.total||1)}};
     if(!data&&from===to){data={blocks:inputBlocks.map(b=>({id:b.id,translations:{[from]:b.text},quality:{warnings:[]}}))};remember(translations,key,data);}

@@ -565,3 +565,6 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 - Recovery model prices centralized in PHOTO_RECOVERY_POLICY: input $0.40/output $1.60 per million tokens; verified 2026-11-19 at https://developers.openai.com/api/docs/models/gpt-4.1-mini . Maximum recovery output 1536 tokens, 12-second provider timeout.
 - Each provider attempt uses guardedAi reservations/settlement; actual recovery usage and model are included in monthly totals. Existing app/monthly limits are unchanged. Primary failed reservations remain conservative consumed cost; not misrepresented as actual bills.
 - Client validates missing translations inside retry, then splits only failing groups (two split levels, at most eight network attempts per original group). Completed groups/subgroups stay cached; cancellation and permanent failures stop. No unlimited background loop. Normal successful/cache paths add no calls.
+
+### 2026-11-19 Photo result stages and playback
+- Selection/change/delete controls consolidated on image; completed results hide creation controls. Language change is explicit; existing OCR and translation caches retained. Partial translated text can be played with existing opt-in speech; switching/rebuilding a panel stops old audio. No automatic audio or new speech service. No additional model calls for UI changes.

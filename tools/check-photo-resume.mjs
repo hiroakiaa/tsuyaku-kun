@@ -13,7 +13,7 @@ fixture.setApiHandler(request=>{
 });
 try{
  const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
- await setup(context);if(process.env.LIVE_PHOTO_PREVIEW)await context.route('https://hiroakiaa.github.io/**',route=>route.continue());
+ await setup(context);if(process.env.PHOTO_SERVICE_FAILURE)await context.addInitScript(()=>{window.__photoSpoken=[];Object.defineProperty(window,'SpeechSynthesisUtterance',{value:class{constructor(text){this.text=text;}}});Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>[{lang:'pt-BR',name:'Portuguese',localService:true}],cancel(){},pause(){},resume(){},speak(u){window.__photoSpoken.push(u.text);queueMicrotask(()=>u.onstart?.());}}});});if(process.env.LIVE_PHOTO_PREVIEW)await context.route('https://hiroakiaa.github.io/**',route=>route.continue());
  const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(process.env.LIVE_PHOTO_PREVIEW?'https://hiroakiaa.github.io/tsuyaku-kun/?resume-check='+Date.now():origin);
  await page.locator('#photo-translate-open').click();
@@ -23,10 +23,11 @@ try{
  await page.locator('.photo-translate-run').click();
  // Another completed group can update the progress label during the retry delay.
  await page.waitForFunction(()=>document.querySelector('.photo-simple')?.getAttribute('aria-busy')==='true'||document.querySelector('.photo-results')?.textContent?.includes('Translated'));
+ if(process.env.PHOTO_SERVICE_FAILURE){await page.waitForFunction(()=>document.querySelector('.photo-results')?.textContent.includes('Translated'));await page.locator('.photo-preview-close').click();await page.locator('.photo-text-details summary').click();const play=page.locator('#photo-text-panel-translated [data-play]');assert.equal(await play.isEnabled(),true,'Available partial translation can be played');await play.click();await page.waitForFunction(()=>window.__photoSpoken.length>0);await page.locator('#photo-text-panel-translated [data-stop]').click();}
  await page.waitForFunction(()=>document.querySelector('.photo-simple')?.getAttribute('aria-busy')==='false');
  assert.equal(calls.get('A'.repeat(200)),1);assert.equal(calls.get('B'.repeat(200)),process.env.PHOTO_SERVICE_FAILURE?3:2);assert.equal(calls.get('C'.repeat(200)),1);
  assert.ok((await page.locator('.photo-results').textContent()).includes('C'.repeat(200)));assert.ok((await page.locator('.photo-results').textContent()).includes('B'.repeat(process.env.PHOTO_SERVICE_FAILURE?100:200)));if(process.env.PHOTO_SERVICE_FAILURE)assert.equal(calls.get('B'.repeat(100)),1);assert.equal((await page.locator('.photo-notice').textContent()).includes('AIサービスが処理できませんでした'),false);
- assert.equal(await page.locator('.photo-overlay').isVisible(),true);assert.equal(await page.locator('.photo-preview-dialog').getAttribute('open'),'');assert.equal(await page.locator('.photo-preview-loading').isVisible(),false);assert.deepEqual(errors,[]);
+ assert.equal(await page.locator('.photo-overlay').isVisible(),true);assert.equal(await page.locator('.photo-preview-dialog').getAttribute('open'),process.env.PHOTO_SERVICE_FAILURE?null:'');assert.equal(await page.locator('.photo-preview-loading').isVisible(),false);assert.deepEqual(errors,[]);
  console.log((process.env.LIVE_PHOTO_PREVIEW?'Published assets':'Local fixture')+': PASS automatic continuation after timeout; no user retry; finished A/C not translated again; image preview remains');
  await context.close();
 }finally{await browser.close();}
