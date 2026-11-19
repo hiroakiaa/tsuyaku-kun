@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {alignPdfTranslation} from '../web/pdf-translation-alignment.js';
+const items=['School handbook','Bring your notebook.','The office opens at nine.'].map((str,i)=>({str,width:200,height:12,transform:[12,0,0,12,30,750-i*30]}));
+const translated='School rules include bringing a notebook and the office opens at nine.';
+const result=alignPdfTranslation({source:[items.map(item=>item.str).join(' ')],lines:[translated]},items);
+assert.equal(result.source.length,3);assert.equal(result.lines.join(' ').replace(/\s+/g,' ').trim(),translated);
+assert.equal(alignPdfTranslation({source:['Different document'],lines:['Wrong']},items),null);
+const reordered=alignPdfTranslation({source:[items[2].str,items[0].str,items[1].str],lines:['THIRD','FIRST','SECOND']},items);
+assert.deepEqual(reordered.lines,['FIRST','SECOND','THIRD']);
+assert.deepEqual(alignPdfTranslation({source:[items[1].str],lines:['NOTEBOOK']},items).untranslatedIndices,[0,2]);
+console.log('PASS paragraph-to-line geometry, text conservation, reordered sources, unchanged unreferenced text and wrong-page protection');

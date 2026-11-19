@@ -1,0 +1,41 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {createUiFixture} from './browser-fixture.mjs';
+const fixture=await createUiFixture(),{browser,setup,origin}=fixture,id='11111111-1111-4111-8111-111111111111';
+const producer=await browser.newPage();await producer.setContent('<style>body{font:20px Arial;margin:40px}h1{font-size:28px}p{margin:30px 0}</style><h1>School handbook</h1><p>Please bring your notebook to the school office.</p><p>The library opens at nine and closes at three.</p>');
+const pdf=await producer.pdf();await producer.close();let layoutRequests=0;
+fixture.setApiHandler(request=>{
+ const path=new URL(request.url()).pathname;
+ if(path==='/documents/'+id)return {json:{id,title:'Synthetic layout regression',sourceType:'pdf',pageCount:1,items:[],materials:[],canRemove:false,summaryReady:true}};
+ if(path==='/documents/'+id+'/pdf')return {body:pdf,contentType:'application/pdf'};
+ if(path==='/documents/'+id+'/translate'){
+  const input=request.postDataJSON();if(input.section)return {json:{source:[],lines:[]}};
+  layoutRequests++;const source=(input.layoutText||'School handbook Please bring your notebook to the school office. The library opens at nine and closes at three.').replace(/\n/g,' ');
+  return {json:{source:[source],lines:['Guide: bring your notebook to the school office. The library is open from nine until three.'],text:'Guide: bring your notebook to the school office. The library is open from nine until three.',reuse:'cache'}};
+ }
+ if(path.startsWith('/documents/'))return {json:[]};
+});
+try{
+ for(const width of [390,1280]){
+  const context=await browser.newContext({viewport:{width,height:844},isMobile:width<800,hasTouch:width<800});await setup(context);
+  if(process.env.LIVE_DOCUMENT_LAYOUT)await context.route('https://hiroakiaa.github.io/**',route=>route.continue());
+  const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+  const base=process.env.LIVE_DOCUMENT_LAYOUT?'https://hiroakiaa.github.io/tsuyaku-kun':origin;
+  await page.goto(base+'/documents.html?id='+id);
+  await page.locator('#pdf-pages canvas').first().waitFor({timeout:30000});
+  await page.locator('select.document-language:visible').selectOption('en');
+  const frame=page.locator('.pdf-translation-layout[data-page="1"]:visible');await frame.waitFor({timeout:30000});
+  assert.ok(await frame.locator('canvas').count()>0,'Original PDF page remains in the translated view');
+  assert.ok(await frame.locator('.pdf-layout-line').count()>=3,'Legacy paragraph translation is positioned on physical PDF lines');
+  assert.equal(await page.locator('.pdf-inline-text').count(),0,'Never replace the document with a plain text panel');
+  const geometry=await frame.locator('.pdf-layout-line').evaluateAll(lines=>lines.every(line=>parseFloat(line.style.left)>=0&&parseFloat(line.style.top)>=0&&line.getBoundingClientRect().height>0));
+  assert.ok(geometry);assert.deepEqual(errors,[]);
+  await fs.mkdir('checks/document-inline',{recursive:true});await page.screenshot({path:'checks/document-inline/'+width+'.png',fullPage:true});
+  await page.locator('select.document-language:visible').selectOption('ja');
+  await page.waitForFunction(()=>[...document.querySelectorAll('.pdf-inline-translation')].every(frame=>frame.hidden));
+  await page.locator('select.document-language:visible').selectOption('en');await frame.waitFor();
+  console.log((process.env.LIVE_DOCUMENT_LAYOUT?'Published assets':'Local fixture')+': PASS '+width+'px original PDF canvas + positioned translation, original toggle and cached paragraph reuse');
+  await context.close();
+ }
+ assert.ok(layoutRequests>0);
+}finally{await browser.close();}

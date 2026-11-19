@@ -1,3 +1,4 @@
+import {alignPdfTranslation} from './pdf-translation-alignment.js?v=20261119-layout-1';
 import {resumeTranslation,transientTranslationError} from './translation-resume.js?v=20261119-resume-1';
 import {readPdfPageText,lookupTableCell,lookupAlignedTableCell} from './document-table-lookup.js?v=88';
 import {recordDocumentQaMetric} from './document-qa-metrics.js?v=1';
@@ -944,15 +945,11 @@ async function reader() {
             return;
           }
           if (!await renderTranslationOnPdf(result,page,revision,language) && revision===translationRevision) {
-            // Older documents can return translated text without matching PDF coordinates.
-            const slot=pageList.querySelector(pageSelector);
-            if (slot) {
-              const frame=document.createElement('div');
-              frame.className='pdf-inline-translation pdf-inline-text';
-              frame.lang=translatedPage.lang;
-              renderTranslatedPage(result,page,frame);
-              installInlineTranslation(slot,frame,language);
-            }
+            const status=$('#pdf-status');
+            status.replaceChildren(document.createTextNode('訳文を資料上に配置できませんでした。'));
+            const retryButton=append(status,'button','配置を再確認');
+            retryButton.onclick=()=>{status.replaceChildren();void updatePageTranslation(true);};
+            translatedPage.hidden=true;
           }
         } else {
           translatedPage.hidden=false;
@@ -995,6 +992,8 @@ async function reader() {
       const viewport=page.getViewport({scale:1});
       const nativeItems=await pageTextRuns(page);
       const items=result.includesDiagram ? [...nativeItems,...await diagramTextRuns(page,nativeItems)] : nativeItems;
+      const aligned=alignPdfTranslation(result,items);
+      if(aligned)result=aligned;
       if (revision!==translationRevision) return;
       const normalize=text=>text.normalize('NFKC').replace(/[\s|]/gu,'');
       let offset=0;
@@ -1023,6 +1022,7 @@ async function reader() {
         from=start+needle.length;
         const matched=runs.filter(run=>run.end>start && run.start<from);
         if (matched[0]?.start!==start || matched.at(-1)?.end!==from) return;
+        if(result.untranslatedIndices?.includes(index))continue;
         const first=matched[0].item;
         if (first.verticalLayout && matched.length===1) {
           const [left,top,width,height]=first.ocrBox;
