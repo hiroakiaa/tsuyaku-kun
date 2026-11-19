@@ -40,7 +40,7 @@ export async function budgetOperation(storage,data,now=Date.now()){
    const lease=state.leases[data.id],cost=data.cost;
    if(!lease||data.day!==day||lease.uid!==data.uid||!Number.isSafeInteger(cost)||cost<1||cost>10000||!state.monthly.leases[data.id])throw budgetError();
    const user=state.users[lease.uid];
-   if(state.blockedUntil>now||limitEnabled&&(state.total+cost>Math.round(AI_LIMITS.globalUSD*1e6)||user.cost+cost>Math.round(AI_LIMITS.userUSD*1e6)))throw budgetError();
+   if(state.blockedUntil>now||limitEnabled&&!data.photoUnlimited&&(state.total+cost>Math.round(AI_LIMITS.globalUSD*1e6)||user.cost+cost>Math.round(AI_LIMITS.userUSD*1e6)))throw budgetError();
    const expires=now+120000;monthlyExtend(state.monthly,data.id,day,cost,expires);lease.cost+=cost;lease.expires=expires;state.total+=cost;user.cost+=cost;await tx.put('budget',state);return {ok:true};
   }
   if(data.action==='reserve'){
@@ -63,7 +63,7 @@ export async function guardedAi(env,model,input,run){
  if(!env.ROOMS)return run(); // Unit fixtures do not provide Cloudflare bindings.
  const budget=env.ROOMS.get(env.ROOMS.idFromName('__ai_budget_v1__'));
  const call=async data=>{const r=await budget.fetch(new Request('https://budget/budget',{method:'POST',body:JSON.stringify(data)}));const result=await r.json();if(!r.ok)throw budgetError(result.reason);return result;};
- const reserveStarted=Date.now();let reservation;try{reservation=await call({action:'reserve',uid:env.budgetUid||'unknown',model,cost:reserveCost(model,input)});}finally{if(env.translationTiming)env.translationTiming.budgetWaitMs=(env.translationTiming.budgetWaitMs||0)+Date.now()-reserveStarted;}
+ const reserveStarted=Date.now();let reservation;try{reservation=await call({action:'reserve',uid:env.budgetUid||'unknown',model,cost:reserveCost(model,input),...(env.photoUnlimited?{photoUnlimited:true}:{})});}finally{if(env.translationTiming)env.translationTiming.budgetWaitMs=(env.translationTiming.budgetWaitMs||0)+Date.now()-reserveStarted;}
  let actual;
  try{const result=await run();const u=result?.usage;if(model.includes('gemma')&&Number.isFinite(u?.prompt_tokens)&&Number.isFinite(u?.completion_tokens))actual=Math.ceil(u.prompt_tokens*TRANSLATION_PRICE.inputPerMillion+u.completion_tokens*TRANSLATION_PRICE.outputPerMillion);return result;}
  catch(e){if([e,...(e?.errors||[]),e?.cause].some(v=>[3036,5035,3023,3041,5016,5018].includes(Number(v?.code))))await call({action:'block'}).catch(()=>{});throw e;}

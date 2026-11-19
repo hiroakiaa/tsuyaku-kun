@@ -71,6 +71,6 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
 }
 
 export function photoUsageSection({api,el}){
- const section=el('section'),value=el('p','取得中…'),refresh=el('button','写真読取の残量を更新');section.append(el('h3','写真の文字読取'),value,refresh,el('p','全端末合計で月900回、認証IDごとに月100回。UTC月初（日本時間9時）に月の集計を更新します。月境界の集中利用を防ぐため直近32日間も900回で停止します。送信後の失敗も数えます。Googleの無料枠・請求額を直接取得した値ではありません。翻訳は既存のAI日次上限を共有します。'));
- refresh.onclick=async()=>{refresh.disabled=true;try{const data=await api('/photo/status');value.textContent=(data.enabled?'利用可能':'未接続')+(data.blocked?'・サービス停止中':'')+'・'+data.month+'：全体 '+data.used+' / '+data.limit+'回、残り '+data.remaining+'回。この認証IDは残り '+data.userRemaining+'回。';}catch{value.textContent='写真読取の利用状況を取得できませんでした。';}finally{refresh.disabled=false;}};void refresh.onclick();return section;
+ const section=el('section'),value=el('p','取得中…'),refresh=el('button','写真読取の利用回数を更新');section.append(el('h3','写真の文字読取'),value,refresh,el('p','写真読取の回数制限はありません。送信後の失敗も集計します。Googleの無料枠・請求額を直接取得した値ではありません。'));
+ refresh.onclick=async()=>{refresh.disabled=true;try{const data=await api('/photo/status');value.textContent=(data.enabled?'利用可能':'未接続')+(data.blocked?'・サービス停止中':'')+'・'+data.month+'：全体 '+data.used+'回・この利用者 '+data.userUsed+'回・回数制限なし。';}catch{value.textContent='写真読取の利用状況を取得できませんでした。';}finally{refresh.disabled=false;}};void refresh.onclick();return section;
 }

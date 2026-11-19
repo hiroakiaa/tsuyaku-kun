@@ -126,7 +126,7 @@ export default {async fetch(request,env,ctx){
       if(url.pathname==='/photo/status'&&request.method==='GET')return cors(json({enabled:!!env.GOOGLE_VISION_API_KEY,...await photoOperation(env,{action:'status',uid:await photoUid(auth.uid)})}));
       if(url.pathname==='/photo/recognize'&&request.method==='POST')return cors(json(await recognizePhoto(env,await body(request,2810000))));
       if(url.pathname==='/photo/translate'&&request.method==='POST'){
-       try{return cors(json(await translatePhotoBlocks(await body(request,24000),catalog,input=>runAi(env,'@cf/google/gemma-4-26b-a4b-it',input))));}
+       try{return cors(json(await translatePhotoBlocks(await body(request,24000),catalog,input=>runAi({...env,photoUnlimited:true},'@cf/google/gemma-4-26b-a4b-it',input))));}
        catch(e){if(e.status)throw e;const failure=aiFailure(e);return cors(json({error:failure.message,aiFailure:failure},failure.reason==='quota'?429:502));}
       }
       return cors(error('写真の操作を確認してください。',404));

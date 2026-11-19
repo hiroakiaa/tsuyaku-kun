@@ -7,13 +7,13 @@ export async function photoBudget(storage,data,now=Date.now()){
   const month=new Date(now).toISOString().slice(0,7),reset=new Date(month+'-01T00:00:00Z');reset.setUTCMonth(reset.getUTCMonth()+1);
   let state=await tx.get('photo-budget');const recent=(state?.recent||[]).filter(at=>at>now-PHOTO_POLICY.rollingDays*86400000);
   if(state?.month!==month)state={month,used:0,users:{},leases:{},receipts:{},blocked:false};state.recent=recent;
-  const uid=String(data.uid||'').slice(0,64),status=()=>({month,resetsAt:reset.getTime(),limit:PHOTO_MONTH_LIMIT,used:state.used,rollingUsed:recent.length,remaining:Math.max(0,Math.min(PHOTO_MONTH_LIMIT-state.used,PHOTO_MONTH_LIMIT-recent.length)),userLimit:PHOTO_USER_LIMIT,userUsed:state.users[uid]||0,userRemaining:Math.max(0,PHOTO_USER_LIMIT-(state.users[uid]||0)),blocked:state.blocked});
+  const uid=String(data.uid||'').slice(0,64),status=()=>({month,resetsAt:reset.getTime(),limit:null,unlimited:true,used:state.used,rollingUsed:recent.length,remaining:null,userLimit:null,userUsed:state.users[uid]||0,userRemaining:null,blocked:state.blocked});
   if(data.action==='status')return status();
   for(const [id,l]of Object.entries(state.leases))if(l.expires<=now)delete state.leases[id];
   if(data.action==='reserve'){
    if(!/^[a-f0-9]{32}$/.test(uid)||!/^[-a-zA-Z0-9]{16,64}$/.test(data.id||''))throw problem('読取データを確認してください。');
    const id=uid+':'+data.id;if(state.receipts[id])throw problem('この読取は送信済みです。結果が表示されない場合は画像を選び直してください。',409);
-   if(state.blocked||state.used>=PHOTO_MONTH_LIMIT||recent.length>=PHOTO_MONTH_LIMIT||(state.users[uid]||0)>=PHOTO_USER_LIMIT)throw problem('写真読取の利用上限に達しました。保存中の結果は引き続き使えます。月初でも直近32日間の上限が残る場合があります。',429);
+   if(state.blocked)throw problem('写真読取サービスを利用できません。管理者にお知らせください。',503);
    const leases=Object.values(state.leases);if(leases.length>=4||leases.some(l=>l.uid===uid))throw problem('写真を読み取り中です。少し待ってください。',429);
    state.used++;recent.push(now);state.users[uid]=(state.users[uid]||0)+1;state.receipts[id]=true;state.leases[id]={uid,expires:now+45000};await tx.put('photo-budget',state);return {id,...status()};
   }
