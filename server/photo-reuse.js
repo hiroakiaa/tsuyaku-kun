@@ -7,7 +7,7 @@ const digest=async value=>[...new Uint8Array(await crypto.subtle.digest('SHA-256
 export async function photoReuseOperation(env,kind,data,catalog){
  const scope=await photoUid(env.budgetUid),input=kind==='ocr'?data:photoTranslationInput(data,catalog.languages.map(l=>l.code));
  let key,canonical;
- if(kind==='ocr'){photoInput(data);canonical=data;key=await digest('ocr-v1:'+data.image);}
+ if(kind==='ocr'){photoInput(data);canonical=data;key=await digest('ocr-v2:'+data.image);}
  else{
   canonical={source:input.source,targets:[...input.targets].sort(),blocks:input.blocks.map((block,index)=>({id:'b'+index,text:block.text}))};
   const glossary=glossaryFor(input.blocks.map(b=>b.text).join('\n'),catalog.glossary).slice(0,24);

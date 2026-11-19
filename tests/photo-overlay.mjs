@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {photoLayout} from '../server/photo-ocr.js';
+import {photoLayout,photoSourceLanguage} from '../server/photo-ocr.js';
 import {photoTranslationInput,translatePhotoBlocks} from '../server/photo-translation.js';
 import {matchingPhotoBlocks,wrapPhotoText,drawPhotoOverlay} from '../web/photo-overlay.js';
 const paragraph=(text,y)=>({boundingBox:{vertices:[{y},{x:800,y},{x:800,y:y+100},{y:y+100}]},words:[{symbols:[...text].map(text=>({text}))}]});
@@ -27,3 +27,12 @@ assert.ok(wrapPhotoText(t=>t.length,'Please bring your textbook',13).includes('y
 assert.equal(photoTranslationInput({source:'ja',targets:['en'],blocks:[{id:'b12345',text:'分割された本文'}]},['ja','en']).blocks[0].id,'b12345','Long photos may need more than 1000 segment IDs');
 const manyParagraphs=Array.from({length:100},(_,i)=>paragraph('段落'+i,i*5));
 assert.equal(photoLayout({fullTextAnnotation:{pages:[{width:1000,height:1000,blocks:[{paragraphs:manyParagraphs}]}]}}).length,100,'OCR retains more than 80 paragraphs');
+
+assert.equal(photoTranslationInput({source:'auto',targets:['en'],blocks:[{id:'b0',text:'Bonjour'}]},['ja','en']).source,'auto');
+const autoTranslation=await translatePhotoBlocks({source:'auto',targets:['en'],blocks:[{id:'b0',text:'Bonjour'}]},{languages:[{code:'ja'},{code:'en'}],glossary:[],examples:[]},async input=>{assert.match(input.messages[0].content,/identify the language/);return {response:JSON.stringify({blocks:[{id:'b0',translations:{en:'Hello'}}]})};});
+assert.equal(autoTranslation.blocks[0].translations.en,'Hello');
+
+assert.equal(photoSourceLanguage({}),'auto');
+assert.equal(photoSourceLanguage({fullTextAnnotation:{pages:[{property:{detectedLanguages:[{languageCode:'en',confidence:.99}]}}]}}),'en');
+assert.equal(photoSourceLanguage({fullTextAnnotation:{pages:[{property:{detectedLanguages:[{languageCode:'ja',confidence:.6}]}}]}}),'auto');
+assert.equal(photoSourceLanguage({fullTextAnnotation:{pages:[{property:{detectedLanguages:[{languageCode:'en',confidence:.9},{languageCode:'ja',confidence:.9}]}}]}}),'auto');

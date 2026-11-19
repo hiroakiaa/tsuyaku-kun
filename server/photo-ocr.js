@@ -31,6 +31,11 @@ export function photoInput(data){
  const image=data.image;if(typeof image!=='string'||image.length<100||image.length>2800000||image.length%4||!/^\/9j\/[A-Za-z0-9+/]*={0,2}$/.test(image))throw problem('2MB以内のJPEG画像を選んでください。');
  if(!/^[-a-zA-Z0-9]{16,64}$/.test(data.id||''))throw problem('読取データを確認してください。');return image;
 }
+export function photoSourceLanguage(result){
+ const detected=result.fullTextAnnotation?.pages?.[0]?.property?.detectedLanguages||[];
+ const ranked=detected.filter(l=>typeof l.languageCode==='string'&&l.confidence>=.8).sort((a,b)=>b.confidence-a.confidence);
+ if(ranked.length!==1)return 'auto';return ranked[0].languageCode.replace(/-.+$/,'');
+}
 export function photoLayout(result){
  const page=result.fullTextAnnotation?.pages?.[0];if(!page||!Number.isFinite(page.width)||!Number.isFinite(page.height)||page.width<=0||page.height<=0)return [];
  const rows=[];
@@ -51,6 +56,6 @@ export async function recognizePhoto(env,data,fetcher=fetch){
   if(!r.ok){if([401,403,429].includes(r.status))await photoOperation(env,{action:'block'});throw problem('写真の読取サービスを利用できません。管理者にお知らせください。',502);}
   const j=await r.json(),result=j.responses?.[0];if(!result||result.error){if([7,8,16].includes(result?.error?.code))await photoOperation(env,{action:'block'});throw problem('写真を読み取れませんでした。文字がはっきり写った写真を選んでください。',502);}
   const raw=result.fullTextAnnotation?.text||result.textAnnotations?.[0]?.description||'',text=String(raw).trim();
-  return {text,blocks:photoLayout(result),truncated:false,budget:{month:reservation.month,remaining:reservation.remaining,userRemaining:reservation.userRemaining}};
+  return {text,sourceLanguage:photoSourceLanguage(result),blocks:photoLayout(result),truncated:false,budget:{month:reservation.month,remaining:reservation.remaining,userRemaining:reservation.userRemaining}};
  }finally{await photoOperation(env,{action:'release',id:reservation.id}).catch(()=>{});}
 }

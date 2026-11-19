@@ -14,7 +14,7 @@ try{
  const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1});
  await setup(context);if(process.env.LIVE_PHOTO_PREVIEW)await context.route('https://hiroakiaa.github.io/**',route=>route.continue());const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
  await page.goto(process.env.LIVE_PHOTO_PREVIEW?'https://hiroakiaa.github.io/tsuyaku-kun/?photo-pinch-check='+Date.now():origin);await page.locator('#photo-translate-open').click();
- const pageGestures=await context.newCDPSession(page);await checkPagePinchBlocked(page,pageGestures,'.photo-languages');
+ const pageGestures=await context.newCDPSession(page);await checkPagePinchBlocked(page,pageGestures,'.photo-pick');
  const sample=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=1400;c.height=2400;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.fillStyle='#111';g.font='42px sans-serif';g.fillText('提出日は10月20日です。',56,245);g.strokeStyle='#ddd';g.strokeRect(40,180,1300,120);return c.toDataURL('image/jpeg').split(',')[1];});
  await page.locator('.photo-simple input[type=file]').setInputFiles({name:'synthetic-photo.jpg',mimeType:'image/jpeg',buffer:Buffer.from(sample,'base64')});
  const source=page.locator('.photo-source-viewport');await source.waitFor({state:'visible'});

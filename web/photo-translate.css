@@ -82,3 +82,11 @@ body.phone-home .photo-preview-dialog[open]{animation:photo-preview-enter .18s e
 @media(prefers-reduced-motion:reduce){body.phone-home .photo-preview-dialog[open],.photo-preview-spinner{animation:none}}
 
 body.phone-home .photo-preview-dialog [hidden]{display:none!important}
+
+/* Reveal translation controls only after a valid photo has loaded. */
+.photo-selection{position:relative;min-width:0;animation:photo-preview-enter .2s ease-out}
+body.phone-home #modal .photo-selection-remove{position:absolute;right:8px;top:8px;display:grid;place-items:center;width:44px;min-width:44px;height:44px;min-height:44px;padding:10px;border:1px solid #ffffff25;border-radius:12px;background:#242426;color:#eee;z-index:1}
+.photo-selection-remove svg{width:22px;height:22px}
+.photo-simple .photo-languages{grid-template-columns:1fr;animation:photo-preview-enter .2s ease-out}
+.photo-simple .photo-translate-run{animation:photo-preview-enter .25s ease-out}
+@media(prefers-reduced-motion:reduce){.photo-selection,.photo-simple .photo-languages,.photo-simple .photo-translate-run{animation:none}}

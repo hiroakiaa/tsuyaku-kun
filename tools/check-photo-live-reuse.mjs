@@ -5,9 +5,9 @@ const auth=await(await fetch('https://identitytoolkit.googleapis.com/v1/accounts
 if(!auth.idToken)throw Error('Anonymous authentication unavailable');
 const headers={Authorization:'Bearer '+auth.idToken,Origin:'https://hiroakiaa.github.io','Content-Type':'application/json'};
 async function api(path,body){const r=await fetch(config.api+path,{method:body?'POST':'GET',headers,body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(90000)});const data=await r.json();if(!r.ok)throw Error(path+' HTTP '+r.status+': '+data.error);return data;}
-const input={source:'ja',targets:['en'],blocks:[{id:'b0',text:'図書室の窓辺にある青い箱へ、読み終えた冊子を戻してください。'}]};
+const input={source:'auto',targets:['en'],blocks:[{id:'b0',text:'図書室の窓辺にある青い箱へ、読み終えた冊子を戻してください。'}]};
 const first=await api('/photo/translate',input),second=await api('/photo/translate',{...input,blocks:[{...input.blocks[0],id:'b99'}]});
-assert.equal(second.reuse,'cache');assert.equal(second.blocks[0].id,'b99');assert.equal(second.usage.inputTokens,0);assert.equal(second.usage.outputTokens,0);
+assert.ok(first.blocks[0].translations.en);console.log('Automatic source translation:',first.blocks[0].translations.en);assert.equal(second.reuse,'cache');assert.equal(second.blocks[0].id,'b99');assert.equal(second.usage.inputTokens,0);assert.equal(second.usage.outputTokens,0);
 const before=await api('/photo/status'),image=(await fs.readFile('checks/photo-test/synthetic-clear.jpg')).toString('base64');
 const ocrFirst=await api('/photo/recognize',{image,id:crypto.randomUUID()}),ocrSecond=await api('/photo/recognize',{image,id:crypto.randomUUID()});
 assert.ok(ocrFirst.text);assert.equal(ocrSecond.reuse,'cache');assert.equal(ocrFirst.text,ocrSecond.text);

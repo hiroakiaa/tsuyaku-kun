@@ -548,3 +548,8 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 
 ## 2026-11-19 翻訳ボタンからプレビューへ直接遷移
 - ボタン押下時にプレビューを開き、原文を表示しながらOCR/翻訳/再開の進行状態を表示。完了時に表示を消す。既存キャッシュと分割処理を利用し、プレビューを開くための追加API要求はしない。閉じた画面を完了時に強制的に開かない。
+
+### 2026-11-19 Photo selection flow and automatic source language
+- Only the target language is selected. OCR's confident language metadata is reused; otherwise the existing translation call detects each block. No extra language-detection API call, no translation before user submission.
+- OCR cache version updated to retain language metadata. Existing text-only cache entries are not misinterpreted as detected Japanese. Translation cache includes source (including auto) and target; reuse, chunking, bounds and retries remain in force.
+- Clearing a selected photo does not call OCR or translation. Original-language speech is omitted when language is unknown.

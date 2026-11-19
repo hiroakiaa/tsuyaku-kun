@@ -8,7 +8,7 @@ reset();
 setApiHandler(async request=>{
  const path=new URL(request.url()).pathname;
  if(path==='/photo/recognize'){await readGate;return {json:{text:'検証用の文章です。',blocks:[{id:'b0',text:'検証用の文章です。',box:{x:.1,y:.1,width:.8,height:.1}}]}};}
- if(path==='/photo/translate'){await translateGate;const b=request.postDataJSON();return {json:{blocks:b.blocks.map(part=>({id:part.id,translations:{[b.targets[0]]:'Test translation.'}}))}};}
+ if(path==='/photo/translate'){await translateGate;const b=request.postDataJSON();assert.equal(b.source,'auto');return {json:{blocks:b.blocks.map(part=>({id:part.id,translations:{[b.targets[0]]:'Test translation.'}}))}};}
 });
 try{
  for(const leaveEarly of [false,true]){
@@ -16,9 +16,21 @@ try{
   if(process.env.LIVE_PHOTO_PREVIEW)await context.route('https://hiroakiaa.github.io/**',route=>route.continue());
   const page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));
   await page.goto(process.env.LIVE_PHOTO_PREVIEW?'https://hiroakiaa.github.io/tsuyaku-kun/?photo-loading-check='+Date.now():origin);await page.locator('#photo-translate-open').click();
+  assert.equal(await page.locator('.photo-languages').isVisible(),false);
+  assert.equal(await page.locator('.photo-translate-run').isVisible(),false);
+  assert.equal(await page.locator('.photo-selection').isVisible(),false);
   const sample=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=700;c.height=1000;const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,700,1000);ctx.fillStyle='#111';ctx.font='28px sans-serif';ctx.fillText('検証用の文章です。',70,140);return c.toDataURL('image/jpeg').split(',')[1]});
   await page.locator('.photo-simple input[type=file]').setInputFiles({name:'synthetic.jpg',mimeType:'image/jpeg',buffer:Buffer.from(sample,'base64')});
   await page.locator('.photo-source-viewport').waitFor({state:'visible'});
+  assert.equal(await page.locator('.photo-languages select').count(),1,'Only the target language is selected');
+  assert.equal(await page.locator('.photo-languages').isVisible(),true);
+  await page.locator('.photo-selection-remove').click();
+  assert.equal(await page.locator('.photo-languages').isVisible(),false);
+  assert.equal(await page.locator('.photo-translate-run').isVisible(),false);
+  assert.equal(await page.locator('.photo-selection').isVisible(),false);
+  await page.locator('.photo-simple input[type=file]').setInputFiles({name:'synthetic.jpg',mimeType:'image/jpeg',buffer:Buffer.from(sample,'base64')});
+  await page.locator('.photo-source-viewport').waitFor({state:'visible'});
+  await page.locator('.photo-selection,.photo-languages,.photo-translate-run').evaluateAll(nodes=>Promise.all(nodes.flatMap(n=>n.getAnimations()).map(a=>a.finished.catch(()=>{}))));await fs.mkdir('checks/photo-loading',{recursive:true});await page.screenshot({path:'checks/photo-loading/selected.png'});
   await page.locator('.photo-translate-run').click();
   await page.locator('.photo-preview-dialog[open]').waitFor({timeout:2000});
   const loading=page.locator('.photo-preview-loading');await loading.waitFor({state:'visible'});
