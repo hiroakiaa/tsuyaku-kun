@@ -6,7 +6,7 @@ let ocrCalls=0,translationCalls=0;
 fixture.setApiHandler(request=>{
  const path=new URL(request.url()).pathname;
  if(path==='/photo/recognize'){ocrCalls++;return {json:{text:'提出日は10月20日です。',blocks:[{id:'b0',text:'提出日は10月20日です。',box:{x:.04,y:.17,width:.8,height:.08}}]}};}
- if(path==='/photo/translate'){translationCalls++;const body=request.postDataJSON();return {json:{blocks:body.blocks.map(b=>({id:b.id,translations:{[body.targets[0]]:'Due October 20.'}}))}};}
+ if(path==='/photo/translate'){translationCalls++;const body=request.postDataJSON();return {json:{reuse:process.env.PHOTO_REUSE_UI_TEST?'cache':'generated',blocks:body.blocks.map(b=>({id:b.id,translations:{[body.targets[0]]:'Due October 20.'}}))}};}
 });
 const errors=[];
 try{
@@ -20,6 +20,7 @@ try{
  assert.ok(full.height<=230,'The form only shows a compact thumbnail');
  await source.click();await page.locator('.photo-preview-dialog[open]').waitFor();await page.locator('.photo-preview-close').click();
  await page.locator('.photo-translate-run').click();
+ if(process.env.PHOTO_REUSE_UI_TEST){await page.waitForFunction(()=>document.querySelector('.photo-simple')?.getAttribute('aria-busy')==='false');assert.ok((await page.locator('.photo-notice').textContent()).includes('再利用'));}
  await page.locator('.photo-open-preview').click();
  const viewport=page.locator('.photo-preview-dialog .photo-overlay-viewport');await viewport.waitFor({state:'visible'});
  const fitBox=await viewport.evaluate(v=>{const c=v.querySelector('canvas').getBoundingClientRect();return {imageWidth:c.width,imageHeight:c.height,width:v.clientWidth,height:v.clientHeight};});
