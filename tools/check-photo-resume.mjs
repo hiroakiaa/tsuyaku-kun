@@ -21,7 +21,8 @@ try{
  await page.locator('.photo-simple input[type=file]').setInputFiles({name:'synthetic.jpg',mimeType:'image/jpeg',buffer:Buffer.from(sample,'base64')});
  await page.locator('.photo-source-viewport').waitFor({state:'visible'});
  await page.locator('.photo-simple > button:not(.photo-pick)').click();
- await page.locator('.photo-notice').filter({hasText:'未完了の部分から'}).waitFor({state:'visible'});
+ // Another completed group can update the progress label during the retry delay.
+ await page.waitForFunction(()=>document.querySelector('.photo-simple')?.getAttribute('aria-busy')==='true'||document.querySelector('.photo-results')?.textContent?.includes('Translated'));
  await page.waitForFunction(()=>document.querySelector('.photo-simple')?.getAttribute('aria-busy')==='false');
  assert.equal(calls.get('A'.repeat(200)),1);assert.equal(calls.get('B'.repeat(200)),2);assert.equal(calls.get('C'.repeat(200)),1);
  assert.ok((await page.locator('.photo-results').textContent()).includes('C'.repeat(200)));
