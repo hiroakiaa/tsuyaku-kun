@@ -39,7 +39,8 @@ try{
   await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:points(from)});
   for(let i=1;i<=8;i++){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:points(from+(to-from)*i/8)});await page.evaluate(()=>new Promise(requestAnimationFrame));}
   await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
-  const after=await metrics();assert.equal(await page.evaluate(()=>visualViewport.scale),1,'Only the preview zooms, not the app');assert.ok(Math.abs(after.scale-before.scale*to/from)<.08,'Pinch scale follows fingers');
+  await page.waitForFunction(()=>{const a=document.querySelector('.photo-preview-modes button[aria-pressed="true"]');return a?.textContent.includes('原文')&&getComputedStyle(a).backgroundColor==='rgb(230, 213, 247)';});
+ const after=await metrics();assert.equal(await page.evaluate(()=>visualViewport.scale),1,'Only the preview zooms, not the app');assert.ok(Math.abs(after.scale-before.scale*to/from)<.08,'Pinch scale follows fingers');
   const afterBox=await viewport.locator('canvas').boundingBox();
   assert.ok(Math.abs((mid.x-afterBox.x)/after.scale-imagePoint.x)<3,'Horizontal point under fingers stays fixed');
   assert.ok(Math.abs((mid.y-afterBox.y)/after.scale-imagePoint.y)<3,'Vertical point under fingers stays fixed');
@@ -51,6 +52,7 @@ try{
  const before=await metrics();await page.locator('.photo-preview-modes button').nth(0).click();
  const after=await metrics();assert.deepEqual(after,before,'Switching original keeps zoom and position');
  await page.locator('.photo-preview-modes button').nth(1).click();
+ await page.waitForFunction(()=>{const a=document.querySelector('.photo-preview-modes button[aria-pressed="true"]'),b=document.querySelector('.photo-preview-modes button[aria-pressed="false"]');return a?.textContent.includes('翻訳')&&getComputedStyle(a).backgroundColor==='rgb(230, 213, 247)'&&getComputedStyle(b).backgroundColor==='rgba(0, 0, 0, 0)';});
  assert.deepEqual(await metrics(),before);assert.equal(ocrCalls,1);assert.equal(translationCalls,1,'Pinch and toggles never call AI again');
  await pinch(100,60);
  await fs.mkdir('checks/photo-pinch',{recursive:true});

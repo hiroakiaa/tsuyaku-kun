@@ -553,3 +553,6 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 - Only the target language is selected. OCR's confident language metadata is reused; otherwise the existing translation call detects each block. No extra language-detection API call, no translation before user submission.
 - OCR cache version updated to retain language metadata. Existing text-only cache entries are not misinterpreted as detected Japanese. Translation cache includes source (including auto) and target; reuse, chunking, bounds and retries remain in force.
 - Clearing a selected photo does not call OCR or translation. Original-language speech is omitted when language is unknown.
+
+### 2026-11-19 Preview selected state
+- CSS-only original/translation selection emphasis. No added model calls, translation, cache changes or usage costs. Existing toggle test checks zero additional API calls.
