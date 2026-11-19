@@ -53,6 +53,7 @@ try{
   assert.equal(await page.locator('#photo-text-panel-translated').isVisible(),true);
   assert.equal(await page.locator('#photo-text-panel-original').isVisible(),false);
   for(const index of [0,1]){await tabs.nth(index).click();const panel=page.locator(index?'#photo-text-panel-translated':'#photo-text-panel-original');assert.equal(await panel.isVisible(),true);const play=panel.locator('[data-play]');assert.equal(await play.isVisible(),true);const tb=await tabs.nth(index).boundingBox(),pb=await play.boundingBox();assert.ok(Math.abs(tb.y-pb.y)<12,'Playback sits beside the tabs');}
+  await page.locator('.photo-text-details').scrollIntoViewIfNeeded();
   await fs.mkdir('checks/photo-text-tabs',{recursive:true});await page.screenshot({path:'checks/photo-text-tabs/translated.png'});
   await tabs.nth(0).click();await page.screenshot({path:'checks/photo-text-tabs/original.png'});
   assert.deepEqual(errors,[]);await context.close();

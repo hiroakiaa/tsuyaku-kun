@@ -106,3 +106,6 @@ body.phone-home #modal .photo-text-tabs button[aria-selected="true"]{background:
 body.phone-home #modal .photo-text-playback button{width:44px;height:44px;min-height:44px;min-width:44px;padding:10px;margin:0}
 .photo-text-playback svg{width:20px;height:20px}
 .photo-text-panel .reference-language-text{margin:0;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
+
+.photo-overlay{position:relative}
+body.phone-home #modal .photo-text-tabs button[aria-selected="false"]{background:#242426!important;color:#b9b9c2!important}
