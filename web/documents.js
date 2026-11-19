@@ -1,3 +1,4 @@
+import {isLegacyImagePage,imageContentFrame,paintImageFrame} from './document-image-margins.js?v=1';
 import {automaticDocumentTitle} from './document-title.js?v=1';
 import {previewFitScale} from './preview-fit.js?v=20261119-fit-1';
 import {installPreviewOnlyGestures} from './preview-only-gestures.js?v=20261119-preview-only-1';
@@ -289,7 +290,7 @@ function teacher() {
         data.set('pages',JSON.stringify(pages));
       }
       if (!/\.pdf$/i.test(file.name)) {
-        const {convertDocument}=await import('./document-convert.js?v=94');
+        const {convertDocument}=await import('./document-convert.js?v=95');
         const converted=await convertDocument(file);
         data.set('pdf',converted.file);
         data.set('converted','1');
@@ -703,6 +704,15 @@ async function reader() {
       preview.scrollTo({top:preview.scrollTop + firstMark.getBoundingClientRect().top - preview.getBoundingClientRect().top - preview.clientHeight*.25,behavior:scrollBehavior()});
     }
   }
+  const imageFrames=new WeakMap();
+  async function themeLegacyImageMargins(page,canvas){
+    if(doc.convertedWorksheet)return;
+    if(!imageFrames.has(page))imageFrames.set(page,(async()=>{
+      if(!await isLegacyImagePage(page,(await pdfLibrary()).OPS))return null;
+      const sample=document.createElement('canvas'),scale=Math.min(1,560/Math.max(canvas.width,canvas.height));sample.width=Math.max(1,Math.round(canvas.width*scale));sample.height=Math.max(1,Math.round(canvas.height*scale));const ctx=sample.getContext('2d',{willReadFrequently:true});ctx.drawImage(canvas,0,0,sample.width,sample.height);return imageContentFrame(ctx.getImageData(0,0,sample.width,sample.height));
+    })().catch(()=>null));
+    paintImageFrame(canvas,await imageFrames.get(page),getComputedStyle(document.body).backgroundColor);
+  }
   async function renderPage(slot) {
     try {
       const page = await (await opened).getPage(Number(slot.dataset.page));
@@ -712,6 +722,7 @@ async function reader() {
       canvas.width = Math.ceil(viewport.width);
       canvas.height = Math.ceil(viewport.height);
       await page.render({canvas,viewport}).promise;
+      await themeLegacyImageMargins(page,canvas);
       canvas.className='pdf-original-canvas';
       slot.prepend(canvas);
       void highlightCitation(slot,page,viewport).catch(()=>{});
@@ -1113,6 +1124,7 @@ async function reader() {
       canvas.width=Math.ceil(renderViewport.width);
       canvas.height=Math.ceil(renderViewport.height);
       await page.render({canvas,viewport:renderViewport}).promise;
+      await themeLegacyImageMargins(page,canvas);
       if (revision!==translationRevision) return;
       const rendered=canvas.getContext('2d');
       const scale=renderViewport.scale;
@@ -1687,7 +1699,7 @@ async function reader() {
       const form = new FormData();
       let upload = file;
       if (/\.(png|jpe?g|webp)$/i.test(file.name)) {
-        const {convertDocument} = await import('./document-convert.js?v=94');
+        const {convertDocument} = await import('./document-convert.js?v=95');
         upload = (await convertDocument(file)).file;
       }
       form.set('file',upload);

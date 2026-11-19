@@ -13,7 +13,8 @@ export async function convertDocument(file){
     const jpeg=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.72));
     if(!jpeg)throw Error('PDFへの変換に失敗しました。');
     const picture=await pdf.embedJpg(await jpeg.arrayBuffer());
-    pdf.addPage([595,842]).drawImage(picture,{x:0,y:0,width:595,height:842});
+    const width=image?canvas.width/2:595,height=image?canvas.height/2:842;
+    pdf.addPage([width,height]).drawImage(picture,{x:0,y:0,width,height});
   }
   function clear(){ctx.fillStyle='#fff';ctx.fillRect(0,0,1120,1584);ctx.fillStyle='#181818';}
   if(image){
@@ -22,9 +23,10 @@ export async function convertDocument(file){
       const element=new Image();
       element.src=url;
       await element.decode();
-      const scale=Math.min(1040/element.naturalWidth,1504/element.naturalHeight);
-      clear();
-      ctx.drawImage(element,(1120-element.naturalWidth*scale)/2,(1584-element.naturalHeight*scale)/2,element.naturalWidth*scale,element.naturalHeight*scale);
+      const scale=Math.min(1,1800/Math.max(element.naturalWidth,element.naturalHeight));
+      canvas.width=Math.max(1,Math.round(element.naturalWidth*scale));canvas.height=Math.max(1,Math.round(element.naturalHeight*scale));
+      ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.drawImage(element,0,0,canvas.width,canvas.height);
       await save();
     }finally{URL.revokeObjectURL(url);}
   }else{

@@ -571,3 +571,6 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 
 ### 2026-11-19 Document creation and title editing
 - Creation title is generated locally from JST date and original filename; renaming only updates stored metadata (owner check on server). No AI call for naming/renaming. Completion opens existing reader and uses existing extraction/create calls. Background summary/translation policy unchanged.
+
+### 2026-11-19 Image PDF margins
+- New images convert to aspect-matched PDF without an A4 mat. Legacy app A4 raster pages are recognized locally from PDF image dimensions and lack of vector text; only high-density image outer blank bands are recolored in display. Text/Excel pages are excluded. No AI/OCR/API call for margin recognition, no source-file modification; translation and citation coordinates remain unchanged.
