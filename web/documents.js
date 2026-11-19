@@ -1,3 +1,4 @@
+import {automaticDocumentTitle} from './document-title.js?v=1';
 import {previewFitScale} from './preview-fit.js?v=20261119-fit-1';
 import {installPreviewOnlyGestures} from './preview-only-gestures.js?v=20261119-preview-only-1';
 installPreviewOnlyGestures();
@@ -14,7 +15,7 @@ import {selectableCatalog} from './selectable-catalog.js';
 import {createDocumentUiLocale} from './document-ui-locale.js?v=5';
 const $ = (selector) => document.querySelector(selector);
 const content = $('#content');
-const id = new URLSearchParams(location.search).get('id');
+let id = new URLSearchParams(location.search).get('id');
 const documentLanguages=selectableCatalog(seed).languages;
 const languagePreference='tsuyaku-document-language';
 const defaultDocumentLanguage='ja';
@@ -244,6 +245,7 @@ function teacher() {
   installLocalIcons($('#content'));
   const saveGuide = documentLibrary();
   const status = $('#upload-status');
+  const estimate=$('#create-estimate');
   const fileInput = $('#upload [name="pdf"]');
   let preflight;
   function preparePdf(file) {
@@ -271,6 +273,7 @@ function teacher() {
     const button = event.submitter;
     const data = new FormData(event.currentTarget);
     const file = data.get('pdf');
+    data.set('title',automaticDocumentTitle(file.name));
     if (file.size > 5000000) { status.textContent = 'PDFは5 MBまでです。'; return; }
     if (data.get('visibility')==='shared' && !window.confirm('共通保管庫では誰でも閲覧できます。\n公開するファイル：'+file.name+'\nこの資料を公開しますか？')) return;
     button.disabled = true;
@@ -278,7 +281,7 @@ function teacher() {
     button.setAttribute('aria-busy','true');
     button.querySelector('span').textContent = '作成中…';
     status.textContent = '';
-    $('#create-estimate').hidden = false;
+    estimate.hidden = false;
     try {
       if (/\.pdf$/i.test(file.name)) {
         const {pages,error} = await (preflight?.file===fileInput.files[0] ? preflight.pending : preparePdf(file));
@@ -296,26 +299,20 @@ function teacher() {
       }
       const controller=new AbortController();
       const deadline=setTimeout(()=>controller.abort(),60_000);
-      const {id,createdAt} = await request('/documents',{method:'POST',body:data,signal:controller.signal}).catch(error=>{
+      const {id:createdId,createdAt} = await request('/documents',{method:'POST',body:data,signal:controller.signal}).catch(error=>{
         if (controller.signal.aborted) throw new Error('資料の作成結果を確認できませんでした。時間をおいて、保管庫を確認してください。');
         throw error;
       }).finally(()=>clearTimeout(deadline));
-      status.textContent = '作成が完了しました。';
-      const url = '?id=' + id;
-      $('#open-guide').href = url;
-      $('#guide-url').value = new URL(url,location.href).href;
-      $('#result').hidden = false;
       const shared = data.get('visibility')==='shared';
-      $('#guide-url').closest('label').hidden = !shared;
-      $('#copy').hidden = !shared;
-      if (!saveGuide({id,title:String(data.get('title')).trim(),createdAt,shared})) {
-        status.textContent = '資料を作成しましたが、保管庫には保存できませんでした。';
-        return;
-      }
+      saveGuide({id:createdId,title:String(data.get('title')).trim(),createdAt,shared});
+      status.textContent='資料を開いています…';estimate.hidden=true;
+      if(!matchMedia('(prefers-reduced-motion: reduce)').matches)await content.animate([{opacity:1},{opacity:0}],{duration:150,easing:'ease-out'}).finished;
+      id=createdId;const next=new URL(location.href);next.searchParams.delete('create');next.searchParams.delete('library');next.searchParams.set('id',id);history.replaceState(null,'',next);
+      await reader();
     } catch (error) {
       status.textContent = error.message;
     } finally {
-      $('#create-estimate').hidden = true;
+      estimate.hidden = true;
       button.removeAttribute('aria-busy');
       button.querySelector('span').textContent = '作成する';
       button.disabled = false;
@@ -348,6 +345,14 @@ async function reader() {
   addLanguagePicker($('#pdf-language-picker'));
   document.title = doc.title + '｜資料QA君';
   $('#doc-title').textContent = doc.title;
+  if(doc.canRemove){
+   const editor=document.createElement('dialog');editor.id='document-title-editor';editor.className='panel';editor.setAttribute('aria-label','資料名を変更');
+   const heading=append(editor,'h2','資料名を変更');heading.tabIndex=-1;heading.autofocus=true;const form=append(editor,'form'),label=append(form,'label','資料名'),input=append(label,'input');input.maxLength=100;input.required=true;input.value=doc.title;
+   const actions=append(form,'div','','title-edit-actions'),cancel=append(actions,'button','キャンセル'),save=append(actions,'button','保存'),status=append(form,'p','','fine');status.setAttribute('role','status');cancel.type='button';cancel.onclick=()=>editor.close();save.type='submit';content.append(editor);
+   const open=()=>{input.value=doc.title;status.textContent='';editor.showModal();};
+   for(const title of [$('#pdf-heading'),$('#doc-title')]){title.classList.add('document-title-editable');title.setAttribute('role','button');title.tabIndex=0;title.title='資料名を変更';title.setAttribute('aria-label','資料名を変更');title.onclick=open;title.onkeydown=event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();open();}};}
+   form.onsubmit=async event=>{event.preventDefault();save.disabled=true;try{const result=await request(api+'/title',{method:'POST',body:JSON.stringify({title:input.value.trim()})});doc.title=result.title;for(const selector of ['#doc-title','#pdf-heading','#ask-heading'])$(selector).textContent=doc.title;document.title=doc.title+'｜資料QA君';documentLibrary()({id,title:doc.title});editor.close();}catch(error){status.textContent=error.message;}finally{save.disabled=false;}};
+  }
   $('#ask-heading').textContent = doc.title;
   const dialog = $('#pdf-dialog');
   const askDialog=$('#ask-dialog');
@@ -2096,6 +2101,7 @@ async function reader() {
     void sendQuestion(question,lastQuestion);
   });
   await showPdf(selectedPage || 1);
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches)askDialog.animate([{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'translateY(0)'}],{duration:200,easing:'ease-out'});
 }
 
 try {

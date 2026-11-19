@@ -937,10 +937,18 @@ export async function documents(request,env,auth) {
     queueSummary(env,target);
     return reply({id,createdAt},201);
   }
-  const match = /^\/documents\/([a-f0-9-]{36})(?:\/(pdf|ask|remove|replace|material|toc|text|translate|summary))?$/.exec(pathname);
+  const match = /^\/documents\/([a-f0-9-]{36})(?:\/(pdf|ask|remove|replace|material|toc|text|translate|summary|title))?$/.exec(pathname);
   if (!match) return fail('資料が見つかりません。',404);
   const [,id,action] = match;
   const target = env.ROOMS.get(env.ROOMS.idFromName('document:'+id));
+  if(action==='title'&&request.method==='POST'){
+    const raw=await request.text();if(raw.length>1000)return fail('資料名は100文字以内にしてください。',413);
+    let input;try{input=JSON.parse(raw);}catch{return fail('資料名を確認してください。');}
+    const title=typeof input.title==='string'?input.title.trim():'';if(!title||title.length>100)return fail('資料名は1～100文字にしてください。');
+    const saved=await target.fetch('https://room/document/title',{method:'POST',body:JSON.stringify({owner:auth.uid,title})});if(!saved.ok)return saved;const result=await saved.json();
+    if(result.visibility==='shared'){const listed=await library.fetch('https://room/document/library',{method:'POST',body:JSON.stringify({id,title,createdAt:result.createdAt})});if(!listed.ok)return fail('共通保管庫の資料名を更新できませんでした。もう一度保存してください。',502);}
+    return reply({title});
+  }
   if (action==='replace' && request.method==='POST') {
     const owner = await target.fetch('https://room/document/owner',{method:'POST',body:auth.uid});
     if (!owner.ok) return owner;
@@ -1649,6 +1657,10 @@ export async function documentStorage(request,storage,env) {
       await tx.put(path,items);
     });
     return reply({ok:true});
+  }
+  if(path==='/document/title'&&request.method==='POST'){
+    const input=await request.json();if(typeof input.title!=='string'||!input.title.trim()||input.title.length>100)return fail('資料名を確認してください。');
+    return storage.transaction(async tx=>{const current=await tx.get('document');if(!current)return fail('資料が見つかりません。',404);if(current.owner!==input.owner)return fail('資料名を変更できるのは作成者だけです。',403);const title=input.title.trim();await tx.put('document',{...current,title});return reply({title,visibility:current.visibility,createdAt:current.createdAt});});
   }
   if (path==='/document/owner') return record.owner===await request.text() ? reply({ok:true}) : fail('作成者だけが資料を追加できます。',403);
   if (path==='/document/material' && request.method==='POST') {

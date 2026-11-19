@@ -651,3 +651,13 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
 }
 
 html{touch-action:pan-x pan-y}
+
+/* Keep the PDF's surrounding workspace in the app theme; pages retain their paper. */
+#ask-dialog,#pdf-dialog,.pdf-stage,#pdf-scroll,#pdf-pages,#pdf-translation:has(.pdf-translation-layout){background:var(--bg)}
+.pdf-page-view{background:var(--bg)}
+.document-title-editable{cursor:pointer}
+.document-title-editable::after{content:' ✎';font-size:.8em;color:var(--muted)}
+#document-title-editor{width:min(30rem,calc(100% - 2rem));max-height:85dvh;color:var(--ink)}
+#document-title-editor form,#document-title-editor label{display:grid;gap:12px}
+#document-title-editor input{width:100%}
+.title-edit-actions{display:flex;justify-content:flex-end;gap:10px}

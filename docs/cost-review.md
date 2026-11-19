@@ -568,3 +568,6 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 
 ### 2026-11-19 Photo result stages and playback
 - Selection/change/delete controls consolidated on image; completed results hide creation controls. Language change is explicit; existing OCR and translation caches retained. Partial translated text can be played with existing opt-in speech; switching/rebuilding a panel stops old audio. No automatic audio or new speech service. No additional model calls for UI changes.
+
+### 2026-11-19 Document creation and title editing
+- Creation title is generated locally from JST date and original filename; renaming only updates stored metadata (owner check on server). No AI call for naming/renaming. Completion opens existing reader and uses existing extraction/create calls. Background summary/translation policy unchanged.

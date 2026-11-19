@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {automaticDocumentTitle} from '../web/document-title.js';
+import {documents,documentStorage} from '../server/documents.js';
+const now=new Date('2026-11-18T16:00:00Z');assert.equal(automaticDocumentTitle('入学説明会.pdf',now),'20261119_入学説明会');assert.equal(automaticDocumentTitle('表.xlsx',now),'20261119_表');assert.ok(automaticDocumentTitle('😀'.repeat(100)+'.pdf',now).length<=100);
+let record={owner:'creator',title:'old',visibility:'shared',createdAt:123,pages:['test']};const storage={get:async()=>record,put:async(key,value)=>{assert.equal(key,'document');record=value;},transaction:async fn=>fn(storage)};
+const change=owner=>documentStorage(new Request('https://room/document/title',{method:'POST',body:JSON.stringify({owner,title:'new name'})}),storage,{});
+assert.equal((await change('other')).status,403);assert.equal(record.title,'old');assert.equal((await change('creator')).status,200);assert.equal(record.title,'new name');
+let listed;const environment={ROOMS:{idFromName:n=>n,get:name=>({fetch:async(url,options)=>name==='__document_library__'?(listed=JSON.parse(options.body),Response.json({ok:true})):documentStorage(new Request(url,options),storage,{})})}};
+const response=await documents(new Request('https://app/documents/11111111-1111-4111-8111-111111111111/title',{method:'POST',body:JSON.stringify({title:'shared renamed'})}),environment,{uid:'creator'});assert.equal(response.status,200);assert.equal(listed.title,'shared renamed');assert.equal(listed.createdAt,123);
+console.log('PASS automatic date/filename title, Unicode length, owner-only rename and shared library metadata update');

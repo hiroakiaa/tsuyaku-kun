@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1d1d1d">
 <title>資料QA君</title>
-<link rel="stylesheet" href="web/documents.css?v=101">
-<script type="module" src="web/documents.js?v=254"></script>
+<link rel="stylesheet" href="web/documents.css?v=102">
+<script type="module" src="web/documents.js?v=255"></script>
 </head>
 <body><div class="shell">
 
@@ -20,7 +20,6 @@
 </header>
 <p id="upload-status" role="status"></p>
 <form class="stack" id="upload">
-<label>資料名<input name="title" maxlength="100" placeholder="例：新1年生の入学案内" required></label>
 <label><span><i class="fa-solid fa-folder" aria-hidden="true"></i> 資料ファイル</span><input type="file" aria-describedby="upload-formats" name="pdf" accept=".pdf,.png,.jpg,.jpeg,.webp,.docx,.xlsx" required></label>
 <p id="upload-formats" class="fine">PDF（5 MB・40ページまで）、画像・Excel・Wordは1つのPDFに変換します</p>
 <label>保管先<select name="visibility"><option value="device">この端末の保管庫のみ</option><option value="shared">共通保管庫にも掲載（誰でも閲覧できます）</option></select></label>
@@ -101,7 +100,7 @@
 <nav id="pdf-toc" aria-label="PDFの目次" hidden></nav>
 <p id="pdf-translation-progress" role="status" hidden>翻訳しています…</p>
 <p id="pdf-status" role="status"></p>
-<div class="pdf-zoom"><button id="qa-expand" type="button" aria-label="PDF全画面" hidden></button><button id="zoom-in" aria-label="拡大">＋</button><button id="zoom-out" aria-label="縮小">−</button><button id="zoom-fit" type="button" aria-label="ページ幅に戻す" title="ページ幅に戻す" hidden>幅</button></div>
+<div class="pdf-zoom"><button id="qa-expand" type="button" aria-label="PDF全画面" hidden></button><button id="zoom-fit" type="button" aria-label="ページ幅に戻す" title="ページ幅に戻す" hidden>幅</button><button id="zoom-in" aria-label="拡大">＋</button><button id="zoom-out" aria-label="縮小">−</button></div>
 </div>
 <p id="pdf-english-progress" role="status" hidden></p>
 <nav class="pdf-navigation" aria-label="ページ送り"><button class="open-material pdf-add" type="button" aria-label="資料追加" hidden>資料追加</button><span id="pdf-language-picker"></span><button id="pdf-answer-return" type="button" hidden>回答へ</button><button id="pdf-prev" aria-label="前のページ">←</button><select id="pdf-page" aria-label="ページ番号"></select><button id="pdf-next" aria-label="次のページ">→</button><div id="pdf-citation-navigation" role="group" aria-label="根拠を移動" hidden><button id="pdf-citation-previous" type="button" aria-label="前の根拠">‹</button><output aria-label="根拠番号"></output><button id="pdf-citation-next" type="button" aria-label="次の根拠">›</button></div></nav>
