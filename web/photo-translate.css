@@ -60,3 +60,6 @@ body.phone-home .photo-preview-heading .photo-preview-close{display:grid!importa
 body.phone-home .photo-preview-heading .photo-preview-close{position:relative;z-index:2;font-size:0!important}
 body.phone-home .photo-preview-heading .photo-preview-close::before,body.phone-home .photo-preview-heading .photo-preview-close::after{content:'';position:absolute;left:50%;top:50%;width:16px;height:2px;background:#eee;pointer-events:none;transform:translate(-50%,-50%) rotate(45deg)}
 body.phone-home .photo-preview-heading .photo-preview-close::after{transform:translate(-50%,-50%) rotate(-45deg)}
+
+body.phone-home .photo-preview-heading .photo-preview-close::before{content:''!important;display:block!important;width:18px!important;height:18px!important;background:linear-gradient(45deg,transparent 44%,#eee 46%,#eee 54%,transparent 56%),linear-gradient(-45deg,transparent 44%,#eee 46%,#eee 54%,transparent 56%)!important;transform:translate(-50%,-50%)!important}
+body.phone-home .photo-preview-heading .photo-preview-close::after{content:none!important}
