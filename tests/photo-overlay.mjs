@@ -23,3 +23,7 @@ assert.equal(matchingPhotoBlocks(longText,longText,longLayout),longLayout,'Long 
 const extraOcr=text+'\nfooter not positioned';
 assert.equal(matchingPhotoBlocks(extraOcr,extraOcr,layout),layout,'Unpositioned footer does not discard all valid paragraph positions');
 assert.ok(wrapPhotoText(t=>t.length,'Please bring your textbook',13).includes('your textbook'),'Wrap Latin words at spaces');
+
+assert.equal(photoTranslationInput({source:'ja',targets:['en'],blocks:[{id:'b12345',text:'分割された本文'}]},['ja','en']).blocks[0].id,'b12345','Long photos may need more than 1000 segment IDs');
+const manyParagraphs=Array.from({length:100},(_,i)=>paragraph('段落'+i,i*5));
+assert.equal(photoLayout({fullTextAnnotation:{pages:[{width:1000,height:1000,blocks:[{paragraphs:manyParagraphs}]}]}}).length,100,'OCR retains more than 80 paragraphs');

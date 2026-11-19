@@ -5,8 +5,8 @@ function orderedPhotoBlocks(original,blocks){
  return true;
 }
 export function matchingPhotoBlocks(text,original,blocks){
- if(!Array.isArray(blocks)||!blocks.length||blocks.length>80||normalized(text)!==normalized(original)||!orderedPhotoBlocks(original,blocks))return null;
- if(blocks.reduce((n,b)=>n+b.text.length,0)>12000||blocks.some(b=>!b.box||![b.box.x,b.box.y,b.box.width,b.box.height].every(Number.isFinite)||b.box.x<0||b.box.y<0||b.box.width<=0||b.box.height<=0||b.box.x+b.box.width>1.001||b.box.y+b.box.height>1.001))return null;
+ if(!Array.isArray(blocks)||!blocks.length||normalized(text)!==normalized(original)||!orderedPhotoBlocks(original,blocks))return null;
+ if(blocks.some(b=>!b.box||![b.box.x,b.box.y,b.box.width,b.box.height].every(Number.isFinite)||b.box.x<0||b.box.y<0||b.box.width<=0||b.box.height<=0||b.box.x+b.box.width>1.001||b.box.y+b.box.height>1.001))return null;
  return blocks;
 }
 export function wrapPhotoText(measure,text,width){

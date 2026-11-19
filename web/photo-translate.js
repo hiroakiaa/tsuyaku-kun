@@ -1,10 +1,10 @@
-import {translatePhotoProgressively} from './photo-progress.js?v=20261020-photo-fast-1';
-import {matchingPhotoBlocks,drawPhotoOverlay} from './photo-overlay.js?v=20261020-photo-overlay-3';
+import {translatePhotoProgressively} from './photo-progress.js?v=20261020-photo-unlimited-2';
+import {matchingPhotoBlocks,drawPhotoOverlay} from './photo-overlay.js?v=20261020-photo-overlay-4';
 export function photoReadResult(value){
  if(!value||typeof value.text!=='string')throw Error('写真の読み取り結果を確認できませんでした。もう一度お試しください。');
  return {...value,blocks:Array.isArray(value.blocks)?value.blocks.filter(b=>b&&typeof b.id==='string'&&typeof b.text==='string'):[],truncated:value.truncated===true};
 }
-export function photoTranslationText(text,start=0,end=0){const selected=end>start?text.slice(start,end):text;const value=selected.trim();if(!value||value.length>12000)throw Error('訳す部分を選択するか、原文を12000文字以内に直してください。');return value;}
+export function photoTranslationText(text,start=0,end=0){const selected=end>start?text.slice(start,end):text;const value=selected.trim();if(!value)throw Error('翻訳する文字がありません。');return value;}
 export function cropRect(width,height,crop){
  const [left,top,right,bottom]=crop.map(Number);if(![width,height,...crop].every(n=>Number.isFinite(Number(n)))||width<1||height<1||left<0||top<0||right>100||bottom>100||right-left<5||bottom-top<5)throw Error('読取範囲を広げてください。');
  return {x:Math.round(width*left/100),y:Math.round(height*top/100),width:Math.max(1,Math.round(width*(right-left)/100)),height:Math.max(1,Math.round(height*(bottom-top)/100))};
@@ -20,7 +20,7 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
   const sourceLabel=el('label','原文の言語'),targetLabel=el('label','訳す言語');sourceLabel.append(source);targetLabel.append(target);const languageRow=el('div',undefined,'photo-languages');languageRow.append(sourceLabel,targetLabel);
   const translate=el('button','翻訳する');translate.type='button';translate.disabled=true;translate.title='選んだ画像をGoogleで読み取り、翻訳します';
   const notice=el('p',undefined,'photo-notice');notice.hidden=true;notice.setAttribute('role','status');notice.setAttribute('aria-live','polite');
-  const text=el('textarea');text.rows=5;text.maxLength=12000;text.setAttribute('aria-label','読み取った原文');const textLabel=el('label','原文を確認・修正');textLabel.append(text);
+  const text=el('textarea');text.rows=5;text.setAttribute('aria-label','読み取った原文');const textLabel=el('label','原文を確認・修正');textLabel.append(text);
   const result=el('div',undefined,'photo-results'),details=el('details',undefined,'photo-text-details');details.hidden=true;details.append(el('summary','原文・訳文を見る'),textLabel,el('p','写真の文字の位置に訳を表示します。読み取りを修正すると、位置を対応づけられない場合があります。','photo-help'),result,el('p','写真はサーバーに保存しません。読取結果・訳はこのページを開いている間だけ再利用します。','photo-help'));
   const overlay=el('section',undefined,'photo-overlay');overlay.hidden=true;const viewport=el('div',undefined,'photo-overlay-viewport'),overlayCanvas=el('canvas');viewport.tabIndex=0;viewport.setAttribute('role','region');viewport.setAttribute('aria-label','翻訳画像。矢印キーでスクロールできます。');viewport.append(overlayCanvas);overlayCanvas.setAttribute('aria-label','写真に重ねた翻訳。全文は原文・訳文を見るで確認できます。');
   const settings=el('details',undefined,'photo-display-settings');settings.append(el('summary','表示設定'));const overlayMode=el('input');overlayMode.type='checkbox';overlayMode.checked=true;const overlayLabel=el('label','画像に訳を重ねる');overlayLabel.prepend(overlayMode);const zoom=el('input');zoom.type='range';zoom.min='1';zoom.max='4';zoom.step='.5';zoom.value='1';zoom.setAttribute('aria-label','翻訳画像の拡大');const zoomLabel=el('label','拡大');zoomLabel.append(zoom);const modes=el('div',undefined,'photo-preview-modes');modes.setAttribute('role','group');modes.setAttribute('aria-label','写真の表示');

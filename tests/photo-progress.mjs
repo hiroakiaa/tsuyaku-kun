@@ -9,3 +9,9 @@ const before=calls;await translatePhotoProgressively({blocks,source:'ja',target:
 let count=0;const partialCache=new Map();await assert.rejects(()=>translatePhotoProgressively({blocks,source:'ja',target:'es',cache:partialCache,request:async body=>{if(++count===2)throw Error('network');return request(body);}}));assert.ok(partialCache.size>0,'successful batches survive another batch failing');
 await assert.rejects(()=>translatePhotoProgressively({blocks,source:'ja',target:'es',cache:new Map(),request:async()=>({blocks:[]})}));
 console.log('Photo progress: bounded batches, no text loss, two requests maximum, selected language only, cache and failure recovery passed');
+
+const longBlocks=Array.from({length:100},(_,i)=>({id:'b'+i,text:('段落'+i+'の確認用文章。').repeat(30)}));
+const longResult=await translatePhotoProgressively({blocks:longBlocks,source:'ja',target:'en',cache:new Map(),request:async body=>({blocks:body.blocks.map(b=>({id:b.id,translations:{en:b.text}}))})});
+assert.equal(longResult.blocks.length,100);
+for(let i=0;i<longBlocks.length;i++)assert.equal(longResult.blocks[i].translations.en.replace(/\s/gu,''),longBlocks[i].text.replace(/\s/gu,''),'No text is dropped after 1200 or 12000 characters');
+console.log('PASS long photo: '+longBlocks.reduce((n,b)=>n+b.text.length,0)+' characters, 100 paragraphs, no truncation');

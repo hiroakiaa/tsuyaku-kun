@@ -6,7 +6,7 @@ export function photoTranslationInput(data,languages){
  const source=String(data.source||''),targets=[...new Set(Array.isArray(data.targets)?data.targets:[])];
  if(!languages.includes(source)||!targets.length||targets.length>3||targets.some(c=>!languages.includes(c)))throw invalid();
  if(!Array.isArray(data.blocks)||!data.blocks.length||data.blocks.length>40)throw invalid();
- const ids=new Set(),blocks=data.blocks.map(b=>{if(!/^b\d{1,3}$/.test(b.id)||ids.has(b.id)||typeof b.text!=='string'||!b.text.trim())throw invalid();ids.add(b.id);return {id:b.id,text:b.text.trim()};});
+ const ids=new Set(),blocks=data.blocks.map(b=>{if(!/^b\d{1,12}$/.test(b.id)||ids.has(b.id)||typeof b.text!=='string'||!b.text.trim())throw invalid();ids.add(b.id);return {id:b.id,text:b.text.trim()};});
  if(blocks.reduce((n,b)=>n+b.text.length,0)>1200)throw invalid();return {source,targets,blocks};
 }
 export async function translatePhotoBlocks(data,catalog,run){
