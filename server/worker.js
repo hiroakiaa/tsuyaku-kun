@@ -1,3 +1,4 @@
+import {photoReuseOperation,photoReuseStorage} from './photo-reuse.js';
 import {documents,documentStorage} from './documents.js';
 import {schoolUsage} from './school-usage.js';
 import {upgradeLiveTranslation} from './live-translation-relay.js';
@@ -124,10 +125,10 @@ export default {async fetch(request,env,ctx){
 
     if(url.pathname.startsWith('/photo/')){try{
       if(url.pathname==='/photo/status'&&request.method==='GET')return cors(json({enabled:!!env.GOOGLE_VISION_API_KEY,...await photoOperation(env,{action:'status',uid:await photoUid(auth.uid)})}));
-      if(url.pathname==='/photo/recognize'&&request.method==='POST')return cors(json(await recognizePhoto(env,await body(request,2810000))));
+      if(url.pathname==='/photo/recognize'&&request.method==='POST')return cors(json(await photoReuseOperation(env,'ocr',await body(request,2810000),catalog)));
       if(url.pathname==='/photo/translate'&&request.method==='POST'){
-       try{return cors(json(await translatePhotoBlocks(await body(request,24000),catalog,input=>runAi({...env,photoUnlimited:true},'@cf/google/gemma-4-26b-a4b-it',input))));}
-       catch(e){if(e.status)throw e;const failure=aiFailure(e);return cors(json({error:failure.message,aiFailure:failure},failure.reason==='quota'?429:502));}
+       try{return cors(json(await photoReuseOperation(env,'translate',await body(request,24000),catalog)));}
+       catch(e){if(e.aiFailure)return cors(json({error:e.message,aiFailure:e.aiFailure},e.status||502));if(e.status)throw e;const failure=aiFailure(e);return cors(json({error:failure.message,aiFailure:failure},failure.reason==='quota'?429:502));}
       }
       return cors(error('写真の操作を確認してください。',404));
     }catch(e){return cors(error(e.message||'写真を読み取れませんでした。',e.status||502));}}
@@ -252,7 +253,7 @@ export class TranslationRoom {
     }
     this.broadcast({type:'participants',participants:this.participants().map(({a})=>({id:a.id,name:a.name,language:a.language,viewLanguage:a.viewLanguage,role:a.role})),summary:this.participantSummary()});this.requests();}
   async fetch(request){
-    const path=new URL(request.url).pathname;if(path.startsWith('/document/'))return documentStorage(request,this.ctx.storage,this.env);if(path==='/school-usage'&&request.method==='POST')return schoolUsage(this.ctx.storage,await body(request,100000));if(path==='/azure-budget'){try{return json(await azureBudget(this.ctx.storage,await body(request,2048)));}catch(e){return json({error:e.message,reason:e.azureFailure?.reason||'service'},e.status||503);}}if(path==='/photo-budget'){try{return json(await photoBudget(this.ctx.storage,await body(request,4096)));}catch(e){return error(e.message,e.status||400);}}if(path==='/speech-budget'){try{return json(await speechBudget(this.ctx.storage,await body(request,2048)));}catch(e){return error(e.message,e.status||400);}}if(path==='/word-stats'){try{return json(await wordStats(this.ctx.storage,request.method==='POST'?(await body(request,12000)).events:null));}catch(e){return error(e.message,400);}}if(path==='/budget'){try{return json(await budgetOperation(this.ctx.storage,await body(request,2048)));}catch(e){return json({reason:e.aiReason||'budget'},429);}}
+    const path=new URL(request.url).pathname;if(path==='/photo-reuse'){try{return json(await photoReuseStorage(this.ctx.storage,this.env,await body(request,2830000),catalog,(input,uid)=>runAi({...this.env,budgetUid:uid,photoUnlimited:true},'@cf/google/gemma-4-26b-a4b-it',input)));}catch(e){if(e.status)return error(e.message,e.status);const failure=aiFailure(e);return json({error:failure.message,aiFailure:failure},failure.reason==='quota'?429:502);}}if(path.startsWith('/document/'))return documentStorage(request,this.ctx.storage,this.env);if(path==='/school-usage'&&request.method==='POST')return schoolUsage(this.ctx.storage,await body(request,100000));if(path==='/azure-budget'){try{return json(await azureBudget(this.ctx.storage,await body(request,2048)));}catch(e){return json({error:e.message,reason:e.azureFailure?.reason||'service'},e.status||503);}}if(path==='/photo-budget'){try{return json(await photoBudget(this.ctx.storage,await body(request,4096)));}catch(e){return error(e.message,e.status||400);}}if(path==='/speech-budget'){try{return json(await speechBudget(this.ctx.storage,await body(request,2048)));}catch(e){return error(e.message,e.status||400);}}if(path==='/word-stats'){try{return json(await wordStats(this.ctx.storage,request.method==='POST'?(await body(request,12000)).events:null));}catch(e){return error(e.message,400);}}if(path==='/budget'){try{return json(await budgetOperation(this.ctx.storage,await body(request,2048)));}catch(e){return json({reason:e.aiReason||'budget'},429);}}
     if(path.startsWith('/codes/')){try{const codes=new LessonCodes(this.ctx.storage),data=await body(request);if(path==='/codes/allocate')return json(await codes.allocate(data));if(path==='/codes/find')return json(await codes.lookup(data.code));if(path==='/codes/release'){await codes.release(data.code,data.id);return json({ok:true});}return error('操作を確認してください。');}catch(e){return json({error:e.message,...(e.errorCode?{errorCode:e.errorCode}:{})},400);}}
     if(path==='/init'){if(await this.info())return error('ルームは作成済みです。',409);const data=await body(request);await this.ctx.storage.put('room',data);await this.ctx.storage.setAlarm(data.expires);return json({ok:true});}
     const room=await this.info();if(!room||room.expires<=Date.now())return error('このルームは終了しました。',410);
