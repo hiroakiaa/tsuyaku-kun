@@ -20,7 +20,7 @@ try{
  const sample=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=800;c.height=1200;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,800,1200);return c.toDataURL('image/jpeg').split(',')[1]});
  await page.locator('.photo-simple input[type=file]').setInputFiles({name:'synthetic.jpg',mimeType:'image/jpeg',buffer:Buffer.from(sample,'base64')});
  await page.locator('.photo-source-viewport').waitFor({state:'visible'});
- await page.locator('.photo-simple > button:not(.photo-pick)').click();
+ await page.locator('.photo-translate-run').click();
  // Another completed group can update the progress label during the retry delay.
  await page.waitForFunction(()=>document.querySelector('.photo-simple')?.getAttribute('aria-busy')==='true'||document.querySelector('.photo-results')?.textContent?.includes('Translated'));
  await page.waitForFunction(()=>document.querySelector('.photo-simple')?.getAttribute('aria-busy')==='false');

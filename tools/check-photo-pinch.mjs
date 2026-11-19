@@ -17,9 +17,13 @@ try{
  await page.locator('.photo-simple input[type=file]').setInputFiles({name:'synthetic-photo.jpg',mimeType:'image/jpeg',buffer:Buffer.from(sample,'base64')});
  const source=page.locator('.photo-source-viewport');await source.waitFor({state:'visible'});
  const full=await source.evaluate(v=>({width:v.clientWidth,height:v.clientHeight,ratio:v.querySelector('canvas').height/v.querySelector('canvas').width}));
- assert.ok(full.width>=388,'Photo uses full phone width');assert.ok(Math.abs(full.height-full.width*full.ratio)<3,'Entire photo height is visible inside preview');
- await page.locator('.photo-simple > button:not(.photo-pick)').click();
- const viewport=page.locator('.photo-overlay > .photo-overlay-viewport');await viewport.waitFor({state:'visible'});
+ assert.ok(full.height<=230,'The form only shows a compact thumbnail');
+ await source.click();await page.locator('.photo-preview-dialog[open]').waitFor();await page.locator('.photo-preview-close').click();
+ await page.locator('.photo-translate-run').click();
+ await page.locator('.photo-open-preview').click();
+ const viewport=page.locator('.photo-preview-dialog .photo-overlay-viewport');await viewport.waitFor({state:'visible'});
+ const fitBox=await viewport.evaluate(v=>{const c=v.querySelector('canvas').getBoundingClientRect();return {imageWidth:c.width,imageHeight:c.height,width:v.clientWidth,height:v.clientHeight};});
+ assert.ok(fitBox.imageWidth<=fitBox.width+2 && fitBox.imageHeight<=fitBox.height+2,'Dedicated preview initially fits the whole image');
  const cdp=await context.newCDPSession(page);
  async function metrics(){return viewport.evaluate(v=>({left:v.scrollLeft,top:v.scrollTop,width:v.clientWidth,height:v.clientHeight,scale:Number(v.querySelector('canvas').style.transform.match(/scale\(([^)]+)/)[1])}));}
  async function pinch(from,to){
@@ -46,12 +50,23 @@ try{
  await pinch(100,60);
  await fs.mkdir('checks/photo-pinch',{recursive:true});
  await page.screenshot({path:'checks/photo-pinch/mobile-translated.png',fullPage:true});
- await page.locator('.photo-display-settings summary').click();
+ 
  await page.locator('.photo-display-settings input[type=range]').fill('1');
  assert.equal((await metrics()).scale,1);
  await page.screenshot({path:'checks/photo-pinch/mobile-fit.png',fullPage:true});
  if(process.env.PHOTO_STYLE_DEBUG)console.log(await page.evaluate(()=>({body:document.body.className,heading:document.querySelector('.modal-heading')?.outerHTML,styles:[document.querySelector('.modal-heading'),document.querySelector('#modal-body')].map(e=>({background:getComputedStyle(e).backgroundColor,z:getComputedStyle(e).zIndex,position:getComputedStyle(e).position}))})));
+ await page.locator('.photo-preview-close').click();
+ assert.equal(await page.locator('#modal').getAttribute('open'),'');
+ await page.locator('.photo-text-details summary').click();await page.locator('.photo-results').scrollIntoViewIfNeeded();
+ assert.equal(await page.locator('.photo-preview-dialog').getAttribute('open'),null,'Only the preview closes');
+ assert.equal(await page.locator('.photo-simple .photo-overlay-viewport').count(),0,'Form has no nested image scroller');
+ await page.setViewportSize({width:390,height:568});
+ await page.locator('#modal').evaluate(d=>{d.scrollTop=0;});
+ await page.locator('.photo-open-preview').hover();
+ const scrollBefore=await page.locator('#modal').evaluate(d=>d.scrollTop);
+ await page.mouse.wheel(0,700);
+ await page.waitForFunction(before=>document.querySelector('#modal').scrollTop>before,scrollBefore);
  assert.deepEqual(errors,[]);
- console.log((process.env.LIVE_PHOTO_PREVIEW?'Published assets (synthetic OCR/translation responses): ':'Local fixture: ')+'PASS mobile touch pinch: focus point, continued zoom after scroll, original toggle, zoom slider, no added API calls');
+ console.log((process.env.LIVE_PHOTO_PREVIEW?'Published assets (synthetic OCR/translation responses): ':'Local fixture: ')+'PASS mobile touch pinch: focus point, continued zoom after scroll, original toggle, zoom slider, no added API calls; dedicated preview closes back to scrollable form');
  await context.close();
 }finally{await browser.close();}
