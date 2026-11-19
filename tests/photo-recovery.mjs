@@ -14,3 +14,8 @@ await assert.rejects(()=>translatePhotoWithRecovery(data,catalog,async()=>{throw
 const result=await runPhotoRecovery({OPENAI_DOCUMENT_QA_KEY:'synthetic-secret'},{messages:[{role:'user',content:'test text'}]},async(url,input)=>{assert.equal(url,'https://api.openai.com/v1/chat/completions');const body=JSON.parse(input.body);assert.equal(body.store,false);assert.equal(body.model,P.model);assert.equal(body.max_completion_tokens,P.maxOutputTokens);assert.deepEqual(body.response_format,{type:'json_object'});return Response.json(await good());});assert.equal(result.usage.prompt_tokens,30);
 assert.ok(reserveCost(P.model,{messages:[{role:'user',content:'test'}],max_completion_tokens:100})>0);
 console.log('PASS alternate provider on service/malformed failures; no auth/quota/budget bypass; bounded private-text request and centralized cost reservation');
+
+const budgetEvents=[];const metered={OPENAI_DOCUMENT_QA_KEY:'synthetic-secret',budgetUid:'test-user',ROOMS:{idFromName:n=>n,get:()=>({fetch:async request=>{const body=await request.json();budgetEvents.push(body);return Response.json(body.action==='reserve'?{id:'test-lease',day:1,reserved:1000}:{ok:true});}})}};
+await runPhotoRecovery(metered,{messages:[{role:'user',content:'test text'}]},async()=>Response.json(await good()));
+assert.equal(budgetEvents[0].action,'reserve');assert.equal(budgetEvents[0].model,P.model);assert.equal(budgetEvents.at(-1).action,'settle');assert.equal(budgetEvents.at(-1).actual,44);
+console.log('PASS recovery reserves before API call and settles actual OpenAI token cost');

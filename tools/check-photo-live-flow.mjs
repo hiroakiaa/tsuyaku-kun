@@ -4,8 +4,10 @@ import {createUiFixture} from './browser-fixture.mjs';
 import {config} from '../web/config.js';
 const auth=await(await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key='+config.firebase.apiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({returnSecureToken:true})})).json();
 if(!auth.idToken)throw Error('Anonymous authentication unavailable');
-const fixture=await createUiFixture();const {browser,setup,setApiHandler}=fixture;const requests=[];
+const fixture=await createUiFixture();const {browser,setup,setApiHandler}=fixture;const requests=[];let failedSignature=null;
 setApiHandler(async request=>{const path=new URL(request.url()).pathname;if(!path.startsWith('/photo/'))return;
+ if(process.env.PHOTO_INJECT_TRANSIENT&&path==='/photo/translate'){const signature=JSON.stringify(request.postDataJSON().blocks.map(b=>b.text));failedSignature??=signature;if(signature===failedSignature){requests.push({path,status:502,injected:true});return {status:502,json:{error:'AIサービスが処理できませんでした。',aiFailure:{reason:'service'}}};}}
+
  const r=await fetch(config.api+path,{method:request.method(),headers:{Authorization:'Bearer '+auth.idToken,Origin:'https://hiroakiaa.github.io','Content-Type':'application/json'},body:request.postData()||undefined,signal:AbortSignal.timeout(90000)});
  const data=await r.json();requests.push({path,status:r.status,source:request.postDataJSON()?.source,reuse:data.reuse});return {status:r.status,json:data};});
 try{const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});await setup(context);await context.route('https://hiroakiaa.github.io/**',route=>route.continue());const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
@@ -17,6 +19,6 @@ try{const context=await browser.newContext({viewport:{width:390,height:844},isMo
  await page.locator('.photo-simple input[type=file]').setInputFiles(photo);await page.locator('.photo-source-viewport').waitFor();await page.locator('.photo-languages select').selectOption('en');
  await page.locator('.photo-selection,.photo-languages,.photo-translate-run').evaluateAll(nodes=>Promise.all(nodes.flatMap(n=>n.getAnimations()).map(a=>a.finished.catch(()=>{}))));await page.screenshot({path:'checks/photo-selection/public-selected.png'});
  await page.locator('.photo-translate-run').click();await page.locator('.photo-preview-dialog[open]').waitFor();await page.waitForFunction(()=>document.querySelector('.photo-simple')?.getAttribute('aria-busy')==='false',{},{timeout:120000});
- assert.equal(await page.locator('.photo-preview-loading').isVisible(),false);assert.ok(await page.locator('.photo-results').textContent());assert.equal(requests.filter(r=>r.path==='/photo/translate').length>0,true);assert.equal(requests.every(r=>r.status===200),true);assert.deepEqual(errors,[]);
+ assert.equal(await page.locator('.photo-preview-loading').isVisible(),false);assert.ok(await page.locator('.photo-results').textContent());assert.equal(requests.filter(r=>r.path==='/photo/translate').length>0,true);assert.equal(requests.filter(r=>!r.injected).every(r=>r.status===200),true);assert.deepEqual(errors,[]);if(process.env.PHOTO_INJECT_TRANSIENT){assert.equal(requests.filter(r=>r.injected).length,3);assert.equal((await page.locator('.photo-notice').textContent()).includes('AIサービスが処理できませんでした'),false);}
  await page.screenshot({path:'checks/photo-selection/public-translated.png'});console.log(JSON.stringify({result:'PASS production assets and live OCR/translation: staged selection, immediate clear, target-only language selection, automatic preview and translated image',requests,text:await page.locator('.photo-results').textContent()}));
 }finally{await browser.close();}
