@@ -18,5 +18,5 @@ await assert.rejects(()=>recognizePhoto(env,data,async()=>{calls++;}));assert.eq
 await assert.rejects(()=>recognizePhoto(env,{...data,id:'failure-123456789'},async()=>new Response('',{status:503})));assert.equal((await photoBudget(synthesisDb,{action:'status'},now)).used,2,'provider failure is conservatively retained');
 assert.equal(JSON.stringify(synthesisDb.rows.get('photo-budget')).includes('提出'),false);assert.equal(JSON.stringify(synthesisDb.rows.get('photo-budget')).includes('/9j/'),false);
 assert.deepEqual(cropRect(1000,2000,[10,20,90,80]),{x:100,y:400,width:800,height:1200});assert.throws(()=>cropRect(100,100,[95,0,50,100]));
-assert.equal(photoTranslationText('12345',1,4),'234');assert.throws(()=>photoTranslationText('a'.repeat(1201)));assert.equal(photoTranslationText('a'.repeat(1201),0,100).length,100);
+assert.equal(photoTranslationText('12345',1,4),'234');assert.equal(photoTranslationText('a'.repeat(1201)).length,1201);assert.throws(()=>photoTranslationText('a'.repeat(12001)));assert.equal(photoTranslationText('a'.repeat(1201),0,100).length,100);
 console.log('Photo OCR: unlimited monthly/user usage across month boundaries, no duplicate provider calls, conservative failures, privacy and selection passed');

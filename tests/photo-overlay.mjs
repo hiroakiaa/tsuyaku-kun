@@ -16,3 +16,10 @@ assert.deepEqual(wrapPhotoText(t=>t.length,'abc\ndef',2),['ab','c','de','f']);
 const draws=[],ctx={drawImage(){},fillRect(x,y,w,h){assert.ok(x>=0&&y>=0&&w>0&&h>0);},save(){},beginPath(){},rect(){},clip(){},restore(){},measureText(text){return {width:text.length*Number(this.font.split(' ')[1].replace('px',''))/2};},fillText(text,x,y){draws.push({text,x,y});}};
 const canvas={getContext:()=>ctx};drawPhotoOverlay(canvas,{width:1000,height:1000},layout,translated.blocks,'en');assert.equal(canvas.width,1000);assert.ok(draws.some(d=>d.text.includes('Due')));assert.ok(draws.every(d=>d.x>=0&&d.y>=0));
 console.log('Photo overlay: OCR paragraph geometry, edited-text protection, one AI call, strict ID mapping and bounded drawing passed');
+
+const longLayout=Array.from({length:60},(_,i)=>({id:'b'+i,text:'Paragraph '+i+' '+ 'word '.repeat(10),box:{x:.1,y:i/80,width:.8,height:.01}}));
+const longText=longLayout.map(b=>b.text).join('\n');
+assert.equal(matchingPhotoBlocks(longText,longText,longLayout),longLayout,'Long photos keep their geometry and use translation batches');
+const extraOcr=text+'\nfooter not positioned';
+assert.equal(matchingPhotoBlocks(extraOcr,extraOcr,layout),layout,'Unpositioned footer does not discard all valid paragraph positions');
+assert.ok(wrapPhotoText(t=>t.length,'Please bring your textbook',13).includes('your textbook'),'Wrap Latin words at spaces');
