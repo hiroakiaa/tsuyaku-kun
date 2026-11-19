@@ -50,6 +50,7 @@ try{
  await page.locator('.photo-display-settings input[type=range]').fill('1');
  assert.equal((await metrics()).scale,1);
  await page.screenshot({path:'checks/photo-pinch/mobile-fit.png',fullPage:true});
+ if(process.env.PHOTO_STYLE_DEBUG)console.log(await page.evaluate(()=>({body:document.body.className,heading:document.querySelector('.modal-heading')?.outerHTML,styles:[document.querySelector('.modal-heading'),document.querySelector('#modal-body')].map(e=>({background:getComputedStyle(e).backgroundColor,z:getComputedStyle(e).zIndex,position:getComputedStyle(e).position}))})));
  assert.deepEqual(errors,[]);
  console.log((process.env.LIVE_PHOTO_PREVIEW?'Published assets (synthetic OCR/translation responses): ':'Local fixture: ')+'PASS mobile touch pinch: focus point, continued zoom after scroll, original toggle, zoom slider, no added API calls');
  await context.close();
