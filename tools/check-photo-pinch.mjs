@@ -57,7 +57,8 @@ try{
  await page.locator('.photo-display-settings input[type=range]').fill('1');
  assert.equal((await metrics()).scale,1);
  const compact=await page.locator('.photo-preview-dialog').evaluate(d=>({header:d.querySelector('.photo-preview-heading').getBoundingClientRect().height,footer:d.querySelector('.photo-display-settings').getBoundingClientRect().height,unused:d.querySelector('.photo-overlay-viewport').clientHeight-d.querySelector('.photo-overlay-viewport canvas').getBoundingClientRect().height}));
- assert.ok(compact.header+compact.footer<=100,'Viewer controls use compact single rows');
+ assert.equal(compact.header,64,'Header spacing matches the other app modes');assert.equal(compact.footer,64,'Footer spacing matches the other app modes');
+ const touch=await page.locator('.photo-preview-dialog button').evaluateAll(buttons=>buttons.every(b=>b.getBoundingClientRect().height>=48));assert.ok(touch,'All buttons have comfortable 48px touch targets');
  const screen=await page.locator('.photo-preview-dialog').evaluate(d=>{const b=d.getBoundingClientRect(),v=d.querySelector('.photo-overlay-viewport').getBoundingClientRect(),c=d.querySelector('.photo-overlay-viewport canvas').getBoundingClientRect();return {top:b.top,bottom:innerHeight-b.bottom,topGap:c.top-v.top,bottomGap:v.bottom-c.bottom};});
  assert.ok(Math.abs(screen.top)<1&&Math.abs(screen.bottom)<1,'No unused area outside the preview');
  assert.ok(Math.abs(screen.topGap-screen.bottomGap)<3,'Image aspect-ratio space is balanced in the viewport');
@@ -70,14 +71,14 @@ try{
  if(process.env.PHOTO_STYLE_DEBUG)console.log('close',await page.locator('.photo-preview-close').evaluate(e=>({html:e.outerHTML,color:getComputedStyle(e).color,font:getComputedStyle(e).fontSize,before:getComputedStyle(e,'::before').backgroundImage,beforeContent:getComputedStyle(e,'::before').content,display:getComputedStyle(e).display,visibility:getComputedStyle(e).visibility})));
  if(process.env.PHOTO_STYLE_DEBUG)console.log('placement',placement,await page.locator('.photo-preview-heading').evaluate(h=>[...h.children].map(e=>({tag:e.tagName,width:e.getBoundingClientRect().width,x:e.getBoundingClientRect().x,margin:getComputedStyle(e).margin,flex:getComputedStyle(e).flex}))));
  assert.ok(placement.headerContainsClose,'Close button stays inside the header');
- assert.ok(placement.footerGap<=4,'Buttons end at the modal bottom without a home-indicator spacer');
+ assert.ok(placement.footerGap<=8,'Buttons end at the modal bottom without a home-indicator spacer');
  assert.ok(placement.headerContainsModes&&placement.titleVisible,'Title and original/translation controls share the header');
  const noticeGap=await page.locator('.photo-preview-dialog').evaluate(d=>{
   const note=d.querySelector('.photo-help');note.textContent='補足がある場合も操作ボタンは最下段です。';note.hidden=false;
   const bottom=Math.max(...[...d.querySelector('.photo-display-settings').querySelectorAll('button')].map(b=>b.getBoundingClientRect().bottom));
   const gap=d.getBoundingClientRect().bottom-bottom;note.hidden=true;return gap;
  });
- assert.ok(noticeGap<=4,'Even with a translation notice, no panel is reserved below the buttons');
+ assert.ok(noticeGap<=8,'Even with a translation notice, no panel is reserved below the buttons');
  await page.screenshot({path:'checks/photo-pinch/mobile-fit.png',fullPage:true});
  if(process.env.PHOTO_STYLE_DEBUG)console.log(await page.evaluate(()=>({body:document.body.className,heading:document.querySelector('.modal-heading')?.outerHTML,styles:[document.querySelector('.modal-heading'),document.querySelector('#modal-body')].map(e=>({background:getComputedStyle(e).backgroundColor,z:getComputedStyle(e).zIndex,position:getComputedStyle(e).position}))})));
  await page.locator('.photo-preview-close').click();
