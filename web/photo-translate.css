@@ -56,3 +56,7 @@ body.phone-home .photo-preview-heading .photo-preview-close{order:2}
 body.phone-home .photo-preview-dialog .photo-display-settings{padding:2px 6px!important;align-self:end}
 
 body.phone-home .photo-preview-heading .photo-preview-close{display:grid!important;place-items:center!important;line-height:1!important;text-indent:0!important;flex:none}
+
+body.phone-home .photo-preview-heading .photo-preview-close{position:relative;z-index:2;font-size:0!important}
+body.phone-home .photo-preview-heading .photo-preview-close::before,body.phone-home .photo-preview-heading .photo-preview-close::after{content:'';position:absolute;left:50%;top:50%;width:16px;height:2px;background:#eee;pointer-events:none;transform:translate(-50%,-50%) rotate(45deg)}
+body.phone-home .photo-preview-heading .photo-preview-close::after{transform:translate(-50%,-50%) rotate(-45deg)}
