@@ -36,3 +36,13 @@ body.phone-home #modal:has(.photo-simple) .modal-heading{background:#1c1c20!impo
 
 body.phone-home #modal .photo-image-card canvas{width:100%!important;height:160px!important;max-height:160px!important;object-fit:contain!important}
 body.phone-home #modal .photo-image-card{overflow:visible!important;touch-action:pan-y;max-height:none}
+
+/* Size the viewer to the image rather than reserving an empty full-height panel. */
+body.phone-home dialog.photo-preview-dialog[open]{box-sizing:border-box!important;display:grid!important;grid-template-rows:auto minmax(0,1fr) auto auto!important;width:var(--photo-preview-width,100vw)!important;max-width:100vw!important;height:var(--photo-preview-height,100dvh)!important;max-height:100dvh!important;inset:0!important;margin:auto!important;padding:0!important;border:0!important;border-radius:12px!important;box-shadow:none!important;gap:0!important}
+body.phone-home .photo-preview-heading{padding:2px 6px!important;gap:6px!important;margin:0!important;min-height:44px}
+body.phone-home .photo-preview-heading h2{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);margin:0;padding:0}
+body.phone-home .photo-preview-heading .photo-preview-modes{justify-content:flex-start;padding:0!important;margin:0!important}
+body.phone-home .photo-preview-dialog button{height:40px!important;min-height:40px!important;min-width:40px!important;margin:0!important;padding:4px 8px!important;font-size:14px!important}
+body.phone-home .photo-preview-dialog .photo-preview-close{margin-inline-start:auto!important;border-radius:0 0 0 12px!important;border:0!important;border-inline-start:1px solid #555!important;border-block-end:1px solid #555!important;font-size:24px!important}
+body.phone-home .photo-preview-dialog .photo-display-settings{padding:2px 6px calc(2px + env(safe-area-inset-bottom))!important;gap:6px!important;margin:0!important}
+body.phone-home .photo-preview-dialog .photo-overlay-viewport{padding:0!important;margin:0!important}

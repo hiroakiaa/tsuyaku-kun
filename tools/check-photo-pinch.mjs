@@ -53,6 +53,9 @@ try{
  
  await page.locator('.photo-display-settings input[type=range]').fill('1');
  assert.equal((await metrics()).scale,1);
+ const compact=await page.locator('.photo-preview-dialog').evaluate(d=>({header:d.querySelector('.photo-preview-heading').getBoundingClientRect().height,footer:d.querySelector('.photo-display-settings').getBoundingClientRect().height,unused:d.querySelector('.photo-overlay-viewport').clientHeight-d.querySelector('.photo-overlay-viewport canvas').getBoundingClientRect().height}));
+ assert.ok(compact.header+compact.footer<=100,'Viewer controls use compact single rows');
+ assert.ok(compact.unused<=3,'No empty strip below the fitted image');
  await page.screenshot({path:'checks/photo-pinch/mobile-fit.png',fullPage:true});
  if(process.env.PHOTO_STYLE_DEBUG)console.log(await page.evaluate(()=>({body:document.body.className,heading:document.querySelector('.modal-heading')?.outerHTML,styles:[document.querySelector('.modal-heading'),document.querySelector('#modal-body')].map(e=>({background:getComputedStyle(e).backgroundColor,z:getComputedStyle(e).zIndex,position:getComputedStyle(e).position}))})));
  await page.locator('.photo-preview-close').click();
