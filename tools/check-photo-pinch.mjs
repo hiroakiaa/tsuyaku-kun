@@ -68,6 +68,12 @@ try{
  assert.ok(placement.headerContainsClose,'Close button stays inside the header');
  assert.ok(placement.footerGap<=4,'Buttons end at the modal bottom without a home-indicator spacer');
  assert.ok(placement.headerContainsModes&&placement.titleVisible,'Title and original/translation controls share the header');
+ const noticeGap=await page.locator('.photo-preview-dialog').evaluate(d=>{
+  const note=d.querySelector('.photo-help');note.textContent='補足がある場合も操作ボタンは最下段です。';note.hidden=false;
+  const bottom=Math.max(...[...d.querySelector('.photo-display-settings').querySelectorAll('button')].map(b=>b.getBoundingClientRect().bottom));
+  const gap=d.getBoundingClientRect().bottom-bottom;note.hidden=true;return gap;
+ });
+ assert.ok(noticeGap<=4,'Even with a translation notice, no panel is reserved below the buttons');
  await page.screenshot({path:'checks/photo-pinch/mobile-fit.png',fullPage:true});
  if(process.env.PHOTO_STYLE_DEBUG)console.log(await page.evaluate(()=>({body:document.body.className,heading:document.querySelector('.modal-heading')?.outerHTML,styles:[document.querySelector('.modal-heading'),document.querySelector('#modal-body')].map(e=>({background:getComputedStyle(e).backgroundColor,z:getComputedStyle(e).zIndex,position:getComputedStyle(e).position}))})));
  await page.locator('.photo-preview-close').click();

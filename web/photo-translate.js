@@ -34,7 +34,7 @@ export function installPhotoTranslate({button,api,modal,el,languages,viewLanguag
   const plus=el('button','＋'),minus=el('button','−');plus.type=minus.type='button';plus.setAttribute('aria-label','拡大');minus.setAttribute('aria-label','縮小');
   plus.onclick=()=>overlayZoom.setScale(overlayZoom.scale*1.25);minus.onclick=()=>overlayZoom.setScale(overlayZoom.scale/1.25);
   settings.replaceChildren(minus,zoom,plus,fit);
-  previewHeader.prepend(modes);previewDialog.append(previewHeader,viewport,settings,overlayNote);document.body.append(previewDialog);
+  previewHeader.prepend(modes);previewDialog.append(previewHeader,viewport,overlayNote,settings);document.body.append(previewDialog);
   const openPreview=el('button',undefined,'photo-open-preview photo-image-card'),thumbnail=el('canvas');openPreview.type='button';openPreview.setAttribute('aria-label','翻訳画像を開く');openPreview.append(thumbnail,el('span','翻訳画像を開く ↗'));overlay.append(openPreview);
   previewViewport.append(el('span','原文画像を開く ↗'));
   let previewReturn=null,readerScroll=0;
