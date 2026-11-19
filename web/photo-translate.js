@@ -1,4 +1,4 @@
-import {installPhotoZoom} from './photo-zoom.js?v=20261119-pinch-1';
+import {installPhotoZoom} from './photo-zoom.js?v=20261119-full-preview-2';
 import {translatePhotoProgressively} from './photo-progress.js?v=20261020-photo-resume-3';
 import {matchingPhotoBlocks,drawPhotoOverlay} from './photo-overlay.js?v=20261020-photo-overlay-4';
 export function photoReadResult(value){

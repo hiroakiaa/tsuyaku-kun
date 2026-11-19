@@ -11,3 +11,7 @@ body.phone-home #photo-translate-open,body.phone-home #photo-translate-open:hove
 .photo-zoom-surface{position:relative;min-width:100%}
 .photo-overlay-viewport .photo-zoom-surface canvas{position:absolute;inset:0 auto auto 0;display:block;max-width:none;max-height:none;transform-origin:0 0;object-fit:fill;user-select:none;-webkit-user-select:none}
 .photo-source-viewport{max-height:40vh}
+
+body.phone-home #modal:has(.photo-simple){width:100vw;max-width:none;max-height:100dvh;box-sizing:border-box;margin:auto 0;padding:16px;border:0;border-radius:0}
+body.phone-home #modal:has(.photo-simple) #modal-body{padding:0;max-width:none}
+body.phone-home #modal .photo-overlay-viewport{width:calc(100% + 32px);max-width:none;max-height:none;margin-inline:-16px;border-inline:0;border-radius:0;box-sizing:border-box}

@@ -13,16 +13,18 @@ try{
  const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1});
  await setup(context);if(process.env.LIVE_PHOTO_PREVIEW)await context.route('https://hiroakiaa.github.io/**',route=>route.continue());const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
  await page.goto(process.env.LIVE_PHOTO_PREVIEW?'https://hiroakiaa.github.io/tsuyaku-kun/?photo-pinch-check='+Date.now():origin);await page.locator('#photo-translate-open').click();
- const sample=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=1400;c.height=1200;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.fillStyle='#111';g.font='42px sans-serif';g.fillText('提出日は10月20日です。',56,245);g.strokeStyle='#ddd';g.strokeRect(40,180,1300,120);return c.toDataURL('image/jpeg').split(',')[1];});
+ const sample=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=1400;c.height=2400;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.fillStyle='#111';g.font='42px sans-serif';g.fillText('提出日は10月20日です。',56,245);g.strokeStyle='#ddd';g.strokeRect(40,180,1300,120);return c.toDataURL('image/jpeg').split(',')[1];});
  await page.locator('.photo-simple input[type=file]').setInputFiles({name:'synthetic-photo.jpg',mimeType:'image/jpeg',buffer:Buffer.from(sample,'base64')});
  const source=page.locator('.photo-source-viewport');await source.waitFor({state:'visible'});
+ const full=await source.evaluate(v=>({width:v.clientWidth,height:v.clientHeight,ratio:v.querySelector('canvas').height/v.querySelector('canvas').width}));
+ assert.ok(full.width>=388,'Photo uses full phone width');assert.ok(Math.abs(full.height-full.width*full.ratio)<3,'Entire photo height is visible inside preview');
  await page.locator('.photo-simple > button:not(.photo-pick)').click();
  const viewport=page.locator('.photo-overlay > .photo-overlay-viewport');await viewport.waitFor({state:'visible'});
  const cdp=await context.newCDPSession(page);
  async function metrics(){return viewport.evaluate(v=>({left:v.scrollLeft,top:v.scrollTop,width:v.clientWidth,height:v.clientHeight,scale:Number(v.querySelector('canvas').style.transform.match(/scale\(([^)]+)/)[1])}));}
  async function pinch(from,to){
   await viewport.scrollIntoViewIfNeeded();const r=await viewport.boundingBox();
-  const mid={x:r.x+r.width*.55,y:r.y+Math.min(r.height*.5,120)};
+  const mid={x:r.x+r.width*.55,y:(Math.max(r.y,100)+Math.min(r.y+r.height,800))/2};
   const points=d=>[{x:mid.x-d/2,y:mid.y,id:1},{x:mid.x+d/2,y:mid.y,id:2}];
   const before=await metrics();const anchor={x:mid.x-r.x-1,y:mid.y-r.y-1};
   const imagePoint={x:(before.left+anchor.x)/before.scale,y:(before.top+anchor.y)/before.scale};

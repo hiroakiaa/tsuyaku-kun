@@ -20,7 +20,8 @@ export function installPhotoZoom(viewport,canvas,{onChange=()=>{}}={}){
   const center={x:viewport.clientWidth/2,y:viewport.clientHeight/2};
   const point={x:oldWidth?(viewport.scrollLeft+center.x)/(oldWidth*scale):0,y:oldHeight?(viewport.scrollTop+center.y)/(oldHeight*scale):0};
   baseWidth=width;baseHeight=width*canvas.height/canvas.width;
-  const max=parseFloat(getComputedStyle(viewport).maxHeight)||window.innerHeight*.6;
+  const limit=parseFloat(getComputedStyle(viewport).maxHeight);
+  const max=Number.isFinite(limit)?limit:Infinity;
   viewport.style.height=Math.min(baseHeight,max)+'px';
   draw();
   if(oldWidth){viewport.scrollLeft=point.x*baseWidth*scale-center.x;viewport.scrollTop=point.y*baseHeight*scale-center.y;}
