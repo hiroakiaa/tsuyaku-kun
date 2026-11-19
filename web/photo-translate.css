@@ -46,3 +46,11 @@ body.phone-home .photo-preview-dialog button{height:40px!important;min-height:40
 body.phone-home .photo-preview-dialog .photo-preview-close{margin-inline-start:auto!important;border-radius:0 0 0 12px!important;border:0!important;border-inline-start:1px solid #555!important;border-block-end:1px solid #555!important;font-size:24px!important}
 body.phone-home .photo-preview-dialog .photo-display-settings{padding:2px 6px calc(2px + env(safe-area-inset-bottom))!important;gap:6px!important;margin:0!important}
 body.phone-home .photo-preview-dialog .photo-overlay-viewport{padding:0!important;margin:0!important}
+
+/* A floating preview is not attached to the phone's home indicator. */
+body.phone-home dialog.photo-preview-dialog[open]{grid-template-rows:auto minmax(0,1fr) auto!important}
+body.phone-home dialog.photo-preview-dialog[open]:has(>.photo-help:not([hidden])){grid-template-rows:auto minmax(0,1fr) auto auto!important}
+body.phone-home .photo-preview-heading h2{position:static;width:auto;height:auto;overflow:visible;clip-path:none;flex:1;order:0;font-size:14px;margin:0;padding:0;white-space:nowrap}
+body.phone-home .photo-preview-heading .photo-preview-modes{order:1;flex:none}
+body.phone-home .photo-preview-heading .photo-preview-close{order:2}
+body.phone-home .photo-preview-dialog .photo-display-settings{padding:2px 6px!important;align-self:end}
