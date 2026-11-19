@@ -60,8 +60,12 @@ try{
  const placement=await page.locator('.photo-preview-dialog').evaluate(d=>{
   const bounds=d.getBoundingClientRect(),header=d.querySelector('.photo-preview-heading').getBoundingClientRect(),modes=d.querySelector('.photo-preview-modes').getBoundingClientRect();
   const buttons=[...d.querySelector('.photo-display-settings').querySelectorAll('button')].map(b=>b.getBoundingClientRect());
-  return {footerGap:bounds.bottom-Math.max(...buttons.map(b=>b.bottom)),headerContainsModes:modes.top>=header.top&&modes.bottom<=header.bottom,titleVisible:d.querySelector('h2').getBoundingClientRect().width>30};
+  const close=d.querySelector('.photo-preview-close').getBoundingClientRect();
+  return {headerContainsClose:close.right<=bounds.right&&close.left>=bounds.left,footerGap:bounds.bottom-Math.max(...buttons.map(b=>b.bottom)),headerContainsModes:modes.top>=header.top&&modes.bottom<=header.bottom,titleVisible:d.querySelector('h2').getBoundingClientRect().width>30};
  });
+ if(process.env.PHOTO_STYLE_DEBUG)console.log('close',await page.locator('.photo-preview-close').evaluate(e=>({html:e.outerHTML,color:getComputedStyle(e).color,font:getComputedStyle(e).fontSize,display:getComputedStyle(e).display,visibility:getComputedStyle(e).visibility})));
+ if(process.env.PHOTO_STYLE_DEBUG)console.log('placement',placement,await page.locator('.photo-preview-heading').evaluate(h=>[...h.children].map(e=>({tag:e.tagName,width:e.getBoundingClientRect().width,x:e.getBoundingClientRect().x,margin:getComputedStyle(e).margin,flex:getComputedStyle(e).flex}))));
+ assert.ok(placement.headerContainsClose,'Close button stays inside the header');
  assert.ok(placement.footerGap<=4,'Buttons end at the modal bottom without a home-indicator spacer');
  assert.ok(placement.headerContainsModes&&placement.titleVisible,'Title and original/translation controls share the header');
  await page.screenshot({path:'checks/photo-pinch/mobile-fit.png',fullPage:true});

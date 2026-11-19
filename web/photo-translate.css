@@ -54,3 +54,5 @@ body.phone-home .photo-preview-heading h2{position:static;width:auto;height:auto
 body.phone-home .photo-preview-heading .photo-preview-modes{order:1;flex:none}
 body.phone-home .photo-preview-heading .photo-preview-close{order:2}
 body.phone-home .photo-preview-dialog .photo-display-settings{padding:2px 6px!important;align-self:end}
+
+body.phone-home .photo-preview-heading .photo-preview-close{display:grid!important;place-items:center!important;line-height:1!important;text-indent:0!important;flex:none}
