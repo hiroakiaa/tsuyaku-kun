@@ -18,13 +18,13 @@ fixture.setApiHandler(request=>{
 });
 try{
  for(const width of [390,1280]){
-  const context=await browser.newContext({viewport:{width,height:844},isMobile:width<800,hasTouch:width<800});await setup(context);
+  const context=await browser.newContext({viewport:{width,height:844},isMobile:width<800,hasTouch:width<800});await setup(context);if(process.env.LIVE_DOCUMENT_LAYOUT)await context.route('https://hiroakiaa.github.io/**',route=>route.continue());
   if(process.env.SCAN_LAYOUT_RECOVERY){
    await context.route('**/web/document-table-lookup.js*',route=>{if(new URL(route.request().url()).searchParams.has('native'))return route.fallback();return route.fulfill({contentType:'text/javascript',body:"export {lookupTableCell,lookupAlignedTableCell} from './document-table-lookup.js?native=1';export async function readPdfPageText(){return {items:[]}}"});});
    await context.route('**/web/document-ocr.js*',route=>route.fulfill({contentType:'text/javascript',body:"export async function createPdfOcr(){return {async readLayout(page){window.__ocrAttempt=(window.__ocrAttempt||0)+1;return window.__ocrAttempt<=2?[]:(await page.getTextContent()).items;},async close(){}}}"}));
   }
 
-  if(process.env.LIVE_DOCUMENT_LAYOUT)await context.route('https://hiroakiaa.github.io/**',route=>route.continue());
+
   const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
   const base=process.env.LIVE_DOCUMENT_LAYOUT?'https://hiroakiaa.github.io/tsuyaku-kun':origin;
   await page.goto(base+'/documents.html?id='+id);
