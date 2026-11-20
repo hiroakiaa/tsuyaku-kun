@@ -577,3 +577,6 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 
 ### 2026-11-20 Library language selection and translation recovery
 - Reopening honors selected language instead of old original-mode preference. Existing successful translation caches reused. Empty/failed local OCR/layout is no longer cached permanently. Alignment failure refreshes local geometry and retries once automatically (not an unlimited loop); failed alignment can add one translation request with the usual server cache/checkpoints. No new model/provider/language fan-out.
+
+### 2026-11-20 Cached translation run-boundary alignment
+- Client splits native PDF text runs at verified cached-source boundaries and positions existing translations; ignores invisible PDF direction/control characters in correspondence. Height fallback and tiny skew tolerance avoid whole-page rejection for font metrics. No new AI call for this alignment. Existing one-attempt automatic relayout fallback unchanged; no character-fuzzy matching or source-page validation relaxed. Diagnostics contain counts/stages, not document text.

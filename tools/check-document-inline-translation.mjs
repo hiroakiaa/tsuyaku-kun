@@ -11,6 +11,7 @@ fixture.setApiHandler(request=>{
  if(path==='/documents/'+id+'/pdf')return {body:pdf,contentType:'application/pdf'};
  if(path==='/documents/'+id+'/translate'){
   const input=request.postDataJSON();if(input.section)return {json:{source:[],lines:[]}};
+  if(process.env.SPLIT_CACHED_TRANSLATION){layoutRequests++;return {json:{source:['School','handbook','Please bring your notebook to the school office.','The library opens at nine and closes at three.'],lines:['Campus','Guide','Bring your notebook to the school office.','The library is open from nine until three.'],reuse:'cache'}};}
   layoutRequests++;const source=(input.layoutText||'School handbook Please bring your notebook to the school office. The library opens at nine and closes at three.').replace(/\n/g,' ');
   return {json:{source:[source],lines:['Guide: bring your notebook to the school office. The library is open from nine until three.'],text:'Guide: bring your notebook to the school office. The library is open from nine until three.',reuse:'cache'}};
  }
@@ -19,6 +20,7 @@ fixture.setApiHandler(request=>{
 try{
  for(const width of [390,1280]){
   const context=await browser.newContext({viewport:{width,height:844},isMobile:width<800,hasTouch:width<800});await setup(context);if(process.env.LIVE_DOCUMENT_LAYOUT)await context.route('https://hiroakiaa.github.io/**',route=>route.continue());
+  if(process.env.PDF_GEOMETRY_RECOVERY)await context.route('**/web/document-table-lookup.js*',route=>{if(new URL(route.request().url()).searchParams.has('native'))return route.fallback();return route.fulfill({contentType:'text/javascript',body:"export {lookupTableCell,lookupAlignedTableCell} from './document-table-lookup.js?native=1';import {readPdfPageText as native} from './document-table-lookup.js?native=1';export async function readPdfPageText(page){const result=await native(page);return {...result,items:result.items.map((item,i)=>i===0?{...item,height:0,transform:[item.transform[0],.0000001,.0000001,item.transform[3],item.transform[4],item.transform[5]]}:item)}}"});});
   if(process.env.SCAN_LAYOUT_RECOVERY){
    await context.route('**/web/document-table-lookup.js*',route=>{if(new URL(route.request().url()).searchParams.has('native'))return route.fallback();return route.fulfill({contentType:'text/javascript',body:"export {lookupTableCell,lookupAlignedTableCell} from './document-table-lookup.js?native=1';export async function readPdfPageText(){return {items:[]}}"});});
    await context.route('**/web/document-ocr.js*',route=>route.fulfill({contentType:'text/javascript',body:"export async function createPdfOcr(){return {async readLayout(page){window.__ocrAttempt=(window.__ocrAttempt||0)+1;return window.__ocrAttempt<=2?[]:(await page.getTextContent()).items;},async close(){}}}"}));

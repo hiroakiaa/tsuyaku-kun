@@ -3,7 +3,7 @@ import {automaticDocumentTitle} from './document-title.js?v=1';
 import {previewFitScale} from './preview-fit.js?v=20261119-fit-1';
 import {installPreviewOnlyGestures} from './preview-only-gestures.js?v=20261119-preview-only-1';
 installPreviewOnlyGestures();
-import {alignPdfTranslation} from './pdf-translation-alignment.js?v=20261119-layout-1';
+import {alignPdfTranslation,pdfComparableText} from './pdf-translation-alignment.js?v=20261120-layout-2';
 import {resumeTranslation,transientTranslationError} from './translation-resume.js?v=20261119-resume-1';
 import {readPdfPageText,lookupTableCell,lookupAlignedTableCell} from './document-table-lookup.js?v=88';
 import {recordDocumentQaMetric} from './document-qa-metrics.js?v=1';
@@ -217,7 +217,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '258');
+      guide.searchParams.set('v', '259');
       link.href = guide.href;
       if (typeof entry.shared==='boolean') append(body,'small',entry.shared?'共通保管庫に公開':'作成したブラウザーで閲覧');
       const remove = append(card,'button','','library-remove');
@@ -439,7 +439,7 @@ async function reader() {
   };
   askDialog.addEventListener('close',()=>{
     if (dialog.open) dialog.close();
-    location.replace('?v=258');
+    location.replace('?v=259');
   });
   const sourceType = doc.sourceType ?? 'pdf';
   let opened,originalUrl,officeText,officeRender = 0;
@@ -1006,16 +1006,17 @@ async function reader() {
     }
   }
   async function renderTranslationOnPdf(result,number,revision,language) {
+    const fail=stage=>{content.dataset.translationPlacement=JSON.stringify({page:number,language,stage,sourceLines:result.source?.length??0});return false;};
     try {
       const pdf=await getOriginalPdf();
       const page=await pdf.getPage(number);
       const viewport=page.getViewport({scale:1});
       const nativeItems=await pageTextRuns(page);
-      const items=result.includesDiagram ? [...nativeItems,...await diagramTextRuns(page,nativeItems)] : nativeItems;
+      let items=result.includesDiagram ? [...nativeItems,...await diagramTextRuns(page,nativeItems)] : nativeItems;
       const aligned=alignPdfTranslation(result,items);
-      if(aligned)result=aligned;
+      if(aligned){result=aligned;items=aligned.items??items;}
       if (revision!==translationRevision) return;
-      const normalize=text=>text.normalize('NFKC').replace(/[\s|]/gu,'');
+      const normalize=pdfComparableText;
       let offset=0;
       const runs=items.filter(item=>item.str?.trim()).map(item=>{
         const start=offset;
@@ -1038,10 +1039,10 @@ async function reader() {
         const needle=normalize(original);
         if (!needle) continue;
         const start=pageText.indexOf(needle,from);
-        if (start!==from) return;
+        if (start!==from) return fail('source-order');
         from=start+needle.length;
         const matched=runs.filter(run=>run.end>start && run.start<from);
-        if (matched[0]?.start!==start || matched.at(-1)?.end!==from) return;
+        if (matched[0]?.start!==start || matched.at(-1)?.end!==from) return fail('source-boundary');
         if(result.untranslatedIndices?.includes(index))continue;
         const first=matched[0].item;
         if (first.verticalLayout && matched.length===1) {
@@ -1069,10 +1070,10 @@ async function reader() {
           continue;
         }
         const [x,y]=point(first);
-        const height=Math.max(...matched.map(({item})=>item.height));
-        if (!height || matched.some(({item})=>Math.abs(point(item)[1]-y)>height*.25 || item.transform[1] || item.transform[2])) return;
+        const height=Math.max(...matched.map(({item})=>item.height||Math.hypot(item.transform[2],item.transform[3])));
+        if (!height || matched.some(({item})=>Math.abs(point(item)[1]-y)>height*.25 || Math.abs(item.transform[1])>1e-3 || Math.abs(item.transform[2])>1e-3)) continue;
         const width=Math.max(...matched.map(({item})=>point(item)[0]+item.width))-x;
-        if (!(width>0)) return;
+        if (!(width>0)) continue;
         const nextX=runs.filter(({item})=>Math.abs(point(item)[1]-y)<height*.5)
           .map(({item})=>point(item)[0])
           .filter(value=>value>=x+width-.1);
@@ -1108,12 +1109,12 @@ async function reader() {
           }
         }
         const size=Math.min(height,available/measured*height,line.includes('\n') ? boxHeight/2.2 : boxHeight);
-        if (!(size>0)) return;
+        if (!(size>0)) continue;
         blocks.push({x,top,boxHeight,width:Math.max(width,measured*size/height),size,line,
           sourceWidth:width,sourceHeight:height*1.26,
           marked:ranges.some(range=>from>range.start && start<range.end)});
       }
-      if (!blocks.length || from!==pageText.length) return;
+      if (!blocks.length || from!==pageText.length) return fail(!blocks.length?'unsupported-geometry':'source-coverage');
       const frame=document.createElement('div');
       frame.className='pdf-page-view pdf-translation-layout pdf-inline-translation';
       frame.lang=translatedPage.lang;
@@ -1220,8 +1221,9 @@ async function reader() {
       if (!slot) return false;
       if(revision!==translationRevision || language!==translationMode.value)return false;
       installInlineTranslation(slot,frame,language);
+      content.dataset.translationPlacement=JSON.stringify({page:number,language,stage:'ready',blocks:blocks.length});
       return true;
-    } catch {}
+    } catch(error) {return fail('render-'+(error.name||'Error'));}
   }
   function renderTranslatedPage(result,page,target=translatedPage) {
     const normalize=text=>text.normalize('NFKC').replace(/[\s|]/gu,'');
@@ -1730,7 +1732,7 @@ async function reader() {
       createUrl.searchParams.delete('id');
       createUrl.searchParams.delete('library');
       createUrl.searchParams.set('create','1');
-      createUrl.searchParams.set('v','258');
+      createUrl.searchParams.set('v','259');
       location.replace(createUrl);
     } catch (error) {
       document.querySelector('#remove-status').textContent = error.message;
@@ -2189,7 +2191,7 @@ try {
         icon.append(localIcon('book-open'));
         const body = append(card,'div','','library-card-body');
         const link = append(body,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=258';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=259';
         }
       };
       $('#library-search').addEventListener('input',renderShared);
