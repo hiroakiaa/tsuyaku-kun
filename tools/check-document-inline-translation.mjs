@@ -19,6 +19,11 @@ fixture.setApiHandler(request=>{
 try{
  for(const width of [390,1280]){
   const context=await browser.newContext({viewport:{width,height:844},isMobile:width<800,hasTouch:width<800});await setup(context);
+  if(process.env.SCAN_LAYOUT_RECOVERY){
+   await context.route('**/web/document-table-lookup.js*',route=>{if(new URL(route.request().url()).searchParams.has('native'))return route.fallback();return route.fulfill({contentType:'text/javascript',body:"export {lookupTableCell,lookupAlignedTableCell} from './document-table-lookup.js?native=1';export async function readPdfPageText(){return {items:[]}}"});});
+   await context.route('**/web/document-ocr.js*',route=>route.fulfill({contentType:'text/javascript',body:"export async function createPdfOcr(){return {async readLayout(page){window.__ocrAttempt=(window.__ocrAttempt||0)+1;return window.__ocrAttempt<=2?[]:(await page.getTextContent()).items;},async close(){}}}"}));
+  }
+
   if(process.env.LIVE_DOCUMENT_LAYOUT)await context.route('https://hiroakiaa.github.io/**',route=>route.continue());
   const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
   const base=process.env.LIVE_DOCUMENT_LAYOUT?'https://hiroakiaa.github.io/tsuyaku-kun':origin;
@@ -42,7 +47,7 @@ try{
    assert.ok(Math.min(Math.abs(minimum.w-minimum.vw),Math.abs(minimum.h-minimum.vh))<3,'Smallest PDF touches one inner edge');
    await page.locator('#zoom-fit').click();
   }
-  await page.locator('select.document-language:visible').selectOption('en');
+  await page.locator('select.document-language:visible').selectOption('en');await page.locator('select.document-language:visible').selectOption('pt');await page.locator('.pdf-inline-translation[data-language="pt"]:visible').waitFor();assert.equal(await page.locator('.pdf-inline-translation[data-language="en"]:visible').count(),0);await page.locator('select.document-language:visible').selectOption('en');
   const frame=page.locator('.pdf-translation-layout[data-page="1"]:visible');await frame.waitFor({timeout:30000});
   assert.ok(await frame.locator('canvas').count()>0,'Original PDF page remains in the translated view');
   assert.ok(await frame.locator('.pdf-layout-line').count()>=3,'Legacy paragraph translation is positioned on physical PDF lines');
@@ -50,9 +55,14 @@ try{
   const geometry=await frame.locator('.pdf-layout-line').evaluateAll(lines=>lines.every(line=>parseFloat(line.style.left)>=0&&parseFloat(line.style.top)>=0&&line.getBoundingClientRect().height>0));
   assert.ok(geometry);assert.deepEqual(errors,[]);
   await fs.mkdir('checks/document-inline',{recursive:true});await page.screenshot({path:'checks/document-inline/'+width+'.png',fullPage:true});
+  await page.locator('#pdf-language-toggle button[data-language=""]').click();await page.waitForFunction(()=>[...document.querySelectorAll('.pdf-inline-translation')].every(f=>f.hidden));
+  await page.locator('#pdf-language-toggle button[data-language="en"]').click();await frame.waitFor();
+  if(process.env.SCAN_LAYOUT_RECOVERY)assert.ok(await page.evaluate(()=>window.__ocrAttempt>=3),'Failed OCR layout was refreshed automatically');
   await page.locator('select.document-language:visible').selectOption('ja');
   await page.waitForFunction(()=>[...document.querySelectorAll('.pdf-inline-translation')].every(frame=>frame.hidden));
   await page.locator('select.document-language:visible').selectOption('en');await frame.waitFor();
+  await page.evaluate(id=>{localStorage.setItem('tsuyaku-reading:'+id,JSON.stringify({page:1,translationMode:''}));localStorage.setItem('tsuyaku-document-language','en');},id);
+  await page.reload();await page.locator('.pdf-inline-translation[data-language="en"]:visible').waitFor();assert.equal(await page.locator('#pdf-language').inputValue(),'en','Reopening selected language overrides saved original mode');
   console.log((process.env.LIVE_DOCUMENT_LAYOUT?'Published assets':'Local fixture')+': PASS '+width+'px original PDF canvas + positioned translation, original toggle and cached paragraph reuse');
   await context.close();
  }

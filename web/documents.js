@@ -653,7 +653,7 @@ async function reader() {
         const reader=await createPdfOcr((await pdfLibrary()).OPS);
         try {
           const runs=await reader.readLayout(page,pageNumberOnly ? items : []);
-          if (!runs.length) console.warn('Document QA: no OCR line boxes for PDF page',number);
+          if (!runs.length){scanLayouts.delete(number);console.warn('Document QA: no OCR line boxes for PDF page',number);}
           return runs;
         }
         finally { await reader.close(); }
@@ -804,8 +804,9 @@ async function reader() {
           else lines[lines.length-1]+=(gap>item.height*.22?' ':'')+item.str;
           last=item;
         }
+        if(!lines.length){pdfTranslationSources.delete(key);return undefined;}
         return {layout:lines.join('\n'),diagram:(await diagramTextRuns(page,items)).map(item=>item.str).join('\n')};
-      })().catch(()=>undefined));
+      })().catch(()=>{pdfTranslationSources.delete(key);return undefined;}));
     }
     return pdfTranslationSources.get(key);
   }
@@ -873,7 +874,7 @@ async function reader() {
     finally { prefetching=false; }
     setTimeout(prefetchTranslations,delay);
   }
-  function syncTranslationOptions({selectLanguage=false}={}) {
+  function syncTranslationOptions() {
     const language=documentLanguages.find(option=>option.code===selectedLanguage);
     translationMode.replaceChildren(new Option('原文',''));
     if(language && language.code!=='ja') translationMode.add(new Option(language.labelNative,language.code));
@@ -890,11 +891,10 @@ async function reader() {
         void updatePageTranslation();
       };
     }
-    const savedMode=readingPosition(id).translationMode;
-    const hasSavedMode=[...translationMode.options].some(option=>option.value===savedMode);
     const preferredMode=language && language.code!=='ja' ? language.code : '';
-    translationMode.value=!selectLanguage && hasSavedMode ? savedMode : preferredMode;
-    if (selectLanguage) readingPosition(id,{translationMode:translationMode.value});
+    // The selected reading language controls reopening; a stale original-mode choice must not override it.
+    translationMode.value=preferredMode;
+    readingPosition(id,{translationMode:preferredMode,language:selectedLanguage});
     for (const button of translationToggle.children) button.setAttribute("aria-pressed", String(button.dataset.language===translationMode.value));
     renderEnglishProgress();
     if (dialog.open) void updatePageTranslation();
@@ -913,7 +913,7 @@ async function reader() {
     scroller.scrollTop+=page.top-view.top+page.height*position.y;
   }
   let visibleTranslationFailed=false;
-  async function updatePageTranslation(retry=false) {
+  async function updatePageTranslation(retry=false,realigned=false) {
     visibleTranslationFailed=false;
     const revision=++translationRevision;
     const language=translationMode.value;
@@ -964,6 +964,7 @@ async function reader() {
             return;
           }
           if (!await renderTranslationOnPdf(result,page,revision,language) && revision===translationRevision) {
+            if(!realigned){pdfTranslationSources.delete(page+':false');pdfTranslationSources.delete(page+':true');scanLayouts.delete(page);recordTranslationTrace(page,language,priority,'realign');await updatePageTranslation(true,true);return;}
             const status=$('#pdf-status');
             status.replaceChildren(document.createTextNode('訳文を資料上に配置できませんでした。'));
             const retryButton=append(status,'button','配置を再確認');
@@ -1217,6 +1218,7 @@ async function reader() {
       }
       const slot=pageList.querySelector('[data-page="'+number+'"]');
       if (!slot) return false;
+      if(revision!==translationRevision || language!==translationMode.value)return false;
       installInlineTranslation(slot,frame,language);
       return true;
     } catch {}
@@ -1250,7 +1252,7 @@ async function reader() {
     if (visibleTranslationFailed && dialog.open && translationMode.value) void updatePageTranslation(true);
     else void prefetchTranslations();
   });
-  window.addEventListener('document-language-change',()=>syncTranslationOptions({selectLanguage:true}));
+  window.addEventListener('document-language-change',()=>syncTranslationOptions());
   syncTranslationOptions();
   const previewImage = $('#source-image');
   const imageType = /^(png|jpe?g|webp)$/.test(sourceType);

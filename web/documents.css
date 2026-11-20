@@ -661,3 +661,7 @@ html{touch-action:pan-x pan-y}
 #document-title-editor form,#document-title-editor label{display:grid;gap:12px}
 #document-title-editor input{width:100%}
 .title-edit-actions{display:flex;justify-content:flex-end;gap:10px}
+
+/* Translation layers stay inside the document surface, below its controls. */
+#pdf-scroll{isolation:isolate}
+.pdf-stage-tools{z-index:5}

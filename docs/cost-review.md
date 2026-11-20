@@ -574,3 +574,6 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 
 ### 2026-11-19 Image PDF margins
 - New images convert to aspect-matched PDF without an A4 mat. Legacy app A4 raster pages are recognized locally from PDF image dimensions and lack of vector text; only high-density image outer blank bands are recolored in display. Text/Excel pages are excluded. No AI/OCR/API call for margin recognition, no source-file modification; translation and citation coordinates remain unchanged.
+
+### 2026-11-20 Library language selection and translation recovery
+- Reopening honors selected language instead of old original-mode preference. Existing successful translation caches reused. Empty/failed local OCR/layout is no longer cached permanently. Alignment failure refreshes local geometry and retries once automatically (not an unlimited loop); failed alignment can add one translation request with the usual server cache/checkpoints. No new model/provider/language fan-out.
