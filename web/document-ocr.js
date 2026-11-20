@@ -64,6 +64,15 @@ function nativeScanImage(page, ops, operatorList) {
   }
 }
 
+// Small raster glyphs need enough pixels for the local OCR model. Keep both
+// extraction and geometry on the identical resized image, without an API call.
+function enlargeScanForOcr(canvas) {
+  const scale=Math.min(3,2000/Math.max(canvas.width,canvas.height));
+  if(scale<=1)return;
+  const copy=document.createElement('canvas');copy.width=canvas.width;copy.height=canvas.height;copy.getContext('2d').drawImage(canvas,0,0);
+  canvas.width=Math.round(copy.width*scale);canvas.height=Math.round(copy.height*scale);canvas.getContext('2d').drawImage(copy,0,0,canvas.width,canvas.height);copy.width=copy.height=0;
+}
+
 export async function createPdfOcr(ops) {
   for (const name of timingNames) performance.clearMeasures(name);
   let standard, horizontal, vertical, disabled=false;
@@ -102,7 +111,7 @@ export async function createPdfOcr(ops) {
         const operators=await page.getOperatorList().catch(()=>null);await page.render({canvas,viewport}).promise;
         const image=operators&&nativeScanImage(page,ops,operators);let input=canvas,bounds;
         if(image){native=document.createElement('canvas');native.width=image.width;native.height=image.height;const ctx=native.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,native.width,native.height);
-          if(image.bitmap)ctx.drawImage(image.bitmap,0,0);else{const pixels=ctx.createImageData(image.width,image.height);if(image.data?.length===pixels.data.length)pixels.data.set(image.data);else if(image.data?.length===image.width*image.height*3){for(let source=0,target=0;source<image.data.length;source+=3,target+=4){pixels.data[target]=image.data[source];pixels.data[target+1]=image.data[source+1];pixels.data[target+2]=image.data[source+2];pixels.data[target+3]=255;}}else pixels.data.fill(255);ctx.putImageData(pixels,0,0);}input=native;bounds=image.pdfBounds;
+          if(image.bitmap)ctx.drawImage(image.bitmap,0,0);else{const pixels=ctx.createImageData(image.width,image.height);if(image.data?.length===pixels.data.length)pixels.data.set(image.data);else if(image.data?.length===image.width*image.height*3){for(let source=0,target=0;source<image.data.length;source+=3,target+=4){pixels.data[target]=image.data[source];pixels.data[target+1]=image.data[source+1];pixels.data[target+2]=image.data[source+2];pixels.data[target+3]=255;}}else pixels.data.fill(255);ctx.putImageData(pixels,0,0);}enlargeScanForOcr(native);input=native;bounds=image.pdfBounds;
         }
         const {findVerticalScanRegion}=await import('./document-ocr-lines.js?v=3');if(findVerticalScanRegion(input.getContext('2d').getImageData(0,0,input.width,input.height))?.wholePage)return this.readLayout(page,pageNumberItems);
         // Same engine, default page segmentation and pixels as creation's read().
@@ -345,6 +354,7 @@ export async function createPdfOcr(ops) {
               } else pixels.data.fill(255);
               context.putImageData(pixels,0,0);
             }
+            enlargeScanForOcr(native);
             if (pageNumberOnly && !disabled && typeof DecompressionStream==='function') {
               const pixels=context.getImageData(0,0,native.width,native.height);
               const {findHorizontalScanLines}=await import('./document-ocr-lines.js');

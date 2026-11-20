@@ -584,3 +584,6 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 ### 2026-11-20 Scanned translation cache repair
 - Reject and automatically rebuild legacy text-only or incomplete translation caches. Structured keyed batches/checkpoints are used even when OCR geometry differs; completed batches and valid shared caches remain reusable. No new provider, language fan-out or budget increase. A previously invalid cache incurs a one-time repair translation.
 - Local canonical OCR uses the same original image and engine as registration. Bounded edit alignment is restricted to OCR geometry; it never changes canonical QA text or translated content and sends no image to an AI service. Native PDF mismatch validation stays strict.
+
+### 2026-11-20 Small scanned glyphs
+- Upscale small embedded rasters locally to at most 3x / 2000px long edge before both extraction and geometry OCR. Same pixels/engine preserve alignment. No new provider, image upload, language fan-out or model calls. Tested on an explicitly authorized private attachment; test documents deleted. Other exploratory OCR alternatives were not adopted.
