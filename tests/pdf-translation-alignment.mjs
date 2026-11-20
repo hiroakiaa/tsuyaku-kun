@@ -14,3 +14,9 @@ const packed=[{str:'School handbook',width:150,height:12,transform:[12,0,0,12,30
 const split=alignPdfTranslation({source:['School','handbook'],lines:['Campus','Guide']},packed);assert.ok(split);assert.equal(split.source.length,2);assert.deepEqual(split.lines,['Campus','Guide']);assert.equal(split.items.length,2);assert.equal(split.items.reduce((n,item)=>n+item.width,0),150);assert.equal(split.items[0].transform[4],30);assert.ok(split.items[1].transform[4]>30);
 const invisible=alignPdfTranslation({source:['School handbook'],lines:['Guide']},[{...packed[0],str:'School\u200b handbook'}]);assert.ok(invisible);assert.equal(invisible.lines[0],'Guide');
 console.log('PASS cached source boundaries inside a PDF item, split geometry and invisible PDF controls');
+
+const scanSource=['説明会は4月8日に開催します。ノートと筆記用具を持参してください。','参加費は1200円です。欠席の場合は前日までに学校へ連絡してください。'];
+const scanItems=scanSource.map((str,i)=>({str:str.replace('説明会','説明回').replace('筆記','筆紀'),width:450,height:14,ocr:true,ocrBox:[.05,.1+i*.1,.85,.04],transform:[14,0,0,14,20,700-i*30]}));
+const scan=alignPdfTranslation({source:scanSource,lines:['Briefing on April 8. Bring a notebook and writing supplies.','Fee 1200 yen. Contact the school by the previous day if absent.']},scanItems,{quote:scanSource[0]});assert.ok(scan);assert.ok(scan.scanAlignment.score>.9);assert.equal(scan.scanAlignment.citationRanges.length,1);assert.ok(scan.lines.join(' ').includes('1200'));
+assert.equal(alignPdfTranslation({source:scanSource,lines:['A','B']},scanItems.map(item=>({...item,ocr:false}))),null,'Approximate geometry is restricted to OCR, never native PDF text');
+console.log('PASS two OCR passes with different glyph recognition retain canonical translation, numeric content and quote geometry');

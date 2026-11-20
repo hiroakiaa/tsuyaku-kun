@@ -15,7 +15,7 @@ function nativeScanImage(page, ops, operatorList) {
   try {
     const {fnArray,argsArray} = operatorList;
     const supported = new Set(supportedScanOperations.map(name=>ops[name]));
-    let imageId, clip;
+    let imageId, clip, imageBounds;
     let matrix = [1,1,0,0];
     const stack = [];
     const bounds = ([left,bottom,right,top]) => {
@@ -50,7 +50,7 @@ function nativeScanImage(page, ops, operatorList) {
       }
       if (op===ops.paintImageXObject) {
         if (imageId || matrix[1]<=0) return null;
-        const imageBounds = bounds([0,0,1,1]);
+        imageBounds = bounds([0,0,1,1]);
         const contains = box=>imageBounds[0]>=box[0] && imageBounds[1]>=box[1] &&
           imageBounds[2]<=box[2] && imageBounds[3]<=box[3];
         if (!contains(page.view) || (clip && !contains(clip))) return null;
@@ -58,7 +58,7 @@ function nativeScanImage(page, ops, operatorList) {
       }
     }
     const image = imageId && page.objs.has(imageId) ? page.objs.get(imageId) : null;
-    return image && image.width<=4096 && image.height<=4096 ? image : null;
+    return image && image.width<=4096 && image.height<=4096 ? {...image,pdfBounds:imageBounds} : null;
   } catch {
     return null;
   }
@@ -94,6 +94,29 @@ export async function createPdfOcr(ops) {
     return vertical;
   }
   return {
+    async readCanonicalLayout(page,pageNumberItems=[]) {
+      if(page.rotate)return this.readLayout(page,pageNumberItems);
+      const size=page.getViewport({scale:1}),viewport=page.getViewport({scale:Math.min(3,2400/Math.max(size.width,size.height))});
+      const canvas=document.createElement('canvas');canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);let native;
+      try{
+        const operators=await page.getOperatorList().catch(()=>null);await page.render({canvas,viewport}).promise;
+        const image=operators&&nativeScanImage(page,ops,operators);let input=canvas,bounds;
+        if(image){native=document.createElement('canvas');native.width=image.width;native.height=image.height;const ctx=native.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,native.width,native.height);
+          if(image.bitmap)ctx.drawImage(image.bitmap,0,0);else{const pixels=ctx.createImageData(image.width,image.height);if(image.data?.length===pixels.data.length)pixels.data.set(image.data);else if(image.data?.length===image.width*image.height*3){for(let source=0,target=0;source<image.data.length;source+=3,target+=4){pixels.data[target]=image.data[source];pixels.data[target+1]=image.data[source+1];pixels.data[target+2]=image.data[source+2];pixels.data[target+3]=255;}}else pixels.data.fill(255);ctx.putImageData(pixels,0,0);}input=native;bounds=image.pdfBounds;
+        }
+        const {findVerticalScanRegion}=await import('./document-ocr-lines.js?v=3');if(findVerticalScanRegion(input.getContext('2d').getImageData(0,0,input.width,input.height))?.wholePage)return this.readLayout(page,pageNumberItems);
+        // Same engine, default page segmentation and pixels as creation's read().
+        const {data}=await (await standardWorker()).recognize(input,{}, {blocks:true});
+        return (data.blocks??[]).flatMap(block=>block.paragraphs).flatMap(paragraph=>paragraph.lines).flatMap(({text,bbox})=>{
+          const str=typeof text==='string'?text.trim():'';if(!str||!bbox)return [];
+          let left,top,right,bottom;
+          if(bounds){const [x0,y0,x1,y1]=bounds;[left,top]=size.convertToViewportPoint(x0+bbox.x0/input.width*(x1-x0),y1-bbox.y0/input.height*(y1-y0));[right,bottom]=size.convertToViewportPoint(x0+bbox.x1/input.width*(x1-x0),y1-bbox.y1/input.height*(y1-y0));}
+          else{left=bbox.x0/viewport.scale;top=bbox.y0/viewport.scale;right=bbox.x1/viewport.scale;bottom=bbox.y1/viewport.scale;}
+          const width=right-left,height=bottom-top;if(![left,top,width,height].every(Number.isFinite)||width<=0||height<=0)return [];
+          const [x,y]=size.convertToPdfPoint(left,bottom);return [{str,width,height,ocr:true,ocrBox:[left/size.width,top/size.height,width/size.width,height/size.height],transform:[height,0,0,height,x,y]}];
+        });
+      }finally{canvas.width=canvas.height=0;if(native)native.width=native.height=0;}
+    },
     async readLayout(page,pageNumberItems=[],{diagram=false}={}) {
       const size=page.getViewport({scale:1});
       const viewport=page.getViewport({scale:Math.min(3,2400/Math.max(size.width,size.height))});

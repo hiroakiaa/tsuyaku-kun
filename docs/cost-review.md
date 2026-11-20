@@ -580,3 +580,7 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 
 ### 2026-11-20 Cached translation run-boundary alignment
 - Client splits native PDF text runs at verified cached-source boundaries and positions existing translations; ignores invisible PDF direction/control characters in correspondence. Height fallback and tiny skew tolerance avoid whole-page rejection for font metrics. No new AI call for this alignment. Existing one-attempt automatic relayout fallback unchanged; no character-fuzzy matching or source-page validation relaxed. Diagnostics contain counts/stages, not document text.
+
+### 2026-11-20 Scanned translation cache repair
+- Reject and automatically rebuild legacy text-only or incomplete translation caches. Structured keyed batches/checkpoints are used even when OCR geometry differs; completed batches and valid shared caches remain reusable. No new provider, language fan-out or budget increase. A previously invalid cache incurs a one-time repair translation.
+- Local canonical OCR uses the same original image and engine as registration. Bounded edit alignment is restricted to OCR geometry; it never changes canonical QA text or translated content and sends no image to an AI service. Native PDF mismatch validation stays strict.

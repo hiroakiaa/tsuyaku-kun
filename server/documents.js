@@ -1543,7 +1543,7 @@ export async function documentStorage(request,storage,env) {
     }
     const work=(async()=>{
       const cached=await storage.get(translationKey);
-      if (cached) return {...cached.result,reuse:'cache'};
+      if (cached && Array.isArray(cached.result?.source) && Array.isArray(cached.result?.lines) && cached.result.source.length===cached.result.lines.length && cached.result.source.join('\n')===text && cached.result.source.every(line=>typeof line==='string') && cached.result.lines.every((line,index)=>typeof line==='string' && (!cached.result.source[index].trim() || line.trim()))) return {...cached.result,reuse:'cache'};
       let usage;
       const source=text.split('\n');
       const nonempty=source.filter(line=>line.trim());
@@ -1556,7 +1556,7 @@ export async function documentStorage(request,storage,env) {
         }
       };
       let translations;
-      if (hasLayout) {
+      {
         const numberTokens=value=>value.normalize('NFKC').match(/[0-9]+(?:[.,][0-9]+)*/g) ?? [];
         const batches=[];
         const batchSize=diagramContext && nonempty.length<=24 && text.length<=4000 ? 24 : 8;
@@ -1564,10 +1564,10 @@ export async function documentStorage(request,storage,env) {
         const translateBatch=async batch=>{
           const keys=batch.map((_,index)=>'line_'+index);
           const input=Object.fromEntries(keys.map((key,index)=>[key,batch[index]]));
-          const output=JSON.parse(await translateDocumentText(env,JSON.stringify(input),language,true,captureUsage,keys,diagramContext));
+          const raw=await translateDocumentText(env,JSON.stringify(input),language,true,captureUsage,keys,diagramContext);let output;try{output=JSON.parse(raw);}catch{output={};}
           return Promise.all(keys.map((key,index)=>{
             const original=batch[index];
-            const translated=output[key];
+            const translated=output?.[key];
             const preservesNumbers=typeof translated==='string' &&
               numberTokens(original).join('|')===numberTokens(translated).join('|');
             return preservesNumbers && translated.trim()
@@ -1576,18 +1576,14 @@ export async function documentStorage(request,storage,env) {
           }));
         };
         translations=await translationCheckpoints(storage,translationKey,batches,translateBatch);
-      } else {
-        const aligned=await translateDocumentText(env,JSON.stringify(nonempty),language,true,captureUsage);
-        try { translations=JSON.parse(aligned)?.lines; } catch {}
       }
       let index=0;
       const lines=Array.isArray(translations) && translations.length===nonempty.length &&
         translations.every(line=>typeof line==='string' && line.trim())
         ? source.map(line=>line.trim()?translations[index++]:line)
         : null;
-      const result=lines
-        ? {text:lines.join('\n'),source,lines,usage}
-        : {text:await translateDocumentText(env,text,language,false,captureUsage),usage};
+      if(!lines)throw Error('訳文と原文の対応を修復しています。');
+      const result={text:lines.join('\n'),source,lines,usage};
       if (new TextEncoder().encode(JSON.stringify(result)).length<120_000) await storage.transaction(async tx=>{
         if (!await tx.get('document')) return;
         const manifest='/document/page-translation-manifest'+(language==='English'?':english':'');

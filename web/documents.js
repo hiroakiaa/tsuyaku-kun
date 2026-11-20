@@ -3,7 +3,7 @@ import {automaticDocumentTitle} from './document-title.js?v=1';
 import {previewFitScale} from './preview-fit.js?v=20261119-fit-1';
 import {installPreviewOnlyGestures} from './preview-only-gestures.js?v=20261119-preview-only-1';
 installPreviewOnlyGestures();
-import {alignPdfTranslation,pdfComparableText} from './pdf-translation-alignment.js?v=20261120-layout-2';
+import {alignPdfTranslation,pdfComparableText} from './pdf-translation-alignment.js?v=20261120-layout-3';
 import {resumeTranslation,transientTranslationError} from './translation-resume.js?v=20261119-resume-1';
 import {readPdfPageText,lookupTableCell,lookupAlignedTableCell} from './document-table-lookup.js?v=88';
 import {recordDocumentQaMetric} from './document-qa-metrics.js?v=1';
@@ -140,7 +140,7 @@ async function extract(file, status) {
       const {requiresOcr,pageNumberOnly}=pdfPageTextStatus(text,n);
       if (requiresOcr) {
         status.textContent = 'スキャンページを端末で読んでいます… ' + n + ' / ' + pdf.numPages;
-        const {createPdfOcr} = await import('./document-ocr.js?v=111');
+        const {createPdfOcr} = await import('./document-ocr.js?v=112');
         ocr ??= await createPdfOcr((await pdfLibrary()).OPS);
         if (page.rotate) {
           const runs=await ocr.readLayout(page,pageNumberOnly ? parts : []).catch(()=>[]);
@@ -217,7 +217,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '259');
+      guide.searchParams.set('v', '260');
       link.href = guide.href;
       if (typeof entry.shared==='boolean') append(body,'small',entry.shared?'共通保管庫に公開':'作成したブラウザーで閲覧');
       const remove = append(card,'button','','library-remove');
@@ -439,7 +439,7 @@ async function reader() {
   };
   askDialog.addEventListener('close',()=>{
     if (dialog.open) dialog.close();
-    location.replace('?v=259');
+    location.replace('?v=260');
   });
   const sourceType = doc.sourceType ?? 'pdf';
   let opened,originalUrl,officeText,officeRender = 0;
@@ -649,10 +649,10 @@ async function reader() {
     if (!requiresOcr) return items;
     if (!scanLayouts.has(number)) {
       scanLayouts.set(number,(async()=>{
-        const {createPdfOcr}=await import('./document-ocr.js?v=111');
+        const {createPdfOcr}=await import('./document-ocr.js?v=112');
         const reader=await createPdfOcr((await pdfLibrary()).OPS);
         try {
-          const runs=await reader.readLayout(page,pageNumberOnly ? items : []);
+          const runs=await (reader.readCanonicalLayout?.(page,pageNumberOnly ? items : [])??reader.readLayout(page,pageNumberOnly ? items : []));
           if (!runs.length){scanLayouts.delete(number);console.warn('Document QA: no OCR line boxes for PDF page',number);}
           return runs;
         }
@@ -777,7 +777,7 @@ async function reader() {
       const {fnArray,argsArray}=await page.getOperatorList();
       if (!fnArray.some((op,index)=>op===OPS.paintImageXObject &&
           argsArray[index]?.[1]>=300 && argsArray[index]?.[2]>=150)) return [];
-      const {createPdfOcr}=await import('./document-ocr.js?v=111');
+      const {createPdfOcr}=await import('./document-ocr.js?v=112');
       const reader=await createPdfOcr(OPS);
       try {
         const runs=await reader.readLayout(page,items,{diagram:true});
@@ -1013,7 +1013,7 @@ async function reader() {
       const viewport=page.getViewport({scale:1});
       const nativeItems=await pageTextRuns(page);
       let items=result.includesDiagram ? [...nativeItems,...await diagramTextRuns(page,nativeItems)] : nativeItems;
-      const aligned=alignPdfTranslation(result,items);
+      const aligned=alignPdfTranslation(result,items,{quote:citation?.page===number?citation.quote:undefined});
       if(aligned){result=aligned;items=aligned.items??items;}
       if (revision!==translationRevision) return;
       const normalize=pdfComparableText;
@@ -1033,7 +1033,7 @@ async function reader() {
       const measuringCanvas=document.createElement('canvas');
       const context=measuringCanvas.getContext('2d');
       const unit=viewport.width/100;
-      const ranges=citation?.page===number ? citationRanges(pageText,citation.quote,normalize) : [];
+      const ranges=citation?.page===number ? result.scanAlignment?.citationRanges??citationRanges(pageText,citation.quote,normalize) : [];
       let from=0;
       for (const [index,original] of result.source.entries()) {
         const needle=normalize(original);
@@ -1221,7 +1221,7 @@ async function reader() {
       if (!slot) return false;
       if(revision!==translationRevision || language!==translationMode.value)return false;
       installInlineTranslation(slot,frame,language);
-      content.dataset.translationPlacement=JSON.stringify({page:number,language,stage:'ready',blocks:blocks.length});
+      content.dataset.translationPlacement=JSON.stringify({page:number,language,stage:'ready',blocks:blocks.length,scanScore:result.scanAlignment?.score});
       return true;
     } catch(error) {return fail('render-'+(error.name||'Error'));}
   }
@@ -1732,7 +1732,7 @@ async function reader() {
       createUrl.searchParams.delete('id');
       createUrl.searchParams.delete('library');
       createUrl.searchParams.set('create','1');
-      createUrl.searchParams.set('v','259');
+      createUrl.searchParams.set('v','260');
       location.replace(createUrl);
     } catch (error) {
       document.querySelector('#remove-status').textContent = error.message;
@@ -2191,7 +2191,7 @@ try {
         icon.append(localIcon('book-open'));
         const body = append(card,'div','','library-card-body');
         const link = append(body,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=259';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=260';
         }
       };
       $('#library-search').addEventListener('input',renderShared);

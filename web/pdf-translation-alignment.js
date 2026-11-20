@@ -1,3 +1,4 @@
+import {scanTranslationRanges} from './pdf-scan-alignment.js?v=1';
 export const pdfComparableText=value=>String(value).normalize('NFKC').replace(/[\s|\u00ad\u200b-\u200f\u202a-\u202e\u2060-\u2069\ufeff]/gu,'');
 const normalize=pdfComparableText;
 function splitTranslation(text,weights){
@@ -23,14 +24,14 @@ function splitItem(item,cuts){
   out.push(part);
  }return out;
 }
-export function alignPdfTranslation(result,items){
+export function alignPdfTranslation(result,items,options={}){
  if(!Array.isArray(result.source)||!Array.isArray(result.lines)||result.source.length!==result.lines.length)return null;
  let offset=0;let runs=items.filter(item=>normalize(item.str||'')).map(item=>{const start=offset;offset+=normalize(item.str).length;return {item,start,end:offset};});
- const text=runs.map(run=>normalize(run.item.str)).join(''),ranges=[];
+ const text=runs.map(run=>normalize(run.item.str)).join('');let ranges=[],scanAlignment;
  for(let i=0;i<result.source.length;i++){
   const needle=normalize(result.source[i]);if(!needle)continue;let start=text.indexOf(needle);
   while(start>=0&&ranges.some(range=>start<range.end&&start+needle.length>range.start))start=text.indexOf(needle,start+1);
-  if(start<0)return null;const end=start+needle.length;ranges.push({start,end,translation:result.lines[i]});
+  if(start<0){scanAlignment=scanTranslationRanges(result,runs,normalize,options);if(!scanAlignment)return null;ranges=scanAlignment.ranges;break;}const end=start+needle.length;ranges.push({start,end,translation:result.lines[i]});
  }
  if(!ranges.length)return null;
  const split=[];
@@ -50,5 +51,5 @@ export function alignPdfTranslation(result,items){
   const matching=groups.filter(group=>group.range===range),pieces=splitTranslation(range.translation,matching.map(group=>group.runs.reduce((n,run)=>n+run.end-run.start,0)));
   matching.forEach((group,i)=>{group.translation=pieces[i];});
  }
- return {...result,items:runs.map(run=>run.item),source:groups.map(group=>group.runs.map(run=>run.item.str).join('')),lines:groups.map(group=>group.translation??group.runs.map(run=>run.item.str).join('')),untranslatedIndices:groups.flatMap((group,i)=>group.range?[]:[i])};
+ return {...result,...(scanAlignment?{scanAlignment:{score:scanAlignment.score,citationRanges:scanAlignment.citationRanges}}:{}),items:runs.map(run=>run.item),source:groups.map(group=>group.runs.map(run=>run.item.str).join('')),lines:groups.map(group=>group.translation??group.runs.map(run=>run.item.str).join('')),untranslatedIndices:groups.flatMap((group,i)=>group.range?[]:[i])};
 }
