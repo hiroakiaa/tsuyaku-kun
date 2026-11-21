@@ -118,8 +118,10 @@
       "id": 15,
       "title": "重なり防止",
       "acceptance": "密集ページの訳文矩形が隣欄に重ならない",
-      "status": "pending",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開6d01cde/UI v269。28ページ密集資料の訳文8矩形で重なり0（checks/first50-dense-current.json）。390/1280の公開資材・制御された日本語PDF/訳文で原文テキストを覆い、訳文6矩形の重なり0、日本語断片0、写真の二色RGBが完全一致、罫線を保持。スクリーンショットを目視確認。checks/translation-mask-public.log、checks/translation-mask/public-1280.png。APIはfixtureでありAI翻訳自体の精度測定とは別。"
+      ]
     },
     {
       "id": 16,
@@ -143,14 +145,16 @@
       "id": 18,
       "title": "原文消し残し",
       "acceptance": "翻訳表示で日本語の痕跡を覆い罫線と写真を保持",
-      "status": "pending",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開6d01cde/UI v269。28ページ密集資料の訳文8矩形で重なり0（checks/first50-dense-current.json）。390/1280の公開資材・制御された日本語PDF/訳文で原文テキストを覆い、訳文6矩形の重なり0、日本語断片0、写真の二色RGBが完全一致、罫線を保持。スクリーンショットを目視確認。checks/translation-mask-public.log、checks/translation-mask/public-1280.png。APIはfixtureでありAI翻訳自体の精度測定とは別。"
+      ]
     },
     {
       "id": 19,
       "title": "状態の明確化",
       "acceptance": "翻訳準備・表示・読み取り課題を一貫して区別",
-      "status": "pending",
+      "status": "in_progress",
       "evidence": []
     },
     {

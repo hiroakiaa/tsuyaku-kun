@@ -620,3 +620,6 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 
 ### 2026-11-22 Nonblocking reanalysis
 - Replacing/reanalyzing a PDF now saves canonical text immediately and queues one existing background overview, matching creation. It removes the foreground overview generation and does not increase any model/output/budget limit. Unchanged page translations retain content-based reuse. Tests defer the model and verify the saved corrected source is already available.
+
+### 2026-11-22 Translation state consistency
+- Only local presentation state/error cleanup changes. Existing one realignment and bounded transient resume policy remain; no extra provider request, model, output cap, or budget change.

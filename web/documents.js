@@ -219,7 +219,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '269');
+      guide.searchParams.set('v', '270');
       link.href = guide.href;
       if (typeof entry.shared==='boolean') append(body,'small',entry.shared?'共通保管庫に公開':'作成したブラウザーで閲覧');
       const remove = append(card,'button','','library-remove');
@@ -442,7 +442,7 @@ async function reader() {
   };
   askDialog.addEventListener('close',()=>{
     if (dialog.open) dialog.close();
-    location.replace('?v=269');
+    location.replace('?v=270');
   });
   const sourceType = doc.sourceType ?? 'pdf';
   let opened,originalUrl,officeText,officeRender = 0;
@@ -814,6 +814,15 @@ async function reader() {
     }
     return pdfTranslationSources.get(key);
   }
+  function setTranslationState(state,page,language){
+    content.dataset.translationState=JSON.stringify({state,page,language});
+    if(['ready','original','unchanged'].includes(state)){
+      visibleTranslationFailed=false;
+      delete content.dataset.translationPlacement;
+      const status=$('#pdf-status');
+      if(status.dataset.translationError){status.replaceChildren();delete status.dataset.translationError;}
+    }
+  }
   const translationTrace=[];
   function recordTranslationTrace(page,language,priority,event) {
     translationTrace.push({page,language,priority,event});
@@ -934,6 +943,7 @@ async function reader() {
         original?.querySelector('.pdf-inline-translation:not([hidden])')) {
       translatedPage.hidden=true;
       translatedPage.dataset.translationReuse='cache';
+      setTranslationState('ready',page,language);
       $('#pdf-translation-progress').hidden=true;
       return;
     }
@@ -943,12 +953,14 @@ async function reader() {
     delete translatedPage.dataset.translationReuse;
     translatedPage.lang=language==='ja-easy'?'ja':language;
     if (!language) {
+      setTranslationState('original',page,language);
       $('#pdf-translation-progress').hidden=true;
       restorePageViewport(preview,original,position);
       return;
     }
     const viewportPosition=position ?? pageViewportPosition(preview,original);
     const pending=$('#pdf-translation-progress');
+    setTranslationState('preparing',page,language);
     pending.textContent='翻訳しています…';
     pending.hidden=false;
     foregroundTranslation++;
@@ -964,18 +976,22 @@ async function reader() {
           if (Array.isArray(result.source) && result.source.length && result.source.length===result.lines?.length
               && result.source.every((line,index)=>sameText(line)===sameText(result.lines[index]))) {
             translatedPage.hidden=true;
+            setTranslationState('unchanged',page,language);
             restorePageViewport(preview,original,viewportPosition);
             return;
           }
           if (!await renderTranslationOnPdf(result,page,revision,language) && revision===translationRevision) {
             if(!realigned){pdfTranslationSources.delete(page+':false');pdfTranslationSources.delete(page+':true');scanLayouts.delete(page);recordTranslationTrace(page,language,priority,'realign');await updatePageTranslation(true,true);return;}
+            setTranslationState('failed',page,language);
             const status=$('#pdf-status');
+            status.dataset.translationError='placement';
             status.replaceChildren(document.createTextNode('訳文を資料上に配置できませんでした。'));
             const retryButton=append(status,'button','配置を再確認');
             retryButton.onclick=()=>{status.replaceChildren();void updatePageTranslation(true);};
             translatedPage.hidden=true;
-          }
+          }else if(revision===translationRevision)setTranslationState('ready',page,language);
         } else {
+          setTranslationState('ready',page,language);
           translatedPage.hidden=false;
           renderTranslatedPage(result,page);
         }
@@ -985,6 +1001,7 @@ async function reader() {
       if(revision!==translationRevision) return;
       translatedPage.hidden=false;
       visibleTranslationFailed=true;
+      setTranslationState('failed',page,language);
       translatedPage.textContent=error.message+' ';
       append(translatedPage,'button','再試行').onclick=()=>void updatePageTranslation(true);
       append(translatedPage,'button','原文').onclick=()=>{
@@ -1745,7 +1762,7 @@ async function reader() {
       createUrl.searchParams.delete('id');
       createUrl.searchParams.delete('library');
       createUrl.searchParams.set('create','1');
-      createUrl.searchParams.set('v','269');
+      createUrl.searchParams.set('v','270');
       location.replace(createUrl);
     } catch (error) {
       document.querySelector('#remove-status').textContent = error.message;
@@ -2213,7 +2230,7 @@ try {
         icon.append(localIcon('book-open'));
         const body = append(card,'div','','library-card-body');
         const link = append(body,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=269';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=270';
         }
       };
       $('#library-search').addEventListener('input',renderShared);
