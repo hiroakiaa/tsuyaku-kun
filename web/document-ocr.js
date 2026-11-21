@@ -1,3 +1,4 @@
+import {prepareScanCanvas} from './document-scan-preprocess.js?v=1';
 import {ocrNumbers,reconcileOcrNumbers} from './document-ocr-consensus.js?v=1';
 const timingNames = ['initialization','render','recognition','native-recognition','full-recognition','horizontal-recognition'].map(stage=>'document-ocr:'+stage);
 
@@ -112,7 +113,8 @@ export async function createPdfOcr(ops) {
     }
     return vertical;
   }
-  async function recognizeScanCanvas(input,{preferHorizontal=false,fallbackCanvas=input}={}) {
+  let lastQuality;
+  async function recognizePreparedCanvas(input,{preferHorizontal=false,fallbackCanvas=input}={}) {
     const primary=(await (await standardWorker()).recognize(input,{}, {blocks:true})).data;
     const linesOf=data=>(data.blocks??[]).flatMap(block=>block.paragraphs??[]).flatMap(paragraph=>paragraph.lines??[]);
     const compact=text=>text.normalize('NFKC').replace(/\s/gu,'');
@@ -161,10 +163,23 @@ export async function createPdfOcr(ops) {
       const full=(await (await standardWorker()).recognize(fallbackCanvas,{}, {blocks:true})).data;
       if(compact(text).length<8||(!malformed.test(compact(full.text))&&calendar.test(compact(full.text)))){lines=linesOf(full);text=textOf(lines);canvas=fallbackCanvas;}
     }
-    return {text,lines,canvas};
+    return {text,lines,canvas,confidence:primary.confidence};
+  }
+  async function recognizeScanCanvas(input,options={}) {
+    const prepared=prepareScanCanvas(input);
+    try{
+      const result=await recognizePreparedCanvas(prepared.canvas,options);
+      if(result.canvas===prepared.canvas){result.lines=result.lines.map(line=>({...line,bbox:prepared.restore(line.bbox)}));result.canvas=input;}
+      result.quality={...prepared.quality,confidence:result.confidence,characters:result.text.replace(/\s/gu,'').length};
+      result.quality.status=result.quality.softInkRatio<.001 ? 'blank' : result.quality.characters<8 || result.confidence<35 ? 'uncertain' : 'readable';
+      lastQuality=result.quality;
+      return result;
+    }finally{prepared.close();}
   }
   return {
+    get lastQuality(){return lastQuality;},
     async readCanonicalLayout(page,pageNumberItems=[]) {
+      lastQuality=undefined;
       if(page.rotate)return this.readLayout(page,pageNumberItems);
       const size=page.getViewport({scale:1}),viewport=page.getViewport({scale:Math.min(3,2400/Math.max(size.width,size.height))});
       const canvas=document.createElement('canvas');canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);let native;
@@ -177,7 +192,7 @@ export async function createPdfOcr(ops) {
         const {findVerticalScanRegion}=await import('./document-ocr-lines.js?v=3');if(findVerticalScanRegion(input.getContext('2d').getImageData(0,0,input.width,input.height))?.wholePage)return this.readLayout(page,pageNumberItems);
         const result=await recognizeScanCanvas(input,{preferHorizontal:pageNumberItems.length>0,fallbackCanvas:canvas});
         if(result.canvas!==input){input=result.canvas;bounds=undefined;}
-        return result.lines.flatMap(({text,bbox})=>{
+        const runs=result.lines.flatMap(({text,bbox})=>{
           const str=typeof text==='string'?text.trim():'';if(!str||!bbox)return [];
           let left,top,right,bottom;
           if(bounds){const [x0,y0,x1,y1]=bounds;[left,top]=size.convertToViewportPoint(x0+bbox.x0/input.width*(x1-x0),y1-bbox.y0/input.height*(y1-y0));[right,bottom]=size.convertToViewportPoint(x0+bbox.x1/input.width*(x1-x0),y1-bbox.y1/input.height*(y1-y0));}
@@ -185,6 +200,7 @@ export async function createPdfOcr(ops) {
           const width=right-left,height=bottom-top;if(![left,top,width,height].every(Number.isFinite)||width<=0||height<=0)return [];
           const [x,y]=size.convertToPdfPoint(left,bottom);return [{str,width,height,ocr:true,ocrBox:[left/size.width,top/size.height,width/size.width,height/size.height],transform:[height,0,0,height,x,y]}];
         });
+        runs.quality=result.quality;return runs;
       }finally{canvas.width=canvas.height=0;if(native)native.width=native.height=0;}
     },
     async readLayout(page,pageNumberItems=[],{diagram=false}={}) {
@@ -366,6 +382,7 @@ export async function createPdfOcr(ops) {
       }
     },
     async read(page,{pageNumberOnly=false}={}) {
+      lastQuality=undefined;
       const size = page.getViewport({scale:1});
       const viewport = page.getViewport({scale:Math.min(3,2400/Math.max(size.width,size.height))});
       const canvas = document.createElement('canvas');
@@ -425,7 +442,7 @@ export async function createPdfOcr(ops) {
         }
         if (text.replace(/\s/gu,'').length<8) {
           const fullStarted = performance.now();
-          text = (await (await standardWorker()).recognize(canvas)).data.text.trim();
+          text = (await recognizeScanCanvas(canvas)).text;
           recordTiming('document-ocr:full-recognition',fullStarted);
         }
         recordTiming(timingNames[2],recognitionStarted);

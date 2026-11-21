@@ -638,3 +638,5 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 ### 2026-11-22 Shared defined-term glossary
 - Only terms explicitly defined and repeated across document pages seed the glossary (up to12). Conflicting definitions and proper names are excluded. A document/language performs one bounded glossary generation (max1200 output tokens) and stores it for other pages/viewers; concurrent initialization coalesces. Documents without eligible definitions add no glossary call. Ordinary batch/output/budget caps remain unchanged.
 - Preferred terms are supplied to existing line batches. A mismatched line uses the existing bounded single-line fallback. This can add recovery work when needed; usage capture includes glossary and recovery tokens. The glossary is scoped to the same document and blocks persistence after deletion. A definition change invalidates dependent page/summary translations; unrelated edits do not.
+
+- 2026-11-22 スキャンの陰影正規化・傾き補正は端末内Canvasのみ。画像を外部に送らず、追加AI呼び出し・単価・日次上限の変更なし。読み取り品質は信頼度とページ番号だけを既存資料に保存。

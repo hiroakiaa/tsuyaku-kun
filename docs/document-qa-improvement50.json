@@ -256,8 +256,10 @@
       "id": 29,
       "title": "補足の区別",
       "acceptance": "原文の事実とたとえ・一般的補足を明示的に区別",
-      "status": "pending",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開b7ffdb5 / documents v271。390/1280の公開資材と制御APIで、事実の根拠リンクがたとえの前、資料外の説明ラベル、たとえ内の根拠リンク無しを照合。tools/check-document-supplement.mjs LIVE_SUPPLEMENT。右ブラウザー管理者→共通資料→全体像も根拠付き表示を確認。"
+      ]
     },
     {
       "id": 30,
@@ -396,8 +398,10 @@
       "id": 45,
       "title": "表示ページ優先",
       "acceptance": "閲覧・根拠移動先を先読みより優先",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開b7ffdb5。390/1280で2ページ目先読みを保留し6ページ目へ移動、6ページの翻訳が先に開始。前の先読みを解放しても表示ページ完了までは3ページ目先読みが発生しない。tools/check-document-translation-priority.mjs LIVE_PRIORITY。制御APIによる優先順検証。"
+      ]
     },
     {
       "id": 46,

@@ -1,3 +1,4 @@
+import {unreadablePages} from './document-reading-quality.js?v=1';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
 import {installDocumentReadingSettings,reducedDocumentMotion} from './document-reading-settings.js?v=1';
 import {isLegacyImagePage,imageContentFrame,paintImageFrame} from './document-image-margins.js?v=1';
@@ -121,6 +122,7 @@ async function extract(file, status) {
     pdf = await openPdf({data:new Uint8Array(await file.arrayBuffer())});
     if (pdf.numPages > 40) throw new Error('40ページ以内のPDFを選んでください。');
     const pages = [];
+    pages.readingQuality=[];
     for (let n = 1; n <= pdf.numPages; n++) {
       status.textContent = 'PDFを読んでいます… ' + n + ' / ' + pdf.numPages;
       const page = await pdf.getPage(n);
@@ -142,7 +144,7 @@ async function extract(file, status) {
       const {requiresOcr,pageNumberOnly}=pdfPageTextStatus(text,n);
       if (requiresOcr) {
         status.textContent = 'スキャンページを端末で読んでいます… ' + n + ' / ' + pdf.numPages;
-        const {createPdfOcr} = await import('./document-ocr.js?v=114');
+        const {createPdfOcr} = await import('./document-ocr.js?v=115');
         ocr ??= await createPdfOcr((await pdfLibrary()).OPS);
         if (page.rotate) {
           const runs=await ocr.readLayout(page,pageNumberOnly ? parts : []).catch(()=>[]);
@@ -150,6 +152,7 @@ async function extract(file, status) {
         } else text='';
         if (text.replace(/\s/gu,'').length<8) text=await ocr.read(page,{pageNumberOnly});
       }
+      pages.readingQuality.push(requiresOcr ? ocr?.lastQuality ?? null : {status:"readable"});
       pages.push(text);
     }
     if (!pages.some(page=>page.length >= 8)) throw new Error('PDFから検索できる文字を読み取れませんでした。文字が鮮明なPDFをお試しください。');
@@ -290,6 +293,7 @@ function teacher() {
         const {pages,error} = await (preflight?.file===fileInput.files[0] ? preflight.pending : preparePdf(file));
         if (error) throw error;
         data.set('pages',JSON.stringify(pages));
+        data.set('readingQuality',JSON.stringify(pages.readingQuality??[]));
       }
       if (!/\.pdf$/i.test(file.name)) {
         const {convertDocument}=await import('./document-convert.js?v=95');
@@ -299,6 +303,7 @@ function teacher() {
         if (/\.xlsx$/i.test(file.name)) data.set('convertedWorksheet','1');
         const pages = converted.image ? await extract(converted.file,document.createElement('span')) : converted.pages;
         data.set('pages',JSON.stringify(pages));
+        data.set('readingQuality',JSON.stringify(pages.readingQuality??[]));
       }
       const controller=new AbortController();
       const deadline=setTimeout(()=>controller.abort(),60_000);
@@ -653,7 +658,7 @@ async function reader() {
     if (!requiresOcr) return items;
     if (!scanLayouts.has(number)) {
       scanLayouts.set(number,(async()=>{
-        const {createPdfOcr}=await import('./document-ocr.js?v=114');
+        const {createPdfOcr}=await import('./document-ocr.js?v=115');
         const reader=await createPdfOcr((await pdfLibrary()).OPS);
         try {
           const runs=await (reader.readCanonicalLayout?.(page,pageNumberOnly ? items : [])??reader.readLayout(page,pageNumberOnly ? items : []));
@@ -781,7 +786,7 @@ async function reader() {
       const {fnArray,argsArray}=await page.getOperatorList();
       if (!fnArray.some((op,index)=>op===OPS.paintImageXObject &&
           argsArray[index]?.[1]>=300 && argsArray[index]?.[2]>=150)) return [];
-      const {createPdfOcr}=await import('./document-ocr.js?v=114');
+      const {createPdfOcr}=await import('./document-ocr.js?v=115');
       const reader=await createPdfOcr(OPS);
       try {
         const runs=await reader.readLayout(page,items,{diagram:true});
@@ -1507,6 +1512,10 @@ async function reader() {
   async function showPdf(n) {
     if (n<1 || n>doc.pageCount) return;
     selectedPage = n;
+    const qualityNotice=$('#pdf-reading-quality');
+    const uncertain=doc.readingQuality?.find(item=>item.page===n&&item.status==='uncertain');
+    qualityNotice.hidden=!uncertain;
+    qualityNotice.textContent=uncertain?'このページは文字の読み取りが不確かです。原文と照合してください。':'';
     readingPosition(id,{page:n});
     syncContentsPage();
     pagePicker.value = n;
@@ -1792,7 +1801,9 @@ async function reader() {
       }
       const form = new FormData();
       form.set('pdf',file);
-      form.set('pages',JSON.stringify(await extract(file,status)));
+      const pages=await extract(file,status);
+      form.set('pages',JSON.stringify(pages));
+      form.set('readingQuality',JSON.stringify(pages.readingQuality??[]));
       status.textContent = '要点と目次を更新しています…';
       await request(api+'/replace',{method:'POST',body:form});
       try { sessionStorage.removeItem(historyKey); } catch {}
@@ -1827,7 +1838,8 @@ async function reader() {
   }
   function renderAnswerText(section,item,animate) {
     const body = append(section,'p','','answer-text');
-    const answer = item.answer ?? 'この項目の根拠は資料内で確認できませんでした。';
+    const uncertain=unreadablePages(doc.readingQuality);
+    const answer = item.answer ?? (uncertain.length ? '文字を十分に読み取れないページがあるため、根拠を確認できませんでした。原文をご確認ください（'+uncertain.join('・')+'ページ）。' : '読み取れた資料の範囲では、この項目の根拠を確認できませんでした。');
     const keyFacts = /(?:[0-9０-９]+(?:[.,．][0-9０-９]+)*\s*(?:時(?:[0-9０-９]+分)?|分|円|月(?:[0-9０-９]+日)?|日|年|回|人|％|%))/gu;
     const match = item.answer && (keyFacts.exec(answer) ?? /^[^。！？\n]{1,55}(?:[。！？]|$)/u.exec(answer));
     if (!match) {
