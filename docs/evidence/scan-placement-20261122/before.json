@@ -1,0 +1,16 @@
+{
+  "scope": "Public real translation API and local OCR; synthetic stored text represents a legacy OCR version",
+  "views": [
+    {
+      "width": 390,
+      "state": {
+        "state": "failed",
+        "page": 1,
+        "language": "en"
+      },
+      "placement": "{\"page\":1,\"language\":\"en\",\"stage\":\"untranslated-source\",\"sourceLines\":2}",
+      "text": []
+    }
+  ],
+  "deleted": true
+}

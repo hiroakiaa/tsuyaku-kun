@@ -1,0 +1,30 @@
+{
+  "scope": "Public real translation API and local OCR; synthetic stored text represents a legacy OCR version",
+  "views": [
+    {
+      "width": 390,
+      "state": {
+        "state": "ready",
+        "page": 1,
+        "language": "en"
+      },
+      "placement": null,
+      "text": [
+        "The information session will be held on April 8th. Please bring a notebook and writing utensils.The participation fee is 1200 yen. If you will be\nabsent, please contact the school by the day before."
+      ]
+    },
+    {
+      "width": 1280,
+      "state": {
+        "state": "ready",
+        "page": 1,
+        "language": "en"
+      },
+      "placement": null,
+      "text": [
+        "The information session will be held on April 8th. Please bring a notebook and writing utensils.The participation fee is 1200 yen. If you will be\nabsent, please contact the school by the day before."
+      ]
+    }
+  ],
+  "deleted": true
+}
