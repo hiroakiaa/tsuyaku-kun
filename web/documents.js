@@ -1,5 +1,5 @@
 import {preventCompositionSubmit,documentFilename,optionalTranslationPrefetch} from './document-interaction.js';
-const DOCUMENT_RELEASE='280';
+const DOCUMENT_RELEASE='281';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -768,7 +768,8 @@ async function reader() {
   const englishFailures=new Map();
   const prefetchFailures=new Set();
   function renderEnglishProgress() {
-    englishProgress.hidden=translationMode.value!=='en';
+    const state=JSON.parse(content.dataset.translationState||'{}');
+    englishProgress.hidden=translationMode.value!=='en'||(state.state==='failed'&&state.language==='en');
     if (englishProgress.hidden) return;
     englishProgress.replaceChildren();
     const ready=readyEnglishPages.size;
@@ -825,6 +826,7 @@ async function reader() {
   }
   function setTranslationState(state,page,language){
     content.dataset.translationState=JSON.stringify({state,page,language});
+    renderEnglishProgress();
     if(['ready','original','unchanged'].includes(state)){
       visibleTranslationFailed=false;
       delete content.dataset.translationPlacement;

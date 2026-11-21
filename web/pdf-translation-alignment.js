@@ -33,6 +33,10 @@ export function alignPdfTranslation(result,items,options={}){
   while(start>=0&&ranges.some(range=>start<range.end&&start+needle.length>range.start))start=text.indexOf(needle,start+1);
   if(start<0){scanAlignment=scanTranslationRanges(result,runs,normalize,options);if(!scanAlignment)return null;ranges=scanAlignment.ranges;break;}const end=start+needle.length;ranges.push({start,end,translation:result.lines[i]});
  }
+ if(!scanAlignment&&runs.every(run=>run.item.ocr===true)&&ranges.reduce((sum,range)=>sum+range.end-range.start,0)<text.length){
+  const recovered=scanTranslationRanges(result,runs,normalize,options);
+  if(recovered&&recovered.ranges.reduce((sum,range)=>sum+range.end-range.start,0)>ranges.reduce((sum,range)=>sum+range.end-range.start,0)){scanAlignment=recovered;ranges=recovered.ranges;}
+ }
  if(!ranges.length)return null;
  const split=[];
  for(const run of runs){const cuts=[...new Set([0,run.end-run.start,...ranges.flatMap(range=>[range.start,range.end]).filter(n=>n>run.start&&n<run.end).map(n=>n-run.start)])].sort((a,b)=>a-b);

@@ -20,3 +20,11 @@ const scanItems=scanSource.map((str,i)=>({str:str.replace('説明会','説明回
 const scan=alignPdfTranslation({source:scanSource,lines:['Briefing on April 8. Bring a notebook and writing supplies.','Fee 1200 yen. Contact the school by the previous day if absent.']},scanItems,{quote:scanSource[0]});assert.ok(scan);assert.ok(scan.scanAlignment.score>.9);assert.equal(scan.scanAlignment.citationRanges.length,1);assert.ok(scan.lines.join(' ').includes('1200'));
 assert.equal(alignPdfTranslation({source:scanSource,lines:['A','B']},scanItems.map(item=>({...item,ocr:false}))),null,'Approximate geometry is restricted to OCR, never native PDF text');
 console.log('PASS two OCR passes with different glyph recognition retain canonical translation, numeric content and quote geometry');
+
+const noisy=scanItems.map((item,index)=>({...item,str:(index===0?'口':'')+item.str+(index===1?'ロ':'')}));
+const recovered=alignPdfTranslation({source:scanSource,lines:['Briefing on April 8. Bring a notebook and writing supplies.','Fee 1200 yen. Contact the school by the previous day if absent.']},noisy);
+assert.ok(recovered);assert.deepEqual(recovered.untranslatedIndices,[],'Small unmatched OCR edges must not block the entire translated page');assert.ok(recovered.lines.join(' ').includes('1200'));
+console.log('PASS canonical translations cover small OCR line-edge artifacts without changing source text or dropping translations');
+
+const exactNoise=scanItems.map((item,index)=>({...item,str:(index===0?'口':'')+scanSource[index]+(index===1?'ロ':'')}));assert.deepEqual(alignPdfTranslation({source:scanSource,lines:['A','B']},exactNoise).untranslatedIndices,[]);
+const unrelatedLine={...scanItems[1],str:'この別の欄には翻訳されていない重要な案内があります。',transform:[14,0,0,14,20,600]};const incomplete=alignPdfTranslation({source:scanSource,lines:['A','B']},[...scanItems,unrelatedLine]);assert.ok(!incomplete||incomplete.untranslatedIndices.length>0,'Never mask an unmatched substantive line');
