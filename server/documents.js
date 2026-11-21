@@ -1,4 +1,4 @@
-import {numericText,supportsDatesAndMeasures} from './document-values.js';
+import {numericText,supportsDatesAndMeasures,requestedMeasureConversion} from './document-values.js';
 import {translationParagraphs} from './document-translation-paragraphs.js';
 import {translationCheckpoints} from './translation-checkpoint.js';
 import {mergeLanguages} from '../web/language-registry.js';
@@ -795,6 +795,8 @@ function checkedAnswer(item,pages,question='',language=null) {
           if(supportedFeeTotals(formula,evidence).has(total))item={...item,answer:formula};
         }
       }
+      const convertedMeasure=typeof item.answer==='string'?requestedMeasureConversion(question,item.answer,evidence):null;
+      if(convertedMeasure)item={...item,answer:convertedMeasure};
       const found = schoolEvidence && evidence.length && typeof item.answer==='string' && item.answer.trim() && supportsQuantities(item.answer,evidence,question) && supportsDatesAndMeasures(item.answer,evidence,question);
       const schedule = found && /^下校の?(?:時刻|時間)は何時(?:ですか)?[？?。]?$/u.test(normalized(question))
         ? monthlyDismissal(evidence) : null;
@@ -1285,7 +1287,7 @@ export async function documents(request,env,auth) {
       return reply({items,answer:items[0].answer,pages:[...new Set(items.flatMap(item=>item.evidence.map(source=>source.page)))]});
     }
   }
-  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([33,language??'',record.pages,record.materials ?? [],generationQuestion.trim()])));
+  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([34,language??'',record.pages,record.materials ?? [],generationQuestion.trim()])));
   const cacheKey = Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
   const cacheUrl = 'https://room/document/answer/'+cacheKey;
   const cached = await (await target.fetch(cacheUrl)).json();

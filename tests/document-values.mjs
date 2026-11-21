@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';import {numericText,supportsDatesAndMeasures} from '../server/document-values.js';
+import assert from 'node:assert/strict';import {numericText,supportsDatesAndMeasures,requestedMeasureConversion} from '../server/document-values.js';
 assert.equal(numericText('二百円、千二百円、二〇二七年四月八日、一億二万円'),'200円、1200円、2027年4月8日、100020000円');
 assert.equal(numericText('十十円'),'十十円');assert.equal(numericText('1.2万円、12万円'),'1.2万円、12万円');
 for(const [source,correct,wrong,question]of [
@@ -15,3 +15,10 @@ for(const [source,correct,wrong,question]of [
  ['データは1 MiBです。','1024 KiBです。','1000 KiBです。','データ量は？'],
  ]){assert.equal(supportsDatesAndMeasures(correct,[{quote:source}],question),true,correct);assert.equal(supportsDatesAndMeasures(wrong,[{quote:source}],question),false,wrong);}
 console.log('PASS Japanese numeric glyphs, date notation, date/year conflicts and equivalent SI/binary units preserve values without accepting scale changes');
+
+assert.equal(requestedMeasureConversion('ファイルは何KBまで？','5120 KB',[{quote:'ファイルは5 MBまでです。'}]),'5 MB = 5000 KB');
+assert.equal(requestedMeasureConversion('荷物は何グラムまで？','5 kgまで',[{quote:'荷物は5 kgまでです。'}]),'5 kg = 5000 グラム');
+assert.equal(requestedMeasureConversion('ファイルは何KB？','不明です。',[{quote:'ファイルは5 MBまでです。'}]),null);
+assert.equal(requestedMeasureConversion('ファイルは何KB？','5 MB',[{quote:'Aは5 MB、Bは6 MBです。'}]),null,'Do not choose between ambiguous limits');
+assert.equal(supportsDatesAndMeasures('5000000001 B',[{quote:'上限は5 GBです。'}]),false,'Integer values must not drift even by one byte');
+console.log('PASS requested unit conversions compute only from one grounded value; ambiguous or unknown values remain unconverted');
