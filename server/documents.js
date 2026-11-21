@@ -264,6 +264,7 @@ async function generate(env,pages,question,materials=[],emit,selectedPassages,me
         (operation==='summary' ? '資料全体の目的と対象者を最初にまとめ、主要な話題を読み手が行動しやすい順に最大8件に整理してください。各要約は100字以内、引用は40字程度の短い一節にしてください。資料にある場合は日時・手順・締切・持ち物・費用・条件を見出しごとに短くまとめてください。各項目にその内容を裏づけるページと原文の短い引用を付けてください。資料の構成に沿う目次も toc に最大12件、20字以内の title と実際の開始ページ page で追加してください。形式は {"items":[{"label":"見出し","text":"要約","source":{"page":1,"quote":"原文"}}],"toc":[{"title":"見出し","page":1}]}。' :
         question ? '縦書き見出し候補がある場合は、その前後の原文を読んで該当する行を確認してください。「何を勉強するか」のような質問には、資料に示された学習目標と具体的な取組を使い、科目名直後に説明がないことだけで根拠なしと判断しないでください。今回尋ねられた情報に回答を絞り、その情報を直接裏づける原文を引用してください。場所だけを尋ねられた場合は場所や行き先を答え、持ち物や手続きの詳細は、その場所を使う条件として不可欠な場合に含めてください。複数項目を尋ねられた場合や、回答の意味を左右する条件・例外がある場合は、それぞれの根拠を残してください。対象者や参加条件を聞かれたときは、資料に明記された対象者と対象外の人の両方を確認してください。両方がある場合は回答に含め、それぞれの原文とページを引用してください。回答言語の指定がない場合は、質問文で求められた言語、なければ質問文の言語で、label と answer の両方を書いてください。金額の通貨名や「1食」「月額」のような単位・頻度もその言語で表してください。sources の quote には資料の言語の原文を入れてください。前の質問が渡された場合は、今回の質問が指す対象を特定するために使ってください。回答する対象は今回の質問です。「1年間でいくらかかる」のような質問も年間費用として扱ってください。総額を算出できない場合も、確認できた金額と単位、金額が未記載の費目、算出に必要な不足情報を、それぞれ対応する原文付きで答えてください。口座振替の回数を各費目の徴収回数とみなさないでください。「学年費は？」のような費目名だけの質問では、その費目の備考や内訳を答え、金額の記載がなければその旨を伝えてください。引用は費目の一覧だけで済ませず、備考を含む行を選んでください。合計費用の質問で、資料に金額と回数が明記されていれば、回答欄に内訳と計算式（例：月額×徴収回数＋一度だけの必須費用）を示してください。任意の費用は別に示し、回数や必須かどうかが不明な費用を推測で合計に加えないでください。計算式は「400円×10回＋100円＝4,100円」のように金額・回数・合計を記載してください。半額や割引が明記されている場合は、その対象を確認し「1200円÷2＋300円＝900円」のように計算式を示してください。割引対象外の加算額を割り引かないでください。繰り返し徴収される費用は、金額と回数の対応がわかる連続した原文を引用してください。引用は翻訳しないでください。金額を「万を使わず円で」「数字だけの円表記で」などと指定された場合は、回答だけを指定の表記に換算してください（1.2万円は12,000円）。引用には換算前の原文を残してください。ひらがなの語は資料にある漢字の語と照合してください。目次や別紙への案内だけでは、別紙にしかない日時などは確認できません。複数の質問には確認できた項目だけ答え、確認できない項目を明示してください。数字・単位・予定などの条件ごとに裏づける引用を付けてください。答えを含む一文を途中で言い換えず、そのまま引用してください。質問された項目ごとに必ず別の行を作る（例：給食費・生徒会費・PTA会費なら3行）。各行の引用はその項目名と値を直接含む資料の一節。別項目の引用を流用しない。形式は {"items":[{"label":"項目名","answer":"その項目だけの回答","sources":[{"page":1,"quote":"原文"}]}]}。根拠なしの行も項目名を返し sources は空配列。' :
           '締切、提出物、持ち物、日時を優先し、最大6件。資料の構成に沿った見出しを最大24件、toc に title と page で追加してください。見出しは章の内容が分かる短い題名にし、ページ番号だけの題名は禁止です。各章が始まる実際のページを付け、ページ順に並べてください。形式は {"items":[{"label":"項目","text":"要点","source":{"page":1,"quote":"原文"}}],"toc":[{"title":"見出し","page":1}]}。')},
+      ...(question && !language && /合計|総額|年間/u.test(question) ? [{role:'system',content:'合計を尋ねる質問は、内訳ごとにitemを分けず、質問1つにつきitem1つに全ての必須内訳をまとめてください。金額を計算する回答では、各itemに calculation を必ず追加してください。calculationは内訳の配列で、各要素は {amount:資料の円金額,count:徴収回数（1回なら1）,countUnit:複数回の場合だけ回またはか月,halve:資料にその金額の半額が明記される場合だけtrue} です。必須の内訳だけを含め、任意費用を除外してください。amountと回数と割引条件の原文をsourcesに引用してください。合計はサーバーが正確に計算します。'}] : []),
       ...(summaryLevel ? [{role:'system',content:summaryLevelInstructions[summaryLevel]+(passages.length===1?' このページの要点を最大2件、実際のページ番号と引用を付けて返してください。':' 最大5件、要約と引用はそれぞれ短くしてください。')}] : []),
       ...(language ? [{role:'system',content:`Write every answer and label in ${language}, regardless of the question or source language. Keep all source quotations in the original language and preserve their page numbers.${bilingual?' Include an englishAnswer field in each item with an English translation of its answer.':''}`}] : []),
       {role:'user',content:JSON.stringify({資料:passages.map(({page,text,verticalLabel})=>({page,縦書き見出し候補:verticalLabel,資料名:materials.find(file=>page>=file.start && page<file.start+file.count)?.name,text:text.normalize('NFKC')})),質問:question})},
@@ -784,6 +785,14 @@ function checkedAnswer(item,pages,question='',language=null) {
         const name = normalized(school);
         return text.includes(name) && text.replace(name,'').length>=8;
       });
+      if(!language && /合計|総額|年間/u.test(question) && Array.isArray(item.calculation) && item.calculation.length>=1 && item.calculation.length<=12){
+        const terms=item.calculation;
+        if(terms.every(term=>Number.isSafeInteger(term?.amount)&&term.amount>=0&&Number.isSafeInteger(term.count)&&term.count>=1&&term.count<=1000&&(term.count===1||['回','か月'].includes(term.countUnit))&&(!term.halve||term.count===1))){
+          const total=terms.reduce((sum,term)=>sum+term.amount*term.count/(term.halve?2:1),0);
+          const formula=terms.map(term=>term.amount+'円'+(term.count>1?'×'+term.count+term.countUnit:term.halve?'÷2':'')).join('＋')+'＝'+total+'円';
+          if(supportedFeeTotals(formula,evidence).has(total))item={...item,answer:formula};
+        }
+      }
       const found = schoolEvidence && evidence.length && typeof item.answer==='string' && item.answer.trim() && supportsQuantities(item.answer,evidence,question);
       const schedule = found && /^下校の?(?:時刻|時間)は何時(?:ですか)?[？?。]?$/u.test(normalized(question))
         ? monthlyDismissal(evidence) : null;
@@ -1275,7 +1284,7 @@ export async function documents(request,env,auth) {
       return reply({items,answer:items[0].answer,pages:[...new Set(items.flatMap(item=>item.evidence.map(source=>source.page)))]});
     }
   }
-  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([language ? 31 : 29,record.pages,record.materials ?? [],generationQuestion.trim()])));
+  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([language ? 31 : 30,record.pages,record.materials ?? [],generationQuestion.trim()])));
   const cacheKey = Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
   const cacheUrl = 'https://room/document/answer/'+cacheKey;
   const cached = await (await target.fetch(cacheUrl)).json();
@@ -1717,7 +1726,8 @@ export async function evaluateDocumentQuestion(env,pages,question,mode,materials
   const result = await generate(env,pages,question,materials,undefined,passages,value=>{usage=value;});
   const timing = {retrievalMs:mode==='full' ? null : Math.round(generationStarted-retrievalStarted),generationMs:Math.round(performance.now()-generationStarted)};
   if (target) await recordUsage(env,usage,"benchmark").catch(()=>{});
-  return {items:(result.items ?? []).map(item=>checkedAnswer(item,pages,question)).filter(Boolean),usage,timing,candidatePages:passages ? [...new Set(passages.map(({page})=>page))] : pages.map((_,index)=>index+1)};
+  const validation=(result.items??[]).map(item=>{const sources=(Array.isArray(item.sources)?item.sources:[]).filter(source=>supported(source,pages));return {sourceCount:item.sources?.length??0,verifiedSourceCount:sources.length,answerAmounts:quantities(item.answer??''),citedAmounts:sources.flatMap(({quote})=>quantities(quote)),verifiedTotals:[...supportedFeeTotals(item.answer??'',sources)],formulaPresent:/[=＝]/u.test(item.answer??'')};});
+  return {validation,items:(result.items ?? []).map(item=>checkedAnswer(item,pages,question)).filter(Boolean),usage,timing,candidatePages:passages ? [...new Set(passages.map(({page})=>page))] : pages.map((_,index)=>index+1)};
 }
 
 function documentSummaryView(record) {

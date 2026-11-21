@@ -607,3 +607,6 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 
 ### 2026-11-21 Multiple fee formulas
 - Local answer validation now checks every quoted formula and verified subtotal, including explicit half-price scope. No new API request, model change, or budget increase. Prompt adds a short discount-format instruction; normal input token count may rise slightly. No zero-cost claim for model-generated answers.
+
+### 2026-11-21 Grounded arithmetic operands
+- A short targeted calculation schema is added only for Japanese total/annual questions. The server computes exact amounts locally; no extra production model call is added. Benchmark diagnostics remain owner-only and include counts/numbers rather than source text. Diagnostic-only benchmark calls consume ordinary measured tokens. API budgets unchanged. Translation font adjustment adds no model work.

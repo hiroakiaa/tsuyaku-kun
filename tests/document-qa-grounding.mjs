@@ -85,3 +85,17 @@ try{
  }
 }finally{globalThis.fetch=savedFetch;}
 console.log('PASS half-price proof respects the undiscounted supplement and rejects wrong totals');
+
+try{
+ for(const [quote,calculation,expected] of [
+  [multiFeeQuote,[{amount:8000,count:1},{amount:1500,count:12,countUnit:'か月'},{amount:1200,count:1}],'8000円＋1500円×12か月＋1200円＝27200円'],
+  [discountQuote,[{amount:1200,count:1,halve:true},{amount:300,count:1}],'1200円÷2＋300円＝900円'],
+  [discountQuote,[{amount:1200,count:1,halve:true},{amount:300,count:1,halve:true}],null],
+  [multiFeeQuote,[{amount:1500,count:13,countUnit:'か月'}],null],
+ ]){
+  globalThis.fetch=async()=>Response.json({choices:[{finish_reason:'stop',message:{content:JSON.stringify({items:[{label:'費用',answer:'999999円です。',calculation,sources:[{page:1,quote}]}]})}}]});
+  const env={...feeEnv,ROOMS:{idFromName:x=>x,get:()=>({fetch:async url=>Response.json(url.endsWith('/data')?{pages:[quote],owner:'author'}:null)})}};
+  const result=await(await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{method:'POST',body:JSON.stringify({question:'費用の合計は？'})}),env,{uid:'author'})).json();assert.equal(result.items[0]?.answer,expected);
+ }
+}finally{globalThis.fetch=savedFetch;}
+console.log('PASS server computes grounded operands instead of trusting model arithmetic; invalid counts and excluded discounts cannot repair answers');

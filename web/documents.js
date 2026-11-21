@@ -218,7 +218,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '264');
+      guide.searchParams.set('v', '265');
       link.href = guide.href;
       if (typeof entry.shared==='boolean') append(body,'small',entry.shared?'共通保管庫に公開':'作成したブラウザーで閲覧');
       const remove = append(card,'button','','library-remove');
@@ -441,7 +441,7 @@ async function reader() {
   };
   askDialog.addEventListener('close',()=>{
     if (dialog.open) dialog.close();
-    location.replace('?v=264');
+    location.replace('?v=265');
   });
   const sourceType = doc.sourceType ?? 'pdf';
   let opened,originalUrl,officeText,officeRender = 0;
@@ -1160,6 +1160,8 @@ async function reader() {
         if (size/viewport.width*(fitWidth || preview.clientWidth)*zoom<12) {
           block.classList.add('pdf-readable-line');
           block.setAttribute('role','button');
+          block.setAttribute('aria-label',line);
+          block.dataset.fullTranslation=line;
           block.tabIndex=0;
           const read=()=>{
             $('#read-translation-text').textContent=line;
@@ -1178,7 +1180,7 @@ async function reader() {
         block.style.top=top/viewport.height*100+'%';
         block.style.width=displayWidth/unit+'%';
         block.style.height=boxHeight/viewport.height*100+'%';
-        block.style.fontSize=size*(displayWidth/width)/unit+'cqw';
+        block.style.fontSize='max(12px, '+size*(displayWidth/width)/unit+'cqw)';
         if (!marked && rendered) {
           const sampleX=Math.min(canvas.width-1,Math.max(0,Math.floor((x-.5)*scale)));
           const sampleY=Math.min(canvas.height-1,Math.max(0,Math.floor((top+boxHeight/2)*scale)));
@@ -1734,7 +1736,7 @@ async function reader() {
       createUrl.searchParams.delete('id');
       createUrl.searchParams.delete('library');
       createUrl.searchParams.set('create','1');
-      createUrl.searchParams.set('v','264');
+      createUrl.searchParams.set('v','265');
       location.replace(createUrl);
     } catch (error) {
       document.querySelector('#remove-status').textContent = error.message;
@@ -2194,7 +2196,7 @@ try {
         icon.append(localIcon('book-open'));
         const body = append(card,'div','','library-card-body');
         const link = append(body,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=264';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=265';
         }
       };
       $('#library-search').addEventListener('input',renderShared);
