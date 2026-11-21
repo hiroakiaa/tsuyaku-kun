@@ -116,15 +116,19 @@
       "id": 16,
       "title": "文字サイズ下限",
       "acceptance": "長い訳が指定下限より小さくならず全文にアクセス可能",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開f01eabe / documents v265、390/1280公開資材の長文ドイツ語回帰で全訳文12 CSS px以上、Enterで全文一致、原文/選択言語切替成功。右側IABの共有【資料】通訳くんでもドイツ語の長い訳文をクリックして全文表示を確認。checks/translation-min-font-public.log、tools/check-document-inline-translation.mjs LONG_TRANSLATION。改行断片の不自然な翻訳は14として未完了。"
+      ]
     },
     {
       "id": 17,
       "title": "長い訳文",
       "acceptance": "長文化言語で欠落を検出し全文を読める",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開f01eabe / documents v265、390/1280公開資材の長文ドイツ語回帰で全訳文12 CSS px以上、Enterで全文一致、原文/選択言語切替成功。右側IABの共有【資料】通訳くんでもドイツ語の長い訳文をクリックして全文表示を確認。checks/translation-min-font-public.log、tools/check-document-inline-translation.mjs LONG_TRANSLATION。改行断片の不自然な翻訳は14として未完了。"
+      ]
     },
     {
       "id": 18,
@@ -329,7 +333,7 @@
       "id": 41,
       "title": "閲覧復元",
       "acceptance": "ページ・倍率・言語・会話位置を開き直し後に復元",
-      "status": "pending",
+      "status": "in_progress",
       "evidence": []
     },
     {

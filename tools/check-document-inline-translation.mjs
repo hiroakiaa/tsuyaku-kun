@@ -61,7 +61,7 @@ try{
    const small=frame.locator('.pdf-readable-line').first();await small.waitFor();
    assert.ok((await frame.locator('.pdf-layout-line').evaluateAll(nodes=>nodes.map(node=>parseFloat(getComputedStyle(node).fontSize)))).every(size=>size>=12),'Every visible translated block respects 12 CSS pixels');
    const full=await small.getAttribute('data-full-translation');assert.ok(full.length>80);
-   await small.press('Enter');await page.locator('#read-translation').waitFor();assert.equal(await page.locator('#read-translation-text').textContent(),full,'Overflow text is complete and keyboard accessible');await page.locator('#read-translation form button').click();
+   await small.press('Enter');await page.locator('#read-translation').waitFor();assert.equal(await page.locator('#read-translation-text').textContent(),full,'Overflow text is complete and keyboard accessible');const modalBox=await page.locator('#read-translation').evaluate(node=>{const r=node.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,vw:innerWidth,vh:innerHeight}});assert.ok(Math.abs(modalBox.x+modalBox.w/2-modalBox.vw/2)<2&&Math.abs(modalBox.y+modalBox.h/2-modalBox.vh/2)<2,'Full translation dialog is centered');await page.locator('#read-translation form button').click();
   }
   await fs.mkdir('checks/document-inline',{recursive:true});await page.screenshot({path:'checks/document-inline/'+width+'.png',fullPage:true});
   await page.locator('#pdf-language-toggle button[data-language=""]').click();await page.waitForFunction(()=>[...document.querySelectorAll('.pdf-inline-translation')].every(f=>f.hidden));

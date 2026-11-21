@@ -218,7 +218,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '265');
+      guide.searchParams.set('v', '266');
       link.href = guide.href;
       if (typeof entry.shared==='boolean') append(body,'small',entry.shared?'共通保管庫に公開':'作成したブラウザーで閲覧');
       const remove = append(card,'button','','library-remove');
@@ -441,7 +441,7 @@ async function reader() {
   };
   askDialog.addEventListener('close',()=>{
     if (dialog.open) dialog.close();
-    location.replace('?v=265');
+    location.replace('?v=266');
   });
   const sourceType = doc.sourceType ?? 'pdf';
   let opened,originalUrl,officeText,officeRender = 0;
@@ -458,7 +458,8 @@ async function reader() {
     })().catch(error=>{opened=undefined;throw error;});
   }
   const officeType = ['xlsx','docx'].includes(sourceType);
-  const previousPage = readingPosition(id,{opened:Date.now()}).page;
+  const savedReading = readingPosition(id,{opened:Date.now()});
+  const previousPage = savedReading.page;
   let selectedPage = Number.isInteger(previousPage) && previousPage>=1 && previousPage<=doc.pageCount ? previousPage : 0;
   const tocButton = $('#pdf-toc-toggle');
   const toc = $('#pdf-toc');
@@ -1264,7 +1265,11 @@ async function reader() {
   const imageType = /^(png|jpe?g|webp)$/.test(sourceType);
   const zoomable = sourceType==='pdf' || imageType;
   preview.classList.toggle('is-zoomable', zoomable);
-  let zoom=1, fitWidth=0;
+  let zoom=Number.isFinite(savedReading.zoom)&&savedReading.zoom>=.05&&savedReading.zoom<=4?savedReading.zoom:1, fitWidth=0;
+  let viewSaveTimer;
+  const saveView=()=>{clearTimeout(viewSaveTimer);readingPosition(id,{zoom,split});};
+  const scheduleViewSave=()=>{clearTimeout(viewSaveTimer);viewSaveTimer=setTimeout(saveView,150);};
+  window.addEventListener('pagehide',saveView);
   let pinch, drag, coastFrame;
   let velocityX = 0, velocityY = 0, lastMove = 0;
   function coast(time) {
@@ -1334,11 +1339,12 @@ async function reader() {
   });
   questionInput.addEventListener('focus',syncKeyboard);
   questionInput.addEventListener('blur',syncKeyboard);
-  let split = 50;
+  let split = Number.isFinite(savedReading.split)?Math.max(25,Math.min(75,savedReading.split)):50;
   function setSplit(value) {
     split = Math.max(25, Math.min(75, value));
     workspace.style.setProperty('--pdf-share', split + '%');
     divider.setAttribute('aria-valuenow', String(Math.round(split)));
+    scheduleViewSave();
   }
   divider.onpointerdown = event => divider.setPointerCapture(event.pointerId);
   divider.onpointermove = event => {
@@ -1390,6 +1396,7 @@ async function reader() {
     const previous=zoom;
     zoom=Math.min(4,Math.max(minimumZoom(),Number(value)||1));
     $('#zoom-fit').hidden=zoom===1;
+    scheduleViewSave();
     if (!fitWidth) return;
     surface.style.width=fitWidth*zoom+'px';
     const translated=translatedPage.querySelector('.pdf-translation-layout');
@@ -1736,7 +1743,7 @@ async function reader() {
       createUrl.searchParams.delete('id');
       createUrl.searchParams.delete('library');
       createUrl.searchParams.set('create','1');
-      createUrl.searchParams.set('v','265');
+      createUrl.searchParams.set('v','266');
       location.replace(createUrl);
     } catch (error) {
       document.querySelector('#remove-status').textContent = error.message;
@@ -1860,6 +1867,11 @@ async function reader() {
     if (entry.fallback) append(answer,'p',entry.fallback);
     lastQuestion = entry.items.at(-1)?.worksheetContext ?? entry.question;
   }
+  const conversationLog=$('#messages'),scrollKey=historyKey+':scroll';
+  let scrollSaveTimer;
+  const saveConversationScroll=()=>{clearTimeout(scrollSaveTimer);try{sessionStorage.setItem(scrollKey,String(conversationLog.scrollTop));}catch{}};
+  conversationLog.addEventListener('scroll',()=>{clearTimeout(scrollSaveTimer);scrollSaveTimer=setTimeout(saveConversationScroll,150);},{passive:true});
+  window.addEventListener('pagehide',saveConversationScroll);
   let taggedTables;
   async function sendQuestion(question,previousQuestion,questionBubble) {
     const answerLanguage=selectedLanguage==='ja' ? '' : selectedLanguage;
@@ -2122,6 +2134,8 @@ async function reader() {
     void sendQuestion(question,lastQuestion);
   });
   await showPdf(selectedPage || 1);
+  setSplit(split);
+  try{const savedScroll=Number(sessionStorage.getItem(scrollKey));if(Number.isFinite(savedScroll)&&savedScroll>=0)requestAnimationFrame(()=>{conversationLog.scrollTop=savedScroll;});}catch{}
   if(!reducedDocumentMotion())askDialog.animate([{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'translateY(0)'}],{duration:200,easing:'ease-out'});
 }
 
@@ -2196,7 +2210,7 @@ try {
         icon.append(localIcon('book-open'));
         const body = append(card,'div','','library-card-body');
         const link = append(body,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=265';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=266';
         }
       };
       $('#library-search').addEventListener('input',renderShared);
