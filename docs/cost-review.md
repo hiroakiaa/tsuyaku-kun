@@ -634,3 +634,7 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 
 ### 2026-11-22 Deterministic proper-name protection
 - Names identified from generic named fields and institutional/place-name cues are replaced locally with checked placeholders, then restored verbatim. Names can be learned from other pages of the same document. No new provider call or model/output/budget increase. Dropped placeholders fail validation rather than caching a guessed identity; existing bounded retries apply. Cache generations12/9/4 apply the new protocol once. Recognized names are not sent verbatim in these page-translation requests, but this is not full anonymization of a document.
+
+### 2026-11-22 Shared defined-term glossary
+- Only terms explicitly defined and repeated across document pages seed the glossary (up to12). Conflicting definitions and proper names are excluded. A document/language performs one bounded glossary generation (max1200 output tokens) and stores it for other pages/viewers; concurrent initialization coalesces. Documents without eligible definitions add no glossary call. Ordinary batch/output/budget caps remain unchanged.
+- Preferred terms are supplied to existing line batches. A mismatched line uses the existing bounded single-line fallback. This can add recovery work when needed; usage capture includes glossary and recovery tokens. The glossary is scoped to the same document and blocks persistence after deletion. A definition change invalidates dependent page/summary translations; unrelated edits do not.

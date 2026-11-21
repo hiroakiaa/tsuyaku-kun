@@ -71,8 +71,10 @@
       "id": 9,
       "title": "固有名詞",
       "acceptance": "架空の人名・学校名・地名が脱落・別名化しない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開Worker1817b2ba-b14b-4f5c-b7a6-e4536cf8081b。同じ架空2ページ/英語・ベトナム語/人名・学校名・地名の原名保持0/12→12/12、日本語QA4/4の原名とページ一致。checks/names-protected.json、削除済み。文脈/接尾辞で識別できた名前をローカル保護し原表記を復元。すべての無標識固有名詞を検出するNER完成とは主張しない。"
+      ]
     },
     {
       "id": 10,

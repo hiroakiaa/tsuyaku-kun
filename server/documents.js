@@ -1,3 +1,4 @@
+import {definedDocumentTerms,sharedDocumentTerminology} from './document-terminology.js';
 import {documentNames,protectDocumentNames} from './document-names.js';
 import {numericText,supportsDatesAndMeasures,requestedMeasureConversion} from './document-values.js';
 import {translationParagraphs} from './document-translation-paragraphs.js';
@@ -6,6 +7,7 @@ import {mergeLanguages} from '../web/language-registry.js';
 import {documentUiLabels} from '../web/document-ui-locale.js';
 
 const DOCUMENT_MODEL = 'gpt-4.1-mini';
+function translationContextKey(parts,pages){const terms=definedDocumentTerms(pages,documentNames(pages.join('\n')));return JSON.stringify(terms.length?[...parts,terms]:parts);}
 const pendingPageTranslations=new Map();
 const answerLanguages = new Map(mergeLanguages([{code:'ja-easy',labelEn:'Plain Japanese'}]).map(language=>[language.code,language.labelEn]));
 
@@ -50,13 +52,14 @@ function searchIndex(pages) {
   });
 }
 
-async function translateDocumentText(env,text,language,aligned=false,onUsage,lineKeys,diagramContext=false,names=[]) {
+async function translateDocumentText(env,text,language,aligned=false,onUsage,lineKeys,diagramContext=false,context={}) {
   if (!env.OPENAI_DOCUMENT_QA_KEY) throw Error('資料の翻訳に接続できませんでした。');
-  const protectedInput=protectDocumentNames(diagramContext?JSON.stringify({reference:diagramContext,entries:JSON.parse(text)}):text,names);
+  const reference=diagramContext||context.reference,glossary=context.glossary&&Object.keys(context.glossary).length?context.glossary:undefined;
+  const protectedInput=protectDocumentNames(reference||glossary?JSON.stringify({...(reference?{reference}:{}),...(glossary?{glossary}:{}),entries:aligned?JSON.parse(text):text}):text,context.names??[]);
   const response=await fetch('https://api.openai.com/v1/chat/completions',{
     method:'POST',signal:AbortSignal.timeout(45000),
     headers:{Authorization:'Bearer '+env.OPENAI_DOCUMENT_QA_KEY,'Content-Type':'application/json'},
-    body:JSON.stringify({model:DOCUMENT_MODEL,temperature:0,max_completion_tokens:16384,store:false,
+    body:JSON.stringify({model:DOCUMENT_MODEL,temperature:0,max_completion_tokens:lineKeys?.every(key=>key.startsWith('term_'))?1200:16384,store:false,
       ...(lineKeys ? {response_format:{type:'json_schema',json_schema:{name:'pdf_line_translations',strict:true,schema:{
         type:'object',properties:Object.fromEntries(lineKeys.map(key=>[key,{type:'string'}])),
         required:lineKeys,additionalProperties:false,
@@ -65,7 +68,7 @@ async function translateDocumentText(env,text,language,aligned=false,onUsage,lin
         ? (lineKeys ? 'Translate each value of the numbered input object, preserving every key and keeping each translation under its original key. Never merge entries.' : 'Input is an array of source lines. Return a JSON object with a lines array of translated strings in the identical order and length. Translate each entry separately. Keep empty entries empty.')
         : 'Return only the full translation.')+(diagramContext
         ? ' Translate only the entries object. The reference field contains the diagram text in reading order and is not output. Resolve references to a choice by identifying what the downstream nodes actually list. For example, when the branches list named languages, a term for the chosen option refers to a language, even if the same source term can mean an individual word elsewhere. Apply that interpretation to both headings and descriptions. Translate only the stated actions. Preserve sentence endings and quoted text.'
-        : '')},{role:'user',content:protectedInput.text}]}),
+        : '')+(context.reference?' The reference contains source-document definitions. Translate only the numbered entries, selecting concise terminology equivalents consistent with those definitions. Return only the term equivalent, without extra explanations or new abbreviations.':'')+(glossary?' The glossary maps original terms to established equivalents. Use those exact equivalents consistently. Translate only entries, never output the glossary or reference.':'')},{role:'user',content:protectedInput.text}]}),
   }).catch(()=>null);
   if (!response?.ok) throw Error('資料を翻訳できませんでした。');
   const result=await response.json();
@@ -1058,7 +1061,7 @@ export async function documents(request,env,auth) {
           : documentSummaryView(record).items) || [])).flatMap(item=>[item.label,item.text,...(item.analogy?[item.analogy]:[])]);
       const text=rows.map(row=>row.replace(/\s+/gu,' ').trim()).join('\n');
       if (!text) return reply({source:[],lines:[]});
-      const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([section,DOCUMENT_MODEL,code,text])));
+      const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(translationContextKey([section,DOCUMENT_MODEL,code,text],record.pages)));
       const key=Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
       return target.fetch('https://room/document/page-translation/'+key,{
         method:'POST',body:JSON.stringify({id,text,language,hasLayout:false})
@@ -1080,7 +1083,7 @@ export async function documents(request,env,auth) {
       diagramText.length<=4000 && diagramText.split('\n').length<=80 && layoutText.length+diagramText.length+1<=MAX_TEXT;
     const text=hasLayout ? (includesDiagram ? layoutText+'\n'+diagramText : layoutText) : storedText;
     if (!text.trim()) return reply({text:'',source:[],lines:[],reuse:'empty'});
-    const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([includesDiagram ? 12 : hasLayout ? 9 : 4,DOCUMENT_MODEL,code,text])));
+    const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(translationContextKey([includesDiagram ? 12 : hasLayout ? 9 : 4,DOCUMENT_MODEL,code,text],record.pages)));
     const key=Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
     const url='https://room/document/page-translation/'+key;
     const translated=await target.fetch(url,{method:'POST',body:JSON.stringify({id,text,language,hasLayout,diagramContext:includesDiagram ? diagramText : undefined})});
@@ -1553,22 +1556,26 @@ export async function documentStorage(request,storage,env) {
     }
     const work=(async()=>{
       const cached=await storage.get(translationKey);
-      if (cached && Array.isArray(cached.result?.source) && Array.isArray(cached.result?.lines) && cached.result.source.length===cached.result.lines.length && cached.result.source.join('\n')===text && cached.result.source.every(line=>typeof line==='string') && cached.result.lines.every((line,index)=>typeof line==='string' && (!cached.result.source[index].trim() || line.trim()))) return {...cached.result,reuse:'cache'};
+      if (cached && Array.isArray(cached.result?.source) && Array.isArray(cached.result?.lines) && cached.result.source.length===cached.result.lines.length && cached.result.source.join('\n')===text && cached.result.source.every(line=>typeof line==='string') && cached.result.lines.every((line,index)=>typeof line==='string' && (!cached.result.source[index].trim() || line.trim()))) return {...cached.result,reuse:'cache',...(cached.result.terminology?{terminology:{...cached.result.terminology,reuse:'page-cache'}}:{})};
       let usage;
       const textKeys=Array.from({length:record.textParts??0},(_,index)=>'document-text:'+index);
       const textChunks=textKeys.length?await storage.get(textKeys):null;
       const documentPages=textChunks?JSON.parse(textKeys.map(key=>textChunks.get(key)).join('')):record.pages??[text];
       const names=documentNames(documentPages.join('\n'));
+      const terms=definedDocumentTerms(documentPages,names);
       const source=translationParagraphs(text,{layout:hasLayout,diagram:Boolean(diagramContext)});
       const nonempty=source.filter(line=>line.trim());
       const captureUsage=value=>{
         if (Number.isSafeInteger(value?.prompt_tokens) && Number.isSafeInteger(value?.completion_tokens)) {
-          usage??={input:0,output:0,cached:0};
+          usage??={input:0,output:0,cached:0,measuredCalls:0};
+          usage.measuredCalls++;
           usage.input+=value.prompt_tokens;
           usage.output+=value.completion_tokens;
           usage.cached+=value.prompt_tokens_details?.cached_tokens??0;
         }
       };
+      let terminologyReuse;
+      const glossary=await sharedDocumentTerminology(storage,id,language,terms,async terms=>{const keys=terms.map((_,index)=>'term_'+index),input=Object.fromEntries(terms.map(({term},index)=>[keys[index],term]));const raw=await translateDocumentText(env,JSON.stringify(input),language,true,captureUsage,keys,false,{names,reference:terms.map(({definition})=>definition).join('\n')});const values=JSON.parse(raw);return Object.fromEntries(terms.map(({term},index)=>[term,values[keys[index]]]));},reuse=>{terminologyReuse=reuse;});
       let translations;
       {
         const numberTokens=value=>value.normalize('NFKC').match(/[0-9]+(?:[.,][0-9]+)*/g) ?? [];
@@ -1578,15 +1585,18 @@ export async function documentStorage(request,storage,env) {
         const translateBatch=async batch=>{
           const keys=batch.map((_,index)=>'line_'+index);
           const input=Object.fromEntries(keys.map((key,index)=>[key,batch[index]]));
-          const raw=await translateDocumentText(env,JSON.stringify(input),language,true,captureUsage,keys,diagramContext,names);let output;try{output=JSON.parse(raw);}catch{output={};}
-          return Promise.all(keys.map((key,index)=>{
+          const raw=await translateDocumentText(env,JSON.stringify(input),language,true,captureUsage,keys,diagramContext,{names,glossary});let output;try{output=JSON.parse(raw);}catch{output={};}
+          const comparable=value=>value.normalize('NFKC').toLowerCase().replace(/[\s\p{P}]/gu,'');
+          const keepsTerms=(original,translated)=>Object.entries(glossary).every(([term,equivalent])=>!original.normalize('NFKC').includes(term)||comparable(translated).includes(comparable(equivalent)));
+          return Promise.all(keys.map(async(key,index)=>{
             const original=batch[index];
             const translated=output?.[key];
             const preservesNumbers=typeof translated==='string' &&
               numberTokens(original).join('|')===numberTokens(translated).join('|');
-            return preservesNumbers && translated.trim()
-              ? translated
-              : translateDocumentText(env,original,language,false,captureUsage,undefined,false,names);
+            if(preservesNumbers&&translated.trim()&&keepsTerms(original,translated))return translated;
+            const retried=await translateDocumentText(env,original,language,false,captureUsage,undefined,false,{names,glossary});
+            if(!keepsTerms(original,retried))throw Error('専門用語の訳を揃えています。');
+            return retried;
           }));
         };
         translations=await translationCheckpoints(storage,translationKey,batches,translateBatch);
@@ -1597,7 +1607,7 @@ export async function documentStorage(request,storage,env) {
         ? source.map(line=>line.trim()?translations[index++]:line)
         : null;
       if(!lines)throw Error('訳文と原文の対応を修復しています。');
-      const result={text:lines.join('\n'),source,lines,usage};
+      const result={text:lines.join('\n'),source,lines,usage,...(terms.length?{terminology:{count:terms.length,reuse:terminologyReuse,entries:Object.entries(glossary)}}:{})};
       if (new TextEncoder().encode(JSON.stringify(result)).length<120_000) await storage.transaction(async tx=>{
         if (!await tx.get('document')) return;
         const manifest='/document/page-translation-manifest'+(language==='English'?':english':'');
