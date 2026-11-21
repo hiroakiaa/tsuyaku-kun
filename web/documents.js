@@ -1,5 +1,5 @@
 import {preventCompositionSubmit,documentFilename,optionalTranslationPrefetch} from './document-interaction.js';
-const DOCUMENT_RELEASE='281';
+const DOCUMENT_RELEASE='282';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -949,6 +949,7 @@ async function reader() {
     const inline=sourceType==='pdf';
     for (const frame of pageList.querySelectorAll('.pdf-inline-translation')) {
       frame.hidden=frame.dataset.language!==language;
+      if(frame.classList.contains('pdf-scan-reading')){frame.parentElement.style.minHeight=frame.hidden?'':frame.scrollHeight+'px';frame.parentElement.style.aspectRatio=frame.hidden?(frame.parentElement.dataset.originalAspect||'auto'):'auto';}
     }
     if (inline && !retry && citation?.page!==page &&
         original?.querySelector('.pdf-inline-translation:not([hidden])')) {
@@ -1026,7 +1027,8 @@ async function reader() {
     }
   }
   function installInlineTranslation(slot,frame,language) {
-    slot.querySelector('.pdf-inline-translation')?.remove();
+    const previous=slot.querySelector('.pdf-inline-translation');
+    if(previous){slot.readingLayoutObserver?.unobserve(previous);previous.remove();}
     frame.dataset.language=language;
     slot.append(frame);
     const cached=[...pageList.querySelectorAll('.pdf-inline-translation')];
@@ -1034,7 +1036,7 @@ async function reader() {
       const farthest=cached.filter(item=>item!==frame).sort((a,b)=>
         Math.abs(Number(b.parentElement.dataset.page)-selectedPage)-
         Math.abs(Number(a.parentElement.dataset.page)-selectedPage))[0];
-      farthest?.remove();
+      if(farthest){farthest.parentElement?.readingLayoutObserver?.unobserve(farthest);farthest.remove();}
     }
   }
   async function renderTranslationOnPdf(result,number,revision,language) {
@@ -1255,7 +1257,18 @@ async function reader() {
       const slot=pageList.querySelector('[data-page="'+number+'"]');
       if (!slot) return false;
       if(revision!==translationRevision || language!==translationMode.value)return false;
+      content.dataset.scanReadingMetrics=JSON.stringify({items:items.length,ocr:items.filter(item=>item.ocr).length,blocks:blocks.length,wide:blocks.filter(b=>(b.sourceWidth||b.width)>viewport.width*.45).length});
+      if(items.length&&items.every(item=>item.ocr)){
+        const {installScanReadingLayout}=await import('./document-scan-reading-layout.js');
+        await installScanReadingLayout(frame,blocks,canvas,viewport.width);
+        if(revision!==translationRevision || language!==translationMode.value)return false;
+      }
+      frame.style.setProperty('--pdf-reading-zoom',String(zoom));
+      slot.dataset.originalAspect??=slot.style.aspectRatio;
+      if(frame.classList.contains('pdf-scan-reading'))slot.style.aspectRatio='auto';
       installInlineTranslation(slot,frame,language);
+      if(!slot.readingLayoutObserver){slot.readingLayoutObserver=new ResizeObserver(()=>{const visible=slot.querySelector('.pdf-inline-translation.pdf-scan-reading:not([hidden])');slot.style.aspectRatio=visible?'auto':(slot.dataset.originalAspect||'auto');slot.style.minHeight=visible?visible.scrollHeight+'px':'';});slot.readingLayoutObserver.observe(slot);}
+      if(frame.classList.contains('pdf-scan-reading')){slot.readingLayoutObserver.observe(frame);slot.style.minHeight=frame.scrollHeight+'px';}
       content.dataset.translationPlacement=JSON.stringify({page:number,language,stage:'ready',blocks:blocks.length,scanScore:result.scanAlignment?.score});
       return true;
     } catch(error) {return fail('render-'+(error.name||'Error'));}
@@ -1433,6 +1446,7 @@ async function reader() {
     scheduleViewSave();
     if (!fitWidth) return;
     surface.style.width=fitWidth*zoom+'px';
+    for(const frame of pageList.querySelectorAll('.pdf-scan-reading'))frame.style.setProperty('--pdf-reading-zoom',String(zoom));
     const translated=translatedPage.querySelector('.pdf-translation-layout');
     if (translated && !translatedPage.hidden) {
       const position=pageViewportPosition(translatedPage,translated);
