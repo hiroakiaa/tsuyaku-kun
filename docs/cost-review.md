@@ -610,3 +610,7 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 
 ### 2026-11-21 Grounded arithmetic operands
 - A short targeted calculation schema is added only for Japanese total/annual questions. The server computes exact amounts locally; no extra production model call is added. Benchmark diagnostics remain owner-only and include counts/numbers rather than source text. Diagnostic-only benchmark calls consume ordinary measured tokens. API budgets unchanged. Translation font adjustment adds no model work.
+
+### 2026-11-21 Wrapped translation tails and coverage
+- Short sentence tails join the previous unfinished prose line before existing batch translation. Batch/checkpoint concurrency and model/output/budget caps unchanged. Layout translation cache generation7 invalidates older fragmented layout results once; future readers reuse generation7. Diagram and non-layout cache generations unchanged.
+- Missing source regions trigger the existing single automatic realignment, not unbounded retries. Partial legacy translations may require one regenerated request; complete cached pages keep reuse. Original text/image is never newly sent as a page image.

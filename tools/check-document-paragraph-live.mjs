@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';import fs from 'node:fs/promises';import {chromium} from './document-browser.mjs';
+const browser=await chromium.launch(),report=[];
+try{for(let viewer=0;viewer<2;viewer++){
+ const context=await browser.newContext({viewport:{width:viewer?390:1280,height:900}});await context.addInitScript(()=>localStorage.setItem('tsuyaku-document-language','ja'));
+ const page=await context.newPage();await page.goto('https://hiroakiaa.github.io/tsuyaku-kun/documents.html?id=a7a701f4-031b-4124-bb95-1119dba6e4b2');await page.locator('#pdf-pages canvas').first().waitFor({timeout:60000});
+ const responsePromise=page.waitForResponse(response=>{if(!response.url().endsWith('/translate')||response.request().method()!=='POST')return false;const input=response.request().postDataJSON();return input.page===1&&input.language==='de'&&Boolean(input.layoutText);},{timeout:90000});
+ await page.locator('select.document-language:visible').selectOption('de');const response=await responsePromise,result=await response.json();assert.equal(response.status(),200);assert.ok(result.source.some(line=>line.includes('\n')),'Wrapped sentence tails are translated in one context');assert.ok(!result.source.some(line=>/^[\p{Script=Hiragana}ー、]{1,8}[。！？]$/u.test(line.trim())),'No orphaned Japanese sentence suffix enters translation');assert.equal(result.source.length,result.lines.length);
+ const frame=page.locator('.pdf-inline-translation[data-page="1"][data-language="de"]:visible');await frame.waitFor({timeout:90000});assert.ok(await frame.locator('.pdf-layout-line').count()>10);const spans=await frame.locator('.pdf-layout-line').allTextContents();assert.ok(!spans.some(line=>/^[\p{Script=Hiragana}ー、]{1,8}[。！？]$/u.test(line.trim())));if(viewer)assert.equal(result.reuse,'cache');
+ const fonts=await frame.locator('.pdf-layout-line').evaluateAll(nodes=>nodes.map(node=>parseFloat(getComputedStyle(node).fontSize)));assert.ok(fonts.every(value=>value>=12));
+ await fs.mkdir('checks/paragraph-live',{recursive:true});await page.screenshot({path:'checks/paragraph-live/viewer-'+viewer+'.png'});report.push({viewer,width:viewer?390:1280,reuse:result.reuse,sourceGroups:result.source.length,paragraphGroups:result.source.filter(line=>line.includes('\n')).length,translatedGroups:result.lines.length,minFont:Math.min(...fonts),usage:result.usage});await context.close();
+}}finally{await fs.writeFile('checks/paragraph-live.json',JSON.stringify(report,null,2));await browser.close();}
+console.log(JSON.stringify(report));

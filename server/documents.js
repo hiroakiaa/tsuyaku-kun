@@ -1,3 +1,4 @@
+import {translationParagraphs} from './document-translation-paragraphs.js';
 import {translationCheckpoints} from './translation-checkpoint.js';
 import {mergeLanguages} from '../web/language-registry.js';
 import {documentUiLabels} from '../web/document-ui-locale.js';
@@ -1077,7 +1078,7 @@ export async function documents(request,env,auth) {
       diagramText.length<=4000 && diagramText.split('\n').length<=80 && layoutText.length+diagramText.length+1<=MAX_TEXT;
     const text=hasLayout ? (includesDiagram ? layoutText+'\n'+diagramText : layoutText) : storedText;
     if (!text.trim()) return reply({text:'',source:[],lines:[],reuse:'empty'});
-    const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([includesDiagram ? 10 : hasLayout ? 6 : 2,DOCUMENT_MODEL,code,text])));
+    const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([includesDiagram ? 10 : hasLayout ? 7 : 2,DOCUMENT_MODEL,code,text])));
     const key=Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
     const url='https://room/document/page-translation/'+key;
     const translated=await target.fetch(url,{method:'POST',body:JSON.stringify({id,text,language,hasLayout,diagramContext:includesDiagram ? diagramText : undefined})});
@@ -1552,7 +1553,7 @@ export async function documentStorage(request,storage,env) {
       const cached=await storage.get(translationKey);
       if (cached && Array.isArray(cached.result?.source) && Array.isArray(cached.result?.lines) && cached.result.source.length===cached.result.lines.length && cached.result.source.join('\n')===text && cached.result.source.every(line=>typeof line==='string') && cached.result.lines.every((line,index)=>typeof line==='string' && (!cached.result.source[index].trim() || line.trim()))) return {...cached.result,reuse:'cache'};
       let usage;
-      const source=text.split('\n');
+      const source=translationParagraphs(text,{layout:hasLayout,diagram:Boolean(diagramContext)});
       const nonempty=source.filter(line=>line.trim());
       const captureUsage=value=>{
         if (Number.isSafeInteger(value?.prompt_tokens) && Number.isSafeInteger(value?.completion_tokens)) {

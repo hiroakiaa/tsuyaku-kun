@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {translationParagraphs} from '../server/document-translation-paragraphs.js';
+import {alignPdfTranslation,pdfComparableText} from '../web/pdf-translation-alignment.js';
+const text='音声認識では、録音した日本語の音声を文字に変換しま\nす。\n\n次の段落です。\n項目 | 値\nす。';
+const grouped=translationParagraphs(text,{layout:true});assert.equal(grouped.join('\n'),text);assert.equal(grouped[0],'音声認識では、録音した日本語の音声を文字に変換しま\nす。');assert.equal(grouped.at(-1),'す。');
+assert.deepEqual(translationParagraphs(text),text.split('\n'));assert.deepEqual(translationParagraphs(text,{layout:true,diagram:true}),text.split('\n'));
+assert.deepEqual(translationParagraphs('この説明は完結した文章であることを確認します。\nす。',{layout:true}),['この説明は完結した文章であることを確認します。','す。']);
+const source=grouped[0],items=source.split('\n').map((str,i)=>({str,width:str.length*9,height:12,transform:[12,0,0,12,20,700-i*18]}));const translated='Speech recognition converts recorded Japanese speech into text.';
+const aligned=alignPdfTranslation({source:[source],lines:[translated]},items);assert.ok(aligned);assert.deepEqual(aligned.untranslatedIndices,[]);assert.equal(pdfComparableText(aligned.lines.join(' ')),pdfComparableText(translated));assert.equal(pdfComparableText(aligned.source.join('')),pdfComparableText(source));
+console.log('PASS short wrapped sentence tails retain paragraph context and exact original coverage without crossing table, blank, heading or sentence boundaries');
