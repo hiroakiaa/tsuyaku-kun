@@ -2,6 +2,14 @@ import assert from 'node:assert/strict';
 import {documents} from '../server/documents.js';
 
 const cases = [
+  {format:'漢数字の金額',pages:['交付手数料は二百円です。','郵送料は四百円です。'],quote:'交付手数料は二百円です。',correct:'200円です。',wrong:'400円です。'},
+  {format:'日付表記の変換',pages:['説明会は2027年4月8日です。','別の説明会は2027年4月9日です。'],quote:'説明会は2027年4月8日です。',correct:'April 8, 2027',wrong:'April 9, 2027'},
+  {format:'年度の変化',pages:['説明会は2027年4月8日です。','別の年度は2028年4月8日です。'],quote:'説明会は2027年4月8日です。',correct:'2027-04-08',wrong:'2028-04-08'},
+  {format:'和暦の日付',pages:['説明会は令和9年4月8日です。','別の日程は令和9年4月9日です。'],quote:'説明会は令和9年4月8日です。',correct:'2027-04-08',wrong:'2027-04-09'},
+  {format:'重量換算',pages:['荷物の重さは5 kgまでです。','別の荷物は500 gです。'],quote:'荷物の重さは5 kgまでです。',correct:'5000 gまでです。',wrong:'500 gまでです。'},
+  {format:'長さ換算',pages:['長さは300 cmです。','別の設備は3 kmです。'],quote:'長さは300 cmです。',correct:'3 mです。',wrong:'3 kmです。'},
+  {format:'容量の単位',pages:['ファイルは5 MBまでです。','別プランは5 GBまでです。'],quote:'ファイルは5 MBまでです。',correct:'5000 KBまでです。',wrong:'5 GBまでです。'},
+
   {format:'PDF', pages:['研修の参加費は3,500円です。','別の研修の参加費は5,300円です。'], quote:'研修の参加費は3,500円です。', correct:'3,500円です。', wrong:'5,300円です。'},
   {format:'Excel抽出', pages:['受付 | 定員 ３０人 | 予備席 12人','別会場の定員は60人です。'], quote:'受付 | 定員 ３０人', correct:'30人です。', wrong:'60人です。'},
   {format:'スキャンOCR抽出', pages:['交付手数料は４００円です。','郵送手数料は800円です。'], quote:'交付手数料は４００円です。', correct:'400円です。', wrong:'800円です。'},

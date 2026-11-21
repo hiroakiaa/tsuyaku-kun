@@ -623,3 +623,7 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 
 ### 2026-11-22 Translation state consistency
 - Only local presentation state/error cleanup changes. Existing one realignment and bounded transient resume policy remain; no extra provider request, model, output cap, or budget change.
+
+### 2026-11-22 Numeric/date/unit validation
+- Deterministic Japanese-number, calendar-notation and dimensional-unit checks run locally on the server. No model call, prompt, cache generation, output cap or budget is changed. Correct equivalent notation/conversion remains allowed. Missing model usage is still not reported as zero.
+- Answer-cache generation33 includes the selected language explicitly. Prior answers bypassed the new guards, so they regenerate once under validation; page translations remain reused. This one-time cache reset can add generation cost on the first repeated question; it does not raise budgets.

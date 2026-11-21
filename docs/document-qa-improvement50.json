@@ -154,8 +154,10 @@
       "id": 19,
       "title": "状態の明確化",
       "acceptance": "翻訳準備・表示・読み取り課題を一貫して区別",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開94f738a/UI v270。390/1280公開資材で2回の配置失敗→別言語の表示成功→元言語回復を操作し、failed→readyと古い配置エラー/再試行ボタンの除去を確認。原文/準備中/同文/表示済/失敗を個別に記録し、別のPDF状態メッセージは消さない。checks/translation-state-public.log。"
+      ]
     },
     {
       "id": 20,

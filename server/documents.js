@@ -1,3 +1,4 @@
+import {numericText,supportsDatesAndMeasures} from './document-values.js';
 import {translationParagraphs} from './document-translation-paragraphs.js';
 import {translationCheckpoints} from './translation-checkpoint.js';
 import {mergeLanguages} from '../web/language-registry.js';
@@ -626,7 +627,7 @@ function lookupAdmissionCell(pages, question) {
 
 function quantities(text) {
   const amount = /(?<![\d.,])(?<sign>[+-]?)(?:(?<tenThousands>\d+(?:\.\d+)?)\s*万(?:\s*(?<remainder>\d{1,3}(?:,\d{3})+|\d+))?|(?<decimal>(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?))\s*(?<unit>円|人(?!目|分)|名(?!目|義)|%)(?:\s*(?<comparison>以上|以下|未満|超(?:え|過)?))?/gu;
-  const matches = text.normalize('NFKC').replaceAll('−','-').matchAll(amount);
+  const matches = numericText(text).matchAll(amount);
   return [...matches].map(({groups:{sign,tenThousands,remainder,decimal,unit,comparison}})=>{
     const value = Number(tenThousands ?? 0)*10_000 + Number((remainder ?? decimal ?? '0').replaceAll(',',''));
     return [sign==='-' ? -value : value,unit==='名'?'人':unit,comparison?.startsWith('超') ? '超' : comparison];
@@ -794,7 +795,7 @@ function checkedAnswer(item,pages,question='',language=null) {
           if(supportedFeeTotals(formula,evidence).has(total))item={...item,answer:formula};
         }
       }
-      const found = schoolEvidence && evidence.length && typeof item.answer==='string' && item.answer.trim() && supportsQuantities(item.answer,evidence,question);
+      const found = schoolEvidence && evidence.length && typeof item.answer==='string' && item.answer.trim() && supportsQuantities(item.answer,evidence,question) && supportsDatesAndMeasures(item.answer,evidence,question);
       const schedule = found && /^下校の?(?:時刻|時間)は何時(?:ですか)?[？?。]?$/u.test(normalized(question))
         ? monthlyDismissal(evidence) : null;
       return {label:item.label.slice(0,100),answer:found ? (language ? item.answer : schedule?.answer ?? item.answer).slice(0,600) : null,evidence:found ? evidence : [],
@@ -1284,7 +1285,7 @@ export async function documents(request,env,auth) {
       return reply({items,answer:items[0].answer,pages:[...new Set(items.flatMap(item=>item.evidence.map(source=>source.page)))]});
     }
   }
-  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([language ? 31 : 30,record.pages,record.materials ?? [],generationQuestion.trim()])));
+  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([33,language??'',record.pages,record.materials ?? [],generationQuestion.trim()])));
   const cacheKey = Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
   const cacheUrl = 'https://room/document/answer/'+cacheKey;
   const cached = await (await target.fetch(cacheUrl)).json();
