@@ -1,4 +1,4 @@
-import {numericText} from '../server/document-values.js?v=2';
+import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=1';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
 import {installDocumentReadingSettings,reducedDocumentMotion} from './document-reading-settings.js?v=1';

@@ -1,1 +1,6 @@
+import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';
 import {execFileSync} from 'node:child_process';execFileSync(process.execPath,['tools/sync-document-release.mjs','--check'],{stdio:'inherit'});console.log('PASS application and embedded library URLs use the current document release');
+
+const html=fs.readFileSync('index.html','utf8'),docs=fs.readFileSync('documents.html','utf8'),map=JSON.parse(/<script type="importmap" id="tsuyaku-module-map">([\s\S]*?)<\/script>/.exec(html)[1]),queue=[...Object.values(map.imports).map(p=>p.replace(/^\.\//,'')),...[...((html+docs).matchAll(/src="((?:web|server)\/[^"?]+\.js)[^"]*"/g))].map(m=>m[1])],visited=new Set();
+while(queue.length){const file=queue.shift().split('?')[0];if(visited.has(file))continue;visited.add(file);assert.ok(file.startsWith('web/')||file==='server/catalog.js','Frontend dependency is not packaged by the Pages workflow: '+file);const source=fs.readFileSync(file,'utf8');for(const m of source.matchAll(/(?:from\s*|import\s*\()\s*['"](\.{1,2}\/[^'"\s]+\.js(?:\?[^'"\s]*)?)['"]/g))queue.push(path.posix.normalize(path.posix.join(path.posix.dirname(file),m[1].split('?')[0])));}
+console.log('PASS all '+visited.size+' frontend modules are included in the Pages artifact before deployment');
