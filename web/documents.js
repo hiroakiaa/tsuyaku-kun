@@ -1,3 +1,4 @@
+import {installDocumentFirstHelp} from './document-first-help.js?v=1';
 import {installDocumentReadingSettings,reducedDocumentMotion} from './document-reading-settings.js?v=1';
 import {isLegacyImagePage,imageContentFrame,paintImageFrame} from './document-image-margins.js?v=1';
 import {automaticDocumentTitle} from './document-title.js?v=1';
@@ -14,7 +15,7 @@ import {config} from './config.js';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
 import {fillLanguageOptions} from './language-picker.js?v=20261103-analysis-stages-1';
 import {selectableCatalog} from './selectable-catalog.js';
-import {createDocumentUiLocale} from './document-ui-locale.js?v=6';
+import {createDocumentUiLocale} from './document-ui-locale.js?v=7';
 const $ = (selector) => document.querySelector(selector);
 const content = $('#content');
 let id = new URLSearchParams(location.search).get('id');
@@ -218,7 +219,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '268');
+      guide.searchParams.set('v', '269');
       link.href = guide.href;
       if (typeof entry.shared==='boolean') append(body,'small',entry.shared?'共通保管庫に公開':'作成したブラウザーで閲覧');
       const remove = append(card,'button','','library-remove');
@@ -441,7 +442,7 @@ async function reader() {
   };
   askDialog.addEventListener('close',()=>{
     if (dialog.open) dialog.close();
-    location.replace('?v=268');
+    location.replace('?v=269');
   });
   const sourceType = doc.sourceType ?? 'pdf';
   let opened,originalUrl,officeText,officeRender = 0;
@@ -1744,7 +1745,7 @@ async function reader() {
       createUrl.searchParams.delete('id');
       createUrl.searchParams.delete('library');
       createUrl.searchParams.set('create','1');
-      createUrl.searchParams.set('v','268');
+      createUrl.searchParams.set('v','269');
       location.replace(createUrl);
     } catch (error) {
       document.querySelector('#remove-status').textContent = error.message;
@@ -1868,6 +1869,7 @@ async function reader() {
     if (entry.fallback) append(answer,'p',entry.fallback);
     lastQuestion = entry.items.at(-1)?.worksheetContext ?? entry.question;
   }
+  installDocumentFirstHelp(askForm,{hasConversation:history.length>0});
   const conversationLog=$('#messages'),scrollKey=historyKey+':scroll';
   let scrollSaveTimer;
   const saveConversationScroll=()=>{clearTimeout(scrollSaveTimer);try{sessionStorage.setItem(scrollKey,String(conversationLog.scrollTop));}catch{}};
@@ -2211,7 +2213,7 @@ try {
         icon.append(localIcon('book-open'));
         const body = append(card,'div','','library-card-body');
         const link = append(body,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=268';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=269';
         }
       };
       $('#library-search').addEventListener('input',renderShared);

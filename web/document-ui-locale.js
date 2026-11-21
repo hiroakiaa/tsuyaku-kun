@@ -1,4 +1,6 @@
 export const documentUiLabels=[
+ ['資料を見ながら質問できます。回答のページ番号で根拠を確認できます。','Ask while reading. Select a page number in an answer to check its source.','Pregunta mientras lees. Selecciona el número de página de una respuesta para comprobar su fuente.'],
+ ['操作案内を閉じる','Dismiss reading tip','Cerrar ayuda'],
   ["読みやすさ","Reading settings","Ajustes de lectura"],
   ["回答・全体像の表示","Answers and overview display","Visualización de respuestas y resumen"],
   ["文字の大きさ","Text size","Tamaño del texto"],

@@ -614,3 +614,6 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 ### 2026-11-21 Wrapped translation tails and coverage
 - Short sentence tails join the previous unfinished prose line before existing batch translation. Batch/checkpoint concurrency and model/output/budget caps unchanged. Layout translation cache generation7 invalidates older fragmented layout results once; future readers reuse generation7. Diagram and non-layout cache generations unchanged.
 - Missing source regions trigger the existing single automatic realignment, not unbounded retries. Partial legacy translations may require one regenerated request; complete cached pages keep reuse. Original text/image is never newly sent as a page image.
+
+### 2026-11-21 First reading help
+- Two UI labels are added. Japanese/English/Spanish help is local; other languages use the existing shared, content-addressed UI dictionary once when requested. No new background language fan-out, model, or budget change. Existing cancellation cannot undo an already-dispatched provider call.

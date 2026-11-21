@@ -678,3 +678,5 @@ html{touch-action:pan-x pan-y}
 
 /* Panel spacing must not override native modal centering. */
 dialog.panel{margin:auto;box-sizing:border-box;max-width:calc(100vw - 1.5rem);max-height:calc(100dvh - 1.5rem)}
+
+.document-first-help{display:flex;align-items:center;gap:.5rem;flex:none;color:var(--muted);font-size:.85rem;line-height:1.45;margin:.35rem .15rem .65rem}.document-first-help button{flex:none;background:transparent;border:0;min-width:36px;min-height:36px;padding:.25rem;font-size:1.25rem}
