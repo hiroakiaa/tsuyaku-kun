@@ -631,3 +631,6 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 
 ### 2026-11-22 Proper-name identity
 - Translation prompts retain original personal/school/place names and forbid guessed personal-name readings. No extra call or model/output/budget change; the longer rule adds a small input-token overhead. Page translation cache generations11/8/3 replace older outputs once so existing sources also receive the policy. Shared reuse and unchanged-source reuse within the new generation remain.
+
+### 2026-11-22 Deterministic proper-name protection
+- Names identified from generic named fields and institutional/place-name cues are replaced locally with checked placeholders, then restored verbatim. Names can be learned from other pages of the same document. No new provider call or model/output/budget increase. Dropped placeholders fail validation rather than caching a guessed identity; existing bounded retries apply. Cache generations12/9/4 apply the new protocol once. Recognized names are not sent verbatim in these page-translation requests, but this is not full anonymization of a document.
