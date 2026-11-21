@@ -11,7 +11,16 @@ function japaneseInteger(text){
  }
  const result=total+section+value;return Number.isSafeInteger(result)?result:null;
 }
-export function numericText(text){return String(text).normalize('NFKC').replaceAll('−','-').replace(/(?<![0-9.])[〇零一二三四五六七八九十百千万億]+(?=円|人|名|%|年|月|日|時|分|秒|回|か月|kg|cm)/gu,value=>{const number=japaneseInteger(value);return number===null?value:String(number);});}
+export function numericText(text){return String(text).normalize('NFKC').replaceAll('−','-')
+ .replace(/([0-9][0-9,]*(?:\.[0-9]+)?)\s*(?:Japanese yen|yen|JPY)\b/giu,'$1円')
+ .replace(/(?:JPY|¥)\s*([0-9][0-9,]*(?:\.[0-9]+)?)/gu,'$1円')
+ .replace(/([0-9][0-9,]*(?:\.[0-9]+)?)\s*(?:US dollars?|USD)\b/giu,'$1USD')
+ .replace(/(?:USD|US\$)\s*([0-9][0-9,]*(?:\.[0-9]+)?)/gu,'$1USD')
+ .replace(/([0-9][0-9,]*(?:\.[0-9]+)?)\s*dollars?\b/giu,'$1$')
+ .replace(/\$\s*([0-9][0-9,]*(?:\.[0-9]+)?)/gu,'$1$')
+ .replace(/([0-9][0-9,]*(?:\.[0-9]+)?)\s*(?:euros?|EUR)\b/giu,'$1EUR')
+ .replace(/(?:EUR|€)\s*([0-9][0-9,]*(?:\.[0-9]+)?)/gu,'$1EUR')
+ .replace(/(?<![0-9.])[〇零一二三四五六七八九十百千万億]+(?=円|人|名|%|年|月|日|時|分|秒|回|か月|kg|cm)/gu,value=>{const number=japaneseInteger(value);return number===null?value:String(number);});}
 const dimensions={kg:['mass',1000],g:['mass',1],mg:['mass',.001],km:['length',100000],m:['length',100],cm:['length',1],mm:['length',.1],L:['volume',1000],mL:['volume',1],TB:['bytes',1e12],GB:['bytes',1e9],MB:['bytes',1e6],KB:['bytes',1e3],B:['bytes',1],GiB:['bytes',1024**3],MiB:['bytes',1024**2],KiB:['bytes',1024]};
 for(const [unit,aliases]of Object.entries({kg:['kilogram','kilograms','キログラム'],g:['gram','grams','グラム'],mg:['milligram','milligrams','ミリグラム'],km:['kilometer','kilometers','kilometre','kilometres'],m:['meter','meters','metre','metres','メートル'],cm:['centimeter','centimeters','centimetre','centimetres','センチメートル'],L:['liter','liters','litre','litres'],MB:['megabyte','megabytes','メガバイト'],GB:['gigabyte','gigabytes','ギガバイト'],KB:['kilobyte','kilobytes']}))for(const alias of aliases)dimensions[alias]=dimensions[unit];
 for(const [unit,scale]of [['時間',3600],['分',60],['秒',1],['hour',3600],['hours',3600],['minute',60],['minutes',60],['second',1],['seconds',1]])dimensions[unit]=['duration',scale];

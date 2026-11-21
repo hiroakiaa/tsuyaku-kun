@@ -1,4 +1,4 @@
-import {prepareScanCanvas} from './document-scan-preprocess.js?v=1';
+import {prepareScanCanvas} from './document-scan-preprocess.js?v=2';
 import {ocrNumbers,reconcileOcrNumbers} from './document-ocr-consensus.js?v=1';
 const timingNames = ['initialization','render','recognition','native-recognition','full-recognition','horizontal-recognition'].map(stage=>'document-ocr:'+stage);
 

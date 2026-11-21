@@ -2,6 +2,10 @@ import assert from 'node:assert/strict';
 import {documents} from '../server/documents.js';
 
 const cases = [
+  {format:'英語円の日本語回答',pages:['The annual membership fee is 2400 yen.','Other fees are 300 yen.'],quote:'The annual membership fee is 2400 yen.',correct:'2400円です。',wrong:'300円です。'},
+  {format:'円の接頭表記',pages:['The cost is JPY 2,400.','Other fees are ¥300.'],quote:'The cost is JPY 2,400.',correct:'2400円です。',wrong:'300円です。'},
+  {format:'ドル金額',pages:['The fee is 25 US dollars.','Other fee is USD 30.'],quote:'The fee is 25 US dollars.',correct:'USD 25',wrong:'USD 30'},
+  {format:'通貨単位違い',pages:['The fee is 25 euros.','Other fee is 25 US dollars.'],quote:'The fee is 25 euros.',correct:'EUR 25',wrong:'USD 25'},
   {format:'漢数字の金額',pages:['交付手数料は二百円です。','郵送料は四百円です。'],quote:'交付手数料は二百円です。',correct:'200円です。',wrong:'400円です。'},
   {format:'日付表記の変換',pages:['説明会は2027年4月8日です。','別の説明会は2027年4月9日です。'],quote:'説明会は2027年4月8日です。',correct:'April 8, 2027',wrong:'April 9, 2027'},
   {format:'年度の変化',pages:['説明会は2027年4月8日です。','別の年度は2028年4月8日です。'],quote:'説明会は2027年4月8日です。',correct:'2027-04-08',wrong:'2028-04-08'},

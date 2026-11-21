@@ -1,4 +1,9 @@
 // Local OCR preprocessing only. The original document pixels are never changed.
+export function scanPhotoRegions({data,width,height}){
+ const tile=32,cols=Math.ceil(width/tile),rows=Math.ceil(height/tile),candidates=new Set(),gray=(x,y)=>{const i=(y*width+x)*4;return .299*data[i]+.587*data[i+1]+.114*data[i+2];};
+ for(let ty=0;ty<rows;ty++)for(let tx=0;tx<cols;tx++){let n=0,edges=0,dark=0,sum=0,squares=0;for(let y=ty*tile;y<Math.min(height-2,(ty+1)*tile);y+=2)for(let x=tx*tile;x<Math.min(width-2,(tx+1)*tile);x+=2){const g=gray(x,y);n++;sum+=g;squares+=g*g;if(g<200)dark++;if(Math.abs(g-gray(x+2,y))>25&&Math.abs(g-gray(x,y+2))>25)edges++;}if(n&&edges/n>.32&&dark/n>.45&&squares/n-(sum/n)**2>300)candidates.add(ty*cols+tx);}
+ const regions=[];while(candidates.size){const first=candidates.values().next().value,queue=[first],group=[];candidates.delete(first);for(let i=0;i<queue.length;i++){const k=queue[i];group.push(k);for(const next of [k-cols,k+cols,...(k%cols?[k-1]:[]),...(k%cols<cols-1?[k+1]:[])])if(candidates.delete(next))queue.push(next);}if(group.length<8)continue;const xs=group.map(k=>k%cols),ys=group.map(k=>Math.floor(k/cols));regions.push({x:Math.min(...xs)*tile,y:Math.min(...ys)*tile,width:Math.min(width,(Math.max(...xs)+1)*tile)-Math.min(...xs)*tile,height:Math.min(height,(Math.max(...ys)+1)*tile)-Math.min(...ys)*tile});}return regions;
+}
 export function scanPixelAnalysis({data,width,height}){
  const tile=40,cols=Math.ceil(width/tile),rows=Math.ceil(height/tile),background=new Uint8Array(cols*rows);let darkest=255,brightest=0;
  for(let y=0;y<height;y+=2)for(let x=0;x<width;x+=2){const i=(y*width+x)*4,g=Math.round(.299*data[i]+.587*data[i+1]+.114*data[i+2]),k=Math.floor(y/tile)*cols+Math.floor(x/tile);background[k]=Math.max(background[k],g);}
@@ -18,10 +23,12 @@ export function restoreScanBox(box,angle,width,height){
  return {x0:Math.max(0,Math.min(...points.map(p=>p[0]))),y0:Math.max(0,Math.min(...points.map(p=>p[1]))),x1:Math.min(width,Math.max(...points.map(p=>p[0]))),y1:Math.min(height,Math.max(...points.map(p=>p[1])))};
 }
 export function prepareScanCanvas(input){
- const ctx=input.getContext('2d'),pixels=ctx.getImageData(0,0,input.width,input.height),analysis=scanPixelAnalysis(pixels),quality={correction:analysis.correction,illumination:analysis.illumination,inkRatio:analysis.inkRatio,softInkRatio:analysis.softInkRatio,skewGain:analysis.skewGain};
- if(!analysis.correction&&analysis.illumination<35)return {canvas:input,quality,restore:box=>box,close(){}};
+ const ctx=input.getContext('2d'),pixels=ctx.getImageData(0,0,input.width,input.height),photos=scanPhotoRegions(pixels);
+ for(const box of photos)for(let y=box.y;y<box.y+box.height;y++)for(let x=box.x;x<box.x+box.width;x++){const i=(y*input.width+x)*4;pixels.data[i]=pixels.data[i+1]=pixels.data[i+2]=255;}
+ const analysis=scanPixelAnalysis(pixels),quality={correction:analysis.correction,illumination:analysis.illumination,inkRatio:analysis.inkRatio,softInkRatio:analysis.softInkRatio,skewGain:analysis.skewGain,photoRegions:photos.length};
+ if(!photos.length&&!analysis.correction&&analysis.illumination<35)return {canvas:input,quality,restore:box=>box,close(){}};
  const source=document.createElement('canvas');source.width=input.width;source.height=input.height;const normalized=source.getContext('2d');
- if(analysis.illumination>=35){for(let y=0;y<input.height;y++)for(let x=0;x<input.width;x++){const i=(y*input.width+x)*4,g=.299*pixels.data[i]+.587*pixels.data[i+1]+.114*pixels.data[i+2],v=Math.min(255,Math.round(g*255/Math.max(45,analysis.localBackground(x,y))));pixels.data[i]=pixels.data[i+1]=pixels.data[i+2]=v;pixels.data[i+3]=255;}normalized.putImageData(pixels,0,0);}else normalized.drawImage(input,0,0);
+ if(analysis.illumination>=35){for(let y=0;y<input.height;y++)for(let x=0;x<input.width;x++){const i=(y*input.width+x)*4,g=.299*pixels.data[i]+.587*pixels.data[i+1]+.114*pixels.data[i+2],v=Math.min(255,Math.round(g*255/Math.max(45,analysis.localBackground(x,y))));pixels.data[i]=pixels.data[i+1]=pixels.data[i+2]=v;pixels.data[i+3]=255;}normalized.putImageData(pixels,0,0);}else normalized.putImageData(pixels,0,0);
  let canvas=source;if(analysis.correction){canvas=document.createElement('canvas');canvas.width=input.width;canvas.height=input.height;const out=canvas.getContext('2d');out.fillStyle='#fff';out.fillRect(0,0,canvas.width,canvas.height);out.translate(canvas.width/2,canvas.height/2);out.rotate(analysis.correction*Math.PI/180);out.drawImage(source,-source.width/2,-source.height/2);}
  return {canvas,quality,restore:box=>restoreScanBox(box,analysis.correction,input.width,input.height),close(){source.width=source.height=0;if(canvas!==source)canvas.width=canvas.height=0;}};
 }
