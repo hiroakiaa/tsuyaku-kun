@@ -85,7 +85,7 @@ export async function translateText(env,text,source,targets,context=[],unit='',d
 export default {async fetch(request,env,ctx){
   const requestStarted=Date.now(),origin=request.headers.get('Origin'),url=new URL(request.url);
   const allowed=origin===env.ALLOWED_ORIGIN||origin==='http://localhost:8787';
-  const cors=response=>{const h=new Headers(response.headers);if(allowed){h.set('Access-Control-Allow-Origin',origin);h.set('Access-Control-Allow-Headers','Content-Type, Authorization, X-Term-Hints');h.set('Access-Control-Allow-Methods','GET, POST, OPTIONS');h.set('Vary','Origin');}return new Response(response.body,{status:response.status,headers:h});};
+  const cors=response=>{const h=new Headers(response.headers);if(allowed){h.set('Access-Control-Allow-Origin',origin);h.set('Access-Control-Allow-Headers','Content-Type, Authorization, X-Term-Hints');h.set('Access-Control-Allow-Methods','GET, POST, OPTIONS');h.set('Access-Control-Expose-Headers','Content-Disposition');h.set('Vary','Origin');}return new Response(response.body,{status:response.status,headers:h});};
   if(request.method==='OPTIONS')return allowed?cors(new Response(null,{status:204,headers:{'Access-Control-Max-Age':'600'}})):error('接続元を確認してください。',403);
   if(url.pathname==='/health')return cors(json({ok:true,app:'通訳君',version:'0.6.9',build:BUILD_ID,safety:'20261008-lifecycle-1',sheets:!!env.SHEETS_BRIDGE}));
   if(!allowed)return error('接続元を確認してください。',403);
