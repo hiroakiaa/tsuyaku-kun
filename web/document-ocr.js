@@ -120,8 +120,6 @@ export async function createPdfOcr(ops) {
     return horizontalReady;
   }
   async function recognizePreparedCanvas(input,{preferHorizontal=false,fallbackCanvas=input}={}) {
-    const {findHorizontalScanLines}=await import('./document-ocr-lines.js?v=3');
-    if(!disabled&&typeof DecompressionStream==='function'&&findHorizontalScanLines(input.getContext('2d').getImageData(0,0,input.width,input.height)))void prepareHorizontalReader();
     const primary=(await (await standardWorker()).recognize(input,{}, {blocks:true})).data;
     const linesOf=data=>(data.blocks??[]).flatMap(block=>block.paragraphs??[]).flatMap(paragraph=>paragraph.lines??[]);
     const compact=text=>text.normalize('NFKC').replace(/\s/gu,'');
