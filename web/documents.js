@@ -6,7 +6,7 @@ import {installPreviewOnlyGestures} from './preview-only-gestures.js?v=20261119-
 installPreviewOnlyGestures();
 import {alignPdfTranslation,pdfComparableText} from './pdf-translation-alignment.js?v=20261120-layout-3';
 import {resumeTranslation,transientTranslationError} from './translation-resume.js?v=20261119-resume-1';
-import {readPdfPageText,lookupTableCell,lookupAlignedTableCell} from './document-table-lookup.js?v=88';
+import {readPdfPageText,lookupTableCell,lookupAlignedTableCell,tableOverviewEntity} from './document-table-lookup.js?v=89';
 import {recordDocumentQaMetric} from './document-qa-metrics.js?v=3';
 import {layoutPdfText} from './document-table.js?v=94';
 import {installLocalIcons,localIcon} from './icons.js?v=pdf-controls';
@@ -218,7 +218,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '263');
+      guide.searchParams.set('v', '264');
       link.href = guide.href;
       if (typeof entry.shared==='boolean') append(body,'small',entry.shared?'共通保管庫に公開':'作成したブラウザーで閲覧');
       const remove = append(card,'button','','library-remove');
@@ -441,7 +441,7 @@ async function reader() {
   };
   askDialog.addEventListener('close',()=>{
     if (dialog.open) dialog.close();
-    location.replace('?v=263');
+    location.replace('?v=264');
   });
   const sourceType = doc.sourceType ?? 'pdf';
   let opened,originalUrl,officeText,officeRender = 0;
@@ -1734,7 +1734,7 @@ async function reader() {
       createUrl.searchParams.delete('id');
       createUrl.searchParams.delete('library');
       createUrl.searchParams.set('create','1');
-      createUrl.searchParams.set('v','263');
+      createUrl.searchParams.set('v','264');
       location.replace(createUrl);
     } catch (error) {
       document.querySelector('#remove-status').textContent = error.message;
@@ -1903,7 +1903,7 @@ async function reader() {
       const namedPrice=/^[\p{L}\p{N}]{2,24}は(?:何円|いくら)(?:ですか)?[?？。]?$/u;
       const priceQuestion=value=>barePrice.test(value?.trim()??'') || namedPrice.test(value?.trim()??'');
       const priceContext=priceQuestion(question) || priceQuestion(previousQuestion);
-      if (!answerLanguage && sourceType==='pdf' && (!doc.convertedWorksheet || materials.length) && (priceContext || /の/.test(question) || /^what is the .+ (?:for|of) /i.test(question))) {
+      if (!answerLanguage && sourceType==='pdf' && (!doc.convertedWorksheet || materials.length) && (priceContext || /の/.test(question) || tableOverviewEntity(question) || /^what is the .+ (?:for|of) /i.test(question))) {
         let item;
         try {
           const pdf=await getOriginalPdf();
@@ -1919,6 +1919,7 @@ async function reader() {
           }
           item ??= await lookupTableCell(pdf,question);
           item ??= await lookupAlignedTableCell(pdf,question);
+          if(!item&&tableOverviewEntity(question))item=await lookupTableCell(pdf,question,{overview:true});
         } catch {}
         if (item) {
           renderAnswerItem(append(log,'div','','bubble'),item);
@@ -2193,7 +2194,7 @@ try {
         icon.append(localIcon('book-open'));
         const body = append(card,'div','','library-card-body');
         const link = append(body,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=263';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=264';
         }
       };
       $('#library-search').addEventListener('input',renderShared);

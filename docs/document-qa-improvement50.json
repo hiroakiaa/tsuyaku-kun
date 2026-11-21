@@ -14,8 +14,10 @@
       "id": 2,
       "title": "細かい文字の再認識",
       "acceptance": "低解像度の細字を端末内で再認識し、同一問題の正解語数が悪化しない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開373c19c / documents v263 / OCR v114。同じ13問で修正前11/13→修正後13/13、誤引用とマーカー欠落を修正。全6資料は作成15秒以内（最大12993ms）、削除済み。checks/first50-acceptance-public-fixed.json。通常3ページ・密集28ページ・結合表・低解像度/番号付きスキャンを組み合わせて確認。低品質写真全般の課題は別項目で未完了。"
+      ]
     },
     {
       "id": 3,
@@ -142,22 +144,28 @@
       "id": 20,
       "title": "翻訳回帰確認",
       "acceptance": "通常・密集・表・スキャンの翻訳回帰を公開版で実行",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開373c19c / documents v263 / OCR v114。同じ13問で修正前11/13→修正後13/13、誤引用とマーカー欠落を修正。全6資料は作成15秒以内（最大12993ms）、削除済み。checks/first50-acceptance-public-fixed.json。通常3ページ・密集28ページ・結合表・低解像度/番号付きスキャンを組み合わせて確認。低品質写真全般の課題は別項目で未完了。"
+      ]
     },
     {
       "id": 21,
       "title": "言い換え",
       "acceptance": "同一根拠への自然な言い換え質問に同じ答え",
-      "status": "pending",
-      "evidence": []
+      "status": "in_progress",
+      "evidence": [
+        "右側IABの既存・未埋め込み縦書き表で自然な質問だけ根拠なしを再現。実際の行/列見出しを使う概要抽出を追加し、施設表の単体・教科表の両幅ブラウザー検証で行混同なし、AI呼び出し0。公開後に同じIAB資料で再確認する。"
+      ]
     },
     {
       "id": 22,
       "title": "短いキーワード",
       "acceptance": "単語のみでも根拠付き概要を返す",
-      "status": "pending",
-      "evidence": []
+      "status": "in_progress",
+      "evidence": [
+        "右側IABの既存・未埋め込み縦書き表で自然な質問だけ根拠なしを再現。実際の行/列見出しを使う概要抽出を追加し、施設表の単体・教科表の両幅ブラウザー検証で行混同なし、AI呼び出し0。公開後に同じIAB資料で再確認する。"
+      ]
     },
     {
       "id": 23,
@@ -381,9 +389,9 @@
       "id": 49,
       "title": "削除範囲",
       "acceptance": "削除後に元資料・要約・訳文・検索データが残らず処理中でも復活しない",
-      "status": "in_progress",
+      "status": "complete",
       "evidence": [
-        "公開版で削除後8経路404。追加で翻訳中の削除による未着手分停止を実装・単体検証済み。公開前のため未完了。"
+        "公開Worker037a569e-7acd-49cf-b240-84e746e9bfa1。削除後の原文/PDF/本文/質問/ページ訳/要約訳/目次訳/専門要約8経路が全て404。tests/translation-checkpoint.mjsで2件翻訳中に削除→未着手6件を開始せず保存キー0を確認。checks/private-lifecycle-public-fixed.log。"
       ]
     },
     {

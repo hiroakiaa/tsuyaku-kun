@@ -601,3 +601,6 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 - PARSEQ decoding follows the official source: keep repeated tokens and space/quote tokens. Model bytes, provider and image handling unchanged. Correct text may change token counts naturally; no fabricated cost saving.
 - Extraction and positioning share the same local OCR decision. Clean Japanese raster lines use the existing local NDLOCR model; an English digit-only local worker checks at most8 geometry-matched numeric disagreements. No image or extra OCR request to a paid service.
 - Registration no longer makes an initial foreground overview generation before saving. One existing background summary creates the shared overview and TOC; output caps and budget limits unchanged. Overview text/titles are bounded to keep the existing completion budget. Reading/questions can proceed while this is pending.
+
+### 2026-11-21 Natural table-row overview
+- Broad entity questions and bare row-name keywords use observed PDF row geometry and column headings; no subject/school name is hardcoded. Exact unique row scope required; specific time/price questions cannot use a generic row overview. No model call for the matched overview; local390/1280 tests verify zero ask calls. PDF pixel data is processed locally, never sent for this lookup.

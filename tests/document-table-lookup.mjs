@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {runInNewContext} from 'node:vm';
-import {lookupTableCell,readPdfPageText} from '../web/document-table-lookup.js';
+import {lookupTableCell,readPdfPageText,tableOverviewEntity} from '../web/document-table-lookup.js';
 
 const width=1200,height=400;
 const pixels=new Uint8ClampedArray(width*height*4).fill(255);
@@ -34,6 +34,13 @@ assert.equal(pageReads,1);
 assert.equal(performance.getEntriesByName('document-qa:pdf-text-extraction').length,1);
 assert.ok(performance.getEntriesByName('document-qa:pdf-text-reuse').length>=2);
 console.log('PASS vertical row labels, duplicate headings and adjacent table cells');
+const overview=await lookupTableCell(pdf,'北館ってどんなところ？',{overview:true});
+assert.equal(overview.answer,'所要時間：15分\n費用：500円');assert.equal(overview.evidence.length,2);
+assert.equal((await lookupTableCell(pdf,'南館',{overview:true})).answer,'所要時間：30分\n費用：900円');
+assert.equal(await lookupTableCell(pdf,'西館って何ができる？',{overview:true}),null);
+assert.equal(tableOverviewEntity('北館って何時まで？'),null,'Specific questions cannot fall back to unrelated row descriptions');
+assert.equal(tableOverviewEntity('数学って何勉強するの？'),'数学');
+console.log('PASS row overview uses observed headings/row geometry for natural questions and bare keywords, excluding specific time/price questions');
 import {layoutPdfText} from '../web/document-table.js';
 const verticalGlyph = (str,x,y)=>({str,dir:'ttb',width:10,transform:[10,0,0,10,x,y]});
 const verticalPage = layoutPdfText([

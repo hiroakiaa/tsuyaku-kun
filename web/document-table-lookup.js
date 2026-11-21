@@ -20,8 +20,16 @@ async function pageText(pdf, number) {
   return {page,...await readPdfPageText(page)};
 }
 
-export async function lookupTableCell(pdf, question) {
-  const match = /^([^の？?、]{2,40}?)の([^？?、]{2,40}?)(?:の基準(?:は)?|を教えてください|を教えて|はいくら|は何|はいつ|はどこ|は)?[？?。]?$/u.exec(compact(question));
+export function tableOverviewEntity(question){
+  const query=compact(question).replace(/[?？。]$/u,'');
+  if(/何時|いつ|いくら|何円|何人|何日|何月|何年|締切|期限|料金|費用|金額|定員|開始|終了/u.test(query))return null;
+  const topic=/^([\p{L}\p{N}・ー]{2,40}?)(?:って|について|とは).{0,60}$/u.exec(query)
+    ?? /^([\p{L}\p{N}・ー]{2,40}?)は(?:どんな|どういう|どのよう|何).{0,60}$/u.exec(query);
+  return topic?.[1] ?? (/^[\p{L}\p{N}・ー]{2,30}$/u.test(query)?query:null);
+}
+export async function lookupTableCell(pdf, question,{overview=false}={}) {
+  const entity=overview?tableOverviewEntity(question):null;
+  const match = overview ? (entity?['',entity,'']:null) : /^([^の？?、]{2,40}?)の([^？?、]{2,40}?)(?:の基準(?:は)?|を教えてください|を教えて|はいくら|は何|はいつ|はどこ|は)?[？?。]?$/u.exec(compact(question));
   if (!match) return null;
   const [,rowName,columnName]=match;
   const normalizeLabel = text=>compact(text).replace(/(?:高等学校|高校)$/u,'');
@@ -29,6 +37,7 @@ export async function lookupTableCell(pdf, question) {
 
   for (let number=1; number<=pdf.numPages; number++) {
     const {page,items}=await pageText(pdf,number);
+    if(overview&&![...rowName].every(char=>items.some(item=>item.str?.includes(char))))continue;
 
     const viewport=page.getViewport({scale:1200/page.getViewport({scale:1}).width});
     const cells=items.filter(item=>item.str?.trim()).map(item=>{
@@ -37,6 +46,7 @@ export async function lookupTableCell(pdf, question) {
     });
     const headers=cells.filter(cell=>{
       const text=compact(cell.text);
+      if(overview)return text.length>=2&&text.length<=80&&!/^[\p{N}\p{P}]+$/u.test(text);
       if(text===columnName || text.startsWith(columnName+'(')) return true;
       if(!columnName.startsWith(text) || text.length<2) return false;
       return cells.some(next=>Math.abs(next.y-cell.y)<3 && next.x>cell.x &&
@@ -63,12 +73,13 @@ export async function lookupTableCell(pdf, question) {
         else rules.push(y);
       }
     }
+    const columnBands=new Map();
     for (const header of headers) {
       const top=rules.findLast(y=>y<header.y);
       const bottom=rules.find(y=>y>header.y);
       if(top==null || bottom==null) continue;
-      const columns=[];
-      for(let x=0;x<width;x++) {
+      const bandKey=top+':'+bottom,columns=columnBands.get(bandKey)??[];
+      if(!columnBands.has(bandKey))for(let x=0;x<width;x++) {
         let count=0;
         for(let y=top+1;y<bottom;y++) if(dark(x,y)) count++;
         if(count>(bottom-top)*0.8) {
@@ -76,6 +87,7 @@ export async function lookupTableCell(pdf, question) {
           else columns.push(x);
         }
       }
+      columnBands.set(bandKey,columns);
       const left=columns.findLast(x=>x<=header.x+1);
       const right=columns.find(x=>x>header.x+3);
       const schoolLeft=columns[0], schoolRight=columns[1];
@@ -97,12 +109,22 @@ export async function lookupTableCell(pdf, question) {
         const values=row.filter(cell=>cell.x>left && cell.x<right).sort((a,b)=>Math.abs(a.y-b.y)<2 ? a.x-b.x : a.y-b.y);
         const quote=values.map(cell=>cell.text.trim()).filter(Boolean).join('\n');
         const key = [number,start,end,left,right].join(':');
-        if(quote && !matches.some(item=>item.key===key)) matches.push({key,label,exact:label===normalizeLabel(rowName),answer:quote,evidence:[{page:number,quote}]});
+        const prior=matches.find(item=>item.key===key);
+        if(quote && (!prior||overview&&header.y<prior.headerY)){
+          if(prior)matches.splice(matches.indexOf(prior),1);
+          matches.push({key,rowKey:[number,start,end].join(':'),left,right,headerY:header.y,headerName:header.text,label,exact:label===normalizeLabel(rowName),answer:quote,evidence:[{page:number,quote}]});
+        }
       }
     }
   }
   const exact=matches.filter(item=>item.exact);
   const candidates=exact.length ? exact : matches;
+  if(overview){
+    if(!exact.length||candidates.length>8||new Set(candidates.map(item=>item.rowKey)).size!==1)return null;
+    const columns=candidates.sort((a,b)=>a.left-b.left);
+    if(columns.some((column,i)=>i&&column.left<columns[i-1].right-2))return null;
+    return {label:columns[0].label,answer:columns.map(column=>column.headerName+'：'+column.answer).join('\n'),evidence:columns.flatMap(column=>column.evidence)};
+  }
   if(candidates.length!==1) return null;
   const {label,answer,evidence}=candidates[0];
   return {label:label+'の'+columnName,answer,evidence};
