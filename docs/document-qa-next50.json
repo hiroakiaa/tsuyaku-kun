@@ -474,218 +474,904 @@
       "id": 69,
       "title": "不可視文字を含む検索",
       "acceptance": "ゼロ幅空白があっても検索でき、表示・引用の原文は保つ",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "候補検索では不可視文字・行末分割・Latinアクセントを正規化。16ページの制御回答試験で原ページを検索し、アクセントを変えた偽引用を拒否。原文・負数・非Latin文字を保持。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tests/document-query-text.mjs",
+            "scope": "Pure normalization/negative cases",
+            "passed": true
+          },
+          {
+            "path": "tests/document-query-integration.mjs",
+            "scope": "Actual retrieval and source verification with controlled model responses",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 70,
       "title": "行末ハイフンの検索",
       "acceptance": "英語の行末分割語を検索でき、通常の負数や固有表記は変えない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "候補検索では不可視文字・行末分割・Latinアクセントを正規化。16ページの制御回答試験で原ページを検索し、アクセントを変えた偽引用を拒否。原文・負数・非Latin文字を保持。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tests/document-query-text.mjs",
+            "scope": "Pure normalization/negative cases",
+            "passed": true
+          },
+          {
+            "path": "tests/document-query-integration.mjs",
+            "scope": "Actual retrieval and source verification with controlled model responses",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 71,
       "title": "アクセントを省いた検索",
       "acceptance": "アクセント省略を検索候補に使い、原文引用はそのまま保持する",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "候補検索では不可視文字・行末分割・Latinアクセントを正規化。16ページの制御回答試験で原ページを検索し、アクセントを変えた偽引用を拒否。原文・負数・非Latin文字を保持。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tests/document-query-text.mjs",
+            "scope": "Pure normalization/negative cases",
+            "passed": true
+          },
+          {
+            "path": "tests/document-query-integration.mjs",
+            "scope": "Actual retrieval and source verification with controlled model responses",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 72,
       "title": "ページ指定の検索",
       "acceptance": "明示した1ページの範囲を優先し、年度などをページ指定と誤認しない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開版8ページ資料でpage 7とpages 7 to 8を質問し、それぞれ7/8ページの原文と黄色マーカーを照合。範囲外・逆順を400にし、指定外の偽引用も拒否。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-query-terminology-live.mjs",
+            "scope": "Public PDF upload, real API answers and citation markers",
+            "passed": true
+          },
+          {
+            "path": "tests/document-query-integration.mjs",
+            "scope": "Off-scope and invalid page rejection",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 73,
       "title": "ページ範囲の検索",
       "acceptance": "明示した複数ページの範囲を検索し範囲外の条件を混ぜない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開版8ページ資料でpage 7とpages 7 to 8を質問し、それぞれ7/8ページの原文と黄色マーカーを照合。範囲外・逆順を400にし、指定外の偽引用も拒否。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-query-terminology-live.mjs",
+            "scope": "Public PDF upload, real API answers and citation markers",
+            "passed": true
+          },
+          {
+            "path": "tests/document-query-integration.mjs",
+            "scope": "Off-scope and invalid page rejection",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 74,
       "title": "英語の定義語共有",
       "acceptance": "英語で明示的に定義され繰り返す語をページ間で統一する",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開版で英語・スペイン語・ポルトガル語の3定義を2ページのベトナム語訳に共有。保存訳Mã truy cậpを回答でも使用し、1ページの英語原文が一致。再訪はpage-cache、追加の辞書生成なしは単体試験でも照合。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-shared-terms-live.mjs",
+            "scope": "Actual public page translations, persisted terminology and grounded Vietnamese answer; disposable fixture deleted",
+            "passed": true
+          },
+          {
+            "path": "tests/document-terminology-answer.mjs",
+            "scope": "Saved glossary read without additional glossary model call",
+            "passed": true
+          },
+          {
+            "path": "tests/document-terminology.mjs",
+            "scope": "Conflicting definitions, cache/coalescing and deletion",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 75,
       "title": "スペイン語等の定義語共有",
       "acceptance": "スペイン語・ポルトガル語の明示的な定義語も共有する",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開版で英語・スペイン語・ポルトガル語の3定義を2ページのベトナム語訳に共有。保存訳Mã truy cậpを回答でも使用し、1ページの英語原文が一致。再訪はpage-cache、追加の辞書生成なしは単体試験でも照合。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-shared-terms-live.mjs",
+            "scope": "Actual public page translations, persisted terminology and grounded Vietnamese answer; disposable fixture deleted",
+            "passed": true
+          },
+          {
+            "path": "tests/document-terminology-answer.mjs",
+            "scope": "Saved glossary read without additional glossary model call",
+            "passed": true
+          },
+          {
+            "path": "tests/document-terminology.mjs",
+            "scope": "Conflicting definitions, cache/coalescing and deletion",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 76,
       "title": "回答での用語共有",
       "acceptance": "資料翻訳の保存済み用語を回答にも再利用し追加の辞書生成をしない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開版で英語・スペイン語・ポルトガル語の3定義を2ページのベトナム語訳に共有。保存訳Mã truy cậpを回答でも使用し、1ページの英語原文が一致。再訪はpage-cache、追加の辞書生成なしは単体試験でも照合。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-shared-terms-live.mjs",
+            "scope": "Actual public page translations, persisted terminology and grounded Vietnamese answer; disposable fixture deleted",
+            "passed": true
+          },
+          {
+            "path": "tests/document-terminology-answer.mjs",
+            "scope": "Saved glossary read without additional glossary model call",
+            "passed": true
+          },
+          {
+            "path": "tests/document-terminology.mjs",
+            "scope": "Conflicting definitions, cache/coalescing and deletion",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 77,
       "title": "中断時の回答保持",
       "acceptance": "受信済みの根拠付き部分を通信エラーで消さない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開v280の実画面に制御した中断ストリームを与え、根拠付き部分の保持・再読込復元・重複なし再試行を確認。停止と閉じるで受信を中止。90秒期限はテスト時計だけ短縮して発火を検証。通信の物理切断や実機Safariの試験ではない。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-answer-recovery.mjs",
+            "scope": "Public assets with controlled incomplete API response; persistent history and deduplication",
+            "passed": true
+          },
+          {
+            "path": "tools/check-document-interaction-upgrades.mjs",
+            "scope": "Public UI, controlled stream, abort on stop/close and accelerated deadline",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 78,
       "title": "中断回答の閲覧復元",
       "acceptance": "中断した回答の完成部分を開き直しても確認できる",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開v280の実画面に制御した中断ストリームを与え、根拠付き部分の保持・再読込復元・重複なし再試行を確認。停止と閉じるで受信を中止。90秒期限はテスト時計だけ短縮して発火を検証。通信の物理切断や実機Safariの試験ではない。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-answer-recovery.mjs",
+            "scope": "Public assets with controlled incomplete API response; persistent history and deduplication",
+            "passed": true
+          },
+          {
+            "path": "tools/check-document-interaction-upgrades.mjs",
+            "scope": "Public UI, controlled stream, abort on stop/close and accelerated deadline",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 79,
       "title": "再試行時の重複防止",
       "acceptance": "同じ部分を再受信しても同じ回答を二重に並べない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開v280の実画面に制御した中断ストリームを与え、根拠付き部分の保持・再読込復元・重複なし再試行を確認。停止と閉じるで受信を中止。90秒期限はテスト時計だけ短縮して発火を検証。通信の物理切断や実機Safariの試験ではない。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-answer-recovery.mjs",
+            "scope": "Public assets with controlled incomplete API response; persistent history and deduplication",
+            "passed": true
+          },
+          {
+            "path": "tools/check-document-interaction-upgrades.mjs",
+            "scope": "Public UI, controlled stream, abort on stop/close and accelerated deadline",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 80,
       "title": "停止時の完成部分保持",
       "acceptance": "停止後も完成した根拠付き部分を残し未完了と分かる",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開v280の実画面に制御した中断ストリームを与え、根拠付き部分の保持・再読込復元・重複なし再試行を確認。停止と閉じるで受信を中止。90秒期限はテスト時計だけ短縮して発火を検証。通信の物理切断や実機Safariの試験ではない。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-answer-recovery.mjs",
+            "scope": "Public assets with controlled incomplete API response; persistent history and deduplication",
+            "passed": true
+          },
+          {
+            "path": "tools/check-document-interaction-upgrades.mjs",
+            "scope": "Public UI, controlled stream, abort on stop/close and accelerated deadline",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 81,
       "title": "回答待ちの期限",
       "acceptance": "応答が止まっても読み取り待ちが永続せず再試行できる",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開v280の実画面に制御した中断ストリームを与え、根拠付き部分の保持・再読込復元・重複なし再試行を確認。停止と閉じるで受信を中止。90秒期限はテスト時計だけ短縮して発火を検証。通信の物理切断や実機Safariの試験ではない。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-answer-recovery.mjs",
+            "scope": "Public assets with controlled incomplete API response; persistent history and deduplication",
+            "passed": true
+          },
+          {
+            "path": "tools/check-document-interaction-upgrades.mjs",
+            "scope": "Public UI, controlled stream, abort on stop/close and accelerated deadline",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 82,
       "title": "閉じた後の質問処理停止",
       "acceptance": "意図して閉じた画面に古い回答が追加されない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開v280の実画面に制御した中断ストリームを与え、根拠付き部分の保持・再読込復元・重複なし再試行を確認。停止と閉じるで受信を中止。90秒期限はテスト時計だけ短縮して発火を検証。通信の物理切断や実機Safariの試験ではない。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-answer-recovery.mjs",
+            "scope": "Public assets with controlled incomplete API response; persistent history and deduplication",
+            "passed": true
+          },
+          {
+            "path": "tools/check-document-interaction-upgrades.mjs",
+            "scope": "Public UI, controlled stream, abort on stop/close and accelerated deadline",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 83,
       "title": "通信復帰後の再開",
       "acceptance": "通信が戻った時に同じ質問を重複送信せず再試行できる",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開v280の実画面に制御した中断ストリームを与え、根拠付き部分の保持・再読込復元・重複なし再試行を確認。停止と閉じるで受信を中止。90秒期限はテスト時計だけ短縮して発火を検証。通信の物理切断や実機Safariの試験ではない。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-answer-recovery.mjs",
+            "scope": "Public assets with controlled incomplete API response; persistent history and deduplication",
+            "passed": true
+          },
+          {
+            "path": "tools/check-document-interaction-upgrades.mjs",
+            "scope": "Public UI, controlled stream, abort on stop/close and accelerated deadline",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 84,
       "title": "英語先読みの復帰",
       "acceptance": "一時的な通信障害後も未準備の英語ページを再開する",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開画面で失敗した英語先読みをonlineイベントから両ページ再開。Save-Data中も英語全ページを準備し、表示中のスペイン語は翻訳、非表示の次ページは先読みしないことを記録。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-prefetch-recovery.mjs",
+            "scope": "Public assets with controlled translation API, online event and Save-Data",
+            "passed": true
+          },
+          {
+            "path": "tests/document-interaction.mjs",
+            "scope": "Optional-prefetch policy",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 85,
       "title": "通信節約時の先読み調整",
       "acceptance": "利用者の通信節約設定時は余分な言語の先読みを抑え表示中の訳は出す",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開画面で失敗した英語先読みをonlineイベントから両ページ再開。Save-Data中も英語全ページを準備し、表示中のスペイン語は翻訳、非表示の次ページは先読みしないことを記録。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-prefetch-recovery.mjs",
+            "scope": "Public assets with controlled translation API, online event and Save-Data",
+            "passed": true
+          },
+          {
+            "path": "tests/document-interaction.mjs",
+            "scope": "Optional-prefetch policy",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 86,
       "title": "資料名の日本語変換入力",
       "acceptance": "IME変換確定のEnterだけで名前変更を送信しない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開画面の390/1280幅でIME確定中の送信防止、PDF自身にフォーカスしたPageDown、縦横幅変更時のページ2と会話保持を確認。高さ450への縮小と仮想visualViewportの入力位置も照合。実機Safariではない。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-interaction-upgrades.mjs",
+            "scope": "Public actual UI with simulated composition and viewport resize",
+            "passed": true
+          },
+          {
+            "path": "tools/check-document-answer-recovery.mjs",
+            "scope": "Question IME submission guard",
+            "passed": true
+          },
+          {
+            "path": "tools/check-document-mobile-keyboard.mjs",
+            "scope": "Public assets, simulated visual viewport, original page/split restored",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 87,
       "title": "質問の日本語変換入力",
       "acceptance": "IME変換確定のEnterだけで質問を送信しない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開画面の390/1280幅でIME確定中の送信防止、PDF自身にフォーカスしたPageDown、縦横幅変更時のページ2と会話保持を確認。高さ450への縮小と仮想visualViewportの入力位置も照合。実機Safariではない。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-interaction-upgrades.mjs",
+            "scope": "Public actual UI with simulated composition and viewport resize",
+            "passed": true
+          },
+          {
+            "path": "tools/check-document-answer-recovery.mjs",
+            "scope": "Question IME submission guard",
+            "passed": true
+          },
+          {
+            "path": "tools/check-document-mobile-keyboard.mjs",
+            "scope": "Public assets, simulated visual viewport, original page/split restored",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 88,
       "title": "PDFのキーボード操作",
       "acceptance": "PDFにフォーカスがある時だけページ移動キーが使える",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開画面の390/1280幅でIME確定中の送信防止、PDF自身にフォーカスしたPageDown、縦横幅変更時のページ2と会話保持を確認。高さ450への縮小と仮想visualViewportの入力位置も照合。実機Safariではない。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-interaction-upgrades.mjs",
+            "scope": "Public actual UI with simulated composition and viewport resize",
+            "passed": true
+          },
+          {
+            "path": "tools/check-document-answer-recovery.mjs",
+            "scope": "Question IME submission guard",
+            "passed": true
+          },
+          {
+            "path": "tools/check-document-mobile-keyboard.mjs",
+            "scope": "Public assets, simulated visual viewport, original page/split restored",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 89,
       "title": "ウィンドウ縮小型キーボード",
       "acceptance": "画面全体が縮むキーボードでも入力欄とPDFの位置を保つ",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開画面の390/1280幅でIME確定中の送信防止、PDF自身にフォーカスしたPageDown、縦横幅変更時のページ2と会話保持を確認。高さ450への縮小と仮想visualViewportの入力位置も照合。実機Safariではない。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-interaction-upgrades.mjs",
+            "scope": "Public actual UI with simulated composition and viewport resize",
+            "passed": true
+          },
+          {
+            "path": "tools/check-document-answer-recovery.mjs",
+            "scope": "Question IME submission guard",
+            "passed": true
+          },
+          {
+            "path": "tools/check-document-mobile-keyboard.mjs",
+            "scope": "Public assets, simulated visual viewport, original page/split restored",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 90,
       "title": "画面回転後の読書位置",
       "acceptance": "縦横の切り替えで同じページとチャットを保つ",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開画面の390/1280幅でIME確定中の送信防止、PDF自身にフォーカスしたPageDown、縦横幅変更時のページ2と会話保持を確認。高さ450への縮小と仮想visualViewportの入力位置も照合。実機Safariではない。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-interaction-upgrades.mjs",
+            "scope": "Public actual UI with simulated composition and viewport resize",
+            "passed": true
+          },
+          {
+            "path": "tools/check-document-answer-recovery.mjs",
+            "scope": "Question IME submission guard",
+            "passed": true
+          },
+          {
+            "path": "tools/check-document-mobile-keyboard.mjs",
+            "scope": "Public assets, simulated visual viewport, original page/split restored",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 91,
       "title": "ダウンロード名の改善",
       "acceptance": "保存したPDFに資料名が付き、資料同士を区別できる",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開PDFのContent-Dispositionに自動命名された資料名を確認。Unicode名・改行・区切り・不正サロゲートは単体で検証し、安全なfilenameとUTF-8 filename*を返す。許可済みoriginに保存名ヘッダーを公開。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-query-terminology-live.mjs",
+            "scope": "Public PDF download filename header",
+            "passed": true
+          },
+          {
+            "path": "tests/document-interaction.mjs",
+            "scope": "Unicode and control-character header safety",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 92,
       "title": "ファイル名の安全な処理",
       "acceptance": "改行や記号・日本語を含む資料名でも安全にダウンロードできる",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開PDFのContent-Dispositionに自動命名された資料名を確認。Unicode名・改行・区切り・不正サロゲートは単体で検証し、安全なfilenameとUTF-8 filename*を返す。許可済みoriginに保存名ヘッダーを公開。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-query-terminology-live.mjs",
+            "scope": "Public PDF download filename header",
+            "passed": true
+          },
+          {
+            "path": "tests/document-interaction.mjs",
+            "scope": "Unicode and control-character header safety",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 93,
       "title": "不正JSONの応答",
       "acceptance": "壊れたJSONを500エラーにせず入力エラーとして扱う",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "質問APIで壊れたJSON・null・配列・不可視文字だけの質問を公開版で各400として確認。モデルへの呼び出しが0回であることは制御API試験で確認。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-query-terminology-live.mjs",
+            "scope": "Actual public ask endpoint input rejection",
+            "passed": true
+          },
+          {
+            "path": "tests/document-query-integration.mjs",
+            "scope": "Input rejection before any model request",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 94,
       "title": "異なる型の入力の応答",
       "acceptance": "nullや配列などの入力を安全に拒否しAPI費用を発生させない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "質問APIで壊れたJSON・null・配列・不可視文字だけの質問を公開版で各400として確認。モデルへの呼び出しが0回であることは制御API試験で確認。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-query-terminology-live.mjs",
+            "scope": "Actual public ask endpoint input rejection",
+            "passed": true
+          },
+          {
+            "path": "tests/document-query-integration.mjs",
+            "scope": "Input rejection before any model request",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 95,
       "title": "見えない空質問の拒否",
       "acceptance": "不可視文字だけの質問はモデルへ送らない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "質問APIで壊れたJSON・null・配列・不可視文字だけの質問を公開版で各400として確認。モデルへの呼び出しが0回であることは制御API試験で確認。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-query-terminology-live.mjs",
+            "scope": "Actual public ask endpoint input rejection",
+            "passed": true
+          },
+          {
+            "path": "tests/document-query-integration.mjs",
+            "scope": "Input rejection before any model request",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 96,
       "title": "見つからない資料から戻る",
       "acceptance": "削除済みや期限切れのリンクから保管庫へ戻れる",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開画面で不正IDと有効形式IDの404応答の両方から「保管庫に戻る」を表示。404は制御API、実際の試験資料削除後404は受入検証でも確認。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-interaction-upgrades.mjs",
+            "scope": "Public UI with controlled missing-document 404",
+            "passed": true
+          },
+          {
+            "path": "tools/smoke-document-qa-acceptance.mjs",
+            "scope": "Actual public disposable documents deleted and return 404",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 97,
       "title": "再試行の対象を明示",
       "acceptance": "古い質問の再試行と編集中の質問を混同させない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "再試行ボタンのtitle/aria-labelに元の質問を付け、編集中の質問を送らず元の質問を再送することを公開画面の制御APIで確認。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-answer-recovery.mjs",
+            "scope": "Public UI, named retry and original-question deduplication",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 98,
       "title": "費用計測のモデル識別",
       "acceptance": "実際の応答モデルを計測に残し不明な単価を0円扱いしない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開比較APIからgpt-4.1-mini-2025-04-14と入力2527/出力45トークンを受信。応答モデル別保存を単体検証し、未登録モデルの概算単価はnull。旧記録のモデルを推定で埋めない。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-query-terminology-live.mjs",
+            "scope": "Actual public response model and token metadata",
+            "passed": true
+          },
+          {
+            "path": "tests/document-terminology-answer.mjs",
+            "scope": "Model-aware usage ledger and unknown-price rejection",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 99,
       "title": "検証セットの指紋",
       "acceptance": "設問・期待根拠・資料条件が変わった比較を同一問題と誤表示しない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開13問の記録に設問・期待値/正規表現フラグ・資料生成条件/ランナーを含むSHA-256を保存。変更や旧記録の指紋欠落は同一セット比較として拒否。過去の指紋は捏造しない。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "0fd29e3",
+          "published": true,
+          "documentVersion": 280
+        },
+        "tests": [
+          {
+            "path": "tests/document-test-fingerprint.mjs",
+            "scope": "Changed questions/evidence/page/source recipe and absent legacy fingerprint rejected",
+            "passed": true
+          },
+          {
+            "path": "tools/smoke-document-qa-acceptance.mjs",
+            "scope": "Actual public report contains testFingerprint",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 100,

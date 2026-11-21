@@ -1,0 +1,89 @@
+{
+  "translations": [
+    {
+      "language": "vi",
+      "page": 1,
+      "reuse": "generated",
+      "terminology": {
+        "count": 3,
+        "reuse": "generated",
+        "entries": [
+          [
+            "Access code",
+            "Mã truy cập"
+          ],
+          [
+            "Código de acceso",
+            "Mã truy cập"
+          ],
+          [
+            "Código de acesso",
+            "Mã truy cập"
+          ]
+        ]
+      },
+      "lines": [
+        "Hướng dẫn sử dụng giả định 1",
+        "Mã truy cập có nghĩa là một định danh được sử dụng để xác nhận đặt chỗ.",
+        "Mã truy cập có nghĩa là một định danh để xác nhận đặt chỗ.",
+        "Mã truy cập có nghĩa là một định danh để xác nhận đặt chỗ."
+      ],
+      "usage": {
+        "input": 585,
+        "output": 110,
+        "cached": 0,
+        "measuredCalls": 2
+      }
+    },
+    {
+      "language": "vi",
+      "page": 2,
+      "reuse": "generated",
+      "terminology": {
+        "count": 3,
+        "reuse": "cache",
+        "entries": [
+          [
+            "Access code",
+            "Mã truy cập"
+          ],
+          [
+            "Código de acceso",
+            "Mã truy cập"
+          ],
+          [
+            "Código de acesso",
+            "Mã truy cập"
+          ]
+        ]
+      },
+      "lines": [
+        "Hướng dẫn sử dụng giả định 2",
+        "Mã truy cập được in trên mẫu đặt chỗ.",
+        "Mã truy cập xuất hiện trên mẫu đặt chỗ.",
+        "Mã truy cập được in trên mẫu đặt chỗ."
+      ],
+      "usage": {
+        "input": 302,
+        "output": 64,
+        "cached": 0,
+        "measuredCalls": 1
+      }
+    }
+  ],
+  "questions": [
+    {
+      "question": "What does Access code mean?",
+      "answer": "Mã truy cập có nghĩa là một định danh được sử dụng để xác nhận một đặt chỗ.",
+      "evidence": [
+        {
+          "page": 1,
+          "quote": "Access code means an identifier used to confirm a booking."
+        }
+      ],
+      "savedEquivalent": "Mã truy cập"
+    }
+  ],
+  "deleted": true,
+  "savedReuse": true
+}

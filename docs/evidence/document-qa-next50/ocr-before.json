@@ -1,0 +1,35 @@
+{
+  "scope": "Real local OCR engines on browser canvases, not PDF upload round trips",
+  "rows": [
+    {
+      "name": "ALPHA",
+      "text": "Document ALPHA\nThe membership fee is 2400 yen.",
+      "ms": 1209,
+      "initializations": 1,
+      "reuse": []
+    },
+    {
+      "name": "BRAVO",
+      "text": "Document BRAVO\nThe membership fee is 2400 yen.",
+      "ms": 511,
+      "initializations": 1,
+      "reuse": []
+    },
+    {
+      "name": "CHARLIE",
+      "text": "Document CHARLIE\nThe membership fee is 2400 yen.",
+      "ms": 478,
+      "initializations": 1,
+      "reuse": []
+    },
+    {
+      "name": "DELTA",
+      "text": "Document DELTA\nThe membership fee is 2400 yen.",
+      "ms": 485,
+      "initializations": 1,
+      "reuse": []
+    }
+  ],
+  "initializations": 4,
+  "concurrent": []
+}

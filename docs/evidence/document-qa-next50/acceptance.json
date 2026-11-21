@@ -1,0 +1,403 @@
+{
+  "testFingerprint": "0bbcad232d64c45742693fc3665c7b0bbf81b58a79ee9d054493ee517b805825",
+  "passed": 13,
+  "total": 13,
+  "network": null,
+  "limits": {
+    "registration": 15000,
+    "firstAnswer": 8000
+  },
+  "retryScan": false,
+  "commit": null,
+  "measuredAt": "2026-11-21T17:40:17.084Z",
+  "browser": "157.0.8103.79",
+  "registrations": [
+    {
+      "fixture": "Excel",
+      "elapsedMs": 2173,
+      "preflightMs": 29,
+      "submitMs": 2144,
+      "ocrDownloads": [],
+      "ocrStages": null,
+      "retriedAfterReadFailure": false,
+      "pageCount": 2,
+      "deleted": true
+    },
+    {
+      "fixture": "本文PDF",
+      "elapsedMs": 1874,
+      "preflightMs": 212,
+      "submitMs": 1662,
+      "ocrDownloads": [],
+      "ocrStages": null,
+      "retriedAfterReadFailure": false,
+      "pageCount": 2,
+      "deleted": true
+    },
+    {
+      "fixture": "スキャンPDF",
+      "elapsedMs": 12503,
+      "preflightMs": 10647,
+      "submitMs": 1856,
+      "ocrDownloads": [
+        {
+          "name": "tesseract.esm.min.js",
+          "ms": 62,
+          "bytes": 9147
+        },
+        {
+          "name": "tesseract.esm.min.js",
+          "ms": 0,
+          "bytes": 0
+        }
+      ],
+      "ocrStages": {
+        "initialization": [
+          749
+        ],
+        "render": [
+          33,
+          21
+        ],
+        "recognition": [
+          9013,
+          1294
+        ],
+        "native-recognition": [
+          8901,
+          1220
+        ],
+        "full-recognition": [],
+        "horizontal-recognition": [
+          1307,
+          1048
+        ],
+        "horizontal-initialization": [
+          6564
+        ],
+        "engine-reuse": []
+      },
+      "retriedAfterReadFailure": false,
+      "pageCount": 2,
+      "deleted": true
+    },
+    {
+      "fixture": "低解像度スキャンPDF",
+      "elapsedMs": 11250,
+      "preflightMs": 9593,
+      "submitMs": 1657,
+      "ocrDownloads": [
+        {
+          "name": "tesseract.esm.min.js",
+          "ms": 54,
+          "bytes": 8849
+        },
+        {
+          "name": "tesseract.esm.min.js",
+          "ms": 0,
+          "bytes": 0
+        }
+      ],
+      "ocrStages": {
+        "initialization": [
+          721
+        ],
+        "render": [
+          33,
+          26
+        ],
+        "recognition": [
+          8007,
+          1259
+        ],
+        "native-recognition": [
+          7893,
+          1184
+        ],
+        "full-recognition": [],
+        "horizontal-recognition": [
+          1306,
+          1029
+        ],
+        "horizontal-initialization": [
+          5602
+        ],
+        "engine-reuse": []
+      },
+      "retriedAfterReadFailure": false,
+      "pageCount": 2,
+      "deleted": true
+    },
+    {
+      "fixture": "万円表記PDF",
+      "elapsedMs": 2547,
+      "preflightMs": 865,
+      "submitMs": 1682,
+      "ocrDownloads": [],
+      "ocrStages": null,
+      "retriedAfterReadFailure": false,
+      "pageCount": 2,
+      "deleted": true
+    },
+    {
+      "fixture": "ページ番号付きスキャンPDF",
+      "elapsedMs": 12934,
+      "preflightMs": 11124,
+      "submitMs": 1810,
+      "ocrDownloads": [
+        {
+          "name": "tesseract.esm.min.js",
+          "ms": 56,
+          "bytes": 8849
+        },
+        {
+          "name": "tesseract.esm.min.js",
+          "ms": 0,
+          "bytes": 0
+        }
+      ],
+      "ocrStages": {
+        "initialization": [
+          661
+        ],
+        "render": [
+          28,
+          29
+        ],
+        "recognition": [
+          8815,
+          1388
+        ],
+        "native-recognition": [
+          8581,
+          1303
+        ],
+        "full-recognition": [],
+        "horizontal-recognition": [
+          1330,
+          1053
+        ],
+        "horizontal-initialization": [
+          6217
+        ],
+        "engine-reuse": []
+      },
+      "retriedAfterReadFailure": false,
+      "pageCount": 2,
+      "deleted": true
+    }
+  ],
+  "measurements": [
+    {
+      "fixture": "Excel",
+      "question": "令和9年度の会議室の子どもの休日料金は？",
+      "answer": "470円",
+      "citations": [
+        "元のPDF 2ページ"
+      ],
+      "quotes": [
+        "A3 会議室",
+        "B4 子ども",
+        "Z1 料金",
+        "AA2 休日",
+        "AA4 470円"
+      ],
+      "elapsedMs": 182,
+      "passed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "citationNavigation": true,
+      "firstAnswerWithinLimit": true
+    },
+    {
+      "fixture": "Excel",
+      "question": "会議室の子どもの休日料金は？",
+      "answer": "令和8年度・令和9年度のうち、どの年度ですか？",
+      "citations": [],
+      "quotes": [],
+      "elapsedMs": 67,
+      "passed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "citationNavigation": null,
+      "firstAnswerWithinLimit": null
+    },
+    {
+      "fixture": "Excel",
+      "question": "令和8年度",
+      "answer": "410円",
+      "citations": [
+        "元のPDF 1ページ"
+      ],
+      "quotes": [
+        "A3 会議室",
+        "B4 子ども",
+        "C1 料金",
+        "D2 休日",
+        "D4 410円"
+      ],
+      "elapsedMs": 93,
+      "passed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "citationNavigation": true,
+      "firstAnswerWithinLimit": null
+    },
+    {
+      "fixture": "本文PDF",
+      "question": "体験会の参加費はいくら？",
+      "answer": "3,500円",
+      "citations": [
+        "元のPDF 1ページ"
+      ],
+      "quotes": [
+        "体験会の参加費は3,500円です。"
+      ],
+      "elapsedMs": 644,
+      "passed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "citationNavigation": true,
+      "firstAnswerWithinLimit": true
+    },
+    {
+      "fixture": "本文PDF",
+      "question": "体験会のキャンセル料はいくら？",
+      "answer": "読み取れた資料の範囲では、この項目の根拠を確認できませんでした。",
+      "citations": [],
+      "quotes": [],
+      "elapsedMs": 780,
+      "passed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "citationNavigation": null,
+      "firstAnswerWithinLimit": null
+    },
+    {
+      "fixture": "スキャンPDF",
+      "question": "窓口の交付手数料はいくら？",
+      "answer": "400円",
+      "citations": [
+        "元のPDF 1ページ"
+      ],
+      "quotes": [
+        "窓口交付手数料 400円"
+      ],
+      "elapsedMs": 393,
+      "passed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "citationNavigation": true,
+      "firstAnswerWithinLimit": true
+    },
+    {
+      "fixture": "スキャンPDF",
+      "question": "窓口で使える支払方法は？",
+      "answer": "読み取れた資料の範囲では、この項目の根拠を確認できませんでした。",
+      "citations": [],
+      "quotes": [],
+      "elapsedMs": 936,
+      "passed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "citationNavigation": null,
+      "firstAnswerWithinLimit": null
+    },
+    {
+      "fixture": "低解像度スキャンPDF",
+      "question": "窓口の発行手数料はいくら？",
+      "answer": "260円",
+      "citations": [
+        "元のPDF 1ページ"
+      ],
+      "quotes": [
+        "窓口の発行手数料は260円です。"
+      ],
+      "elapsedMs": 441,
+      "passed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "citationNavigation": true,
+      "firstAnswerWithinLimit": true
+    },
+    {
+      "fixture": "低解像度スキャンPDF",
+      "question": "窓口の支払方法は何ですか？",
+      "answer": "読み取れた資料の範囲では、この項目の根拠を確認できませんでした。",
+      "citations": [],
+      "quotes": [],
+      "elapsedMs": 721,
+      "passed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "citationNavigation": null,
+      "firstAnswerWithinLimit": null
+    },
+    {
+      "fixture": "万円表記PDF",
+      "question": "講習会の参加費を万を使わず数字だけの円表記で教えてください。",
+      "answer": "10500円",
+      "citations": [
+        "元のPDF 1ページ"
+      ],
+      "quotes": [
+        "講習会の参加費は1万500円です。"
+      ],
+      "elapsedMs": 1116,
+      "passed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "citationNavigation": true,
+      "firstAnswerWithinLimit": true
+    },
+    {
+      "fixture": "万円表記PDF",
+      "question": "年間の施設利用料を万を使わず数字だけの円表記で教えてください。",
+      "answer": "12000円",
+      "citations": [
+        "元のPDF 2ページ"
+      ],
+      "quotes": [
+        "年間の施設利用料は1.2万円です。"
+      ],
+      "elapsedMs": 946,
+      "passed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "citationNavigation": true,
+      "firstAnswerWithinLimit": null
+    },
+    {
+      "fixture": "ページ番号付きスキャンPDF",
+      "question": "初級講習の受講料はいくら？",
+      "answer": "320円",
+      "citations": [
+        "元のPDF 1ページ"
+      ],
+      "quotes": [
+        "初級講習の受講料は320円です。"
+      ],
+      "elapsedMs": 536,
+      "passed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "citationNavigation": true,
+      "firstAnswerWithinLimit": true,
+      "scanLineMarker": true
+    },
+    {
+      "fixture": "ページ番号付きスキャンPDF",
+      "question": "初級講習の開始時刻は何時ですか？",
+      "answer": "読み取れた資料の範囲では、この項目の根拠を確認できませんでした。",
+      "citations": [],
+      "quotes": [],
+      "elapsedMs": 1377,
+      "passed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "citationNavigation": null,
+      "firstAnswerWithinLimit": null
+    }
+  ],
+  "failures": []
+}

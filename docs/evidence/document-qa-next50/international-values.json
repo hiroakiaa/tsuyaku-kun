@@ -1,0 +1,77 @@
+{
+  "cases": [
+    {
+      "question": "登録料はいくらですか？",
+      "answer": "GBP 25",
+      "quotes": [
+        "Registration fee is GBP 25."
+      ],
+      "links": [
+        "元のPDF 1ページ"
+      ],
+      "elapsedMs": 1488,
+      "passed": true
+    },
+    {
+      "question": "備品の保証金はいくらですか？",
+      "answer": "CHF 30",
+      "quotes": [
+        "保証金 Equipment deposit is CHF 30."
+      ],
+      "links": [
+        "元のPDF 2ページ"
+      ],
+      "elapsedMs": 860,
+      "passed": true
+    },
+    {
+      "question": "昼食代はいくらですか？",
+      "answer": "CNY 300",
+      "quotes": [
+        "昼食代 Lunch price is CNY 300."
+      ],
+      "links": [
+        "元のPDF 3ページ"
+      ],
+      "elapsedMs": 861,
+      "passed": true
+    },
+    {
+      "question": "会議室の入室人数の上限は？",
+      "answer": "20人まで",
+      "quotes": [
+        "At most 20 people may enter the meeting room."
+      ],
+      "links": [
+        "元のPDF 4ページ"
+      ],
+      "elapsedMs": 858,
+      "passed": true
+    },
+    {
+      "question": "講習会の開催に必要な人数は？",
+      "answer": "At least 12 participants are required for the workshop.",
+      "quotes": [
+        "At least 12 participants are required for the workshop."
+      ],
+      "links": [
+        "元のPDF 5ページ"
+      ],
+      "elapsedMs": 1369,
+      "passed": true
+    },
+    {
+      "question": "荷物の重量条件は？",
+      "answer": "5 kg未満",
+      "quotes": [
+        "The weight must be less than 5 kg."
+      ],
+      "links": [
+        "元のPDF 6ページ"
+      ],
+      "elapsedMs": 871,
+      "passed": true
+    }
+  ],
+  "deleted": true
+}

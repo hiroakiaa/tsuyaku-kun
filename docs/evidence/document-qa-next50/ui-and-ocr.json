@@ -1,0 +1,294 @@
+{
+  "ocr": [
+    {
+      "scope": "Real local OCR engines on browser canvases, not PDF upload round trips",
+      "rows": [
+        {
+          "name": "ALPHA",
+          "text": "Document ALPHA\nThe membership fee is 2400 yen.",
+          "ms": 1158,
+          "initializations": 1,
+          "reuse": []
+        },
+        {
+          "name": "BRAVO",
+          "text": "Document BRAVO\nThe membership fee is 2400 yen.",
+          "ms": 163,
+          "initializations": 0,
+          "reuse": [
+            {
+              "kind": "tesseract6:jpn+eng:default",
+              "mode": "ready"
+            }
+          ]
+        },
+        {
+          "name": "CHARLIE",
+          "text": "Document CHARLIE\nThe membership fee is 2400 yen.",
+          "ms": 157,
+          "initializations": 0,
+          "reuse": [
+            {
+              "kind": "tesseract6:jpn+eng:default",
+              "mode": "ready"
+            }
+          ]
+        },
+        {
+          "name": "DELTA",
+          "text": "Document DELTA\nThe membership fee is 2400 yen.",
+          "ms": 148,
+          "initializations": 0,
+          "reuse": [
+            {
+              "kind": "tesseract6:jpn+eng:default",
+              "mode": "ready"
+            }
+          ]
+        }
+      ],
+      "initializations": 1,
+      "stats": {
+        "created": 1,
+        "reused": 3,
+        "terminated": 0,
+        "maxIdle": 2,
+        "idleMs": 5000,
+        "workers": 1,
+        "leases": 0,
+        "pending": 0
+      },
+      "concurrent": [
+        {
+          "name": "ECHO",
+          "text": "Document ECHO\nThe membership fee is 2400 yen.",
+          "ms": 190,
+          "initializations": 0,
+          "reuse": [
+            {
+              "kind": "tesseract6:jpn+eng:default",
+              "mode": "ready"
+            },
+            {
+              "kind": "tesseract6:jpn+eng:default",
+              "mode": "ready"
+            },
+            {
+              "kind": "tesseract6:jpn+eng:default",
+              "mode": "ready"
+            }
+          ]
+        },
+        {
+          "name": "FOXTROT",
+          "text": "Document FOXTROT\nThe membership fee is 2400 yen.",
+          "ms": 323,
+          "initializations": 0,
+          "reuse": [
+            {
+              "kind": "tesseract6:jpn+eng:default",
+              "mode": "ready"
+            },
+            {
+              "kind": "tesseract6:jpn+eng:default",
+              "mode": "ready"
+            },
+            {
+              "kind": "tesseract6:jpn+eng:default",
+              "mode": "ready"
+            }
+          ]
+        },
+        {
+          "name": "GOLF",
+          "text": "Document GOLF\nThe membership fee is 2400 yen.",
+          "ms": 444,
+          "initializations": 0,
+          "reuse": [
+            {
+              "kind": "tesseract6:jpn+eng:default",
+              "mode": "ready"
+            },
+            {
+              "kind": "tesseract6:jpn+eng:default",
+              "mode": "ready"
+            },
+            {
+              "kind": "tesseract6:jpn+eng:default",
+              "mode": "ready"
+            }
+          ]
+        }
+      ],
+      "afterClose": {
+        "created": 1,
+        "reused": 6,
+        "terminated": 1,
+        "maxIdle": 2,
+        "idleMs": 5000,
+        "workers": 0,
+        "leases": 0,
+        "pending": 0
+      }
+    }
+  ],
+  "japaneseOcr": [
+    {
+      "scope": "Actual Japanese local OCR engines on browser canvases",
+      "rows": [
+        {
+          "text": "窓0の交付手数料は400円です。\n受付は午前9時からです",
+          "ms": 10371,
+          "initialization": [
+            713
+          ],
+          "horizontalPreparation": [
+            6605
+          ],
+          "horizontalRecognition": [
+            2480
+          ],
+          "reuse": []
+        },
+        {
+          "text": "窓0の交付手数料は400円です。\n受付は午前9時からです",
+          "ms": 2397,
+          "initialization": [],
+          "horizontalPreparation": [],
+          "horizontalRecognition": [
+            2139
+          ],
+          "reuse": [
+            {
+              "kind": "tesseract6:jpn+eng:default",
+              "mode": "ready"
+            },
+            {
+              "kind": "ndlocr:parseq100:decoder3",
+              "mode": "ready"
+            }
+          ]
+        }
+      ],
+      "stats": {
+        "created": 2,
+        "reused": 2,
+        "terminated": 0,
+        "maxIdle": 2,
+        "idleMs": 5000,
+        "workers": 2,
+        "leases": 0,
+        "pending": 0
+      },
+      "afterClose": {
+        "created": 2,
+        "reused": 2,
+        "terminated": 2,
+        "maxIdle": 2,
+        "idleMs": 5000,
+        "workers": 0,
+        "leases": 0,
+        "pending": 0
+      }
+    }
+  ],
+  "recovery": [
+    {
+      "scope": "Actual reader UI with controlled interrupted API",
+      "partialRetained": true,
+      "reloadRestores": true,
+      "retryDeduplicated": true,
+      "originalQuestionNamed": true,
+      "imeDoesNotSubmit": true,
+      "requests": 2
+    }
+  ],
+  "interaction": [
+    {
+      "scope": "Actual reader UI, controlled streaming and accelerated 90s deadline",
+      "stopKeepsGrounded": true,
+      "stoppedReloadMarked": true,
+      "deadlineRecovers": true,
+      "keyboardPageNavigation": true,
+      "resizePreservesPageAndChat": true,
+      "titleImeDoesNotSubmit": true,
+      "windowShrinkingKeyboard": true,
+      "invalidLinkRecovery": true,
+      "closeAbortsPending": true,
+      "physicalSafari": false
+    }
+  ],
+  "prefetch": [
+    {
+      "scope": "Browser UI, controlled translation API and online event",
+      "englishResumedBothPages": true,
+      "saveDataSuppressesOptionalSpanish": true,
+      "visibleSpanishStillWorks": true,
+      "calls": [
+        {
+          "page": 1,
+          "language": "en",
+          "failed": true
+        },
+        {
+          "page": 1,
+          "language": "en",
+          "failed": true
+        },
+        {
+          "page": 1,
+          "language": "en",
+          "failed": false
+        },
+        {
+          "page": 2,
+          "language": "en",
+          "failed": false
+        },
+        {
+          "page": 1,
+          "language": "es",
+          "failed": false
+        }
+      ]
+    }
+  ],
+  "keyboard": [
+    {
+      "touchViewport": true,
+      "simulatedVisualViewport": true,
+      "physicalSafari": false,
+      "before": 438.8750025331974,
+      "during": 115.1875,
+      "after": 438.875,
+      "pagePreserved": 2,
+      "inputWithinViewport": true
+    }
+  ],
+  "priority": [
+    {
+      "width": 390,
+      "calls": [
+        1,
+        2,
+        6,
+        5,
+        3
+      ],
+      "visibleBypassesHeldPrefetch": true,
+      "noExtraPrefetchWhileVisiblePending": true
+    },
+    {
+      "width": 1280,
+      "calls": [
+        1,
+        2,
+        6,
+        5,
+        3
+      ],
+      "visibleBypassesHeldPrefetch": true,
+      "noExtraPrefetchWhileVisiblePending": true
+    }
+  ]
+}

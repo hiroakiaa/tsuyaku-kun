@@ -1,0 +1,113 @@
+{
+  "cases": [
+    {
+      "question": "What does Access code mean?",
+      "answer": "Access code means an identifier used to confirm a booking.",
+      "quotes": [
+        "Access code means an identifier used to confirm a booking."
+      ],
+      "links": [
+        "元のPDF 1ページ"
+      ],
+      "elapsedMs": 1474,
+      "passed": true
+    },
+    {
+      "question": "Where is the Access code printed?",
+      "answer": "the booking form",
+      "quotes": [
+        "Access code is printed on the booking form."
+      ],
+      "links": [
+        "元のPDF 2ページ"
+      ],
+      "elapsedMs": 1393,
+      "passed": true
+    },
+    {
+      "question": "¿Qué significa Código de acceso?",
+      "answer": "Código de acceso significa un identificador para confirmar una reserva.",
+      "quotes": [
+        "Código de acceso significa un identificador para confirmar una reserva."
+      ],
+      "links": [
+        "元のPDF 3ページ"
+      ],
+      "elapsedMs": 1390,
+      "passed": true
+    },
+    {
+      "question": "¿Dónde aparece el Código de acceso?",
+      "answer": "El Código de acceso aparece en el formulario de reserva.",
+      "quotes": [
+        "Código de acceso aparece en el formulario de reserva."
+      ],
+      "links": [
+        "元のPDF 4ページ"
+      ],
+      "elapsedMs": 1380,
+      "passed": true
+    },
+    {
+      "question": "O que significa Código de acesso?",
+      "answer": "Código de acesso significa um identificador para confirmar uma reserva.",
+      "quotes": [
+        "Código de acesso significa um identificador para confirmar uma reserva."
+      ],
+      "links": [
+        "元のPDF 5ページ"
+      ],
+      "elapsedMs": 1377,
+      "passed": true
+    },
+    {
+      "question": "Onde está impresso o Código de acesso?",
+      "answer": "Código de acesso está impresso no formulário de reserva.",
+      "quotes": [
+        "Formulário Código de acesso está impresso no formulário de reserva."
+      ],
+      "links": [
+        "元のPDF 6ページ"
+      ],
+      "elapsedMs": 1373,
+      "passed": true
+    },
+    {
+      "question": "page 7: cafe registration fee?",
+      "answer": "GBP 27",
+      "quotes": [
+        "Café registration fee is GBP 27."
+      ],
+      "links": [
+        "元のPDF 7ページ"
+      ],
+      "elapsedMs": 859,
+      "passed": true
+    },
+    {
+      "question": "pages 7 to 8: international registration fee?",
+      "answer": "CHF 40",
+      "quotes": [
+        "The international registration fee is CHF 40."
+      ],
+      "links": [
+        "元のPDF 8ページ"
+      ],
+      "elapsedMs": 876,
+      "passed": true
+    }
+  ],
+  "deleted": true,
+  "protocol": {
+    "invalid": [
+      400,
+      400,
+      400,
+      400
+    ],
+    "disposition": "inline; filename=\"document.pdf\"; filename*=UTF-8''20261122_fictional-query-terminology.pdf",
+    "model": "gpt-4.1-mini-2025-04-14",
+    "input": 2527,
+    "output": 45
+  }
+}
