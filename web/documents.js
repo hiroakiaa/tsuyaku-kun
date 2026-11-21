@@ -1,4 +1,4 @@
-const DOCUMENT_RELEASE='278';
+const DOCUMENT_RELEASE='279';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';

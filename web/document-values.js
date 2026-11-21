@@ -20,7 +20,7 @@ function extendedNumericNotation(value){
  for(const [words,comparison]of [['at least|no fewer than','以上'],['at most|no more than|up to','以下'],['less than|under|below','未満'],['more than|over|above','超']])value=value.replace(new RegExp('\\b(?:'+words+')\\s+'+quantity,'giu'),(_,q)=>q+comparison);
  return value.replace(new RegExp(quantity+'\\s+or (?:more|greater)\\b','giu'),(_,q)=>q+'以上').replace(new RegExp(quantity+'\\s+or (?:less|fewer)\\b','giu'),(_,q)=>q+'以下');
 }
-export function numericEvidenceVersion(pages){return /(?:\b(?:GBP|CHF|CNY|RMB)\s*\d|£\s*[0-9.]|\d\s*(?:British pounds?|pounds? sterling|Swiss francs?|Chinese yuan|renminbi|GBP|CHF|CNY|RMB|people|persons?|participants?|attendees?|students?)\b|\b(?:at least|at most|no more than|no fewer than|up to|less than|more than|under|below|over|above)\s+\d|\d\s*[^\n]{0,12}\s+or (?:more|less|fewer)\b)/iu.test(pages.join('\n'))?36:35;}
+export function numericEvidenceVersion(pages){return /(?:\b(?:GBP|CHF|CNY|RMB)\s*\d|£\s*[0-9.]|\d\s*(?:British pounds?|pounds? sterling|Swiss francs?|Chinese yuan|renminbi|GBP|CHF|CNY|RMB|people|persons?|participants?|attendees?|students?)\b|\b(?:at least|at most|no more than|no fewer than|up to|less than|more than|under|below|over|above)\s+\d|\d\s*[^\n]{0,12}\s+or (?:more|less|fewer)\b)/iu.test(pages.join('\n'))?37:35;}
 export function numericText(text){return extendedNumericNotation(String(text).normalize('NFKC').replaceAll('−','-')
  .replace(/([0-9][0-9,]*(?:\.[0-9]+)?)\s*(?:Japanese yen|yen|JPY)\b/giu,'$1円')
  .replace(/(?:JPY|¥)\s*([0-9][0-9,]*(?:\.[0-9]+)?)/gu,'$1円')

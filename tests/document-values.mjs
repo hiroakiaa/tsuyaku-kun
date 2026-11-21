@@ -25,4 +25,4 @@ console.log('PASS requested unit conversions compute only from one grounded valu
 
 assert.equal(requestedMeasureConversion('何グラムですか','5000 g',[{quote:'The weight is at most 5 kg.'}]),'5 kg以下 = 5000 グラム以下');assert.equal(requestedMeasureConversion('何グラムですか','5000 g',[{quote:'The weight is at most 5 kg.'},{quote:'The weight is at least 5 kg.'}]),null);console.log('PASS unit conversion preserves bounds and refuses conflicting constraints');
 
-assert.equal(numericEvidenceVersion(['£.50']),36);assert.equal(numericEvidenceVersion(['費用は500円です。']),35);assert.equal(numericText('5 pounds of flour'),'5 pounds of flour');console.log('PASS only affected numeric evidence invalidates its answer cache; weight pounds are not treated as currency');
+assert.equal(numericEvidenceVersion(['£.50']),37);assert.equal(numericEvidenceVersion(['費用は500円です。']),35);assert.equal(numericText('5 pounds of flour'),'5 pounds of flour');console.log('PASS only affected numeric evidence invalidates its answer cache; weight pounds are not treated as currency');
