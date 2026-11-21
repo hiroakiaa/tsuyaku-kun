@@ -8,7 +8,7 @@ import {alignPdfTranslation,pdfComparableText} from './pdf-translation-alignment
 import {resumeTranslation,transientTranslationError} from './translation-resume.js?v=20261119-resume-1';
 import {readPdfPageText,lookupTableCell,lookupAlignedTableCell,tableOverviewEntity} from './document-table-lookup.js?v=89';
 import {recordDocumentQaMetric} from './document-qa-metrics.js?v=3';
-import {layoutPdfText} from './document-table.js?v=94';
+import {layoutPdfText} from './document-table.js?v=95';
 import {installLocalIcons,localIcon} from './icons.js?v=pdf-controls';
 import {config} from './config.js';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
@@ -218,7 +218,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '267');
+      guide.searchParams.set('v', '268');
       link.href = guide.href;
       if (typeof entry.shared==='boolean') append(body,'small',entry.shared?'共通保管庫に公開':'作成したブラウザーで閲覧');
       const remove = append(card,'button','','library-remove');
@@ -441,7 +441,7 @@ async function reader() {
   };
   askDialog.addEventListener('close',()=>{
     if (dialog.open) dialog.close();
-    location.replace('?v=267');
+    location.replace('?v=268');
   });
   const sourceType = doc.sourceType ?? 'pdf';
   let opened,originalUrl,officeText,officeRender = 0;
@@ -1744,7 +1744,7 @@ async function reader() {
       createUrl.searchParams.delete('id');
       createUrl.searchParams.delete('library');
       createUrl.searchParams.set('create','1');
-      createUrl.searchParams.set('v','267');
+      createUrl.searchParams.set('v','268');
       location.replace(createUrl);
     } catch (error) {
       document.querySelector('#remove-status').textContent = error.message;
@@ -2211,7 +2211,7 @@ try {
         icon.append(localIcon('book-open'));
         const body = append(card,'div','','library-card-body');
         const link = append(body,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=267';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=268';
         }
       };
       $('#library-search').addEventListener('input',renderShared);

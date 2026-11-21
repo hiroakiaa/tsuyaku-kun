@@ -44,14 +44,16 @@
       "id": 6,
       "title": "縦横混在",
       "acceptance": "縦書き見出しと横書き本文の読み方向・引用位置が一致",
-      "status": "pending",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開848074d右側IABの未埋め込み縦書き教科表で、縦の数学/理科と横の重点目標/取組の対応、根拠1ページ、原文黄色マーカーを確認。390/1280の行概要回帰と縦書き単体テストも合格。"
+      ]
     },
     {
       "id": 7,
       "title": "段組み読み順",
       "acceptance": "2段・3段の本文順序と段落が一致",
-      "status": "pending",
+      "status": "in_progress",
       "evidence": []
     },
     {
@@ -81,8 +83,10 @@
       "id": 11,
       "title": "翻訳抜け検出",
       "acceptance": "原文領域と訳文の対応数を検証し欠落を成功扱いしない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開99b3da5/documents v267、共有資料のドイツ語30原文組→30訳文組、2組の改行末尾を段落化し、単独「す。」の原文/不自然訳が消えたことを右側IABで確認。1280/390の別匿名利用者はgenerated→cache。部分キャッシュの欠落検出→自動再配置も両幅公開資材で合格。checks/paragraph-live.json、checks/translation-coverage-public.log。"
+      ]
     },
     {
       "id": 12,
@@ -102,8 +106,10 @@
       "id": 14,
       "title": "段落翻訳",
       "acceptance": "改行で切れた文を文脈付きで翻訳し元領域に対応",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開99b3da5/documents v267、共有資料のドイツ語30原文組→30訳文組、2組の改行末尾を段落化し、単独「す。」の原文/不自然訳が消えたことを右側IABで確認。1280/390の別匿名利用者はgenerated→cache。部分キャッシュの欠落検出→自動再配置も両幅公開資材で合格。checks/paragraph-live.json、checks/translation-coverage-public.log。"
+      ]
     },
     {
       "id": 15,

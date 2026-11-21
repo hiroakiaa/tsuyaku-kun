@@ -109,6 +109,24 @@ export function layoutPdfText(items) {
       horizontal = [...split.map(([left])=>formatRow(left)), '', ...split.map(([,right])=>formatRow(right))];
     }
   }
+  // Prose columns need column-first reading order. Require large independent
+  // headings, a clear gutter throughout, and several long prose lines in each
+  // column; ordinary tables with short labels or numeric cells keep row order.
+  if(!vertical.length&&!rotated.length)for(let heading=0;heading<Math.min(4,groupedRows.length);heading++){
+    const heads=groupedRows[heading].cells;
+    if(![2,3].includes(heads.length))continue;
+    const body=groupedRows.slice(heading+1),size=Math.max(0,...body.flatMap(row=>row.cells.map(cell=>cell.size)));
+    if(!size||!heads.every(cell=>cell.size>=size*1.2))continue;
+    const starts=heads.map(cell=>cell.x),sections=starts.map(()=>[]);let valid=true;
+    for(const row of groupedRows.slice(heading)){
+      const parts=starts.map(()=>[]);
+      for(const cell of row.cells){const column=starts.findLastIndex(start=>cell.x>=start-2);if(column<0||(column+1<starts.length&&cell.end>starts[column+1]-size*1.5)){valid=false;break;}parts[column].push(cell);}
+      if(!valid)break;
+      parts.forEach((cells,index)=>{if(cells.length)sections[index].push(formatRow(cells));});
+    }
+    if(!valid||sections.some(lines=>lines.length<4||lines.slice(1).filter(line=>line.length>=20&&!/^[-+\d\s.,%円]+$/u.test(line)).length<3))continue;
+    horizontal=[...horizontal.slice(0,heading),...sections.flatMap((lines,index)=>[...(index?['']:[]),...lines])];break;
+  }
   const columns = vertical.sort((a,b)=>b.x-a.x).map(column=>
     column.fragments.sort((a,b)=>b.y-a.y).map(fragment=>fragment.text).join(''));
   return [...horizontal,...columns,...rotated].join('\n');
