@@ -1,5 +1,5 @@
 import {numericText} from './document-values.js?v=1';
-import {unreadablePages} from './document-reading-quality.js?v=1';
+import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
 import {installDocumentReadingSettings,reducedDocumentMotion} from './document-reading-settings.js?v=1';
 import {isLegacyImagePage,imageContentFrame,paintImageFrame} from './document-image-margins.js?v=1';
@@ -17,7 +17,7 @@ import {config} from './config.js';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
 import {fillLanguageOptions} from './language-picker.js?v=20261103-analysis-stages-1';
 import {selectableCatalog} from './selectable-catalog.js';
-import {createDocumentUiLocale} from './document-ui-locale.js?v=8';
+import {createDocumentUiLocale} from './document-ui-locale.js?v=9';
 const $ = (selector) => document.querySelector(selector);
 const content = $('#content');
 let id = new URLSearchParams(location.search).get('id');
@@ -145,7 +145,7 @@ async function extract(file, status) {
       const {requiresOcr,pageNumberOnly}=pdfPageTextStatus(text,n);
       if (requiresOcr) {
         status.textContent = 'スキャンページを端末で読んでいます… ' + n + ' / ' + pdf.numPages;
-        const {createPdfOcr} = await import('./document-ocr.js?v=118');
+        const {createPdfOcr} = await import('./document-ocr.js?v=119');
         ocr ??= await createPdfOcr((await pdfLibrary()).OPS);
         if (page.rotate) {
           const runs=await ocr.readLayout(page,pageNumberOnly ? parts : []).catch(()=>[]);
@@ -659,7 +659,7 @@ async function reader() {
     if (!requiresOcr) return items;
     if (!scanLayouts.has(number)) {
       scanLayouts.set(number,(async()=>{
-        const {createPdfOcr}=await import('./document-ocr.js?v=118');
+        const {createPdfOcr}=await import('./document-ocr.js?v=119');
         const reader=await createPdfOcr((await pdfLibrary()).OPS);
         try {
           const runs=await (reader.readCanonicalLayout?.(page,pageNumberOnly ? items : [])??reader.readLayout(page,pageNumberOnly ? items : []));
@@ -787,7 +787,7 @@ async function reader() {
       const {fnArray,argsArray}=await page.getOperatorList();
       if (!fnArray.some((op,index)=>op===OPS.paintImageXObject &&
           argsArray[index]?.[1]>=300 && argsArray[index]?.[2]>=150)) return [];
-      const {createPdfOcr}=await import('./document-ocr.js?v=118');
+      const {createPdfOcr}=await import('./document-ocr.js?v=119');
       const reader=await createPdfOcr(OPS);
       try {
         const runs=await reader.readLayout(page,items,{diagram:true});
@@ -1514,9 +1514,9 @@ async function reader() {
     if (n<1 || n>doc.pageCount) return;
     selectedPage = n;
     const qualityNotice=$('#pdf-reading-quality');
-    const uncertain=doc.readingQuality?.find(item=>item.page===n&&item.status==='uncertain');
+    const uncertain=doc.readingQuality?.find(item=>item.page===n&&(item.status==='uncertain'||item.unresolvedNumbers>0));
     qualityNotice.hidden=!uncertain;
-    qualityNotice.textContent=uncertain?'このページは文字の読み取りが不確かです。原文と照合してください。':'';
+    qualityNotice.textContent=uncertain?(uncertain.unresolvedNumbers>0?'このページには読み取りを確認できない数値があります。原文と照合してください。':'このページは文字の読み取りが不確かです。原文と照合してください。'):'';
     readingPosition(id,{page:n});
     syncContentsPage();
     pagePicker.value = n;
@@ -1748,7 +1748,7 @@ async function reader() {
         upload = (await convertDocument(file)).file;
       }
       form.set('file',upload);
-      if (/\.pdf$/i.test(upload.name)) form.set('pages',JSON.stringify(await extract(upload,status)));
+      if (/\.pdf$/i.test(upload.name)){const pages=await extract(upload,status);form.set('pages',JSON.stringify(pages));form.set('readingQuality',JSON.stringify(pages.readingQuality??[]));}
       if (/\.(docx|xlsx)$/i.test(file.name)) {
         const {officePages} = await import('./document-office.js?v=92');
         form.set('pages',JSON.stringify(await officePages(file)));
@@ -1837,10 +1837,16 @@ async function reader() {
       return joined.split(/(?<=。)\s*(?=・)/).filter(Boolean);
     });
   }
+  let readingCheckSequence=0;
   function renderAnswerText(section,item,animate) {
     const body = append(section,'p','','answer-text');
     const uncertain=unreadablePages(doc.readingQuality);
-    const answer = item.answer ?? (uncertain.length ? '文字を十分に読み取れないページがあるため、根拠を確認できませんでした。原文をご確認ください（'+uncertain.join('・')+'ページ）。' : '読み取れた資料の範囲では、この項目の根拠を確認できませんでした。');
+    if(!item.answer){
+      const message=append(body,'span',uncertain.length?'文字を十分に読み取れないページがあるため、根拠を確認できませんでした。原文をご確認ください。':'読み取れた資料の範囲では、この項目の根拠を確認できませんでした。');message.dataset.documentUi='true';
+      if(uncertain.length){body.append(' ');const label=append(body,'span','確認するページ');label.dataset.documentUi='true';label.id='reading-check-'+ ++readingCheckSequence;body.append(': ');uncertain.forEach((page,index)=>{if(index)body.append(', ');const material=materials.find(item=>page>=item.start&&page<item.start+item.count);if(page>doc.pageCount){body.append(material?material.name+' · '+(page-material.start+1):String(page));return;}const link=append(body,'button',String(page),'reading-check-page');link.type='button';link.id=label.id+'-'+page;link.setAttribute('aria-labelledby',label.id+' '+link.id);link.onclick=()=>{clearCitation();void showPdf(page);};});}
+      return;
+    }
+    const answer=item.answer;
     const keyFacts = /(?:[0-9０-９]+(?:[.,．][0-9０-９]+)*\s*(?:時(?:[0-9０-９]+分)?|分|円|月(?:[0-9０-９]+日)?|日|年|回|人|％|%))/gu;
     const match = item.answer && (keyFacts.exec(answer) ?? /^[^。！？\n]{1,55}(?:[。！？]|$)/u.exec(answer));
     if (!match) {

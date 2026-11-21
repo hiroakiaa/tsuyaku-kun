@@ -1,4 +1,4 @@
-import {validatedReadingQuality} from '../web/document-reading-quality.js';
+import {validatedReadingQuality,mergeReadingQuality} from '../web/document-reading-quality.js';
 import {definedDocumentTerms,sharedDocumentTerminology} from './document-terminology.js';
 import {documentNames,protectDocumentNames} from './document-names.js';
 import {numericText,supportsDatesAndMeasures,requestedMeasureConversion} from './document-values.js';
@@ -1029,7 +1029,7 @@ export async function documents(request,env,auth) {
     if (!Array.isArray(pages) || pages.length>MAX_PAGES || pages.some(page=>typeof page!=='string') ||
         pages.join('').length>MAX_TEXT || !pages.some(page=>page.trim())) return fail('追加資料は文字のある40ページ・22,000文字以内のファイルを選んでください。');
     const unit = ext==='pdf' ? 'ページ' : ext==='xlsx' ? 'シート' : ext==='docx' ? '文書' : '画像';
-    return target.fetch('https://room/document/material',{method:'POST',body:JSON.stringify({owner:auth.uid,name:file.name.slice(0,150),unit,pages})});
+    return target.fetch('https://room/document/material',{method:'POST',body:JSON.stringify({owner:auth.uid,name:file.name.slice(0,150),unit,pages,readingQuality:validatedReadingQuality(form.get('readingQuality'),pages.length)})});
   }
   if (!(['ask','translate','summary'].includes(action) && request.method==='POST') && !((!action || action==='text') && request.method==='GET')) return fail('この操作は使えません。',405);
   const info = await target.fetch('https://room/document/data',{headers:{'X-Document-Viewer':auth.uid}});
@@ -1291,7 +1291,7 @@ export async function documents(request,env,auth) {
       return reply({items,answer:items[0].answer,pages:[...new Set(items.flatMap(item=>item.evidence.map(source=>source.page)))]});
     }
   }
-  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([35,language??'',record.pages,record.materials ?? [],generationQuestion.trim()])));
+  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([35,language??'',record.pages,record.materials ?? [],generationQuestion.trim(),...(record.revision?[record.revision]:[])])));
   const cacheKey = Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
   const cacheUrl = 'https://room/document/answer/'+cacheKey;
   const cached = await (await target.fetch(cacheUrl)).json();
@@ -1659,7 +1659,7 @@ export async function documentStorage(request,storage,env) {
         return fail('差し替え後の資料が本文の上限を超えています。',413);
       }
       const materials = (current.materials ?? []).map(material=>({...material,start:material.start+shift}));
-      const values = {document:{...current,pages,readingQuality:input.readingQuality??[],materials,index:searchIndex(pages),items:input.items,toc:input.toc,sourceType:'pdf',convertedWorksheet:false,originalPageCount:input.pages.length,revision:(current.revision ?? 0)+1}};
+      const values = {document:{...current,pages,readingQuality:mergeReadingQuality(current.readingQuality,input.readingQuality,{start:1,replaceCount:oldCount,newCount:input.pages.length}),materials,index:searchIndex(pages),items:input.items,toc:input.toc,sourceType:'pdf',convertedWorksheet:false,originalPageCount:input.pages.length,revision:(current.revision ?? 0)+1}};
       for (let offset=0;offset<pdf.length;offset+=CHUNK) values['pdf:'+offset]=pdf.slice(offset,offset+CHUNK);
       const previous = await tx.list({prefix:'pdf:'});
       const obsolete = [...previous.keys()].filter(key=>!(key in values));
@@ -1697,7 +1697,7 @@ export async function documentStorage(request,storage,env) {
         return fail('追加資料は8件まで、本文は元のPDFと合わせて22,000文字までです。',413);
       }
       const material = {name:input.name,unit:input.unit,start:current.pages.length+1,count:input.pages.length};
-      await tx.put('document',{...current,originalPageCount:current.originalPageCount ?? current.pages.length,pages,index:searchIndex(pages),materials:[...materials,material],revision:(current.revision ?? 0)+1});
+      await tx.put('document',{...current,originalPageCount:current.originalPageCount ?? current.pages.length,pages,readingQuality:mergeReadingQuality(current.readingQuality,input.readingQuality,{start:current.pages.length+1,newCount:input.pages.length}),index:searchIndex(pages),materials:[...materials,material],revision:(current.revision ?? 0)+1});
       return reply(material,201);
     });
   }

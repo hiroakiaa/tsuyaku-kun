@@ -1,4 +1,9 @@
 export const documentUiLabels=[
+ ['このページには読み取りを確認できない数値があります。原文と照合してください。','This page has unverified numbers. Please check the original.','Esta página contiene números sin verificar. Revisa el original.'],
+ ['読み取れた資料の範囲では、この項目の根拠を確認できませんでした。',"I couldn't verify supporting evidence in the text that could be read.",'No pude verificar pruebas en el texto que se pudo leer.'],
+ ['文字を十分に読み取れないページがあるため、根拠を確認できませんでした。原文をご確認ください。',"Some pages could not be read clearly, so I couldn't verify the evidence. Please check the original.",'Algunas páginas no se pudieron leer claramente, así que no pude verificar las pruebas. Revisa el original.'],
+ ['このページは文字の読み取りが不確かです。原文と照合してください。','Text recognition on this page is uncertain. Please check the original.','El reconocimiento del texto de esta página es incierto. Revisa el original.'],
+ ['確認するページ','Pages to check','Páginas que revisar'],
  ['たとえ（資料外の説明）','Analogy (explanation outside the document)','Analogía (explicación ajena al documento)'],
  ['資料を見ながら質問できます。回答のページ番号で根拠を確認できます。','Ask while reading. Select a page number in an answer to check its source.','Pregunta mientras lees. Selecciona el número de página de una respuesta para comprobar su fuente.'],
  ['操作案内を閉じる','Dismiss reading tip','Cerrar ayuda'],

@@ -125,7 +125,7 @@ export async function createPdfOcr(ops) {
     const compact=text=>text.normalize('NFKC').replace(/\s/gu,'');
     const malformed=/(?:[ァ-ヶー]{2,4}月[0-9一二三四五六七八九十]{1,3}日|[0-9一二三四五六七八九十]{1,3}月[一二三四五六七八九十]*ニ[ニ一二三四五六七八九十\s]*日)/u;
     const calendar=/(?:1[0-2]|[1-9]|十[一二]?|[一二三四五六七八九])月[0-9一二三四五六七八九十]{1,3}日/u;
-    let lines=linesOf(primary),canvas=input;
+    let lines=linesOf(primary),canvas=input,confidence=primary.confidence;
     if(!disabled && typeof DecompressionStream==='function' && (preferHorizontal||/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(primary.text))){
       const pixels=input.getContext('2d').getImageData(0,0,input.width,input.height);
       const {findHorizontalScanLines}=await import('./document-ocr-lines.js?v=3');
@@ -166,16 +166,19 @@ export async function createPdfOcr(ops) {
     if(malformed.test(compact(text))&&!malformed.test(compact(primary.text))&&calendar.test(compact(primary.text))){lines=linesOf(primary);text=textOf(lines);}
     if((compact(text).length<8||malformed.test(compact(text)))&&fallbackCanvas!==input){
       const full=(await (await standardWorker()).recognize(fallbackCanvas,{}, {blocks:true})).data;
-      if(compact(text).length<8||(!malformed.test(compact(full.text))&&calendar.test(compact(full.text)))){lines=linesOf(full);text=textOf(lines);canvas=fallbackCanvas;}
+      if(compact(text).length<8||(!malformed.test(compact(full.text))&&calendar.test(compact(full.text)))){lines=linesOf(full);text=textOf(lines);canvas=fallbackCanvas;confidence=full.confidence;}
     }
-    return {text,lines,canvas,confidence:primary.confidence};
+    return {text,lines,canvas,confidence};
   }
   async function recognizeScanCanvas(input,options={}) {
     const prepared=prepareScanCanvas(input);
     try{
       const result=await recognizePreparedCanvas(prepared.canvas,options);
-      if(result.canvas===prepared.canvas){result.lines=result.lines.map(line=>({...line,bbox:prepared.restore(line.bbox)}));result.canvas=input;}
-      result.quality={...prepared.quality,confidence:result.confidence,characters:result.text.replace(/\s/gu,'').length};
+      const usedPrepared=result.canvas===prepared.canvas;
+      const assessment=usedPrepared?prepared:prepareScanCanvas(result.canvas);
+      if(usedPrepared){result.lines=result.lines.map(line=>({...line,bbox:prepared.restore(line.bbox)}));result.canvas=input;}
+      const quality={...assessment.quality};if(assessment!==prepared)assessment.close();
+      result.quality={...quality,confidence:result.confidence,characters:result.text.replace(/\s/gu,'').length,unresolvedNumbers:result.lines.reduce((sum,line)=>sum+(line.ocrNumberUnresolved??0),0)};
       result.quality.status=result.quality.softInkRatio<.001 ? 'blank' : result.quality.characters<8 || result.confidence<35 ? 'uncertain' : 'readable';
       lastQuality=result.quality;
       return result;
@@ -197,18 +200,19 @@ export async function createPdfOcr(ops) {
         const {findVerticalScanRegion}=await import('./document-ocr-lines.js?v=3');if(findVerticalScanRegion(input.getContext('2d').getImageData(0,0,input.width,input.height))?.wholePage)return this.readLayout(page,pageNumberItems);
         const result=await recognizeScanCanvas(input,{preferHorizontal:pageNumberItems.length>0,fallbackCanvas:canvas});
         if(result.canvas!==input){input=result.canvas;bounds=undefined;}
-        const runs=result.lines.flatMap(({text,bbox})=>{
+        const runs=result.lines.flatMap(({text,bbox,ocrNumberUnresolved})=>{
           const str=typeof text==='string'?text.trim():'';if(!str||!bbox)return [];
           let left,top,right,bottom;
           if(bounds){const [x0,y0,x1,y1]=bounds;[left,top]=size.convertToViewportPoint(x0+bbox.x0/input.width*(x1-x0),y1-bbox.y0/input.height*(y1-y0));[right,bottom]=size.convertToViewportPoint(x0+bbox.x1/input.width*(x1-x0),y1-bbox.y1/input.height*(y1-y0));}
           else{left=bbox.x0/viewport.scale;top=bbox.y0/viewport.scale;right=bbox.x1/viewport.scale;bottom=bbox.y1/viewport.scale;}
           const width=right-left,height=bottom-top;if(![left,top,width,height].every(Number.isFinite)||width<=0||height<=0)return [];
-          const [x,y]=size.convertToPdfPoint(left,bottom);return [{str,width,height,ocr:true,ocrBox:[left/size.width,top/size.height,width/size.width,height/size.height],transform:[height,0,0,height,x,y]}];
+          const [x,y]=size.convertToPdfPoint(left,bottom);return [{str,width,height,ocr:true,ocrUncertainNumber:Boolean(ocrNumberUnresolved),ocrBox:[left/size.width,top/size.height,width/size.width,height/size.height],transform:[height,0,0,height,x,y]}];
         });
         runs.quality=result.quality;return runs;
       }finally{canvas.width=canvas.height=0;if(native)native.width=native.height=0;}
     },
     async readLayout(page,pageNumberItems=[],{diagram=false}={}) {
+      lastQuality=undefined;
       const size=page.getViewport({scale:1});
       const viewport=page.getViewport({scale:Math.min(3,2400/Math.max(size.width,size.height))});
       const canvas=document.createElement('canvas');

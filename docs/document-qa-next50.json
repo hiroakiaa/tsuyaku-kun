@@ -1,0 +1,360 @@
+{
+  "schema": 2,
+  "created": "2026-11-22",
+  "phase": 2,
+  "startId": 51,
+  "title": "資料QA 追加改善50項目",
+  "policy": "最初の50項目確認後に定義。数は実装・受入条件・公開または適切な自動検証証拠が揃った項目のみ。実機Safariと冷間4Mbpsの登録30秒基準は別途未達として隠さず記録。",
+  "items": [
+    {
+      "id": 51,
+      "title": "根拠なし理由の言語対応",
+      "acceptance": "根拠なしの最終文が日本語・英語・選択言語に追従する",
+      "status": "in_progress",
+      "evidence": []
+    },
+    {
+      "id": 52,
+      "title": "読み取り注意の言語対応",
+      "acceptance": "読み取り不確かなページの注意が利用言語に追従する",
+      "status": "in_progress",
+      "evidence": []
+    },
+    {
+      "id": 53,
+      "title": "確認ページ表記の言語対応",
+      "acceptance": "注意に付くページ番号・ページ名が言語変更後も正しく表示される",
+      "status": "in_progress",
+      "evidence": []
+    },
+    {
+      "id": 54,
+      "title": "再認識時の品質更新",
+      "acceptance": "全体画像への再認識が成功した時はその認識の品質を採用する",
+      "status": "in_progress",
+      "evidence": []
+    },
+    {
+      "id": 55,
+      "title": "回転ページの品質分離",
+      "acceptance": "前ページの品質判定が回転ページに引き継がれない",
+      "status": "in_progress",
+      "evidence": []
+    },
+    {
+      "id": 56,
+      "title": "追加資料の読み取り状態",
+      "acceptance": "追加資料の品質を元資料のページ番号に続けて保存する",
+      "status": "in_progress",
+      "evidence": []
+    },
+    {
+      "id": 57,
+      "title": "差し替え時の読み取り状態",
+      "acceptance": "元PDFの差し替えで追加資料の品質番号も正しく移動する",
+      "status": "in_progress",
+      "evidence": []
+    },
+    {
+      "id": 58,
+      "title": "再解析後の回答キャッシュ更新",
+      "acceptance": "同じ本文でも再解析後は前の回答キャッシュを使い回さず回答を再評価する",
+      "status": "in_progress",
+      "evidence": []
+    },
+    {
+      "id": 59,
+      "title": "不確かなページへの導線",
+      "acceptance": "元PDFの注意から該当ページを直接開け、追加資料には無効なページ移動リンクを作らない",
+      "status": "in_progress",
+      "evidence": []
+    },
+    {
+      "id": 60,
+      "title": "数字OCRの未確認通知",
+      "acceptance": "数値の複数認識が未一致の場合はその情報を失わず表示する",
+      "status": "in_progress",
+      "evidence": []
+    },
+    {
+      "id": 61,
+      "title": "OCR準備の再利用",
+      "acceptance": "同一画面で次のスキャンを読む時に初期化の再利用を実測する",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 62,
+      "title": "共有OCRの順番待ち",
+      "acceptance": "共用エンジンに同時認識が入っても別の資料の結果が混ざらない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 63,
+      "title": "OCRの待機資源解放",
+      "acceptance": "未使用になった共用エンジンを待機後に解放する",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 64,
+      "title": "OCR初期化失敗からの復帰",
+      "acceptance": "失敗した初期化を再利用せず次回正常に初期化できる",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 65,
+      "title": "OCR準備時間の内訳",
+      "acceptance": "日本語認識の準備と認識本体の時間を分けて記録する",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 66,
+      "title": "通貨表記の拡充",
+      "acceptance": "GBPなどの記号・名称を同じ金額で照合し別通貨との混同を拒否する",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 67,
+      "title": "英語の人数照合",
+      "acceptance": "people/personの人数と日本語の人数を照合し違う人数を拒否する",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 68,
+      "title": "英語の上下限照合",
+      "acceptance": "at least/at most/less thanの条件の反転を拒否する",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 69,
+      "title": "不可視文字を含む検索",
+      "acceptance": "ゼロ幅空白があっても検索でき、表示・引用の原文は保つ",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 70,
+      "title": "行末ハイフンの検索",
+      "acceptance": "英語の行末分割語を検索でき、通常の負数や固有表記は変えない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 71,
+      "title": "アクセントを省いた検索",
+      "acceptance": "アクセント省略を検索候補に使い、原文引用はそのまま保持する",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 72,
+      "title": "ページ指定の検索",
+      "acceptance": "明示した1ページの範囲を優先し、年度などをページ指定と誤認しない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 73,
+      "title": "ページ範囲の検索",
+      "acceptance": "明示した複数ページの範囲を検索し範囲外の条件を混ぜない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 74,
+      "title": "英語の定義語共有",
+      "acceptance": "英語で明示的に定義され繰り返す語をページ間で統一する",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 75,
+      "title": "スペイン語等の定義語共有",
+      "acceptance": "スペイン語・ポルトガル語の明示的な定義語も共有する",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 76,
+      "title": "回答での用語共有",
+      "acceptance": "資料翻訳の保存済み用語を回答にも再利用し追加の辞書生成をしない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 77,
+      "title": "中断時の回答保持",
+      "acceptance": "受信済みの根拠付き部分を通信エラーで消さない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 78,
+      "title": "中断回答の閲覧復元",
+      "acceptance": "中断した回答の完成部分を開き直しても確認できる",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 79,
+      "title": "再試行時の重複防止",
+      "acceptance": "同じ部分を再受信しても同じ回答を二重に並べない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 80,
+      "title": "停止時の完成部分保持",
+      "acceptance": "停止後も完成した根拠付き部分を残し未完了と分かる",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 81,
+      "title": "回答待ちの期限",
+      "acceptance": "応答が止まっても読み取り待ちが永続せず再試行できる",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 82,
+      "title": "閉じた後の質問処理停止",
+      "acceptance": "意図して閉じた画面に古い回答が追加されない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 83,
+      "title": "通信復帰後の再開",
+      "acceptance": "通信が戻った時に同じ質問を重複送信せず再試行できる",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 84,
+      "title": "英語先読みの復帰",
+      "acceptance": "一時的な通信障害後も未準備の英語ページを再開する",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 85,
+      "title": "通信節約時の先読み調整",
+      "acceptance": "利用者の通信節約設定時は余分な言語の先読みを抑え表示中の訳は出す",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 86,
+      "title": "資料名の日本語変換入力",
+      "acceptance": "IME変換確定のEnterだけで名前変更を送信しない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 87,
+      "title": "質問の日本語変換入力",
+      "acceptance": "IME変換確定のEnterだけで質問を送信しない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 88,
+      "title": "PDFのキーボード操作",
+      "acceptance": "PDFにフォーカスがある時だけページ移動キーが使える",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 89,
+      "title": "ウィンドウ縮小型キーボード",
+      "acceptance": "画面全体が縮むキーボードでも入力欄とPDFの位置を保つ",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 90,
+      "title": "画面回転後の読書位置",
+      "acceptance": "縦横の切り替えで同じページとチャットを保つ",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 91,
+      "title": "ダウンロード名の改善",
+      "acceptance": "保存したPDFに資料名が付き、資料同士を区別できる",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 92,
+      "title": "ファイル名の安全な処理",
+      "acceptance": "改行や記号・日本語を含む資料名でも安全にダウンロードできる",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 93,
+      "title": "不正JSONの応答",
+      "acceptance": "壊れたJSONを500エラーにせず入力エラーとして扱う",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 94,
+      "title": "異なる型の入力の応答",
+      "acceptance": "nullや配列などの入力を安全に拒否しAPI費用を発生させない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 95,
+      "title": "見えない空質問の拒否",
+      "acceptance": "不可視文字だけの質問はモデルへ送らない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 96,
+      "title": "見つからない資料から戻る",
+      "acceptance": "削除済みや期限切れのリンクから保管庫へ戻れる",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 97,
+      "title": "再試行の対象を明示",
+      "acceptance": "古い質問の再試行と編集中の質問を混同させない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 98,
+      "title": "費用計測のモデル識別",
+      "acceptance": "実際の応答モデルを計測に残し不明な単価を0円扱いしない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 99,
+      "title": "検証セットの指紋",
+      "acceptance": "設問・期待根拠・資料条件が変わった比較を同一問題と誤表示しない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 100,
+      "title": "完了記録の検査",
+      "acceptance": "追加50項目の完了には実在する検証証拠と対象版が必要",
+      "status": "in_progress",
+      "evidence": []
+    }
+  ]
+}
