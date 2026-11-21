@@ -587,3 +587,8 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 
 ### 2026-11-20 Small scanned glyphs
 - Upscale small embedded rasters locally to at most 3x / 2000px long edge before both extraction and geometry OCR. Same pixels/engine preserve alignment. No new provider, image upload, language fan-out or model calls. Tested on an explicitly authorized private attachment; test documents deleted. Other exploratory OCR alternatives were not adopted.
+
+### 2026-11-21 Reading preferences and UI cache identity
+- Text size, spacing, contrast and reduced motion are local preferences; no AI request. They affect generated prose only, preserving PDF/translation geometry.
+- UI translation cache keys now include the label-content digest instead of a manual version. Same-language concurrent requests coalesce; valid cached dictionaries are reused and incomplete caches rebuilt. Added labels cause one new dictionary per used language, not document/page fan-out. Existing quotas and model unchanged.
+- Invalid timing/count samples are excluded rather than reported as NaN or percentages. Missing metrics remain unmeasured.

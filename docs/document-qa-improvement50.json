@@ -1,0 +1,365 @@
+{
+  "schema": 1,
+  "created": "2026-11-21",
+  "policy": "完了は受入条件を満たす実装と検証証拠がある場合のみ。旧記録だけでは今回の確認済みにしない。追加50項目は最初の50項目完了後に定義する。",
+  "items": [
+    {
+      "id": 1,
+      "title": "読み取り品質の判定",
+      "acceptance": "不鮮明・低信頼度・傾きをページごとに判定し、鮮明なページを誤警告しない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 2,
+      "title": "細かい文字の再認識",
+      "acceptance": "低解像度の細字を端末内で再認識し、同一問題の正解語数が悪化しない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 3,
+      "title": "写真の傾き補正",
+      "acceptance": "正負の傾き付き写真で補正後の文字・位置が原文と一致",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 4,
+      "title": "影・反射への対応",
+      "acceptance": "陰影を含む写真で文字の欠落を測定し鮮明な部分を保持",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 5,
+      "title": "文章と写真の分離",
+      "acceptance": "写真内の模様を本文・訳文に混入させない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 6,
+      "title": "縦横混在",
+      "acceptance": "縦書き見出しと横書き本文の読み方向・引用位置が一致",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 7,
+      "title": "段組み読み順",
+      "acceptance": "2段・3段の本文順序と段落が一致",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 8,
+      "title": "数字・単位の照合",
+      "acceptance": "金額・日付・時刻・割合の変化を検出し表記差は誤検出しない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 9,
+      "title": "固有名詞",
+      "acceptance": "架空の人名・学校名・地名が脱落・別名化しない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 10,
+      "title": "既存資料の更新",
+      "acceptance": "同じURLで再解析し翻訳・根拠が更新され変更なし部分を再利用",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 11,
+      "title": "翻訳抜け検出",
+      "acceptance": "原文領域と訳文の対応数を検証し欠落を成功扱いしない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 12,
+      "title": "意味の保持",
+      "acceptance": "否定・例外・対象条件が正解と一致",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 13,
+      "title": "用語の統一",
+      "acceptance": "同一資料の同一専門用語がページを跨いで一貫",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 14,
+      "title": "段落翻訳",
+      "acceptance": "改行で切れた文を文脈付きで翻訳し元領域に対応",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 15,
+      "title": "重なり防止",
+      "acceptance": "密集ページの訳文矩形が隣欄に重ならない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 16,
+      "title": "文字サイズ下限",
+      "acceptance": "長い訳が指定下限より小さくならず全文にアクセス可能",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 17,
+      "title": "長い訳文",
+      "acceptance": "長文化言語で欠落を検出し全文を読める",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 18,
+      "title": "原文消し残し",
+      "acceptance": "翻訳表示で日本語の痕跡を覆い罫線と写真を保持",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 19,
+      "title": "状態の明確化",
+      "acceptance": "翻訳準備・表示・読み取り課題を一貫して区別",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 20,
+      "title": "翻訳回帰確認",
+      "acceptance": "通常・密集・表・スキャンの翻訳回帰を公開版で実行",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 21,
+      "title": "言い換え",
+      "acceptance": "同一根拠への自然な言い換え質問に同じ答え",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 22,
+      "title": "短いキーワード",
+      "acceptance": "単語のみでも根拠付き概要を返す",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 23,
+      "title": "文脈保持",
+      "acceptance": "続き質問の対象を直前会話から特定し他行と混ぜない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 24,
+      "title": "曖昧条件の聞き返し",
+      "acceptance": "年度・対象・コース不明時に聞き返し指定後に回答",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 25,
+      "title": "複数ページ回答",
+      "acceptance": "複数ページの情報を統合してそれぞれ正しい根拠を表示",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 26,
+      "title": "計算説明",
+      "acceptance": "内訳・回数・式を示し未確定項目は合計へ混ぜない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 27,
+      "title": "回答引用一致",
+      "acceptance": "回答と質問の対象条件を満たす引用のみ採用",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 28,
+      "title": "精密マーカー",
+      "acceptance": "該当行・セルだけを原文と訳文の双方で黄色表示",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 29,
+      "title": "補足の区別",
+      "acceptance": "原文の事実とたとえ・一般的補足を明示的に区別",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 30,
+      "title": "回答不可の原因",
+      "acceptance": "原文に未記載と読み取り未確認を区別し途中で断定しない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 31,
+      "title": "複数段見出し",
+      "acceptance": "複数段の見出しと値の対応を異なる表で検証",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 32,
+      "title": "結合セル",
+      "acceptance": "縦横結合セルが跨ぐ行・列を正しく引き継ぐ",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 33,
+      "title": "空欄の意味",
+      "acceptance": "空欄をゼロや上の値と根拠なく解釈しない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 34,
+      "title": "改ページ表",
+      "acceptance": "次ページの値に前ページ見出しを引き継ぎ両ページを引用",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 35,
+      "title": "脚注",
+      "acceptance": "表の脚注・例外条件を回答に反映",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 36,
+      "title": "行列取り違え防止",
+      "acceptance": "同名・同額・別コースの条件を混ぜない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 37,
+      "title": "セル根拠",
+      "acceptance": "Excel根拠にシート名・セル番地・PDFページを表示",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 38,
+      "title": "比較質問",
+      "acceptance": "複数対象を同じ項目で比較し各対象の根拠を区別",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 39,
+      "title": "初回案内",
+      "acceptance": "初回だけ短い操作案内を表示し以後の閲覧を妨げない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 40,
+      "title": "スマホ入力",
+      "acceptance": "入力時にPDFを縮め送信後に同ページの高さへ復帰",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 41,
+      "title": "閲覧復元",
+      "acceptance": "ページ・倍率・言語・会話位置を開き直し後に復元",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 42,
+      "title": "処理中操作",
+      "acceptance": "重複送信を防ぎ停止と他操作の可否を明示",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 43,
+      "title": "読みやすさ調整",
+      "acceptance": "文字サイズ・行間・コントラストを選択し端末に保存",
+      "status": "in_progress",
+      "evidence": [
+        "2026-11-21 ローカル検証中。公開確認前のため完了にしない。"
+      ]
+    },
+    {
+      "id": 44,
+      "title": "支援技術",
+      "acceptance": "アイコン名・キーボード操作・動きを減らす設定を検証",
+      "status": "in_progress",
+      "evidence": [
+        "2026-11-21 ローカル検証中。公開確認前のため完了にしない。"
+      ]
+    },
+    {
+      "id": 45,
+      "title": "表示ページ優先",
+      "acceptance": "閲覧・根拠移動先を先読みより優先",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 46,
+      "title": "翻訳再利用",
+      "acceptance": "本文・言語・方式一致時だけ再利用し変更ページのみ再取得",
+      "status": "in_progress",
+      "evidence": [
+        "2026-11-21 ローカル検証中。公開確認前のため完了にしない。"
+      ]
+    },
+    {
+      "id": 47,
+      "title": "同時処理",
+      "acceptance": "同じ翻訳への並行要求でモデル処理が重複しない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 48,
+      "title": "非公開アクセス",
+      "acceptance": "別ユーザーが原文・訳文・要約・検索データを取得できない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 49,
+      "title": "削除範囲",
+      "acceptance": "削除後に元資料・要約・訳文・検索データが残らず処理中でも復活しない",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": 50,
+      "title": "継続測定",
+      "acceptance": "初見資料の正答・引用一致・翻訳抜け・時間・費用を同一条件で記録",
+      "status": "in_progress",
+      "evidence": [
+        "2026-11-21 ローカル検証中。公開確認前のため完了にしない。"
+      ]
+    }
+  ]
+}

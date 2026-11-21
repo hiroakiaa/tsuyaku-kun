@@ -1,0 +1,6 @@
+import fs from 'node:fs';
+const path=new URL('../docs/document-qa-improvement50.json',import.meta.url),data=JSON.parse(fs.readFileSync(path));
+if(data.items.length!==50||new Set(data.items.map(x=>x.id)).size!==50||data.items.some((x,i)=>x.id!==i+1||!x.title||!x.acceptance||!['pending','in_progress','complete'].includes(x.status)||!Array.isArray(x.evidence)||(x.status==='complete'&&!x.evidence.length)))throw Error('Invalid improvement acceptance record');
+const counts=Object.fromEntries(['complete','in_progress','pending'].map(s=>[s,data.items.filter(x=>x.status===s).length]));
+const report='# 資料QA 改善50項目\n\n確認済み '+counts.complete+'/50（'+counts.complete*2+'％）、作業中 '+counts.in_progress+'、未確認 '+counts.pending+'。追加50項目はこの50項目の完了後に定義する。\n\n|番号|項目|状態|受入条件・証拠|\n|---|---|---|---|\n'+data.items.map(x=>'|'+[x.id,x.title,{pending:'未確認',in_progress:'作業中',complete:'確認済み'}[x.status],x.acceptance+' / '+x.evidence.join(' / ')].map(s=>String(s).replaceAll('|','／').replaceAll('\n',' ')).join('|')+'|').join('\n')+'\n';
+if(process.argv.includes('--write'))fs.writeFileSync(new URL('../docs/document-qa-improvement50.md',import.meta.url),report);console.log(JSON.stringify({accepted:counts.complete,total:50,percent:counts.complete*2,...counts}));

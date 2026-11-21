@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1d1d1d">
 <title>資料QA君</title>
-<link rel="stylesheet" href="web/documents.css?v=103">
-<script type="module" src="web/documents.js?v=261"></script>
+<link rel="stylesheet" href="web/documents.css?v=104">
+<script type="module" src="web/documents.js?v=262"></script>
 </head>
 <body><div class="shell">
 
@@ -16,7 +16,7 @@
 <section class="panel document-panel create-panel">
 <header class="create-heading">
 <h1>資料QAを作る</h1>
-<a class="document-entry" href="?v=261"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>保管庫に戻る</a>
+<a class="document-entry" href="?v=262"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>保管庫に戻る</a>
 </header>
 <p id="upload-status" role="status"></p>
 <form class="stack" id="upload">
@@ -43,7 +43,7 @@
 </div>
 </header>
 <div id="library-search-panel" hidden><input id="library-search" type="search" aria-label="資料名" placeholder="資料を検索"></div>
-<a class="document-entry" href="?create=1&amp;v=261"><i class="fa-solid fa-plus" aria-hidden="true"></i><span>資料チャット作成</span></a>
+<a class="document-entry" href="?create=1&amp;v=262"><i class="fa-solid fa-plus" aria-hidden="true"></i><span>資料チャット作成</span></a>
 <div class="library-tabs" role="group" aria-label="保管庫">
 <button id="library-device" type="button" aria-pressed="true">この端末の資料</button>
 <button id="library-shared" type="button" aria-pressed="false">共通の資料</button>
@@ -57,12 +57,13 @@
 </section>
 </template>
 <template id="reader">
-<header class="reader-heading"><h1 id="doc-title"></h1><a class="ref" href="?v=261">保管庫に戻る</a><button class="open-material" type="button" hidden>資料追加</button></header>
+<header class="reader-heading"><h1 id="doc-title"></h1><a class="ref" href="?v=262">保管庫に戻る</a><button class="open-material" type="button" hidden>資料追加</button></header>
 <dialog id="material-dialog" aria-labelledby="material-heading">
 <header class="reader-heading"><h2 id="material-heading" tabindex="-1" autofocus>資料追加</h2><form method="dialog"><button aria-label="資料追加を閉じる">×</button></form></header>
 <form id="add-material"><label>追加資料<input name="file" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.docx,.xlsx" required></label><button>追加する</button><p id="material-status" role="status"></p></form>
 <form id="replace-pdf" hidden><label>新しいPDF<input name="pdf" type="file" accept=".pdf,application/pdf" required></label><button type="submit">元のPDFを差し替える</button><button type="button" id="reanalyse-pdf">登録済みのPDFを再解析</button><p role="status"></p></form>
 <ul id="materials"></ul>
+
 <button id="remove-guide" hidden>共有を終了</button><p id="remove-status" role="status"></p>
 </dialog>
 <dialog id="read-translation" class="panel" aria-labelledby="read-translation-title">
@@ -71,7 +72,12 @@
 </dialog>
 <dialog id="points" class="panel" aria-labelledby="points-title">
 <header class="reader-heading"><h2 id="points-title" tabindex="-1" autofocus>資料の全体像</h2><form method="dialog"><button aria-label="要約を閉じる">×</button></form></header>
-<p id="summary-status" class="fine" role="status" hidden></p><p id="summary-translation-status" class="fine" role="status" hidden></p><div id="cards" class="cards"></div>
+<p id="summary-status" class="fine" role="status" hidden></p><p id="summary-translation-status" class="fine" role="status" hidden></p><div id="cards" class="cards"></div><details class="document-reading-settings"><summary>読みやすさ</summary><p class="fine">回答・全体像の表示</p>
+<label>文字の大きさ<select data-reading-setting="size"><option value="standard">標準</option><option value="large">大きめ</option><option value="largest">さらに大きく</option></select></label>
+<label>行間<select data-reading-setting="spacing"><option value="compact">コンパクト</option><option value="comfortable">ゆったり</option></select></label>
+<label>コントラスト<select data-reading-setting="contrast"><option value="standard">標準</option><option value="high">高くする</option></select></label>
+<label>画面の動き<select data-reading-setting="motion"><option value="system">端末の設定に合わせる</option><option value="reduce">動きを減らす</option></select></label>
+<p id="reading-status" class="fine" role="status"></p></details>
 </dialog>
 <dialog id="ask-dialog" aria-labelledby="ask-heading"><div class="qa-workspace"><div id="qa-divider" role="separator" aria-label="列幅" aria-orientation="vertical" aria-valuemin="25" aria-valuemax="75" aria-valuenow="50" tabindex="0"></div><div class="ask-heading"><h2 id="ask-heading" tabindex="-1" autofocus></h2><div class="qa-actions"><button class="open-material qa-add" type="button" hidden>資料追加</button><form method="dialog"><button aria-label="資料を閉じる">×</button></form></div></div><div class="ask-layout">
 <div id="messages" role="log" aria-live="polite"><p class="answer-empty">回答がここに表示されます</p></div>

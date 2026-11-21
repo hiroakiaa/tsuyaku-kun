@@ -1,3 +1,4 @@
+import {installDocumentReadingSettings,reducedDocumentMotion} from './document-reading-settings.js?v=1';
 import {isLegacyImagePage,imageContentFrame,paintImageFrame} from './document-image-margins.js?v=1';
 import {automaticDocumentTitle} from './document-title.js?v=1';
 import {previewFitScale} from './preview-fit.js?v=20261119-fit-1';
@@ -6,14 +7,14 @@ installPreviewOnlyGestures();
 import {alignPdfTranslation,pdfComparableText} from './pdf-translation-alignment.js?v=20261120-layout-3';
 import {resumeTranslation,transientTranslationError} from './translation-resume.js?v=20261119-resume-1';
 import {readPdfPageText,lookupTableCell,lookupAlignedTableCell} from './document-table-lookup.js?v=88';
-import {recordDocumentQaMetric} from './document-qa-metrics.js?v=1';
+import {recordDocumentQaMetric} from './document-qa-metrics.js?v=3';
 import {layoutPdfText} from './document-table.js?v=94';
 import {installLocalIcons,localIcon} from './icons.js?v=pdf-controls';
 import {config} from './config.js';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
 import {fillLanguageOptions} from './language-picker.js?v=20261103-analysis-stages-1';
 import {selectableCatalog} from './selectable-catalog.js';
-import {createDocumentUiLocale} from './document-ui-locale.js?v=5';
+import {createDocumentUiLocale} from './document-ui-locale.js?v=6';
 const $ = (selector) => document.querySelector(selector);
 const content = $('#content');
 let id = new URLSearchParams(location.search).get('id');
@@ -217,7 +218,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '261');
+      guide.searchParams.set('v', '262');
       link.href = guide.href;
       if (typeof entry.shared==='boolean') append(body,'small',entry.shared?'共通保管庫に公開':'作成したブラウザーで閲覧');
       const remove = append(card,'button','','library-remove');
@@ -307,7 +308,7 @@ function teacher() {
       const shared = data.get('visibility')==='shared';
       saveGuide({id:createdId,title:String(data.get('title')).trim(),createdAt,shared});
       status.textContent='資料を開いています…';estimate.hidden=true;
-      if(!matchMedia('(prefers-reduced-motion: reduce)').matches)await content.animate([{opacity:1},{opacity:0}],{duration:150,easing:'ease-out'}).finished;
+      if(!reducedDocumentMotion())await content.animate([{opacity:1},{opacity:0}],{duration:150,easing:'ease-out'}).finished;
       id=createdId;const next=new URL(location.href);next.searchParams.delete('create');next.searchParams.delete('library');next.searchParams.set('id',id);history.replaceState(null,'',next);
       await reader();
     } catch (error) {
@@ -343,6 +344,7 @@ async function reader() {
     return;
   }
   show('#reader');
+  installDocumentReadingSettings(content);
   addLanguagePicker($('#pdf-language-picker'));
   document.title = doc.title + '｜資料QA君';
   $('#doc-title').textContent = doc.title;
@@ -439,7 +441,7 @@ async function reader() {
   };
   askDialog.addEventListener('close',()=>{
     if (dialog.open) dialog.close();
-    location.replace('?v=261');
+    location.replace('?v=262');
   });
   const sourceType = doc.sourceType ?? 'pdf';
   let opened,originalUrl,officeText,officeRender = 0;
@@ -1244,7 +1246,7 @@ async function reader() {
       if(index<result.lines.length-1) target.append('\n');
       offset=end;
     });
-    if (target===translatedPage) firstMark?.scrollIntoView({block:'center',behavior:'smooth'});
+    if (target===translatedPage) firstMark?.scrollIntoView({block:'center',behavior:scrollBehavior()});
   }
   translationMode.onchange=()=>void updatePageTranslation();
   document.addEventListener('visibilitychange',()=>void prefetchTranslations());
@@ -1473,7 +1475,7 @@ async function reader() {
       if (translationMode.value) void updatePageTranslation();
     });
   }, {passive:true});
-  const scrollBehavior = ()=>matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
+  const scrollBehavior = ()=>reducedDocumentMotion() ? 'instant' : 'smooth';
   async function showPdf(n) {
     if (n<1 || n>doc.pageCount) return;
     selectedPage = n;
@@ -1732,7 +1734,7 @@ async function reader() {
       createUrl.searchParams.delete('id');
       createUrl.searchParams.delete('library');
       createUrl.searchParams.set('create','1');
-      createUrl.searchParams.set('v','261');
+      createUrl.searchParams.set('v','262');
       location.replace(createUrl);
     } catch (error) {
       document.querySelector('#remove-status').textContent = error.message;
@@ -2016,7 +2018,7 @@ async function reader() {
           citation = {page:evidence.page,quote:evidence.quote};
           if (wide.matches || dialog.open) void showPdf(evidence.page);
         }
-        if (first) answer.scrollIntoView({behavior:'smooth',block:'start'});
+        if (first) answer.scrollIntoView({behavior:scrollBehavior(),block:'start'});
       }
       if (!response.headers.get('Content-Type')?.includes('application/x-ndjson')) {
         const result = await response.json();
@@ -2117,7 +2119,7 @@ async function reader() {
     void sendQuestion(question,lastQuestion);
   });
   await showPdf(selectedPage || 1);
-  if(!matchMedia('(prefers-reduced-motion: reduce)').matches)askDialog.animate([{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'translateY(0)'}],{duration:200,easing:'ease-out'});
+  if(!reducedDocumentMotion())askDialog.animate([{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'translateY(0)'}],{duration:200,easing:'ease-out'});
 }
 
 try {
@@ -2191,7 +2193,7 @@ try {
         icon.append(localIcon('book-open'));
         const body = append(card,'div','','library-card-body');
         const link = append(body,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=261';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v=262';
         }
       };
       $('#library-search').addEventListener('input',renderShared);

@@ -1402,12 +1402,13 @@ export async function documentStorage(request,storage,env) {
   const path = new URL(request.url).pathname;
   if (path.startsWith('/document/ui-locale/') && request.method==='POST') {
     const {language}=await request.json();
-    const key=path+':v4';
+    const labelDigest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(documentUiLabels.map(([label])=>label))));
+    const key=path+':'+Array.from(new Uint8Array(labelDigest),byte=>byte.toString(16).padStart(2,'0')).join('');
     if (!pendingPageTranslations.has(key)) {
       pendingPageTranslations.set(key,(async()=>{
         const cached=await storage.get(key);
-        if (cached) return cached;
         const source=documentUiLabels.map(([label])=>label);
+        if (Array.isArray(cached?.lines)&&cached.lines.length===source.length&&cached.lines.every(line=>typeof line==='string'&&line.trim())) return cached;
         const {lines}=JSON.parse(await translateDocumentText(env,JSON.stringify(source),language,true));
         if (!Array.isArray(lines) || lines.length!==source.length ||
             lines.some(line=>typeof line!=='string' || !line.trim())) throw Error('画面の翻訳を完了できませんでした。');

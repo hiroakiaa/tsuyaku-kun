@@ -1,4 +1,4 @@
-import {documentQaMetrics,documentQaMetricCells} from './document-qa-metrics.js?v=2';
+import {documentQaMetrics,documentQaMetricCells} from './document-qa-metrics.js?v=3';
 import {createLiveSummarySetting} from './live-summary.js?v=20261113-summary-dialog-1';
 import {createLiveTranslationSetting} from './live-translation-setting.js?v=20261112-display-benchmark-1';
 import {improvementReport} from './analysis-focus.js?v=20261115-qa-yen-display';
@@ -69,7 +69,7 @@ reportSummary.replaceChildren(...liveSummary,el('p',current&&liveEvents.length?'
   dialog.setAttribute('aria-label','資料QA');
   const frame=el('iframe');
   frame.title='資料QA';
-  frame.src='documents.html?embedded=1&v=261';
+  frame.src='documents.html?embedded=1&v=262';
   window.addEventListener('message',event=>{
    if(event.origin===location.origin && event.source===frame.contentWindow &&
       event.data?.type==='document-library-close' && dialog.open) dialog.close();
