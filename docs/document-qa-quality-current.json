@@ -1,0 +1,67 @@
+{
+  "measuredAt": "2026-11-22",
+  "environment": "公開版・PC Chrome・架空資料。実機Safariではない。各回の通信条件は原記録を参照。",
+  "groups": [
+    {
+      "name": "PDF・Excel・スキャン受入",
+      "before": 11,
+      "after": 13,
+      "total": 13,
+      "medianMs": 807,
+      "citations": 13,
+      "source": "checks/first50-acceptance-public-fixed.json"
+    },
+    {
+      "name": "自然な質問と料金計算",
+      "before": 8,
+      "after": 10,
+      "total": 10,
+      "medianMs": 1873,
+      "source": "checks/natural-questions-computed-total.json"
+    },
+    {
+      "name": "日付・単位換算・漢数字",
+      "before": 3,
+      "after": 5,
+      "total": 5,
+      "medianMs": 1392,
+      "source": "checks/values-public.json"
+    },
+    {
+      "name": "人名・組織名・地名の原表記",
+      "before": 0,
+      "after": 12,
+      "total": 12,
+      "source": "checks/names-protected.json"
+    },
+    {
+      "name": "定義語のページ間統一",
+      "before": null,
+      "after": 18,
+      "total": 18,
+      "source": "checks/terminology-public.json"
+    }
+  ],
+  "translationUsage": {
+    "input": 2511,
+    "output": 459,
+    "cached": 0,
+    "measuredCalls": 8,
+    "estimatedUSD": 0.0017388000000000002,
+    "price": {
+      "checkedAt": "2026-11-22",
+      "model": "gpt-4.1-mini",
+      "inputPerMillion": 0.4,
+      "cachedPerMillion": 0.1,
+      "outputPerMillion": 1.6,
+      "source": "https://developers.openai.com/api/docs/models/gpt-4.1-mini"
+    },
+    "scope": "3ページ×2言語の生成で返却されたusageのみ。辞書初期化と修復を含む。背景の英語先読み、要約、埋め込み、通常質問の未計測usageは含まない。"
+  },
+  "savedTranslationReuse": true,
+  "limitations": [
+    "問題群は別々の試験であり、一般資料すべての正答率として合算しない。",
+    "usageのない試験の費用は未計測。0円とは扱わない。",
+    "同一の設問と期待原文で前後比較。モデル回答には変動がある。"
+  ]
+}

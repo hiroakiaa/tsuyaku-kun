@@ -68,7 +68,7 @@ let passed = 0;
 try {
   for (const fixture of scanFixturePath ? fixtures.filter(fixture=>fixture.printedPageNumbers) : selectedFixtures) {
     const page = await browser.newPage();
-    if(process.env.CANDIDATE_DOCUMENT_OCR)for(const name of ["document-ocr.js","document-ocr-consensus.js","ocr/assets/recognition.worker-CFphUR-D.js"])await page.route("**/web/"+name+"*",async route=>route.fulfill({contentType:"text/javascript",body:await readFile(new URL("../web/"+name,import.meta.url),"utf8")}));
+    if(process.env.CANDIDATE_DOCUMENT_OCR)for(const name of ["document-ocr.js","document-ocr-consensus.js","document-ocr-horizontal.js","document-scan-preprocess.js","ocr/assets/recognition.worker-CFphUR-D.js"])await page.route("**/web/"+name+"*",async route=>route.fulfill({contentType:"text/javascript",body:process.env.FAST_SCAN&&name==="document-ocr.js"?(await readFile(new URL("../web/"+name,import.meta.url),"utf8")).replace("createWorker(['jpn','eng'],1,{","createWorker(['jpn','eng'],1,{langPath:'https://tessdata.projectnaptha.com/4.0.0_fast',"):await readFile(new URL("../web/"+name,import.meta.url),"utf8")}));
     try {
       if (!fixture.excel) {
         await page.setContent('<meta charset="utf-8">');

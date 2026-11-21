@@ -9,7 +9,6 @@ let stage = 'open library';
 let failure;
 try {
   const page = await browser.newPage();
-  const checks = [];
   const externalWrites = [];
   page.on('request',request=>{
     const url = new URL(request.url());
@@ -22,6 +21,7 @@ try {
   await page.getByRole('heading',{name:'資料QAの保管庫'}).waitFor();
   await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
   assert.equal(await page.getByRole('link',{name:'資料チャット作成',exact:true}).count(),0);
+  const registrationStarted=performance.now();
   stage = 'read workbook';
   await page.locator('#upload input[type=file]').setInputFiles(fileURLToPath(new URL('../tests/fixtures/document-qa-admission-years.xlsx',import.meta.url)));
   const sheets=await page.evaluate(async()=>{

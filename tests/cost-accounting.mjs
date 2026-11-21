@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {UsageLedger,costOf,PRICES} from '../web/usage.js';
 import {budgetEstimates,monthlyCostNote,budgetLimitNote} from '../web/budget-view.js';
-import {AI_LIMITS,TRANSLATION_PRICE,SPEECH_POLICY,PHOTO_POLICY} from '../web/cost-policy.js';
+import {documentUsageEstimate,AI_LIMITS,TRANSLATION_PRICE,SPEECH_POLICY,PHOTO_POLICY} from '../web/cost-policy.js';
 import {translateText} from '../server/worker.js';
 import {reserveCost,budgetOperation} from '../server/ai-budget.js';
 import {speechBudget} from '../server/cloud-speech.js';
@@ -20,3 +20,5 @@ const ai=memory(),reservation=await budgetOperation(ai,{action:'reserve',uid:'a'
 const speech=memory();await speechBudget(speech,{action:'reserve',uid:'a',characters:100});const own=await speechBudget(speech,{action:'status',uid:'a'}),other=await speechBudget(speech,{action:'status',uid:'b'});assert.equal(own.userRemainingCharacters,SPEECH_POLICY.userCharacters-100);assert.equal(other.userRemainingCharacters,SPEECH_POLICY.userCharacters);assert.equal(other.remainingCharacters,SPEECH_POLICY.monthCharacters-100);assert.equal('users' in own,false);assert.match(monthlyCostNote('speech',own,()=>150),/0.06円/);assert.match(monthlyCostNote('speech',own,()=>300),/0.12円/);assert.match(budgetLimitNote(),/1000回/);
 const photo=await photoBudget(memory(),{action:'status',uid:'a'.repeat(32)});assert.equal(photo.limit,null);assert.equal(photo.userLimit,null);assert.match(monthlyCostNote('photo',photo,()=>150),/回数制限はありません/);assert.equal(PRICES.inputPerMillion,TRANSLATION_PRICE.inputPerMillion);
 console.log('Cost accounting: real translation metadata, own-call forecast, cache/replay isolation, language changes, shared limits, monthly per-user status and currency conversion passed');
+
+assert.equal(documentUsageEstimate(null),null);assert.equal(documentUsageEstimate({input:10,output:1,cached:11}),null);assert.equal(documentUsageEstimate({input:1000,output:1000,cached:0}),.002);assert.equal(documentUsageEstimate({input:1000,output:1000,cached:1000}),.0017);console.log('PASS measured document usage applies cached-token price and keeps unknown usage unmeasured');

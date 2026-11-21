@@ -1,3 +1,4 @@
+import {numericText} from '../server/document-values.js?v=2';
 import {unreadablePages} from './document-reading-quality.js?v=1';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
 import {installDocumentReadingSettings,reducedDocumentMotion} from './document-reading-settings.js?v=1';
@@ -144,7 +145,7 @@ async function extract(file, status) {
       const {requiresOcr,pageNumberOnly}=pdfPageTextStatus(text,n);
       if (requiresOcr) {
         status.textContent = 'スキャンページを端末で読んでいます… ' + n + ' / ' + pdf.numPages;
-        const {createPdfOcr} = await import('./document-ocr.js?v=116');
+        const {createPdfOcr} = await import('./document-ocr.js?v=117');
         ocr ??= await createPdfOcr((await pdfLibrary()).OPS);
         if (page.rotate) {
           const runs=await ocr.readLayout(page,pageNumberOnly ? parts : []).catch(()=>[]);
@@ -658,7 +659,7 @@ async function reader() {
     if (!requiresOcr) return items;
     if (!scanLayouts.has(number)) {
       scanLayouts.set(number,(async()=>{
-        const {createPdfOcr}=await import('./document-ocr.js?v=116');
+        const {createPdfOcr}=await import('./document-ocr.js?v=117');
         const reader=await createPdfOcr((await pdfLibrary()).OPS);
         try {
           const runs=await (reader.readCanonicalLayout?.(page,pageNumberOnly ? items : [])??reader.readLayout(page,pageNumberOnly ? items : []));
@@ -786,7 +787,7 @@ async function reader() {
       const {fnArray,argsArray}=await page.getOperatorList();
       if (!fnArray.some((op,index)=>op===OPS.paintImageXObject &&
           argsArray[index]?.[1]>=300 && argsArray[index]?.[2]>=150)) return [];
-      const {createPdfOcr}=await import('./document-ocr.js?v=116');
+      const {createPdfOcr}=await import('./document-ocr.js?v=117');
       const reader=await createPdfOcr(OPS);
       try {
         const runs=await reader.readLayout(page,items,{diagram:true});
@@ -2039,16 +2040,16 @@ async function reader() {
           }
         }
         const isPriceItem=/(?:代金|費|料|値段|価格|金額|\b(?:fee|cost|price)\b)/iu.test(item.label);
-        const freePrice=/無料|無償|(?:^|[^\d])0\s*円/u;
+        const freePrice=/無料|無償|\bfree\b|(?:^|[^\d])0\s*円/iu;
         if (isPriceItem && /(?:いくら|何円|費用|料金|手数料|教材費)/u.test(question) &&
             freePrice.test((item.answer??'').normalize('NFKC')) &&
-            !item.evidence?.some(source=>freePrice.test(source.quote.normalize('NFKC')))) {
+            !item.evidence?.some(source=>freePrice.test(numericText(source.quote)))) {
           item={...item,answer:null,evidence:[]};
         }
-        const priceEvidence=/無料|無償|実費|要(?:問合せ|問い合わせ)|[0-9一二三四五六七八九十百千万億][0-9一二三四五六七八九十百千万億,.\s]*円|[¥￥]\s*\d/u;
+        const priceEvidence=/無料|無償|\bfree\b|実費|要(?:問合せ|問い合わせ)|[0-9][0-9,.\s]*(?:円|USD|EUR|\$)|[¥￥£]\s*\d/iu;
         if (isPriceItem && /(?:いくら|何円)/u.test(question) &&
             item.answer && item.evidence?.length &&
-            !item.evidence.some(source=>priceEvidence.test(source.quote.normalize('NFKC')))) {
+            !item.evidence.some(source=>priceEvidence.test(numericText(source.quote)))) {
           item={...item,answer:null,evidence:[]};
         }
         if (item.answer && /^(?:資料(?:内)?に|本文に)[^。！？\r\n]{1,80}(?:記載されていません|記載がありません|見当たりません)。?$/u.test(item.answer.trim())) {

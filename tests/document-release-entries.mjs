@@ -1,0 +1,1 @@
+import {execFileSync} from 'node:child_process';execFileSync(process.execPath,['tools/sync-document-release.mjs','--check'],{stdio:'inherit'});console.log('PASS application and embedded library URLs use the current document release');

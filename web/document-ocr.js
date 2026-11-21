@@ -1,4 +1,4 @@
-import {prepareScanCanvas} from './document-scan-preprocess.js?v=2';
+import {prepareScanCanvas} from './document-scan-preprocess.js?v=3';
 import {ocrNumbers,reconcileOcrNumbers} from './document-ocr-consensus.js?v=1';
 const timingNames = ['initialization','render','recognition','native-recognition','full-recognition','horizontal-recognition'].map(stage=>'document-ocr:'+stage);
 
@@ -77,7 +77,7 @@ function enlargeScanForOcr(canvas) {
 
 export async function createPdfOcr(ops) {
   for (const name of timingNames) performance.clearMeasures(name);
-  let standard, horizontal, vertical, digits, disabled=false;
+  let standard, horizontal, horizontalReady, horizontalAbort, vertical, digits, disabled=false;
   async function digitWorker(){
     digits??=(async()=>{
       const {default:{createWorker}}=await import('https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/tesseract.esm.min.js');
@@ -114,7 +114,14 @@ export async function createPdfOcr(ops) {
     return vertical;
   }
   let lastQuality;
+  function prepareHorizontalReader(){
+    if(horizontal)return Promise.resolve(horizontal);
+    if(!horizontalReady){horizontalAbort=new AbortController();horizontalReady=(async()=>{const {createHorizontalScanReader}=await import('./document-ocr-horizontal.js?v=3');horizontal=await createHorizontalScanReader(new URL('./ocr/assets/recognition.worker-CFphUR-D.js?v=3',import.meta.url),{signal:horizontalAbort.signal});return horizontal;})();void horizontalReady.catch(()=>{});}
+    return horizontalReady;
+  }
   async function recognizePreparedCanvas(input,{preferHorizontal=false,fallbackCanvas=input}={}) {
+    const {findHorizontalScanLines}=await import('./document-ocr-lines.js?v=3');
+    if(!disabled&&typeof DecompressionStream==='function'&&findHorizontalScanLines(input.getContext('2d').getImageData(0,0,input.width,input.height)))void prepareHorizontalReader();
     const primary=(await (await standardWorker()).recognize(input,{}, {blocks:true})).data;
     const linesOf=data=>(data.blocks??[]).flatMap(block=>block.paragraphs??[]).flatMap(paragraph=>paragraph.lines??[]);
     const compact=text=>text.normalize('NFKC').replace(/\s/gu,'');
@@ -125,7 +132,7 @@ export async function createPdfOcr(ops) {
       const pixels=input.getContext('2d').getImageData(0,0,input.width,input.height);
       const {findHorizontalScanLines}=await import('./document-ocr-lines.js?v=3');
       if(findHorizontalScanLines(pixels))try{
-        if(!horizontal){const {createHorizontalScanReader}=await import('./document-ocr-horizontal.js?v=2');horizontal=await createHorizontalScanReader(new URL('./ocr/assets/recognition.worker-CFphUR-D.js?v=3',import.meta.url));}
+        if(!horizontal)await prepareHorizontalReader();
         const started=performance.now(),recognized=await horizontal.read(pixels,{withLayout:true});recordTiming('document-ocr:horizontal-recognition',started);
         if(recognized?.length){
           const primaryLines=linesOf(primary),started=performance.now();let checked=0,repaired=0,unresolved=0;
@@ -460,6 +467,8 @@ export async function createPdfOcr(ops) {
       }
     },
     async close() {
+      horizontalAbort?.abort();
+      await horizontalReady?.catch(()=>{});
       horizontal?.close();
       await vertical?.terminate();
       await (await digits?.catch(()=>null))?.terminate();

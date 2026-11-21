@@ -1,17 +1,21 @@
 import {findHorizontalScanLines} from './document-ocr-lines.js';
 
-export async function createHorizontalScanReader(workerUrl) {
+export async function createHorizontalScanReader(workerUrl,{signal}={}) {
   const worker = new Worker(workerUrl,{type:'module'});
   function request(message, expected, transfer=[]) {
     return new Promise((resolve,reject)=>{
       const timer=setTimeout(()=>finish(new Error('OCR worker timed out')),45000);
       function finish(error,result) {
         clearTimeout(timer);
+        signal?.removeEventListener('abort',abort);
         worker.onmessage=null;
         worker.onerror=null;
         if (error) reject(error);
         else resolve(result);
       }
+      const abort=()=>finish(new DOMException('OCR initialization aborted','AbortError'));
+      if(signal?.aborted){abort();return;}
+      signal?.addEventListener('abort',abort,{once:true});
       worker.onerror=event=>finish(new Error(event.message));
       worker.onmessage=({data})=>{
         if (data.type==='REC_ERROR') finish(new Error(data.error));

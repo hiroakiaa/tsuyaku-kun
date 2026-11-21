@@ -105,3 +105,5 @@ body dialog.documents-dialog.document-fullscreen[open] > .modal-heading {
   display: none !important;
 }
 .documents-dialog.document-fullscreen > iframe {display:block;height:100dvh!important;min-height:100dvh!important;max-height:none!important;width:100%;border:0}
+
+.admin-quality-table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:12px;line-height:1.5}.admin-quality-table th,.admin-quality-table td{text-align:left;padding:8px 4px;vertical-align:top;border-bottom:1px solid #45454a;overflow-wrap:anywhere}.admin-quality-table th:first-child{width:40%}
