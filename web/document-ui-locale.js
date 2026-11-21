@@ -1,4 +1,5 @@
 export const documentUiLabels=[
+ ['たとえ（資料外の説明）','Analogy (explanation outside the document)','Analogía (explicación ajena al documento)'],
  ['資料を見ながら質問できます。回答のページ番号で根拠を確認できます。','Ask while reading. Select a page number in an answer to check its source.','Pregunta mientras lees. Selecciona el número de página de una respuesta para comprobar su fuente.'],
  ['操作案内を閉じる','Dismiss reading tip','Cerrar ayuda'],
   ["読みやすさ","Reading settings","Ajustes de lectura"],
@@ -159,7 +160,7 @@ export function createDocumentUiLocale(root,loadLanguage) {
   }
   function visit(node) {
     if(node.nodeType===Node.TEXT_NODE){
-      if(node.parentElement?.closest('blockquote,#pdf-translation,.pdf-inline-translation,#read-translation-text,.answer-text,.answer-english,.bubble.user,#doc-title,#ask-heading,#pdf-heading,.library-card a,#cards'))return;
+      if(!node.parentElement?.closest('[data-document-ui]') && node.parentElement?.closest('blockquote,#pdf-translation,.pdf-inline-translation,#read-translation-text,.answer-text,.answer-english,.bubble.user,#doc-title,#ask-heading,#pdf-heading,.library-card a,#cards'))return;
       translateValue(node,'text',node.data,value=>{node.data=value;});
       return;
     }

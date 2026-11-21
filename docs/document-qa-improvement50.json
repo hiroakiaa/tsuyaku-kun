@@ -99,15 +99,19 @@
       "id": 12,
       "title": "意味の保持",
       "acceptance": "否定・例外・対象条件が正解と一致",
-      "status": "pending",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開Worker532309af。架空の3ページを英語・ベトナム語で翻訳し、予約必須／付き添い例外／交通費対象外の否定と対象条件を原文照合。日本語の実質問2問は各々2ページ・3ページ付きで合格。checks/terminology-public.json。試験資料削除済み。"
+      ]
     },
     {
       "id": 13,
       "title": "用語の統一",
       "acceptance": "同一資料の同一専門用語がページを跨いで一貫",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開Worker532309af。文書内で定義され複数ページに現れる3用語を3ページ×英語・ベトナム語で照合し全件同一訳（大文字小文字差除く）。同一資料・言語の辞書を共有、ページ再訪cache。定義変更時の無効化・同時生成の集約・削除競合も自動テスト。定義を持たない語と日本語以外の原文の用語抽出は今後の拡張。checks/terminology-public.json。"
+      ]
     },
     {
       "id": 14,

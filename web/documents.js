@@ -15,7 +15,7 @@ import {config} from './config.js';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
 import {fillLanguageOptions} from './language-picker.js?v=20261103-analysis-stages-1';
 import {selectableCatalog} from './selectable-catalog.js';
-import {createDocumentUiLocale} from './document-ui-locale.js?v=7';
+import {createDocumentUiLocale} from './document-ui-locale.js?v=8';
 const $ = (selector) => document.querySelector(selector);
 const content = $('#content');
 let id = new URLSearchParams(location.search).get('id');
@@ -1693,12 +1693,13 @@ async function reader() {
     for (const item of items ?? []) {
       const card=append(cards,'div','','card');
       labels.push(append(card,'h3',item.label),append(card,'p',item.text));
+      sourceLink(card,item.source.page,item.source.quote || item.text);
       if (item.analogy) {
         const example=append(card,'div','','summary-example');
-        append(example,'strong','たとえ');
+        const label=append(example,'strong','たとえ（資料外の説明）');
+        label.dataset.documentUi='true';
         labels.push(append(example,'p',item.analogy));
       }
-      sourceLink(card,item.source.page,item.source.quote || item.text);
     }
     summaryTranslationStatus.hidden=true;
     if (!points.open || !selectedLanguage || selectedLanguage==='ja' || !labels.length) return;
