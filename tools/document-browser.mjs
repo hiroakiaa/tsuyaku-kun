@@ -7,7 +7,7 @@ export const chromium={launch:options=>engine.launch({...process.env.PLAYWRIGHT_
 export async function submitDocument(page,{timeout=120000}={}){
  if(await page.locator('#upload input[name=title]').count())throw Error('Deprecated title field returned');
  await page.evaluate(()=>addEventListener('pagehide',()=>{
-  const entries=Object.fromEntries(['initialization','render','recognition','native-recognition','full-recognition','horizontal-recognition'].map(stage=>[stage,performance.getEntriesByName('document-ocr:'+stage,'measure').map(entry=>Math.round(entry.duration))]));
+  const entries=Object.fromEntries(['initialization','render','recognition','native-recognition','full-recognition','horizontal-recognition','horizontal-initialization','engine-reuse'].map(stage=>[stage,performance.getEntriesByName('document-ocr:'+stage,'measure').map(entry=>Math.round(entry.duration))]));
   sessionStorage.setItem('document-smoke-ocr-stages',JSON.stringify(entries));
  },{once:true}));
  let created;const registrations=[];

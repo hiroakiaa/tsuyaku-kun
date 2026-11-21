@@ -143,7 +143,7 @@ try {
       await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
       const uploadStarted = performance.now();
       await page.locator('#upload input[type=file]').setInputFiles(file);
-      const readOcrStages=()=>page.evaluate(()=>{const stages=Object.fromEntries(['initialization','render','recognition','native-recognition','full-recognition','horizontal-recognition'].map(stage=>[stage,performance.getEntriesByName('document-ocr:'+stage,'measure').map(entry=>Math.round(entry.duration))]));return Object.values(stages).some(rows=>rows.length)?stages:JSON.parse(sessionStorage.getItem('document-smoke-ocr-stages')??'null')??stages;});
+      const readOcrStages=()=>page.evaluate(()=>{const stages=Object.fromEntries(['initialization','render','recognition','native-recognition','full-recognition','horizontal-recognition','horizontal-initialization','engine-reuse'].map(stage=>[stage,performance.getEntriesByName('document-ocr:'+stage,'measure').map(entry=>Math.round(entry.duration))]));return Object.values(stages).some(rows=>rows.length)?stages:JSON.parse(sessionStorage.getItem('document-smoke-ocr-stages')??'null')??stages;});
       if (!fixture.excel) {
         const expectedStatus = retryScan ? 'OCRの一時エラー' : 'PDFの文字を確認しました。';
         try {

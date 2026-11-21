@@ -1,3 +1,4 @@
+const DOCUMENT_RELEASE='278';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -17,7 +18,7 @@ import {config} from './config.js';
 import {catalog as seed} from '../server/catalog.js?v=20261020-dictionary-voice-1';
 import {fillLanguageOptions} from './language-picker.js?v=20261103-analysis-stages-1';
 import {selectableCatalog} from './selectable-catalog.js';
-import {createDocumentUiLocale} from './document-ui-locale.js?v=9';
+import {createDocumentUiLocale} from './document-ui-locale.js?v=10';
 const $ = (selector) => document.querySelector(selector);
 const content = $('#content');
 let id = new URLSearchParams(location.search).get('id');
@@ -145,7 +146,7 @@ async function extract(file, status) {
       const {requiresOcr,pageNumberOnly}=pdfPageTextStatus(text,n);
       if (requiresOcr) {
         status.textContent = 'スキャンページを端末で読んでいます… ' + n + ' / ' + pdf.numPages;
-        const {createPdfOcr} = await import('./document-ocr.js?v=119');
+        const {createPdfOcr} = await import('./document-ocr.js?v=120');
         ocr ??= await createPdfOcr((await pdfLibrary()).OPS);
         if (page.rotate) {
           const runs=await ocr.readLayout(page,pageNumberOnly ? parts : []).catch(()=>[]);
@@ -223,7 +224,7 @@ function documentLibrary() {
       const guide = new URL('documents.html', location.href);
       guide.searchParams.set('id', entry.id);
       if (window.parent !== window) guide.searchParams.set('embedded', '1');
-      guide.searchParams.set('v', '270');
+      guide.searchParams.set('v', DOCUMENT_RELEASE);
       link.href = guide.href;
       if (typeof entry.shared==='boolean') append(body,'small',entry.shared?'共通保管庫に公開':'作成したブラウザーで閲覧');
       const remove = append(card,'button','','library-remove');
@@ -448,7 +449,7 @@ async function reader() {
   };
   askDialog.addEventListener('close',()=>{
     if (dialog.open) dialog.close();
-    location.replace('?v=270');
+    location.replace('?v='+DOCUMENT_RELEASE);
   });
   const sourceType = doc.sourceType ?? 'pdf';
   let opened,originalUrl,officeText,officeRender = 0;
@@ -659,7 +660,7 @@ async function reader() {
     if (!requiresOcr) return items;
     if (!scanLayouts.has(number)) {
       scanLayouts.set(number,(async()=>{
-        const {createPdfOcr}=await import('./document-ocr.js?v=119');
+        const {createPdfOcr}=await import('./document-ocr.js?v=120');
         const reader=await createPdfOcr((await pdfLibrary()).OPS);
         try {
           const runs=await (reader.readCanonicalLayout?.(page,pageNumberOnly ? items : [])??reader.readLayout(page,pageNumberOnly ? items : []));
@@ -787,7 +788,7 @@ async function reader() {
       const {fnArray,argsArray}=await page.getOperatorList();
       if (!fnArray.some((op,index)=>op===OPS.paintImageXObject &&
           argsArray[index]?.[1]>=300 && argsArray[index]?.[2]>=150)) return [];
-      const {createPdfOcr}=await import('./document-ocr.js?v=119');
+      const {createPdfOcr}=await import('./document-ocr.js?v=120');
       const reader=await createPdfOcr(OPS);
       try {
         const runs=await reader.readLayout(page,items,{diagram:true});
@@ -1773,7 +1774,7 @@ async function reader() {
       createUrl.searchParams.delete('id');
       createUrl.searchParams.delete('library');
       createUrl.searchParams.set('create','1');
-      createUrl.searchParams.set('v','270');
+      createUrl.searchParams.set('v',DOCUMENT_RELEASE);
       location.replace(createUrl);
     } catch (error) {
       document.querySelector('#remove-status').textContent = error.message;
@@ -2052,7 +2053,7 @@ async function reader() {
             !item.evidence?.some(source=>freePrice.test(numericText(source.quote)))) {
           item={...item,answer:null,evidence:[]};
         }
-        const priceEvidence=/無料|無償|\bfree\b|実費|要(?:問合せ|問い合わせ)|[0-9][0-9,.\s]*(?:円|USD|EUR|\$)|[¥￥£]\s*\d/iu;
+        const priceEvidence=/無料|無償|\bfree\b|実費|要(?:問合せ|問い合わせ)|[0-9][0-9,.\s]*(?:円|USD|EUR|GBP|CHF|CNY|\$)|[¥￥£]\s*\d/iu;
         if (isPriceItem && /(?:いくら|何円)/u.test(question) &&
             item.answer && item.evidence?.length &&
             !item.evidence.some(source=>priceEvidence.test(numericText(source.quote)))) {
@@ -2250,7 +2251,7 @@ try {
         icon.append(localIcon('book-open'));
         const body = append(card,'div','','library-card-body');
         const link = append(body,'a',entry.title);
-        link.href = '?id='+encodeURIComponent(entry.id)+'&v=270';
+        link.href = '?id='+encodeURIComponent(entry.id)+'&v='+DOCUMENT_RELEASE;
         }
       };
       $('#library-search').addEventListener('input',renderShared);

@@ -2,6 +2,18 @@ import assert from 'node:assert/strict';
 import {documents} from '../server/documents.js';
 
 const cases = [
+ {format:'英ポンド',pages:['The fee is GBP 25.','Another fee is GBP 30.'],quote:'The fee is GBP 25.',correct:'£25',wrong:'£30'},
+ {format:'フラン',pages:['The fee is 25 Swiss francs.','Another fee is CHF 30.'],quote:'The fee is 25 Swiss francs.',correct:'CHF 25',wrong:'CHF 30'},
+ {format:'人民元のコード',pages:['The fee is CNY 300.','Another fee is CNY 330.'],quote:'The fee is CNY 300.',correct:'RMB 300',wrong:'RMB 330'},
+ {format:'英ポンド小数',pages:['The fee is £.50.','Another fee is £.60.'],quote:'The fee is £.50.',correct:'GBP 0.50',wrong:'GBP 0.60'},
+ {format:'通貨の取り違え',pages:['The fee is GBP 25.','Another fee is EUR 25.'],quote:'The fee is GBP 25.',correct:'GBP 25',wrong:'EUR 25'},
+ {format:'英語の人数',pages:['The group has 20 people.','Another group has 30 people.'],quote:'The group has 20 people.',correct:'20人',wrong:'30人'},
+ {format:'英語の参加者人数',pages:['There are 20 participants.','Another event has 30 participants.'],quote:'There are 20 participants.',correct:'20名',wrong:'30名'},
+ {format:'英語の下限',pages:['At least 20 people are required.','Another group has at most 20 people.'],quote:'At least 20 people are required.',correct:'20人以上',wrong:'20人以下'},
+ {format:'英語の上限',pages:['At most 20 people may attend.','Another group has at least 20 people.'],quote:'At most 20 people may attend.',correct:'20人以下',wrong:'20人以上'},
+ {format:'英語の未満',pages:['The fee is less than 20 euros.','Another fee is over 20 euros.'],quote:'The fee is less than 20 euros.',correct:'20 EUR未満',wrong:'20 EUR超'},
+ {format:'英語の重量条件',pages:['The weight is at most 5 kg.','Another limit is at least 5 kg.'],quote:'The weight is at most 5 kg.',correct:'5000 g以下',wrong:'5000 g以上'},
+
   {format:'英語円の日本語回答',pages:['The annual membership fee is 2400 yen.','Other fees are 300 yen.'],quote:'The annual membership fee is 2400 yen.',correct:'2400円です。',wrong:'300円です。'},
   {format:'円の接頭表記',pages:['The cost is JPY 2,400.','Other fees are ¥300.'],quote:'The cost is JPY 2,400.',correct:'2400円です。',wrong:'300円です。'},
   {format:'ドル金額',pages:['The fee is 25 US dollars.','Other fee is USD 30.'],quote:'The fee is 25 US dollars.',correct:'USD 25',wrong:'USD 30'},

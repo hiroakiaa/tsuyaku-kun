@@ -1,4 +1,5 @@
 export const documentUiLabels=[
+ ['全体像','Overview','Vista general'],
  ['このページには読み取りを確認できない数値があります。原文と照合してください。','This page has unverified numbers. Please check the original.','Esta página contiene números sin verificar. Revisa el original.'],
  ['読み取れた資料の範囲では、この項目の根拠を確認できませんでした。',"I couldn't verify supporting evidence in the text that could be read.",'No pude verificar pruebas en el texto que se pudo leer.'],
  ['文字を十分に読み取れないページがあるため、根拠を確認できませんでした。原文をご確認ください。',"Some pages could not be read clearly, so I couldn't verify the evidence. Please check the original.",'Algunas páginas no se pudieron leer claramente, así que no pude verificar las pruebas. Revisa el original.'],

@@ -10,126 +10,296 @@
       "id": 51,
       "title": "根拠なし理由の言語対応",
       "acceptance": "根拠なしの最終文が日本語・英語・選択言語に追従する",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開v277、1列・2列のja/en/esで理由・注意・確認ページを照合。右ブラウザーで管理者→共通資料→英語→資料にない質問を実行し、英語の最終文を確認。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "2aba9b3",
+          "published": true,
+          "documentVersion": 277
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-reading-quality.mjs",
+            "scope": "Public assets at 390/1280, controlled API, Japanese/English/Spanish",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 52,
       "title": "読み取り注意の言語対応",
       "acceptance": "読み取り不確かなページの注意が利用言語に追従する",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開v277、1列・2列のja/en/esで理由・注意・確認ページを照合。右ブラウザーで管理者→共通資料→英語→資料にない質問を実行し、英語の最終文を確認。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "2aba9b3",
+          "published": true,
+          "documentVersion": 277
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-reading-quality.mjs",
+            "scope": "Public assets at 390/1280, controlled API, Japanese/English/Spanish",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 53,
       "title": "確認ページ表記の言語対応",
       "acceptance": "注意に付くページ番号・ページ名が言語変更後も正しく表示される",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開v277、1列・2列のja/en/esで理由・注意・確認ページを照合。右ブラウザーで管理者→共通資料→英語→資料にない質問を実行し、英語の最終文を確認。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "2aba9b3",
+          "published": true,
+          "documentVersion": 277
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-reading-quality.mjs",
+            "scope": "Public assets at 390/1280, controlled API, Japanese/English/Spanish",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 54,
       "title": "再認識時の品質更新",
       "acceptance": "全体画像への再認識が成功した時はその認識の品質を採用する",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "小さい画像から全体画像へ再認識した信頼度96と画素判定を採用。回転ページでは前ページの判定なし。制御OCRで確認。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "2aba9b3",
+          "published": true,
+          "documentVersion": 277
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-quality-provenance.mjs",
+            "scope": "Controlled OCR engines against the published module implementation",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 55,
       "title": "回転ページの品質分離",
       "acceptance": "前ページの品質判定が回転ページに引き継がれない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "小さい画像から全体画像へ再認識した信頼度96と画素判定を採用。回転ページでは前ページの判定なし。制御OCRで確認。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "2aba9b3",
+          "published": true,
+          "documentVersion": 277
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-quality-provenance.mjs",
+            "scope": "Controlled OCR engines against the published module implementation",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 56,
       "title": "追加資料の読み取り状態",
       "acceptance": "追加資料の品質を元資料のページ番号に続けて保存する",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開で2ページの資料追加後3/4ページの注意が、元PDFを3ページへ差し替えると4/5に移動。元PDFに誤警告なし。試験資料削除済み。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "2aba9b3",
+          "published": true,
+          "documentVersion": 277
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-quality-mutations-live.mjs",
+            "scope": "Public API with controlled reading-quality metadata; private fixture deleted",
+            "passed": true
+          },
+          {
+            "path": "tests/document-quality-mutations.mjs",
+            "scope": "DO metadata offsets and owner scope",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 57,
       "title": "差し替え時の読み取り状態",
       "acceptance": "元PDFの差し替えで追加資料の品質番号も正しく移動する",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開で2ページの資料追加後3/4ページの注意が、元PDFを3ページへ差し替えると4/5に移動。元PDFに誤警告なし。試験資料削除済み。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "2aba9b3",
+          "published": true,
+          "documentVersion": 277
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-quality-mutations-live.mjs",
+            "scope": "Public API with controlled reading-quality metadata; private fixture deleted",
+            "passed": true
+          },
+          {
+            "path": "tests/document-quality-mutations.mjs",
+            "scope": "DO metadata offsets and owner scope",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 58,
       "title": "再解析後の回答キャッシュ更新",
       "acceptance": "同じ本文でも再解析後は前の回答キャッシュを使い回さず回答を再評価する",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "同本文・同質問でも再解析revision変更後にモデル呼び出しが1→2となるDOテストを確認。再解析なしでは1回のまま。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "2aba9b3",
+          "published": true,
+          "documentVersion": 277
+        },
+        "tests": [
+          {
+            "path": "tests/document-quality-mutations.mjs",
+            "scope": "Controlled provider counts prove same-text reanalysis makes a new generation",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 59,
       "title": "不確かなページへの導線",
       "acceptance": "元PDFの注意から該当ページを直接開け、追加資料には無効なページ移動リンクを作らない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開の1列・2列で注意ページの数字を押すと該当元PDFページに移動し、根拠マーカーは作らない。追加資料には無効リンクを作らない。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "2aba9b3",
+          "published": true,
+          "documentVersion": 277
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-reading-quality.mjs",
+            "scope": "Public assets at 390/1280, controlled API, Japanese/English/Spanish",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 60,
       "title": "数字OCRの未確認通知",
       "acceptance": "数値の複数認識が未一致の場合はその情報を失わず表示する",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "数値230/2380の未一致が品質メタデータとOCR行に残る制御試験、数値未確認の多言語ページ注意を公開資材で確認。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "2aba9b3",
+          "published": true,
+          "documentVersion": 277
+        },
+        "tests": [
+          {
+            "path": "tools/check-document-reading-quality.mjs",
+            "scope": "Public assets at 390/1280, controlled API, Japanese/English/Spanish",
+            "passed": true
+          }
+        ]
+      }
     },
     {
       "id": 61,
       "title": "OCR準備の再利用",
       "acceptance": "同一画面で次のスキャンを読む時に初期化の再利用を実測する",
-      "status": "pending",
+      "status": "in_progress",
       "evidence": []
     },
     {
       "id": 62,
       "title": "共有OCRの順番待ち",
       "acceptance": "共用エンジンに同時認識が入っても別の資料の結果が混ざらない",
-      "status": "pending",
+      "status": "in_progress",
       "evidence": []
     },
     {
       "id": 63,
       "title": "OCRの待機資源解放",
       "acceptance": "未使用になった共用エンジンを待機後に解放する",
-      "status": "pending",
+      "status": "in_progress",
       "evidence": []
     },
     {
       "id": 64,
       "title": "OCR初期化失敗からの復帰",
       "acceptance": "失敗した初期化を再利用せず次回正常に初期化できる",
-      "status": "pending",
+      "status": "in_progress",
       "evidence": []
     },
     {
       "id": 65,
       "title": "OCR準備時間の内訳",
       "acceptance": "日本語認識の準備と認識本体の時間を分けて記録する",
-      "status": "pending",
+      "status": "in_progress",
       "evidence": []
     },
     {
       "id": 66,
       "title": "通貨表記の拡充",
       "acceptance": "GBPなどの記号・名称を同じ金額で照合し別通貨との混同を拒否する",
-      "status": "pending",
+      "status": "in_progress",
       "evidence": []
     },
     {
       "id": 67,
       "title": "英語の人数照合",
       "acceptance": "people/personの人数と日本語の人数を照合し違う人数を拒否する",
-      "status": "pending",
+      "status": "in_progress",
       "evidence": []
     },
     {
       "id": 68,
       "title": "英語の上下限照合",
       "acceptance": "at least/at most/less thanの条件の反転を拒否する",
-      "status": "pending",
+      "status": "in_progress",
       "evidence": []
     },
     {
@@ -353,8 +523,24 @@
       "id": 100,
       "title": "完了記録の検査",
       "acceptance": "追加50項目の完了には実在する検証証拠と対象版が必要",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "未公開・失敗・証拠なし・リポジトリ外の記録を拒否することを39組テストで確認。"
+      ],
+      "verification": {
+        "release": {
+          "commit": "2aba9b3",
+          "published": true,
+          "documentVersion": 277
+        },
+        "tests": [
+          {
+            "path": "tests/document-improvement-record.mjs",
+            "scope": "Completion record validation, public repository source",
+            "passed": true
+          }
+        ]
+      }
     }
   ]
 }

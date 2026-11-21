@@ -1,6 +1,7 @@
+import {documentOcrPool} from './document-ocr-pool.js?v=1';
 import {prepareScanCanvas} from './document-scan-preprocess.js?v=3';
 import {ocrNumbers,reconcileOcrNumbers} from './document-ocr-consensus.js?v=1';
-const timingNames = ['initialization','render','recognition','native-recognition','full-recognition','horizontal-recognition'].map(stage=>'document-ocr:'+stage);
+const timingNames = ['initialization','render','recognition','native-recognition','full-recognition','horizontal-recognition','horizontal-initialization','engine-reuse'].map(stage=>'document-ocr:'+stage);
 
 function recordTiming(name,start) {
   try { performance.measure(name,{start,end:performance.now()}); } catch { /* Optional browser timing. */ }
@@ -77,47 +78,21 @@ function enlargeScanForOcr(canvas) {
 
 export async function createPdfOcr(ops) {
   for (const name of timingNames) performance.clearMeasures(name);
-  let standard, horizontal, horizontalReady, horizontalAbort, vertical, digits, disabled=false;
-  async function digitWorker(){
-    digits??=(async()=>{
-      const {default:{createWorker}}=await import('https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/tesseract.esm.min.js');
-      const worker=await createWorker('eng',1,{workerPath:'https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/worker.min.js',corePath:'https://cdn.jsdelivr.net/npm/tesseract.js-core@6.0.0'});
-      await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:'0123456789.,-'});
-      return worker;
-    })();
-    return digits;
+  let standard,horizontal,horizontalReady,vertical,digits,disabled=false;
+  async function pooled(key,factory,options){const started=performance.now(),lease=await documentOcrPool.acquire(key,factory,options);if(lease.ocrPoolReused)performance.measure('document-ocr:engine-reuse',{start:started,detail:{kind:key,mode:lease.ocrPoolMode}});performance.measure('document-ocr:pool-state',{start:performance.now(),detail:documentOcrPool.stats()});return lease;}
+  function digitWorker(){
+    digits??=pooled('tesseract6:eng:digits7',async()=>{const {default:{createWorker}}=await import('https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/tesseract.esm.min.js');const worker=await createWorker('eng',1,{workerPath:'https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/worker.min.js',corePath:'https://cdn.jsdelivr.net/npm/tesseract.js-core@6.0.0'});await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:'0123456789.,-'});return worker;},{methods:['recognize'],priority:0});return digits;
   }
-  async function standardWorker() {
-    standard ??= (async()=>{
-      const started=performance.now();
-      const {default:{createWorker}} = await import('https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/tesseract.esm.min.js');
-      const worker=await createWorker(['jpn','eng'],1,{
-        workerPath:'https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/worker.min.js',
-        corePath:'https://cdn.jsdelivr.net/npm/tesseract.js-core@6.0.0',
-      });
-      if (!horizontal && !vertical) recordTiming(timingNames[0],started);
-      return worker;
-    })();
-    return standard;
+  function standardWorker(){
+    standard??=pooled('tesseract6:jpn+eng:default',async()=>{const started=performance.now(),{default:{createWorker}}=await import('https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/tesseract.esm.min.js');const worker=await createWorker(['jpn','eng'],1,{workerPath:'https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/worker.min.js',corePath:'https://cdn.jsdelivr.net/npm/tesseract.js-core@6.0.0'});recordTiming(timingNames[0],started);return worker;},{methods:['recognize'],priority:2});return standard;
   }
-  async function verticalWorker() {
-    if (!vertical) {
-      const started=performance.now();
-      const {default:{createWorker}}=await import('https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/tesseract.esm.min.js');
-      vertical=await createWorker('jpn_vert',1,{
-        workerPath:'https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/worker.min.js',
-        corePath:'https://cdn.jsdelivr.net/npm/tesseract.js-core@6.0.0',
-      });
-      await vertical.setParameters({tessedit_pageseg_mode:'5'});
-      if (!standard && !horizontal) recordTiming(timingNames[0],started);
-    }
-    return vertical;
+  function verticalWorker(){
+    vertical??=pooled('tesseract6:jpn_vert:psm5',async()=>{const started=performance.now(),{default:{createWorker}}=await import('https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/tesseract.esm.min.js');const worker=await createWorker('jpn_vert',1,{workerPath:'https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/worker.min.js',corePath:'https://cdn.jsdelivr.net/npm/tesseract.js-core@6.0.0'});await worker.setParameters({tessedit_pageseg_mode:'5'});recordTiming(timingNames[0],started);return worker;},{methods:['recognize'],priority:1});return vertical;
   }
   let lastQuality;
   function prepareHorizontalReader(){
     if(horizontal)return Promise.resolve(horizontal);
-    if(!horizontalReady){horizontalAbort=new AbortController();horizontalReady=(async()=>{const {createHorizontalScanReader}=await import('./document-ocr-horizontal.js?v=3');horizontal=await createHorizontalScanReader(new URL('./ocr/assets/recognition.worker-CFphUR-D.js?v=3',import.meta.url),{signal:horizontalAbort.signal});return horizontal;})();void horizontalReady.catch(()=>{});}
-    return horizontalReady;
+    if(!horizontalReady){horizontalReady=(async()=>{horizontal=await pooled('ndlocr:parseq100:decoder3',async()=>{const started=performance.now(),{createHorizontalScanReader}=await import('./document-ocr-horizontal.js?v=3');const reader=await createHorizontalScanReader(new URL('./ocr/assets/recognition.worker-CFphUR-D.js?v=3',import.meta.url));recordTiming('document-ocr:horizontal-initialization',started);return reader;},{methods:['read'],dispose:'close',priority:3});return horizontal;})();void horizontalReady.catch(()=>{});}return horizontalReady;
   }
   async function recognizePreparedCanvas(input,{preferHorizontal=false,fallbackCanvas=input}={}) {
     const primary=(await (await standardWorker()).recognize(input,{}, {blocks:true})).data;
@@ -469,10 +444,9 @@ export async function createPdfOcr(ops) {
       }
     },
     async close() {
-      horizontalAbort?.abort();
       await horizontalReady?.catch(()=>{});
       horizontal?.close();
-      await vertical?.terminate();
+      await (await vertical?.catch(()=>null))?.terminate();
       await (await digits?.catch(()=>null))?.terminate();
       const worker=await standard?.catch(()=>null);
       await worker?.terminate();
