@@ -1,4 +1,5 @@
-const DOCUMENT_RELEASE='279';
+import {preventCompositionSubmit,documentFilename,optionalTranslationPrefetch} from './document-interaction.js';
+const DOCUMENT_RELEASE='280';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -362,6 +363,7 @@ async function reader() {
    const actions=append(form,'div','','title-edit-actions'),cancel=append(actions,'button','キャンセル'),save=append(actions,'button','保存'),status=append(form,'p','','fine');status.setAttribute('role','status');cancel.type='button';cancel.onclick=()=>editor.close();save.type='submit';content.append(editor);
    const open=()=>{input.value=doc.title;status.textContent='';editor.showModal();};
    for(const title of [$('#pdf-heading'),$('#doc-title')]){title.classList.add('document-title-editable');title.setAttribute('role','button');title.tabIndex=0;title.title='資料名を変更';title.setAttribute('aria-label','資料名を変更');title.onclick=open;title.onkeydown=event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();open();}};}
+   preventCompositionSubmit(form,input);
    form.onsubmit=async event=>{event.preventDefault();save.disabled=true;try{const result=await request(api+'/title',{method:'POST',body:JSON.stringify({title:input.value.trim()})});doc.title=result.title;for(const selector of ['#doc-title','#pdf-heading','#ask-heading'])$(selector).textContent=doc.title;document.title=doc.title+'｜資料QA君';documentLibrary()({id,title:doc.title});editor.close();}catch(error){status.textContent=error.message;}finally{save.disabled=false;}};
   }
   $('#ask-heading').textContent = doc.title;
@@ -877,7 +879,7 @@ async function reader() {
     const current=Number(pagePicker.value)||1;
     const englishPages=Array.from({length:doc.pageCount},(_,i)=>i+1);
     const near=current+1;
-    const visible=dialog.open && language && language!=='en' && near<=doc.pageCount &&
+    const visible=optionalTranslationPrefetch(navigator.connection) && dialog.open && language && language!=='en' && near<=doc.pageCount &&
       !prefetchFailures.has(near+':'+language) && !pageTranslations.has(near+':'+language) ? {page:near,language} : null;
     const english=englishPages.find(page=>!pageTranslations.has(page+':en') && (englishFailures.get(page)??0)<2);
     const next=visible ?? (english ? {page:english,language:'en'} : null);
@@ -1287,6 +1289,8 @@ async function reader() {
   });
   window.addEventListener('document-language-change',()=>syncTranslationOptions());
   syncTranslationOptions();
+  preview.tabIndex=0;
+  preview.addEventListener('keydown',event=>{if(event.target!==preview||event.ctrlKey||event.metaKey||event.altKey||event.shiftKey)return;const delta={PageDown:1,PageUp:-1,ArrowRight:1,ArrowLeft:-1}[event.key];if(delta){event.preventDefault();void showPdf(Math.max(1,Math.min(doc.pageCount,Number(pagePicker.value)+delta)));}});
   const previewImage = $('#source-image');
   const imageType = /^(png|jpe?g|webp)$/.test(sourceType);
   const zoomable = sourceType==='pdf' || imageType;
@@ -1339,6 +1343,8 @@ async function reader() {
   const frame = window.frameElement;
   const viewport = (frame ? window.parent : window).visualViewport;
   const questionInput = $('#question');
+  window.addEventListener('resize',()=>requestAnimationFrame(syncKeyboard));
+  window.addEventListener('orientationchange',()=>requestAnimationFrame(syncKeyboard));
   function syncKeyboard() {
     const frameBounds = frame?.getBoundingClientRect();
     const layoutHeight = frameBounds?.height ?? window.innerHeight;
@@ -1587,7 +1593,7 @@ async function reader() {
           previewImage.alt=doc.title;
           previewImage.hidden=false;
           setZoom(zoom);
-        }else $('#pdf-file').download='source.'+sourceType;
+        }else $('#pdf-file').download=documentFilename(doc.title,sourceType);
         $('#pdf-status').textContent='';
       } catch(error) { $('#pdf-status').textContent=error.message; }
       return;
@@ -1905,6 +1911,7 @@ async function reader() {
     const answer = append(log,'div','','bubble');
     for (const item of entry.items) renderAnswerItem(answer,item);
     if (entry.fallback) append(answer,'p',entry.fallback);
+    if (entry.interrupted) append(answer,'p','回答は途中までです。','fine');
     lastQuestion = entry.items.at(-1)?.worksheetContext ?? entry.question;
   }
   installDocumentFirstHelp(askForm,{hasConversation:history.length>0});
@@ -1913,22 +1920,27 @@ async function reader() {
   const saveConversationScroll=()=>{clearTimeout(scrollSaveTimer);try{sessionStorage.setItem(scrollKey,String(conversationLog.scrollTop));}catch{}};
   conversationLog.addEventListener('scroll',()=>{clearTimeout(scrollSaveTimer);scrollSaveTimer=setTimeout(saveConversationScroll,150);},{passive:true});
   window.addEventListener('pagehide',saveConversationScroll);
-  let taggedTables;
-  async function sendQuestion(question,previousQuestion,questionBubble) {
+  let taggedTables,activeQuestionController;
+  window.addEventListener('pagehide',()=>activeQuestionController?.abort());
+  askDialog.addEventListener('close',()=>activeQuestionController?.abort());
+  async function sendQuestion(question,previousQuestion,questionBubble,resume) {
     const answerLanguage=selectedLanguage==='ja' ? '' : selectedLanguage;
     const log = $('#messages');
     if (button.disabled) return;
     button.disabled = true;
     const controller=new AbortController();
+    activeQuestionController=controller;
+    const answerDeadline=setTimeout(()=>controller.abort(new Error('回答の待ち時間が長くなっています。')),90000);
     const stop=$('#ask-stop');
     stop.hidden=false;
     stop.onclick=()=>controller.abort();
     clearCitation();
     let followedCitation = false;
     questionBubble ??= append(log,'div',question,'bubble user');
-    let box;
+    let box=resume?.box;
     log.append(status);
-    const entry = {question,items:[]};
+    const entry = resume?.entry ?? {question,items:[]};
+    const saveEntry=()=>{if(!entry.items.some(item=>item.answer&&item.evidence?.length))return;history=[...history.filter(row=>row!==entry),entry].slice(-10);try{sessionStorage.setItem(historyKey,JSON.stringify(history));}catch{}};
     let stage = '接続';
     let httpStatus;
     status.textContent = '資料から答えを探しています…';
@@ -1981,7 +1993,7 @@ async function reader() {
           entry.items.push(item);
           recordAnswerMetrics();
           lastQuestion = entry.items.at(-1)?.worksheetContext ?? question;
-          history = [...history,entry].slice(-10);
+          history = [...history.filter(row=>row!==entry),entry].slice(-10);
           try { sessionStorage.setItem(historyKey,JSON.stringify(history)); } catch {}
           status.textContent = '';
           measureAnswer('first-grounded-answer');
@@ -2063,11 +2075,14 @@ async function reader() {
           item={...item,answer:null,evidence:[]};
         }
         item=await includeAliasDefinition(item);
+        controller.signal.throwIfAborted();
+        if(entry.items.some(previous=>JSON.stringify(previous)===JSON.stringify(item)))return;
         const first = !box;
         const answer = answerBox();
         renderAnswerItem(answer,item,true);
         if (item.answer && !entry.items.some(previous=>previous.answer)) measureAnswer('first-grounded-answer');
         entry.items.push(item);
+        saveEntry();
         const evidence = item.evidence?.find(source=>source.page>=1 && source.page<=doc.pageCount && source.quote);
         if (!followedCitation && evidence && sourceType==='pdf') {
           followedCitation = true;
@@ -2125,17 +2140,23 @@ async function reader() {
           if (!finished) throw Error('回答の受信が途中で止まりました。');
         } finally { await reader.cancel().catch(()=>{}); }
       }
+      delete entry.interrupted;
       recordAnswerMetrics();
       lastQuestion = entry.items.at(-1)?.worksheetContext ?? question;
       history = [...history,entry].slice(-10);
       try { sessionStorage.setItem(historyKey,JSON.stringify(history)); } catch {}
       status.textContent = '';
     } catch (error) {
-      box?.remove();
+      entry.interrupted=true;
+      if(!askDialog.open)return;
+      if(!entry.items.some(item=>item.answer&&item.evidence?.length))box?.remove();
+      else saveEntry();
       status.textContent = controller.signal.aborted ? '回答を停止しました。 ' : error.message+'（'+stage+(httpStatus && httpStatus!==200?' / HTTP '+httpStatus:'')+'） ';
       const retry = append(status,'button','再試行');
       retry.type = 'button';
-      retry.onclick = () => void sendQuestion(question,previousQuestion,questionBubble);
+      retry.title=question;
+      retry.setAttribute('aria-label','再試行: '+question);
+      retry.onclick = () => void sendQuestion(question,previousQuestion,questionBubble,entry.items.some(item=>item.answer&&item.evidence?.length)?{entry,box}:undefined);
       const edit = append(status,'button','質問を編集');
       edit.type = 'button';
       edit.onclick = () => {
@@ -2151,6 +2172,8 @@ async function reader() {
       };
     }
     finally {
+      clearTimeout(answerDeadline);
+      if(activeQuestionController===controller)activeQuestionController=undefined;
       stop.hidden=true;
       stop.onclick=null;
       clearInterval(elapsedTimer);
@@ -2162,6 +2185,7 @@ async function reader() {
     }
   }
   const draftField=$('#question');
+  preventCompositionSubmit(askForm,draftField);
   draftField.value=readingPosition(id).draft ?? '';
   draftField.addEventListener('input',()=>readingPosition(id,{draft:draftField.value}));
   askForm.addEventListener('submit',event=>{
@@ -2268,4 +2292,5 @@ try {
 } catch (error) {
   content.replaceChildren();
   append(content,'p',error.message,'panel');
+  const back=append(content,'a','保管庫に戻る');back.href='?v='+DOCUMENT_RELEASE;
 }

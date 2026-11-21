@@ -1,3 +1,4 @@
+import {documentTestFingerprint} from './document-test-fingerprint.mjs';
 import {readFile,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import {chromium,submitDocument} from './document-browser.mjs';
@@ -284,6 +285,6 @@ try {
 
 if (!scanFixturePath) console.log('Acceptance questions passed: '+passed+'/'+total);
 if (!scanFixturePath && process.env.DOCUMENT_QA_REPORT) {
-  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({passed,total,network,limits,retryScan,commit:process.env.GITHUB_SHA ?? null,measuredAt:new Date().toISOString(),browser:browser.version(),registrations,measurements,failures:failures.map(error=>error.message)},null,2));
+  await writeFile(process.env.DOCUMENT_QA_REPORT,JSON.stringify({testFingerprint:documentTestFingerprint({fixtures:selectedFixtures,runner:await readFile(new URL(import.meta.url),'utf8')}),passed,total,network,limits,retryScan,commit:process.env.GITHUB_SHA ?? null,measuredAt:new Date().toISOString(),browser:browser.version(),registrations,measurements,failures:failures.map(error=>error.message)},null,2));
 }
 if (failures.length) throw new AggregateError(failures,'Document QA acceptance failed');

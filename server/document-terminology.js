@@ -6,6 +6,11 @@ export function definedDocumentTerms(pages,names=[]){
   if(excluded.has(term)||ambiguous.has(term)||/^\s*\d/u.test(meaning)||!/(?:こと|もの|仕組み|方法|符号|番号|処理|手続き|制度|機能|認証|登録|費用|料金)$/u.test(meaning)||pages.filter(page=>page.normalize('NFKC').includes(term)).length<2)continue;
   const canonical=term+'は'+meaning+'です。';if(terms.has(term)&&terms.get(term).definition!==canonical){terms.delete(term);ambiguous.add(term);continue;}terms.set(term,{term,definition:canonical});
  }
+ const western=/^([\p{Script=Latin}\d][\p{Script=Latin}\d -]{2,39}?)\s+(means|refers to|is defined as|significa|se define como|refere-se a)\s+([^\n.!?]{8,160})[.!?]?$/gimu;
+ for(const [definition,label,,meaning]of source.matchAll(western)){
+  const term=label.trim();if(excluded.has(term)||ambiguous.has(term)||/^\s*\d/u.test(meaning)||pages.filter(page=>page.normalize('NFKC').includes(term)).length<2)continue;
+  const canonical=definition.trim();if(terms.has(term)&&terms.get(term).definition!==canonical){terms.delete(term);ambiguous.add(term);continue;}terms.set(term,{term,definition:canonical});
+ }
  return [...terms.values()].slice(0,12);
 }
 export async function sharedDocumentTerminology(storage,id,language,terms,generate,onReuse=()=>{}){

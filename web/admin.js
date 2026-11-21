@@ -70,7 +70,7 @@ reportSummary.replaceChildren(...liveSummary,el('p',current&&liveEvents.length?'
   dialog.setAttribute('aria-label','資料QA');
   const frame=el('iframe');
   frame.title='資料QA';
-  frame.src='documents.html?embedded=1&v=279';
+  frame.src='documents.html?embedded=1&v=280';
   window.addEventListener('message',event=>{
    if(event.origin===location.origin && event.source===frame.contentWindow &&
       event.data?.type==='document-library-close' && dialog.open) dialog.close();
