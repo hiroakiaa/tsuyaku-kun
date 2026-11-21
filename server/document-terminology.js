@@ -13,9 +13,11 @@ export function definedDocumentTerms(pages,names=[]){
  }
  return [...terms.values()].slice(0,12);
 }
+async function terminologyKey(language,terms){const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([1,language,terms])));return '/document/terminology/'+Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');}
+export async function savedDocumentTerminology(storage,language,terms){if(!terms.length)return {};const value=await storage.get(await terminologyKey(language,terms));return value&&typeof value==='object'&&terms.every(({term})=>typeof value[term]==='string'&&value[term].trim()&&value[term].length<=120)?value:{};}
 export async function sharedDocumentTerminology(storage,id,language,terms,generate,onReuse=()=>{}){
  if(!terms.length)return {};
- const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([1,language,terms]))),suffix=Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join(''),key='/document/terminology/'+suffix;
+ const key=await terminologyKey(language,terms),suffix=key.split('/').at(-1);
  const valid=value=>value&&typeof value==='object'&&terms.every(({term})=>typeof value[term]==='string'&&value[term].trim()&&value[term].length<=120);
  const cached=await storage.get(key);if(valid(cached)){onReuse('cache');return cached;}
  const lock=id+':'+suffix;if(pending.has(lock)){onReuse('in-flight');return pending.get(lock);}
