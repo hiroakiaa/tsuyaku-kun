@@ -62,14 +62,16 @@
       "id": 8,
       "title": "数字・単位の照合",
       "acceptance": "金額・日付・時刻・割合の変化を検出し表記差は誤検出しない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開Worker1889a039-c8de-4004-9d76-ae5f0b8a79b9。注入した同一48件の回答検証が41/48→48/48。公開版の架空5ページPDF5問は3/5→5/5、和暦→ISO日付、5MB→5000KB、5kg→5000グラム、2時間→120分、二百円→200円の回答/原文引用/ページ/マーカー一致。checks/values-before-conversion.json、checks/values-public.json、削除済み。未実装の数値表記まで全対応と主張しない。"
+      ]
     },
     {
       "id": 9,
       "title": "固有名詞",
       "acceptance": "架空の人名・学校名・地名が脱落・別名化しない",
-      "status": "pending",
+      "status": "in_progress",
       "evidence": []
     },
     {
@@ -102,7 +104,7 @@
       "id": 13,
       "title": "用語の統一",
       "acceptance": "同一資料の同一専門用語がページを跨いで一貫",
-      "status": "pending",
+      "status": "in_progress",
       "evidence": []
     },
     {
