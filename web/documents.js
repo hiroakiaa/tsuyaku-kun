@@ -1,5 +1,5 @@
 import {preventCompositionSubmit,documentFilename,optionalTranslationPrefetch} from './document-interaction.js';
-const DOCUMENT_RELEASE='282';
+const DOCUMENT_RELEASE='283';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -949,7 +949,7 @@ async function reader() {
     const inline=sourceType==='pdf';
     for (const frame of pageList.querySelectorAll('.pdf-inline-translation')) {
       frame.hidden=frame.dataset.language!==language;
-      if(frame.classList.contains('pdf-scan-reading')){frame.parentElement.style.minHeight=frame.hidden?'':frame.scrollHeight+'px';frame.parentElement.style.aspectRatio=frame.hidden?(frame.parentElement.dataset.originalAspect||'auto'):'auto';}
+
     }
     if (inline && !retry && citation?.page!==page &&
         original?.querySelector('.pdf-inline-translation:not([hidden])')) {
@@ -1263,12 +1263,7 @@ async function reader() {
         await installScanReadingLayout(frame,blocks,canvas,viewport.width);
         if(revision!==translationRevision || language!==translationMode.value)return false;
       }
-      frame.style.setProperty('--pdf-reading-zoom',String(zoom));
-      slot.dataset.originalAspect??=slot.style.aspectRatio;
-      if(frame.classList.contains('pdf-scan-reading'))slot.style.aspectRatio='auto';
       installInlineTranslation(slot,frame,language);
-      if(!slot.readingLayoutObserver){slot.readingLayoutObserver=new ResizeObserver(()=>{const visible=slot.querySelector('.pdf-inline-translation.pdf-scan-reading:not([hidden])');slot.style.aspectRatio=visible?'auto':(slot.dataset.originalAspect||'auto');slot.style.minHeight=visible?visible.scrollHeight+'px':'';});slot.readingLayoutObserver.observe(slot);}
-      if(frame.classList.contains('pdf-scan-reading')){slot.readingLayoutObserver.observe(frame);slot.style.minHeight=frame.scrollHeight+'px';}
       content.dataset.translationPlacement=JSON.stringify({page:number,language,stage:'ready',blocks:blocks.length,scanScore:result.scanAlignment?.score});
       return true;
     } catch(error) {return fail('render-'+(error.name||'Error'));}
@@ -1446,7 +1441,7 @@ async function reader() {
     scheduleViewSave();
     if (!fitWidth) return;
     surface.style.width=fitWidth*zoom+'px';
-    for(const frame of pageList.querySelectorAll('.pdf-scan-reading'))frame.style.setProperty('--pdf-reading-zoom',String(zoom));
+
     const translated=translatedPage.querySelector('.pdf-translation-layout');
     if (translated && !translatedPage.hidden) {
       const position=pageViewportPosition(translatedPage,translated);
