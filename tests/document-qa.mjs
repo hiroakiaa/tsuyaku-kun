@@ -218,13 +218,13 @@ try {
 }
 
 try {
-  const payloads = [];
+  const payloads = [];let registered;
   globalThis.fetch = async (_url,options)=>{
     payloads.push(JSON.parse(options.body));
     return Response.json({choices:[{finish_reason:'stop',message:{content:'{"items":[]}'}}]});
   };
   const env = {OPENAI_DOCUMENT_QA_KEY:'test',ROOMS:{idFromName:name=>name,get:()=>({
-    fetch:async()=>Response.json(null),
+    fetch:async(url,options)=>{if(url.endsWith('/init'))registered=JSON.parse(options.body.get('record'));return Response.json(null);},
   })}};
   const form = new FormData();
   const ocrText = 'The swimming pool opens at 8 AM.';
@@ -233,8 +233,8 @@ try {
   form.set('pages',JSON.stringify([ocrText]));
   const response = await documents(new Request('https://test/documents',{method:'POST',body:form}),env,{uid:'author'});
   assert.equal(response.status,201);
-  assert.equal(payloads.length,1);
-  const sent = JSON.stringify(payloads[0]);
+  assert.equal(payloads.length,0,'Registration must not wait for or spend on a foreground overview');
+  const sent = JSON.stringify(registered);
   assert.ok(sent.includes(ocrText));
   assert.doesNotMatch(sent,/image_url|data:image|synthetic scan bytes/);
 } finally {

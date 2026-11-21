@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {chromium} from 'playwright';
+import {chromium,submitDocument} from './document-browser.mjs';
 
 const id = process.env.DOCUMENT_QA_EXISTING_FIXTURE;
 assert.match(id ?? '', /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i,
@@ -15,7 +15,7 @@ try {
   const language = page.locator('select.document-language:visible');
   await language.selectOption('ja');
   await page.locator('#question').fill('ルームは何時間で失効しますか？');
-  await page.locator('#ask-form button').click();
+  await page.locator('#ask-form button.primary').click();
   const answer = page.locator('#messages .answer-item').filter({hasText:/24\s*時間/});
   const citation = answer.getByRole('link',{name:'元のPDF 2ページ',exact:true});
   await citation.click({timeout:60_000});

@@ -7,3 +7,11 @@ const result=await translationCheckpoints(storage,'page-language-hash',batches,t
 assert.deepEqual(result,['translated a','translated b','translated c']);assert.equal(calls.get('a'),1);assert.equal(calls.get('b'),2);assert.equal(calls.get('c'),1);
 await translationCheckpoints(storage,'page-language-hash',batches,translate);assert.equal(calls.get('b'),2);
 console.log('PASS document translation resumes unfinished groups and reuses saved groups');
+rows.clear();rows.set('document',{});let count=0,release,started;
+const gate=new Promise(resolve=>release=resolve),bothStarted=new Promise(resolve=>started=resolve);
+const pending=translationCheckpoints(storage,'removed-document',Array.from({length:8},(_,i)=>[String(i)]),async batch=>{if(++count===2)started();await gate;return batch.map(value=>'translated '+value);});
+await bothStarted;rows.clear();release();
+await assert.rejects(()=>pending,error=>error.status===404);
+assert.equal(count,2,'Deletion stops unstarted batches instead of spending on all remaining pages');
+assert.equal(rows.size,0,'In-flight translation cannot resurrect document text or checkpoints after deletion');
+console.log('PASS deleting during translation stops pending batches and leaves no stored data');

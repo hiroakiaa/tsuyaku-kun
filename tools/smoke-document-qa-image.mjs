@@ -1,6 +1,6 @@
 import {writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
-import {chromium} from 'playwright';
+import {chromium,submitDocument} from './document-browser.mjs';
 
 const format = process.argv[2] ?? 'png';
 if (!['png','jpeg','webp'].includes(format)) throw new Error('Expected png, jpeg or webp');
@@ -24,7 +24,6 @@ try {
   await page.getByRole('heading',{name:'資料QAの保管庫'}).waitFor();
   await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
   assert.equal(await page.getByRole('link',{name:'資料チャット作成',exact:true}).count(),0);
-  await page.locator('#upload input[name=title]').fill('自動公開確認');
   const image = await page.evaluate(({type,label})=>{
     const canvas=document.createElement('canvas');
     canvas.width=1000;
@@ -51,11 +50,8 @@ try {
   assert.ok(image.startsWith('data:'+mimeType+';base64,'));
   await page.locator('#upload input[type=file]').setInputFiles({name:'fixture.'+format,mimeType,buffer:Buffer.from(image.split(',')[1],'base64')});
   const registrationStarted = performance.now();
-  await page.locator('#upload button').click();
-  const url = page.locator('#guide-url');
-  await page.waitForFunction(()=>Boolean(document.querySelector('#guide-url')?.value),null,{timeout:120000}).catch(async e=>{throw Error(await page.locator('#upload-status').textContent(),{cause:e});});
+  const guide = await submitDocument(page);
   const registrationMs = Math.round(performance.now()-registrationStarted);
-  const guide = await url.inputValue();
   try {
     const upload=await page.evaluate(()=>window.qaUpload);
     assert.deepEqual(upload.files,['application/pdf']);
@@ -103,8 +99,8 @@ try {
     assert.equal(await page.locator('#pdf-page option').count(),1);
     await page.locator('#question').fill(japanese ? '青組の開始時刻は？' : 'What is the start time for the Blue group?');
     const questionStarted = performance.now();
-    await page.locator('#ask-form button').click();
-    await page.locator('#ask-form button:enabled').waitFor();
+    await page.locator('#ask-form button.primary').click();
+    await page.locator('#ask-form button.primary:enabled').waitFor();
     const answerMs = Math.round(performance.now()-questionStarted);
     const bubble=page.locator('#messages .bubble').last();
     assert.match(await bubble.locator('.answer-text').textContent(),japanese ? /14:00|午後\s*2\s*時/ : /14:00|2\s*(?::00)?\s*p\.?m\.?/i);
@@ -145,8 +141,8 @@ try {
       assert.match(attachment.pages,/Green group starts at 16:30/i);
       await page.keyboard.press('Escape');
       await page.locator('#question').fill('What is the start time for the Green group?');
-      await page.locator('#ask-form button').click();
-      await page.locator('#ask-form button:enabled').waitFor();
+      await page.locator('#ask-form button.primary').click();
+      await page.locator('#ask-form button.primary:enabled').waitFor();
       assert.match(await bubble.locator('.answer-text').textContent(),/16:30|4:30\s*p\.?m\.?/i);
       assert.match(await bubble.locator('.answer-source').textContent(),/green-schedule\.pdf\s*·\s*1/);
       assert.match(await bubble.locator('.answer-quote').textContent(),/Green group[\s\S]*16:30/i);

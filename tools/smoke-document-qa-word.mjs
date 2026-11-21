@@ -1,6 +1,6 @@
 import {readFile,appendFile,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
-import {chromium} from 'playwright';
+import {chromium,submitDocument} from './document-browser.mjs';
 
 const browser = await chromium.launch();
 try {
@@ -17,7 +17,6 @@ try {
   await page.getByRole('heading',{name:'資料QAの保管庫'}).waitFor();
   await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
   assert.equal(await page.getByRole('link',{name:'資料チャット作成',exact:true}).count(),0);
-  await page.locator('#upload input[name=title]').fill('自動公開確認');
   await page.locator('#upload input[type=file]').setInputFiles({name:'page-break.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:await readFile(new URL('../tests/fixtures/document-qa-page-break.docx',import.meta.url))});
   const sheets=await page.evaluate(async()=>{
     const {officePages}=await import('./web/document-office.js');
@@ -25,11 +24,8 @@ try {
   });
   assert.match(sheets[0], /Blue group.*14:00/);
   const registrationStarted = performance.now();
-  await page.locator('#upload button').click();
-  const url = page.locator('#guide-url');
-  await page.waitForFunction(()=>Boolean(document.querySelector('#guide-url')?.value),null,{timeout:120000}).catch(async e=>{throw Error(await page.locator('#upload-status').textContent(),{cause:e});});
+  const guide = await submitDocument(page);
   const registrationMs = Math.round(performance.now()-registrationStarted);
-  const guide = await url.inputValue();
   let measurement;
   try {
     assert.deepEqual(externalWrites,[]);
@@ -59,8 +55,8 @@ try {
     assert.equal(await page.locator('#pdf-page option').count(),2);
     await page.locator('#question').fill('What is the start time for the Blue group?');
     const questionStarted = performance.now();
-    await page.locator('#ask-form button').click();
-    await page.locator('#ask-form button:enabled').waitFor();
+    await page.locator('#ask-form button.primary').click();
+    await page.locator('#ask-form button.primary:enabled').waitFor();
     const answerMs = Math.round(performance.now()-questionStarted);
     const bubble=page.locator('#messages .bubble').last();
     assert.match(await bubble.locator('.answer-text').textContent(),/14:00|2\s*(?::00)?\s*p\.?m\.?/i);

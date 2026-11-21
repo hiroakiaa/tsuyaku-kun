@@ -1,6 +1,6 @@
 import {appendFile,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
-import {chromium} from 'playwright';
+import {chromium,submitDocument} from './document-browser.mjs';
 
 const atSizeLimit = process.argv.includes('--size-limit');
 const dense = process.argv.includes('--dense');
@@ -52,7 +52,6 @@ try {
   await page.getByRole('heading',{name:'資料QAの保管庫'}).waitFor();
   await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
   assert.equal(await page.getByRole('link',{name:'資料チャット作成',exact:true}).count(),0);
-  await page.locator('#upload input[name=title]').fill('自動公開確認');
   const preflightStarted = performance.now();
   await page.locator('#upload input[type=file]').setInputFiles({name:'smoke.pdf',mimeType:'application/pdf',buffer:pdf});
   await page.getByText('PDFの文字を確認しました。',{exact:true}).waitFor({timeout:120_000}).catch(async error=>{
@@ -60,11 +59,8 @@ try {
   });
   const preflightMs = Math.round(performance.now()-preflightStarted);
   const registrationStarted = performance.now();
-  await page.locator('#upload button').click();
-  const url = page.locator('#guide-url');
-  await page.waitForFunction(()=>Boolean(document.querySelector('#guide-url')?.value));
+  const guide = await submitDocument(page);
   const registrationMs = Math.round(performance.now()-registrationStarted);
-  const guide = await url.inputValue();
   let result;
   try {
     assert.deepEqual(externalWrites,[]);
@@ -74,11 +70,11 @@ try {
     const pageCount = await page.locator('#pdf-page option').count();
     await page.locator('#question').fill('When does the library close?');
     const libraryStarted = performance.now();
-    await page.locator('#ask-form button').click();
+    await page.locator('#ask-form button.primary').click();
     await page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 2ページ'}).waitFor();
     await page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 1ページ'}).waitFor();
     assert.match(await page.locator('#messages').textContent(),/3\s*(?::00)?\s*PM/i);
-    await page.locator('#ask-form button:enabled').waitFor();
+    await page.locator('#ask-form button.primary:enabled').waitFor();
     const libraryMs = Math.round(performance.now()-libraryStarted);
     const answerTimings=async()=>{
       const raw=await page.locator('#messages').getAttribute('data-answer-timings');
@@ -115,11 +111,11 @@ try {
       await waitForOriginalMarker();
       originalMarkerAfterTranslation = true;
       const metrics = await page.evaluate(async () => {
-        const {documentQaMetrics}=await import('./web/document-qa-metrics.js?v=1');
+        const {documentQaMetrics}=await import('./web/document-qa-metrics.js?v=3');
         const id=new URLSearchParams(location.search).get('id');
         return documentQaMetrics().find(row=>row.id===id);
       });
-      assert.equal(metrics?.title,'自動公開確認');
+      assert.match(metrics?.title,/^\d{8}_smoke$/);
       assert.equal(metrics.answers,1);
       assert.equal(metrics.unsupported,0);
       assert.ok(metrics.answerMs>0 && metrics.translations>0);
@@ -127,24 +123,24 @@ try {
     }
     await page.locator('#question').fill('When does the swimming pool open?');
     const poolStarted = performance.now();
-    await page.locator('#ask-form button').click();
+    await page.locator('#ask-form button.primary').click();
     const citation = page.locator('#messages .answer-source').getByRole('link',{name:scanCitation});
     await citation.waitFor({timeout:60_000});
-    await page.locator('#ask-form button:enabled').waitFor();
+    await page.locator('#ask-form button.primary:enabled').waitFor();
     const poolMs = Math.round(performance.now()-poolStarted);
     await citation.click();
     await page.waitForFunction(expected=>document.querySelector('#pdf-page')?.value===String(expected),scanPage);
     assert.match(await page.locator('#messages .bubble').last().textContent(),/8\s*(?::00)?\s*AM/i);
     await page.locator('#question').fill('When does the library close and when does the swimming pool open? Give both facts separately.');
     const combinedStarted = performance.now();
-    await page.locator('#ask-form button').click();
+    await page.locator('#ask-form button.primary').click();
     const combined = page.locator('#messages .bubble').last();
     const librarySource = combined.locator('.answer-item').filter({hasText:/3\s*(?::00)?\s*PM/i});
     const poolSource = combined.locator('.answer-item').filter({hasText:/8\s*(?::00)?\s*AM/i});
     await librarySource.getByRole('link',{name:'元のPDF 2ページ'}).waitFor();
     await librarySource.getByRole('link',{name:'元のPDF 1ページ'}).waitFor();
     await poolSource.getByRole('link',{name:scanCitation}).waitFor();
-    await page.locator('#ask-form button:enabled').waitFor();
+    await page.locator('#ask-form button.primary:enabled').waitFor();
     const citationNames = async item => (await item.locator('.answer-source a').allTextContents())
       .map(label=>label.trim()).sort();
     assert.deepEqual(await citationNames(librarySource),['元のPDF 1ページ','元のPDF 2ページ']);
@@ -183,10 +179,10 @@ try {
     const missingQuestion = 'What is the annual parking permit fee?';
     await page.locator('#question').fill(missingQuestion);
     const missingStarted = performance.now();
-    await page.locator('#ask-form button').click();
+    await page.locator('#ask-form button.primary').click();
     const unanswered = page.locator('#messages .bubble').last();
     await unanswered.getByText('この項目の根拠は資料内で確認できませんでした。',{exact:true}).waitFor({timeout:60_000});
-    await page.locator('#ask-form button:enabled').waitFor();
+    await page.locator('#ask-form button.primary:enabled').waitFor();
     const missingMs = Math.round(performance.now()-missingStarted);
     assert.equal(await unanswered.locator('.answer-source').count(),0);
     const missingStages=await answerTimings();
@@ -196,8 +192,8 @@ try {
       sources:await citationNames(unanswered), elapsedMs:missingMs,
     };
     await page.locator('#question').fill('When does the library close, and what is the annual parking permit fee? Answer each separately.');
-    await page.locator('#ask-form button').click();
-    await page.locator('#ask-form button:enabled').waitFor();
+    await page.locator('#ask-form button.primary').click();
+    await page.locator('#ask-form button.primary:enabled').waitFor();
     const mixed = page.locator('#messages .bubble').last();
     const supported = mixed.locator('.answer-item').filter({hasText:/3\s*(?::00)?\s*PM/i});
     const unsupported = mixed.locator('.answer-item').filter({hasText:'この項目の根拠は資料内で確認できませんでした。'});
@@ -205,8 +201,8 @@ try {
     assert.equal(await unsupported.count(),1);
     assert.deepEqual(await citationNames(unsupported),[]);
     await page.locator('#question').fill('図書館は何時に閉まりますか？ 年間駐車許可料はいくらですか？ 項目ごとに答えてください。');
-    await page.locator('#ask-form button').click();
-    await page.locator('#ask-form button:enabled').waitFor();
+    await page.locator('#ask-form button.primary').click();
+    await page.locator('#ask-form button.primary:enabled').waitFor();
     const translated = page.locator('#messages .bubble').last();
     const closing = translated.locator('.answer-item').filter({hasText:/午後\s*3\s*時|15:00/});
     const missingFee = translated.locator('.answer-item').filter({hasText:'この項目の根拠は資料内で確認できませんでした。'});
@@ -217,8 +213,8 @@ try {
     if (groupVisit) {
       await page.locator('#question').fill('For group visits, how many days in advance must I book and cancel? Answer each separately.');
       const started = performance.now();
-      await page.locator('#ask-form button').click();
-      await page.locator('#ask-form button:enabled').waitFor();
+      await page.locator('#ask-form button.primary').click();
+      await page.locator('#ask-form button.primary:enabled').waitFor();
       const answer = page.locator('#messages .bubble').last();
       for (const [days, number, quote] of [[14,6,/booked at least 14 days/i],[3,21,/cancellations must be received at least 3 days/i]]) {
         const item = answer.locator('.answer-item').filter({has:page.locator('.answer-text').filter({hasText:new RegExp('\\b'+days+'\\s+days','i')})});

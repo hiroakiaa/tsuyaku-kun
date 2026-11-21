@@ -1,3 +1,4 @@
+import {ocrNumbers,reconcileOcrNumbers} from './document-ocr-consensus.js?v=1';
 const timingNames = ['initialization','render','recognition','native-recognition','full-recognition','horizontal-recognition'].map(stage=>'document-ocr:'+stage);
 
 function recordTiming(name,start) {
@@ -75,7 +76,16 @@ function enlargeScanForOcr(canvas) {
 
 export async function createPdfOcr(ops) {
   for (const name of timingNames) performance.clearMeasures(name);
-  let standard, horizontal, vertical, disabled=false;
+  let standard, horizontal, vertical, digits, disabled=false;
+  async function digitWorker(){
+    digits??=(async()=>{
+      const {default:{createWorker}}=await import('https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/tesseract.esm.min.js');
+      const worker=await createWorker('eng',1,{workerPath:'https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/worker.min.js',corePath:'https://cdn.jsdelivr.net/npm/tesseract.js-core@6.0.0'});
+      await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:'0123456789.,-'});
+      return worker;
+    })();
+    return digits;
+  }
   async function standardWorker() {
     standard ??= (async()=>{
       const started=performance.now();
@@ -102,6 +112,57 @@ export async function createPdfOcr(ops) {
     }
     return vertical;
   }
+  async function recognizeScanCanvas(input,{preferHorizontal=false,fallbackCanvas=input}={}) {
+    const primary=(await (await standardWorker()).recognize(input,{}, {blocks:true})).data;
+    const linesOf=data=>(data.blocks??[]).flatMap(block=>block.paragraphs??[]).flatMap(paragraph=>paragraph.lines??[]);
+    const compact=text=>text.normalize('NFKC').replace(/\s/gu,'');
+    const malformed=/(?:[ァ-ヶー]{2,4}月[0-9一二三四五六七八九十]{1,3}日|[0-9一二三四五六七八九十]{1,3}月[一二三四五六七八九十]*ニ[ニ一二三四五六七八九十\s]*日)/u;
+    const calendar=/(?:1[0-2]|[1-9]|十[一二]?|[一二三四五六七八九])月[0-9一二三四五六七八九十]{1,3}日/u;
+    let lines=linesOf(primary),canvas=input;
+    if(!disabled && typeof DecompressionStream==='function' && (preferHorizontal||/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(primary.text))){
+      const pixels=input.getContext('2d').getImageData(0,0,input.width,input.height);
+      const {findHorizontalScanLines}=await import('./document-ocr-lines.js?v=3');
+      if(findHorizontalScanLines(pixels))try{
+        if(!horizontal){const {createHorizontalScanReader}=await import('./document-ocr-horizontal.js?v=2');horizontal=await createHorizontalScanReader(new URL('./ocr/assets/recognition.worker-CFphUR-D.js?v=3',import.meta.url));}
+        const started=performance.now(),recognized=await horizontal.read(pixels,{withLayout:true});recordTiming('document-ocr:horizontal-recognition',started);
+        if(recognized?.length){
+          const primaryLines=linesOf(primary),started=performance.now();let checked=0,repaired=0,unresolved=0;
+          lines=[];
+          for(const {text,box:{x,y,width,height}} of recognized){
+            const bbox={x0:x,y0:y,x1:x+width,y1:y+height};
+            const overlap=box=>Math.max(0,Math.min(bbox.x1,box.x1)-Math.max(bbox.x0,box.x0))*Math.max(0,Math.min(bbox.y1,box.y1)-Math.max(bbox.y0,box.y0))/Math.max(1,Math.min(width*height,(box.x1-box.x0)*(box.y1-box.y0)));
+            const match=primaryLines.filter(line=>overlap(line.bbox)>=.6).sort((a,b)=>overlap(b.bbox)-overlap(a.bbox))[0];
+            let result={text,repaired:0,unresolved:0};
+            if(match){
+              const before=ocrNumbers(match.text),after=ocrNumbers(text),confirmations=[];
+              if(JSON.stringify(before)!==JSON.stringify(after)){
+                const words=(match.words??[]).flatMap(word=>ocrNumbers(word.text).map(value=>({word,value})));
+                if(before.length===after.length&&JSON.stringify(words.map(item=>item.value))===JSON.stringify(before))for(let i=0;i<before.length;i++){
+                  if(before[i]===after[i]||checked>=8)continue;
+                  const {word}=words[i];if(!/^[-−]?[0-9０-９]+(?:[.,，][0-9０-９]+)*$/u.test(word.text.trim()))continue;
+                  const b=word.bbox,crop=document.createElement('canvas');
+                  if(b.x0<0||b.y0<0||b.x1>input.width||b.y1>input.height||b.x1<=b.x0||b.y1<=b.y0)continue;
+                  crop.width=b.x1-b.x0+20;crop.height=b.y1-b.y0+20;
+                  try{const ctx=crop.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,crop.width,crop.height);ctx.drawImage(input,b.x0,b.y0,b.x1-b.x0,b.y1-b.y0,10,10,b.x1-b.x0,b.y1-b.y0);confirmations[i]=(await(await digitWorker()).recognize(crop)).data;checked++;}catch{confirmations[i]=null;checked++;}finally{crop.width=crop.height=0;}
+                }
+                result=reconcileOcrNumbers(match.text,text,confirmations);
+              }
+            }
+            repaired+=result.repaired;unresolved+=result.unresolved;lines.push({text:result.text,bbox,ocrNumberUnresolved:result.unresolved});
+          }
+          performance.measure('document-ocr:number-check',{start:started,detail:{checked,repaired,unresolved}});
+        }
+      }catch{horizontal?.close();horizontal=undefined;disabled=true;}
+    }
+    const textOf=rows=>rows.map(line=>line.text.trim()).filter(Boolean).join('\n');
+    let text=textOf(lines);
+    if(malformed.test(compact(text))&&!malformed.test(compact(primary.text))&&calendar.test(compact(primary.text))){lines=linesOf(primary);text=textOf(lines);}
+    if((compact(text).length<8||malformed.test(compact(text)))&&fallbackCanvas!==input){
+      const full=(await (await standardWorker()).recognize(fallbackCanvas,{}, {blocks:true})).data;
+      if(compact(text).length<8||(!malformed.test(compact(full.text))&&calendar.test(compact(full.text)))){lines=linesOf(full);text=textOf(lines);canvas=fallbackCanvas;}
+    }
+    return {text,lines,canvas};
+  }
   return {
     async readCanonicalLayout(page,pageNumberItems=[]) {
       if(page.rotate)return this.readLayout(page,pageNumberItems);
@@ -114,9 +175,9 @@ export async function createPdfOcr(ops) {
           if(image.bitmap)ctx.drawImage(image.bitmap,0,0);else{const pixels=ctx.createImageData(image.width,image.height);if(image.data?.length===pixels.data.length)pixels.data.set(image.data);else if(image.data?.length===image.width*image.height*3){for(let source=0,target=0;source<image.data.length;source+=3,target+=4){pixels.data[target]=image.data[source];pixels.data[target+1]=image.data[source+1];pixels.data[target+2]=image.data[source+2];pixels.data[target+3]=255;}}else pixels.data.fill(255);ctx.putImageData(pixels,0,0);}enlargeScanForOcr(native);input=native;bounds=image.pdfBounds;
         }
         const {findVerticalScanRegion}=await import('./document-ocr-lines.js?v=3');if(findVerticalScanRegion(input.getContext('2d').getImageData(0,0,input.width,input.height))?.wholePage)return this.readLayout(page,pageNumberItems);
-        // Same engine, default page segmentation and pixels as creation's read().
-        const {data}=await (await standardWorker()).recognize(input,{}, {blocks:true});
-        return (data.blocks??[]).flatMap(block=>block.paragraphs).flatMap(paragraph=>paragraph.lines).flatMap(({text,bbox})=>{
+        const result=await recognizeScanCanvas(input,{preferHorizontal:pageNumberItems.length>0,fallbackCanvas:canvas});
+        if(result.canvas!==input){input=result.canvas;bounds=undefined;}
+        return result.lines.flatMap(({text,bbox})=>{
           const str=typeof text==='string'?text.trim():'';if(!str||!bbox)return [];
           let left,top,right,bottom;
           if(bounds){const [x0,y0,x1,y1]=bounds;[left,top]=size.convertToViewportPoint(x0+bbox.x0/input.width*(x1-x0),y1-bbox.y0/input.height*(y1-y0));[right,bottom]=size.convertToViewportPoint(x0+bbox.x1/input.width*(x1-x0),y1-bbox.y1/input.height*(y1-y0));}
@@ -278,7 +339,7 @@ export async function createPdfOcr(ops) {
           }
           if (!lines?.length) {
             const {createHorizontalScanReader}=await import('./document-ocr-horizontal.js?v=2');
-            horizontal ??= await createHorizontalScanReader(new URL('./ocr/assets/recognition.worker-CFphUR-D.js?v=2',import.meta.url));
+            horizontal ??= await createHorizontalScanReader(new URL('./ocr/assets/recognition.worker-CFphUR-D.js?v=3',import.meta.url));
             const recognized=await horizontal.read(pixels,{withLayout:true});
             lines=recognized?.map(({text,box:{x,y,width,height}})=>({text,bbox:{x0:x,y0:y,x1:x+width,y1:y+height}}));
           }
@@ -355,40 +416,8 @@ export async function createPdfOcr(ops) {
               context.putImageData(pixels,0,0);
             }
             enlargeScanForOcr(native);
-            if (pageNumberOnly && !disabled && typeof DecompressionStream==='function') {
-              const pixels=context.getImageData(0,0,native.width,native.height);
-              const {findHorizontalScanLines}=await import('./document-ocr-lines.js');
-              if (findHorizontalScanLines(pixels)) {
-                try {
-                  if (!horizontal) {
-                    const started=performance.now();
-                    const {createHorizontalScanReader}=await import('./document-ocr-horizontal.js');
-                    const workerUrl=new URL('./ocr/assets/recognition.worker-CFphUR-D.js?v=2',import.meta.url);
-                    horizontal=await createHorizontalScanReader(workerUrl);
-                    if (!standard) recordTiming(timingNames[0],started);
-                  }
-                  const started=performance.now();
-                  text=(await horizontal.read(pixels)) ?? '';
-                  recordTiming('document-ocr:horizontal-recognition',started);
-                } catch {
-                  horizontal?.close();
-                  horizontal=undefined;
-                  disabled=true;
-                }
-              }
-            }
-            const nativeStarted = performance.now();
-            const compact=value=>value.normalize('NFKC').replace(/\s/gu,'');
-            const malformedMonth=/(?:[ァ-ヶー]{2,4}月[0-9一二三四五六七八九十]{1,3}日|[0-9一二三四五六七八九十]{1,3}月[一二三四五六七八九十]*ニ[ニ一二三四五六七八九十]*日)/u;
-            const calendarDate=/(?:1[0-2]|[1-9]|十[一二]?|[一二三四五六七八九])月[0-9一二三四五六七八九十]{1,3}日/u;
-            if (compact(text).length<8 || malformedMonth.test(compact(text))) {
-              const alternative=(await (await standardWorker()).recognize(native)).data.text.trim();
-              if (compact(text).length<8 || (!malformedMonth.test(compact(alternative)) && calendarDate.test(compact(alternative)))) text=alternative;
-              if (malformedMonth.test(compact(text))) {
-                const rendered=(await (await standardWorker()).recognize(canvas)).data.text.trim();
-                if (!malformedMonth.test(compact(rendered)) && calendarDate.test(compact(rendered))) text=rendered;
-              }
-            }
+            const nativeStarted=performance.now();
+            text=(await recognizeScanCanvas(native,{preferHorizontal:pageNumberOnly,fallbackCanvas:canvas})).text;
             recordTiming('document-ocr:native-recognition',nativeStarted);
           } finally {
             native.width = native.height = 0;
@@ -416,6 +445,7 @@ export async function createPdfOcr(ops) {
     async close() {
       horizontal?.close();
       await vertical?.terminate();
+      await (await digits?.catch(()=>null))?.terminate();
       const worker=await standard?.catch(()=>null);
       await worker?.terminate();
     },

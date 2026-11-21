@@ -5,12 +5,13 @@ export async function translationCheckpoints(storage,key,batches,translate){
   const index=next++;if(index>=batches.length)return;
   const part=key+':part:'+index;
   try{
+   if(!await storage.get('document'))throw Object.assign(Error('資料が削除されたため翻訳を終了しました。'),{status:404});
    const cached=await storage.get(part);
    if(Array.isArray(cached)&&cached.length===batches[index].length&&cached.every(value=>typeof value==='string'&&value.trim())){output[index]=cached;continue;}
    const result=await translate(batches[index]);
    if(!Array.isArray(result)||result.length!==batches[index].length||result.some(value=>typeof value!=='string'||!value.trim()))throw Error('訳文を確認できませんでした。');
    if(new TextEncoder().encode(JSON.stringify(result)).length<120000)await storage.transaction(async tx=>{
-    if(!await tx.get('document'))return;
+    if(!await tx.get('document'))throw Object.assign(Error('資料が削除されたため翻訳を終了しました。'),{status:404});
     const manifest='/document/translation-checkpoints',entries=(await tx.get(manifest)??[]).filter(value=>value!==part);
     if(entries.length>=320)await tx.delete(entries.shift());
     await tx.put({[part]:result,[manifest]:[...entries,part]});

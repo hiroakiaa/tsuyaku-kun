@@ -1,7 +1,7 @@
 import {fileURLToPath} from 'node:url';
 import {writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
-import {chromium} from 'playwright';
+import {chromium,submitDocument} from './document-browser.mjs';
 
 const browser = await chromium.launch();
 const checks = [];
@@ -22,7 +22,6 @@ try {
   await page.getByRole('heading',{name:'資料QAの保管庫'}).waitFor();
   await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
   assert.equal(await page.getByRole('link',{name:'資料チャット作成',exact:true}).count(),0);
-  await page.locator('#upload input[name=title]').fill('自動公開確認');
   stage = 'read workbook';
   await page.locator('#upload input[type=file]').setInputFiles(fileURLToPath(new URL('../tests/fixtures/document-qa-admission-years.xlsx',import.meta.url)));
   const sheets=await page.evaluate(async()=>{
@@ -31,10 +30,8 @@ try {
   });
   assert.equal(sheets.length,2);
   stage = 'register document';
-  await page.locator('#upload button').click();
-  const url = page.locator('#guide-url');
-  await page.waitForFunction(()=>Boolean(document.querySelector('#guide-url')?.value),null,{timeout:120000}).catch(async e=>{throw Error(await page.locator('#upload-status').textContent(),{cause:e});});
-  const guide = await url.inputValue();
+  const guide = await submitDocument(page);
+  const registrationMs = Math.round(performance.now()-registrationStarted);
   try {
     assert.deepEqual(externalWrites,[]);
     await page.goto(guide);
@@ -44,10 +41,10 @@ try {
       const index = await answers.count();
       await page.locator('#question').fill(question);
       const started = performance.now();
-      await page.locator('#ask-form button').click();
+      await page.locator('#ask-form button.primary').click();
       const bubble = answers.nth(index);
       await bubble.locator('.answer-text').waitFor();
-      await page.locator('#ask-form button:enabled').waitFor();
+      await page.locator('#ask-form button.primary:enabled').waitFor();
       return {bubble, elapsedMs:Math.round(performance.now()-started)};
     }
 

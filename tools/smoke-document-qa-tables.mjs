@@ -1,6 +1,6 @@
 import {readFile,appendFile,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
-import {chromium} from 'playwright';
+import {chromium,submitDocument} from './document-browser.mjs';
 
 const inventory = process.argv.includes('--inventory');
 const zero = process.argv.includes('--zero');
@@ -23,7 +23,6 @@ try {
   await page.getByRole('heading',{name:'資料QAの保管庫'}).waitFor();
   await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
   assert.equal(await page.getByRole('link',{name:'資料チャット作成',exact:true}).count(),0);
-  await page.locator('#upload input[name=title]').fill('自動公開確認');
   await page.locator('#upload input[type=file]').setInputFiles({name:'document-qa-tables.xlsx',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',buffer:await readFile(new URL('../tests/fixtures/'+fixture,import.meta.url))});
   const sheets=await page.evaluate(async()=>{
     const {officePages}=await import('./web/document-office.js');
@@ -31,11 +30,8 @@ try {
   });
   assert.equal(sheets.length,inventory ? 1 : 4);
   const registrationStarted = performance.now();
-  await page.locator('#upload button').click();
-  const url = page.locator('#guide-url');
-  await page.waitForFunction(()=>Boolean(document.querySelector('#guide-url')?.value),null,{timeout:120000}).catch(async e=>{throw Error(await page.locator('#upload-status').textContent(),{cause:e});});
+  const guide = await submitDocument(page);
   const registrationMs = Math.round(performance.now()-registrationStarted);
-  const guide = await url.inputValue();
   const inventoryChecks = [];
   let simulatedFailure = false;
   let recoveryStarted;
@@ -114,7 +110,7 @@ try {
       const field = page.locator('#question');
       const failedQuestion = 'プロジェクターの在庫を確認したい';
       await field.fill(failedQuestion);
-      await page.locator('#ask-form button').click();
+      await page.locator('#ask-form button.primary').click();
       const edit = page.getByRole('button',{name:'質問を編集',exact:true});
       await field.fill('編集中の質問');
       await edit.click();
@@ -136,10 +132,10 @@ try {
         const question = followup ?? 'プロジェクターの'+slot+'の'+branch+'の在庫は？';
         await page.locator('#question').fill(question);
         const started = performance.now();
-        await page.locator('#ask-form button').click();
+        await page.locator('#ask-form button.primary').click();
         const answer = page.locator('#messages .bubble').last();
         await answer.getByText(expected,{exact:true}).waitFor({timeout:30000});
-        await page.locator('#ask-form button:enabled').waitFor();
+        await page.locator('#ask-form button.primary:enabled').waitFor();
         const elapsedMs = Math.round(performance.now()-started);
         if (!cell) {
           assert.equal(await answer.locator('.answer-source').count(),0);
@@ -200,12 +196,12 @@ try {
         requestStarted,
         headers,
         (async () => {
-          await page.locator('#ask-form button').click();
+          await page.locator('#ask-form button.primary').click();
           await bubble.getByText(value,{exact:true}).waitFor({timeout:30000});
           return performance.now();
         })(),
       ]);
-      await page.locator('#ask-form button:enabled').waitFor();
+      await page.locator('#ask-form button.primary:enabled').waitFor();
       const elapsedMs=Math.round(performance.now()-started);
       const submitEpoch = Number(await page.locator('#ask-form').getAttribute('data-test-submit-at'));
       assert.ok(submitEpoch >= startedEpoch && submitEpoch <= requestedAt.epoch, 'Missing or out-of-order submit event');
@@ -250,8 +246,8 @@ try {
     const blankQuestion = '令和9年度の青空高校の特進の入試日程は？';
     await page.locator('#question').fill(blankQuestion);
     const blankStarted = performance.now();
-    await page.locator('#ask-form button').click();
-    await page.locator('#ask-form button:enabled').waitFor();
+    await page.locator('#ask-form button.primary').click();
+    await page.locator('#ask-form button.primary:enabled').waitFor();
     const blankBubble = page.locator('#messages .bubble').last();
     const blankAnswer = await blankBubble.textContent();
     assert.equal(await blankBubble.locator('.answer-source').count(),0,blankQuestion);
@@ -261,8 +257,8 @@ try {
     const combinedQuestion = '令和9年度の青空高校と青空星雲高校について、それぞれ特進の入試定員は？';
     await page.locator('#question').fill(combinedQuestion);
     const combinedStarted = performance.now();
-    await page.locator('#ask-form button').click();
-    await page.locator('#ask-form button:enabled').waitFor();
+    await page.locator('#ask-form button.primary').click();
+    await page.locator('#ask-form button.primary:enabled').waitFor();
     const sections = page.locator('#messages .bubble').last().locator('.answer-item');
     const values = await sections.locator('.answer-text').allTextContents();
     assert.deepEqual(values,['20','この項目の根拠は資料内で確認できませんでした。'],combinedQuestion);
@@ -276,8 +272,8 @@ try {
     const scheduleQuestion = '説明会の午前組と午後組について、それぞれ開始時刻は？';
     await page.locator('#question').fill(scheduleQuestion);
     const scheduleStarted = performance.now();
-    await page.locator('#ask-form button').click();
-    await page.locator('#ask-form button:enabled').waitFor();
+    await page.locator('#ask-form button.primary').click();
+    await page.locator('#ask-form button.primary:enabled').waitFor();
     const scheduleSections = page.locator('#messages .bubble').last().locator('.answer-item');
     assert.deepEqual(await scheduleSections.locator('.answer-text').allTextContents(),['10:00','14:00']);
     const scheduleLinks = await scheduleSections.locator('.answer-source a').allTextContents();
@@ -297,8 +293,8 @@ try {
       ]) {
         await page.locator('#question').fill(question);
         const started = performance.now();
-        await page.locator('#ask-form button').click();
-        await page.locator('#ask-form button:enabled').waitFor();
+        await page.locator('#ask-form button.primary').click();
+        await page.locator('#ask-form button.primary:enabled').waitFor();
         const answers = page.locator('#messages .bubble').last().locator('.answer-item');
         assert.deepEqual(await answers.locator('.answer-text').allTextContents(),values,question);
         const citationLinks = await answers.locator('.answer-source a').allTextContents();

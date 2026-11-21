@@ -672,3 +672,6 @@ html{touch-action:pan-x pan-y}
 #messages .answer-text,#messages .answer-english,#messages .answer-item blockquote,#points #cards .card p{font-size:calc(1em * var(--reading-size));line-height:var(--reading-line)}
 :root[data-reading-contrast=high]{--bg:#080808;--panel:#080808;--soft:#181818;--ink:#fff;--muted:#e7e7e7;--line:#858585}
 :root[data-reading-motion=reduce] *, :root[data-reading-motion=reduce] *::before, :root[data-reading-motion=reduce] *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+
+#points{box-shadow:none}#points .reader-heading{position:sticky;top:0;z-index:3;background:var(--panel);padding-block:.5rem;border-bottom:1px solid var(--line)}
+@media(max-width:480px){.document-reading-settings label{grid-template-columns:1fr;gap:.2rem}}

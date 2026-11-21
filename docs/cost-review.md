@@ -592,3 +592,12 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 - Text size, spacing, contrast and reduced motion are local preferences; no AI request. They affect generated prose only, preserving PDF/translation geometry.
 - UI translation cache keys now include the label-content digest instead of a manual version. Same-language concurrent requests coalesce; valid cached dictionaries are reused and incomplete caches rebuilt. Added labels cause one new dictionary per used language, not document/page fan-out. Existing quotas and model unchanged.
 - Invalid timing/count samples are excluded rather than reported as NaN or percentages. Missing metrics remain unmeasured.
+
+### 2026-11-21 Stop translation batches after removal
+- Each checkpoint batch verifies the source document still exists. Deletion blocks new batches and checkpoint persistence; already-dispatched provider requests cannot be undone. Two in-flight batches maximum remains unchanged. No added model calls or increased budget. Test deletes during two active batches and verifies zero remaining keys and no further batches.
+- Public synthetic concurrent translation measured generated + in-flight for two callers, one generation with input141/output44/cached0. No private-source contents in the measurement report.
+
+### 2026-11-21 OCR consistency and nonblocking creation
+- PARSEQ decoding follows the official source: keep repeated tokens and space/quote tokens. Model bytes, provider and image handling unchanged. Correct text may change token counts naturally; no fabricated cost saving.
+- Extraction and positioning share the same local OCR decision. Clean Japanese raster lines use the existing local NDLOCR model; an English digit-only local worker checks at most8 geometry-matched numeric disagreements. No image or extra OCR request to a paid service.
+- Registration no longer makes an initial foreground overview generation before saving. One existing background summary creates the shared overview and TOC; output caps and budget limits unchanged. Overview text/titles are bounded to keep the existing completion budget. Reading/questions can proceed while this is pending.

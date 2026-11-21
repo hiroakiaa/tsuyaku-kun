@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {chromium} from 'playwright';
+import {chromium,submitDocument} from './document-browser.mjs';
 
 const browser = await chromium.launch();
 try {
@@ -12,7 +12,6 @@ try {
   await page.getByRole('heading',{name:'資料QAの保管庫'}).waitFor();
   await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
   assert.equal(await page.getByRole('link',{name:'資料チャット作成',exact:true}).count(),0);
-  await page.locator('#upload input[name=title]').fill('自動公開確認');
   const oversized = Buffer.concat([singlePage, Buffer.alloc(5_000_001-singlePage.length,32)]);
   const input = page.locator('#upload input[type=file]');
   const status = page.locator('#upload-status');

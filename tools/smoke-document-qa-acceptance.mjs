@@ -1,6 +1,6 @@
 import {readFile,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
-import {chromium} from 'playwright';
+import {chromium,submitDocument} from './document-browser.mjs';
 
 const fixtures = [
   {
@@ -68,6 +68,7 @@ let passed = 0;
 try {
   for (const fixture of scanFixturePath ? fixtures.filter(fixture=>fixture.printedPageNumbers) : selectedFixtures) {
     const page = await browser.newPage();
+    if(process.env.CANDIDATE_DOCUMENT_OCR)for(const name of ["document-ocr.js","document-ocr-consensus.js","ocr/assets/recognition.worker-CFphUR-D.js"])await page.route("**/web/"+name+"*",async route=>route.fulfill({contentType:"text/javascript",body:await readFile(new URL("../web/"+name,import.meta.url),"utf8")}));
     try {
       if (!fixture.excel) {
         await page.setContent('<meta charset="utf-8">');
@@ -140,14 +141,9 @@ try {
       if (network) await session.send('Network.emulateNetworkConditions',network);
       await page.goto('https://hiroakiaa.github.io/tsuyaku-kun/documents.html');
       await page.getByRole('link',{name:'資料チャット作成',exact:true}).click();
-      await page.locator('#upload input[name=title]').fill('自動受入確認 '+fixture.label);
       const uploadStarted = performance.now();
       await page.locator('#upload input[type=file]').setInputFiles(file);
-      const readOcrStages = ()=>page.evaluate(()=>Object.fromEntries(
-        ['initialization','render','recognition','native-recognition','full-recognition','horizontal-recognition'].map(stage=>[
-          stage,performance.getEntriesByName('document-ocr:'+stage,'measure').map(entry=>Math.round(entry.duration)),
-        ]),
-      ));
+      const readOcrStages=()=>page.evaluate(()=>{const stages=Object.fromEntries(['initialization','render','recognition','native-recognition','full-recognition','horizontal-recognition'].map(stage=>[stage,performance.getEntriesByName('document-ocr:'+stage,'measure').map(entry=>Math.round(entry.duration))]));return Object.values(stages).some(rows=>rows.length)?stages:JSON.parse(sessionStorage.getItem('document-smoke-ocr-stages')??'null')??stages;});
       if (!fixture.excel) {
         const expectedStatus = retryScan ? 'OCRの一時エラー' : 'PDFの文字を確認しました。';
         try {
@@ -164,22 +160,7 @@ try {
       }
       let ocrStages = fixture.scan && !retryScan ? await readOcrStages() : null;
       const registrationStarted = performance.now();
-      await page.locator('#upload button').click();
-      const uploadResult=await page.waitForFunction(()=>{
-        const url=document.querySelector('#guide-url')?.value;
-        if (url) return {url};
-        const status=document.querySelector('#upload-status')?.textContent?.trim();
-        const busy=document.querySelector('#upload button')?.getAttribute('aria-busy');
-        return status && busy!=='true' ? {error:status} : null;
-      },null,{timeout:120_000}).then(handle=>handle.jsonValue()).catch(async error=>({
-        error:error.message+' '+(await page.locator('#upload-status').textContent()),
-      }));
-      if (uploadResult.error) {
-        registrations.push({fixture:fixture.label,failedStage:'submit',error:uploadResult.error,
-          elapsedMs:Math.round(performance.now()-uploadStarted),ocrDownloads,ocrStages});
-        throw Error(uploadResult.error);
-      }
-      const guide = await page.locator('#guide-url').inputValue();
+      const guide=await submitDocument(page).catch(error=>{registrations.push({fixture:fixture.label,failedStage:'submit',error:error.message,elapsedMs:Math.round(performance.now()-uploadStarted),ocrDownloads,ocrStages});throw error;});
       const finished = performance.now();
       if (retryScan) ocrStages = await readOcrStages();
       const registration = {
@@ -206,9 +187,9 @@ try {
             const before = await answers.count();
             await page.locator('#question').fill(question);
             const started = performance.now();
-            await page.locator('#ask-form button').click();
+            await page.locator('#ask-form button.primary').click();
             await page.waitForFunction(count=>document.querySelectorAll('#messages .answer-item').length>count,before,{timeout:60_000});
-            await page.locator('#ask-form button:enabled').waitFor({timeout:60_000});
+            await page.locator('#ask-form button.primary:enabled').waitFor({timeout:60_000});
             const answer = await answers.last().locator('.answer-text').textContent();
             const source = answers.last().locator('.answer-source');
             const citations = await source.locator('a').allTextContents();

@@ -14,7 +14,7 @@
       "id": 2,
       "title": "細かい文字の再認識",
       "acceptance": "低解像度の細字を端末内で再認識し、同一問題の正解語数が悪化しない",
-      "status": "pending",
+      "status": "in_progress",
       "evidence": []
     },
     {
@@ -56,7 +56,7 @@
       "id": 8,
       "title": "数字・単位の照合",
       "acceptance": "金額・日付・時刻・割合の変化を検出し表記差は誤検出しない",
-      "status": "pending",
+      "status": "in_progress",
       "evidence": []
     },
     {
@@ -70,8 +70,10 @@
       "id": 10,
       "title": "既存資料の更新",
       "acceptance": "同じURLで再解析し翻訳・根拠が更新され変更なし部分を再利用",
-      "status": "pending",
-      "evidence": []
+      "status": "in_progress",
+      "evidence": [
+        "同じURLでの差し替え・新しい根拠と訳の再利用は公開確認済み。旧OCRデータを新しいデコーダーで自動更新する移行処理は未完了。"
+      ]
     },
     {
       "id": 11,
@@ -140,7 +142,7 @@
       "id": 20,
       "title": "翻訳回帰確認",
       "acceptance": "通常・密集・表・スキャンの翻訳回帰を公開版で実行",
-      "status": "pending",
+      "status": "in_progress",
       "evidence": []
     },
     {
@@ -161,22 +163,28 @@
       "id": 23,
       "title": "文脈保持",
       "acceptance": "続き質問の対象を直前会話から特定し他行と混ぜない",
-      "status": "pending",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "tools/smoke-document-qa-tables.mjs --merged: 公開063ec04、13/13問。入試・料金・予定の4シート、結合・多段見出し・空欄・続き質問・年度確認・比較・シート/セル/PDF引用を照合。checks/first50-merged.json。試験資料削除済み。"
+      ]
     },
     {
       "id": 24,
       "title": "曖昧条件の聞き返し",
       "acceptance": "年度・対象・コース不明時に聞き返し指定後に回答",
-      "status": "pending",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "tools/smoke-document-qa-tables.mjs --merged: 公開063ec04、13/13問。入試・料金・予定の4シート、結合・多段見出し・空欄・続き質問・年度確認・比較・シート/セル/PDF引用を照合。checks/first50-merged.json。試験資料削除済み。"
+      ]
     },
     {
       "id": 25,
       "title": "複数ページ回答",
       "acceptance": "複数ページの情報を統合してそれぞれ正しい根拠を表示",
-      "status": "pending",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "tools/smoke-document-qa.mjs: 公開063ec04、本文表とスキャン3ページ、図書館3PM・プール8AM・複数回答・未記載項目を確認。見出し1ページ/値2ページ/スキャン3ページの引用が一致。checks/first50-mixed-pdf.json。削除済み。"
+      ]
     },
     {
       "id": 26,
@@ -189,15 +197,19 @@
       "id": 27,
       "title": "回答引用一致",
       "acceptance": "回答と質問の対象条件を満たす引用のみ採用",
-      "status": "pending",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "tools/smoke-document-qa.mjs: 公開063ec04、本文表とスキャン3ページ、図書館3PM・プール8AM・複数回答・未記載項目を確認。見出し1ページ/値2ページ/スキャン3ページの引用が一致。checks/first50-mixed-pdf.json。削除済み。"
+      ]
     },
     {
       "id": 28,
       "title": "精密マーカー",
       "acceptance": "該当行・セルだけを原文と訳文の双方で黄色表示",
-      "status": "pending",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "tools/smoke-document-qa-existing.mjs: 公開063ec04、既存共有資料に24時間の質問。原文2ページ/英訳の黄色マーカーと原文復帰、スペイン語の失敗ページ再試行と他ページ保持を確認。checks/first50-existing.log。"
+      ]
     },
     {
       "id": 29,
@@ -217,29 +229,37 @@
       "id": 31,
       "title": "複数段見出し",
       "acceptance": "複数段の見出しと値の対応を異なる表で検証",
-      "status": "pending",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "tools/smoke-document-qa-tables.mjs --merged: 公開063ec04、13/13問。入試・料金・予定の4シート、結合・多段見出し・空欄・続き質問・年度確認・比較・シート/セル/PDF引用を照合。checks/first50-merged.json。試験資料削除済み。"
+      ]
     },
     {
       "id": 32,
       "title": "結合セル",
       "acceptance": "縦横結合セルが跨ぐ行・列を正しく引き継ぐ",
-      "status": "pending",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "tools/smoke-document-qa-tables.mjs --merged: 公開063ec04、13/13問。入試・料金・予定の4シート、結合・多段見出し・空欄・続き質問・年度確認・比較・シート/セル/PDF引用を照合。checks/first50-merged.json。試験資料削除済み。"
+      ]
     },
     {
       "id": 33,
       "title": "空欄の意味",
       "acceptance": "空欄をゼロや上の値と根拠なく解釈しない",
-      "status": "pending",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "tools/smoke-document-qa-tables.mjs --merged: 公開063ec04、13/13問。入試・料金・予定の4シート、結合・多段見出し・空欄・続き質問・年度確認・比較・シート/セル/PDF引用を照合。checks/first50-merged.json。試験資料削除済み。"
+      ]
     },
     {
       "id": 34,
       "title": "改ページ表",
       "acceptance": "次ページの値に前ページ見出しを引き継ぎ両ページを引用",
-      "status": "pending",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "tools/smoke-document-qa.mjs: 公開063ec04、本文表とスキャン3ページ、図書館3PM・プール8AM・複数回答・未記載項目を確認。見出し1ページ/値2ページ/スキャン3ページの引用が一致。checks/first50-mixed-pdf.json。削除済み。"
+      ]
     },
     {
       "id": 35,
@@ -252,22 +272,28 @@
       "id": 36,
       "title": "行列取り違え防止",
       "acceptance": "同名・同額・別コースの条件を混ぜない",
-      "status": "pending",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "tools/smoke-document-qa-tables.mjs --merged: 公開063ec04、13/13問。入試・料金・予定の4シート、結合・多段見出し・空欄・続き質問・年度確認・比較・シート/セル/PDF引用を照合。checks/first50-merged.json。試験資料削除済み。"
+      ]
     },
     {
       "id": 37,
       "title": "セル根拠",
       "acceptance": "Excel根拠にシート名・セル番地・PDFページを表示",
-      "status": "pending",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "tools/smoke-document-qa-tables.mjs --merged: 公開063ec04、13/13問。入試・料金・予定の4シート、結合・多段見出し・空欄・続き質問・年度確認・比較・シート/セル/PDF引用を照合。checks/first50-merged.json。試験資料削除済み。"
+      ]
     },
     {
       "id": 38,
       "title": "比較質問",
       "acceptance": "複数対象を同じ項目で比較し各対象の根拠を区別",
-      "status": "pending",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "tools/smoke-document-qa-tables.mjs --merged: 公開063ec04、13/13問。入試・料金・予定の4シート、結合・多段見出し・空欄・続き質問・年度確認・比較・シート/セル/PDF引用を照合。checks/first50-merged.json。試験資料削除済み。"
+      ]
     },
     {
       "id": 39,
@@ -301,56 +327,64 @@
       "id": 43,
       "title": "読みやすさ調整",
       "acceptance": "文字サイズ・行間・コントラストを選択し端末に保存",
-      "status": "in_progress",
+      "status": "complete",
       "evidence": [
-        "2026-11-21 ローカル検証中。公開確認前のため完了にしない。"
+        "公開063ec04 / documents v262。tools/check-admin-document-reading-settings.mjs: 390/1280px、実管理者→既存共有資料、文字16→20.8px、PDF形状不変、全操作部の名前・Enterページ送り・動きを減らす設定合格。",
+        "tools/check-document-reading-settings.mjs: 行間・高コントラスト・設定復元・閲覧者の操作合格。"
       ]
     },
     {
       "id": 44,
       "title": "支援技術",
       "acceptance": "アイコン名・キーボード操作・動きを減らす設定を検証",
-      "status": "in_progress",
+      "status": "complete",
       "evidence": [
-        "2026-11-21 ローカル検証中。公開確認前のため完了にしない。"
+        "公開063ec04 / documents v262。tools/check-admin-document-reading-settings.mjs: 390/1280px、実管理者→既存共有資料、文字16→20.8px、PDF形状不変、全操作部の名前・Enterページ送り・動きを減らす設定合格。",
+        "tools/check-document-reading-settings.mjs: 行間・高コントラスト・設定復元・閲覧者の操作合格。"
       ]
     },
     {
       "id": 45,
       "title": "表示ページ優先",
       "acceptance": "閲覧・根拠移動先を先読みより優先",
-      "status": "pending",
+      "status": "in_progress",
       "evidence": []
     },
     {
       "id": 46,
       "title": "翻訳再利用",
       "acceptance": "本文・言語・方式一致時だけ再利用し変更ページのみ再取得",
-      "status": "in_progress",
+      "status": "complete",
       "evidence": [
-        "2026-11-21 ローカル検証中。公開確認前のため完了にしない。"
+        "tools/check-document-private-lifecycle.mjs: 公開063ec04。同じURLで2ページ資料を差し替え、revision0→1、未変更ページはcache、変更ページはgenerated。新時刻11AM・根拠2ページ・黄色マーカーを表示。checks/private-lifecycle.json。試験資料削除済み。"
       ]
     },
     {
       "id": 47,
       "title": "同時処理",
       "acceptance": "同じ翻訳への並行要求でモデル処理が重複しない",
-      "status": "pending",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "tools/check-document-private-lifecycle.mjs: 公開063ec04、別利用者による8経路の取得は全て404。同一ドイツ語翻訳の同時2要求はgenerated1件/in-flight1件、入力141/出力44トークンの生成を共有。checks/private-lifecycle.json。削除後8経路も404、試験資料削除済み。"
+      ]
     },
     {
       "id": 48,
       "title": "非公開アクセス",
       "acceptance": "別ユーザーが原文・訳文・要約・検索データを取得できない",
-      "status": "pending",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "tools/check-document-private-lifecycle.mjs: 公開063ec04、別利用者による8経路の取得は全て404。同一ドイツ語翻訳の同時2要求はgenerated1件/in-flight1件、入力141/出力44トークンの生成を共有。checks/private-lifecycle.json。削除後8経路も404、試験資料削除済み。"
+      ]
     },
     {
       "id": 49,
       "title": "削除範囲",
       "acceptance": "削除後に元資料・要約・訳文・検索データが残らず処理中でも復活しない",
-      "status": "pending",
-      "evidence": []
+      "status": "in_progress",
+      "evidence": [
+        "公開版で削除後8経路404。追加で翻訳中の削除による未着手分停止を実装・単体検証済み。公開前のため未完了。"
+      ]
     },
     {
       "id": 50,

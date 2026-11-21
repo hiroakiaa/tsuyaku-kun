@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {reconcileOcrNumbers} from '../web/document-ocr-consensus.js';
+assert.deepEqual(reconcileOcrNumbers('訟口 400 円','窓口40円',[{text:'400',confidence:94}]),{text:'窓口400円',repaired:1,unresolved:0});
+assert.equal(reconcileOcrNumbers('料金40円','料金400円',[{text:'400',confidence:94}]).text,'料金400円','Independent digit recognition may support the second OCR');
+assert.equal(reconcileOcrNumbers('料金400円','料金40円',[{text:'400',confidence:30}]).repaired,0,'Low confidence must not silently replace numbers');
+assert.equal(reconcileOcrNumbers('料金400円','料金40円',[{text:'900',confidence:94}]).unresolved,1);
+assert.equal(reconcileOcrNumbers('費用1200円','費用1,200円').unresolved,0,'Thousands formatting is equivalent');
+assert.equal(reconcileOcrNumbers('ID007','ID07',[{text:'007',confidence:94}]).text,'ID007','Leading zeros are meaningful');
+assert.equal(reconcileOcrNumbers('1200円・3回','1200円').unresolved,1,'Missing numeric facts remain unresolved');
+console.log('PASS geometry-matched OCR number conflicts require independent high-confidence confirmation');
