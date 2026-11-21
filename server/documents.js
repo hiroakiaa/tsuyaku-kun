@@ -981,13 +981,12 @@ export async function documents(request,env,auth) {
     if (pages instanceof Response) return pages;
     if (!Array.isArray(pages) || pages.length>MAX_PAGES || pages.some(page=>typeof page!=='string') ||
         pages.join('').length>MAX_TEXT || !pages.some(page=>page.trim().length>=5)) return fail('資料の文字を読み取れませんでした。');
-    const result = await generate(env,pages);
-    const items = summaryItems(result,pages,6);
-    if (!items.length) return fail('根拠を確認できる要点を作れませんでした。',502);
     const data = new FormData();
     data.set('pdf',pdf);
-    data.set('record',JSON.stringify({owner:auth.uid,pages,items,toc:validatedToc(result,pages)}));
-    return target.fetch('https://room/document/replace',{method:'POST',body:data});
+    data.set('record',JSON.stringify({owner:auth.uid,pages,items:[],toc:[]}));
+    const updated=await target.fetch('https://room/document/replace',{method:'POST',body:data});
+    if(updated.ok)queueSummary(env,target);
+    return updated;
   }
   if (action==='pdf' && request.method==='GET') return target.fetch('https://room/document/pdf',{headers:{'X-Document-Viewer':auth.uid}});
   if (action==='remove' && request.method==='POST') {

@@ -617,3 +617,6 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 
 ### 2026-11-21 First reading help
 - Two UI labels are added. Japanese/English/Spanish help is local; other languages use the existing shared, content-addressed UI dictionary once when requested. No new background language fan-out, model, or budget change. Existing cancellation cannot undo an already-dispatched provider call.
+
+### 2026-11-22 Nonblocking reanalysis
+- Replacing/reanalyzing a PDF now saves canonical text immediately and queues one existing background overview, matching creation. It removes the foreground overview generation and does not increase any model/output/budget limit. Unchanged page translations retain content-based reuse. Tests defer the model and verify the saved corrected source is already available.
