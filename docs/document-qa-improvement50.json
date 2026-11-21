@@ -76,9 +76,10 @@
       "id": 10,
       "title": "既存資料の更新",
       "acceptance": "同じURLで再解析し翻訳・根拠が更新され変更なし部分を再利用",
-      "status": "in_progress",
+      "status": "complete",
       "evidence": [
-        "同じURLでの差し替え・新しい根拠と訳の再利用は公開確認済み。旧OCRデータを新しいデコーダーで自動更新する移行処理は未完了。"
+        "同じURLでの差し替え・新しい根拠と訳の再利用は公開確認済み。旧OCRデータを新しいデコーダーで自動更新する移行処理は未完了。",
+        "公開Worker ce78446f-680a-41ff-bf41-7b56f2d159be / UI v269。架空PDFの古い400→40抽出を模擬し、登録済みPDFを再解析するUIから同一URL・revision2へ回復。変更ページのドイツ語generated、変更なしページcache、400回答/根拠1ページ/黄色マーカー一致。583msで画面復帰（1回の測定）。checks/reanalysis-public.json、削除済み。これは明示的な再解析操作であり旧資料全件の自動再解析ではない。"
       ]
     },
     {
@@ -327,8 +328,10 @@
       "id": 39,
       "title": "初回案内",
       "acceptance": "初回だけ短い操作案内を表示し以後の閲覧を妨げない",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開6d01cde/documents v269、27組テスト+HTML/165資材一致。390/1280公開資材で初回案内を閉じて再読込後は再表示なし、二重Enter1要求、回答待ちのページ送り、停止後の次質問が成功。右側IABの管理者→共有資料でも案内表示を確認。checks/first-help-busy-public.log。停止済み提供元課金は取り消さない。"
+      ]
     },
     {
       "id": 40,
@@ -350,8 +353,10 @@
       "id": 42,
       "title": "処理中操作",
       "acceptance": "重複送信を防ぎ停止と他操作の可否を明示",
-      "status": "in_progress",
-      "evidence": []
+      "status": "complete",
+      "evidence": [
+        "公開6d01cde/documents v269、27組テスト+HTML/165資材一致。390/1280公開資材で初回案内を閉じて再読込後は再表示なし、二重Enter1要求、回答待ちのページ送り、停止後の次質問が成功。右側IABの管理者→共有資料でも案内表示を確認。checks/first-help-busy-public.log。停止済み提供元課金は取り消さない。"
+      ]
     },
     {
       "id": 43,
