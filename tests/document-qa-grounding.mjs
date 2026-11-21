@@ -63,3 +63,25 @@ try {
   globalThis.fetch=savedFetch;
 }
 console.log('PASS annual fee totals require matching quoted amounts and counts');
+
+const multiFeeQuote='入学費は8000円です。学年費は月1500円を12か月徴収します。保険料は年間1200円です。';
+const multiFeeAnswer='学年費は1500円×12か月＝18000円。初年度は8000円＋1500円×12か月＋1200円＝27200円です。';
+try{
+  for(const [answer,expected] of [[multiFeeAnswer,true],[multiFeeAnswer.replace('27200','27300'),false],[multiFeeAnswer.replace('12か月＝','13か月＝'),false],[multiFeeAnswer.replaceAll('8000円','9000円').replace('27200','28200'),false]]){
+    globalThis.fetch=async()=>Response.json({choices:[{finish_reason:'stop',message:{content:JSON.stringify({items:[{label:'初年度費用',answer,sources:[{page:1,quote:multiFeeQuote}]}]})}}]});
+    const env={...feeEnv,ROOMS:{idFromName:x=>x,get:()=>({fetch:async url=>Response.json(url.endsWith('/data')?{pages:[multiFeeQuote],owner:'author'}:null)})}};
+    const response=await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{method:'POST',body:JSON.stringify({question:'1年間にかかるお金の合計は？'})}),env,{uid:'author'});
+    const result=await response.json();assert.equal(result.items[0]?.answer,expected?answer:null);
+  }
+}finally{globalThis.fetch=savedFetch;}
+console.log('PASS multiple verified fee formulas retain correct subtotals and reject unsupported operands, counts, or totals');
+
+const discountQuote='基本入館料は1200円です。中学生は基本入館料が半額になります。休日は300円を追加します。休日加算は割引の対象外です。';
+try{
+ for(const [answer,expected] of [['1200円÷2＋300円＝900円です。',true],['1200円÷2＝600円。600円＋300円＝900円です。',true],['1200円÷2＋300円÷2＝750円です。',false],['1200円÷2＋300円＝800円です。',false]]){
+  globalThis.fetch=async()=>Response.json({choices:[{finish_reason:'stop',message:{content:JSON.stringify({items:[{label:'休日の中学生料金',answer,sources:[{page:1,quote:discountQuote}]}]})}}]});
+  const env={...feeEnv,ROOMS:{idFromName:x=>x,get:()=>({fetch:async url=>Response.json(url.endsWith('/data')?{pages:[discountQuote],owner:'author'}:null)})}};
+  const result=await(await documents(new Request('https://test/documents/10000000-0000-0000-0000-000000000000/ask',{method:'POST',body:JSON.stringify({question:'休日に中学生が入館すると合計いくら？'})}),env,{uid:'author'})).json();assert.equal(result.items[0]?.answer,expected?answer:null);
+ }
+}finally{globalThis.fetch=savedFetch;}
+console.log('PASS half-price proof respects the undiscounted supplement and rejects wrong totals');

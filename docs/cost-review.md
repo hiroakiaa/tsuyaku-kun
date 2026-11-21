@@ -604,3 +604,6 @@ Azure F0接続が設定されているチャットは、既存の対応言語で
 
 ### 2026-11-21 Natural table-row overview
 - Broad entity questions and bare row-name keywords use observed PDF row geometry and column headings; no subject/school name is hardcoded. Exact unique row scope required; specific time/price questions cannot use a generic row overview. No model call for the matched overview; local390/1280 tests verify zero ask calls. PDF pixel data is processed locally, never sent for this lookup.
+
+### 2026-11-21 Multiple fee formulas
+- Local answer validation now checks every quoted formula and verified subtotal, including explicit half-price scope. No new API request, model change, or budget increase. Prompt adds a short discount-format instruction; normal input token count may rise slightly. No zero-cost claim for model-generated answers.
