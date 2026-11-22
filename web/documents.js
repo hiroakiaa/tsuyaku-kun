@@ -1,6 +1,6 @@
 import {nextDocumentTranslation} from './document-translation-queue.js';
 import {preventCompositionSubmit,documentFilename} from './document-interaction.js';
-const DOCUMENT_RELEASE='289';
+const DOCUMENT_RELEASE='290';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -848,17 +848,19 @@ async function reader() {
     content.dataset.translationTrace=JSON.stringify(translationTrace);
   }
   let visionTranslation;
-  async function loadVisionTranslation(page,language){
+  async function loadVisionTranslation(page,language,force=false){
     if(!visionTranslation){const {createDocumentVisionTranslation}=await import('./document-vision-translation.js');visionTranslation=createDocumentVisionTranslation({request,documentPath:api,getPdf:getOriginalPdf,requiresOcr:(items,number)=>pdfPageTextStatus(layoutPdfText(items),number).requiresOcr,valid:()=>askDialog.open||dialog.open});}
-    return visionTranslation(page,language);
+    return visionTranslation(page,language,force);
   }
   function loadPageTranslation(page,language,retry=false,priority='visible') {
     const key=page+':'+language;
     if (retry) pageTranslations.delete(key);
     if (!pageTranslations.has(key)) {
       recordTranslationTrace(page,language,priority,'start');
+      let nativeTranslation=false;
       pageTranslations.set(key,(async()=>{
         if(sourceType==='pdf'){const vision=await loadVisionTranslation(page,language);if(vision)return vision;}
+        nativeTranslation=sourceType==='pdf';
         const layoutText=sourceType==='pdf' ? await pdfTranslationSource(page,retry) : undefined;
         const translate=(layout,diagramText)=>resumeTranslation(()=>request(api+'/translate',{
           method:'POST',
@@ -875,7 +877,9 @@ async function reader() {
         }
         return translate();
       })()
-        .then(result=>{
+        .catch(async error=>{if(nativeTranslation&&error.name!=='AbortError'&&(askDialog.open||dialog.open)){const recovered=await loadVisionTranslation(page,language,true);if(recovered)return recovered;}throw error;})
+        .then(async result=>{
+          if(nativeTranslation&&!result.visionLayout){const {unchangedTranslationNeedsVision,incompleteNativeTranslation}=await import('./document-vision-translation.js');const nativeItems=(await readPdfPageText(await(await getOriginalPdf()).getPage(page))).items;if(unchangedTranslationNeedsVision(result,language)||incompleteNativeTranslation(result,nativeItems)){const recovered=await loadVisionTranslation(page,language,true);if(recovered)result=recovered;}}
           if (language==='en') {
             readyEnglishPages.add(page);
             englishFailures.delete(page);
@@ -1000,6 +1004,7 @@ async function reader() {
             return;
           }
           if (!await renderTranslationOnPdf(result,page,revision,language) && revision===translationRevision) {
+            if(!result.visionLayout){try{const recovered=await loadVisionTranslation(page,language,true);if(recovered&&revision===translationRevision&&await renderTranslationOnPdf(recovered,page,revision,language)){pageTranslations.set(page+':'+language,Promise.resolve(recovered));setTranslationState('ready',page,language);return;}}catch(error){recordTranslationTrace(page,language,priority,'vision-recovery-failed');}}
             if(!realigned){pdfTranslationSources.delete(page+':false');pdfTranslationSources.delete(page+':true');scanLayouts.delete(page);recordTranslationTrace(page,language,priority,'realign');await updatePageTranslation(true,true);return;}
             setTranslationState('failed',page,language);
             const status=$('#pdf-status');
@@ -1056,8 +1061,8 @@ async function reader() {
         const frame=document.createElement('div');frame.className='pdf-page-view pdf-translation-layout pdf-inline-translation';frame.lang=language;frame.dataset.page=number;
         const canvas=append(frame,'canvas',''),renderViewport=page.getViewport({scale:Math.min(3,1800/Math.max(viewport.width,viewport.height))});canvas.width=Math.ceil(renderViewport.width);canvas.height=Math.ceil(renderViewport.height);await page.render({canvas,viewport:renderViewport}).promise;await themeLegacyImageMargins(page,canvas);
         const quote=citation?.page===number?pdfComparableText(citation.quote):'',text=result.source.map(pdfComparableText).join(''),ranges=quote?citationRanges(text,citation.quote,pdfComparableText):[];let offset=0;
-        const {separateVisionParagraphs}=await import('./document-vision-translation.js');
-        const blocks=separateVisionParagraphs(result.visionLayout).map((block,index)=>{const start=offset;offset+=pdfComparableText(block.text).length;return {x:block.box.x*viewport.width,top:block.box.y*viewport.height,width:block.box.width*viewport.width,sourceWidth:block.box.width*viewport.width,sourceHeight:block.box.height*viewport.height,boxHeight:block.box.height*viewport.height,maskBox:block.originalBox,size:16,line:result.lines[index],marked:ranges.some(r=>offset>r.start&&start<r.end)};});
+        const {separateVisionParagraphs,expandVisionTableCells}=await import('./document-vision-translation.js');
+        const blocks=separateVisionParagraphs(expandVisionTableCells(result.visionLayout,canvas)).map((block,index)=>{const start=offset;offset+=pdfComparableText(block.text).length;return {x:block.box.x*viewport.width,top:block.box.y*viewport.height,width:block.box.width*viewport.width,sourceWidth:block.box.width*viewport.width,sourceHeight:block.box.height*viewport.height,boxHeight:block.box.height*viewport.height,maskBox:block.originalBox,maximumFont:block.maximumFont,size:16,line:result.lines[index],marked:ranges.some(r=>offset>r.start&&start<r.end)};});
         const {installScanReadingLayout}=await import('./document-scan-reading-layout.js');await installScanReadingLayout(frame,blocks,canvas,viewport.width,{group:false});
         if(revision!==translationRevision||language!==translationMode.value)return false;const slot=pageList.querySelector('[data-page="'+number+'"]');if(!slot)return false;frame.dataset.recognition='google-cloud-vision';installInlineTranslation(slot,frame,language);return true;
       }
@@ -1081,6 +1086,7 @@ async function reader() {
         return [left*viewport.width,(top+height)*viewport.height];
       };
       const blocks=[];
+      let unsupportedGeometry=false;
       const measuringCanvas=document.createElement('canvas');
       const context=measuringCanvas.getContext('2d');
       const unit=viewport.width/100;
@@ -1122,9 +1128,9 @@ async function reader() {
         }
         const [x,y]=point(first);
         const height=Math.max(...matched.map(({item})=>item.height||Math.hypot(item.transform[2],item.transform[3])));
-        if (!height || matched.some(({item})=>Math.abs(point(item)[1]-y)>height*.25 || Math.abs(item.transform[1])>1e-3 || Math.abs(item.transform[2])>1e-3)) continue;
+        if (!height || matched.some(({item})=>Math.abs(point(item)[1]-y)>height*.25 || Math.abs(item.transform[1])>1e-3 || Math.abs(item.transform[2])>1e-3)){unsupportedGeometry=true;continue;}
         const width=Math.max(...matched.map(({item})=>point(item)[0]+item.width))-x;
-        if (!(width>0)) continue;
+        if (!(width>0)){unsupportedGeometry=true;continue;}
         const nextX=runs.filter(({item})=>Math.abs(point(item)[1]-y)<height*.5)
           .map(({item})=>point(item)[0])
           .filter(value=>value>=x+width-.1);
@@ -1160,12 +1166,12 @@ async function reader() {
           }
         }
         const size=Math.min(height,available/measured*height,line.includes('\n') ? boxHeight/2.2 : boxHeight);
-        if (!(size>0)) continue;
+        if (!(size>0)){unsupportedGeometry=true;continue;}
         blocks.push({x,top,boxHeight,width:Math.max(width,measured*size/height),size,line,
           sourceWidth:width,sourceHeight:height*1.26,
           marked:ranges.some(range=>from>range.start && start<range.end)});
       }
-      if (!blocks.length || from!==pageText.length) return fail(!blocks.length?'unsupported-geometry':'source-coverage');
+      if (!blocks.length || unsupportedGeometry || from!==pageText.length) return fail(!blocks.length||unsupportedGeometry?'unsupported-geometry':'source-coverage');
       const frame=document.createElement('div');
       frame.className='pdf-page-view pdf-translation-layout pdf-inline-translation';
       frame.lang=translatedPage.lang;

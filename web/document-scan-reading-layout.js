@@ -27,7 +27,7 @@ export async function installScanReadingLayout(frame,blocks,sourceCanvas,pageWid
    return [{...rows[0],x,top,width,sourceWidth:width,sourceHeight:height,boxHeight:height,line:rows.map(b=>b.line.trim()).join(' '),marked:rows.some(b=>b.marked)}];
   });
  }
- const regions=blocks.map((block,index)=>({id:String(index),text:block.line,highlight:Boolean(block.marked),maskBox:block.maskBox,minimumFont:block.maskBox?2:undefined,box:{x:Math.max(0,block.x)/pageWidth,y:Math.max(0,block.top)/pageHeight,width:Math.max(.1,Math.min(block.sourceWidth||block.width,pageWidth-Math.max(0,block.x)))/pageWidth,height:Math.max(.1,Math.min(block.sourceHeight||block.boxHeight,pageHeight-Math.max(0,block.top)))/pageHeight}}));
+ const regions=blocks.map((block,index)=>({id:String(index),text:block.line,highlight:Boolean(block.marked),maskBox:block.maskBox,maximumFont:block.maximumFont,minimumFont:block.maskBox?2:undefined,box:{x:Math.max(0,block.x)/pageWidth,y:Math.max(0,block.top)/pageHeight,width:Math.max(.1,Math.min(block.sourceWidth||block.width,pageWidth-Math.max(0,block.x)))/pageWidth,height:Math.max(.1,Math.min(block.sourceHeight||block.boxHeight,pageHeight-Math.max(0,block.top)))/pageHeight}}));
  const language=frame.lang||'en',paint=drawPhotoOverlay(sourceCanvas,source,regions,blocks.map((block,index)=>({id:String(index),translations:{[language]:block.line}})),language);
  frame.querySelectorAll('.pdf-layout-line,.pdf-source-mask').forEach(node=>node.remove());
  const context=source.getContext('2d');
