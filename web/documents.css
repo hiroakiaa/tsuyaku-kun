@@ -495,7 +495,7 @@ body .shell :is(.panel,button,a,input,select,dialog){box-shadow:none}
 #points .reader-heading{margin-bottom:1rem}
 #pdf-dialog .pdf-bar #pdf-summary{width:auto;min-height:44px;padding:.25rem .55rem;border-radius:.5rem;white-space:nowrap}
 
-#pdf-translation-progress{position:absolute;z-index:3;inset:.4rem auto auto 50%;transform:translateX(-50%);padding:.15rem .5rem;background:#202020;color:#fff;border-radius:.4rem;pointer-events:none}
+#pdf-translation-progress{position:absolute;z-index:6;inset:.5rem .5rem auto auto;transform:none;margin:0;max-width:8rem;padding:.4rem .55rem;background:#202020;color:#fff;border-radius:.4rem;pointer-events:none;font-size:.8rem;line-height:1.35;text-align:start}
 .pdf-zoom [hidden]{display:none}
 
 #read-translation[open]{width:min(38rem,calc(100% - 1.5rem));max-height:80dvh;overflow:auto}
@@ -684,3 +684,6 @@ dialog.panel{margin:auto;box-sizing:border-box;max-width:calc(100vw - 1.5rem);ma
 .reading-check-page{display:inline;min-width:24px;min-height:24px;padding:0 .2em;border:0;border-bottom:1px solid currentColor;border-radius:0;background:transparent;color:inherit;font:inherit;cursor:pointer}
 
 .pdf-source-mask{position:absolute;display:block;pointer-events:none;z-index:2}.pdf-inplace-paragraph{cursor:pointer;overflow:hidden}.pdf-inplace-paragraph:focus-visible{outline:2px solid #4273c9;outline-offset:1px}
+
+.pdf-stage:has(#pdf-translation-progress:not([hidden])) .pdf-stage-tools{max-width:calc(100% - 9rem)}
+.pdf-stage-tools .pdf-language-toggle{flex-wrap:wrap;max-width:100%;box-sizing:border-box}

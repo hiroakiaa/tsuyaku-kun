@@ -1,5 +1,6 @@
-import {preventCompositionSubmit,documentFilename,optionalTranslationPrefetch} from './document-interaction.js';
-const DOCUMENT_RELEASE='286';
+import {nextDocumentTranslation} from './document-translation-queue.js';
+import {preventCompositionSubmit,documentFilename} from './document-interaction.js';
+const DOCUMENT_RELEASE='287';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -766,7 +767,7 @@ async function reader() {
   let prefetching=false;
   let foregroundTranslation=0;
   const englishFailures=new Map();
-  const prefetchFailures=new Set();
+  const prefetchFailures=new Map();
   function renderEnglishProgress() {
     const state=JSON.parse(content.dataset.translationState||'{}');
     englishProgress.hidden=translationMode.value!=='en'||(state.state==='failed'&&state.language==='en');
@@ -883,21 +884,15 @@ async function reader() {
   }
   async function prefetchTranslations() {
     if (prefetching || foregroundTranslation || document.hidden || navigator.onLine===false) return;
-    const language=translationMode.value;
-    const current=Number(pagePicker.value)||1;
-    const englishPages=Array.from({length:doc.pageCount},(_,i)=>i+1);
-    const near=current+1;
-    const visible=optionalTranslationPrefetch(navigator.connection) && dialog.open && language && language!=='en' && near<=doc.pageCount &&
-      !prefetchFailures.has(near+':'+language) && !pageTranslations.has(near+':'+language) ? {page:near,language} : null;
-    const english=englishPages.find(page=>!pageTranslations.has(page+':en') && (englishFailures.get(page)??0)<2);
-    const next=visible ?? (english ? {page:english,language:'en'} : null);
+    if(!askDialog.open&&!dialog.open)return;
+    const next=nextDocumentTranslation({count:doc.pageCount,current:Number(pagePicker.value)||1,language:selectedLanguage,pending:pageTranslations,failures:prefetchFailures,englishFailures});
     if (!next) return;
     prefetching=true;
     let delay=400;
     try { await loadPageTranslation(next.page,next.language,false,'prefetch'); }
     catch {
       if (next.language==='en') englishFailures.set(next.page,(englishFailures.get(next.page)??0)+1);
-      else prefetchFailures.add(next.page+':'+next.language);
+      else prefetchFailures.set(next.page+':'+next.language,(prefetchFailures.get(next.page+':'+next.language)??0)+1);
       renderEnglishProgress();
       delay=1500;
     }
