@@ -1,0 +1,60 @@
+{
+  "scope": "Public real translation API and local OCR; dense synthetic prose, actual extracted text",
+  "views": [
+    {
+      "width": 390,
+      "state": {
+        "state": "ready",
+        "page": 1,
+        "language": "pt"
+      },
+      "placement": null,
+      "textLength": 1795,
+      "metrics": null,
+      "layout": {
+        "canvas": 1,
+        "width": 390,
+        "available": 390,
+        "font": 5.84028,
+        "overlaps": 0,
+        "clipped": 0,
+        "count": 5,
+        "reflow": 0,
+        "inPlace": "in-place",
+        "renderer": "photo-overlay"
+      },
+      "navigation": {
+        "fullTextPopup": true,
+        "originalAndEnglishRestored": true
+      }
+    },
+    {
+      "width": 1280,
+      "state": {
+        "state": "ready",
+        "page": 1,
+        "language": "pt"
+      },
+      "placement": null,
+      "textLength": 1795,
+      "metrics": null,
+      "layout": {
+        "canvas": 1,
+        "width": 640,
+        "available": 640,
+        "font": 9.58405,
+        "overlaps": 0,
+        "clipped": 0,
+        "count": 5,
+        "reflow": 0,
+        "inPlace": "in-place",
+        "renderer": "photo-overlay"
+      },
+      "navigation": {
+        "fullTextPopup": true,
+        "originalAndEnglishRestored": true
+      }
+    }
+  ],
+  "deleted": true
+}
