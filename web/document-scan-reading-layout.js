@@ -15,11 +15,11 @@ export function fitTranslationBox(context,text,width,height,preferred){
  let low=.5,high=Math.max(.5,preferred);for(let i=0;i<18;i++){const size=(low+high)/2;if(wrap(size).length*size*1.18<=height)low=size;else high=size;}return {text:clean,size:low,rows:wrap(low)};
 }
 // Scanned documents use the same clipped, background-aware raster compositor as photo translation.
-export async function installScanReadingLayout(frame,blocks,sourceCanvas,pageWidth){
+export async function installScanReadingLayout(frame,blocks,sourceCanvas,pageWidth,{group=true}={}){
  if(!blocks.length)return false;
  const {drawPhotoOverlay}=await import('./photo-overlay.js');
  const pageHeight=sourceCanvas.height/sourceCanvas.width*pageWidth,source=document.createElement('canvas');source.width=sourceCanvas.width;source.height=sourceCanvas.height;source.getContext('2d').drawImage(sourceCanvas,0,0);
- const grouped=scanReadingParagraphs(blocks,pageWidth);
+ const grouped=group?scanReadingParagraphs(blocks,pageWidth):null;
  if(grouped){
   const {scanPhotoRegions}=await import('./document-scan-preprocess.js'),photos=scanPhotoRegions(source.getContext('2d').getImageData(0,0,source.width,source.height));
   blocks=grouped.flatMap(group=>{if(group.blocks.length===1)return group.blocks;const rows=group.blocks,x=Math.min(...rows.map(b=>b.x)),top=Math.min(...rows.map(b=>b.top)),width=Math.max(...rows.map(b=>b.x+(b.sourceWidth||b.width)))-x,height=Math.max(...rows.map(b=>b.top+(b.sourceHeight||b.boxHeight)))-top;
@@ -27,7 +27,7 @@ export async function installScanReadingLayout(frame,blocks,sourceCanvas,pageWid
    return [{...rows[0],x,top,width,sourceWidth:width,sourceHeight:height,boxHeight:height,line:rows.map(b=>b.line.trim()).join(' '),marked:rows.some(b=>b.marked)}];
   });
  }
- const regions=blocks.map((block,index)=>({id:String(index),text:block.line,highlight:Boolean(block.marked),box:{x:Math.max(0,block.x)/pageWidth,y:Math.max(0,block.top)/pageHeight,width:Math.max(.1,Math.min(block.sourceWidth||block.width,pageWidth-Math.max(0,block.x)))/pageWidth,height:Math.max(.1,Math.min(block.sourceHeight||block.boxHeight,pageHeight-Math.max(0,block.top)))/pageHeight}}));
+ const regions=blocks.map((block,index)=>({id:String(index),text:block.line,highlight:Boolean(block.marked),maskBox:block.maskBox,minimumFont:block.maskBox?2:undefined,box:{x:Math.max(0,block.x)/pageWidth,y:Math.max(0,block.top)/pageHeight,width:Math.max(.1,Math.min(block.sourceWidth||block.width,pageWidth-Math.max(0,block.x)))/pageWidth,height:Math.max(.1,Math.min(block.sourceHeight||block.boxHeight,pageHeight-Math.max(0,block.top)))/pageHeight}}));
  const language=frame.lang||'en',paint=drawPhotoOverlay(sourceCanvas,source,regions,blocks.map((block,index)=>({id:String(index),translations:{[language]:block.line}})),language);
  frame.querySelectorAll('.pdf-layout-line,.pdf-source-mask').forEach(node=>node.remove());
  const context=source.getContext('2d');

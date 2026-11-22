@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {createDocumentVisionTranslation,separateVisionParagraphs} from '../web/document-vision-translation.js';
+const previous=globalThis.document;globalThis.document={createElement:()=>({width:0,height:0,toDataURL:()=> 'data:image/jpeg;base64,'+'A'.repeat(120)})};
+try{let reads=0,translations=0;const layout=[{id:'b0',text:'授業の案内',box:{x:.1,y:.2,width:.8,height:.1}}];
+ const getPdf=async()=>({getPage:async()=>({getTextContent:async()=>({items:[]}),getViewport:({scale})=>({width:600*scale,height:900*scale}),render:()=>({promise:Promise.resolve()})})});
+ const request=async(path,options)=>{const body=JSON.parse(options.body);if(path==='/photo/recognize'){reads++;assert.ok(body.image);return {blocks:layout,sourceLanguage:'ja'};}translations++;return {blocks:body.blocks.map(b=>({id:b.id,translations:{[body.targets[0]]:'Translated paragraph'},quality:{warnings:[]}}))};};
+ const load=createDocumentVisionTranslation({request,getPdf,requiresOcr:()=>true});const [en,pt]=await Promise.all([load(1,'en'),load(1,'pt')]);assert.equal(reads,1);assert.equal(translations,2);assert.deepEqual(en.visionLayout,layout);assert.equal(en.source[0],'授業の案内');assert.equal(pt.lines[0],'Translated paragraph');await load(1,'en');assert.equal(reads,1);assert.equal(translations,2);
+ const native=createDocumentVisionTranslation({request,getPdf,requiresOcr:()=>false});assert.equal(await native(1,'en'),null);assert.equal(reads,1);console.log('PASS shared photo recognition/translation, page OCR reuse across languages, translated segment reuse, native text bypass');
+}finally{globalThis.document=previous;}
+
+const source=[{text:'upper',box:{x:.1,y:.1,width:.8,height:.2}},{text:'lower',box:{x:.12,y:.28,width:.7,height:.2}},{text:'side',box:{x:.75,y:.3,width:.2,height:.2}}],separated=separateVisionParagraphs(source);for(let i=0;i<separated.length;i++)for(let j=i+1;j<separated.length;j++){const a=separated[i].box,b=separated[j].box;assert.ok(Math.min(a.x+a.width,b.x+b.width)<=Math.max(a.x,b.x)+1e-7||Math.min(a.y+a.height,b.y+b.height)<=Math.max(a.y,b.y)+1e-7);}assert.equal(source[0].box.height,.2);assert.deepEqual(separated.map(b=>b.text),source.map(b=>b.text));assert.deepEqual(separated[0].originalBox,source[0].box);console.log('PASS perspective paragraph overlaps separated without losing original masks or text');

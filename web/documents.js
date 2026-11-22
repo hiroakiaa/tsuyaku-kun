@@ -1,5 +1,5 @@
 import {preventCompositionSubmit,documentFilename,optionalTranslationPrefetch} from './document-interaction.js';
-const DOCUMENT_RELEASE='284';
+const DOCUMENT_RELEASE='285';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -840,12 +840,18 @@ async function reader() {
     if (translationTrace.length>64) translationTrace.shift();
     content.dataset.translationTrace=JSON.stringify(translationTrace);
   }
+  let visionTranslation;
+  async function loadVisionTranslation(page,language){
+    if(!visionTranslation){const {createDocumentVisionTranslation}=await import('./document-vision-translation.js');visionTranslation=createDocumentVisionTranslation({request,getPdf:getOriginalPdf,requiresOcr:(items,number)=>pdfPageTextStatus(layoutPdfText(items),number).requiresOcr,valid:()=>askDialog.open||dialog.open});}
+    return visionTranslation(page,language);
+  }
   function loadPageTranslation(page,language,retry=false,priority='visible') {
     const key=page+':'+language;
     if (retry) pageTranslations.delete(key);
     if (!pageTranslations.has(key)) {
       recordTranslationTrace(page,language,priority,'start');
       pageTranslations.set(key,(async()=>{
+        if(sourceType==='pdf'){const vision=await loadVisionTranslation(page,language);if(vision)return vision;}
         const layoutText=sourceType==='pdf' ? await pdfTranslationSource(page,retry) : undefined;
         const translate=(layout,diagramText)=>resumeTranslation(()=>request(api+'/translate',{
           method:'POST',
@@ -1045,6 +1051,15 @@ async function reader() {
       const pdf=await getOriginalPdf();
       const page=await pdf.getPage(number);
       const viewport=page.getViewport({scale:1});
+      if(result.visionLayout){
+        const frame=document.createElement('div');frame.className='pdf-page-view pdf-translation-layout pdf-inline-translation';frame.lang=language;frame.dataset.page=number;
+        const canvas=append(frame,'canvas',''),renderViewport=page.getViewport({scale:Math.min(3,1800/Math.max(viewport.width,viewport.height))});canvas.width=Math.ceil(renderViewport.width);canvas.height=Math.ceil(renderViewport.height);await page.render({canvas,viewport:renderViewport}).promise;await themeLegacyImageMargins(page,canvas);
+        const quote=citation?.page===number?pdfComparableText(citation.quote):'',text=result.source.map(pdfComparableText).join(''),ranges=quote?citationRanges(text,citation.quote,pdfComparableText):[];let offset=0;
+        const {separateVisionParagraphs}=await import('./document-vision-translation.js');
+        const blocks=separateVisionParagraphs(result.visionLayout).map((block,index)=>{const start=offset;offset+=pdfComparableText(block.text).length;return {x:block.box.x*viewport.width,top:block.box.y*viewport.height,width:block.box.width*viewport.width,sourceWidth:block.box.width*viewport.width,sourceHeight:block.box.height*viewport.height,boxHeight:block.box.height*viewport.height,maskBox:block.originalBox,size:16,line:result.lines[index],marked:ranges.some(r=>offset>r.start&&start<r.end)};});
+        const {installScanReadingLayout}=await import('./document-scan-reading-layout.js');await installScanReadingLayout(frame,blocks,canvas,viewport.width,{group:false});
+        if(revision!==translationRevision||language!==translationMode.value)return false;const slot=pageList.querySelector('[data-page="'+number+'"]');if(!slot)return false;frame.dataset.recognition='google-cloud-vision';installInlineTranslation(slot,frame,language);return true;
+      }
       const nativeItems=await pageTextRuns(page);
       let items=result.includesDiagram ? [...nativeItems,...await diagramTextRuns(page,nativeItems)] : nativeItems;
       const aligned=alignPdfTranslation(result,items,{quote:citation?.page===number?citation.quote:undefined});
