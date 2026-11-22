@@ -1,0 +1,41 @@
+{
+  "release": "e883ee7",
+  "documents": "289",
+  "css": "112",
+  "admin": "308",
+  "assetsVerified": 265,
+  "controlledApiViews": [
+    {
+      "width": 390,
+      "disclosureRemoved": true,
+      "icon": true,
+      "label": "10ページ",
+      "page": 10,
+      "marker": true,
+      "savedAndNewAnswers": true,
+      "englishAndJapaneseLabels": true,
+      "overviewLabel": true
+    },
+    {
+      "width": 1280,
+      "disclosureRemoved": true,
+      "icon": true,
+      "label": "10ページ",
+      "page": 10,
+      "marker": true,
+      "savedAndNewAnswers": true,
+      "englishAndJapaneseLabels": true,
+      "overviewLabel": true
+    }
+  ],
+  "actualApi": {
+    "fixture": "Existing public Tsuyaku guide",
+    "question": "ルームは何時間で失効しますか？",
+    "label": "2ページ",
+    "icon": true,
+    "disclosureRemoved": true,
+    "page": 2,
+    "marker": true
+  },
+  "createdServerFixtures": false
+}
