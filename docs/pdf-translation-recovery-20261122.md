@@ -22,3 +22,8 @@ Release: documents v290 / admin309, implementation 4f17389.
 ## Resume / alternatives
 Use tools/check-complex-native-live.mjs with PLAYWRIGHT_PACKAGE set to the installed runtime Playwright path. CANDIDATE_NATIVE_TRANSLATION=1 tests local modules against the public app; omit it for the deployed version. The script generates only synthetic data and removes its private document in finally. Network is restricted under the default host: request escalation specifically for the synthetic test. Never substitute the original PDF into that route without the pending approval.
 
+
+## Authorized original-page verification follow-up
+The user explicitly approved sending original pages 5, 6, and 8 to Google Cloud Vision and translating extracted text with the existing API. The original PDF was subset locally; only these three pages were registered as a private test document. Public code displayed English on all three pages (72 / 33 / 55 OCR blocks). Cleanup returned success and the private test document was deleted. The earlier approval blocker is resolved.
+
+Visual review found remaining quality defects, so this is NOT a full quality pass: some OCR paragraphs span multiple table cells; translation placement then splits or shrinks unrelated content. In illustrated uniform cells, fragmented OCR regions produce inconsistent text sizes. Next work must retain word-level geometry and split recognition by cell/region before translation; post-translation overlap splitting cannot recover semantic cell boundaries. Do not mark original-page quality complete from the current visible-translation assertions alone. No original text or screenshots are committed.
