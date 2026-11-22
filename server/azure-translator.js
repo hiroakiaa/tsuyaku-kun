@@ -10,7 +10,7 @@ export function azureConfig(env,now=Date.now()){
  if(c.sku!=='F0'||typeof c.key!=='string'||!c.key||c.region!=='japaneast'||(c.monthlyF0!==true&&!Number.isFinite(Date.parse(c.expiresAt))))throw fail('Azure無料翻訳の設定を確認してください。');
  if(c.monthlyF0!==true&&now>=Date.parse(c.expiresAt))throw fail('Azure無料試用の接続期限です。有料プランには切り替えていません。',429,'quota');return c;
 }
-export function azureLanguages(source,targets){const map=azureLanguageCode;return Array.isArray(targets)&&map(source)&&targets.every(c=>map(c))?{source:map(source),targets:[...new Set(targets.map(map))],map}:null;}
+export function azureLanguages(source,targets){const map=azureLanguageCode;return Array.isArray(targets)&&(source==='auto'||map(source))&&targets.every(c=>map(c))?{source:map(source),targets:[...new Set(targets.map(map))],map}:null;}
 
 export async function azureBudget(storage,data,now=Date.now()){
  return storage.transaction(async tx=>{
@@ -40,17 +40,16 @@ export async function azureTranslate(env,text,source,targets,onUsage=()=>{},fetc
  const timing=env.translationTiming;if(timing)timing.providerScope='azure_http_headers';const measure=async(key,work)=>{const started=now();try{return await work();}finally{if(timing)timing[key]=(timing[key]||0)+Math.max(0,now()-started);}};
  const config=azureConfig(env);if(!config)throw fail('Azure無料翻訳は未接続です。');const langs=azureLanguages(source,targets);if(!langs)throw fail('Azure翻訳の言語を確認してください。',400,'input');
  const hash=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(env.budgetUid||''))),uid=Array.from(hash,x=>x.toString(16).padStart(2,'0')).join('').slice(0,32);
- const sourceCharacters=[...text].length,characters=sourceCharacters*langs.targets.length;
- if(characters>P.requestCharacters&&sourceCharacters>0&&sourceCharacters<=P.requestCharacters){const width=Math.max(1,Math.floor(P.requestCharacters/sourceCharacters)),out={},total={inputTokens:0,outputTokens:0,unknown:false,provider:'azure_f0',azureCharacters:0,azureAttempts:0,azureFreePlanUSD:0,azureAttempted:true};for(let offset=0;offset<targets.length;offset+=width){Object.assign(out,await azureTranslate(env,text,source,targets.slice(offset,offset+width),u=>{total.azureCharacters+=u.azureCharacters;total.azureAttempts++;onUsage({...total});},fetcher,now));}return out;}
+ const texts=Array.isArray(text)?text:[text];if(!texts.length||texts.some(t=>typeof t!=='string'||!t.trim()))throw fail('Azure翻訳の入力を確認してください。',400,'input');const sourceCharacters=texts.reduce((n,t)=>n+t.length,0),characters=sourceCharacters*langs.targets.length;
+ if(!Array.isArray(text)&&characters>P.requestCharacters&&sourceCharacters>0&&sourceCharacters<=P.requestCharacters){const width=Math.max(1,Math.floor(P.requestCharacters/sourceCharacters)),out={},total={inputTokens:0,outputTokens:0,unknown:false,provider:'azure_f0',azureCharacters:0,azureAttempts:0,azureFreePlanUSD:0,azureAttempted:true};for(let offset=0;offset<targets.length;offset+=width){Object.assign(out,await azureTranslate(env,text,source,targets.slice(offset,offset+width),u=>{total.azureCharacters+=u.azureCharacters;total.azureAttempts++;onUsage({...total});},fetcher,now));}return out;}
  if(env.executionValid&&!await env.executionValid())throw fail('この翻訳の有効期限が切れました。');
  const lease=await measure('budgetWaitMs',()=>azureOperation(env,{action:'reserve',uid,characters}));
  const usage={inputTokens:0,outputTokens:0,unknown:false,provider:'azure_f0',azureCharacters:characters,azureFreePlanUSD:0,azureAttempted:true};onUsage(usage);
  try{
-  const url=new URL('https://api.cognitive.microsofttranslator.com/translate');url.searchParams.set('api-version','3.0');url.searchParams.set('from',langs.source);for(const code of langs.targets)url.searchParams.append('to',code);
-  const response=await measure('providerMs',()=>fetcher(url,{method:'POST',headers:{'Content-Type':'application/json','Ocp-Apim-Subscription-Key':config.key,'Ocp-Apim-Subscription-Region':config.region},body:JSON.stringify([{Text:text}]),signal:AbortSignal.timeout(10000)}));
+  const url=new URL('https://api.cognitive.microsofttranslator.com/translate');url.searchParams.set('api-version','3.0');if(langs.source)url.searchParams.set('from',langs.source);for(const code of langs.targets)url.searchParams.append('to',code);
+  const response=await measure('providerMs',()=>fetcher(url,{method:'POST',headers:{'Content-Type':'application/json','Ocp-Apim-Subscription-Key':config.key,'Ocp-Apim-Subscription-Region':config.region},body:JSON.stringify(texts.map(Text=>({Text}))),signal:AbortSignal.timeout(10000)}));
   if(!response.ok){let code;try{code=(await measure('parseMs',()=>response.json()))?.error?.code;}catch{}if(code===403001){await azureOperation(env,{action:'block'});throw fail('Azureの無料枠上限です。有料翻訳へは切り替えません。',429,'quota');}throw fail(response.status===429?'Azure翻訳が混み合っています。':'Azure無料翻訳との接続を確認してください。',response.status===429?429:502,response.status===429?'overloaded':'service');}
-  const raw=await measure('parseMs',()=>response.json());if(!Array.isArray(raw)||raw.length!==1||!Array.isArray(raw[0]?.translations))throw fail('Azureの翻訳結果を確認できませんでした。',502);
-  const out={};for(const target of targets){const rows=raw[0].translations.filter(r=>r.to===langs.map(target));if(rows.length!==1||typeof rows[0].text!=='string')throw fail('Azureの翻訳結果がそろいませんでした。',502);out[target]=rows[0].text;}
-  return parseTranslation(JSON.stringify(out),targets);
+  const raw=await measure('parseMs',()=>response.json());if(!Array.isArray(raw)||raw.length!==texts.length||raw.some(row=>!Array.isArray(row?.translations)))throw fail('Azureの翻訳結果を確認できませんでした。',502);
+  const results=raw.map(row=>{const out={};for(const target of targets){const rows=row.translations.filter(r=>r.to===langs.map(target));if(rows.length!==1||typeof rows[0].text!=='string'||!rows[0].text.trim())throw fail('Azureの翻訳結果がそろいませんでした。',502);out[target]=rows[0].text;}return parseTranslation(JSON.stringify(out),targets);});return Array.isArray(text)?results:results[0];
  }catch(e){if(e.azureFailure)throw e;throw fail('Azure無料翻訳を完了できませんでした。有料翻訳へは切り替えません。',502);}finally{await completeBudgetCleanup(env,()=>azureOperation(env,{action:'release',id:lease.id}),timing,now);}
 }

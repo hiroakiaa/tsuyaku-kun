@@ -1,3 +1,5 @@
+import {azureTranslate,azureLanguages} from './azure-translator.js';
+import {inspectTranslations} from '../web/translation-quality.js';
 import {runPhotoRecovery} from './photo-recovery.js';
 import {photoTranslationInput,translatePhotoWithRecovery} from './photo-translation.js';
 import {photoInput,photoUid,recognizePhoto} from './photo-ocr.js';
@@ -16,7 +18,7 @@ export async function photoReuseOperation(env,kind,data,catalog,{documentScope}=
   key=await digest(JSON.stringify(['photo-gemma-4-v1',canonical,glossary,bank]));
  }
  const room=env.ROOMS.get(env.ROOMS.idFromName('__photo_reuse_v1__:'+scope));
- const response=await room.fetch(new Request('https://photo/photo-reuse',{method:'POST',body:JSON.stringify({kind,key,scope,uid:env.budgetUid,data:canonical})}));
+ const response=await room.fetch(new Request('https://photo/photo-reuse',{method:'POST',body:JSON.stringify({kind,key,scope,uid:env.budgetUid,data:canonical,fastTranslation:Boolean(documentScope)})}));
  const result=await response.json();if(!response.ok)throw Object.assign(Error(result.error||'保存済みの翻訳を確認できませんでした。'),{status:response.status,aiFailure:result.aiFailure});
  if(kind==='translate')result.blocks=result.blocks.map((block,index)=>({...block,id:input.blocks[index].id}));
  return result;
@@ -30,7 +32,8 @@ export async function photoReuseStorage(storage,env,input,catalog,run){
  const pendingKey=scope+':'+cacheKey;
  if(pending.has(pendingKey))return reused(await pending.get(pendingKey),'in-flight');
  const work=(async()=>{
-  const result=kind==='ocr'?await recognizePhoto({...env,budgetUid:uid},data):await translatePhotoWithRecovery(data,catalog,input=>run(input,uid),env.OPENAI_DOCUMENT_QA_KEY?input=>runPhotoRecovery({...env,budgetUid:uid,photoUnlimited:true},input):null);
+  const result=kind==='ocr'?await recognizePhoto({...env,budgetUid:uid},data):await (async()=>{if(input.fastTranslation===true&&env.DOCUMENT_FAST_TRANSLATION==='azure-consented-v1'&&env.AZURE_TRANSLATOR_F0&&!data.targets.includes('ja-easy')&&azureLanguages(data.source,data.targets)){try{let usage;const rows=await azureTranslate({...env,budgetUid:uid},data.blocks.map(b=>b.text),data.source,data.targets,u=>usage=u);const blocks=data.blocks.map((b,i)=>({id:b.id,translations:rows[i],quality:inspectTranslations(b.text,data.source,data.targets,rows[i])}));if(blocks.every(b=>!b.quality?.warnings?.length))return {blocks,usage,provider:'azure_f0'};}catch{}}
+   return translatePhotoWithRecovery(data,catalog,input=>run(input,uid),env.OPENAI_DOCUMENT_QA_KEY?input=>runPhotoRecovery({...env,budgetUid:uid,photoUnlimited:true},input):null);})();
   const safe=(kind==='ocr'?Boolean(result.text):result.blocks.every(block=>!block.quality?.warnings?.length)) && new TextEncoder().encode(JSON.stringify(result)).length<120000;
   if(safe)await storage.transaction(async tx=>{
    const manifest=kind+':entries',entries=(await tx.get(manifest)||[]).filter(value=>value!==cacheKey);
