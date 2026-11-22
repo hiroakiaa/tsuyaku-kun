@@ -1,6 +1,6 @@
 import {nextDocumentTranslation} from './document-translation-queue.js';
 import {preventCompositionSubmit,documentFilename} from './document-interaction.js';
-const DOCUMENT_RELEASE='290';
+const DOCUMENT_RELEASE='291';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -848,8 +848,9 @@ async function reader() {
     content.dataset.translationTrace=JSON.stringify(translationTrace);
   }
   let visionTranslation;
+  const translationPartials=new Map(),translationObservers=new Map(),visionSourceCanvases=new Map();
   async function loadVisionTranslation(page,language,force=false){
-    if(!visionTranslation){const {createDocumentVisionTranslation}=await import('./document-vision-translation.js');visionTranslation=createDocumentVisionTranslation({request,documentPath:api,getPdf:getOriginalPdf,requiresOcr:(items,number)=>pdfPageTextStatus(layoutPdfText(items),number).requiresOcr,valid:()=>askDialog.open||dialog.open});}
+    if(!visionTranslation){const {createDocumentVisionTranslation}=await import('./document-vision-translation.js');visionTranslation=createDocumentVisionTranslation({request,documentPath:api,getPdf:getOriginalPdf,requiresOcr:(items,number)=>pdfPageTextStatus(layoutPdfText(items),number).requiresOcr,valid:()=>askDialog.open||dialog.open,onProgress:(number,language,result)=>{const key=number+':'+language;translationPartials.set(key,result);translationObservers.get(key)?.(result);}});}
     return visionTranslation(page,language,force);
   }
   function loadPageTranslation(page,language,retry=false,priority='visible') {
@@ -963,7 +964,7 @@ async function reader() {
 
     }
     if (inline && !retry && citation?.page!==page &&
-        original?.querySelector('.pdf-inline-translation:not([hidden])')) {
+        original?.querySelector('.pdf-inline-translation:not([hidden]):not([data-partial="true"])')) {
       translatedPage.hidden=true;
       translatedPage.dataset.translationReuse='cache';
       setTranslationState('ready',page,language);
@@ -987,10 +988,18 @@ async function reader() {
     pending.textContent='翻訳しています…';
     pending.hidden=false;
     foregroundTranslation++;
+    const progressKey=page+':'+language;let progressPaint=Promise.resolve(),latestPartial,paintPending=false;
+    const progressObserver=result=>{
+      latestPartial=result;if(paintPending)return;paintPending=true;
+      progressPaint=progressPaint.then(async()=>{while(latestPartial&&revision===translationRevision){const next=latestPartial;latestPartial=null;await renderTranslationOnPdf(next,page,revision,language);if(revision===translationRevision){pending.textContent='翻訳しています… '+next.completed+' / '+next.total;recordTranslationTrace(page,language,'visible','partial');}}}).catch(()=>{}).finally(()=>{paintPending=false;});
+    };
+    translationObservers.set(progressKey,progressObserver);
+    if(translationPartials.has(progressKey))progressObserver(translationPartials.get(progressKey));
     try {
       const priority=citation?.page===page ? 'citation' : 'visible';
       const load=()=>loadPageTranslation(page,language,retry,priority);
       const result=await load();
+      await progressPaint;
       if(revision===translationRevision) {
         if (result.reuse) translatedPage.dataset.translationReuse=result.reuse;
         if (['cache','in-flight','generated'].includes(result.reuse)) recordDocumentQaMetric(id,doc.title,{translation:result.reuse});
@@ -1033,6 +1042,7 @@ async function reader() {
         void updatePageTranslation();
       };
     } finally {
+      if(translationObservers.get(progressKey)===progressObserver)translationObservers.delete(progressKey);
       if(revision===translationRevision) pending.hidden=true;
       foregroundTranslation--;
       void prefetchTranslations();
@@ -1059,12 +1069,12 @@ async function reader() {
       const viewport=page.getViewport({scale:1});
       if(result.visionLayout){
         const frame=document.createElement('div');frame.className='pdf-page-view pdf-translation-layout pdf-inline-translation';frame.lang=language;frame.dataset.page=number;
-        const canvas=append(frame,'canvas',''),renderViewport=page.getViewport({scale:Math.min(3,1800/Math.max(viewport.width,viewport.height))});canvas.width=Math.ceil(renderViewport.width);canvas.height=Math.ceil(renderViewport.height);await page.render({canvas,viewport:renderViewport}).promise;await themeLegacyImageMargins(page,canvas);
+        const canvas=append(frame,'canvas','');if(!visionSourceCanvases.has(number)){visionSourceCanvases.set(number,(async()=>{const base=document.createElement('canvas'),renderViewport=page.getViewport({scale:Math.min(3,1800/Math.max(viewport.width,viewport.height))});base.width=Math.ceil(renderViewport.width);base.height=Math.ceil(renderViewport.height);await page.render({canvas:base,viewport:renderViewport}).promise;await themeLegacyImageMargins(page,base);return base;})().catch(error=>{visionSourceCanvases.delete(number);throw error;}));while(visionSourceCanvases.size>3)visionSourceCanvases.delete(visionSourceCanvases.keys().next().value);}const base=await visionSourceCanvases.get(number);canvas.width=base.width;canvas.height=base.height;canvas.getContext('2d').drawImage(base,0,0);
         const quote=citation?.page===number?pdfComparableText(citation.quote):'',text=result.source.map(pdfComparableText).join(''),ranges=quote?citationRanges(text,citation.quote,pdfComparableText):[];let offset=0;
         const {separateVisionParagraphs,expandVisionTableCells}=await import('./document-vision-translation.js');
         const blocks=separateVisionParagraphs(expandVisionTableCells(result.visionLayout,canvas)).map((block,index)=>{const start=offset;offset+=pdfComparableText(block.text).length;return {x:block.box.x*viewport.width,top:block.box.y*viewport.height,width:block.box.width*viewport.width,sourceWidth:block.box.width*viewport.width,sourceHeight:block.box.height*viewport.height,boxHeight:block.box.height*viewport.height,maskBox:block.originalBox,maximumFont:block.maximumFont,size:16,line:result.lines[index],marked:ranges.some(r=>offset>r.start&&start<r.end)};});
         const {installScanReadingLayout}=await import('./document-scan-reading-layout.js');await installScanReadingLayout(frame,blocks,canvas,viewport.width,{group:false});
-        if(revision!==translationRevision||language!==translationMode.value)return false;const slot=pageList.querySelector('[data-page="'+number+'"]');if(!slot)return false;frame.dataset.recognition='google-cloud-vision';installInlineTranslation(slot,frame,language);return true;
+        if(revision!==translationRevision||language!==translationMode.value)return false;const slot=pageList.querySelector('[data-page="'+number+'"]');if(!slot)return false;frame.dataset.recognition='google-cloud-vision';frame.dataset.partial=String(Boolean(result.partial));installInlineTranslation(slot,frame,language);return true;
       }
       const nativeItems=await pageTextRuns(page);
       let items=result.includesDiagram ? [...nativeItems,...await diagramTextRuns(page,nativeItems)] : nativeItems;

@@ -3,8 +3,14 @@ import {resumeTranslation} from './translation-resume.js';
 import {translatePhotoProgressively} from './photo-progress.js';
 // Same recognition and paragraph translation endpoints as the photo mode.
 // Cache is scoped to this reader; server document caches enforce document read access and revision separation.
-export function createDocumentVisionTranslation({request,getPdf,requiresOcr,documentPath,valid=()=>true}){
+export function createDocumentVisionTranslation({request,getPdf,requiresOcr,documentPath,valid=()=>true,onProgress=()=>{}}){
  const pages=new Map(),segments=new Map(),forced=new Set();
+ let activeTranslations=0;const waitingTranslations=[];
+ async function translateRequest(number,body){
+  await new Promise(resolve=>{const start=()=>{activeTranslations++;resolve();};if(activeTranslations<2)start();else waitingTranslations.push(start);});
+  try{if(!valid())throw new DOMException('Aborted','AbortError');return await photoRequest(number,'translate',body,AbortSignal.timeout(45000));}
+  finally{activeTranslations--;waitingTranslations.shift()?.();}
+ }
  const photoRequest=(number,kind,body,signal)=>request(documentPath+'/vision',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page:number,kind,data:body}),signal});
  async function recognize(number,force=false){
   const pdf=await getPdf(),page=await pdf.getPage(number),native=await page.getTextContent();
@@ -24,7 +30,7 @@ export function createDocumentVisionTranslation({request,getPdf,requiresOcr,docu
   if(!pages.has(number))pages.set(number,recognize(number,force).catch(error=>{pages.delete(number);throw error;}));
   const recognized=await pages.get(number);if(!recognized)return null;
   if(recognized.blank)return {visionLayout:[],source:[],lines:[],blank:true,reuse:recognized.reuse||'generated'};
-  const result=await translatePhotoProgressively({blocks:recognized.blocks,source:recognized.sourceLanguage||'auto',target:language,cache:segments,valid,request:body=>photoRequest(number,'translate',body,AbortSignal.timeout(45000))});
+  const result=await translatePhotoProgressively({blocks:recognized.blocks,source:recognized.sourceLanguage||'auto',target:language,cache:segments,valid,onProgress:snapshot=>{const ready=new Map(snapshot.blocks.filter(b=>!b.partial).map(b=>[b.id,b.translations[language]]));const layout=recognized.blocks.filter(b=>ready.has(b.id));if(layout.length)onProgress(number,language,{visionLayout:layout,source:layout.map(b=>b.text),lines:layout.map(b=>ready.get(b.id)),partial:true,completed:layout.length,total:recognized.blocks.length});},request:body=>translateRequest(number,body)});
   const byId=new Map(result.blocks.map(b=>[b.id,b.translations[language]]));
   if(recognized.blocks.some(b=>!byId.get(b.id)))throw Error('ページの翻訳がまだ完了していません。');
   return {visionLayout:recognized.blocks,source:recognized.blocks.map(b=>b.text),lines:recognized.blocks.map(b=>byId.get(b.id)),reuse:result.reuse.reused===result.reuse.total?'cache':'generated'};
