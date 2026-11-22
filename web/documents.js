@@ -1,6 +1,6 @@
 import {nextDocumentTranslation} from './document-translation-queue.js';
 import {preventCompositionSubmit,documentFilename} from './document-interaction.js';
-const DOCUMENT_RELEASE='288';
+const DOCUMENT_RELEASE='289';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -1468,8 +1468,10 @@ async function reader() {
       restorePageViewport(translatedPage,translated,position);
     }
     const after=surface.getBoundingClientRect();
-    preview.scrollLeft+=after.left-bounds.left+(bounds.left+from.x-before.left)*zoom/previous-to.x;
-    preview.scrollTop+=after.top-bounds.top+(bounds.top+from.y-before.top)*zoom/previous-to.y;
+    const deltaX=after.left-bounds.left+(bounds.left+from.x-before.left)*zoom/previous-to.x;
+    const deltaY=after.top-bounds.top+(bounds.top+from.y-before.top)*zoom/previous-to.y;
+    if(Math.abs(deltaX)>.5)preview.scrollLeft+=deltaX;
+    if(Math.abs(deltaY)>.5)preview.scrollTop+=deltaY;
   }
   $('.pdf-zoom').hidden=!zoomable;
   for (const control of [$('#pdf-prev'),$('#pdf-next'),pagePicker]) control.hidden=sourceType!=='pdf';
