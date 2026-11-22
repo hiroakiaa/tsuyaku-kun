@@ -4,7 +4,7 @@ export function scanReadingParagraphs(blocks,pageWidth){
  const heights=text.map(b=>b.sourceHeight/1.26||b.size).sort((a,b)=>a-b),median=heights[Math.floor(heights.length/2)];const paragraphs=[];
  if(text.filter(a=>text.some(b=>a!==b&&Math.abs(a.top-b.top)<median*.35&&(a.x+a.sourceWidth<=b.x||b.x+b.sourceWidth<=a.x))).length>text.length*.25)return null;
  for(const block of text){const previous=paragraphs.at(-1),last=previous?.blocks.at(-1),height=block.sourceHeight/1.26||block.size;const heading=block.line.length<90&&height>median*1.3;
-  const same=last&&previous.blocks.length<6&&!/[.!?。]\s*$/u.test(last.line)&&!heading&&!previous.heading&&Math.abs(block.x-last.x)<median*1.5&&block.top>=last.top&&block.top-last.top<(last.sourceHeight||median)*1.8;
+  const same=last&&previous.blocks.length<6&&!heading&&!previous.heading&&Math.abs(block.x-last.x)<median*1.5&&block.top>=last.top&&block.top-last.top<(last.sourceHeight||median)*1.8;
   if(same)previous.blocks.push(block);else paragraphs.push({heading,top:block.top,blocks:[block]});
  }return paragraphs;
 }
@@ -19,6 +19,14 @@ export async function installScanReadingLayout(frame,blocks,sourceCanvas,pageWid
  if(!blocks.length)return false;
  const {drawPhotoOverlay}=await import('./photo-overlay.js');
  const pageHeight=sourceCanvas.height/sourceCanvas.width*pageWidth,source=document.createElement('canvas');source.width=sourceCanvas.width;source.height=sourceCanvas.height;source.getContext('2d').drawImage(sourceCanvas,0,0);
+ const grouped=scanReadingParagraphs(blocks,pageWidth);
+ if(grouped){
+  const {scanPhotoRegions}=await import('./document-scan-preprocess.js'),photos=scanPhotoRegions(source.getContext('2d').getImageData(0,0,source.width,source.height));
+  blocks=grouped.flatMap(group=>{if(group.blocks.length===1)return group.blocks;const rows=group.blocks,x=Math.min(...rows.map(b=>b.x)),top=Math.min(...rows.map(b=>b.top)),width=Math.max(...rows.map(b=>b.x+(b.sourceWidth||b.width)))-x,height=Math.max(...rows.map(b=>b.top+(b.sourceHeight||b.boxHeight)))-top;
+   if(photos.some(p=>x/pageWidth<(p.x+p.width)/source.width&&(x+width)/pageWidth>p.x/source.width&&top/pageHeight<(p.y+p.height)/source.height&&(top+height)/pageHeight>p.y/source.height))return rows;
+   return [{...rows[0],x,top,width,sourceWidth:width,sourceHeight:height,boxHeight:height,line:rows.map(b=>b.line.trim()).join(' '),marked:rows.some(b=>b.marked)}];
+  });
+ }
  const regions=blocks.map((block,index)=>({id:String(index),text:block.line,highlight:Boolean(block.marked),box:{x:Math.max(0,block.x)/pageWidth,y:Math.max(0,block.top)/pageHeight,width:Math.max(.1,Math.min(block.sourceWidth||block.width,pageWidth-Math.max(0,block.x)))/pageWidth,height:Math.max(.1,Math.min(block.sourceHeight||block.boxHeight,pageHeight-Math.max(0,block.top)))/pageHeight}}));
  const language=frame.lang||'en',paint=drawPhotoOverlay(sourceCanvas,source,regions,blocks.map((block,index)=>({id:String(index),translations:{[language]:block.line}})),language);
  frame.querySelectorAll('.pdf-layout-line,.pdf-source-mask').forEach(node=>node.remove());
