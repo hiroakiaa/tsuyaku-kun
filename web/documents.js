@@ -1715,7 +1715,7 @@ async function reader() {
       return append(parent,'p',material.name+' · '+(n-material.start+1)+' '+material.unit,'ref');
     }
     const link = append(parent,'a',sourceType==='pdf' ? '' : '資料データ'+(sourceType==='xlsx' ? ' · シート '+n : '')+' →','ref');
-    if(sourceType==='pdf'){link.classList.add('pdf-source-link');link.append(localIcon('file-pdf'));append(link,'span',n+'ページ');}
+    if(sourceType==='pdf'){link.classList.add('pdf-source-link');link.append(localIcon('file-pdf'));append(link,'span',n+'ページ').dataset.documentUi='true';}
     link.href = '#ask-dialog';
     link.addEventListener('click',async event=>{
       event.preventDefault();
