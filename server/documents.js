@@ -1,3 +1,4 @@
+import {fastDocumentLines} from './document-fast-translation.js';
 import {photoReuseOperation} from './photo-reuse.js';
 import {catalog as documentPhotoCatalog} from './catalog.js';
 import {documentDisposition} from '../web/document-interaction.js';
@@ -1104,7 +1105,7 @@ export async function documents(request,env,auth,photoCatalog=documentPhotoCatal
     const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(translationContextKey([includesDiagram ? 12 : hasLayout ? 9 : 4,DOCUMENT_MODEL,code,text],record.pages)));
     const key=Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
     const url='https://room/document/page-translation/'+key;
-    const translated=await target.fetch(url,{method:'POST',body:JSON.stringify({id,text,language,hasLayout,diagramContext:includesDiagram ? diagramText : undefined})});
+    const translated=await target.fetch(url,{method:'POST',body:JSON.stringify({id,text,language,viewer:auth.uid,hasLayout,diagramContext:includesDiagram ? diagramText : undefined})});
     if (!includesDiagram || !translated.ok) return translated;
     return reply({...await translated.json(),includesDiagram:true});
   }
@@ -1578,7 +1579,7 @@ export async function documentStorage(request,storage,env) {
   }
   const translationKey=/^\/document\/page-translation\/[a-f0-9]{64}$/.test(path) && path;
   if (translationKey && request.method==='POST') {
-    const {id,text,language,hasLayout,diagramContext}=await request.json();
+    const {id,text,language,viewer,hasLayout,diagramContext}=await request.json();
     const key=id+':'+translationKey;
     const current=pendingPageTranslations.get(key);
     if (current) {
@@ -1599,20 +1600,24 @@ export async function documentStorage(request,storage,env) {
       const captureUsage=value=>{
         if (Number.isSafeInteger(value?.prompt_tokens) && Number.isSafeInteger(value?.completion_tokens)) {
           usage??={input:0,output:0,cached:0,measuredCalls:0};
-          usage.measuredCalls++;
+          usage.measuredCalls=(usage.measuredCalls||0)+1;
           usage.input+=value.prompt_tokens;
           usage.output+=value.completion_tokens;
           usage.cached+=value.prompt_tokens_details?.cached_tokens??0;
         }
       };
+      let fastRows,fastStatus;const fastCode=[...answerLanguages].find(([,name])=>name===language)?.[0];
+      fastStatus=terms.length?'terminology':diagramContext?'diagram':!nonempty.length?'empty':!fastCode?'language':'attempt';
+      if(!terms.length&&!diagramContext&&nonempty.length&&fastCode)try{fastRows=await fastDocumentLines({...env,budgetUid:viewer||record.owner},nonempty,fastCode);if(fastRows){usage=fastRows.usage;fastStatus='ready';}else fastStatus='quality-or-limit';}catch(error){fastStatus=error.azureFailure?.reason||'service';}
       let terminologyReuse;
-      const glossary=await sharedDocumentTerminology(storage,id,language,terms,async terms=>{const keys=terms.map((_,index)=>'term_'+index),input=Object.fromEntries(terms.map(({term},index)=>[keys[index],term]));const raw=await translateDocumentText(env,JSON.stringify(input),language,true,captureUsage,keys,false,{names,reference:terms.map(({definition})=>definition).join('\n')});const values=JSON.parse(raw);return Object.fromEntries(terms.map(({term},index)=>[term,values[keys[index]]]));},reuse=>{terminologyReuse=reuse;});
+      const glossary=fastRows?{}:await sharedDocumentTerminology(storage,id,language,terms,async terms=>{const keys=terms.map((_,index)=>'term_'+index),input=Object.fromEntries(terms.map(({term},index)=>[keys[index],term]));const raw=await translateDocumentText(env,JSON.stringify(input),language,true,captureUsage,keys,false,{names,reference:terms.map(({definition})=>definition).join('\n')});const values=JSON.parse(raw);return Object.fromEntries(terms.map(({term},index)=>[term,values[keys[index]]]));},reuse=>{terminologyReuse=reuse;});
       let translations;
       {
         const numberTokens=value=>value.normalize('NFKC').match(/[0-9]+(?:[.,][0-9]+)*/g) ?? [];
+        const repairSource=fastRows?nonempty.filter((_,index)=>fastRows.lines[index]===null):nonempty;
         const batches=[];
         const batchSize=diagramContext && nonempty.length<=24 && text.length<=4000 ? 24 : 8;
-        for (let offset=0;offset<nonempty.length;offset+=batchSize) batches.push(nonempty.slice(offset,offset+batchSize));
+        for (let offset=0;offset<repairSource.length;offset+=batchSize) batches.push(repairSource.slice(offset,offset+batchSize));
         const translateBatch=async batch=>{
           const keys=batch.map((_,index)=>'line_'+index);
           const input=Object.fromEntries(keys.map((key,index)=>[key,batch[index]]));
@@ -1630,7 +1635,7 @@ export async function documentStorage(request,storage,env) {
             return retried;
           }));
         };
-        translations=await translationCheckpoints(storage,translationKey,batches,translateBatch);
+        const repaired=await translationCheckpoints(storage,translationKey+(fastRows?':fast-repair-v1':''),batches,translateBatch);let repairIndex=0;translations=fastRows?fastRows.lines.map(line=>line===null?repaired[repairIndex++]:line):repaired;
       }
       let index=0;
       const lines=Array.isArray(translations) && translations.length===nonempty.length &&
@@ -1638,7 +1643,7 @@ export async function documentStorage(request,storage,env) {
         ? source.map(line=>line.trim()?translations[index++]:line)
         : null;
       if(!lines)throw Error('訳文と原文の対応を修復しています。');
-      const result={text:lines.join('\n'),source,lines,usage,...(terms.length?{terminology:{count:terms.length,reuse:terminologyReuse,entries:Object.entries(glossary)}}:{})};
+      const result={text:lines.join('\n'),source,lines,usage,fastTranslation:fastStatus,...(fastRows?{provider:fastRows.repairIndices.length?'azure_f0+repair':'azure_f0'}:{}),...(terms.length?{terminology:{count:terms.length,reuse:terminologyReuse,entries:Object.entries(glossary)}}:{})};
       if (new TextEncoder().encode(JSON.stringify(result)).length<120_000) await storage.transaction(async tx=>{
         if (!await tx.get('document')) return;
         const manifest='/document/page-translation-manifest'+(language==='English'?':english':'');
