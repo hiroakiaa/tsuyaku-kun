@@ -1,0 +1,20 @@
+{
+  "checks": [
+    {
+      "fixture": "new two-page PDF",
+      "status": 200,
+      "pages": [
+        1,
+        2
+      ],
+      "cacheSame": true,
+      "visibleRows": 2
+    },
+    {
+      "fixture": "existing public Tsuyaku guide",
+      "status": 200,
+      "visibleRows": 12
+    }
+  ],
+  "deleted": true
+}

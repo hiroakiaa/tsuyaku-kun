@@ -1042,7 +1042,7 @@ export async function documents(request,env,auth,photoCatalog=documentPhotoCatal
     const unit = ext==='pdf' ? 'ページ' : ext==='xlsx' ? 'シート' : ext==='docx' ? '文書' : '画像';
     return target.fetch('https://room/document/material',{method:'POST',body:JSON.stringify({owner:auth.uid,name:file.name.slice(0,150),unit,pages,readingQuality:validatedReadingQuality(form.get('readingQuality'),pages.length)})});
   }
-  if (!(['ask','translate','summary','vision'].includes(action) && request.method==='POST') && !((!action || action==='text') && request.method==='GET')) return fail('この操作は使えません。',405);
+  if (!(['ask','translate','summary','vision','toc'].includes(action) && request.method==='POST') && !((!action || action==='text') && request.method==='GET')) return fail('この操作は使えません。',405);
   const info = await target.fetch('https://room/document/data',{headers:{'X-Document-Viewer':auth.uid}});
   if (!info.ok) return info;
   const record = await info.json();
@@ -1121,7 +1121,7 @@ export async function documents(request,env,auth,photoCatalog=documentPhotoCatal
     const toc=validatedToc(generated,pages);
     if (!toc.length) {
       const fallback=pages.flatMap((text,index)=>{
-        const title=text.split(/\n/u).map(line=>line.trim()).find(line=>/\p{L}/u.test(line) && line.length>=4);
+        const title=text.split(/\n/u).map(line=>line.trim()).find(line=>/\p{L}/u.test(line) && line.length>=2 && !/^(?:page\s*\d+|\d+\s*(?:ページ|頁))$/iu.test(line));
         return title ? [{title:title.slice(0,60),page:index+1}] : [];
       }).slice(0,40);
       return fallback.length ? target.fetch('https://room/document/toc',{method:'POST',body:JSON.stringify(fallback)}) : fail('本文から目次を作れませんでした。',502);
