@@ -1,0 +1,208 @@
+{
+  "views": [
+    {
+      "viewer": "creator",
+      "events": [
+        {
+          "page": 1,
+          "kind": "ocr",
+          "reuse": "generated"
+        },
+        {
+          "page": 1,
+          "kind": "translate",
+          "language": "pt",
+          "reuse": "generated",
+          "inputTokens": 238,
+          "outputTokens": 98
+        },
+        {
+          "page": 2,
+          "kind": "ocr",
+          "reuse": "generated"
+        },
+        {
+          "page": 2,
+          "kind": "translate",
+          "language": "pt",
+          "reuse": "generated",
+          "inputTokens": 239,
+          "outputTokens": 98
+        },
+        {
+          "page": 3,
+          "kind": "ocr",
+          "reuse": "generated"
+        },
+        {
+          "page": 3,
+          "kind": "translate",
+          "language": "pt",
+          "reuse": "generated",
+          "inputTokens": 238,
+          "outputTokens": 98
+        },
+        {
+          "page": 1,
+          "kind": "translate",
+          "language": "en",
+          "reuse": "generated",
+          "inputTokens": 238,
+          "outputTokens": 92
+        },
+        {
+          "page": 2,
+          "kind": "translate",
+          "language": "en",
+          "reuse": "generated",
+          "inputTokens": 238,
+          "outputTokens": 93
+        },
+        {
+          "page": 3,
+          "kind": "translate",
+          "language": "en",
+          "reuse": "generated",
+          "inputTokens": 238,
+          "outputTokens": 93
+        }
+      ],
+      "pageUnchanged": true
+    },
+    {
+      "viewer": "other-user",
+      "events": [
+        {
+          "page": 1,
+          "kind": "ocr",
+          "reuse": "cache"
+        },
+        {
+          "page": 1,
+          "kind": "translate",
+          "language": "pt",
+          "reuse": "cache",
+          "inputTokens": 0,
+          "outputTokens": 0
+        },
+        {
+          "page": 2,
+          "kind": "ocr",
+          "reuse": "cache"
+        },
+        {
+          "page": 2,
+          "kind": "translate",
+          "language": "pt",
+          "reuse": "cache",
+          "inputTokens": 0,
+          "outputTokens": 0
+        },
+        {
+          "page": 3,
+          "kind": "ocr",
+          "reuse": "cache"
+        },
+        {
+          "page": 3,
+          "kind": "translate",
+          "language": "pt",
+          "reuse": "cache",
+          "inputTokens": 0,
+          "outputTokens": 0
+        },
+        {
+          "page": 1,
+          "kind": "translate",
+          "language": "en",
+          "reuse": "cache",
+          "inputTokens": 0,
+          "outputTokens": 0
+        },
+        {
+          "page": 2,
+          "kind": "translate",
+          "language": "en",
+          "reuse": "cache",
+          "inputTokens": 0,
+          "outputTokens": 0
+        },
+        {
+          "page": 3,
+          "kind": "translate",
+          "language": "en",
+          "reuse": "cache",
+          "inputTokens": 0,
+          "outputTokens": 0
+        }
+      ],
+      "newTranslationTokens": 0
+    }
+  ],
+  "deleted": true,
+  "ownerEvents": [
+    {
+      "page": 1,
+      "kind": "ocr",
+      "reuse": "generated"
+    },
+    {
+      "page": 1,
+      "kind": "translate",
+      "language": "pt",
+      "reuse": "generated",
+      "inputTokens": 238,
+      "outputTokens": 98
+    },
+    {
+      "page": 2,
+      "kind": "ocr",
+      "reuse": "generated"
+    },
+    {
+      "page": 2,
+      "kind": "translate",
+      "language": "pt",
+      "reuse": "generated",
+      "inputTokens": 239,
+      "outputTokens": 98
+    },
+    {
+      "page": 3,
+      "kind": "ocr",
+      "reuse": "generated"
+    },
+    {
+      "page": 3,
+      "kind": "translate",
+      "language": "pt",
+      "reuse": "generated",
+      "inputTokens": 238,
+      "outputTokens": 98
+    },
+    {
+      "page": 1,
+      "kind": "translate",
+      "language": "en",
+      "reuse": "generated",
+      "inputTokens": 238,
+      "outputTokens": 92
+    },
+    {
+      "page": 2,
+      "kind": "translate",
+      "language": "en",
+      "reuse": "generated",
+      "inputTokens": 238,
+      "outputTokens": 93
+    },
+    {
+      "page": 3,
+      "kind": "translate",
+      "language": "en",
+      "reuse": "generated",
+      "inputTokens": 238,
+      "outputTokens": 93
+    }
+  ]
+}
