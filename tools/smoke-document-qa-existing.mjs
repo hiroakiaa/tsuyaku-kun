@@ -17,7 +17,7 @@ try {
   await page.locator('#question').fill('ルームは何時間で失効しますか？');
   await page.locator('#ask-form button.primary').click();
   const answer = page.locator('#messages .answer-item').filter({hasText:/24\s*時間/});
-  const citation = answer.getByRole('link',{name:'元のPDF 2ページ',exact:true});
+  const citation = answer.getByRole('link',{name:'2ページ',exact:true});
   await citation.click({timeout:60_000});
   const picker=page.locator('#pdf-page');
   const waitForOriginalMark = () => page.waitForFunction(() =>

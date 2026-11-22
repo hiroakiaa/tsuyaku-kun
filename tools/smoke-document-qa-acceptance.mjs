@@ -194,7 +194,7 @@ try {
             const answer = await answers.last().locator('.answer-text').textContent();
             const source = answers.last().locator('.answer-source');
             const citations = await source.locator('a').allTextContents();
-            const quotes = await source.locator('blockquote').allTextContents();
+            const quotes = await source.locator('[data-source-quotes]').evaluateAll(nodes=>nodes.flatMap(node=>JSON.parse(node.dataset.sourceQuotes||'[]')));
             const elapsedMs = Math.round(performance.now()-started);
             const measurement = {fixture:fixture.label,question,answer,citations,quotes,elapsedMs,passed:false,answerPassed:false,citationPassed:false,citationNavigation:null,firstAnswerWithinLimit:before===0 ? elapsedMs<=limits.firstAnswer : null};
             measurements.push(measurement);
@@ -203,7 +203,7 @@ try {
               assert.match(answer,display,question);
               assert.doesNotMatch(answer,wrong,question);
               measurement.answerPassed = true;
-              assert.deepEqual(citations,['元のPDF '+sourcePage+'ページ'],question);
+              assert.deepEqual(citations,[''+sourcePage+'ページ'],question);
               if (cell) {
                 const addresses = (await source.locator(':scope > div').allTextContents()).flatMap(text=>text.split('、'));
                 assert.ok(addresses.includes(cell),question);

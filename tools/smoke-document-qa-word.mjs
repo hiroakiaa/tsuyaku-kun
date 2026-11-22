@@ -60,8 +60,8 @@ try {
     const answerMs = Math.round(performance.now()-questionStarted);
     const bubble=page.locator('#messages .bubble').last();
     assert.match(await bubble.locator('.answer-text').textContent(),/14:00|2\s*(?::00)?\s*p\.?m\.?/i);
-    assert.deepEqual(await bubble.locator('.answer-source a').allTextContents(),['元のPDF 2ページ']);
-    assert.match(await bubble.locator('.answer-quote').textContent(),/Blue group[\s\S]*14:00/);
+    assert.deepEqual(await bubble.locator('.answer-source a').allTextContents(),['2ページ']);
+    assert.match(await bubble.locator('[data-source-quotes]').evaluateAll(nodes=>nodes.flatMap(node=>JSON.parse(node.dataset.sourceQuotes||'[]')).join(' ')),/Blue group[\s\S]*14:00/);
     measurement = {fixture:'word-page-break',registrationMs,answerMs};
   } finally {
     const removed = await page.evaluate(async documentUrl=>{

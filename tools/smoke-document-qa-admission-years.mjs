@@ -66,10 +66,10 @@ try {
       const displayed = (await bubble.locator('.answer-text').allTextContents()).map(normalize);
       assert.deepEqual(displayed,[normalize(candidates[0].slice(cell.length + 1))]);
       const sources = bubble.locator('.answer-source');
-      assert.deepEqual(await sources.locator('a').allTextContents(),['元のPDF '+expectedPage+'ページ']);
-      const quotes = await sources.locator('blockquote').allTextContents();
+      assert.deepEqual(await sources.locator('a').allTextContents(),[''+expectedPage+'ページ']);
+      const quotes = await sources.locator('[data-source-quotes]').evaluateAll(nodes=>nodes.flatMap(node=>JSON.parse(node.dataset.sourceQuotes||'[]')));
       assert.ok(quotes.some(quote=>normalize(quote)===normalize(candidates[0])),'Missing full quote for '+year+' '+school+' '+cell);
-      await sources.getByRole('link',{name:'元のPDF '+expectedPage+'ページ',exact:true}).click();
+      await sources.getByRole('link',{name:''+expectedPage+'ページ',exact:true}).click();
       await page.waitForFunction(expected =>
         document.querySelector('#pdf-page')?.value===String(expected),expectedPage);
       const renderedPage = page.locator('#pdf-dialog[open] .pdf-page-view[data-page="'+expectedPage+'"] canvas');

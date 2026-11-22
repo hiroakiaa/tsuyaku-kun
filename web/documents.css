@@ -687,3 +687,8 @@ dialog.panel{margin:auto;box-sizing:border-box;max-width:calc(100vw - 1.5rem);ma
 
 .pdf-stage:has(#pdf-translation-progress:not([hidden])) .pdf-stage-tools{max-width:calc(100% - 9rem)}
 .pdf-stage-tools .pdf-language-toggle{flex-wrap:wrap;max-width:100%;box-sizing:border-box}
+
+.ref.pdf-source-link{display:inline-flex;align-items:center;gap:.4rem;padding:.35rem 0;text-decoration:none;border-bottom:1px solid currentColor;line-height:1.4}
+.pdf-source-link .local-icon{width:1.2em;height:1.2em;flex:none}
+.pdf-source-link:hover{opacity:.8}
+.pdf-source-link:focus-visible{outline:2px solid currentColor;outline-offset:4px}

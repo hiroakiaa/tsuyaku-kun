@@ -104,8 +104,8 @@ try {
     const answerMs = Math.round(performance.now()-questionStarted);
     const bubble=page.locator('#messages .bubble').last();
     assert.match(await bubble.locator('.answer-text').textContent(),japanese ? /14:00|午後\s*2\s*時/ : /14:00|2\s*(?::00)?\s*p\.?m\.?/i);
-    assert.deepEqual(await bubble.locator('.answer-source a').allTextContents(),['元のPDF 1ページ']);
-    assert.match(await bubble.locator('.answer-quote').textContent(),japanese ? /14\s*[:：]\s*00/ : /Blue group[\s\S]*14:00/);
+    assert.deepEqual(await bubble.locator('.answer-source a').allTextContents(),['1ページ']);
+    assert.match(await bubble.locator('[data-source-quotes]').evaluateAll(nodes=>nodes.flatMap(node=>JSON.parse(node.dataset.sourceQuotes||'[]')).join(' ')),japanese ? /14\s*[:：]\s*00/ : /Blue group[\s\S]*14:00/);
     if (process.argv.includes('--append')) {
       const extra = await page.evaluate(()=>{
         const canvas=document.createElement('canvas');
@@ -145,7 +145,7 @@ try {
       await page.locator('#ask-form button.primary:enabled').waitFor();
       assert.match(await bubble.locator('.answer-text').textContent(),/16:30|4:30\s*p\.?m\.?/i);
       assert.match(await bubble.locator('.answer-source').textContent(),/green-schedule\.pdf\s*·\s*1/);
-      assert.match(await bubble.locator('.answer-quote').textContent(),/Green group[\s\S]*16:30/i);
+      assert.match(await bubble.locator('[data-source-quotes]').evaluateAll(nodes=>nodes.flatMap(node=>JSON.parse(node.dataset.sourceQuotes||'[]')).join(' ')),/Green group[\s\S]*16:30/i);
       assert.deepEqual(externalWrites,[]);
     }
     measurement = {fixture:format+'-browser-ocr',language,registrationMs,answerMs,browserVersion:browser.version()};

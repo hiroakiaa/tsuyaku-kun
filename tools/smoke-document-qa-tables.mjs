@@ -151,7 +151,7 @@ try {
         const addresses = (await answer.locator('.answer-source > div').allTextContents()).flatMap(line=>line.split('、'));
         const expectedCells = ['A3', slot === '午前' ? 'B3' : 'B4', 'C1', branch === '本館' ? 'C2' : 'D2', cell];
         assert.deepEqual(addresses.sort(), expectedCells.sort().map(address=>'貸出備品表 · '+address));
-        assert.deepEqual(await answer.locator('.answer-source a').allTextContents(),['元のPDF 1ページ']);
+        assert.deepEqual(await answer.locator('.answer-source a').allTextContents(),['1ページ']);
         inventoryChecks.push({question,expected,elapsedMs,addresses,page:1});
         console.log('Inventory answer and citation matched:',expected,cell,1);
       }
@@ -232,7 +232,7 @@ try {
           'R8料金表':source.endsWith('D3') ? ['A3','B3','C1','D2','D3'] : ['A3','B4','C1','D2','D4'],
         }[sheet];
         assert.deepEqual(addresses.sort(),expected.map(cell=>sheet+' · '+cell),question);
-        const pageLabel = '元のPDF '+(['R9入試表','R9料金表','R9予定表','R8料金表'].indexOf(sheet)+1)+'ページ';
+        const pageLabel = ''+(['R9入試表','R9料金表','R9予定表','R8料金表'].indexOf(sheet)+1)+'ページ';
         assert.deepEqual(await bubble.locator('.answer-source a').allTextContents(),[pageLabel],question);
         if (source==='R8料金表 · D3') {
           await bubble.getByRole('link',{name:pageLabel,exact:true}).click();
@@ -264,7 +264,7 @@ try {
     assert.deepEqual(values,['20','この項目の根拠は資料内で確認できませんでした。'],combinedQuestion);
     const citationLinks = await sections.first().locator('.answer-source a').allTextContents();
     const citationCells = await sections.first().locator('.answer-source > div').allTextContents();
-    assert.deepEqual(citationLinks,['元のPDF 1ページ'],combinedQuestion);
+    assert.deepEqual(citationLinks,['1ページ'],combinedQuestion);
     assert.ok(citationCells.join('、').split('、').includes('R9入試表 · C4'),combinedQuestion);
     assert.equal(await sections.last().locator('.answer-source').count(),0,combinedQuestion);
     measurements.push({question:combinedQuestion,value:values.join(' ／ '),source:'R9入試表 · C4',
@@ -277,7 +277,7 @@ try {
     const scheduleSections = page.locator('#messages .bubble').last().locator('.answer-item');
     assert.deepEqual(await scheduleSections.locator('.answer-text').allTextContents(),['10:00','14:00']);
     const scheduleLinks = await scheduleSections.locator('.answer-source a').allTextContents();
-    assert.deepEqual(scheduleLinks,['元のPDF 3ページ','元のPDF 3ページ']);
+    assert.deepEqual(scheduleLinks,['3ページ','3ページ']);
     const scheduleCells = await scheduleSections.locator('.answer-source > div').allTextContents();
     assert.deepEqual(scheduleCells.map(line=>line.split('、').filter(cell=>/ · C[34]$/.test(cell))),[
       ['R9予定表 · C3'],['R9予定表 · C4'],
@@ -298,7 +298,7 @@ try {
         const answers = page.locator('#messages .bubble').last().locator('.answer-item');
         assert.deepEqual(await answers.locator('.answer-text').allTextContents(),values,question);
         const citationLinks = await answers.locator('.answer-source a').allTextContents();
-        assert.deepEqual(citationLinks,cells.map(()=> '元のPDF '+pageNumber+'ページ'),question);
+        assert.deepEqual(citationLinks,cells.map(()=> ''+pageNumber+'ページ'),question);
         const citationCells = await answers.locator('.answer-source > div').allTextContents();
         assert.deepEqual(citationCells.map(line=>line.split('、').filter(cell=>/ · D[34]$/.test(cell))),
           cells.map(cell=>[sheet+' · '+cell]),question);

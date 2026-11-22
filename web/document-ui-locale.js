@@ -1,5 +1,6 @@
 export const documentUiLabels=[
  ['全体像','Overview','Vista general'],
+ ['{page}ページ','Page {page}','Página {page}'],
  ['このページには読み取りを確認できない数値があります。原文と照合してください。','This page has unverified numbers. Please check the original.','Esta página contiene números sin verificar. Revisa el original.'],
  ['読み取れた資料の範囲では、この項目の根拠を確認できませんでした。',"I couldn't verify supporting evidence in the text that could be read.",'No pude verificar pruebas en el texto que se pudo leer.'],
  ['文字を十分に読み取れないページがあるため、根拠を確認できませんでした。原文をご確認ください。',"Some pages could not be read clearly, so I couldn't verify the evidence. Please check the original.",'Algunas páginas no se pudieron leer claramente, así que no pude verificar las pruebas. Revisa el original.'],
@@ -90,7 +91,6 @@ export const documentUiLabels=[
   ['前のページ','Previous page','Página anterior'],
   ['次のページ','Next page','Página siguiente'],
   ['ページ番号','Page number','Número de página'],
-  ['資料内表記','Source quotation','Cita original'],
   ['再試行','Retry','Reintentar'],
   ['再読み込み','Reload','Volver a cargar'],
   ['読み込んでいます…','Loading…','Cargando…'],
@@ -150,9 +150,10 @@ export function createDocumentUiLocale(root,loadLanguage) {
   let language='';
   const translate=text=>{
     const word=text.trim();
-    const page=/^元のPDF (\d+)ページ$/u.exec(word)?.[1];
+    const page=/^(?:元のPDF )?(\d+)ページ$/u.exec(word)?.[1];
+    const pageTemplate=dictionaries[language]?.get('{page}ページ');
     const result=dictionaries[language]?.get(word) ??
-      (page && language==='en' ? 'Original PDF, page '+page : page && language==='es' ? 'PDF original, página '+page : undefined);
+      (page && pageTemplate?.includes('{page}') ? pageTemplate.replace('{page}',page) : undefined);
     return result ? text.replace(word,result) : text;
   };
   function translateValue(node,key,value,write) {

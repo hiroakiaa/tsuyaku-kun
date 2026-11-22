@@ -11,7 +11,7 @@ const gardenNotes = dense || groupVisit ? 'Planting beds are watered in the earl
 const padding = long ? Array.from({length:atPageLimit ? 37 : 25},(_,i)=>
   '<p style="break-before:page">School garden notices and planting instructions. Section '+(i+1)+'. '+gardenNotes+(groupVisit && i===3 ? ' Group visits must be booked at least 14 days before the visit.' : groupVisit && i===18 ? ' Group visit cancellations must be received at least 3 days before the visit.' : '')+'</p>').join('') : '';
 const scanPage = atPageLimit ? 40 : long ? 28 : 3;
-const scanCitation = '元のPDF '+scanPage+'ページ';
+const scanCitation = ''+scanPage+'ページ';
 const browser = await chromium.launch();
 try {
   const page = await browser.newPage();
@@ -71,8 +71,8 @@ try {
     await page.locator('#question').fill('When does the library close?');
     const libraryStarted = performance.now();
     await page.locator('#ask-form button.primary').click();
-    await page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 2ページ'}).waitFor();
-    await page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 1ページ'}).waitFor();
+    await page.locator('#messages .answer-source').getByRole('link',{name:'2ページ'}).waitFor();
+    await page.locator('#messages .answer-source').getByRole('link',{name:'1ページ'}).waitFor();
     assert.match(await page.locator('#messages').textContent(),/3\s*(?::00)?\s*PM/i);
     await page.locator('#ask-form button.primary:enabled').waitFor();
     const libraryMs = Math.round(performance.now()-libraryStarted);
@@ -86,7 +86,7 @@ try {
     };
     const libraryStages=await answerTimings();
     assert.ok(Number.isInteger(libraryStages['first-grounded-answer']));
-    await page.locator('#messages .answer-source').getByRole('link',{name:'元のPDF 2ページ'}).click();
+    await page.locator('#messages .answer-source').getByRole('link',{name:'2ページ'}).click();
     const waitForOriginalMarker = () => page.waitForFunction(()=>[...document.querySelectorAll('[data-page="2"] .pdf-citation-visible')].some(mark=>{
       const fill=getComputedStyle(mark,'::after');
       return mark.getBoundingClientRect().width>0 && fill.backgroundColor==='rgb(245, 217, 117)' &&
@@ -137,44 +137,35 @@ try {
     const combined = page.locator('#messages .bubble').last();
     const librarySource = combined.locator('.answer-item').filter({hasText:/3\s*(?::00)?\s*PM/i});
     const poolSource = combined.locator('.answer-item').filter({hasText:/8\s*(?::00)?\s*AM/i});
-    await librarySource.getByRole('link',{name:'元のPDF 2ページ'}).waitFor();
-    await librarySource.getByRole('link',{name:'元のPDF 1ページ'}).waitFor();
+    await librarySource.getByRole('link',{name:'2ページ'}).waitFor();
+    await librarySource.getByRole('link',{name:'1ページ'}).waitFor();
     await poolSource.getByRole('link',{name:scanCitation}).waitFor();
     await page.locator('#ask-form button.primary:enabled').waitFor();
     const citationNames = async item => (await item.locator('.answer-source a').allTextContents())
       .map(label=>label.trim()).sort();
-    assert.deepEqual(await citationNames(librarySource),['元のPDF 1ページ','元のPDF 2ページ']);
+    assert.deepEqual(await citationNames(librarySource),['1ページ','2ページ']);
     const combinedMs = Math.round(performance.now()-combinedStarted);
     assert.deepEqual(await citationNames(poolSource),[scanCitation]);
     for (const [item,number] of [[librarySource,1],[librarySource,2],[poolSource,scanPage]]) {
-      await item.getByRole('link',{name:'元のPDF '+number+'ページ',exact:true}).click();
+      await item.getByRole('link',{name:''+number+'ページ',exact:true}).click();
       await page.waitForFunction(expected=>document.querySelector('#pdf-page')?.value===String(expected),number);
     }
     assert.deepEqual(externalWrites,[]);
-    for (const item of [librarySource,poolSource]) {
-      for (const disclosure of await item.locator('.answer-quote').all()) {
-        const quote = disclosure.locator('blockquote').first();
-        await quote.waitFor({state:'hidden'});
-        await disclosure.locator('summary').click();
-        await quote.waitFor({state:'visible'});
-        await disclosure.locator('summary').click();
-        await quote.waitFor({state:'hidden'});
-      }
-    }
+    for (const item of [librarySource,poolSource]) assert.equal(await item.locator('.answer-quote').count(),0);
     const combinedEvidence = await Promise.all([librarySource,poolSource].map(async item=>({
       answer:await item.locator('.answer-text').textContent(),
       sources:await item.locator('.answer-source').evaluateAll(entries=>entries.map(entry=>({
         citation:entry.querySelector('a').textContent.trim(),
-        quotes:[...entry.querySelectorAll('blockquote')].map(quote=>quote.textContent),
+        quotes:JSON.parse(entry.querySelector('[data-source-quotes]')?.dataset.sourceQuotes||'[]'),
       }))),
     })));
-    const quotesAt = (item,number)=>item.sources.find(source=>source.citation==='元のPDF '+number+'ページ')?.quotes.join(' ') ?? '';
+    const quotesAt = (item,number)=>item.sources.find(source=>source.citation===''+number+'ページ')?.quotes.join(' ') ?? '';
     assert.match(quotesAt(combinedEvidence[0],1),/Closing/i);
     assert.match(quotesAt(combinedEvidence[0],2),/Library[\s\S]*3\s*(?::00)?\s*PM/i);
     assert.match(quotesAt(combinedEvidence[1],scanPage),/swimming pool[\s\S]*8\s*(?::00)?\s*AM/i);
     await page.reload();
     await page.locator('#question').waitFor({state:'visible'});
-    assert.deepEqual(await citationNames(librarySource),['元のPDF 1ページ','元のPDF 2ページ']);
+    assert.deepEqual(await citationNames(librarySource),['1ページ','2ページ']);
     assert.deepEqual(await citationNames(poolSource),[scanCitation]);
     const missingQuestion = 'What is the annual parking permit fee?';
     await page.locator('#question').fill(missingQuestion);
@@ -197,7 +188,7 @@ try {
     const mixed = page.locator('#messages .bubble').last();
     const supported = mixed.locator('.answer-item').filter({hasText:/3\s*(?::00)?\s*PM/i});
     const unsupported = mixed.locator('.answer-item').filter({hasText:'この項目の根拠は資料内で確認できませんでした。'});
-    assert.deepEqual(await citationNames(supported),['元のPDF 1ページ','元のPDF 2ページ']);
+    assert.deepEqual(await citationNames(supported),['1ページ','2ページ']);
     assert.equal(await unsupported.count(),1);
     assert.deepEqual(await citationNames(unsupported),[]);
     await page.locator('#question').fill('図書館は何時に閉まりますか？ 年間駐車許可料はいくらですか？ 項目ごとに答えてください。');
@@ -206,7 +197,7 @@ try {
     const translated = page.locator('#messages .bubble').last();
     const closing = translated.locator('.answer-item').filter({hasText:/午後\s*3\s*時|15:00/});
     const missingFee = translated.locator('.answer-item').filter({hasText:'この項目の根拠は資料内で確認できませんでした。'});
-    assert.deepEqual(await citationNames(closing),['元のPDF 1ページ','元のPDF 2ページ']);
+    assert.deepEqual(await citationNames(closing),['1ページ','2ページ']);
     assert.equal(await missingFee.count(),1);
     assert.deepEqual(await citationNames(missingFee),[]);
     let groupVisitEvidence;
@@ -219,8 +210,8 @@ try {
       for (const [days, number, quote] of [[14,6,/booked at least 14 days/i],[3,21,/cancellations must be received at least 3 days/i]]) {
         const item = answer.locator('.answer-item').filter({has:page.locator('.answer-text').filter({hasText:new RegExp('\\b'+days+'\\s+days','i')})});
         assert.equal(await item.count(),1);
-        assert.deepEqual(await citationNames(item),['元のPDF '+number+'ページ']);
-        assert.match(await item.locator('blockquote').textContent(),quote);
+        assert.deepEqual(await citationNames(item),[''+number+'ページ']);
+        assert.match(await item.locator('[data-source-quotes]').evaluateAll(nodes=>nodes.flatMap(node=>JSON.parse(node.dataset.sourceQuotes||'[]')).join(' ')),quote);
       }
       groupVisitEvidence = {pages:[6,21],elapsedMs:Math.round(performance.now()-started)};
       if (process.argv.includes('--compare-search')) {

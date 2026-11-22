@@ -1,6 +1,6 @@
 import {nextDocumentTranslation} from './document-translation-queue.js';
 import {preventCompositionSubmit,documentFilename} from './document-interaction.js';
-const DOCUMENT_RELEASE='287';
+const DOCUMENT_RELEASE='288';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -727,7 +727,13 @@ async function reader() {
     })().catch(()=>null));
     paintImageFrame(canvas,await imageFrames.get(page),getComputedStyle(document.body).backgroundColor);
   }
-  async function renderPage(slot) {
+  const pageRenderTasks=new WeakMap();
+  function renderPage(slot){
+    if(slot.querySelector('.pdf-original-canvas'))return Promise.resolve();
+    if(!pageRenderTasks.has(slot))pageRenderTasks.set(slot,renderPageOnce(slot).finally(()=>pageRenderTasks.delete(slot)));
+    return pageRenderTasks.get(slot);
+  }
+  async function renderPageOnce(slot) {
     try {
       const page = await (await opened).getPage(Number(slot.dataset.page));
       const scale = Math.min(3, Math.max(1, preview.clientWidth * devicePixelRatio / page.getViewport({scale:1}).width));
@@ -1529,7 +1535,7 @@ async function reader() {
       scrollFrame = 0;
       if (!pageViews || performance.now()-lastNavigation < 650) return;
       const top = preview.getBoundingClientRect().top;
-      const index = pageViews.findIndex(slot => slot.getBoundingClientRect().bottom > top+1);
+      const index = pageViews.findIndex(slot => slot.getBoundingClientRect().bottom > top+preview.clientHeight*.35);
       if (index < 0 || selectedPage===index+1) return;
       selectedPage = index+1;
       readingPosition(id,{page:selectedPage});
@@ -1645,6 +1651,8 @@ async function reader() {
       fitWidth = preview.clientWidth;
       setZoom(zoom);
       const slot = pageViews[n-1];
+      await renderPage(slot);
+      if(selectedPage!==n||!dialog.open)return;
       lastNavigation = performance.now();
       preview.scrollTo({top:preview.scrollTop+slot.getBoundingClientRect().top-preview.getBoundingClientRect().top,behavior:scrollBehavior()});
       if (citation?.page===n && slot.querySelector('canvas')) void pdf.getPage(n).then(page=>highlightCitation(slot,page,page.getViewport({scale:1}))).catch(()=>{});
@@ -1704,10 +1712,10 @@ async function reader() {
   function sourceLink(parent,n,quote,getSequence) {
     const material = materials.find(item=>n>=item.start && n<item.start+item.count);
     if (material) {
-      append(parent,'p',material.name+' · '+(n-material.start+1)+' '+material.unit,'ref');
-      return;
+      return append(parent,'p',material.name+' · '+(n-material.start+1)+' '+material.unit,'ref');
     }
-    const link = append(parent,'a',sourceType==='pdf' ? '元のPDF ' + n + 'ページ' : '資料データ'+(sourceType==='xlsx' ? ' · シート '+n : '')+' →','ref');
+    const link = append(parent,'a',sourceType==='pdf' ? '' : '資料データ'+(sourceType==='xlsx' ? ' · シート '+n : '')+' →','ref');
+    if(sourceType==='pdf'){link.classList.add('pdf-source-link');link.append(localIcon('file-pdf'));append(link,'span',n+'ページ');}
     link.href = '#ask-dialog';
     link.addEventListener('click',async event=>{
       event.preventDefault();
@@ -1726,6 +1734,7 @@ async function reader() {
       citation = quote && sourceType==='pdf' ? {page:n,quote} : undefined;
       await showPdf(n);
     });
+    return link;
   }
   function renderSummary(items) {
     const cards=$('#cards');
@@ -1917,16 +1926,11 @@ async function reader() {
     const answerCitations=()=>[...answer.children].flatMap(child=>citationsBySection.get(child) ?? []);
     for (const [page,quotes] of byPage) {
       const source = append(evidence,'div','','answer-source');
-      sourceLink(source,page,quotes.keys().next().value,answerCitations);
+      const reference=sourceLink(source,page,quotes.keys().next().value,answerCitations);
+      reference.dataset.sourceQuotes=JSON.stringify([...quotes.keys()]);
       const addresses = [...new Set([...quotes.values()].filter(Boolean))];
       if (addresses.length) append(source,'div',addresses.join('、'));
-      const disclosure = append(source,'details','','answer-quote');
-      append(disclosure,'summary','資料内表記');
-      const content = append(disclosure,'div');
-      for (const quote of quotes.keys()) {
-        const block = append(content,'blockquote');
-        for (const paragraph of formatQuote(quote)) append(block,'p',paragraph);
-      }
+
     }
   }
   for (const entry of history) {
