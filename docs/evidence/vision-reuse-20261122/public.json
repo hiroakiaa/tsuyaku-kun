@@ -1,0 +1,90 @@
+{
+  "scope": "Public photo recognition/translation API; synthetic scan",
+  "views": [
+    {
+      "width": 390,
+      "state": {
+        "state": "ready",
+        "page": 1,
+        "language": "en"
+      },
+      "placement": null,
+      "textLength": 1536,
+      "metrics": null,
+      "layout": {
+        "canvas": 1,
+        "width": 390,
+        "available": 390,
+        "font": 8.94236,
+        "overlaps": 0,
+        "clipped": 0,
+        "count": 13,
+        "reflow": 0,
+        "inPlace": "in-place",
+        "renderer": "photo-overlay",
+        "rasterClipped": "false"
+      },
+      "navigation": {
+        "fullTextPopup": true,
+        "originalAndEnglishRestored": true
+      }
+    },
+    {
+      "width": 1280,
+      "state": {
+        "state": "ready",
+        "page": 1,
+        "language": "en"
+      },
+      "placement": null,
+      "textLength": 1536,
+      "metrics": null,
+      "layout": {
+        "canvas": 1,
+        "width": 640,
+        "available": 640,
+        "font": 14.6746,
+        "overlaps": 0,
+        "clipped": 0,
+        "count": 13,
+        "reflow": 0,
+        "inPlace": "in-place",
+        "renderer": "photo-overlay",
+        "rasterClipped": "false"
+      },
+      "navigation": {
+        "fullTextPopup": true,
+        "originalAndEnglishRestored": true
+      }
+    }
+  ],
+  "deleted": true,
+  "otherViewer": {
+    "events": [
+      {
+        "kind": "ocr",
+        "reuse": "cache"
+      },
+      {
+        "kind": "translate",
+        "reuse": "cache",
+        "inputTokens": 0,
+        "outputTokens": 0
+      },
+      {
+        "kind": "translate",
+        "reuse": "cache",
+        "inputTokens": 0,
+        "outputTokens": 0
+      },
+      {
+        "kind": "translate",
+        "reuse": "cache",
+        "inputTokens": 0,
+        "outputTokens": 0
+      }
+    ],
+    "allReused": true,
+    "newTranslationTokens": 0
+  }
+}
