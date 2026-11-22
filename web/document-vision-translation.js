@@ -1,15 +1,16 @@
 import {resumeTranslation} from './translation-resume.js';
 import {translatePhotoProgressively} from './photo-progress.js';
 // Same recognition and paragraph translation endpoints as the photo mode.
-// Cache is scoped to this reader; server photo caches retain their existing user isolation.
-export function createDocumentVisionTranslation({request,getPdf,requiresOcr,valid=()=>true}){
+// Cache is scoped to this reader; server document caches enforce document read access and revision separation.
+export function createDocumentVisionTranslation({request,getPdf,requiresOcr,documentPath,valid=()=>true}){
  const pages=new Map(),segments=new Map();
+ const photoRequest=(number,kind,body,signal)=>request(documentPath+'/vision',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page:number,kind,data:body}),signal});
  async function recognize(number){
   const pdf=await getPdf(),page=await pdf.getPage(number),native=await page.getTextContent();
   if(!requiresOcr(native.items,number))return null;
   const size=page.getViewport({scale:1}),viewport=page.getViewport({scale:Math.min(3,1800/Math.max(size.width,size.height))}),canvas=document.createElement('canvas');canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
   try{await page.render({canvas,viewport}).promise;let image;for(const quality of [.9,.75,.6,.45]){image=canvas.toDataURL('image/jpeg',quality).split(',')[1];if(image.length<=2800000)break;}if(image.length>2800000)throw Error('ページ画像を読み取り用に調整できませんでした。');
-   const result=await resumeTranslation(()=>request('/photo/recognize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image,id:crypto.randomUUID()}),signal:AbortSignal.timeout(45000)}),{valid});
+   const result=await resumeTranslation(()=>photoRequest(number,'ocr',{image,id:crypto.randomUUID()},AbortSignal.timeout(45000)),{valid});
    if(!result.blocks?.length)throw Error('このページの文字位置を読み取れませんでした。');
    return result;
   }finally{canvas.width=canvas.height=0;}
@@ -17,7 +18,7 @@ export function createDocumentVisionTranslation({request,getPdf,requiresOcr,vali
  return async(number,language)=>{
   if(!pages.has(number))pages.set(number,recognize(number).catch(error=>{pages.delete(number);throw error;}));
   const recognized=await pages.get(number);if(!recognized)return null;
-  const result=await translatePhotoProgressively({blocks:recognized.blocks,source:recognized.sourceLanguage||'auto',target:language,cache:segments,valid,request:body=>request('/photo/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(45000)})});
+  const result=await translatePhotoProgressively({blocks:recognized.blocks,source:recognized.sourceLanguage||'auto',target:language,cache:segments,valid,request:body=>photoRequest(number,'translate',body,AbortSignal.timeout(45000))});
   const byId=new Map(result.blocks.map(b=>[b.id,b.translations[language]]));
   if(recognized.blocks.some(b=>!byId.get(b.id)))throw Error('ページの翻訳がまだ完了していません。');
   return {visionLayout:recognized.blocks,source:recognized.blocks.map(b=>b.text),lines:recognized.blocks.map(b=>byId.get(b.id)),reuse:result.reuse.reused===result.reuse.total?'cache':'generated'};

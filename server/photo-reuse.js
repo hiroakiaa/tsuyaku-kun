@@ -5,8 +5,8 @@ import {glossaryFor} from '../web/core.js';
 import {storedTranslations} from './dictionary.js';
 const pending=new Map();
 const digest=async value=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value)))].map(n=>n.toString(16).padStart(2,'0')).join('');
-export async function photoReuseOperation(env,kind,data,catalog){
- const scope=await photoUid(env.budgetUid),input=kind==='ocr'?data:photoTranslationInput(data,catalog.languages.map(l=>l.code));
+export async function photoReuseOperation(env,kind,data,catalog,{documentScope}={}){
+ const scope=documentScope?await digest('document-photo-v1:'+documentScope):await photoUid(env.budgetUid),input=kind==='ocr'?data:photoTranslationInput(data,catalog.languages.map(l=>l.code));
  let key,canonical;
  if(kind==='ocr'){photoInput(data);canonical=data;key=await digest('ocr-v2:'+data.image);}
  else{

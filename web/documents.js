@@ -1,5 +1,5 @@
 import {preventCompositionSubmit,documentFilename,optionalTranslationPrefetch} from './document-interaction.js';
-const DOCUMENT_RELEASE='285';
+const DOCUMENT_RELEASE='286';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -842,7 +842,7 @@ async function reader() {
   }
   let visionTranslation;
   async function loadVisionTranslation(page,language){
-    if(!visionTranslation){const {createDocumentVisionTranslation}=await import('./document-vision-translation.js');visionTranslation=createDocumentVisionTranslation({request,getPdf:getOriginalPdf,requiresOcr:(items,number)=>pdfPageTextStatus(layoutPdfText(items),number).requiresOcr,valid:()=>askDialog.open||dialog.open});}
+    if(!visionTranslation){const {createDocumentVisionTranslation}=await import('./document-vision-translation.js');visionTranslation=createDocumentVisionTranslation({request,documentPath:api,getPdf:getOriginalPdf,requiresOcr:(items,number)=>pdfPageTextStatus(layoutPdfText(items),number).requiresOcr,valid:()=>askDialog.open||dialog.open});}
     return visionTranslation(page,language);
   }
   function loadPageTranslation(page,language,retry=false,priority='visible') {

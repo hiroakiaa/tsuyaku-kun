@@ -1,3 +1,5 @@
+import {photoReuseOperation} from './photo-reuse.js';
+import {catalog as documentPhotoCatalog} from './catalog.js';
 import {documentDisposition} from '../web/document-interaction.js';
 import {evidenceMatchText,documentSearchText,requestedDocumentPages} from '../web/document-query-text.js';
 import {validatedReadingQuality,mergeReadingQuality} from '../web/document-reading-quality.js';
@@ -885,7 +887,7 @@ async function readMaterial(env,file,form,ext) {
     return pages;
 }
 
-export async function documents(request,env,auth) {
+export async function documents(request,env,auth,photoCatalog=documentPhotoCatalog) {
   const {pathname} = new URL(request.url);
   const uiLanguage=/^\/documents\/ui-language\/([\w-]+)$/.exec(pathname)?.[1];
   if (uiLanguage && request.method==='GET') {
@@ -959,7 +961,7 @@ export async function documents(request,env,auth) {
     queueSummary(env,target);
     return reply({id,createdAt},201);
   }
-  const match = /^\/documents\/([a-f0-9-]{36})(?:\/(pdf|ask|remove|replace|material|toc|text|translate|summary|title))?$/.exec(pathname);
+  const match = /^\/documents\/([a-f0-9-]{36})(?:\/(pdf|ask|remove|replace|material|toc|text|translate|summary|title|vision))?$/.exec(pathname);
   if (!match) return fail('資料が見つかりません。',404);
   const [,id,action] = match;
   const target = env.ROOMS.get(env.ROOMS.idFromName('document:'+id));
@@ -1040,10 +1042,16 @@ export async function documents(request,env,auth) {
     const unit = ext==='pdf' ? 'ページ' : ext==='xlsx' ? 'シート' : ext==='docx' ? '文書' : '画像';
     return target.fetch('https://room/document/material',{method:'POST',body:JSON.stringify({owner:auth.uid,name:file.name.slice(0,150),unit,pages,readingQuality:validatedReadingQuality(form.get('readingQuality'),pages.length)})});
   }
-  if (!(['ask','translate','summary'].includes(action) && request.method==='POST') && !((!action || action==='text') && request.method==='GET')) return fail('この操作は使えません。',405);
+  if (!(['ask','translate','summary','vision'].includes(action) && request.method==='POST') && !((!action || action==='text') && request.method==='GET')) return fail('この操作は使えません。',405);
   const info = await target.fetch('https://room/document/data',{headers:{'X-Document-Viewer':auth.uid}});
   if (!info.ok) return info;
   const record = await info.json();
+  if(action==='vision'){
+    const raw=await request.text();if(raw.length>2810000)return fail('ページ画像が大きすぎます。',413);
+    let input;try{input=JSON.parse(raw);}catch{return fail('翻訳データを確認してください。');}
+    if(!['ocr','translate'].includes(input.kind)||!Number.isInteger(input.page)||input.page<1||input.page>(record.originalPageCount??record.pages.length))return fail('ページ番号を確認してください。');
+    return reply(await photoReuseOperation(env,input.kind,input.data,photoCatalog,{documentScope:id+':'+(record.revision??0)+':'+input.page}));
+  }
   if (action==='summary') {
     const level=new URL(request.url).searchParams.get('level');
     const page=new URL(request.url).searchParams.get('page');

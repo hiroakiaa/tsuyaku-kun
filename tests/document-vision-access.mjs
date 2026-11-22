@@ -1,0 +1,6 @@
+import assert from 'node:assert/strict';import {documents} from '../server/documents.js';
+let readable=false,photoCalls=0;const record={pages:['本文'],originalPageCount:1,revision:3,visibility:'shared'};
+const env={budgetUid:'viewer',ROOMS:{idFromName:n=>n,get:n=>({fetch:async(url,options)=>{if(n.startsWith('document:')){assert.equal(options.headers['X-Document-Viewer'],'viewer');return Response.json(readable?record:{error:'not found'},{status:readable?200:404});}if(n.startsWith('__photo_reuse_v1__')){photoCalls++;return Response.json({reuse:'cache',blocks:[{id:'b0',translations:{en:'Cached text'}}],usage:{inputTokens:0,outputTokens:0}});}throw Error('Unexpected scope');}})}};
+const id='11111111-1111-4111-8111-111111111111',body={page:1,kind:'translate',data:{source:'ja',targets:['en'],blocks:[{id:'b0',text:'共通資料です。'}]}};
+const call=input=>documents(new Request('https://example.com/documents/'+id+'/vision',{method:'POST',body:JSON.stringify(input)}),env,{uid:'viewer'});
+assert.equal((await call(body)).status,404);assert.equal(photoCalls,0);readable=true;assert.equal((await call({...body,page:2})).status,400);assert.equal(photoCalls,0);assert.equal((await call(body)).status,200);assert.equal(photoCalls,1);console.log('PASS document read authorization before cache access and page bounds validation');
