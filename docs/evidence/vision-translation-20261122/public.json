@@ -1,0 +1,62 @@
+{
+  "scope": "Public photo recognition/translation API; private screenshot-derived document excerpt",
+  "views": [
+    {
+      "width": 390,
+      "state": {
+        "state": "ready",
+        "page": 1,
+        "language": "en"
+      },
+      "placement": null,
+      "textLength": 2708,
+      "metrics": null,
+      "layout": {
+        "canvas": 1,
+        "width": 390,
+        "available": 390,
+        "font": 2.44963,
+        "overlaps": 0,
+        "clipped": 0,
+        "count": 17,
+        "reflow": 0,
+        "inPlace": "in-place",
+        "renderer": "photo-overlay",
+        "rasterClipped": "false"
+      },
+      "navigation": {
+        "fullTextPopup": true,
+        "originalAndEnglishRestored": true
+      }
+    },
+    {
+      "width": 1280,
+      "state": {
+        "state": "ready",
+        "page": 1,
+        "language": "en"
+      },
+      "placement": null,
+      "textLength": 2703,
+      "metrics": null,
+      "layout": {
+        "canvas": 1,
+        "width": 640,
+        "available": 640,
+        "font": 4.01991,
+        "overlaps": 0,
+        "clipped": 0,
+        "count": 17,
+        "reflow": 0,
+        "inPlace": "in-place",
+        "renderer": "photo-overlay",
+        "rasterClipped": "false"
+      },
+      "navigation": {
+        "fullTextPopup": true,
+        "originalAndEnglishRestored": true
+      }
+    }
+  ],
+  "deleted": true
+}

@@ -21,3 +21,11 @@
 
 ### 2026-11-22 写真翻訳の描画を資料QAへ共通化
 公開60c97d3、資料v284/admin303。スキャンはphoto-overlay.jsのdrawPhotoOverlayを直接利用。縦書き/図形混在でも旧HTMLの12px床へ戻らない。原画像の文字領域にクリップして描き、透明な操作領域だけHTMLに置く。段落は元の座標範囲内、写真を横切る場合はまとめない。画像の外部送信は増やさず取得済みOCR/訳文を再利用。公開259資材一致、公開ポルトガル語390/1280検証・右IAB表示確認。今回の試験資料削除済み。添付原資料と実機Safari未確認。詳細document-photo-compositor-20261122.md。
+
+### 2026-11-22 続報：実資料の翻訳品質は未解決
+ユーザーのIMG_0981スクリーンショットで依然読み取り誤りと不揃いな配置が残る。drawPhotoOverlay共通化だけでは不十分。写真翻訳はserver/photo-ocr.js経由Google Cloud Vision DOCUMENT_TEXT_DETECTIONで段落boxを得る。資料QAはweb/document-ocr.jsで端末内Tesseract/NDLOCRの行boxを得る。原文OCRが違うため描画だけ共通にしても同品質にはならない。
+既存checks/scan-translation/cropped-private-fixture.jpg（過去スクリーンショットからの切り出し、元ファイルではない）で画像を外部送信せず端末内OCRを測定。倍率1：confidence62/6つの一般語アンカー中3つ、倍率3：confidence75/6中5つ。倍率増だけで解決としない。ユーザーの過去のPDFページ画像外部送信禁止が残るため、資料QAでもGoogle Cloud Visionへ翻訳ページ画像を送って同じ認識を使ってよいか非同期質問を送信。回答が必要。未許可の画像送信・自動OCR差し替えは行っていない。今回修正済み/公開済みとは報告しない。
+
+### 2026-11-22 Cloud Visionの利用許可後
+ユーザー「送って良いです」で資料QAページ画像のGoogle Cloud Vision送信を明示許可。公開8ffb870/v285/admin304、263資材一致。スキャン翻訳は新web/document-vision-translation.js経由で/photo/recognizeと/photo/translateを共通利用。保存済みPDFから認識するため旧資料も対象。QA索引は今回変更していない。セッション内OCRをページ単位、翻訳をセグメント単位で再利用。サーバーのユーザー分離は維持。斜め撮影の段落枠は原文消去範囲を保持し訳文領域を分割。
+実資料の既存画面切り出しを私有PDF登録して公開版390/1280で確認。認識経路Vision、重なり0/欠け0/描画省略false、拡大・原文切替・全文合格。今回の試験資料削除済み。切り出しには旧UIの文字が含まれるため認識されるが新アプリのエラーではない。47組テスト、通常PDFの表/写真/罫線回帰合格。原本全体・実機Safari未確認。詳細document-vision-translation-20261122.md。
