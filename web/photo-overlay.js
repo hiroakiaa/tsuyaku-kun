@@ -32,7 +32,7 @@ export function drawPhotoOverlay(canvas,source,blocks,translated,language){
   let font=Math.min(48,Math.max(12,h*.65)),lines;
   do{ctx.font=`600 ${font}px system-ui, sans-serif`;lines=wrapPhotoText(t=>ctx.measureText(t).width,text,available);if(lines.length*font*1.25<=h-padding*2||font<=8)break;font--;}while(font>=8);
   const maxLines=Math.max(1,Math.floor((h-padding*2)/(font*1.25))),shown=lines.slice(0,maxLines);if(lines.length>maxLines){clipped=true;let last=shown.at(-1);while(last&&ctx.measureText(last+'…').width>available)last=last.slice(0,-1);shown[shown.length-1]=last+'…';}
-  const colors=photoColors(ctx,x,y,w,h);ctx.fillStyle=colors.background;ctx.fillRect(x,y,w,h);ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();ctx.fillStyle=colors.foreground;ctx.direction=/^(ar|fa|he|ur)(-|$)/.test(language)?'rtl':'ltr';ctx.textAlign=ctx.direction==='rtl'?'right':'left';shown.forEach((line,i)=>ctx.fillText(line,ctx.direction==='rtl'?x+w-padding:x+padding,y+padding+i*font*1.25));ctx.restore();
+  const colors=photoColors(ctx,x,y,w,h);ctx.fillStyle=block.highlight?'#ffe45c':colors.background;ctx.fillRect(x,y,w,h);ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();ctx.fillStyle=colors.foreground;ctx.direction=/^(ar|fa|he|ur)(-|$)/.test(language)?'rtl':'ltr';ctx.textAlign=ctx.direction==='rtl'?'right':'left';shown.forEach((line,i)=>ctx.fillText(line,ctx.direction==='rtl'?x+w-padding:x+padding,y+padding+i*font*1.25));ctx.restore();
  }
  return {clipped};
 }

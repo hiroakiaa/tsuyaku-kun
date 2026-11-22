@@ -1,5 +1,5 @@
 import {preventCompositionSubmit,documentFilename,optionalTranslationPrefetch} from './document-interaction.js';
-const DOCUMENT_RELEASE='283';
+const DOCUMENT_RELEASE='284';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -1163,6 +1163,14 @@ async function reader() {
       await page.render({canvas,viewport:renderViewport}).promise;
       await themeLegacyImageMargins(page,canvas);
       if (revision!==translationRevision) return;
+      if(items.length&&items.every(item=>item.ocr)){
+        const {installScanReadingLayout}=await import('./document-scan-reading-layout.js');
+        await installScanReadingLayout(frame,blocks,canvas,viewport.width);
+        if(revision!==translationRevision || language!==translationMode.value)return false;
+        const slot=pageList.querySelector('[data-page="'+number+'"]');if(!slot)return false;
+        installInlineTranslation(slot,frame,language);
+        content.dataset.translationPlacement=JSON.stringify({page:number,language,stage:'ready',renderer:'photo-overlay',blocks:blocks.length});return true;
+      }
       const rendered=canvas.getContext('2d');
       const scale=renderViewport.scale;
       for (const {x,top,boxHeight,width,size,line,marked,vertical,diagramText,sourceWidth,sourceHeight} of blocks) {
@@ -1258,11 +1266,6 @@ async function reader() {
       if (!slot) return false;
       if(revision!==translationRevision || language!==translationMode.value)return false;
       content.dataset.scanReadingMetrics=JSON.stringify({items:items.length,ocr:items.filter(item=>item.ocr).length,blocks:blocks.length,wide:blocks.filter(b=>(b.sourceWidth||b.width)>viewport.width*.45).length});
-      if(items.length&&items.every(item=>item.ocr)){
-        const {installScanReadingLayout}=await import('./document-scan-reading-layout.js');
-        await installScanReadingLayout(frame,blocks,canvas,viewport.width);
-        if(revision!==translationRevision || language!==translationMode.value)return false;
-      }
       installInlineTranslation(slot,frame,language);
       content.dataset.translationPlacement=JSON.stringify({page:number,language,stage:'ready',blocks:blocks.length,scanScore:result.scanAlignment?.score});
       return true;
