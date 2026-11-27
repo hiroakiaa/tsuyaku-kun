@@ -1,7 +1,8 @@
+import {answerCitations,citationOnPage} from './document-citation-state.js';
 import {processDocumentFiles,processDocumentChat} from './document-file-batch.js';
 import {nextDocumentTranslation} from './document-translation-queue.js';
 import {preventCompositionSubmit,documentFilename} from './document-interaction.js';
-const DOCUMENT_RELEASE='294';
+const DOCUMENT_RELEASE='295';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -688,6 +689,7 @@ async function reader() {
   }
   let citation;
   function citationRanges(text, sourceQuote, normalize) {
+    if(Array.isArray(sourceQuote))return sourceQuote.flatMap(quote=>citationRanges(text,quote,normalize));
     const locate = source=>{
       const literal = normalize(source);
       const quote = text.includes(literal) ? literal : literal.replaceAll('|','');
@@ -737,7 +739,7 @@ async function reader() {
     if (citation!==selected) return;
     const runs = items.filter(item=>item.str).map(item=>({item,text:normalize(item.str)}));
     const text = runs.map(run=>run.text).join('');
-    const ranges=citationRanges(text,selected.quote,normalize);
+    const ranges=citationRanges(text,selected.quotes??selected.quote,normalize);
     if (scan && !ranges.length) console.warn('Document QA: citation did not match OCR lines for page',selected.page);
     removeCitationMarks(slot);
     slot.classList.toggle('pdf-citation-page',ranges.length===0);
@@ -749,7 +751,9 @@ async function reader() {
       if (ranges.some(range=>end>range.start && offset<range.end)) {
         const {item} = run;
         const [x,y] = viewport.convertToViewportPoint(item.transform[4],item.transform[5]);
-        const mark = append(slot,'span','','pdf-citation-mark');
+        const mark = append(slot,'span','','pdf-citation-mark pdf-citation-visible');
+        mark.setAttribute('role','mark');
+        mark.setAttribute('aria-label','参照箇所：'+item.str);
         firstMark ??= mark;
         const [left,top,width,height]=item.ocrBox ?? [x/viewport.width,
           (y-item.height*viewport.scale)/viewport.height,item.width*viewport.scale/viewport.width,
@@ -1118,7 +1122,7 @@ async function reader() {
       if(result.visionLayout){
         const frame=document.createElement('div');frame.className='pdf-page-view pdf-translation-layout pdf-inline-translation';frame.lang=language;frame.dataset.page=number;
         const canvas=append(frame,'canvas','');if(!visionSourceCanvases.has(number)){visionSourceCanvases.set(number,(async()=>{const base=document.createElement('canvas'),renderViewport=page.getViewport({scale:Math.min(3,1800/Math.max(viewport.width,viewport.height))});base.width=Math.ceil(renderViewport.width);base.height=Math.ceil(renderViewport.height);await page.render({canvas:base,viewport:renderViewport}).promise;await themeLegacyImageMargins(page,base);return base;})().catch(error=>{visionSourceCanvases.delete(number);throw error;}));while(visionSourceCanvases.size>3)visionSourceCanvases.delete(visionSourceCanvases.keys().next().value);}const base=await visionSourceCanvases.get(number);canvas.width=base.width;canvas.height=base.height;canvas.getContext('2d').drawImage(base,0,0);
-        const quote=citation?.page===number?pdfComparableText(citation.quote):'',text=result.source.map(pdfComparableText).join(''),ranges=quote?citationRanges(text,citation.quote,pdfComparableText):[];let offset=0;
+        const quote=citation?.page===number?pdfComparableText(citation.quote):'',text=result.source.map(pdfComparableText).join(''),ranges=quote?citationRanges(text,citation.quotes??citation.quote,pdfComparableText):[];let offset=0;
         const {separateVisionParagraphs,expandVisionTableCells}=await import('./document-vision-translation.js');
         const blocks=separateVisionParagraphs(expandVisionTableCells(result.visionLayout,canvas)).map((block,index)=>{const start=offset;offset+=pdfComparableText(block.text).length;return {x:block.box.x*viewport.width,top:block.box.y*viewport.height,width:block.box.width*viewport.width,sourceWidth:block.box.width*viewport.width,sourceHeight:block.box.height*viewport.height,boxHeight:block.box.height*viewport.height,maskBox:block.originalBox,maximumFont:block.maximumFont,size:16,line:result.lines[index],marked:ranges.some(r=>offset>r.start&&start<r.end)};});
         const {installScanReadingLayout}=await import('./document-scan-reading-layout.js');await installScanReadingLayout(frame,blocks,canvas,viewport.width,{group:false});
@@ -1148,7 +1152,7 @@ async function reader() {
       const measuringCanvas=document.createElement('canvas');
       const context=measuringCanvas.getContext('2d');
       const unit=viewport.width/100;
-      const ranges=citation?.page===number ? result.scanAlignment?.citationRanges??citationRanges(pageText,citation.quote,normalize) : [];
+      const ranges=citation?.page===number ? result.scanAlignment?.citationRanges??citationRanges(pageText,citation.quotes??citation.quote,normalize) : [];
       let from=0;
       for (const [index,original] of result.source.entries()) {
         const needle=normalize(original);
@@ -1354,7 +1358,7 @@ async function reader() {
   function renderTranslatedPage(result,page,target=translatedPage) {
     const normalize=text=>text.normalize('NFKC').replace(/[\s|]/gu,'');
     const source=result.source?.map(normalize)??[];
-    const ranges=citation?.page===page ? citationRanges(source.join(''),citation.quote,normalize) : [];
+    const ranges=citation?.page===page ? citationRanges(source.join(''),citation.quotes??citation.quote,normalize) : [];
     if (!ranges.length || !Array.isArray(result.lines) || result.lines.length!==source.length) {
       target.textContent=result.text || result.lines?.join('\n') || 'このページに翻訳できる文字はありません。';
       return;
@@ -1604,6 +1608,7 @@ async function reader() {
       const index = pageViews.findIndex(slot => slot.getBoundingClientRect().bottom > top+preview.clientHeight*.35);
       if (index < 0 || selectedPage===index+1) return;
       selectedPage = index+1;
+      if(citationSequence.length){citation=citationOnPage(citationSequence,selectedPage);const slot=pageViews[index];void getOriginalPdf().then(pdf=>pdf.getPage(selectedPage)).then(page=>highlightCitation(slot,page,page.getViewport({scale:1}))).catch(()=>{});}
       readingPosition(id,{page:selectedPage});
       syncContentsPage();
       pagePicker.value = selectedPage;
@@ -1616,6 +1621,7 @@ async function reader() {
   async function showPdf(n) {
     if (n<1 || n>doc.pageCount) return;
     selectedPage = n;
+    if(citationSequence.length)citation=citationOnPage(citationSequence,n);
     const qualityNotice=$('#pdf-reading-quality');
     const uncertain=doc.readingQuality?.find(item=>item.page===n&&(item.status==='uncertain'||item.unresolvedNumbers>0));
     qualityNotice.hidden=!uncertain;
@@ -1751,7 +1757,7 @@ async function reader() {
     if (!citationSequence[index]) return;
     clearCitation(true);
     citationIndex=index;
-    citation=citationSequence[index];
+    citation=citationOnPage(citationSequence,citationSequence[index].page);
     citationNavigation.hidden=citationSequence.length<2;
     citationPrevious.disabled=index===0;
     citationNext.disabled=index===citationSequence.length-1;
@@ -2003,6 +2009,8 @@ async function reader() {
     if (entry.interrupted) append(answer,'p','回答は途中までです。','fine');
     lastQuestion = entry.items.at(-1)?.worksheetContext ?? entry.question;
   }
+  citationSequence=answerCitations(history.at(-1)?.items??[],doc.pageCount);
+  citation=citationOnPage(citationSequence,selectedPage);
   installDocumentFirstHelp(askForm,{hasConversation:history.length>0});
   const conversationLog=$('#messages'),scrollKey=historyKey+':scroll';
   let scrollSaveTimer;
@@ -2086,7 +2094,8 @@ async function reader() {
           try { sessionStorage.setItem(historyKey,JSON.stringify(history)); } catch {}
           status.textContent = '';
           measureAnswer('first-grounded-answer');
-          citation=item.evidence[0];
+          citationSequence=answerCitations(entry.items,doc.pageCount);
+          citation=citationOnPage(citationSequence,citationSequence[0]?.page);
           if (wide.matches || dialog.open) void showPdf(citation.page);
           return;
         }
@@ -2172,10 +2181,12 @@ async function reader() {
         if (item.answer && !entry.items.some(previous=>previous.answer)) measureAnswer('first-grounded-answer');
         entry.items.push(item);
         saveEntry();
-        const evidence = item.evidence?.find(source=>source.page>=1 && source.page<=doc.pageCount && source.quote);
+        citationSequence=answerCitations(entry.items,doc.pageCount);
+        const evidence = citationSequence[0];
+        if(followedCitation && (wide.matches || dialog.open)) void showPdf(selectedPage);
         if (!followedCitation && evidence && sourceType==='pdf') {
           followedCitation = true;
-          citation = {page:evidence.page,quote:evidence.quote};
+          citation = citationOnPage(citationSequence,evidence.page);
           if (wide.matches || dialog.open) void showPdf(evidence.page);
         }
         if (first) answer.scrollIntoView({behavior:scrollBehavior(),block:'start'});
