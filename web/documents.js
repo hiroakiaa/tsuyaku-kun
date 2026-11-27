@@ -2,7 +2,7 @@ import {answerCitations,citationOnPage} from './document-citation-state.js';
 import {processDocumentFiles,processDocumentChat} from './document-file-batch.js';
 import {nextDocumentTranslation} from './document-translation-queue.js';
 import {preventCompositionSubmit,documentFilename} from './document-interaction.js';
-const DOCUMENT_RELEASE='300';
+const DOCUMENT_RELEASE='301';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -1442,11 +1442,14 @@ async function reader() {
   const questionInput = $('#question');
   window.addEventListener('resize',()=>requestAnimationFrame(syncKeyboard));
   window.addEventListener('orientationchange',()=>requestAnimationFrame(syncKeyboard));
+  let keyboardLayoutHeight=window.innerHeight;
   function syncKeyboard() {
     const frameBounds = frame?.getBoundingClientRect();
     const layoutHeight = frameBounds?.height ?? window.innerHeight;
-    const keyboard = document.activeElement === questionInput && !wide.matches &&
-      viewport && layoutHeight - viewport.height > 90;
+    const focused=document.activeElement===questionInput;
+    if(!focused)keyboardLayoutHeight=Math.max(layoutHeight,viewport?.height??0);
+    const keyboard = focused && !wide.matches &&
+      viewport && Math.max(layoutHeight,keyboardLayoutHeight) - viewport.height > 90;
     workspace.classList.toggle('qa-keyboard', Boolean(keyboard));
     if (!keyboard) {
       askDialog.style.removeProperty('--qa-visible-top');
@@ -1456,7 +1459,7 @@ async function reader() {
     // Safari can pan the visual viewport when the keyboard focuses an input.
     const frameTop = frameBounds?.top ?? 0;
     const top = Math.max(0, viewport.offsetTop - frameTop);
-    const bottom = Math.min(layoutHeight, viewport.offsetTop + viewport.height - frameTop);
+    const bottom = Math.min(Math.max(layoutHeight,keyboardLayoutHeight), viewport.offsetTop + viewport.height - frameTop);
     askDialog.style.setProperty('--qa-visible-top',top+'px');
     askDialog.style.setProperty('--qa-visible-height',Math.max(0,bottom-top)+'px');
   }
