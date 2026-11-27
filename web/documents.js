@@ -2,7 +2,7 @@ import {answerCitations,citationOnPage} from './document-citation-state.js';
 import {processDocumentFiles,processDocumentChat} from './document-file-batch.js';
 import {nextDocumentTranslation} from './document-translation-queue.js';
 import {preventCompositionSubmit,documentFilename} from './document-interaction.js';
-const DOCUMENT_RELEASE='301';
+const DOCUMENT_RELEASE='302';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -1442,15 +1442,16 @@ async function reader() {
   const questionInput = $('#question');
   window.addEventListener('resize',()=>requestAnimationFrame(syncKeyboard));
   window.addEventListener('orientationchange',()=>requestAnimationFrame(syncKeyboard));
-  let keyboardLayoutHeight=window.innerHeight;
+  let keyboardLayoutHeight=window.innerHeight,keyboardWasOpen=false;
   function syncKeyboard() {
     const frameBounds = frame?.getBoundingClientRect();
     const layoutHeight = frameBounds?.height ?? window.innerHeight;
     const focused=document.activeElement===questionInput;
-    if(!focused)keyboardLayoutHeight=Math.max(layoutHeight,viewport?.height??0);
-    const keyboard = focused && !wide.matches &&
+    if(!focused&&!keyboardWasOpen)keyboardLayoutHeight=Math.max(layoutHeight,viewport?.height??0);
+    const keyboard = (focused||keyboardWasOpen) && !wide.matches &&
       viewport && Math.max(layoutHeight,keyboardLayoutHeight) - viewport.height > 90;
-    workspace.classList.toggle('qa-keyboard', Boolean(keyboard));
+    keyboardWasOpen=Boolean(keyboard);
+    workspace.classList.toggle('qa-keyboard', keyboardWasOpen);
     if (!keyboard) {
       askDialog.style.removeProperty('--qa-visible-top');
       askDialog.style.removeProperty('--qa-visible-height');
