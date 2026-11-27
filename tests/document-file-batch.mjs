@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {processDocumentFiles} from '../web/document-file-batch.js';
+const files=['first.pdf','failure.docx','last.xlsx'].map(name=>({name,size:100}));
+let active=0,maxActive=0;const seen=[];
+const result=await processDocumentFiles(files,async(file,index)=>{seen.push([file.name,index]);maxActive=Math.max(maxActive,++active);await new Promise(resolve=>setTimeout(resolve,5));active--;if(index===1)throw Error('upload failed');return 'id-'+index;});
+assert.equal(maxActive,1);assert.deepEqual(seen,files.map((f,i)=>[f.name,i]));assert.deepEqual(result.successes.map(r=>r.value),['id-0','id-2']);assert.equal(result.errors[0].file.name,'failure.docx');
+let calls=0;const validation=await processDocumentFiles([{name:'huge.pdf',size:5000001},{name:'empty.pdf',size:0},{name:'bad.exe',size:5},{name:'ok.PDF',size:5000000}],async()=>++calls);
+assert.equal(calls,1);assert.equal(validation.errors.length,3);assert.equal(validation.successes.length,1);
+const html=await fs.readFile('documents.html','utf8');assert.match(html,/name="pdf"[^>]*multiple required/);assert.match(html,/name="file"[^>]*multiple required/);assert.doesNotMatch(html.match(/<form id="replace-pdf"[\s\S]*?<\/form>/)[0],/multiple/);
+console.log('PASS sequential mixed-file registration, per-file validation, partial failures, no retries, both multi-select controls, single replacement');

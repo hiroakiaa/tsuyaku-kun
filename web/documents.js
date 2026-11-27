@@ -1,6 +1,7 @@
+import {processDocumentFiles} from './document-file-batch.js';
 import {nextDocumentTranslation} from './document-translation-queue.js';
 import {preventCompositionSubmit,documentFilename} from './document-interaction.js';
-const DOCUMENT_RELEASE='291';
+const DOCUMENT_RELEASE='292';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -266,7 +267,7 @@ function teacher() {
     const file = fileInput.files[0];
     preflight = undefined;
     status.textContent = '';
-    if (!file || !/\.pdf$/i.test(file.name) || file.size>5000000) return;
+    if (fileInput.files.length!==1 || !file || !/\.pdf$/i.test(file.name) || file.size>5000000) return;
     const progress = document.createElement('span');
     const pending = extract(file,progress).then(pages=>({pages}),error=>({error}));
     preflight = {file,pending};
@@ -281,11 +282,12 @@ function teacher() {
   $('#upload').addEventListener('submit',async event=>{
     event.preventDefault();
     const button = event.submitter;
-    const data = new FormData(event.currentTarget);
-    const file = data.get('pdf');
-    data.set('title',automaticDocumentTitle(file.name));
-    if (file.size > 5000000) { status.textContent = 'PDFは5 MBまでです。'; return; }
-    if (data.get('visibility')==='shared' && !window.confirm('共通保管庫では誰でも閲覧できます。\n公開するファイル：'+file.name+'\nこの資料を公開しますか？')) return;
+    if ($('#upload button').disabled) return;
+    const baseData = new FormData(event.currentTarget);
+    const files = Array.from(fileInput.files);
+    if (!files.length) return;
+    if (baseData.get('visibility')==='shared' && !window.confirm('共通保管庫では誰でも閲覧できます。\n公開するファイル：\n'+files.map(file=>file.name).join('\n')+'\nこれらの資料を公開しますか？')) return;
+    fileInput.disabled = true;
     button.disabled = true;
     $('#result').hidden = true;
     button.setAttribute('aria-busy','true');
@@ -293,8 +295,14 @@ function teacher() {
     status.textContent = '';
     estimate.hidden = false;
     try {
+      const outcome = await processDocumentFiles(files, async (file,index) => {
+      status.textContent = (index+1)+' / '+files.length+' 件目を登録しています：'+file.name;
+      const data = new FormData();
+      for (const [key,value] of baseData) if (key!=='pdf') data.append(key,value);
+      data.set('pdf',file);
+      data.set('title',automaticDocumentTitle(file.name));
       if (/\.pdf$/i.test(file.name)) {
-        const {pages,error} = await (preflight?.file===fileInput.files[0] ? preflight.pending : preparePdf(file));
+        const {pages,error} = await (preflight?.file===file ? preflight.pending : preparePdf(file));
         if (error) throw error;
         data.set('pages',JSON.stringify(pages));
         data.set('readingQuality',JSON.stringify(pages.readingQuality??[]));
@@ -317,6 +325,12 @@ function teacher() {
       }).finally(()=>clearTimeout(deadline));
       const shared = data.get('visibility')==='shared';
       saveGuide({id:createdId,title:String(data.get('title')).trim(),createdAt,shared});
+      return createdId;
+      });
+      fileInput.value = ''; preflight = undefined;
+      status.textContent = outcome.successes.length+'件を登録しました。'+(outcome.errors.length ? ' 登録できなかった資料：'+outcome.errors.map(item=>item.file.name+'（'+item.error.message+'）').join('、')+'。再度選択してお試しください。' : ' 保管庫から各資料を開けます。');
+      if(files.length!==1 || outcome.errors.length) return;
+      const createdId = outcome.successes[0].value;
       status.textContent='資料を開いています…';estimate.hidden=true;
       if(!reducedDocumentMotion())await content.animate([{opacity:1},{opacity:0}],{duration:150,easing:'ease-out'}).finished;
       id=createdId;const next=new URL(location.href);next.searchParams.delete('create');next.searchParams.delete('library');next.searchParams.set('id',id);history.replaceState(null,'',next);
@@ -326,6 +340,7 @@ function teacher() {
     } finally {
       estimate.hidden = true;
       button.removeAttribute('aria-busy');
+      fileInput.disabled = false;
       button.querySelector('span').textContent = '作成する';
       button.disabled = false;
     }
@@ -1794,11 +1809,16 @@ async function reader() {
     event.preventDefault();
     const button = event.submitter;
     const status = $('#material-status');
-    const file = new FormData(addForm).get('file');
+    if (button.disabled) return;
+    const input = addForm.elements.file;
+    const files = Array.from(input.files);
+    if (!files.length) return;
+    input.disabled = true;
     button.disabled = true;
     status.textContent = '追加資料を読み込んでいます…';
     try {
-      if (file.size>5000000) throw Error('追加資料は5 MBまでです。');
+      const outcome = await processDocumentFiles(files, async (file,index) => {
+      status.textContent = (index+1)+' / '+files.length+' 件目を追加しています：'+file.name;
       const form = new FormData();
       let upload = file;
       if (/\.(png|jpe?g|webp)$/i.test(file.name)) {
@@ -1814,10 +1834,12 @@ async function reader() {
       const material = await request(api+'/material',{method:'POST',body:form});
       materials.push(material);
       listMaterial(material);
+      return material;
+      });
       addForm.reset();
-      status.textContent = '追加しました。質問に使用できます。';
+      status.textContent = outcome.successes.length+'件を追加しました。質問に使用できます。'+(outcome.errors.length ? ' 追加できなかった資料：'+outcome.errors.map(item=>item.file.name+'（'+item.error.message+'）').join('、')+'。再度選択してお試しください。' : '');
     } catch(error) { status.textContent = error.message; }
-    finally { button.disabled = false; }
+    finally { button.disabled = false; input.disabled = false; }
   };
   const status = $('#answer-status');
   const remove = document.querySelector('#remove-guide');
