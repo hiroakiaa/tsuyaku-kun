@@ -1,7 +1,7 @@
 import {processDocumentFiles,processDocumentChat} from './document-file-batch.js';
 import {nextDocumentTranslation} from './document-translation-queue.js';
 import {preventCompositionSubmit,documentFilename} from './document-interaction.js';
-const DOCUMENT_RELEASE='293';
+const DOCUMENT_RELEASE='294';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -312,19 +312,30 @@ function teacher() {
     status.textContent = '';
     estimate.hidden = false;
     try {
-      const outcome = await processDocumentChat(files, async (file,index) => {
+      let bundle;
+      if(files.length>1){
+        const {combineChatFiles}=await import('./document-chat-bundle.js');
+        bundle=await combineChatFiles(files,async file=>{
+          if(/\.pdf$/i.test(file.name)){const {pages,error}=await preparePdf(file);if(error)throw error;return {file,pages};}
+          const {convertDocument}=await import('./document-convert.js?v=95');
+          const converted=await convertDocument(file);
+          return {file:converted.file,pages:converted.image?await extract(converted.file,document.createElement('span')):converted.pages};
+        },(file,index)=>{status.textContent=(index+1)+' / '+files.length+' 件目を読み込んでいます：'+file.name;});
+      }
+      const registerDocument = async (file,index) => {
       status.textContent = (index+1)+' / '+files.length+' 件目を登録しています：'+file.name;
       const data = new FormData();
       for (const [key,value] of baseData) if (key!=='pdf') data.append(key,value);
-      data.set('pdf',file);
-      data.set('title',automaticDocumentTitle(file.name));
-      if (/\.pdf$/i.test(file.name)) {
+      data.set('pdf',bundle?.file??file);
+      data.set('title',automaticDocumentTitle(files[0].name)+(bundle?' ほか'+(files.length-1)+'資料':''));
+      if(bundle){data.set('converted','1');data.set('pages',JSON.stringify(bundle.pages));data.set('readingQuality',JSON.stringify(bundle.pages.readingQuality));}
+      if (!bundle && /\.pdf$/i.test(file.name)) {
         const {pages,error} = await (preflight?.file===file ? preflight.pending : preparePdf(file));
         if (error) throw error;
         data.set('pages',JSON.stringify(pages));
         data.set('readingQuality',JSON.stringify(pages.readingQuality??[]));
       }
-      if (!/\.pdf$/i.test(file.name)) {
+      if (!bundle && !/\.pdf$/i.test(file.name)) {
         const {convertDocument}=await import('./document-convert.js?v=95');
         const converted=await convertDocument(file);
         data.set('pdf',converted.file);
@@ -343,10 +354,10 @@ function teacher() {
       const shared = data.get('visibility')==='shared';
       saveGuide({id:createdId,title:String(data.get('title')).trim(),createdAt,shared});
       return createdId;
-      }, (chatId,file,index)=>{
-        status.textContent=(index+1)+" / "+files.length+" 件目を同じチャットに追加しています："+file.name;
-        return appendChatMaterial(chatId,file,status);
-      });
+      };
+      let outcome;
+      if(bundle){const chatId=await registerDocument(bundle.file,0);outcome={chatId,successes:[{file:bundle.file,value:chatId}],errors:[]};}
+      else outcome=await processDocumentChat(files,registerDocument,(chatId,file)=>appendChatMaterial(chatId,file,status));
       fileInput.value = ''; preflight = undefined;
       status.textContent = outcome.successes.length+'件を登録しました。'+(outcome.errors.length ? ' 登録できなかった資料：'+outcome.errors.map(item=>item.file.name+'（'+item.error.message+'）').join('、')+'。再度選択してお試しください。' : ' 1つのチャットで質問できます。');
       if(!outcome.chatId) return;
@@ -355,7 +366,7 @@ function teacher() {
       if(!reducedDocumentMotion())await content.animate([{opacity:1},{opacity:0}],{duration:150,easing:'ease-out'}).finished;
       id=createdId;const next=new URL(location.href);next.searchParams.delete('create');next.searchParams.delete('library');next.searchParams.set('id',id);history.replaceState(null,'',next);
       await reader();
-      const batchNotice=append($('#content'),'p',outcome.successes.length+'件の資料を1つのチャットに登録しました。'+(outcome.errors.length?' 登録できなかった資料：'+outcome.errors.map(item=>item.file.name+'（'+item.error.message+'）').join('、')+'。資料追加から再度選択してください。':''),'fine');
+      const batchNotice=append($('#content'),'p',(bundle?files.length:outcome.successes.length)+'件の資料を1つのチャットに登録しました。'+(outcome.errors.length?' 登録できなかった資料：'+outcome.errors.map(item=>item.file.name+'（'+item.error.message+'）').join('、')+'。資料追加から再度選択してください。':''),'fine');
       batchNotice.setAttribute('role','status');
     } catch (error) {
       status.textContent = error.message;
