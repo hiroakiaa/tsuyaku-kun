@@ -69,6 +69,20 @@ jobs:
           npm install --no-save --package-lock=false playwright@1.61.0
           npx playwright install --with-deps chromium
           sudo apt-get install -y fonts-noto-cjk
+      - name: Verify mobile keyboard context with controlled viewport
+        env:
+          LIVE_KEYBOARD: '1'
+        run: |
+          node tools/check-document-mobile-keyboard.mjs
+          EMBEDDED_KEYBOARD=1 node tools/check-document-mobile-keyboard.mjs
+          EMBEDDED_KEYBOARD=1 EMBEDDED_RESIZE_FRAME=1 node tools/check-document-mobile-keyboard.mjs
+      - name: Save mobile keyboard screenshots
+        if: ${{ !cancelled() && steps.document_browser.outcome == 'success' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: document-mobile-keyboard
+          path: checks/mobile-keyboard/*.png
+          if-no-files-found: warn
       - name: Verify marker contrast on colored backgrounds
         run: node tools/smoke-marker-contrast.mjs
       - name: Save marker contrast screenshot
