@@ -155,9 +155,10 @@ dialog [tabindex="-1"][autofocus]:focus {
   content: "";
   position: absolute;
   inset: 0;
-  background: var(--pdf-citation-yellow);
-  mix-blend-mode: multiply;
-  transform: scaleX(0);
+  background: rgba(255, 220, 40, .52) !important;
+  box-shadow: inset 0 -2px 0 #e8b900;
+  mix-blend-mode: normal;
+  transform: scaleX(1);
   transform-origin: left center;
   transition: transform .55s ease-out;
 }
