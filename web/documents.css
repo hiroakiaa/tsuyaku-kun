@@ -156,7 +156,7 @@ dialog [tabindex="-1"][autofocus]:focus {
   position: absolute;
   inset: 0;
   background: rgba(255, 220, 40, .52) !important;
-  box-shadow: inset 0 -2px 0 #e8b900;
+  box-shadow: inset 0 -2px 0 #202020, 0 0 0 1px #202020, 0 0 0 2px #fff;
   mix-blend-mode: normal;
   transform: scaleX(1);
   transform-origin: left center;
@@ -693,3 +693,8 @@ dialog.panel{margin:auto;box-sizing:border-box;max-width:calc(100vw - 1.5rem);ma
 .pdf-source-link .local-icon{width:1.2em;height:1.2em;flex:none}
 .pdf-source-link:hover{opacity:.8}
 .pdf-source-link:focus-visible{outline:2px solid currentColor;outline-offset:4px}
+
+/* Two-tone boundaries remain distinguishable even on yellow, white or dark source pages. */
+.pdf-translated-citation{box-shadow:inset 0 -2px 0 #202020,0 0 0 1px #202020,0 0 0 2px #fff}
+.pdf-citation-page{box-shadow:0 0 0 1px #202020,0 0 0 3px #fff}
+@media (forced-colors:active){.pdf-citation-mark::after{background:transparent!important;outline:2px solid Highlight;box-shadow:none}.pdf-translated-citation{outline:2px solid Highlight}}
