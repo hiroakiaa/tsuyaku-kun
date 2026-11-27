@@ -1,8 +1,8 @@
-import {answerCitations,citationOnPage} from './document-citation-state.js';
+import {answerCitations,citationOnPage,citationRanges} from './document-citation-state.js';
 import {processDocumentFiles,processDocumentChat} from './document-file-batch.js';
 import {nextDocumentTranslation} from './document-translation-queue.js';
 import {preventCompositionSubmit,documentFilename} from './document-interaction.js';
-const DOCUMENT_RELEASE='305';
+const DOCUMENT_RELEASE='306';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -688,21 +688,17 @@ async function reader() {
     }
   }
   let citation;
-  function citationRanges(text, sourceQuote, normalize) {
-    if(Array.isArray(sourceQuote))return sourceQuote.flatMap(quote=>citationRanges(text,quote,normalize));
-    const locate = source=>{
-      const literal = normalize(source);
-      const quote = text.includes(literal) ? literal : literal.replaceAll('|','');
-      const start = quote ? text.indexOf(quote) : -1;
-      if (start<0 || text.indexOf(quote,start+1)>=0) return null;
-      return {start,end:start+quote.length};
-    };
-    const whole = locate(sourceQuote);
-    return whole ? [whole] : sourceQuote.split(/\n|\s\|\s/u)
-      .filter(fragment=>normalize(fragment).length>=8)
-      .map(locate).filter(Boolean);
+  const scanLayouts=new Map(),canonicalLayouts=new Map();
+  async function canonicalCitationRuns(page,items=[]){
+    const number=page.pageNumber;
+    if(!canonicalLayouts.has(number))canonicalLayouts.set(number,(async()=>{
+      const {createPdfOcr}=await import('./document-ocr.js?v=120');
+      const reader=await createPdfOcr((await pdfLibrary()).OPS);
+      try{return await (reader.readCanonicalLayout?.(page,items)??reader.readLayout(page,items));}
+      finally{await reader.close();}
+    })().catch(error=>{canonicalLayouts.delete(number);throw error;}));
+    const runs=await canonicalLayouts.get(number);if(!runs.length)canonicalLayouts.delete(number);return runs;
   }
-  const scanLayouts=new Map();
   async function pageTextRuns(page) {
     const {items}=await readPdfPageText(page);
     content.dataset.pdfTextTimings=JSON.stringify(Object.fromEntries(['extraction','reuse'].map(stage=>[
@@ -715,19 +711,8 @@ async function reader() {
       scanLayouts.set(number,(async()=>{
         try{const loader=await getVisionTranslation();const recognized=await loader.recognize(number);const {visionCitationRuns}=await import('./document-citation-layout.js');const shared=visionCitationRuns(recognized,page.getViewport({scale:1}));if(shared?.length){content.dataset.citationLayoutSource='shared-vision';return shared;}}catch{}
         content.dataset.citationLayoutSource='canonical-fallback';
-        const {createPdfOcr}=await import('./document-ocr.js?v=120');
-        const reader=await createPdfOcr((await pdfLibrary()).OPS);
-        try {
-          const runs=await (reader.readCanonicalLayout?.(page,pageNumberOnly ? items : [])??reader.readLayout(page,pageNumberOnly ? items : []));
-          if (!runs.length){scanLayouts.delete(number);console.warn('Document QA: no OCR line boxes for PDF page',number);}
-          return runs;
-        }
-        finally { await reader.close(); }
-      })().catch(()=>{
-        console.warn('Document QA: scan layout recognition failed for PDF page',number);
-        scanLayouts.delete(number);
-        return [];
-      }));
+        return canonicalCitationRuns(page,pageNumberOnly ? items : []);
+      })().catch(()=>{scanLayouts.delete(number);return [];}));
     }
     const runs=await scanLayouts.get(number);
     return runs.length ? runs : items;
@@ -736,13 +721,17 @@ async function reader() {
     const selected = citation;
     if (!selected || selected.page!==Number(slot.dataset.page)) return;
     const citationKey=JSON.stringify([selected.page,selected.quotes??selected.quote]);if(slot.dataset.citationKey===citationKey&&slot.querySelector('.pdf-citation-mark'))return;
-    const items = await pageTextRuns(page);
+    let items = await pageTextRuns(page);
     const scan = items.some(item=>item.ocr);
     const normalize = text=>text.normalize('NFKC').replace(scan ? /[\s、。]+/gu : /\s+/gu,'');
     if (citation!==selected) return;
-    const runs = items.filter(item=>item.str).map(item=>({item,text:normalize(item.str)}));
-    const text = runs.map(run=>run.text).join('');
-    const ranges=citationRanges(text,selected.quotes??selected.quote,normalize);
+    let runs = items.filter(item=>item.str).map(item=>({item,text:normalize(item.str)}));
+    let text = runs.map(run=>run.text).join('');
+    let ranges=citationRanges(text,selected.quotes??selected.quote,normalize);
+    if(scan&&!ranges.length){
+      try{const recovered=await canonicalCitationRuns(page);const candidate=recovered.filter(item=>item.str).map(item=>({item,text:normalize(item.str)})),matched=citationRanges(candidate.map(run=>run.text).join(''),selected.quotes??selected.quote,normalize);if(matched.length){runs=candidate;ranges=matched;content.dataset.citationLayoutSource='canonical-fallback';}}catch{}
+      if(citation!==selected)return;
+    }
     if (scan && !ranges.length) console.warn('Document QA: citation did not match OCR lines for page',selected.page);
     removeCitationMarks(slot);
     slot.classList.toggle('pdf-citation-page',ranges.length===0);
