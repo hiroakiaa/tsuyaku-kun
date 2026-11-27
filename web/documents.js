@@ -2,7 +2,7 @@ import {answerCitations,citationOnPage} from './document-citation-state.js';
 import {processDocumentFiles,processDocumentChat} from './document-file-batch.js';
 import {nextDocumentTranslation} from './document-translation-queue.js';
 import {preventCompositionSubmit,documentFilename} from './document-interaction.js';
-const DOCUMENT_RELEASE='299';
+const DOCUMENT_RELEASE='300';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -1856,15 +1856,15 @@ async function reader() {
     button.disabled = true;
     status.textContent = '追加資料を読み込んでいます…';
     try {
-      const outcome = await processDocumentFiles(files, async (file,index) => {
-      status.textContent = (index+1)+' / '+files.length+' 件目を追加しています：'+file.name;
-      const material = await appendChatMaterial(id,file,status);
-      materials.push(material);
-      listMaterial(material);
-      return material;
-      });
-      addForm.reset();
-      status.textContent = outcome.successes.length+'件を追加しました。質問に使用できます。'+(outcome.errors.length ? ' 追加できなかった資料：'+outcome.errors.map(item=>item.file.name+'（'+item.error.message+'）').join('、')+'。再度選択してお試しください。' : '');
+      if(materials.length+files.length>8)throw Error('追加資料は合計8件までです。');
+      const {appendDocumentBundle}=await import('./document-append-bundle.js');
+      const basePages=await request(api+'/text');basePages.readingQuality=doc.readingQuality;
+      const bundle=await appendDocumentBundle(await(await getOriginalPdf()).getData(),basePages,files,async file=>{
+        if(/\.pdf$/i.test(file.name))return {file,pages:await extract(file,status)};
+        const {convertDocument}=await import('./document-convert.js?v=95'),converted=await convertDocument(file);return {file:converted.file,pages:converted.image?await extract(converted.file,status):converted.pages};
+      },(file,index)=>{status.textContent=(index+1)+' / '+files.length+' 件目を読み込んでいます：'+file.name;});
+      const data=new FormData();data.set('pdf',bundle.file);data.set('pages',JSON.stringify(bundle.pages));data.set('sources',JSON.stringify(bundle.sources));data.set('readingQuality',JSON.stringify(bundle.pages.readingQuality));data.set('revision',String(doc.revision??0));status.textContent='PDFと本文をまとめて保存しています…';
+      const updated=await request(api+'/append',{method:'POST',body:data});try{const previous='document-qa-questions:'+id+(doc.revision?':'+doc.revision:''),next='document-qa-questions:'+id+':'+updated.revision;const saved=sessionStorage.getItem(previous);if(saved)sessionStorage.setItem(next,saved);const scroll=sessionStorage.getItem(previous+':scroll');if(scroll!==null)sessionStorage.setItem(next+':scroll',scroll);}catch{}readingPosition(id,{page:updated.start});addForm.reset();$('#material-dialog').close();location.reload();
     } catch(error) { status.textContent = error.message; }
     finally { button.disabled = false; input.disabled = false; }
   };

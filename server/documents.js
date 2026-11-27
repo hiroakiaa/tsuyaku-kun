@@ -1,3 +1,4 @@
+import {appendDocumentStorage} from './document-append.js';
 import {fastDocumentLines} from './document-fast-translation.js';
 import {photoReuseOperation} from './photo-reuse.js';
 import {catalog as documentPhotoCatalog} from './catalog.js';
@@ -962,7 +963,7 @@ export async function documents(request,env,auth,photoCatalog=documentPhotoCatal
     queueSummary(env,target);
     return reply({id,createdAt},201);
   }
-  const match = /^\/documents\/([a-f0-9-]{36})(?:\/(pdf|ask|remove|replace|material|toc|text|translate|summary|title|vision))?$/.exec(pathname);
+  const match = /^\/documents\/([a-f0-9-]{36})(?:\/(pdf|ask|remove|replace|append|material|toc|text|translate|summary|title|vision))?$/.exec(pathname);
   if (!match) return fail('資料が見つかりません。',404);
   const [,id,action] = match;
   const target = env.ROOMS.get(env.ROOMS.idFromName('document:'+id));
@@ -973,6 +974,13 @@ export async function documents(request,env,auth,photoCatalog=documentPhotoCatal
     const saved=await target.fetch('https://room/document/title',{method:'POST',body:JSON.stringify({owner:auth.uid,title})});if(!saved.ok)return saved;const result=await saved.json();
     if(result.visibility==='shared'){const listed=await library.fetch('https://room/document/library',{method:'POST',body:JSON.stringify({id,title,createdAt:result.createdAt})});if(!listed.ok)return fail('共通保管庫の資料名を更新できませんでした。もう一度保存してください。',502);}
     return reply({title});
+  }
+  if(action==='append'&&request.method==='POST'){
+    const owner=await target.fetch('https://room/document/owner',{method:'POST',body:auth.uid});if(!owner.ok)return owner;
+    if(!request.body)return fail('追加資料を選んでください。');const reader=request.body.getReader(),chunks=[];let size=0;try{for(;;){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>22000000){await reader.cancel();return fail('統合資料が大きすぎます。',413);}chunks.push(value);}}finally{reader.releaseLock();}
+    const form=await new Response(new Blob(chunks),{headers:{'Content-Type':request.headers.get('Content-Type')||''}}).formData(),pdf=form.get('pdf');if(!(pdf instanceof File)||!pdf.size||pdf.size>20000000||await pdf.slice(0,5).text()!=='%PDF-')return fail('統合PDFを確認してください。',400);
+    let pages,sources;try{pages=JSON.parse(form.get('pages'));sources=JSON.parse(form.get('sources'));}catch{return fail('追加資料を確認してください。',400);}if(!Array.isArray(pages)||pages.length>160||pages.some(p=>typeof p!=='string')||pages.join('').length>150000)return fail('統合資料の上限を確認してください。',413);
+    const data=new FormData();data.set('pdf',pdf);data.set('record',JSON.stringify({owner:auth.uid,revision:Number(form.get('revision')),pages,sources,readingQuality:validatedReadingQuality(form.get('readingQuality'),pages.length)}));const result=await target.fetch('https://room/document/append',{method:'POST',body:data});if(result.ok)queueSummary(env,target);return result;
   }
   if (action==='replace' && request.method==='POST') {
     const owner = await target.fetch('https://room/document/owner',{method:'POST',body:auth.uid});
@@ -1679,6 +1687,7 @@ export async function documentStorage(request,storage,env) {
     });
     return reply({ok:true});
   }
+  if(path==='/document/append'&&request.method==='POST'){const form=await request.formData();return appendDocumentStorage(storage,JSON.parse(form.get('record')),new Uint8Array(await form.get('pdf').arrayBuffer()));}
   if (path==='/document/replace' && request.method==='POST') {
     if (record.textParts) return fail('本文が大きい資料の差し替えは新規作成から行ってください。',409);
     const form = await request.formData();
