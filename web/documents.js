@@ -2,7 +2,7 @@ import {answerCitations,citationOnPage} from './document-citation-state.js';
 import {processDocumentFiles,processDocumentChat} from './document-file-batch.js';
 import {nextDocumentTranslation} from './document-translation-queue.js';
 import {preventCompositionSubmit,documentFilename} from './document-interaction.js';
-const DOCUMENT_RELEASE='303';
+const DOCUMENT_RELEASE='304';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -730,9 +730,10 @@ async function reader() {
     const runs=await scanLayouts.get(number);
     return runs.length ? runs : items;
   }
-  async function highlightCitation(slot,page,viewport) {
+  async function highlightCitation(slot,page,viewport,{scroll=true,defer=false}={}) {
     const selected = citation;
     if (!selected || selected.page!==Number(slot.dataset.page)) return;
+    const citationKey=JSON.stringify([selected.page,selected.quotes??selected.quote]);if(slot.dataset.citationKey===citationKey&&slot.querySelector('.pdf-citation-mark'))return;
     const items = await pageTextRuns(page);
     const scan = items.some(item=>item.ocr);
     const normalize = text=>text.normalize('NFKC').replace(scan ? /[\s、。]+/gu : /\s+/gu,'');
@@ -744,6 +745,7 @@ async function reader() {
     removeCitationMarks(slot);
     slot.classList.toggle('pdf-citation-page',ranges.length===0);
     if (!ranges.length) return;
+    slot.dataset.citationKey=citationKey;
     let offset = 0;
     let firstMark;
     for (const run of runs) {
@@ -751,7 +753,7 @@ async function reader() {
       if (ranges.some(range=>end>range.start && offset<range.end)) {
         const {item} = run;
         const [x,y] = viewport.convertToViewportPoint(item.transform[4],item.transform[5]);
-        const mark = append(slot,'span','','pdf-citation-mark pdf-citation-visible');
+        const mark = append(slot,'span','','pdf-citation-mark pdf-citation-visible'+(defer?' pdf-citation-pending':''));
         mark.setAttribute('role','mark');
         mark.setAttribute('aria-label','参照箇所：'+item.str);
         firstMark ??= mark;
@@ -766,7 +768,7 @@ async function reader() {
       }
       offset = end;
     }
-    if (firstMark && dialog.open && selectedPage===selected.page) {
+    if (scroll && firstMark && dialog.open && selectedPage===selected.page) {
       preview.scrollTo({top:preview.scrollTop + firstMark.getBoundingClientRect().top - preview.getBoundingClientRect().top - preview.clientHeight*.25,behavior:scrollBehavior()});
     }
   }
@@ -779,6 +781,7 @@ async function reader() {
     })().catch(()=>null));
     paintImageFrame(canvas,await imageFrames.get(page),getComputedStyle(document.body).backgroundColor);
   }
+  let pendingCitationPage=0,pageNavigation=0;
   const pageRenderTasks=new WeakMap();
   function renderPage(slot){
     if(slot.querySelector('.pdf-original-canvas'))return Promise.resolve();
@@ -797,7 +800,7 @@ async function reader() {
       await themeLegacyImageMargins(page,canvas);
       canvas.className='pdf-original-canvas';
       slot.prepend(canvas);
-      void highlightCitation(slot,page,viewport).catch(()=>{});
+      if(pendingCitationPage!==Number(slot.dataset.page))void highlightCitation(slot,page,viewport).catch(()=>{});
     } catch {
       const retry = document.createElement('button');
       retry.type = 'button';
@@ -1605,11 +1608,14 @@ async function reader() {
   });
   dialog.addEventListener('close',()=>cancelAnimationFrame(coastFrame));
   let scrollFrame;
-  let lastNavigation = 0;
+  let lastNavigation = 0,navigationScroll;
+  for(const type of ['wheel','touchstart','pointerdown'])preview.addEventListener(type,()=>{navigationScroll=undefined;},{passive:true});
   preview.addEventListener('scroll', () => {
     if (scrollFrame) return;
     scrollFrame = requestAnimationFrame(() => {
       scrollFrame = 0;
+      if(navigationScroll&&performance.now()-navigationScroll.started<2200&&Math.abs(preview.scrollTop-Math.max(0,Math.min(navigationScroll.top,preview.scrollHeight-preview.clientHeight)))>2)return;
+      navigationScroll=undefined;
       if (!pageViews || performance.now()-lastNavigation < 650) return;
       const top = preview.getBoundingClientRect().top;
       const index = pageViews.findIndex(slot => slot.getBoundingClientRect().bottom > top+preview.clientHeight*.35);
@@ -1627,6 +1633,7 @@ async function reader() {
   const scrollBehavior = ()=>reducedDocumentMotion() ? 'instant' : 'smooth';
   async function showPdf(n) {
     if (n<1 || n>doc.pageCount) return;
+    const navigation=++pageNavigation;
     selectedPage = n;
     if(citationSequence.length)citation=citationOnPage(citationSequence,n);
     const qualityNotice=$('#pdf-reading-quality');
@@ -1729,12 +1736,14 @@ async function reader() {
       }
       fitWidth = preview.clientWidth;
       setZoom(zoom);
-      const slot = pageViews[n-1];
-      await renderPage(slot);
-      if(selectedPage!==n||!dialog.open)return;
+      const slot = pageViews[n-1];pendingCitationPage=n;
+      try{await Promise.all([renderPage(slot),citation?.page===n?pdf.getPage(n).then(page=>highlightCitation(slot,page,page.getViewport({scale:1}),{scroll:false,defer:true})).catch(()=>{}):Promise.resolve()]);}finally{if(pendingCitationPage===n)pendingCitationPage=0;}
+      if(selectedPage!==n||!dialog.open||navigation!==pageNavigation)return;
       lastNavigation = performance.now();
-      preview.scrollTo({top:preview.scrollTop+slot.getBoundingClientRect().top-preview.getBoundingClientRect().top,behavior:scrollBehavior()});
-      if (citation?.page===n && slot.querySelector('canvas')) void pdf.getPage(n).then(page=>highlightCitation(slot,page,page.getViewport({scale:1}))).catch(()=>{});
+      const firstMark=slot.querySelector('.pdf-citation-mark');
+      for(const mark of slot.querySelectorAll('.pdf-citation-pending')){getComputedStyle(mark,'::after').transform;mark.classList.remove('pdf-citation-pending');}
+      slot.dataset.citationStarted=String(performance.now());
+      const slotTop=preview.scrollTop+slot.getBoundingClientRect().top-preview.getBoundingClientRect().top;const targetTop=preview.scrollTop+(firstMark??slot).getBoundingClientRect().top-preview.getBoundingClientRect().top-(firstMark?preview.clientHeight*.25:0);navigationScroll={top:Math.max(slotTop,targetTop),started:performance.now()};preview.scrollTo({top:navigationScroll.top,behavior:scrollBehavior()});
       $('#pdf-status').textContent = '';
       if (translationMode.value) void updatePageTranslation();
     } catch (error) {
@@ -1790,11 +1799,11 @@ async function reader() {
   }
   function sourceLink(parent,n,quote,getSequence) {
     const material = materials.find(item=>n>=item.start && n<item.start+item.count);
-    if (material) {
+    if (material && (sourceType!=='pdf'||n>doc.pageCount)) {
       return append(parent,'p',material.name+' · '+(n-material.start+1)+' '+material.unit,'ref');
     }
     const link = append(parent,'a',sourceType==='pdf' ? '' : '資料データ'+(sourceType==='xlsx' ? ' · シート '+n : '')+' →','ref');
-    if(sourceType==='pdf'){link.classList.add('pdf-source-link');link.append(localIcon('file-pdf'));append(link,'span',n+'ページ').dataset.documentUi='true';}
+    if(sourceType==='pdf'){link.classList.add('pdf-source-link');link.append(localIcon('file-pdf'));if(material)append(link,'span',material.name+' · ');append(link,'span',(material?n-material.start+1:n)+'ページ').dataset.documentUi='true';}
     link.href = '#ask-dialog';
     link.addEventListener('click',async event=>{
       event.preventDefault();
@@ -1988,13 +1997,14 @@ async function reader() {
     }
     if (!item.evidence?.length) return;
     const evidence = append(section,'div','','answer-evidence');
+    append(evidence,'span','該当ページ','answer-evidence-label').dataset.documentUi='true';
     const byPage = new Map();
     for (const {page,quote,sheet,cell} of item.evidence) {
       if (!byPage.has(page)) byPage.set(page,new Map());
       byPage.get(page).set(quote,sheet && cell ? sheet+' · '+cell : null);
     }
     const sequence=sourceType==='pdf' ? Array.from(byPage,([page,quotes])=>
-      materials.some(material=>page>=material.start && page<material.start+material.count) ? [] :
+      page>doc.pageCount ? [] :
       [...quotes.keys()].filter(Boolean).map(quote=>({page,quote}))).flat() : [];
     citationsBySection.set(section,sequence);
     const answerCitations=()=>[...answer.children].flatMap(child=>citationsBySection.get(child) ?? []);

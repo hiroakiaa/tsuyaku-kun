@@ -721,3 +721,12 @@ dialog.panel{margin:auto;box-sizing:border-box;max-width:calc(100vw - 1.5rem);ma
  .qa-workspace.qa-keyboard #messages{display:none}
  .qa-workspace.qa-keyboard #ask-form{margin-top:0}
 }
+
+.pdf-citation-mark.pdf-citation-pending::after{transform:scaleX(0)}
+.answer-evidence{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem .5rem;border-top:0;padding-top:0;margin-top:.65rem}
+.answer-evidence-label{flex:none;font-size:.9em;color:var(--muted);white-space:nowrap}
+.answer-source{display:inline-flex;align-items:center;gap:.35rem;min-width:0;max-width:100%}
+.answer-evidence .ref.pdf-source-link{border:0;border-radius:.65rem;padding:.35rem .6rem;background:color-mix(in srgb,currentColor 10%,transparent);color:var(--ink);max-width:100%;white-space:normal}
+
+.answer-evidence{border-bottom:1px solid var(--line);padding-bottom:.65rem}
+.answer-item:has(.answer-evidence)+.answer-item{border-top:0;padding-top:.25rem}

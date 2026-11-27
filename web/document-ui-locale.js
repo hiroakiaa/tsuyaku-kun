@@ -1,4 +1,5 @@
 export const documentUiLabels=[
+ ['該当ページ','Relevant pages','Páginas pertinentes'],
  ['全体像','Overview','Vista general'],
  ['{page}ページ','Page {page}','Página {page}'],
  ['このページには読み取りを確認できない数値があります。原文と照合してください。','This page has unverified numbers. Please check the original.','Esta página contiene números sin verificar. Revisa el original.'],
