@@ -1,3 +1,4 @@
+import {installDocumentKeyboardHost} from './document-keyboard-host.js';
 import {documentQualityView} from './document-quality-view.js?v=1';
 import {documentQaMetrics,documentQaMetricCells} from './document-qa-metrics.js?v=3';
 import {createLiveSummarySetting} from './live-summary.js?v=20261113-summary-dialog-1';
@@ -70,11 +71,12 @@ reportSummary.replaceChildren(...liveSummary,el('p',current&&liveEvents.length?'
   dialog.setAttribute('aria-label','資料QA');
   const frame=el('iframe');
   frame.title='資料QA';
-  frame.src='documents.html?embedded=1&v=302';
+  frame.src='documents.html?embedded=1&v=303';
   window.addEventListener('message',event=>{
    if(event.origin===location.origin && event.source===frame.contentWindow &&
       event.data?.type==='document-library-close' && dialog.open) dialog.close();
   });
+  installDocumentKeyboardHost(dialog,frame);
   dialog.append(frame);
   document.body.append(dialog);
  }

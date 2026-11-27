@@ -2,7 +2,7 @@ import {answerCitations,citationOnPage} from './document-citation-state.js';
 import {processDocumentFiles,processDocumentChat} from './document-file-batch.js';
 import {nextDocumentTranslation} from './document-translation-queue.js';
 import {preventCompositionSubmit,documentFilename} from './document-interaction.js';
-const DOCUMENT_RELEASE='302';
+const DOCUMENT_RELEASE='303';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -1442,7 +1442,8 @@ async function reader() {
   const questionInput = $('#question');
   window.addEventListener('resize',()=>requestAnimationFrame(syncKeyboard));
   window.addEventListener('orientationchange',()=>requestAnimationFrame(syncKeyboard));
-  let keyboardLayoutHeight=window.innerHeight,keyboardWasOpen=false;
+  let keyboardLayoutHeight=window.innerHeight,keyboardWasOpen=false,hostManaged=false;
+  window.addEventListener('message',event=>{if(frame&&event.origin===location.origin&&event.source===window.parent&&event.data?.type==='document-viewport-managed'){hostManaged=event.data.active===true;requestAnimationFrame(syncKeyboard);}});
   function syncKeyboard() {
     const frameBounds = frame?.getBoundingClientRect();
     const layoutHeight = frameBounds?.height ?? window.innerHeight;
@@ -1450,7 +1451,9 @@ async function reader() {
     if(!focused&&!keyboardWasOpen)keyboardLayoutHeight=Math.max(layoutHeight,viewport?.height??0);
     const keyboard = (focused||keyboardWasOpen) && !wide.matches &&
       viewport && Math.max(layoutHeight,keyboardLayoutHeight) - viewport.height > 90;
+    if(frame&&Boolean(keyboard)!==keyboardWasOpen)window.parent.postMessage({type:'document-keyboard',open:Boolean(keyboard)},location.origin);
     keyboardWasOpen=Boolean(keyboard);
+    document.documentElement.classList.toggle('document-keyboard-open',keyboardWasOpen);
     workspace.classList.toggle('qa-keyboard', keyboardWasOpen);
     if (!keyboard) {
       askDialog.style.removeProperty('--qa-visible-top');
@@ -1459,8 +1462,8 @@ async function reader() {
     }
     // Safari can pan the visual viewport when the keyboard focuses an input.
     const frameTop = frameBounds?.top ?? 0;
-    const top = Math.max(0, viewport.offsetTop - frameTop);
-    const bottom = Math.min(frame?layoutHeight:Math.max(layoutHeight,keyboardLayoutHeight), viewport.offsetTop + viewport.height - frameTop);
+    const top = hostManaged?0:Math.max(0, viewport.offsetTop - frameTop);
+    const bottom = hostManaged?Math.min(layoutHeight,viewport.height):Math.min(frame?layoutHeight:Math.max(layoutHeight,keyboardLayoutHeight), viewport.offsetTop + viewport.height - frameTop);
     askDialog.style.setProperty('--qa-visible-top',top+'px');
     askDialog.style.setProperty('--qa-visible-height',Math.max(0,bottom-top)+'px');
   }
