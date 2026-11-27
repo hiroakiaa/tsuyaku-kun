@@ -1459,7 +1459,7 @@ async function reader() {
     // Safari can pan the visual viewport when the keyboard focuses an input.
     const frameTop = frameBounds?.top ?? 0;
     const top = Math.max(0, viewport.offsetTop - frameTop);
-    const bottom = Math.min(Math.max(layoutHeight,keyboardLayoutHeight), viewport.offsetTop + viewport.height - frameTop);
+    const bottom = Math.min(frame?layoutHeight:Math.max(layoutHeight,keyboardLayoutHeight), viewport.offsetTop + viewport.height - frameTop);
     askDialog.style.setProperty('--qa-visible-top',top+'px');
     askDialog.style.setProperty('--qa-visible-height',Math.max(0,bottom-top)+'px');
   }
