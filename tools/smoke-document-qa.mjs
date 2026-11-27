@@ -89,13 +89,13 @@ try {
     await page.locator('#messages .answer-source').getByRole('link',{name:'2ページ'}).click();
     const waitForOriginalMarker = () => page.waitForFunction(()=>[...document.querySelectorAll('[data-page="2"] .pdf-citation-visible')].some(mark=>{
       const fill=getComputedStyle(mark,'::after');
-      return mark.getBoundingClientRect().width>0 && fill.backgroundColor==='rgba(255, 220, 40, 0.52)' &&
+      return mark.getBoundingClientRect().width>0 && fill.backgroundColor==='rgba(255, 220, 40, 0.28)' &&
         fill.transform==='matrix(1, 0, 0, 1, 0, 0)';
     }),null,{timeout:15_000});
     await waitForOriginalMarker();
     const markerImage=await page.locator('[data-page="2"].pdf-page-view').first().screenshot({path:'document-qa-marker.png'});
     const yellowPixels=await page.evaluate(async data=>{
-      const image=new Image();image.src=data;await image.decode();const canvas=document.createElement('canvas');canvas.width=image.width;canvas.height=image.height;const ctx=canvas.getContext('2d');ctx.drawImage(image,0,0);const pixels=ctx.getImageData(0,0,canvas.width,canvas.height).data;let count=0;for(let i=0;i<pixels.length;i+=4)if(pixels[i]>170&&pixels[i+1]>130&&pixels[i+2]<170&&pixels[i]-pixels[i+2]>50)count++;return count;
+      const image=new Image();image.src=data;await image.decode();const canvas=document.createElement('canvas');canvas.width=image.width;canvas.height=image.height;const ctx=canvas.getContext('2d');ctx.drawImage(image,0,0);const pixels=ctx.getImageData(0,0,canvas.width,canvas.height).data;let count=0;for(let i=0;i<pixels.length;i+=4)if(pixels[i]>170&&pixels[i+1]>130&&pixels[i+2]<230&&pixels[i]-pixels[i+2]>20)count++;return count;
     },'data:image/png;base64,'+markerImage.toString('base64'));
     assert.ok(yellowPixels>40,'Rendered screenshot must contain yellow marker pixels');
     console.log('VISIBLE_MARKER_PIXELS '+yellowPixels);

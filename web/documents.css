@@ -1,5 +1,5 @@
 @font-face{font-family:Zen Maru;src:url(ZenMaruGothic-Regular.ttf) format("truetype");font-display:swap}
-:root{color-scheme:dark;--bg:#1d1d1d;--panel:#191919;--soft:#242424;--line:#383838;--ink:#ededed;--muted:#bcbcbc;--lime:#d9eaaa;--pdf-citation-yellow:#f5d975}
+:root{color-scheme:dark;--bg:#1d1d1d;--panel:#191919;--soft:#242424;--line:#383838;--ink:#ededed;--muted:#bcbcbc;--lime:#d9eaaa;--pdf-citation-yellow:#fff0b3}
 *{box-sizing:border-box}
 html{scroll-padding-top:16px}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 "Zen Maru",system-ui,sans-serif}
@@ -149,14 +149,16 @@ dialog [tabindex="-1"][autofocus]:focus {
 
 #pdf-pages { width:100%; margin-inline:auto; }
 .pdf-page-view { position:relative; background:#fff; color:#222; margin-bottom: .5rem; }
-.pdf-citation-page { outline: 3px solid var(--pdf-citation-yellow); outline-offset: -3px; }
-.pdf-citation-mark { position:absolute; pointer-events:none; z-index:4; min-height:3px; isolation:isolate; }
+.pdf-citation-page { outline:none; }
+.pdf-citation-mark { position:absolute; pointer-events:none; z-index:4; min-height:3px; isolation:auto; mix-blend-mode:multiply; }
 .pdf-citation-mark::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(255, 220, 40, .52) !important;
-  box-shadow: inset 0 -2px 0 #202020, 0 0 0 1px #202020, 0 0 0 2px #fff;
+  background: rgba(255, 220, 40, .28) !important;
+  box-shadow:none;
+  border:0;
+  border-radius:2px;
   mix-blend-mode: normal;
   transform: scaleX(1);
   transform-origin: left center;
@@ -694,7 +696,7 @@ dialog.panel{margin:auto;box-sizing:border-box;max-width:calc(100vw - 1.5rem);ma
 .pdf-source-link:hover{opacity:.8}
 .pdf-source-link:focus-visible{outline:2px solid currentColor;outline-offset:4px}
 
-/* Two-tone boundaries remain distinguishable even on yellow, white or dark source pages. */
-.pdf-translated-citation{box-shadow:inset 0 -2px 0 #202020,0 0 0 1px #202020,0 0 0 2px #fff}
-.pdf-citation-page{box-shadow:0 0 0 1px #202020,0 0 0 3px #fff}
+/* A light highlighter wash preserves source text without a frame. */
+.pdf-translated-citation{box-shadow:none;border:0;text-decoration:none}
+.pdf-citation-page{box-shadow:none}
 @media (forced-colors:active){.pdf-citation-mark::after{background:transparent!important;outline:2px solid Highlight;box-shadow:none}.pdf-translated-citation{outline:2px solid Highlight}}
