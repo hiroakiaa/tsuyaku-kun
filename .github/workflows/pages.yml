@@ -73,6 +73,13 @@ jobs:
         env:
           DOCUMENT_QA_REPORT: document-qa-pdf-report.json
         run: node tools/smoke-document-qa.mjs
+      - name: Save visible marker screenshot
+        if: ${{ !cancelled() && steps.document_browser.outcome == 'success' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: document-marker-visual
+          path: document-qa-marker.png
+          if-no-files-found: warn
       - name: Verify an existing document in the published app
         if: ${{ !cancelled() && steps.document_browser.outcome == 'success' }}
         env:
@@ -169,6 +176,7 @@ jobs:
         with:
           name: document-qa-tables-report
           path: |
+            document-qa-marker.png
             document-qa-run.json
             document-qa-acceptance-report.json
             document-qa-synthetic-scan.pdf
