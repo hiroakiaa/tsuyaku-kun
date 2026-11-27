@@ -1741,7 +1741,7 @@ async function reader() {
       if(selectedPage!==n||!dialog.open||navigation!==pageNavigation)return;
       lastNavigation = performance.now();
       const firstMark=slot.querySelector('.pdf-citation-mark');
-      for(const mark of slot.querySelectorAll('.pdf-citation-pending')){getComputedStyle(mark,'::after').transform;mark.classList.remove('pdf-citation-pending');}
+      const pendingMarks=[...slot.querySelectorAll('.pdf-citation-pending')];if(pendingMarks.length)getComputedStyle(pendingMarks[0],'::after').transform;for(const mark of pendingMarks)mark.classList.remove('pdf-citation-pending');
       slot.dataset.citationStarted=String(performance.now());
       const slotTop=preview.scrollTop+slot.getBoundingClientRect().top-preview.getBoundingClientRect().top;const targetTop=preview.scrollTop+(firstMark??slot).getBoundingClientRect().top-preview.getBoundingClientRect().top-(firstMark?preview.clientHeight*.25:0);navigationScroll={top:Math.max(slotTop,targetTop),started:performance.now()};preview.scrollTo({top:navigationScroll.top,behavior:scrollBehavior()});
       $('#pdf-status').textContent = '';
