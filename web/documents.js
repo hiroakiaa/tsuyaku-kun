@@ -2,7 +2,7 @@ import {answerCitations,citationOnPage} from './document-citation-state.js';
 import {processDocumentFiles,processDocumentChat} from './document-file-batch.js';
 import {nextDocumentTranslation} from './document-translation-queue.js';
 import {preventCompositionSubmit,documentFilename} from './document-interaction.js';
-const DOCUMENT_RELEASE='304';
+const DOCUMENT_RELEASE='305';
 import {numericText} from './document-values.js?v=1';
 import {unreadablePages} from './document-reading-quality.js?v=2';
 import {installDocumentFirstHelp} from './document-first-help.js?v=1';
@@ -713,6 +713,8 @@ async function reader() {
     if (!requiresOcr) return items;
     if (!scanLayouts.has(number)) {
       scanLayouts.set(number,(async()=>{
+        try{const loader=await getVisionTranslation();const recognized=await loader.recognize(number);const {visionCitationRuns}=await import('./document-citation-layout.js');const shared=visionCitationRuns(recognized,page.getViewport({scale:1}));if(shared?.length){content.dataset.citationLayoutSource='shared-vision';return shared;}}catch{}
+        content.dataset.citationLayoutSource='canonical-fallback';
         const {createPdfOcr}=await import('./document-ocr.js?v=120');
         const reader=await createPdfOcr((await pdfLibrary()).OPS);
         try {
@@ -904,9 +906,12 @@ async function reader() {
   }
   let visionTranslation;
   const translationPartials=new Map(),translationObservers=new Map(),visionSourceCanvases=new Map();
-  async function loadVisionTranslation(page,language,force=false){
+  async function getVisionTranslation(){
     if(!visionTranslation){const {createDocumentVisionTranslation}=await import('./document-vision-translation.js');visionTranslation=createDocumentVisionTranslation({request,documentPath:api,getPdf:getOriginalPdf,requiresOcr:(items,number)=>pdfPageTextStatus(layoutPdfText(items),number).requiresOcr,valid:()=>askDialog.open||dialog.open,onProgress:(number,language,result)=>{const key=number+':'+language;translationPartials.set(key,result);translationObservers.get(key)?.(result);}});}
-    return visionTranslation(page,language,force);
+    return visionTranslation;
+  }
+  async function loadVisionTranslation(page,language,force=false){
+    return (await getVisionTranslation())(page,language,force);
   }
   function loadPageTranslation(page,language,retry=false,priority='visible') {
     const key=page+':'+language;
@@ -1476,7 +1481,7 @@ async function reader() {
     viewport?.removeEventListener('resize',syncKeyboard);
     viewport?.removeEventListener('scroll',syncKeyboard);
   });
-  questionInput.addEventListener('focus',syncKeyboard);
+  questionInput.addEventListener('focus',()=>{syncKeyboard();if(sourceType==='pdf')void getOriginalPdf().then(pdf=>pdf.getPage(selectedPage||1)).then(page=>readPdfPageText(page)).catch(()=>{});});
   questionInput.addEventListener('blur',syncKeyboard);
   let split = Number.isFinite(savedReading.split)?Math.max(25,Math.min(75,savedReading.split)):50;
   function setSplit(value) {
@@ -1997,7 +2002,7 @@ async function reader() {
     }
     if (!item.evidence?.length) return;
     const evidence = append(section,'div','','answer-evidence');
-    append(evidence,'span','該当ページ','answer-evidence-label').dataset.documentUi='true';
+    append(evidence,'span','該当','answer-evidence-label').dataset.documentUi='true';
     const byPage = new Map();
     for (const {page,quote,sheet,cell} of item.evidence) {
       if (!byPage.has(page)) byPage.set(page,new Map());
@@ -2189,6 +2194,7 @@ async function reader() {
         if (item.answer && /^(?:資料(?:内)?に|本文に)[^。！？\r\n]{1,80}(?:記載されていません|記載がありません|見当たりません)。?$/u.test(item.answer.trim())) {
           item={...item,answer:null,evidence:[]};
         }
+        const firstPage=item.evidence?.find(source=>Number.isInteger(source.page)&&source.page>0&&source.page<=doc.pageCount)?.page;if(sourceType==='pdf'&&firstPage)void getOriginalPdf().then(pdf=>pdf.getPage(firstPage)).then(page=>pageTextRuns(page)).catch(()=>{});
         item=await includeAliasDefinition(item);
         controller.signal.throwIfAborted();
         if(entry.items.some(previous=>JSON.stringify(previous)===JSON.stringify(item)))return;

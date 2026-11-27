@@ -28,7 +28,7 @@ export async function photoReuseStorage(storage,env,input,catalog,run){
  if(!['ocr','translate'].includes(kind)||!/^[a-f0-9]{64}$/.test(key)||!uid)throw Object.assign(Error('写真の操作を確認してください。'),{status:400});
  const cacheKey=kind+':'+key,cached=await storage.get(cacheKey).catch(()=>undefined);
  const reused=(result,reuse)=>({...result,reuse,...(kind==='translate'?{usage:{inputTokens:0,outputTokens:0,cacheHit:true}}:{})});
- if(cached)return reused(cached,'cache');
+ if(cached&&!(kind==='ocr'&&data.layoutVersion===1&&cached.layoutVersion!==1))return reused(cached,'cache');
  const pendingKey=scope+':'+cacheKey;
  if(pending.has(pendingKey))return reused(await pending.get(pendingKey),'in-flight');
  const work=(async()=>{

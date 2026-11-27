@@ -20,21 +20,26 @@ export function createDocumentVisionTranslation({request,getPdf,requiresOcr,docu
   }
   const size=page.getViewport({scale:1}),viewport=page.getViewport({scale:Math.min(3,1800/Math.max(size.width,size.height))}),canvas=document.createElement('canvas');canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
   try{await page.render({canvas,viewport}).promise;let image;for(const quality of [.9,.75,.6,.45]){image=canvas.toDataURL('image/jpeg',quality).split(',')[1];if(image.length<=2800000)break;}if(image.length>2800000)throw Error('ページ画像を読み取り用に調整できませんでした。');
-   const result=await resumeTranslation(()=>photoRequest(number,'ocr',{image,id:crypto.randomUUID()},AbortSignal.timeout(45000)),{valid});
+   const result=await resumeTranslation(()=>photoRequest(number,'ocr',{image,id:crypto.randomUUID(),layoutVersion:1},AbortSignal.timeout(45000)),{valid});
    if(!result.blocks?.length){if(!result.text?.trim())return {...result,blocks:[],blank:true};throw Error('このページの文字位置を読み取れませんでした。');}
    return result;
   }finally{canvas.width=canvas.height=0;}
  }
- return async(number,language,force=false)=>{
+ async function readRecognition(number,force=false){
   if(force&&!forced.has(number)){forced.add(number);pages.delete(number);}
   if(!pages.has(number))pages.set(number,recognize(number,force).catch(error=>{pages.delete(number);throw error;}));
-  const recognized=await pages.get(number);if(!recognized)return null;
+  return pages.get(number);
+ }
+ const load=async(number,language,force=false)=>{
+  const recognized=await readRecognition(number,force);if(!recognized)return null;
   if(recognized.blank)return {visionLayout:[],source:[],lines:[],blank:true,reuse:recognized.reuse||'generated'};
   const result=await translatePhotoProgressively({blocks:recognized.blocks,source:recognized.sourceLanguage||'auto',target:language,cache:segments,valid,onProgress:snapshot=>{const ready=new Map(snapshot.blocks.filter(b=>!b.partial).map(b=>[b.id,b.translations[language]]));const layout=recognized.blocks.filter(b=>ready.has(b.id));if(layout.length)onProgress(number,language,{visionLayout:layout,source:layout.map(b=>b.text),lines:layout.map(b=>ready.get(b.id)),partial:true,completed:layout.length,total:recognized.blocks.length});},request:body=>translateRequest(number,body)});
   const byId=new Map(result.blocks.map(b=>[b.id,b.translations[language]]));
   if(recognized.blocks.some(b=>!byId.get(b.id)))throw Error('ページの翻訳がまだ完了していません。');
   return {visionLayout:recognized.blocks,source:recognized.blocks.map(b=>b.text),lines:recognized.blocks.map(b=>byId.get(b.id)),reuse:result.reuse.reused===result.reuse.total?'cache':'generated'};
  };
+ load.recognize=number=>readRecognition(number);
+ return load;
 }
 
 export function separateVisionParagraphs(blocks){
